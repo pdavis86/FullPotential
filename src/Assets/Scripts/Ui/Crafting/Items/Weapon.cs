@@ -14,6 +14,9 @@ namespace Assets.Scripts.Ui.Crafting.Items
         public const string Gun = "Gun";
         public const string Shield = "Shield";
 
+        public const string OneHanded = "One-handed";
+        public const string TwoHanded = "Two-handed";
+
         public static List<string> WeaponOptions = new List<string> {
             Dagger,
             Axe,
@@ -25,6 +28,8 @@ namespace Assets.Scripts.Ui.Crafting.Items
             Gun,
             Shield
         };
+
+        public bool IsTwoHanded { get; set; }
 
     }
 }

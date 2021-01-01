@@ -1,4 +1,6 @@
 ﻿using Assets.Scripts.Ui.Crafting;
+using Assets.Scripts.Ui.Crafting.Items;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,7 +21,10 @@ public class TempAddScrap : MonoBehaviour
     private void OnClick()
     {
         var newComp = Instantiate(_slotTemplate, Container.transform);
-        newComp.gameObject.GetComponent<ComponentAttributes>().Attributes = _resultFactory.GetRandom();
+        newComp.gameObject.GetComponent<ComponentProperties>().Properties = new CraftableBase { 
+            Attributes = _resultFactory.GetRandomAttributes(), 
+            Effects = new List<string> { _resultFactory.GetRandomEffect() }
+        };
         newComp.gameObject.SetActive(true);
 
         UiHelper.UpdateResults(Container.transform.parent.parent, _resultFactory);

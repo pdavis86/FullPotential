@@ -13,13 +13,13 @@ namespace Assets.Scripts.Ui.Crafting
             var slotTemplate = compContainer.Find("ComponentTemplate");
             var slotTemplateWidth = slotTemplate.GetComponent<RectTransform>().rect.width;
 
-            var components = new List<Attributes>();
+            var components = new List<CraftableBase>();
             foreach (Transform transform in compContainer.transform)
             {
                 if (transform.gameObject.activeInHierarchy && transform.gameObject.name.Contains("(Clone)"))
                 {
                     transform.position = slotTemplate.position + new Vector3(components.Count * slotTemplateWidth, 0);
-                    components.Add(transform.gameObject.GetComponent<ComponentAttributes>().Attributes);
+                    components.Add(transform.gameObject.GetComponent<ComponentProperties>().Properties);
                 }
             }
 
@@ -39,42 +39,42 @@ namespace Assets.Scripts.Ui.Crafting
             var subTypeDropdown = header.Find("ResultSubType").GetComponent<Dropdown>();
             var selectedSubtype = subTypeDropdown.options.Count > 0 ? subTypeDropdown.options[subTypeDropdown.value].text : null;
 
-            //todo: use this
-            var handednessDropdown = header.Find("ResultHandedness").GetComponent<Dropdown>();
-
-            Attributes resultingAttribues;
-            if (selectedType == ItemBase.Spell)
+            CraftableBase craftedThing;
+            if (selectedType == ChooseCraftingType.Spell)
             {
-                resultingAttribues = resultFactory.Spell(components);
+                craftedThing = resultFactory.Spell(components);
             }
             else
             {
                 switch (selectedSubtype)
                 {
-                    case Weapon.Dagger: resultingAttribues = resultFactory.Dagger(components); break;
-                    case Weapon.Spear: resultingAttribues = resultFactory.Spear(components); break;
-                    case Weapon.Bow: resultingAttribues = resultFactory.Bow(components); break;
-                    case Weapon.Crossbow: resultingAttribues = resultFactory.Crossbow(components); break;
-                    case Weapon.Shield: resultingAttribues = resultFactory.Shield(components); break;
+                    case Weapon.Dagger: craftedThing = resultFactory.MeleeWeapon(Weapon.Dagger, components, false); break;
+                    case Weapon.Spear: craftedThing = resultFactory.MeleeWeapon(Weapon.Spear, components, true); break;
+                    case Weapon.Bow: craftedThing = resultFactory.RangedWeapon(Weapon.Bow, components, true); break;
+                    case Weapon.Crossbow: craftedThing = resultFactory.RangedWeapon(Weapon.Crossbow, components, true); break;
+                    case Weapon.Shield: craftedThing = resultFactory.Shield(components); break;
 
-                    case Armor.Helm: resultingAttribues = resultFactory.Helm(components); break;
-                    case Armor.Chest: resultingAttribues = resultFactory.Chest(components); break;
-                    case Armor.Legs: resultingAttribues = resultFactory.Legs(components); break;
-                    case Armor.Feet: resultingAttribues = resultFactory.Feet(components); break;
-                    case Armor.Gloves: resultingAttribues = resultFactory.Gloves(components); break;
-                    case Armor.Barrier: resultingAttribues = resultFactory.Barrier(components); break;
+                    case Armor.Helm: craftedThing = resultFactory.Armor(Armor.Helm, components); break;
+                    case Armor.Chest: craftedThing = resultFactory.Armor(Armor.Chest, components); break;
+                    case Armor.Legs: craftedThing = resultFactory.Armor(Armor.Legs, components); break;
+                    case Armor.Feet: craftedThing = resultFactory.Armor(Armor.Feet, components); break;
+                    case Armor.Gloves: craftedThing = resultFactory.Armor(Armor.Gloves, components); break;
+                    case Armor.Barrier: craftedThing = resultFactory.Barrier(components); break;
 
-                    case Accessory.Amulet: resultingAttribues = resultFactory.Amulet(components); break;
-                    case Accessory.Ring: resultingAttribues = resultFactory.Ring(components); break;
-                    case Accessory.Belt: resultingAttribues = resultFactory.Belt(components); break;
+                    case Accessory.Amulet: craftedThing = resultFactory.Accessory(Accessory.Amulet, components); break;
+                    case Accessory.Ring: craftedThing = resultFactory.Accessory(Accessory.Ring, components); break;
+                    case Accessory.Belt: craftedThing = resultFactory.Accessory(Accessory.Belt, components); break;
 
                     default:
+                        var handednessDropdown = header.Find("ResultHandedness").GetComponent<Dropdown>();
+                        var isTwoHanded = handednessDropdown.options.Count > 0 && handednessDropdown.options[handednessDropdown.value].text == Weapon.TwoHanded;
+
                         switch (selectedSubtype)
                         {
-                            case Weapon.Axe: resultingAttribues = resultFactory.Axe(components); break;
-                            case Weapon.Sword: resultingAttribues = resultFactory.Sword(components); break;
-                            case Weapon.Hammer: resultingAttribues = resultFactory.Hammer(components); break;
-                            case Weapon.Gun: resultingAttribues = resultFactory.Gun(components); break;
+                            case Weapon.Axe: craftedThing = resultFactory.MeleeWeapon(Weapon.Axe, components, isTwoHanded); break;
+                            case Weapon.Sword: craftedThing = resultFactory.MeleeWeapon(Weapon.Sword, components, isTwoHanded); break;
+                            case Weapon.Hammer: craftedThing = resultFactory.MeleeWeapon(Weapon.Hammer, components, isTwoHanded); break;
+                            case Weapon.Gun: craftedThing = resultFactory.RangedWeapon(Weapon.Gun, components, isTwoHanded); break;
                             default:
                                 throw new System.Exception("Invalid weapon type");
                         }
@@ -98,17 +98,20 @@ namespace Assets.Scripts.Ui.Crafting
 
             //todo: only show values if >0 or true
 
-            textArea.text = $@"IsActivated: {resultingAttribues.IsActivated}
-IsMultiShot {resultingAttribues.IsMultiShot}
-Type {resultingAttribues.Type}
-Strength {resultingAttribues.Strength}
-Cost {resultingAttribues.Cost}
-Range {resultingAttribues.Range}
-Accuracy {resultingAttribues.Accuracy}
-Speed {resultingAttribues.Speed}
-Recovery {resultingAttribues.Recovery}
-Duration {resultingAttribues.Duration}
+            textArea.text = $@"IsActivated: {craftedThing.Attributes.IsActivated}
+IsAutomatic {craftedThing.Attributes.IsAutomatic}
+IsSoulbound {craftedThing.Attributes.IsSoulbound}
+ExtraAmmoPerShot {craftedThing.Attributes.ExtraAmmoPerShot}
+Strength {craftedThing.Attributes.Strength}
+Cost {craftedThing.Attributes.Cost}
+Range {craftedThing.Attributes.Range}
+Accuracy {craftedThing.Attributes.Accuracy}
+Speed {craftedThing.Attributes.Speed}
+Recovery {craftedThing.Attributes.Recovery}
+Duration {craftedThing.Attributes.Duration}
+Effects {string.Join(", ", craftedThing.Effects ?? new List<string>())}
 ";
         }
+
     }
 }

@@ -3,8 +3,9 @@
     public struct Attributes
     {
         public bool IsActivated { get; set; }
-        public bool IsMultiShot { get; set; }
-        public int Type { get; set; }
+        public bool IsAutomatic { get; set; }
+        public bool IsSoulbound { get; set; }
+        public int ExtraAmmoPerShot { get; set; }
         public int Strength { get; set; }
         public int Cost { get; set; }
         public int Range { get; set; }

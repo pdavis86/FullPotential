@@ -11,8 +11,8 @@ public class ChooseCraftingSubType : MonoBehaviour
     public Dropdown HandednessDropdown;
 
     public static List<string> HandednessOptions = new List<string> {
-        ItemBase.OneHanded,
-        ItemBase.TwoHanded
+        Weapon.OneHanded,
+        Weapon.TwoHanded
     };
 
     private Dropdown _subTypeDropdown;
