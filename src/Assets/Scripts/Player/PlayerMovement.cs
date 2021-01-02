@@ -2,40 +2,58 @@
 
 public class PlayerMovement : MonoBehaviour
 {
-    public Rigidbody rigidBody;
-    public float forwardForce = 2000;
-    public float sidewaysForce = 500;
+	const float _speed = 5f;
+	const float _lookSensitivity = 3f;
+	const float _cameraRotationLimit = 85f;
 
-    bool goLeft;
-    bool goRight;
+	private Rigidbody _rb;
+	private Camera _cam;
 
-    // Start is called before the first frame update
-    //void Start()
-    //{
+	private Vector3 _velocity;
+	private Vector3 _rotation;
+	private float _cameraRotationX;
+	private float _currentCameraRotationX = 0f;
 
-    //}
+	private void Start()
+    {
+		_rb = GetComponent<Rigidbody>();
+		_cam = transform.Find("PlayerCamera").GetComponent<Camera>();
+	}
 
-    // Update is called once per frame
     void Update()
     {
-        goLeft = Input.GetKey("a");
-        goRight = Input.GetKey("d");
-    }
+		var moveX = transform.right * Input.GetAxis("Horizontal");
+		var moveZ = transform.forward * Input.GetAxis("Vertical");
+		_velocity = (moveX + moveZ) * _speed;
 
-    // Use for physics
-    void FixedUpdate()
-    {
-        rigidBody.AddForce(0, 0, forwardForce * Time.deltaTime);
+		_rotation = new Vector3(0f, Input.GetAxisRaw("Mouse X"), 0f) * _lookSensitivity;
 
-        if (goRight)
-        {
-            rigidBody.AddForce(sidewaysForce * Time.deltaTime, 0, 0);
-        }
+		_cameraRotationX = Input.GetAxisRaw("Mouse Y") * _lookSensitivity;
+	}
 
-        if (goLeft)
-        {
-            rigidBody.AddForce(-sidewaysForce * Time.deltaTime, 0, 0);
-        }
-    }
+	void FixedUpdate()
+	{
+		PerformMovement();
+		PerformRotation();
+	}
+
+	void PerformMovement()
+	{
+		if (_velocity != Vector3.zero)
+		{
+			_rb.MovePosition(_rb.position + _velocity * Time.fixedDeltaTime);
+		}
+	}
+
+	void PerformRotation()
+	{
+		_rb.MoveRotation(_rb.rotation * Quaternion.Euler(_rotation));
+		if (_cam != null)
+		{
+			_currentCameraRotationX -= _cameraRotationX;
+			_currentCameraRotationX = Mathf.Clamp(_currentCameraRotationX, -_cameraRotationLimit, _cameraRotationLimit);
+			_cam.transform.localEulerAngles = new Vector3(_currentCameraRotationX, 0f, 0f);
+		}
+	}
 
 }
