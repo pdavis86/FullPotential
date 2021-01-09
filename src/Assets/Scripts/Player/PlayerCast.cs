@@ -1,11 +1,10 @@
-﻿using Assets.Scripts.Spells;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerCast : MonoBehaviour
 {
-    public GameObject Spell;
+    public GameObject SpellPrefab;
+    public GameObject HitTextUiPrefab;
+    public GameObject UiCanvas;
 
     private Camera _camera;
 
@@ -28,17 +27,18 @@ public class PlayerCast : MonoBehaviour
 
     void CastSpell(bool leftHand = false)
     {
-        var spell = Instantiate(Spell, transform.position + _camera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0), transform.rotation);
+        var startPos = transform.position + _camera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
+        var spell = Instantiate(SpellPrefab, startPos, transform.rotation);
         spell.SetActive(true);
 
         var spellRb = spell.GetComponent<Rigidbody>();
         spellRb.AddForce(_camera.transform.forward * 20f, ForceMode.VelocityChange);
 
-        //spell.AddComponent<Impact>();
-        ////spellRb.useGravity = true;
-        ////spellRb.mass = 0.1f;
-
-        spell.AddComponent<Damage>();
-        spell.GetComponent<Collider>().isTrigger = true;
+        var spellScript = spell.GetComponent<SpellBehaviour>();
+        spellScript.HitTextUiPrefab = HitTextUiPrefab;
+        spellScript.Player = gameObject;
+        spellScript.PlayerCamera = _camera;
+        spellScript.UiCanvas = UiCanvas;
     }
+
 }
