@@ -60,9 +60,9 @@ namespace Assets.Scripts.Crafting
             //    newRow.gameObject.SetActive(true);
             //}
 
-            //todo: only show values if >0 or true
-
             //todo: work on the UI. I think it needs to be a table showing which aspects come from which loot
+            //todo: requirements
+            // e.g. strength, speed, accuracy, 6 scrap or less
 
             var sb = new StringBuilder();
 

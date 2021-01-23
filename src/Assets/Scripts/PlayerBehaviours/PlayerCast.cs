@@ -44,7 +44,7 @@ public class PlayerCast : MonoBehaviour
             Targeting = Spell.TargetingProjectile,
             Attributes = new Attributes
             {
-                Cost = 1
+                Strength = 50
             },
             Effects = new List<string> { Spell.DamageFire },
             Shape = Spell.ShapeWall
