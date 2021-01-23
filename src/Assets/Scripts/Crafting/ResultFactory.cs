@@ -1,10 +1,12 @@
-﻿using Assets.Scripts.Ui.Crafting.Items;
+﻿using Assets.Scripts.Attributes;
+using Assets.Scripts.Ui.Crafting.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Assets.Scripts.Ui.Crafting
 {
+    [ServerSideOnlyTemp]
     public class ResultFactory
     {
         private readonly Random _random;
@@ -99,13 +101,11 @@ namespace Assets.Scripts.Ui.Crafting
                 .Union(_debuffEffects)
                 .Union(_supportEffects)
                 .Union(_damageEffects)
-                .Union(_lingeringEffects)
+                //Do not include as it needs pairing: .Union(_lingeringEffects)
                 .Union(_targetingEffects)
                 .Union(_shapeEffects)
                 .ToList();
         }
-
-        //todo: add validation e.g. enough scrap to make a two-handed weapon
 
         private int GetValue(int rarityThreshold)
         {
@@ -141,14 +141,10 @@ namespace Assets.Scripts.Ui.Crafting
             return values.ElementAt(takeAt);
         }
 
-        private List<string> GetEffects(string craftingType, List<CraftableBase> components)
+        private List<string> GetEffects(string craftingType, IEnumerable<string> effectsInput)
         {
-            var effects = components
-                .Where(x => x.Effects.Any())
-                .Select(x => x.Effects.First());
-
             //Cannot cast "tap" buffs
-            effects = effects.Except(new[] { Items.Spell.BuffLifeTap, Items.Spell.BuffManaTap });
+            var effects = effectsInput.Except(new[] { Items.Spell.BuffLifeTap, Items.Spell.BuffManaTap });
 
             //If there is a buff or support then remove all debuffs
             if (effects.Intersect(_buffEffects).Any() || effects.Intersect(_supportEffects).Any())
@@ -230,7 +226,7 @@ namespace Assets.Scripts.Ui.Crafting
             return effects.ToList();
         }
 
-        internal Attributes GetRandomAttributes()
+        private Attributes GetRandomAttributes()
         {
             return new Attributes
             {
@@ -248,15 +244,49 @@ namespace Assets.Scripts.Ui.Crafting
             };
         }
 
-        internal string GetRandomEffect()
+        private string GetRandomEffect()
         {
             return _allEffects.ElementAt(_random.Next(0, _allEffects.Count - 1));
         }
+
+        private double GetBiasedNumber(int min, int max)
+        {
+            return min + (max - min) * Math.Pow(_random.Next(), 2);
+        }
+
+        internal CraftableBase GetLootDrop()
+        {
+            var lootDrop = new CraftableBase
+            {
+                Attributes = GetRandomAttributes()
+            };
+
+            var isMagical = _random.Next(0, 2) > 0;
+            if (isMagical)
+            {
+                lootDrop.Effects = new List<string>();
+                var numberOfEffects = GetBiasedNumber(1, 4);
+                for (var i = 1; i <= numberOfEffects; i++)
+                {
+                    string effect;
+                    do { effect = GetRandomEffect(); }
+                    while (lootDrop.Effects.Contains(effect));
+                    lootDrop.Effects.Add(effect);
+                }
+            }
+
+            return lootDrop;
+        }
+
+        //todo: add ability to name item
+        //todo: add validation e.g. enough scrap to make a two-handed weapon
+        //todo: add validation e.g. at least one effect for a spell
 
         internal CraftableBase Spell(List<CraftableBase> components)
         {
             return new Spell
             {
+                Name = "Unnamed Spell",
                 Attributes = new Attributes
                 {
                     IsActivated = true,
@@ -268,7 +298,7 @@ namespace Assets.Scripts.Ui.Crafting
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery),
                     Duration = ComputeAttribute(components, x => x.Attributes.Duration)
                 },
-                Effects = GetEffects(ChooseCraftingType.Spell, components)
+                Effects = GetEffects(ChooseCraftingType.Spell, components.SelectMany(x => x.Effects))
             };
         }
 
@@ -276,6 +306,7 @@ namespace Assets.Scripts.Ui.Crafting
         {
             return new Weapon
             {
+                Name = "Unnamed Melee Weapon",
                 Type = type,
                 IsTwoHanded = isTwoHanded,
                 Attributes = new Attributes
@@ -285,7 +316,7 @@ namespace Assets.Scripts.Ui.Crafting
                     Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed)
                 },
-                Effects = GetEffects(ChooseCraftingType.Weapon, components)
+                Effects = GetEffects(ChooseCraftingType.Weapon, components.SelectMany(x => x.Effects))
             };
         }
 
@@ -293,6 +324,7 @@ namespace Assets.Scripts.Ui.Crafting
         {
             return new Weapon
             {
+                Name = "Unnamed Ranged Weapon",
                 Type = type,
                 IsTwoHanded = isTwoHanded,
                 Attributes = new Attributes
@@ -307,7 +339,7 @@ namespace Assets.Scripts.Ui.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(ChooseCraftingType.Weapon, components)
+                Effects = GetEffects(ChooseCraftingType.Weapon, components.SelectMany(x => x.Effects))
             };
         }
 
@@ -315,6 +347,7 @@ namespace Assets.Scripts.Ui.Crafting
         {
             return new Weapon
             {
+                Name = "Unnamed Shield",
                 Type = Items.Weapon.Shield,
                 Attributes = new Attributes
                 {
@@ -323,7 +356,7 @@ namespace Assets.Scripts.Ui.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(ChooseCraftingType.Weapon, components)
+                Effects = GetEffects(ChooseCraftingType.Weapon, components.SelectMany(x => x.Effects))
             };
         }
 
@@ -331,12 +364,13 @@ namespace Assets.Scripts.Ui.Crafting
         {
             return new Armor
             {
+                Name = "Unnamed Armor",
                 Type = type,
                 Attributes = new Attributes
                 {
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength)
                 },
-                Effects = GetEffects(ChooseCraftingType.Armor, components)
+                Effects = GetEffects(ChooseCraftingType.Armor, components.SelectMany(x => x.Effects))
             };
         }
 
@@ -344,6 +378,7 @@ namespace Assets.Scripts.Ui.Crafting
         {
             return new Armor
             {
+                Name = "Unnamed Barrier",
                 Type = Items.Armor.Barrier,
                 Attributes = new Attributes
                 {
@@ -353,7 +388,7 @@ namespace Assets.Scripts.Ui.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(ChooseCraftingType.Armor, components)
+                Effects = GetEffects(ChooseCraftingType.Armor, components.SelectMany(x => x.Effects))
             };
         }
 
@@ -361,12 +396,13 @@ namespace Assets.Scripts.Ui.Crafting
         {
             return new Accessory
             {
+                Name = "Unnamed Accessory",
                 Type = type,
                 Attributes = new Attributes
                 {
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength)
                 },
-                Effects = GetEffects(ChooseCraftingType.Accessory, components)
+                Effects = GetEffects(ChooseCraftingType.Accessory, components.SelectMany(x => x.Effects))
             };
         }
 

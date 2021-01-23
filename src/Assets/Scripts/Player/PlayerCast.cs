@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Attributes;
+using UnityEngine;
 
 public class PlayerCast : MonoBehaviour
 {
@@ -25,8 +26,11 @@ public class PlayerCast : MonoBehaviour
         }
     }
 
+    [ServerSideOnlyTemp]
     void CastSpell(bool leftHand = false)
     {
+        //todo: check the player has the spell and cna cast it
+
         var startPos = transform.position + _camera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
         var spell = Instantiate(SpellPrefab, startPos, transform.rotation);
         spell.SetActive(true);

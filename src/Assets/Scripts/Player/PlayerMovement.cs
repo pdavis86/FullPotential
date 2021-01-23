@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Attributes;
+using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -37,8 +38,11 @@ public class PlayerMovement : MonoBehaviour
 		PerformRotation();
 	}
 
+	[ServerSideOnlyTemp]
 	void PerformMovement()
 	{
+		//todo: server side to prevent movement cheating
+
 		if (_velocity != Vector3.zero)
 		{
 			_rb.MovePosition(_rb.position + _velocity * Time.fixedDeltaTime);
