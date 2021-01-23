@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Assets.Scripts.Ui.Crafting.Items
+namespace Assets.Scripts.Crafting.Results
 {
-    public class Spell : ItemBase
+    public class Spell : CraftableBase
     {
         public const string BuffRegen = "Regen";
         public const string BuffHaste = "Haste";
@@ -27,7 +27,7 @@ namespace Assets.Scripts.Ui.Crafting.Items
         public const string SupportAbsorb = "Absorb";
         public const string SupportDeflect = "Deflect";
 
-        public const string DamageForce = "Force";
+        public const string DamageForce = "Force"; //todo: is this necessary?
         public const string DamageFire = "Fire";
         public const string DamageLightning = "Lightning";
         public const string DamageIce = "Ice";
@@ -49,11 +49,17 @@ namespace Assets.Scripts.Ui.Crafting.Items
         public const string ShapeZone = "Zone";
         public const string ShapeWall = "Wall";
 
-        //todo: 
-        //private static readonly Dictionary<string, string> _buffOpposites = new Dictionary<string, string> {
-        //    { BuffRegen, DebuffPoison }
-        //};
+        public static readonly Dictionary<string, string> BuffOpposites = new Dictionary<string, string> {
+            { BuffRegen, DebuffPoison },
+            { BuffHaste, DebuffSlow },
+            { BuffCourage, DebuffFear },
+            { BuffFocus, DebuffDistract },
+            { BuffStrengthen, DebuffWeaken },
+            { BuffLifeTap, DebuffLifeDrain },
+            { BuffManaTap, DebuffManaDrain }
+        };
 
-        public string DamageType { get; set; }
+        public string Targeting { get; set; }
+        public string Shape { get; set; }
     }
 }

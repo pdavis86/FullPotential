@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Ui.Crafting;
+﻿using Assets.Scripts.Crafting;
+using Assets.Scripts.Crafting.Results;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,10 +7,10 @@ using UnityEngine.UI;
 
 public class ChooseCraftingType : MonoBehaviour
 {
-    public const string Weapon = "Weapon";
-    public const string Armor = "Armor";
-    public const string Accessory = "Accessory";
-    public const string Spell = "Spell";
+    public const string CraftingTypeWeapon = "Weapon";
+    public const string CraftingTypeArmor = "Armor";
+    public const string CraftingTypeAccessory = "Accessory";
+    public const string CraftingTypeSpell = "Spell";
 
     public Dropdown SubTypeDropdown;
     public Dropdown HandednessDropdown;
@@ -17,10 +18,10 @@ public class ChooseCraftingType : MonoBehaviour
     private Dropdown _thisDropdown;
 
     public static List<string> TypeOptions = new List<string> {
-        Weapon,
-        Armor,
-        Accessory,
-        Spell
+        CraftingTypeWeapon,
+        CraftingTypeArmor,
+        CraftingTypeAccessory,
+        CraftingTypeSpell
     };
 
     void Start()
@@ -37,13 +38,14 @@ public class ChooseCraftingType : MonoBehaviour
         SubTypeDropdown.ClearOptions();
 
         var isSpell = false;
+        var craftingType = _thisDropdown.options[_thisDropdown.value].text;
 
-        switch (_thisDropdown.options[_thisDropdown.value].text)
+        switch (craftingType)
         {
-            case Weapon: SubTypeDropdown.AddOptions(Assets.Scripts.Ui.Crafting.Items.Weapon.WeaponOptions); break;
-            case Armor: SubTypeDropdown.AddOptions(Assets.Scripts.Ui.Crafting.Items.Armor.ArmorOptions); break;
-            case Accessory: SubTypeDropdown.AddOptions(Assets.Scripts.Ui.Crafting.Items.Accessory.AccessoryOptions); break;
-            case Spell: isSpell = true; break;
+            case CraftingTypeWeapon: SubTypeDropdown.AddOptions(Weapon.WeaponOptions); break;
+            case CraftingTypeArmor: SubTypeDropdown.AddOptions(Armor.ArmorOptions); break;
+            case CraftingTypeAccessory: SubTypeDropdown.AddOptions(Accessory.AccessoryOptions); break;
+            case CraftingTypeSpell: isSpell = true; break;
 
             default:
                 throw new InvalidOperationException("Unknown crafting type");
@@ -52,13 +54,15 @@ public class ChooseCraftingType : MonoBehaviour
         if (isSpell)
         {
             SubTypeDropdown.gameObject.SetActive(false);
-            HandednessDropdown.gameObject.SetActive(false);
         }
         else
         {
             SubTypeDropdown.RefreshShownValue();
             SubTypeDropdown.gameObject.SetActive(true);
         }
+
+        var subType = SubTypeDropdown.options != null ? SubTypeDropdown.options[SubTypeDropdown.value].text : null;
+        ChooseCraftingSubType.SetHandednessDropDownVisibility(HandednessDropdown, craftingType, subType);
 
         UiHelper.UpdateResults(transform.parent.parent, new ResultFactory());
     }

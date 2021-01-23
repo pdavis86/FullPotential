@@ -1,4 +1,4 @@
-﻿namespace Assets.Scripts.Ui.Crafting.Items
+﻿namespace Assets.Scripts.Crafting.Results
 {
     public abstract class ItemBase : CraftableBase
     {

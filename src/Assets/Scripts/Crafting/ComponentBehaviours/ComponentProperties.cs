@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.Ui.Crafting.Items;
+﻿using Assets.Scripts.Crafting.Results;
 using UnityEngine;
 
 public class ComponentProperties : MonoBehaviour

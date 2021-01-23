@@ -1,10 +1,11 @@
 ﻿using Assets.Scripts.Attributes;
-using Assets.Scripts.Ui.Crafting.Items;
+using Assets.Scripts.Crafting.Results;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Assets.Scripts.Ui.Crafting
+namespace Assets.Scripts.Crafting
 {
     public static class UiHelper
     {
@@ -63,19 +64,22 @@ namespace Assets.Scripts.Ui.Crafting
 
             //todo: work on the UI. I think it needs to be a table showing which aspects come from which loot
 
-            textArea.text = $@"IsActivated: {craftedThing.Attributes.IsActivated}
-IsAutomatic {craftedThing.Attributes.IsAutomatic}
-IsSoulbound {craftedThing.Attributes.IsSoulbound}
-ExtraAmmoPerShot {craftedThing.Attributes.ExtraAmmoPerShot}
-Strength {craftedThing.Attributes.Strength}
-Cost {craftedThing.Attributes.Cost}
-Range {craftedThing.Attributes.Range}
-Accuracy {craftedThing.Attributes.Accuracy}
-Speed {craftedThing.Attributes.Speed}
-Recovery {craftedThing.Attributes.Recovery}
-Duration {craftedThing.Attributes.Duration}
-Effects {string.Join(", ", craftedThing.Effects ?? new List<string>())}
-";
+            var sb = new StringBuilder();
+
+            if (craftedThing.Attributes.IsActivated) { sb.Append("IsActivated: true\n"); }
+            if (craftedThing.Attributes.IsAutomatic) { sb.Append("IsAutomatic: true\n"); }
+            if (craftedThing.Attributes.IsSoulbound) { sb.Append("IsSoulbound: true\n"); }
+            if (craftedThing.Attributes.ExtraAmmoPerShot > 0) { sb.Append("ExtraAmmoPerShot: " + craftedThing.Attributes.ExtraAmmoPerShot + "\n"); }
+            if (craftedThing.Attributes.Strength > 0) { sb.Append("Strength: " + craftedThing.Attributes.Strength + "\n"); }
+            if (craftedThing.Attributes.Cost > 0) { sb.Append("Cost: " + craftedThing.Attributes.Cost + "\n"); }
+            if (craftedThing.Attributes.Range > 0) { sb.Append("Range: " + craftedThing.Attributes.Range + "\n"); }
+            if (craftedThing.Attributes.Accuracy > 0) { sb.Append("Accuracy: " + craftedThing.Attributes.Accuracy + "\n"); }
+            if (craftedThing.Attributes.Speed > 0) { sb.Append("Speed: " + craftedThing.Attributes.Speed + "\n"); }
+            if (craftedThing.Attributes.Recovery > 0) { sb.Append("Recovery: " + craftedThing.Attributes.Recovery + "\n"); }
+            if (craftedThing.Attributes.Duration > 0) { sb.Append("Duration: " + craftedThing.Attributes.Duration + "\n"); }
+            if (craftedThing.Effects.Count > 0) { sb.Append("Effects: " + string.Join(", ", craftedThing.Effects)); }
+
+            textArea.text = sb.ToString();
         }
 
         [ServerSideOnlyTemp]
@@ -84,39 +88,39 @@ Effects {string.Join(", ", craftedThing.Effects ?? new List<string>())}
             //todo: check the components are actually in the player's invesntory
 
             CraftableBase craftedThing;
-            if (selectedType == ChooseCraftingType.Spell)
+            if (selectedType == ChooseCraftingType.CraftingTypeSpell)
             {
-                craftedThing = resultFactory.Spell(components);
+                craftedThing = resultFactory.GetSpell(components);
             }
             else
             {
                 switch (selectedSubtype)
                 {
-                    case Weapon.Dagger: craftedThing = resultFactory.MeleeWeapon(Weapon.Dagger, components, false); break;
-                    case Weapon.Spear: craftedThing = resultFactory.MeleeWeapon(Weapon.Spear, components, true); break;
-                    case Weapon.Bow: craftedThing = resultFactory.RangedWeapon(Weapon.Bow, components, true); break;
-                    case Weapon.Crossbow: craftedThing = resultFactory.RangedWeapon(Weapon.Crossbow, components, true); break;
-                    case Weapon.Shield: craftedThing = resultFactory.Shield(components); break;
+                    case Weapon.Dagger: craftedThing = resultFactory.GetMeleeWeapon(Weapon.Dagger, components, false); break;
+                    case Weapon.Spear: craftedThing = resultFactory.GetMeleeWeapon(Weapon.Spear, components, true); break;
+                    case Weapon.Bow: craftedThing = resultFactory.GetRangedWeapon(Weapon.Bow, components, true); break;
+                    case Weapon.Crossbow: craftedThing = resultFactory.GetRangedWeapon(Weapon.Crossbow, components, true); break;
+                    case Weapon.Shield: craftedThing = resultFactory.GetShield(components); break;
 
-                    case Armor.Helm: craftedThing = resultFactory.Armor(Armor.Helm, components); break;
-                    case Armor.Chest: craftedThing = resultFactory.Armor(Armor.Chest, components); break;
-                    case Armor.Legs: craftedThing = resultFactory.Armor(Armor.Legs, components); break;
-                    case Armor.Feet: craftedThing = resultFactory.Armor(Armor.Feet, components); break;
-                    case Armor.Gloves: craftedThing = resultFactory.Armor(Armor.Gloves, components); break;
-                    case Armor.Barrier: craftedThing = resultFactory.Barrier(components); break;
+                    case Armor.Helm: craftedThing = resultFactory.GetArmor(Armor.Helm, components); break;
+                    case Armor.Chest: craftedThing = resultFactory.GetArmor(Armor.Chest, components); break;
+                    case Armor.Legs: craftedThing = resultFactory.GetArmor(Armor.Legs, components); break;
+                    case Armor.Feet: craftedThing = resultFactory.GetArmor(Armor.Feet, components); break;
+                    case Armor.Gloves: craftedThing = resultFactory.GetArmor(Armor.Gloves, components); break;
+                    case Armor.Barrier: craftedThing = resultFactory.GetBarrier(components); break;
 
-                    case Accessory.Amulet: craftedThing = resultFactory.Accessory(Accessory.Amulet, components); break;
-                    case Accessory.Ring: craftedThing = resultFactory.Accessory(Accessory.Ring, components); break;
-                    case Accessory.Belt: craftedThing = resultFactory.Accessory(Accessory.Belt, components); break;
+                    case Accessory.Amulet: craftedThing = resultFactory.GetAccessory(Accessory.Amulet, components); break;
+                    case Accessory.Ring: craftedThing = resultFactory.GetAccessory(Accessory.Ring, components); break;
+                    case Accessory.Belt: craftedThing = resultFactory.GetAccessory(Accessory.Belt, components); break;
 
                     default:
 
                         switch (selectedSubtype)
                         {
-                            case Weapon.Axe: craftedThing = resultFactory.MeleeWeapon(Weapon.Axe, components, isTwoHanded); break;
-                            case Weapon.Sword: craftedThing = resultFactory.MeleeWeapon(Weapon.Sword, components, isTwoHanded); break;
-                            case Weapon.Hammer: craftedThing = resultFactory.MeleeWeapon(Weapon.Hammer, components, isTwoHanded); break;
-                            case Weapon.Gun: craftedThing = resultFactory.RangedWeapon(Weapon.Gun, components, isTwoHanded); break;
+                            case Weapon.Axe: craftedThing = resultFactory.GetMeleeWeapon(Weapon.Axe, components, isTwoHanded); break;
+                            case Weapon.Sword: craftedThing = resultFactory.GetMeleeWeapon(Weapon.Sword, components, isTwoHanded); break;
+                            case Weapon.Hammer: craftedThing = resultFactory.GetMeleeWeapon(Weapon.Hammer, components, isTwoHanded); break;
+                            case Weapon.Gun: craftedThing = resultFactory.GetRangedWeapon(Weapon.Gun, components, isTwoHanded); break;
                             default:
                                 throw new System.Exception("Invalid weapon type");
                         }

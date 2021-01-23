@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Assets.Scripts.Ui.Crafting.Items
+namespace Assets.Scripts.Crafting.Results
 {
     public class Armor : ItemBase
     {

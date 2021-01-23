@@ -1,4 +1,4 @@
-﻿namespace Assets.Scripts.Ui.Crafting
+﻿namespace Assets.Scripts.Crafting.Results
 {
     public struct Attributes
     {

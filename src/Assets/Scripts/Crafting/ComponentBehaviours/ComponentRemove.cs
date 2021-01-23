@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Ui.Crafting;
+﻿using Assets.Scripts.Crafting;
+using Assets.Scripts.Crafting.Results;
 using UnityEngine;
 using UnityEngine.UI;
 
