@@ -61,6 +61,8 @@ namespace Assets.Scripts.Ui.Crafting
 
             //todo: only show values if >0 or true
 
+            //todo: work on the UI. I think it needs to be a table showing which aspects come from which loot
+
             textArea.text = $@"IsActivated: {craftedThing.Attributes.IsActivated}
 IsAutomatic {craftedThing.Attributes.IsAutomatic}
 IsSoulbound {craftedThing.Attributes.IsSoulbound}

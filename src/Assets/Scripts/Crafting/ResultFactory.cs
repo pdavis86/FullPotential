@@ -3,13 +3,14 @@ using Assets.Scripts.Ui.Crafting.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Assets.Scripts.Ui.Crafting
 {
     [ServerSideOnlyTemp]
     public class ResultFactory
     {
-        private readonly Random _random;
+        private readonly System.Random _random;
         private readonly List<string> _buffEffects;
         private readonly List<string> _debuffEffects;
         private readonly List<string> _supportEffects;
@@ -22,7 +23,7 @@ namespace Assets.Scripts.Ui.Crafting
 
         public ResultFactory()
         {
-            _random = new Random();
+            _random = new System.Random();
             _buffEffects = new List<string>
             {
                 Items.Spell.BuffRegen,
@@ -189,6 +190,7 @@ namespace Assets.Scripts.Ui.Crafting
                 effects = effects.Except(_damageEffects.Where(x => x != damageEffects.Last()));
             }
 
+            //Weapons to dame and debuffs only
             if (craftingType == ChooseCraftingType.Weapon)
             {
                 return effects.Intersect(_debuffEffects)
@@ -249,22 +251,22 @@ namespace Assets.Scripts.Ui.Crafting
             return _allEffects.ElementAt(_random.Next(0, _allEffects.Count - 1));
         }
 
-        private double GetBiasedNumber(int min, int max)
+        private int GetBiasedNumber(int min, int max)
         {
-            return min + (max - min) * Math.Pow(_random.Next(), 2);
+            return min + (int)Math.Round((max - min) * Math.Pow(_random.NextDouble(), 3), 0);
         }
 
         internal CraftableBase GetLootDrop()
         {
             var lootDrop = new CraftableBase
             {
-                Attributes = GetRandomAttributes()
+                Attributes = GetRandomAttributes(),
+                Effects = new List<string>()
             };
 
             var isMagical = _random.Next(0, 2) > 0;
             if (isMagical)
             {
-                lootDrop.Effects = new List<string>();
                 var numberOfEffects = GetBiasedNumber(1, 4);
                 for (var i = 1; i <= numberOfEffects; i++)
                 {
@@ -273,6 +275,8 @@ namespace Assets.Scripts.Ui.Crafting
                     while (lootDrop.Effects.Contains(effect));
                     lootDrop.Effects.Add(effect);
                 }
+
+                Debug.Log($"Added {numberOfEffects} effects: {string.Join(", ", lootDrop.Effects)}");
             }
 
             return lootDrop;
