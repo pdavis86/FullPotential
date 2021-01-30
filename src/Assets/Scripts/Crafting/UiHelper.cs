@@ -61,29 +61,29 @@ namespace Assets.Scripts.Crafting
             //}
 
             //todo: work on the UI. I think it needs to be a table showing which aspects come from which loot
-            //todo: requirements
-            // e.g. strength, speed, accuracy, 6 scrap or less
+            //todo: requirements e.g. strength, speed, accuracy, 6 scrap or less
 
             var sb = new StringBuilder();
 
-            if (craftedThing.Attributes.IsActivated) { sb.Append("IsActivated: true\n"); }
-            if (craftedThing.Attributes.IsAutomatic) { sb.Append("IsAutomatic: true\n"); }
-            if (craftedThing.Attributes.IsSoulbound) { sb.Append("IsSoulbound: true\n"); }
-            if (craftedThing.Attributes.ExtraAmmoPerShot > 0) { sb.Append("ExtraAmmoPerShot: " + craftedThing.Attributes.ExtraAmmoPerShot + "\n"); }
-            if (craftedThing.Attributes.Strength > 0) { sb.Append("Strength: " + craftedThing.Attributes.Strength + "\n"); }
-            if (craftedThing.Attributes.Cost > 0) { sb.Append("Cost: " + craftedThing.Attributes.Cost + "\n"); }
-            if (craftedThing.Attributes.Range > 0) { sb.Append("Range: " + craftedThing.Attributes.Range + "\n"); }
-            if (craftedThing.Attributes.Accuracy > 0) { sb.Append("Accuracy: " + craftedThing.Attributes.Accuracy + "\n"); }
-            if (craftedThing.Attributes.Speed > 0) { sb.Append("Speed: " + craftedThing.Attributes.Speed + "\n"); }
-            if (craftedThing.Attributes.Recovery > 0) { sb.Append("Recovery: " + craftedThing.Attributes.Recovery + "\n"); }
-            if (craftedThing.Attributes.Duration > 0) { sb.Append("Duration: " + craftedThing.Attributes.Duration + "\n"); }
-            if (craftedThing.Effects.Count > 0) { sb.Append("Effects: " + string.Join(", ", craftedThing.Effects)); }
+            sb.Append($"Name: {craftedThing.Name}\n");
+            if (craftedThing.Attributes.IsActivated) { sb.Append($"IsActivated: true\n"); }
+            if (craftedThing.Attributes.IsAutomatic) { sb.Append($"IsAutomatic: true\n"); }
+            if (craftedThing.Attributes.IsSoulbound) { sb.Append($"IsSoulbound: true\n"); }
+            if (craftedThing.Attributes.ExtraAmmoPerShot > 0) { sb.Append($"ExtraAmmoPerShot: {craftedThing.Attributes.ExtraAmmoPerShot}\n"); }
+            if (craftedThing.Attributes.Strength > 0) { sb.Append($"Strength: {craftedThing.Attributes.Strength}\n"); }
+            if (craftedThing.Attributes.Cost > 0) { sb.Append($"Cost: {craftedThing.Attributes.Cost}\n"); }
+            if (craftedThing.Attributes.Range > 0) { sb.Append($"Range: {craftedThing.Attributes.Range}\n"); }
+            if (craftedThing.Attributes.Accuracy > 0) { sb.Append($"Accuracy: {craftedThing.Attributes.Accuracy}\n"); }
+            if (craftedThing.Attributes.Speed > 0) { sb.Append($"Speed: {craftedThing.Attributes.Speed}\n"); }
+            if (craftedThing.Attributes.Recovery > 0) { sb.Append($"Recovery: {craftedThing.Attributes.Recovery}\n"); }
+            if (craftedThing.Attributes.Duration > 0) { sb.Append($"Duration: {craftedThing.Attributes.Duration}\n"); }
+            if (craftedThing.Effects.Count > 0) { sb.Append($"Effects: {string.Join(", ", craftedThing.Effects)}"); }
 
             textArea.text = sb.ToString();
         }
 
         [ServerSideOnlyTemp]
-        private static CraftableBase GetCraftedItem(ResultFactory resultFactory, List<CraftableBase> components, string  selectedType, string selectedSubtype, bool isTwoHanded)
+        private static CraftableBase GetCraftedItem(ResultFactory resultFactory, List<CraftableBase> components, string selectedType, string selectedSubtype, bool isTwoHanded)
         {
             //todo: check the components are actually in the player's invesntory
 

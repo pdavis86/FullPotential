@@ -41,18 +41,17 @@ public class PlayerCast : MonoBehaviour
         var activeSpell = new Spell
         {
             Name = "test spell",
-            Targeting = Spell.TargetingProjectile,
+            Targeting = Spell.TargetingOptions.Projectile,
             Attributes = new Attributes
             {
                 Strength = 50
             },
-            Effects = new List<string> { Spell.DamageFire },
-            Shape = Spell.ShapeWall
+            Effects = new List<string> { Spell.ElementalEffects.Fire },
+            Shape = Spell.ShapeOptions.Wall
         };
 
-        if (activeSpell.Targeting == Spell.TargetingProjectile)
+        if (activeSpell.Targeting == Spell.TargetingOptions.Projectile)
         {
-
             var startPos = transform.position + _camera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
             var spell = Instantiate(SpellPrefab, startPos, transform.rotation);
             spell.SetActive(true);

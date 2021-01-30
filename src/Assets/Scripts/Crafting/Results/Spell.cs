@@ -1,65 +1,174 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Assets.Scripts.Crafting.Results
 {
     public class Spell : CraftableBase
     {
-        public const string BuffRegen = "Regen";
-        public const string BuffHaste = "Haste";
-        public const string BuffCourage = "Courage";
-        public const string BuffFocus = "Focus";
-        public const string BuffStrengthen = "Strengthen";
-        public const string BuffLifeTap = "LifeTap";
-        public const string BuffManaTap = "ManaTap";
-
-        public const string DebuffPoison = "Poison";
-        public const string DebuffSlow = "Slow";
-        public const string DebuffFear = "Fear";
-        public const string DebuffDistract = "Distract";
-        public const string DebuffWeaken = "Weaken";
-        public const string DebuffLifeDrain = "LifeDrain";
-        public const string DebuffManaDrain = "ManaDrain";
-
-        public const string SupportHeal = "Heal";
-        public const string SupportLeap = "Leap";
-        public const string SupportBlink = "Blink";
-        public const string SupportSoften = "Soften";
-        public const string SupportAbsorb = "Absorb";
-        public const string SupportDeflect = "Deflect";
-
-        public const string DamageForce = "Force"; //todo: is this necessary?
-        public const string DamageFire = "Fire";
-        public const string DamageLightning = "Lightning";
-        public const string DamageIce = "Ice";
-        public const string DamageEarth = "Earth";
-        public const string DamageWater = "Water";
-        public const string DamageAir = "Air";
-
-        public const string LingeringIgnition = "Ignition";
-        public const string LingeringShock = "Shock";
-        public const string LingeringFreeze = "Freeze";
-        public const string LingeringImmobilise = "Immobilise";
-
-        public const string TargetingSelf = "Self";
-        public const string TargetingTouch = "Touch";
-        public const string TargetingProjectile = "Projectile";
-        public const string TargetingBeam = "Beam";
-        public const string TargetingCone = "Cone";
-
-        public const string ShapeZone = "Zone";
-        public const string ShapeWall = "Wall";
-
-        public static readonly Dictionary<string, string> BuffOpposites = new Dictionary<string, string> {
-            { BuffRegen, DebuffPoison },
-            { BuffHaste, DebuffSlow },
-            { BuffCourage, DebuffFear },
-            { BuffFocus, DebuffDistract },
-            { BuffStrengthen, DebuffWeaken },
-            { BuffLifeTap, DebuffLifeDrain },
-            { BuffManaTap, DebuffManaDrain }
-        };
-
         public string Targeting { get; set; }
         public string Shape { get; set; }
+
+
+
+        public abstract class BuffEffects
+        {
+            public const string Regen = "Regen";
+            public const string Haste = "Haste";
+            public const string Courage = "Courage";
+            public const string Focus = "Focus";
+            public const string Strengthen = "Strengthen";
+            public const string LifeTap = "LifeTap";
+            public const string ManaTap = "ManaTap";
+
+            public static readonly List<string> All = new List<string>
+            {
+                Regen,
+                Haste,
+                Courage,
+                Focus,
+                Strengthen
+                //Not needed for loot generation: LifeTap,
+                //Not needed for loot generation: ManaTap
+            };
+        }
+
+        public abstract class DebuffEffects
+        {
+            public const string Poison = "Poison";
+            public const string Slow = "Slow";
+            public const string Fear = "Fear";
+            public const string Distract = "Distract";
+            public const string Weaken = "Weaken";
+            public const string LifeDrain = "LifeDrain";
+            public const string ManaDrain = "ManaDrain";
+
+            public static readonly List<string> All = new List<string>
+            {
+                Poison,
+                Slow,
+                Fear,
+                Distract,
+                Weaken,
+                LifeDrain,
+                ManaDrain
+            };
+        }
+
+        public static readonly Dictionary<string, string> BuffOpposites = new Dictionary<string, string> {
+            { BuffEffects.Regen, DebuffEffects.Poison },
+            { BuffEffects.Haste, DebuffEffects.Slow },
+            { BuffEffects.Courage, DebuffEffects.Fear },
+            { BuffEffects.Focus, DebuffEffects.Distract },
+            { BuffEffects.Strengthen, DebuffEffects.Weaken },
+            { BuffEffects.LifeTap, DebuffEffects.LifeDrain },
+            { BuffEffects.ManaTap, DebuffEffects.ManaDrain }
+        };
+
+        public abstract class SupportEffects
+        {
+            public const string Heal = "Heal";
+            public const string Leap = "Leap";
+            public const string Blink = "Blink";
+            public const string Soften = "Soften";
+            public const string Absorb = "Absorb";
+            public const string Deflect = "Deflect";
+
+            public static readonly List<string> All = new List<string>
+            {
+                Heal,
+                Leap,
+                Blink,
+                Soften,
+                Absorb,
+                Deflect
+            };
+        }
+
+        public abstract class ElementalEffects
+        {
+            //todo: is this necessary?: public const string Force = "Force"; 
+            public const string Fire = "Fire";
+            public const string Lightning = "Lightning";
+            public const string Ice = "Ice";
+            public const string Earth = "Earth";
+            public const string Water = "Water";
+            public const string Air = "Air";
+
+            public static readonly List<string> All = new List<string>
+            {
+                //Not needed for loot creation: Force,
+                Fire,
+                Lightning,
+                Ice,
+                Earth,
+                Water,
+                Air
+            };
+        }
+
+        public abstract class LingeringOptions
+        {
+            public const string Ignition = "Ignition";
+            public const string Shock = "Shock";
+            public const string Freeze = "Freeze";
+            public const string Immobilise = "Immobilise";
+
+            public static readonly List<string> All = new List<string>
+            {
+                Ignition,
+                Shock,
+                Freeze,
+                Immobilise
+            };
+        }
+
+        public static readonly Dictionary<string, string> LingeringPairing = new Dictionary<string, string>
+        {
+            { ElementalEffects.Fire, LingeringOptions.Ignition },
+            { ElementalEffects.Lightning, LingeringOptions.Shock },
+            { ElementalEffects.Ice, LingeringOptions.Freeze },
+            { ElementalEffects.Earth, LingeringOptions.Immobilise }
+        };
+
+        public abstract class TargetingOptions
+        {
+            public const string Self = "Self";
+            public const string Touch = "Touch";
+            public const string Projectile = "Projectile";
+            public const string Beam = "Beam";
+            public const string Cone = "Cone";
+
+            public static readonly List<string> All = new List<string>
+            {
+                Self,
+                Touch,
+                Projectile,
+                Beam,
+                Cone
+            };
+        }
+
+        public abstract class ShapeOptions
+        {
+            public const string Zone = "Zone";
+            public const string Wall = "Wall";
+
+            public static readonly List<string> All = new List<string>
+            {
+                Zone,
+                Wall
+            };
+        }
+
+        public static readonly List<string> LootEffectsAndOptions = 
+            BuffEffects.All //Excluded from "All" property: .Except(new[] { BuffEffects.LifeTap, BuffEffects.ManaTap })
+            .Union(DebuffEffects.All)
+            .Union(SupportEffects.All)
+            .Union(ElementalEffects.All)
+            //Do not include as it needs pairing: .Union(_lingeringEffects)
+            .Union(TargetingOptions.All)
+            .Union(ShapeOptions.All)
+            .ToList();
+
     }
 }

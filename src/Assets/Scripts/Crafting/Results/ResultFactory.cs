@@ -11,103 +11,6 @@ namespace Assets.Scripts.Crafting.Results
     {
         private static readonly System.Random _random = new System.Random();
 
-        private readonly List<string> _buffEffects;
-        private readonly List<string> _debuffEffects;
-        private readonly List<string> _supportEffects;
-        private readonly List<string> _damageEffects;
-        private readonly List<string> _lingeringEffects;
-        private readonly Dictionary<string, string> _lingeringPairing;
-        private readonly List<string> _targetingEffects;
-        private readonly List<string> _shapeEffects;
-        private readonly List<string> _allEffects;
-
-        public ResultFactory()
-        {
-            //todo: should all of these be in the spell class instead?
-            _buffEffects = new List<string>
-            {
-                Spell.BuffRegen,
-                Spell.BuffHaste,
-                Spell.BuffCourage,
-                Spell.BuffFocus,
-                Spell.BuffStrengthen,
-                Spell.BuffLifeTap,
-                Spell.BuffManaTap
-            };
-
-            _debuffEffects = new List<string>
-            {
-                Spell.DebuffPoison,
-                Spell.DebuffSlow,
-                Spell.DebuffFear,
-                Spell.DebuffDistract,
-                Spell.DebuffWeaken,
-                Spell.DebuffLifeDrain,
-                Spell.DebuffManaDrain
-            };
-
-            _supportEffects = new List<string>
-            {
-                Spell.SupportHeal,
-                Spell.SupportLeap,
-                Spell.SupportBlink,
-                Spell.SupportSoften,
-                Spell.SupportAbsorb,
-                Spell.SupportDeflect
-            };
-
-            _damageEffects = new List<string>
-            {
-                Spell.DamageForce,
-                Spell.DamageFire,
-                Spell.DamageLightning,
-                Spell.DamageIce,
-                Spell.DamageEarth,
-                Spell.DamageWater,
-                Spell.DamageAir
-            };
-
-            _lingeringEffects = new List<string>
-            {
-                Spell.LingeringIgnition,
-                Spell.LingeringShock,
-                Spell.LingeringFreeze,
-                Spell.LingeringImmobilise
-            };
-
-            _lingeringPairing = new Dictionary<string, string>
-            {
-                { Spell.LingeringIgnition, Spell.DamageFire },
-                { Spell.LingeringShock, Spell.DamageLightning },
-                { Spell.LingeringFreeze, Spell.DamageIce },
-                { Spell.LingeringImmobilise, Spell.DamageEarth }
-            };
-
-            _targetingEffects = new List<string>
-            {
-                Spell.TargetingSelf,
-                Spell.TargetingTouch,
-                Spell.TargetingProjectile,
-                Spell.TargetingBeam,
-                Spell.TargetingCone
-            };
-
-            _shapeEffects = new List<string>
-            {
-                Spell.ShapeZone,
-                Spell.ShapeWall
-            };
-
-            _allEffects = _buffEffects
-                .Union(_debuffEffects)
-                .Union(_supportEffects)
-                .Union(_damageEffects)
-                //Do not include as it needs pairing: .Union(_lingeringEffects)
-                .Union(_targetingEffects)
-                .Union(_shapeEffects)
-                .ToList();
-        }
-
         private int GetValue(int rarityThreshold)
         {
             return _random.Next(0, 100) > rarityThreshold ? _random.Next(1, 100) : 0;
@@ -147,82 +50,95 @@ namespace Assets.Scripts.Crafting.Results
             return values.ElementAt(takeAt);
         }
 
+        private string GetTargeting(IEnumerable<string> effectsInput)
+        {
+            //Only one target
+            var targetEffects = effectsInput.Intersect(Spell.TargetingOptions.All);
+            if (targetEffects.Any())
+            {
+                return targetEffects.Last();
+            }
+
+            return Spell.TargetingOptions.Projectile;
+        }
+
+        private string GetShape(string targeting, IEnumerable<string> effectsInput)
+        {
+            //Only one shape
+            if (targeting != Spell.TargetingOptions.Beam && targeting != Spell.TargetingOptions.Cone)
+            {
+                var shapeEffects = effectsInput.Intersect(Spell.ShapeOptions.All);
+                if (shapeEffects.Any())
+                {
+                    return shapeEffects.Last();
+                }
+            }
+
+            return null;
+        }
+
         private List<string> GetEffects(string craftingType, IEnumerable<string> effectsInput)
         {
             //Cannot cast "tap" buffs
-            var effects = effectsInput.Except(new[] { Spell.BuffLifeTap, Spell.BuffManaTap });
+            var effects = effectsInput
+                .Except(new[] { Spell.BuffEffects.LifeTap, Spell.BuffEffects.ManaTap })
+                .Except(Spell.TargetingOptions.All)
+                .Except(Spell.ShapeOptions.All);
 
             //If there is a buff or support then remove all debuffs
-            if (effects.Intersect(_buffEffects).Any() || effects.Intersect(_supportEffects).Any())
+            if (effects.Intersect(Spell.BuffEffects.All).Any() || effects.Intersect(Spell.SupportEffects.All).Any())
             {
-                effects = effects.Except(_debuffEffects);
+                effects = effects.Except(Spell.DebuffEffects.All);
+            }
+
+            //Lingering must have matching elemental type
+            var elementalEffects = effects.Intersect(Spell.ElementalEffects.All);
+            var lingeringOptions = effects.Intersect(Spell.LingeringOptions.All);
+            if (lingeringOptions.Any())
+            {
+                var elementalEffectFound = false;
+                foreach (var option in lingeringOptions)
+                {
+                    var expectedElementalEffect = Spell.LingeringPairing.FirstOrDefault(x => x.Value == option).Key;
+                    if (!string.IsNullOrWhiteSpace(expectedElementalEffect) && elementalEffects.Contains(expectedElementalEffect))
+                    {
+                        elementalEffectFound = true;
+                        effects = effects.Except(Spell.LingeringOptions.All.Where(x => x != option));
+                        effects = effects.Except(Spell.ElementalEffects.All.Where(x => x != expectedElementalEffect));
+                        break;
+                    }
+                }
+                if (!elementalEffectFound)
+                {
+                    effects = effects.Except(Spell.LingeringOptions.All);
+                }
+
+                elementalEffects = effects.Intersect(Spell.ElementalEffects.All);
+            }
+
+            //Remove all but the last elemental effect
+            if (elementalEffects.Count() > 1)
+            {
+                var lastElementalEffect = elementalEffects.Last();
+                effects = effects
+                    .Except(Spell.ElementalEffects.All.Where(x => x != lastElementalEffect));
             }
 
             if (craftingType == ChooseCraftingType.CraftingTypeArmor || craftingType == ChooseCraftingType.CraftingTypeAccessory)
             {
-                return effects.Intersect(_buffEffects)
-                    .Union(effects.Intersect(_supportEffects))
+                return effects.Intersect(Spell.BuffEffects.All)
+                    .Union(effects.Intersect(Spell.SupportEffects.All))
+                    .Union(effects.Intersect(Spell.ElementalEffects.All))
                     .ToList();
             }
 
-            //Lingering must have matching damage type
-            var damageEffects = effects.Intersect(_damageEffects);
-            var lingering = effects.Intersect(_lingeringEffects);
-            if (lingering.Any())
-            {
-                var damageFound = false;
-                foreach (var effect in lingering)
-                {
-                    var expectedDamageType = _lingeringPairing[effect];
-                    if (damageEffects.Contains(expectedDamageType))
-                    {
-                        damageFound = true;
-                        effects = effects.Except(_lingeringEffects.Where(x => x != effect));
-                        effects = effects.Except(_damageEffects.Where(x => x != expectedDamageType));
-                    }
-                    break;
-                }
-                if (!damageFound)
-                {
-                    effects = effects.Except(_lingeringEffects);
-                }
-            }
-
-            //Remove all but the last damage effect
-            damageEffects = effects.Intersect(_damageEffects);
-            if (damageEffects.Count() > 1)
-            {
-                effects = effects.Except(_damageEffects.Where(x => x != damageEffects.Last()));
-            }
-
-            //Weapons to dame and debuffs only
+            //Weapons have debuffs and elemental (+lingering) only
             if (craftingType == ChooseCraftingType.CraftingTypeWeapon)
             {
-                return effects.Intersect(_debuffEffects)
-                    .Union(effects.Intersect(_damageEffects))
-                    .Union(effects.Intersect(_lingeringEffects))
+                return effects.Intersect(Spell.DebuffEffects.All)
+                    .Union(effects.Intersect(Spell.ElementalEffects.All))
+                    .Union(effects.Intersect(Spell.LingeringOptions.All))
                     .ToList();
-            }
-
-            //Only one target
-            var targetEffects = effects.Intersect(_targetingEffects);
-            if (targetEffects.Count() > 1)
-            {
-                effects = effects.Except(_targetingEffects.Where(x => x != targetEffects.Last()));
-            }
-
-            //Only one valid shape
-            var shapeEffects = effects.Intersect(_shapeEffects);
-            if (shapeEffects.Any())
-            {
-                if (shapeEffects.Contains(Spell.TargetingBeam) || shapeEffects.Contains(Spell.TargetingCone))
-                {
-                    effects = effects.Except(_shapeEffects);
-                }
-                else
-                {
-                    effects = effects.Except(_shapeEffects.Where(x => x != shapeEffects.Last()));
-                }
             }
 
             if (craftingType != ChooseCraftingType.CraftingTypeSpell)
@@ -253,8 +169,7 @@ namespace Assets.Scripts.Crafting.Results
 
         private string GetRandomEffect()
         {
-            //todo: if lingering is appropriate, add a chance of it being included
-            return _allEffects.ElementAt(_random.Next(0, _allEffects.Count - 1));
+            return Spell.LootEffectsAndOptions.ElementAt(_random.Next(0, Spell.LootEffectsAndOptions.Count - 1));
         }
 
         private int GetBiasedNumber(int min, int max)
@@ -284,6 +199,13 @@ namespace Assets.Scripts.Crafting.Results
                     lootDrop.Effects.Add(effect);
                 }
 
+                //If lingering is appropriate, add a chance of it being included
+                var elementalEffect = lootDrop.Effects.Intersect(Spell.ElementalEffects.All).FirstOrDefault();
+                if (!string.IsNullOrWhiteSpace(elementalEffect) && _random.Next(0, 2) > 0)
+                {
+                    lootDrop.Effects.Add(Spell.LingeringPairing[elementalEffect]);
+                }
+
                 Debug.Log($"Added {numberOfEffects} effects: {string.Join(", ", lootDrop.Effects)}");
             }
 
@@ -298,10 +220,10 @@ namespace Assets.Scripts.Crafting.Results
 
         internal CraftableBase GetSpell(List<CraftableBase> components)
         {
-            return new Spell
+            var effects = components.SelectMany(x => x.Effects);
+            var spell = new Spell
             {
-                Name = "Unnamed Spell",
-                Targeting = Spell.TargetingProjectile, //todo: set this
+                Targeting = GetTargeting(effects),
                 Attributes = new Attributes
                 {
                     IsActivated = true,
@@ -313,16 +235,22 @@ namespace Assets.Scripts.Crafting.Results
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery),
                     Duration = ComputeAttribute(components, x => x.Attributes.Duration)
                 },
-                Effects = GetEffects(ChooseCraftingType.CraftingTypeSpell, components.SelectMany(x => x.Effects)),
-                //todo: Shape = 
+                Effects = GetEffects(ChooseCraftingType.CraftingTypeSpell, effects),
             };
+            spell.Shape = GetShape(spell.Targeting, effects);
+            spell.Name = spell.Effects.First() + " Spell";
+            return spell;
+        }
+
+        private string GetItemName(string prefix, ItemBase item)
+        {
+            return $"{prefix} {item.Attributes.Strength} {item.Type}";
         }
 
         internal CraftableBase GetMeleeWeapon(string type, List<CraftableBase> components, bool isTwoHanded)
         {
-            return new Weapon
+            var item = new Weapon
             {
-                Name = "Unnamed Melee Weapon",
                 Type = type,
                 IsTwoHanded = isTwoHanded,
                 Attributes = new Attributes
@@ -334,13 +262,14 @@ namespace Assets.Scripts.Crafting.Results
                 },
                 Effects = GetEffects(ChooseCraftingType.CraftingTypeWeapon, components.SelectMany(x => x.Effects))
             };
+            item.Name = GetItemName("Strength", item);
+            return item;
         }
 
         internal CraftableBase GetRangedWeapon(string type, List<CraftableBase> components, bool isTwoHanded)
         {
-            return new Weapon
+            var item = new Weapon
             {
-                Name = "Unnamed Ranged Weapon",
                 Type = type,
                 IsTwoHanded = isTwoHanded,
                 Attributes = new Attributes
@@ -357,13 +286,14 @@ namespace Assets.Scripts.Crafting.Results
                 },
                 Effects = GetEffects(ChooseCraftingType.CraftingTypeWeapon, components.SelectMany(x => x.Effects))
             };
+            item.Name = GetItemName("Strength", item);
+            return item;
         }
 
         internal CraftableBase GetShield(List<CraftableBase> components)
         {
-            return new Weapon
+            var item = new Weapon
             {
-                Name = "Unnamed Shield",
                 Type = Weapon.Shield,
                 Attributes = new Attributes
                 {
@@ -374,11 +304,13 @@ namespace Assets.Scripts.Crafting.Results
                 },
                 Effects = GetEffects(ChooseCraftingType.CraftingTypeWeapon, components.SelectMany(x => x.Effects))
             };
+            item.Name = GetItemName("Defence", item);
+            return item;
         }
 
         internal CraftableBase GetArmor(string type, List<CraftableBase> components)
         {
-            return new Armor
+            var item = new Armor
             {
                 Name = "Unnamed Armor",
                 Type = type,
@@ -388,13 +320,14 @@ namespace Assets.Scripts.Crafting.Results
                 },
                 Effects = GetEffects(ChooseCraftingType.CraftingTypeArmor, components.SelectMany(x => x.Effects))
             };
+            item.Name = GetItemName("Defence", item);
+            return item;
         }
 
         internal CraftableBase GetBarrier(List<CraftableBase> components)
         {
-            return new Armor
+            var item = new Armor
             {
-                Name = "Unnamed Barrier",
                 Type = Armor.Barrier,
                 Attributes = new Attributes
                 {
@@ -406,13 +339,14 @@ namespace Assets.Scripts.Crafting.Results
                 },
                 Effects = GetEffects(ChooseCraftingType.CraftingTypeArmor, components.SelectMany(x => x.Effects))
             };
+            item.Name = GetItemName("Defence", item);
+            return item;
         }
 
         internal CraftableBase GetAccessory(string type, List<CraftableBase> components)
         {
-            return new Accessory
+            var item = new Accessory
             {
-                Name = "Unnamed Accessory",
                 Type = type,
                 Attributes = new Attributes
                 {
@@ -420,6 +354,8 @@ namespace Assets.Scripts.Crafting.Results
                 },
                 Effects = GetEffects(ChooseCraftingType.CraftingTypeAccessory, components.SelectMany(x => x.Effects))
             };
+            item.Name = GetItemName("Strength", item);
+            return item;
         }
 
     }
