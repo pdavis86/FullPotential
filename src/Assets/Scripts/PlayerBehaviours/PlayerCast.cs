@@ -3,6 +3,10 @@ using Assets.Scripts.Crafting.Results;
 using System.Collections.Generic;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+
 public class PlayerCast : MonoBehaviour
 {
     public GameObject SpellPrefab;

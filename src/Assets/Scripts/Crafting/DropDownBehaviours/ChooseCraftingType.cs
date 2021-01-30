@@ -5,6 +5,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
+// ReSharper disable ClassNeverInstantiated.Global
+
 public class ChooseCraftingType : MonoBehaviour
 {
     public const string CraftingTypeWeapon = "Weapon";

@@ -3,11 +3,16 @@ using Assets.Scripts.Crafting.Results;
 using UnityEngine;
 using UnityEngine.UI;
 
+// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Local
+// ReSharper disable ClassNeverInstantiated.Global
+
 public class ComponentRemove : MonoBehaviour
 {
     void Start()
     {
-        transform.GetComponent<Button>().onClick.AddListener(OnClick); ;
+        transform.GetComponent<Button>().onClick.AddListener(OnClick);
     }
 
     private void OnClick()

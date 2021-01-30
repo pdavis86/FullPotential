@@ -5,6 +5,13 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
+// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnassignedField.Compiler
+
 public class ChooseCraftingSubType : MonoBehaviour
 {
     public Dropdown TypeDropdown;
@@ -30,9 +37,15 @@ public class ChooseCraftingSubType : MonoBehaviour
 
 
 
-    private static readonly string[] _handednessSubTypes = new[] { Weapon.Axe, Weapon.Sword, Weapon.Hammer, Weapon.Gun };
+    // ReSharper disable once InconsistentNaming
+    private static readonly string[] _handednessSubTypes = new[] { 
+        Weapon.Axe, 
+        Weapon.Sword, 
+        Weapon.Hammer, 
+        Weapon.Gun 
+    };
 
-    public static List<string> HandednessOptions = new List<string> {
+    public readonly static List<string> HandednessOptions = new List<string> {
         Weapon.OneHanded,
         Weapon.TwoHanded
     };

@@ -2,7 +2,6 @@
 
 namespace UnityEngine
 {
-
     public static class UnityEngineEx
     {
         //public static int GetActiveChildCount(this Component parent)

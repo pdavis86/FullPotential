@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 
+// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+
 public class PlayerToggles : MonoBehaviour
 {
     public GameObject _hud;

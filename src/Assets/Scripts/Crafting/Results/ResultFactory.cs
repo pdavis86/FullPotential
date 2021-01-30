@@ -9,7 +9,8 @@ namespace Assets.Scripts.Crafting.Results
     [ServerSideOnlyTemp]
     public class ResultFactory
     {
-        private static readonly System.Random _random = new System.Random();
+        // ReSharper disable once InconsistentNaming
+        private static readonly System.Random _random = default;
 
         private int GetValue(int rarityThreshold)
         {
@@ -45,18 +46,18 @@ namespace Assets.Scripts.Crafting.Results
 
         private int PickValueAtRandom(List<CraftableBase> components, Func<CraftableBase, int> getProp)
         {
-            var values = components.Select(getProp);
-            var takeAt = _random.Next(0, values.Count() - 1);
+            var values = components.Select(getProp).ToList();
+            var takeAt = _random.Next(0, values.Count - 1);
             return values.ElementAt(takeAt);
         }
 
         private string GetTargeting(IEnumerable<string> effectsInput)
         {
             //Only one target
-            var targetEffects = effectsInput.Intersect(Spell.TargetingOptions.All);
-            if (targetEffects.Any())
+            var target = effectsInput.Intersect(Spell.TargetingOptions.All).LastOrDefault();
+            if (!string.IsNullOrWhiteSpace(target))
             {
-                return targetEffects.Last();
+                return target;
             }
 
             return Spell.TargetingOptions.Projectile;
@@ -67,10 +68,10 @@ namespace Assets.Scripts.Crafting.Results
             //Only one shape
             if (targeting != Spell.TargetingOptions.Beam && targeting != Spell.TargetingOptions.Cone)
             {
-                var shapeEffects = effectsInput.Intersect(Spell.ShapeOptions.All);
-                if (shapeEffects.Any())
+                var shape = effectsInput.Intersect(Spell.ShapeOptions.All).LastOrDefault();
+                if (!string.IsNullOrWhiteSpace(shape))
                 {
-                    return shapeEffects.Last();
+                    return shape;
                 }
             }
 
@@ -86,7 +87,9 @@ namespace Assets.Scripts.Crafting.Results
                 .Except(Spell.ShapeOptions.All);
 
             //If there is a buff or support then remove all debuffs
-            if (effects.Intersect(Spell.BuffEffects.All).Any() || effects.Intersect(Spell.SupportEffects.All).Any())
+            var firstBuff = effects.Intersect(Spell.BuffEffects.All).FirstOrDefault();
+            var firstSupport = effects.Intersect(Spell.SupportEffects.All).FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(firstBuff) || !string.IsNullOrWhiteSpace(firstSupport))
             {
                 effects = effects.Except(Spell.DebuffEffects.All);
             }

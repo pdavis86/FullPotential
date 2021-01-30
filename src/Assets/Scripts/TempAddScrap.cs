@@ -3,6 +3,10 @@ using Assets.Scripts.Crafting.Results;
 using UnityEngine;
 using UnityEngine.UI;
 
+// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+
 public class TempAddScrap : MonoBehaviour
 {
     public GameObject Container;

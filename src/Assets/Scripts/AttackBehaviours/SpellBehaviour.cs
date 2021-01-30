@@ -1,6 +1,9 @@
-﻿using Assets.Scripts.Attacks;
-using Assets.Scripts.Crafting.Results;
+﻿using Assets.Scripts.Crafting.Results;
 using UnityEngine;
+
+// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedMember.Local
+// ReSharper disable ClassNeverInstantiated.Global
 
 public class SpellBehaviour : AttackBehaviourBase
 {

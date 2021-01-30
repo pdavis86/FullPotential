@@ -9,9 +9,9 @@ namespace Assets.Scripts.Crafting
 {
     public static class UiHelper
     {
-        public static void UpdateResults(Transform CraftingTransform, ResultFactory resultFactory)
+        public static void UpdateResults(Transform craftingTransform, ResultFactory resultFactory)
         {
-            var compContainer = CraftingTransform.Find("ComponentsScrollView").Find("ComponentsContainer");
+            var compContainer = craftingTransform.Find("ComponentsScrollView").Find("ComponentsContainer");
             var slotTemplate = compContainer.Find("ComponentTemplate");
             var slotTemplateWidth = slotTemplate.GetComponent<RectTransform>().rect.width;
 
@@ -25,7 +25,7 @@ namespace Assets.Scripts.Crafting
                 }
             }
 
-            var textArea = CraftingTransform.Find("ResultingItem").Find("Text").GetComponent<Text>();
+            var textArea = craftingTransform.Find("ResultingItem").Find("Text").GetComponent<Text>();
 
             if (components.Count == 0)
             {
@@ -33,7 +33,7 @@ namespace Assets.Scripts.Crafting
                 return;
             }
 
-            var header = CraftingTransform.Find("Header");
+            var header = craftingTransform.Find("Header");
 
             var typeDropdown = header.Find("ResultType").GetComponent<Dropdown>();
             var selectedType = typeDropdown.options[typeDropdown.value].text;
@@ -66,9 +66,9 @@ namespace Assets.Scripts.Crafting
             var sb = new StringBuilder();
 
             sb.Append($"Name: {craftedThing.Name}\n");
-            if (craftedThing.Attributes.IsActivated) { sb.Append($"IsActivated: true\n"); }
-            if (craftedThing.Attributes.IsAutomatic) { sb.Append($"IsAutomatic: true\n"); }
-            if (craftedThing.Attributes.IsSoulbound) { sb.Append($"IsSoulbound: true\n"); }
+            if (craftedThing.Attributes.IsActivated) { sb.Append("IsActivated: true\n"); }
+            if (craftedThing.Attributes.IsAutomatic) { sb.Append("IsAutomatic: true\n"); }
+            if (craftedThing.Attributes.IsSoulbound) { sb.Append("IsSoulbound: true\n"); }
             if (craftedThing.Attributes.ExtraAmmoPerShot > 0) { sb.Append($"ExtraAmmoPerShot: {craftedThing.Attributes.ExtraAmmoPerShot}\n"); }
             if (craftedThing.Attributes.Strength > 0) { sb.Append($"Strength: {craftedThing.Attributes.Strength}\n"); }
             if (craftedThing.Attributes.Cost > 0) { sb.Append($"Cost: {craftedThing.Attributes.Cost}\n"); }

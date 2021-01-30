@@ -1,6 +1,10 @@
 ﻿using Assets.Scripts.Attributes;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+
 public class PlayerMovement : MonoBehaviour
 {
     const float _speed = 5f;

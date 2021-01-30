@@ -11,7 +11,7 @@ namespace Assets.Scripts.Crafting.Results
         public const string Gloves = "Gloves";
         public const string Barrier = "Barrier";
 
-        public static List<string> ArmorOptions = new List<string> {
+        public static readonly List<string> ArmorOptions = new List<string> {
             Helm,
             Chest,
             Legs,
