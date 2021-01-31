@@ -5,11 +5,13 @@ using UnityEngine;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnassignedField.Global
 
 public class PlayerToggles : MonoBehaviour
 {
-    public GameObject _hud;
-    public GameObject _crafting;
+    public GameObject Hud;
+    public GameObject CraftingUi;
 
     public bool HasMenuOpen;
 
@@ -20,7 +22,7 @@ public class PlayerToggles : MonoBehaviour
     {
         _toggles = GetComponent<PlayerToggles>();
 
-        _crafting.SetActive(false);
+        CraftingUi.SetActive(false);
     }
 
     void Update()
@@ -46,10 +48,10 @@ public class PlayerToggles : MonoBehaviour
             {
                 _doToggle = false;
 
-                _hud.SetActive(!_hud.activeSelf);
-                _crafting.SetActive(!_hud.activeSelf);
+                Hud.SetActive(!Hud.activeSelf);
+                CraftingUi.SetActive(!Hud.activeSelf);
 
-                _toggles.HasMenuOpen = !_hud.activeSelf;
+                _toggles.HasMenuOpen = !Hud.activeSelf;
             }
         }
         catch (Exception ex)

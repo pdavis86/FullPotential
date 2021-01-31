@@ -2,3 +2,6 @@
 
 # Default severity for analyzer diagnostics with category 'Style'
 dotnet_analyzer_diagnostic.category-Style.severity = none
+
+# Stop telling me that new List<string>() should be new(). Unity doesn't like that!
+resharper_arrange_object_creation_when_type_evident_highlighting = none

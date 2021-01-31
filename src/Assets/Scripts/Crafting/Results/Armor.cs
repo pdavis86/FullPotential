@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
 namespace Assets.Scripts.Crafting.Results
 {
     public class Armor : ItemBase

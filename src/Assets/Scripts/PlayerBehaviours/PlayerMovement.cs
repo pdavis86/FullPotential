@@ -6,12 +6,15 @@ using UnityEngine;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable UnusedType.Global
 
 public class PlayerMovement : MonoBehaviour
 {
+    // ReSharper disable InconsistentNaming
     const float _speed = 5f;
     const float _lookSensitivity = 3f;
     const float _cameraRotationLimit = 85f;
+    // ReSharper restore InconsistentNaming
 
     private Rigidbody _rb;
     private Camera _cam;
@@ -20,7 +23,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _velocity;
     private Vector3 _rotation;
     private float _cameraRotationX;
-    private float _currentCameraRotationX = 0f;
+    private float _currentCameraRotationX;
 
     private void Awake()
     {
