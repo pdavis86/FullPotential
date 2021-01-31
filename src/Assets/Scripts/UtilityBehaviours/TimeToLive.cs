@@ -2,6 +2,7 @@
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 
 public class TimeToLive : MonoBehaviour

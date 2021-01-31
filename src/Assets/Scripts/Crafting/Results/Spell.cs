@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
 namespace Assets.Scripts.Crafting.Results
 {
     public class Spell : CraftableBase
@@ -54,7 +56,8 @@ namespace Assets.Scripts.Crafting.Results
             };
         }
 
-        public static readonly Dictionary<string, string> BuffOpposites = new Dictionary<string, string> {
+        public static readonly Dictionary<string, string> BuffOpposites = new Dictionary<string, string>
+        {
             { BuffEffects.Regen, DebuffEffects.Poison },
             { BuffEffects.Haste, DebuffEffects.Slow },
             { BuffEffects.Courage, DebuffEffects.Fear },
@@ -160,7 +163,7 @@ namespace Assets.Scripts.Crafting.Results
             };
         }
 
-        public static readonly List<string> LootEffectsAndOptions = 
+        public static readonly List<string> LootEffectsAndOptions =
             BuffEffects.All //Excluded from "All" property: .Except(new[] { BuffEffects.LifeTap, BuffEffects.ManaTap })
             .Union(DebuffEffects.All)
             .Union(SupportEffects.All)

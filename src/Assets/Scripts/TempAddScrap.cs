@@ -1,10 +1,12 @@
 ﻿using Assets.Scripts.Crafting;
 using Assets.Scripts.Crafting.Results;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 
 public class TempAddScrap : MonoBehaviour
@@ -23,11 +25,18 @@ public class TempAddScrap : MonoBehaviour
 
     private void OnClick()
     {
-        var newComp = Instantiate(_slotTemplate, Container.transform);
-        newComp.gameObject.GetComponent<ComponentProperties>().Properties = _resultFactory.GetLootDrop();
-        newComp.gameObject.SetActive(true);
+        try
+        {
+            var newComp = Instantiate(_slotTemplate, Container.transform);
+            newComp.gameObject.GetComponent<ComponentProperties>().Properties = _resultFactory.GetLootDrop();
+            newComp.gameObject.SetActive(true);
 
-        UiHelper.UpdateResults(Container.transform.parent.parent, _resultFactory);
+            UiHelper.UpdateResults(Container.transform.parent.parent, _resultFactory);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(ex);
+        }
     }
 
 }

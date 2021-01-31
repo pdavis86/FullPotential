@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+// ReSharper disable PossibleMultipleEnumeration
+
 namespace Assets.Scripts.Crafting.Results
 {
     [ServerSideOnlyTemp]
@@ -87,9 +89,7 @@ namespace Assets.Scripts.Crafting.Results
                 .Except(Spell.ShapeOptions.All);
 
             //If there is a buff or support then remove all debuffs
-            var firstBuff = effects.Intersect(Spell.BuffEffects.All).FirstOrDefault();
-            var firstSupport = effects.Intersect(Spell.SupportEffects.All).FirstOrDefault();
-            if (!string.IsNullOrWhiteSpace(firstBuff) || !string.IsNullOrWhiteSpace(firstSupport))
+            if (effects.Intersect(Spell.BuffEffects.All).Any() || effects.Intersect(Spell.SupportEffects.All).Any())
             {
                 effects = effects.Except(Spell.DebuffEffects.All);
             }

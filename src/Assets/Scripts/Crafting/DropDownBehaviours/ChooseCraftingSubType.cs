@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Crafting;
 using Assets.Scripts.Crafting.Results;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,7 +11,7 @@ using UnityEngine.UI;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Compiler
+// ReSharper disable UnassignedField.Global
 
 public class ChooseCraftingSubType : MonoBehaviour
 {
@@ -31,21 +32,30 @@ public class ChooseCraftingSubType : MonoBehaviour
 
     void OnValueChanged(int index)
     {
-        SetHandednessDropDownVisibility(HandednessDropdown, TypeDropdown.options[TypeDropdown.value].text, _subTypeDropdown.options[index].text);
-        UiHelper.UpdateResults(transform.parent.parent, new ResultFactory());
+        try
+        {
+            SetHandednessDropDownVisibility(HandednessDropdown, TypeDropdown.options[TypeDropdown.value].text, _subTypeDropdown.options[index].text);
+            UiHelper.UpdateResults(transform.parent.parent, new ResultFactory());
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(ex);
+        }
     }
 
 
 
     // ReSharper disable once InconsistentNaming
-    private static readonly string[] _handednessSubTypes = new[] { 
-        Weapon.Axe, 
-        Weapon.Sword, 
-        Weapon.Hammer, 
-        Weapon.Gun 
+    private static readonly string[] _handednessSubTypes = new[]
+    {
+        Weapon.Axe,
+        Weapon.Sword,
+        Weapon.Hammer,
+        Weapon.Gun
     };
 
-    public readonly static List<string> HandednessOptions = new List<string> {
+    public static readonly List<string> HandednessOptions = new List<string>
+    {
         Weapon.OneHanded,
         Weapon.TwoHanded
     };

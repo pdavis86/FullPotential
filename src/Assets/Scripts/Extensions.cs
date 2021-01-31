@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace UnityEngine
-{
-    public static class UnityEngineEx
-    {
+﻿//namespace UnityEngine
+//{
+    //public static class UnityEngineEx
+    //{
         //public static int GetActiveChildCount(this Component parent)
         //{
         //    var i = 0;
@@ -120,5 +118,5 @@ namespace UnityEngine
         //    return parent.GetComponents<T>();
         //}
 
-    }
-}
+    //}
+//}

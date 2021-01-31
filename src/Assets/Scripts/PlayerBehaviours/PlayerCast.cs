@@ -1,10 +1,12 @@
 ﻿using Assets.Scripts.Attributes;
 using Assets.Scripts.Crafting.Results;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 
 public class PlayerCast : MonoBehaviour
@@ -22,13 +24,20 @@ public class PlayerCast : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        try
         {
-            CastSpell();
+            if (Input.GetMouseButtonDown(0))
+            {
+                CastSpell();
+            }
+            else if (Input.GetMouseButtonDown(1))
+            {
+                CastSpell(true);
+            }
         }
-        else if (Input.GetMouseButtonDown(1))
+        catch (Exception ex)
         {
-            CastSpell(true);
+            Debug.LogError(ex);
         }
     }
 

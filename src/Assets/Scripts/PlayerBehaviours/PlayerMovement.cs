@@ -1,8 +1,10 @@
 ﻿using Assets.Scripts.Attributes;
+using System;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 
 public class PlayerMovement : MonoBehaviour
@@ -29,21 +31,35 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        var moveX = transform.right * Input.GetAxis("Horizontal");
-        var moveZ = transform.forward * Input.GetAxis("Vertical");
-        _velocity = (moveX + moveZ) * _speed;
+        try
+        {
+            var moveX = transform.right * Input.GetAxis("Horizontal");
+            var moveZ = transform.forward * Input.GetAxis("Vertical");
+            _velocity = (moveX + moveZ) * _speed;
 
-        _rotation = new Vector3(0f, Input.GetAxisRaw("Mouse X"), 0f) * _lookSensitivity;
+            _rotation = new Vector3(0f, Input.GetAxisRaw("Mouse X"), 0f) * _lookSensitivity;
 
-        _cameraRotationX = Input.GetAxisRaw("Mouse Y") * _lookSensitivity;
+            _cameraRotationX = Input.GetAxisRaw("Mouse Y") * _lookSensitivity;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(ex);
+        }
     }
 
     void FixedUpdate()
     {
-        if (!_toggles.HasMenuOpen)
+        try
         {
-            PerformMovement();
-            PerformRotation();
+            if (!_toggles.HasMenuOpen)
+            {
+                PerformMovement();
+                PerformRotation();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(ex);
         }
     }
 

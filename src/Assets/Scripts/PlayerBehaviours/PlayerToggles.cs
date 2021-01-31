@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 
 public class PlayerToggles : MonoBehaviour
@@ -23,22 +25,36 @@ public class PlayerToggles : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        try
         {
-            _doToggle = true;
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                _doToggle = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(ex);
         }
     }
 
     private void FixedUpdate()
     {
-        if (_doToggle)
+        try
         {
-            _doToggle = false;
+            if (_doToggle)
+            {
+                _doToggle = false;
 
-            _hud.SetActive(!_hud.activeSelf);
-            _crafting.SetActive(!_hud.activeSelf);
+                _hud.SetActive(!_hud.activeSelf);
+                _crafting.SetActive(!_hud.activeSelf);
 
-            _toggles.HasMenuOpen = !_hud.activeSelf;
+                _toggles.HasMenuOpen = !_hud.activeSelf;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(ex);
         }
     }
 

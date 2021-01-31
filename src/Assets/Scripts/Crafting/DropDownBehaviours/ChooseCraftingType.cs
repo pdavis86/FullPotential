@@ -9,6 +9,8 @@ using UnityEngine.UI;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable UnassignedField.Global
+// ReSharper disable MemberCanBePrivate.Global
 
 public class ChooseCraftingType : MonoBehaviour
 {
@@ -22,7 +24,8 @@ public class ChooseCraftingType : MonoBehaviour
 
     private Dropdown _thisDropdown;
 
-    public static List<string> TypeOptions = new List<string> {
+    public static readonly List<string> TypeOptions = new List<string>
+    {
         CraftingTypeWeapon,
         CraftingTypeArmor,
         CraftingTypeAccessory,
@@ -40,36 +43,43 @@ public class ChooseCraftingType : MonoBehaviour
 
     void OnValueChanged(int index)
     {
-        SubTypeDropdown.ClearOptions();
-
-        var isSpell = false;
-        var craftingType = _thisDropdown.options[_thisDropdown.value].text;
-
-        switch (craftingType)
+        try
         {
-            case CraftingTypeWeapon: SubTypeDropdown.AddOptions(Weapon.WeaponOptions); break;
-            case CraftingTypeArmor: SubTypeDropdown.AddOptions(Armor.ArmorOptions); break;
-            case CraftingTypeAccessory: SubTypeDropdown.AddOptions(Accessory.AccessoryOptions); break;
-            case CraftingTypeSpell: isSpell = true; break;
+            SubTypeDropdown.ClearOptions();
 
-            default:
-                throw new InvalidOperationException("Unknown crafting type");
+            var isSpell = false;
+            var craftingType = _thisDropdown.options[_thisDropdown.value].text;
+
+            switch (craftingType)
+            {
+                case CraftingTypeWeapon: SubTypeDropdown.AddOptions(Weapon.WeaponOptions); break;
+                case CraftingTypeArmor: SubTypeDropdown.AddOptions(Armor.ArmorOptions); break;
+                case CraftingTypeAccessory: SubTypeDropdown.AddOptions(Accessory.AccessoryOptions); break;
+                case CraftingTypeSpell: isSpell = true; break;
+
+                default:
+                    throw new InvalidOperationException("Unknown crafting type");
+            }
+
+            if (isSpell)
+            {
+                SubTypeDropdown.gameObject.SetActive(false);
+            }
+            else
+            {
+                SubTypeDropdown.RefreshShownValue();
+                SubTypeDropdown.gameObject.SetActive(true);
+            }
+
+            var subType = SubTypeDropdown.options != null && SubTypeDropdown.options.Count > 0 ? SubTypeDropdown.options[SubTypeDropdown.value].text : null;
+            ChooseCraftingSubType.SetHandednessDropDownVisibility(HandednessDropdown, craftingType, subType);
+
+            UiHelper.UpdateResults(transform.parent.parent, new ResultFactory());
         }
-
-        if (isSpell)
+        catch (Exception ex)
         {
-            SubTypeDropdown.gameObject.SetActive(false);
+            Debug.LogError(ex);
         }
-        else
-        {
-            SubTypeDropdown.RefreshShownValue();
-            SubTypeDropdown.gameObject.SetActive(true);
-        }
-
-        var subType = SubTypeDropdown.options != null && SubTypeDropdown.options.Count > 0 ? SubTypeDropdown.options[SubTypeDropdown.value].text : null;
-        ChooseCraftingSubType.SetHandednessDropDownVisibility(HandednessDropdown, craftingType, subType);
-
-        UiHelper.UpdateResults(transform.parent.parent, new ResultFactory());
     }
 
 }

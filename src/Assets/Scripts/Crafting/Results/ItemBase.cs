@@ -1,4 +1,6 @@
-﻿namespace Assets.Scripts.Crafting.Results
+﻿// ReSharper disable UnusedMember.Global
+
+namespace Assets.Scripts.Crafting.Results
 {
     public abstract class ItemBase : CraftableBase
     {

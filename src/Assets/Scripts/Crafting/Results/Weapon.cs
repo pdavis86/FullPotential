@@ -17,7 +17,8 @@ namespace Assets.Scripts.Crafting.Results
         public const string OneHanded = "One-handed";
         public const string TwoHanded = "Two-handed";
 
-        public static readonly List<string> WeaponOptions = new List<string> {
+        public static readonly List<string> WeaponOptions = new List<string>
+        {
             Dagger,
             Axe,
             Sword,

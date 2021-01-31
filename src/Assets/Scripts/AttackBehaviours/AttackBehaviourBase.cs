@@ -7,6 +7,7 @@ using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable NotAccessedField.Global
 
@@ -25,6 +26,7 @@ public abstract class AttackBehaviourBase : MonoBehaviour
     {
         //todo: check target is damagable
         //todo: crit? if so, what is it?
+        //todo: half-damage for duel-weilding
 
         //todo: calc damage
         var defenseStrength = 30;
