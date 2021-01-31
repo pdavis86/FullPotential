@@ -19,7 +19,7 @@ public abstract class AttackBehaviourBase : MonoBehaviour
     public Transform DamageNumbersParent;
 
     // ReSharper disable once InconsistentNaming
-    private static readonly System.Random _random = default;
+    private static readonly System.Random _random = new System.Random();
 
     [ServerSideOnlyTemp]
     internal void DealDamage(CraftableBase source, GameObject target, Vector3 position)

@@ -20,7 +20,7 @@ public class PlayerCast : MonoBehaviour
 
     private Camera _camera;
 
-    private void Start()
+    void Start()
     {
         _camera = transform.Find("PlayerCamera").GetComponent<Camera>();
     }
@@ -45,16 +45,10 @@ public class PlayerCast : MonoBehaviour
     }
 
     [ServerSideOnlyTemp]
-    void CastSpell(bool leftHand = false)
+    private Spell GetPlayerActiveSpell()
     {
-        //todo: check the player has the spell and cna cast it
-        if (GetComponent<PlayerToggles>().HasMenuOpen)
-        {
-            return;
-        }
-
-        //todo: which spell is active?
-        var activeSpell = new Spell
+        //todo: check the player has a spell active and can cast it
+        return new Spell
         {
             Name = "test spell",
             Targeting = Spell.TargetingOptions.Projectile,
@@ -65,28 +59,50 @@ public class PlayerCast : MonoBehaviour
             Effects = new List<string> { Spell.ElementalEffects.Fire },
             Shape = Spell.ShapeOptions.Wall
         };
+    }
 
-        if (activeSpell.Targeting == Spell.TargetingOptions.Projectile)
+    [ServerSideOnlyTemp]
+    private void CastSpell(bool leftHand = false)
+    {
+        if (GetComponent<PlayerToggles>().HasMenuOpen)
         {
-            var startPos = transform.position + _camera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
-            var spell = Instantiate(SpellPrefab, startPos, transform.rotation);
-            spell.SetActive(true);
-
-            var spellRb = spell.GetComponent<Rigidbody>();
-            spellRb.AddForce(_camera.transform.forward * 20f, ForceMode.VelocityChange);
-
-            var spellScript = spell.GetComponent<SpellBehaviour>();
-            spellScript.HitTextUiPrefab = HitTextUiPrefab;
-            spellScript.Player = gameObject;
-            spellScript.PlayerCamera = _camera;
-            spellScript.DamageNumbersParent = DamageNumbersParent;
-
-            //todo: finish this
-            spellScript.Spell = activeSpell;
+            return;
         }
-        else
+
+        var activeSpell = GetPlayerActiveSpell();
+
+        if (activeSpell == null)
         {
+            return;
+        }
+
+        switch (activeSpell.Targeting)
+        {
+            case Spell.TargetingOptions.Projectile:
+                var startPos = transform.position + _camera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
+                var spell = Instantiate(SpellPrefab, startPos, transform.rotation);
+                spell.SetActive(true);
+
+                var spellRb = spell.GetComponent<Rigidbody>();
+                spellRb.AddForce(_camera.transform.forward * 20f, ForceMode.VelocityChange);
+
+                var spellScript = spell.GetComponent<SpellBehaviour>();
+                spellScript.HitTextUiPrefab = HitTextUiPrefab;
+                spellScript.Player = gameObject;
+                spellScript.PlayerCamera = _camera;
+                spellScript.DamageNumbersParent = DamageNumbersParent;
+                spellScript.Spell = activeSpell;
+
+                break;
+
+            case Spell.TargetingOptions.Self:
+            case Spell.TargetingOptions.Touch:
+            case Spell.TargetingOptions.Beam:
+            case Spell.TargetingOptions.Cone:
             //todo: other spell targeting options
+
+            default:
+                throw new Exception("Unexpected spell targeting: " + activeSpell.Targeting);
         }
     }
 

@@ -2778,8 +2778,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14a7122f3a98c9d4691ab7dc300f1633, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _hud: {fileID: 85336378}
-  _crafting: {fileID: 521180628}
+  Hud: {fileID: 85336378}
+  CraftingUi: {fileID: 521180628}
   HasMenuOpen: 0
 --- !u!1 &1080999843
 GameObject:

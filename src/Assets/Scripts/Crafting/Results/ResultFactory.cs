@@ -12,7 +12,7 @@ namespace Assets.Scripts.Crafting.Results
     public class ResultFactory
     {
         // ReSharper disable once InconsistentNaming
-        private static readonly System.Random _random = default;
+        private static readonly System.Random _random = new System.Random();
 
         private int GetValue(int rarityThreshold)
         {
@@ -209,7 +209,7 @@ namespace Assets.Scripts.Crafting.Results
                     lootDrop.Effects.Add(Spell.LingeringPairing[elementalEffect]);
                 }
 
-                Debug.Log($"Added {numberOfEffects} effects: {string.Join(", ", lootDrop.Effects)}");
+                //Debug.Log($"Added {numberOfEffects} effects: {string.Join(", ", lootDrop.Effects)}");
             }
 
             return lootDrop;
@@ -219,7 +219,7 @@ namespace Assets.Scripts.Crafting.Results
         //todo: add ability to name item
         //todo: add validation e.g. enough scrap to make a two-handed weapon
         //todo: add validation e.g. at least one effect for a spell
-        //todo: add a min level
+        //todo: add a min level to craftedResult
 
         internal CraftableBase GetSpell(List<CraftableBase> components)
         {

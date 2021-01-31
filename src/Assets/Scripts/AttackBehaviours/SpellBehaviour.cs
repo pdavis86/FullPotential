@@ -27,7 +27,6 @@ public class SpellBehaviour : AttackBehaviourBase
     {
         try
         {
-            //todo: how dod we make sure this is checked server-side only?
             DealDamage(Spell, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
             Destroy(gameObject);
         }
@@ -42,7 +41,6 @@ public class SpellBehaviour : AttackBehaviourBase
     {
         try
         {
-            //todo: how dod we make sure this is checked server-side only?
             DealDamage(Spell, collision.gameObject, collision.GetContact(0).point);
             Destroy(gameObject);
         }
