@@ -15,14 +15,13 @@ using UnityEngine.UI;
 public class TempAddScrap : MonoBehaviour
 {
     public GameObject Container;
+    public Transform SlotTemplate;
 
-    private Transform _slotTemplate;
     private readonly ResultFactory _resultFactory = new ResultFactory();
 
     void Start()
     {
-        _slotTemplate = Container.transform.Find("ComponentTemplate");
-        _slotTemplate.gameObject.SetActive(false);
+        SlotTemplate.gameObject.SetActive(false);
         transform.GetComponent<Button>().onClick.AddListener(OnClick);
     }
 
@@ -30,7 +29,7 @@ public class TempAddScrap : MonoBehaviour
     {
         try
         {
-            var newComp = Instantiate(_slotTemplate, Container.transform);
+            var newComp = Instantiate(SlotTemplate, Container.transform);
             newComp.gameObject.GetComponent<ComponentProperties>().Properties = _resultFactory.GetLootDrop();
             newComp.gameObject.SetActive(true);
 

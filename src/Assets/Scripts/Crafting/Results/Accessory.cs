@@ -4,7 +4,7 @@
 
 namespace Assets.Scripts.Crafting.Results
 {
-    public class Accessory : ItemBase
+    public class Accessory : GearBase
     {
         public const string Amulet = "Amulet";
         public const string Ring = "Ring";

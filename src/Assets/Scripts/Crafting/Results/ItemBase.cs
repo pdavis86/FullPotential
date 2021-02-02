@@ -1,10 +1,11 @@
-﻿// ReSharper disable UnusedMember.Global
+﻿using System.Collections.Generic;
 
 namespace Assets.Scripts.Crafting.Results
 {
-    public abstract class ItemBase : CraftableBase
+    public class ItemBase
     {
-        public string Type { get; set; }
-        public int Health { get; set; }
+        public string Name { get; set; }
+        public Attributes Attributes { get; set; }
+        public List<string> Effects { get; set; }
     }
 }

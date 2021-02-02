@@ -17,13 +17,7 @@ public class PlayerCast : MonoBehaviour
     public GameObject SpellPrefab;
     public GameObject HitTextUiPrefab;
     public Transform DamageNumbersParent;
-
-    private Camera _camera;
-
-    void Start()
-    {
-        _camera = transform.Find("PlayerCamera").GetComponent<Camera>();
-    }
+    public Camera PlayerCamera;
 
     void Update()
     {
@@ -79,27 +73,28 @@ public class PlayerCast : MonoBehaviour
         switch (activeSpell.Targeting)
         {
             case Spell.TargetingOptions.Projectile:
-                var startPos = transform.position + _camera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
+                var startPos = transform.position + PlayerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
                 var spell = Instantiate(SpellPrefab, startPos, transform.rotation);
                 spell.SetActive(true);
 
+                //todo: force should vary
                 var spellRb = spell.GetComponent<Rigidbody>();
-                spellRb.AddForce(_camera.transform.forward * 20f, ForceMode.VelocityChange);
+                spellRb.AddForce(PlayerCamera.transform.forward * 20f, ForceMode.VelocityChange);
 
                 var spellScript = spell.GetComponent<SpellBehaviour>();
                 spellScript.HitTextUiPrefab = HitTextUiPrefab;
                 spellScript.Player = gameObject;
-                spellScript.PlayerCamera = _camera;
+                spellScript.PlayerCamera = PlayerCamera;
                 spellScript.DamageNumbersParent = DamageNumbersParent;
                 spellScript.Spell = activeSpell;
 
                 break;
 
-            case Spell.TargetingOptions.Self:
-            case Spell.TargetingOptions.Touch:
-            case Spell.TargetingOptions.Beam:
-            case Spell.TargetingOptions.Cone:
             //todo: other spell targeting options
+            //case Spell.TargetingOptions.Self:
+            //case Spell.TargetingOptions.Touch:
+            //case Spell.TargetingOptions.Beam:
+            //case Spell.TargetingOptions.Cone:
 
             default:
                 throw new Exception("Unexpected spell targeting: " + activeSpell.Targeting);

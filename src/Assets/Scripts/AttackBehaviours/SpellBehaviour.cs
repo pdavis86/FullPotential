@@ -22,7 +22,6 @@ public class SpellBehaviour : AttackBehaviourBase
         //}
     }
 
-    //Damage
     private void OnTriggerEnter(Collider other)
     {
         try
@@ -36,18 +35,17 @@ public class SpellBehaviour : AttackBehaviourBase
         }
     }
 
-    //Impact
-    private void OnCollisionEnter(Collision collision)
-    {
-        try
-        {
-            DealDamage(Spell, collision.gameObject, collision.GetContact(0).point);
-            Destroy(gameObject);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError(ex);
-        }
-    }
+    //private void OnCollisionEnter(Collision collision)
+    //{
+    //    try
+    //    {
+    //        DealDamage(Spell, collision.gameObject, collision.GetContact(0).point);
+    //        Destroy(gameObject);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Debug.LogError(ex);
+    //    }
+    //}
 
 }

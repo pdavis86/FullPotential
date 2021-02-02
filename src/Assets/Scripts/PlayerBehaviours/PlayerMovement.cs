@@ -7,6 +7,8 @@ using UnityEngine;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnassignedField.Global
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -17,7 +19,6 @@ public class PlayerMovement : MonoBehaviour
     // ReSharper restore InconsistentNaming
 
     private Rigidbody _rb;
-    private Camera _cam;
     private PlayerToggles _toggles;
 
     private Vector3 _velocity;
@@ -25,10 +26,11 @@ public class PlayerMovement : MonoBehaviour
     private float _cameraRotationX;
     private float _currentCameraRotationX;
 
+    public Camera PlayerCamera;
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
-        _cam = transform.Find("PlayerCamera").GetComponent<Camera>();
         _toggles = GetComponent<PlayerToggles>();
     }
 
@@ -78,11 +80,11 @@ public class PlayerMovement : MonoBehaviour
     void PerformRotation()
     {
         _rb.MoveRotation(_rb.rotation * Quaternion.Euler(_rotation));
-        if (_cam != null)
+        if (PlayerCamera != null)
         {
             _currentCameraRotationX -= _cameraRotationX;
             _currentCameraRotationX = Mathf.Clamp(_currentCameraRotationX, -_cameraRotationLimit, _cameraRotationLimit);
-            _cam.transform.localEulerAngles = new Vector3(_currentCameraRotationX, 0f, 0f);
+            PlayerCamera.transform.localEulerAngles = new Vector3(_currentCameraRotationX, 0f, 0f);
         }
     }
 

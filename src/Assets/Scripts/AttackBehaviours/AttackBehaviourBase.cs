@@ -22,7 +22,7 @@ public abstract class AttackBehaviourBase : MonoBehaviour
     private static readonly System.Random _random = new System.Random();
 
     [ServerSideOnlyTemp]
-    internal void DealDamage(CraftableBase source, GameObject target, Vector3 position)
+    internal void DealDamage(ItemBase source, GameObject target, Vector3 position)
     {
         //todo: check target is damagable
         //todo: crit? if so, what is it?

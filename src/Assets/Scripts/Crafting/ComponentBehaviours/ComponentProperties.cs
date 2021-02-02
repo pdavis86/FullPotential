@@ -8,5 +8,5 @@ using UnityEngine;
 
 public class ComponentProperties : MonoBehaviour
 {
-    public CraftableBase Properties;   
+    public ItemBase Properties;   
 }

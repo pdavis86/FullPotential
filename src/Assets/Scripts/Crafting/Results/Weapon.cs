@@ -4,7 +4,7 @@
 
 namespace Assets.Scripts.Crafting.Results
 {
-    public class Weapon : ItemBase
+    public class Weapon : GearBase
     {
         public const string Dagger = "Dagger";
         public const string Axe = "Axe";

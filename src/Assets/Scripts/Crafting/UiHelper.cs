@@ -9,13 +9,15 @@ namespace Assets.Scripts.Crafting
 {
     public static class UiHelper
     {
+        //todo: stop using .Find(
+
         public static void UpdateResults(Transform craftingTransform, ResultFactory resultFactory)
         {
             var compContainer = craftingTransform.Find("ComponentsScrollView").Find("ComponentsContainer");
             var slotTemplate = compContainer.Find("ComponentTemplate");
             var slotTemplateWidth = slotTemplate.GetComponent<RectTransform>().rect.width;
 
-            var components = new List<CraftableBase>();
+            var components = new List<ItemBase>();
             foreach (Transform transform in compContainer.transform)
             {
                 if (transform.gameObject.activeInHierarchy && transform.gameObject.name.Contains("(Clone)"))
@@ -83,11 +85,11 @@ namespace Assets.Scripts.Crafting
         }
 
         [ServerSideOnlyTemp]
-        private static CraftableBase GetCraftedItem(ResultFactory resultFactory, List<CraftableBase> components, string selectedType, string selectedSubtype, bool isTwoHanded)
+        private static ItemBase GetCraftedItem(ResultFactory resultFactory, List<ItemBase> components, string selectedType, string selectedSubtype, bool isTwoHanded)
         {
             //todo: check the components are actually in the player's invesntory
 
-            CraftableBase craftedThing;
+            ItemBase craftedThing;
             if (selectedType == ChooseCraftingType.CraftingTypeSpell)
             {
                 craftedThing = resultFactory.GetSpell(components);

@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Assets.Scripts.Crafting.Results
 {
-    public class Spell : CraftableBase
+    public class Spell : ItemBase
     {
         public string Targeting { get; set; }
         public string Shape { get; set; }

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 // ReSharper disable PossibleMultipleEnumeration
 
@@ -12,14 +11,14 @@ namespace Assets.Scripts.Crafting.Results
     public class ResultFactory
     {
         // ReSharper disable once InconsistentNaming
-        private static readonly System.Random _random = new System.Random();
+        private static readonly Random _random = new Random();
 
         private int GetValue(int rarityThreshold)
         {
             return _random.Next(0, 100) > rarityThreshold ? _random.Next(1, 100) : 0;
         }
 
-        private int ComputeAttribute(List<CraftableBase> components, Func<CraftableBase, int> getProp)
+        private int ComputeAttribute(List<ItemBase> components, Func<ItemBase, int> getProp)
         {
             var min = components.Min(getProp);
             var max = components.Max(getProp);
@@ -46,7 +45,7 @@ namespace Assets.Scripts.Crafting.Results
             return result;
         }
 
-        private int PickValueAtRandom(List<CraftableBase> components, Func<CraftableBase, int> getProp)
+        private int PickValueAtRandom(List<ItemBase> components, Func<ItemBase, int> getProp)
         {
             var values = components.Select(getProp).ToList();
             var takeAt = _random.Next(0, values.Count - 1);
@@ -180,11 +179,11 @@ namespace Assets.Scripts.Crafting.Results
             return min + (int)Math.Round((max - min) * Math.Pow(_random.NextDouble(), 3), 0);
         }
 
-        internal CraftableBase GetLootDrop()
+        internal ItemBase GetLootDrop()
         {
             //todo: limit good drops to higher level players
 
-            var lootDrop = new CraftableBase
+            var lootDrop = new ItemBase
             {
                 Attributes = GetRandomAttributes(),
                 Effects = new List<string>()
@@ -193,6 +192,9 @@ namespace Assets.Scripts.Crafting.Results
             var isMagical = _random.Next(0, 2) > 0;
             if (isMagical)
             {
+                lootDrop.Name = "Shard";
+                //todo: icon
+
                 var numberOfEffects = GetBiasedNumber(1, 4);
                 for (var i = 1; i <= numberOfEffects; i++)
                 {
@@ -211,6 +213,11 @@ namespace Assets.Scripts.Crafting.Results
 
                 //Debug.Log($"Added {numberOfEffects} effects: {string.Join(", ", lootDrop.Effects)}");
             }
+            else
+            {
+                lootDrop.Name = "Scrap";
+                //todo: icon
+            }
 
             return lootDrop;
         }
@@ -221,7 +228,7 @@ namespace Assets.Scripts.Crafting.Results
         //todo: add validation e.g. at least one effect for a spell
         //todo: add a min level to craftedResult
 
-        internal CraftableBase GetSpell(List<CraftableBase> components)
+        internal ItemBase GetSpell(List<ItemBase> components)
         {
             var effects = components.SelectMany(x => x.Effects);
             var spell = new Spell
@@ -245,12 +252,12 @@ namespace Assets.Scripts.Crafting.Results
             return spell;
         }
 
-        private string GetItemName(string prefix, ItemBase item)
+        private string GetItemName(string prefix, GearBase item)
         {
             return $"{prefix} {item.Attributes.Strength} {item.Type}";
         }
 
-        internal CraftableBase GetMeleeWeapon(string type, List<CraftableBase> components, bool isTwoHanded)
+        internal ItemBase GetMeleeWeapon(string type, List<ItemBase> components, bool isTwoHanded)
         {
             var item = new Weapon
             {
@@ -269,7 +276,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal CraftableBase GetRangedWeapon(string type, List<CraftableBase> components, bool isTwoHanded)
+        internal ItemBase GetRangedWeapon(string type, List<ItemBase> components, bool isTwoHanded)
         {
             var item = new Weapon
             {
@@ -293,7 +300,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal CraftableBase GetShield(List<CraftableBase> components)
+        internal ItemBase GetShield(List<ItemBase> components)
         {
             var item = new Weapon
             {
@@ -311,7 +318,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal CraftableBase GetArmor(string type, List<CraftableBase> components)
+        internal ItemBase GetArmor(string type, List<ItemBase> components)
         {
             var item = new Armor
             {
@@ -327,7 +334,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal CraftableBase GetBarrier(List<CraftableBase> components)
+        internal ItemBase GetBarrier(List<ItemBase> components)
         {
             var item = new Armor
             {
@@ -346,7 +353,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal CraftableBase GetAccessory(string type, List<CraftableBase> components)
+        internal ItemBase GetAccessory(string type, List<ItemBase> components)
         {
             var item = new Accessory
             {
