@@ -13,10 +13,7 @@ using UnityEngine;
 
 public abstract class AttackBehaviourBase : MonoBehaviour
 {
-    public GameObject Player;
     public Camera PlayerCamera;
-    public GameObject HitTextUiPrefab;
-    public Transform DamageNumbersParent;
 
     // ReSharper disable once InconsistentNaming
     private static readonly System.Random _random = new System.Random();
@@ -42,8 +39,8 @@ public abstract class AttackBehaviourBase : MonoBehaviour
     [ClientSideOnlyTemp]
     private void ShowDamage(Vector3 position, string damage)
     {
-        var hit = Instantiate(HitTextUiPrefab);
-        hit.transform.SetParent(DamageNumbersParent, false);
+        var hit = Instantiate(ObjectAccess.Instance.PrefabHitText);
+        hit.transform.SetParent(ObjectAccess.Instance.UiDamageNumbers.transform, false);
         hit.gameObject.SetActive(true);
 
         var hitText = hit.GetComponent<TextMeshProUGUI>();

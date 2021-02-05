@@ -14,15 +14,20 @@ using UnityEngine;
 
 public class PlayerCast : MonoBehaviour
 {
-    public GameObject SpellPrefab;
-    public GameObject HitTextUiPrefab;
-    public Transform DamageNumbersParent;
     public Camera PlayerCamera;
+
+    private PlayerController _playerController;
+
+    private void Awake()
+    {
+        _playerController = GetComponent<PlayerController>();
+    }
 
     void Update()
     {
         try
         {
+            //todo: fire1 and fire2 instead?
             if (Input.GetMouseButtonDown(0))
             {
                 CastSpell();
@@ -58,7 +63,7 @@ public class PlayerCast : MonoBehaviour
     [ServerSideOnlyTemp]
     private void CastSpell(bool leftHand = false)
     {
-        if (GetComponent<PlayerToggles>().HasMenuOpen)
+        if (_playerController.HasMenuOpen)
         {
             return;
         }
@@ -74,7 +79,7 @@ public class PlayerCast : MonoBehaviour
         {
             case Spell.TargetingOptions.Projectile:
                 var startPos = transform.position + PlayerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
-                var spell = Instantiate(SpellPrefab, startPos, transform.rotation);
+                var spell = Instantiate(ObjectAccess.Instance.PrefabSpell, startPos, transform.rotation);
                 spell.SetActive(true);
 
                 //todo: force should vary
@@ -82,10 +87,7 @@ public class PlayerCast : MonoBehaviour
                 spellRb.AddForce(PlayerCamera.transform.forward * 20f, ForceMode.VelocityChange);
 
                 var spellScript = spell.GetComponent<SpellBehaviour>();
-                spellScript.HitTextUiPrefab = HitTextUiPrefab;
-                spellScript.Player = gameObject;
                 spellScript.PlayerCamera = PlayerCamera;
-                spellScript.DamageNumbersParent = DamageNumbersParent;
                 spellScript.Spell = activeSpell;
 
                 break;

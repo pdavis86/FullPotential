@@ -19,7 +19,7 @@ public class PlayerMovement : MonoBehaviour
     // ReSharper restore InconsistentNaming
 
     private Rigidbody _rb;
-    private PlayerToggles _toggles;
+    private PlayerController _playerController;
 
     private Vector3 _velocity;
     private Vector3 _rotation;
@@ -31,7 +31,7 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
-        _toggles = GetComponent<PlayerToggles>();
+        _playerController = GetComponent<PlayerController>();
     }
 
     void Update()
@@ -56,7 +56,7 @@ public class PlayerMovement : MonoBehaviour
     {
         try
         {
-            if (!_toggles.HasMenuOpen)
+            if (!_playerController.HasMenuOpen)
             {
                 PerformMovement();
                 PerformRotation();

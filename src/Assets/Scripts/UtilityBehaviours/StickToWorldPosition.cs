@@ -12,6 +12,9 @@ public class StickToWorldPosition : MonoBehaviour
 
     void Update()
     {
-        transform.position = PlayerCamera.WorldToScreenPoint(WorldPosition);
+        if (PlayerCamera != null)
+        {
+            transform.position = PlayerCamera.WorldToScreenPoint(WorldPosition);
+        }
     }
 }
