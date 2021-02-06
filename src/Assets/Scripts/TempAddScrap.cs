@@ -1,5 +1,4 @@
 ﻿using Assets.Scripts.Crafting;
-using Assets.Scripts.Crafting.Results;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,8 +16,6 @@ public class TempAddScrap : MonoBehaviour
     public GameObject Container;
     public Transform SlotTemplate;
 
-    private readonly ResultFactory _resultFactory = new ResultFactory();
-
     void Start()
     {
         SlotTemplate.gameObject.SetActive(false);
@@ -30,10 +27,10 @@ public class TempAddScrap : MonoBehaviour
         try
         {
             var newComp = Instantiate(SlotTemplate, Container.transform);
-            newComp.gameObject.GetComponent<ComponentProperties>().Properties = _resultFactory.GetLootDrop();
+            newComp.gameObject.GetComponent<ComponentProperties>().Properties = GameManager.Instance.ResultFactory.GetLootDrop();
             newComp.gameObject.SetActive(true);
 
-            UiHelper.UpdateResults(Container.transform.parent.parent, _resultFactory);
+            UiHelper.Instance.UpdateResults();
         }
         catch (Exception ex)
         {

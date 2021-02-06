@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
-        ObjectAccess.Instance.UiCrafting.SetActive(false);
+        GameManager.Instance.GameObjects.UiCrafting.SetActive(false);
     }
 
     void Update()
@@ -43,10 +43,10 @@ public class PlayerController : MonoBehaviour
             {
                 _doUiToggle = false;
 
-                ObjectAccess.Instance.UiHud.SetActive(!ObjectAccess.Instance.UiHud.activeSelf);
-                ObjectAccess.Instance.UiCrafting.SetActive(!ObjectAccess.Instance.UiHud.activeSelf);
+                GameManager.Instance.GameObjects.UiHud.SetActive(!GameManager.Instance.GameObjects.UiHud.activeSelf);
+                GameManager.Instance.GameObjects.UiCrafting.SetActive(!GameManager.Instance.GameObjects.UiHud.activeSelf);
 
-                HasMenuOpen = !ObjectAccess.Instance.UiHud.activeSelf;
+                HasMenuOpen = !GameManager.Instance.GameObjects.UiHud.activeSelf;
 
                 if (HasMenuOpen)
                 {
@@ -73,7 +73,7 @@ public class PlayerController : MonoBehaviour
         if (Physics.Raycast(startPos, PlayerCamera.transform.forward, out var hit))
         {
             //Debug.DrawLine(startPos, hit.point, Color.blue, 3);
-            Debug.Log("Ray cast hit " + hit.collider.gameObject.name);
+            //Debug.Log("Ray cast hit " + hit.collider.gameObject.name);
 
             var interactable = hit.collider.GetComponent<Interactable>();
             if (interactable != null)
@@ -81,27 +81,27 @@ public class PlayerController : MonoBehaviour
                 var distance = Vector3.Distance(PlayerCamera.transform.position, interactable.transform.position);
                 if (distance <= interactable.Radius)
                 {
-                    Debug.Log("Interacted with " + hit.collider.gameObject.name);
+                    //Debug.Log("Interacted with " + hit.collider.gameObject.name);
                     interactable.InteractWith();
                 }
-                else
-                {
-                    Debug.Log($"But not close enough ({distance})");
-                }
+                //else
+                //{
+                //    Debug.Log($"But not close enough ({distance})");
+                //}
             }
-            else
-            {
-                Debug.Log("But it's not interactable");
-            }
+            //else
+            //{
+            //    Debug.Log("But it's not interactable");
+            //}
         }
     }
 
     private void OnDisable()
     {
-        if (ObjectAccess.Instance.UiHud != null)
+        if (GameManager.Instance.GameObjects.UiHud != null)
         {
-            ObjectAccess.Instance.UiHud.SetActive(false);
-            ObjectAccess.Instance.UiCrafting.SetActive(false);
+            GameManager.Instance.GameObjects.UiHud.SetActive(false);
+            GameManager.Instance.GameObjects.UiCrafting.SetActive(false);
         }
     }
 

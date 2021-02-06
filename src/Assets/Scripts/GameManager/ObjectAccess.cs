@@ -16,22 +16,21 @@ public class ObjectAccess : MonoBehaviour
     public GameObject UiHud;
     public GameObject UiCrafting;
 
-    private static ObjectAccess _instance;
+    //private static ObjectAccess _instance;
+    //public static ObjectAccess Instance
+    //{
+    //    get { return _instance; }
+    //}
 
-    public static ObjectAccess Instance
-    {
-        get { return _instance; }
-    }
-
-    private void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            _instance = this;
-        }
-    }
+    //private void Awake()
+    //{
+    //    if (_instance != null && _instance != this)
+    //    {
+    //        Destroy(this.gameObject);
+    //    }
+    //    else
+    //    {
+    //        _instance = this;
+    //    }
+    //}
 }

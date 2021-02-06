@@ -24,9 +24,9 @@ public abstract class AttackBehaviourBase : MonoBehaviour
         //todo: crit? if so, what is it?
         //todo: half-damage for duel-weilding
 
-        if (target.tag != "Player" && target.tag != "Enemy")
+        if (!target.CompareTag("Player") && !target.CompareTag("Enemy"))
         {
-            Debug.Log("You hit something not damageable");
+            //Debug.Log("You hit something not damageable");
             return;
         }
 
@@ -44,8 +44,8 @@ public abstract class AttackBehaviourBase : MonoBehaviour
     [ClientSideOnlyTemp]
     private void ShowDamage(Vector3 position, string damage)
     {
-        var hit = Instantiate(ObjectAccess.Instance.PrefabHitText);
-        hit.transform.SetParent(ObjectAccess.Instance.UiDamageNumbers.transform, false);
+        var hit = Instantiate(GameManager.Instance.GameObjects.PrefabHitText);
+        hit.transform.SetParent(GameManager.Instance.GameObjects.UiDamageNumbers.transform, false);
         hit.gameObject.SetActive(true);
 
         var hitText = hit.GetComponent<TextMeshProUGUI>();

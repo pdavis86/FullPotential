@@ -18,7 +18,22 @@ public class ChooseCraftingSubType : MonoBehaviour
     public Dropdown TypeDropdown;
     public Dropdown HandednessDropdown;
 
+    public static readonly List<string> HandednessOptions = new List<string>
+    {
+        Weapon.OneHanded,
+        Weapon.TwoHanded
+    };
+
     private Dropdown _subTypeDropdown;
+
+    // ReSharper disable once InconsistentNaming
+    private static readonly string[] _handednessSubTypes = new[]
+    {
+        Weapon.Axe,
+        Weapon.Sword,
+        Weapon.Hammer,
+        Weapon.Gun
+    };
 
     void Start()
     {
@@ -35,30 +50,13 @@ public class ChooseCraftingSubType : MonoBehaviour
         try
         {
             SetHandednessDropDownVisibility(HandednessDropdown, TypeDropdown.options[TypeDropdown.value].text, _subTypeDropdown.options[index].text);
-            UiHelper.UpdateResults(transform.parent.parent, new ResultFactory());
+            UiHelper.Instance.UpdateResults();
         }
         catch (Exception ex)
         {
             Debug.LogError(ex);
         }
     }
-
-
-
-    // ReSharper disable once InconsistentNaming
-    private static readonly string[] _handednessSubTypes = new[]
-    {
-        Weapon.Axe,
-        Weapon.Sword,
-        Weapon.Hammer,
-        Weapon.Gun
-    };
-
-    public static readonly List<string> HandednessOptions = new List<string>
-    {
-        Weapon.OneHanded,
-        Weapon.TwoHanded
-    };
 
     public static void SetHandednessDropDownVisibility(Dropdown handednessDropdown, string type, string subType)
     {

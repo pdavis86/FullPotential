@@ -1,5 +1,4 @@
-﻿using Assets.Scripts.Crafting.Results;
-using UnityEngine;
+﻿using UnityEngine;
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -13,11 +12,11 @@ public class TempGiveLoot : Interactable
 {
     public Inventory Inventory;
 
-    private readonly ResultFactory _resultFactory = new ResultFactory();
-
     public override void InteractWith()
     {
-        Inventory.Add(_resultFactory.GetLootDrop());
+        Inventory.Add(GameManager.Instance.ResultFactory.GetLootDrop());
+
+        //todo: comment out
         Debug.Log($"Inventory now has {Inventory.Items.Count} items in it");
     }
 }

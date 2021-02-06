@@ -1,5 +1,4 @@
 ﻿using Assets.Scripts.Crafting;
-using Assets.Scripts.Crafting.Results;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,9 +23,9 @@ public class ComponentRemove : MonoBehaviour
             var slot = transform.parent.parent.gameObject;
             slot.name = "Deleting";
 
-            Destroy(transform.parent.parent.gameObject);
+            Destroy(slot);
 
-            UiHelper.UpdateResults(transform.parent.parent.parent.parent.parent, new ResultFactory());
+            UiHelper.Instance.UpdateResults();
         }
         catch (Exception ex)
         {

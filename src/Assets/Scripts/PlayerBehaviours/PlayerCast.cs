@@ -80,7 +80,7 @@ public class PlayerCast : MonoBehaviour
         {
             case Spell.TargetingOptions.Projectile:
                 var startPos = transform.position + PlayerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
-                var spell = Instantiate(ObjectAccess.Instance.PrefabSpell, startPos, transform.rotation);
+                var spell = Instantiate(GameManager.Instance.GameObjects.PrefabSpell, startPos, transform.rotation);
                 spell.SetActive(true);
 
                 //todo: force should vary

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Networking;
 
 // ReSharper disable once CheckNamespace
@@ -11,7 +9,9 @@ using UnityEngine.Networking;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
 
+#pragma warning disable CS0618 // Type or member is obsolete
 public class PlayerSetup : NetworkBehaviour
+#pragma warning restore CS0618 // Type or member is obsolete
 {
     private Camera _sceneCamera;
 
@@ -29,7 +29,7 @@ public class PlayerSetup : NetworkBehaviour
             return;
         }
 
-        ObjectAccess.Instance.UiHud.SetActive(true);
+        GameManager.Instance.GameObjects.UiHud.SetActive(true);
 
         var pp = gameObject.AddComponent<PlayerController>();
         pp.PlayerCamera = playerCamera;
@@ -50,9 +50,9 @@ public class PlayerSetup : NetworkBehaviour
 
     private void OnDisable()
     {
-        if (ObjectAccess.Instance.UiHud != null)
+        if (GameManager.Instance.GameObjects.UiHud != null)
         {
-            ObjectAccess.Instance.UiHud.SetActive(false);
+            GameManager.Instance.GameObjects.UiHud.SetActive(false);
         }
 
         if (_sceneCamera != null)

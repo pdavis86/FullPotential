@@ -74,7 +74,7 @@ public class ChooseCraftingType : MonoBehaviour
             var subType = SubTypeDropdown.options != null && SubTypeDropdown.options.Count > 0 ? SubTypeDropdown.options[SubTypeDropdown.value].text : null;
             ChooseCraftingSubType.SetHandednessDropDownVisibility(HandednessDropdown, craftingType, subType);
 
-            UiHelper.UpdateResults(transform.parent.parent, new ResultFactory());
+            UiHelper.Instance.UpdateResults();
         }
         catch (Exception ex)
         {

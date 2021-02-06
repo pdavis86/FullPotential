@@ -29,7 +29,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _jumpForce;
     private float _cameraRotationX;
     private float _currentCameraRotationX;
-    private double _startY;
+    //private double _startY;
     private bool _isJumping;
 
     public Camera PlayerCamera;
@@ -38,7 +38,7 @@ public class PlayerMovement : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _playerController = GetComponent<PlayerController>();
-        _startY = Math.Ceiling(transform.position.y);
+        //_startY = Math.Ceiling(transform.position.y);
     }
 
     void Update()

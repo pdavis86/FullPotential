@@ -5134,6 +5134,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1944863106}
+  - component: {fileID: 1944863108}
   - component: {fileID: 1944863105}
   - component: {fileID: 1944863107}
   m_Layer: 0
@@ -5189,6 +5190,18 @@ MonoBehaviour:
   UiDamageNumbers: {fileID: 1694622519}
   UiHud: {fileID: 85336378}
   UiCrafting: {fileID: 521180628}
+--- !u!114 &1944863108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1944863104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d098ff6b28f6a5459d1c46f7d085668, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1963050061
 GameObject:
   m_ObjectHideFlags: 0

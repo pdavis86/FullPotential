@@ -248,7 +248,16 @@ namespace Assets.Scripts.Crafting.Results
                 Effects = GetEffects(ChooseCraftingType.CraftingTypeSpell, effects),
             };
             spell.Shape = GetShape(spell.Targeting, effects);
-            spell.Name = spell.Effects.First() + " Spell";
+
+            if(spell.Effects.Count > 0)
+            {
+                spell.Name = spell.Effects.First() + " Spell";
+            }
+            else
+            {
+                spell.Name = spell.Targeting + " Spell";
+            }
+
             return spell;
         }
 

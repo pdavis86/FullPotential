@@ -7,46 +7,67 @@ using UnityEngine.UI;
 
 namespace Assets.Scripts.Crafting
 {
-    public static class UiHelper
+    public class UiHelper
     {
-        //todo: stop using .Find(
+        private static Transform _componentsContainer;
+        private static RectTransform _componentTemplateRect;
+        private static Text _textArea;
+        private static Dropdown _typeDropdown;
+        private static Dropdown _subTypeDropdown;
+        private static Dropdown _handednessDropdown;
 
-        public static void UpdateResults(Transform craftingTransform, ResultFactory resultFactory)
+        private UiHelper() { }
+
+        private static UiHelper _instance;
+        public static UiHelper Instance
         {
-            var compContainer = craftingTransform.Find("ComponentsScrollView").Find("ComponentsContainer");
-            var slotTemplate = compContainer.Find("ComponentTemplate");
-            var slotTemplateWidth = slotTemplate.GetComponent<RectTransform>().rect.width;
+            get
+            {
+                if (_instance == null)
+                {
+                    var craftingTransform = GameManager.Instance.GameObjects.UiCrafting.transform;
 
+                    _componentsContainer = craftingTransform.Find("ComponentsScrollView").Find("ComponentsContainer");
+
+                    var componentTemplateTransform = _componentsContainer.Find("ComponentTemplate");
+                    _componentTemplateRect = componentTemplateTransform.GetComponent<RectTransform>();
+
+                    _textArea = craftingTransform.Find("ResultingItem").Find("Text").GetComponent<Text>();
+
+                    var header = craftingTransform.Find("Header");
+                    _typeDropdown = header.Find("ResultType").GetComponent<Dropdown>();
+                    _subTypeDropdown = header.Find("ResultSubType").GetComponent<Dropdown>();
+                    _handednessDropdown = header.Find("ResultHandedness").GetComponent<Dropdown>();
+
+                    _instance = new UiHelper();
+                }
+
+                return _instance;
+            }
+        }
+
+        public void UpdateResults()
+        {
             var components = new List<ItemBase>();
-            foreach (Transform transform in compContainer.transform)
+            foreach (Transform transform in _componentsContainer.transform)
             {
                 if (transform.gameObject.activeInHierarchy && transform.gameObject.name.Contains("(Clone)"))
                 {
-                    transform.position = slotTemplate.position + new Vector3(components.Count * slotTemplateWidth, 0);
+                    transform.position = _componentTemplateRect.position + new Vector3(components.Count * _componentTemplateRect.rect.width, 0);
                     components.Add(transform.gameObject.GetComponent<ComponentProperties>().Properties);
                 }
             }
 
-            var textArea = craftingTransform.Find("ResultingItem").Find("Text").GetComponent<Text>();
-
             if (components.Count == 0)
             {
-                textArea.text = null;
+                _textArea.text = null;
                 return;
             }
 
-            var header = craftingTransform.Find("Header");
-
-            var typeDropdown = header.Find("ResultType").GetComponent<Dropdown>();
-            var selectedType = typeDropdown.options[typeDropdown.value].text;
-
-            var subTypeDropdown = header.Find("ResultSubType").GetComponent<Dropdown>();
-            var selectedSubtype = subTypeDropdown.options.Count > 0 ? subTypeDropdown.options[subTypeDropdown.value].text : null;
-
-            var handednessDropdown = header.Find("ResultHandedness").GetComponent<Dropdown>();
-            var isTwoHanded = handednessDropdown.options.Count > 0 && handednessDropdown.options[handednessDropdown.value].text == Weapon.TwoHanded;
-
-            var craftedThing = GetCraftedItem(resultFactory, components, selectedType, selectedSubtype, isTwoHanded);
+            var selectedType = _typeDropdown.options[_typeDropdown.value].text;
+            var selectedSubtype = _subTypeDropdown.options.Count > 0 ? _subTypeDropdown.options[_subTypeDropdown.value].text : null;
+            var isTwoHanded = _handednessDropdown.options.Count > 0 && _handednessDropdown.options[_handednessDropdown.value].text == Weapon.TwoHanded;
+            var craftedThing = GetCraftedItem(components, selectedType, selectedSubtype, isTwoHanded);
 
             ////copy a row
             //var container = transform.Find("container");
@@ -81,13 +102,15 @@ namespace Assets.Scripts.Crafting
             if (craftedThing.Attributes.Duration > 0) { sb.Append($"Duration: {craftedThing.Attributes.Duration}\n"); }
             if (craftedThing.Effects.Count > 0) { sb.Append($"Effects: {string.Join(", ", craftedThing.Effects)}"); }
 
-            textArea.text = sb.ToString();
+            _textArea.text = sb.ToString();
         }
 
         [ServerSideOnlyTemp]
-        private static ItemBase GetCraftedItem(ResultFactory resultFactory, List<ItemBase> components, string selectedType, string selectedSubtype, bool isTwoHanded)
+        private ItemBase GetCraftedItem(List<ItemBase> components, string selectedType, string selectedSubtype, bool isTwoHanded)
         {
             //todo: check the components are actually in the player's invesntory
+
+            var resultFactory = GameManager.Instance.ResultFactory;
 
             ItemBase craftedThing;
             if (selectedType == ChooseCraftingType.CraftingTypeSpell)
