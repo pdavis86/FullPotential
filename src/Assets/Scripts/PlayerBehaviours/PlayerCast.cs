@@ -28,7 +28,6 @@ public class PlayerCast : MonoBehaviour
     {
         try
         {
-            //todo: fire1 and fire2 instead?
             if (Input.GetMouseButtonDown(0))
             {
                 CastSpell();
@@ -83,9 +82,14 @@ public class PlayerCast : MonoBehaviour
                 var spell = Instantiate(GameManager.Instance.GameObjects.PrefabSpell, startPos, transform.rotation);
                 spell.SetActive(true);
 
-                //todo: force should vary
+                var castSpeed = activeSpell.Attributes.Speed / 50f;
+                if (castSpeed < 0.5)
+                {
+                    castSpeed = 0.5f;
+                }
+
                 var spellRb = spell.GetComponent<Rigidbody>();
-                spellRb.AddForce(PlayerCamera.transform.forward * 20f, ForceMode.VelocityChange);
+                spellRb.AddForce(PlayerCamera.transform.forward * 20f * castSpeed, ForceMode.VelocityChange);
 
                 var spellScript = spell.GetComponent<SpellBehaviour>();
                 spellScript.PlayerCamera = PlayerCamera;

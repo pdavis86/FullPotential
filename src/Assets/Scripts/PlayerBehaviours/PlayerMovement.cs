@@ -14,8 +14,6 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerController))]
 public class PlayerMovement : MonoBehaviour
 {
-    // ReSharper disable InconsistentNaming
-    // ReSharper restore InconsistentNaming
     [SerializeField] private float _speed = 5f;
     [SerializeField] private float _lookSensitivity = 3f;
     [SerializeField] private float _cameraRotationLimit = 85f;
@@ -29,7 +27,6 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _jumpForce;
     private float _cameraRotationX;
     private float _currentCameraRotationX;
-    //private double _startY;
     private bool _isJumping;
 
     public Camera PlayerCamera;
@@ -38,7 +35,6 @@ public class PlayerMovement : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _playerController = GetComponent<PlayerController>();
-        //_startY = Math.Ceiling(transform.position.y);
     }
 
     void Update()
@@ -53,16 +49,6 @@ public class PlayerMovement : MonoBehaviour
 
             _cameraRotationX = Input.GetAxisRaw("Mouse Y") * _lookSensitivity;
 
-            //if (Input.GetButtonDown("Jump"))
-            //{
-            //    _isJumping = true;
-            //}
-            //else if (Input.GetButtonUp("Jump"))
-            //{
-            //    _isJumping = false;
-            //}
-
-            //_isJumping = Input.GetButton("Jump");
             _jumpForce = Input.GetButton("Jump") ? Vector3.up * _jumpForceMultipler : Vector3.zero;
         }
         catch (Exception ex)
@@ -99,15 +85,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (!_isJumping && _jumpForce != Vector3.zero)
         {
-            //if (transform.position.y <= _startY)
-            //{
             _isJumping = true;
             _rb.AddForce(_jumpForce * Time.fixedDeltaTime, ForceMode.Acceleration);
-            //}
-            //else
-            //{
-            //    Debug.Log("Still jumping from the last time");
-            //}
         }
 
         if (_isJumping && _jumpForce == Vector3.zero)

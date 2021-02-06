@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
 
     public Inventory Inventory { get; private set; }
 
+    public InputMappings InputMappings { get; private set; }
+
     public ResultFactory ResultFactory { get; private set; }
 
 
@@ -34,6 +36,7 @@ public class GameManager : MonoBehaviour
             _instance = this;
             GameObjects = GetComponent<ObjectAccess>();
             Inventory = GetComponent<Inventory>();
+            InputMappings = GetComponent<InputMappings>();
             ResultFactory = new ResultFactory();
         }
     }

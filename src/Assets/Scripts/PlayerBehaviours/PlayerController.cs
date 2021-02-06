@@ -25,9 +25,10 @@ public class PlayerController : MonoBehaviour
     {
         try
         {
-            //todo: make settings for keys
-            if (Input.GetKeyDown(KeyCode.E)) { InteractWith(); }
-            if (Input.GetKeyDown(KeyCode.Escape)) { _doUiToggle = true; }
+            var mappings = GameManager.Instance.InputMappings;
+            if (Input.GetKeyDown(mappings.Menu)) { _doUiToggle = true; }
+            else if (Input.GetKeyDown(mappings.Inventory)) { OpenInventory(); }
+            else if (Input.GetKeyDown(mappings.Interact)) { InteractWith(); }
         }
         catch (Exception ex)
         {
@@ -67,6 +68,18 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void OnDisable()
+    {
+        if (GameManager.Instance.GameObjects.UiHud != null)
+        {
+            GameManager.Instance.GameObjects.UiHud.SetActive(false);
+            GameManager.Instance.GameObjects.UiCrafting.SetActive(false);
+        }
+    }
+
+
+
+
     void InteractWith()
     {
         var startPos = PlayerCamera.transform.position;
@@ -96,13 +109,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OnDisable()
+    void OpenInventory()
     {
-        if (GameManager.Instance.GameObjects.UiHud != null)
-        {
-            GameManager.Instance.GameObjects.UiHud.SetActive(false);
-            GameManager.Instance.GameObjects.UiCrafting.SetActive(false);
-        }
+        //todo: finish this
+        Debug.Log("Tried to open inventory");
     }
 
 
