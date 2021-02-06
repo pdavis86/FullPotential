@@ -12,9 +12,11 @@ public class SpellBehaviour : AttackBehaviourBase
 
     private void Awake()
     {
-        var ttl = gameObject.AddComponent<TimeToLive>();
-        ttl.GameObjectToDestroy = gameObject;
-        ttl.AllowedTime = 3f;
+        //var ttl = gameObject.AddComponent<TimeToLive>();
+        //ttl.GameObjectToDestroy = gameObject;
+        //ttl.AllowedTime = 3f;
+
+        Destroy(this, 3f);
 
         //if (ignorePhysics)
         //{
@@ -26,7 +28,7 @@ public class SpellBehaviour : AttackBehaviourBase
     {
         try
         {
-            DealDamage(Spell, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
+            CmdDealDamage(Spell, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
             Destroy(gameObject);
         }
         catch (Exception ex)

@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Attributes;
 using Assets.Scripts.Crafting.Results;
+using Assets.Scripts.Networking;
 using System;
 using System.Globalization;
 using TMPro;
@@ -18,8 +19,8 @@ public abstract class AttackBehaviourBase : MonoBehaviour
     // ReSharper disable once InconsistentNaming
     private static readonly System.Random _random = new System.Random();
 
-    [ServerSideOnlyTemp]
-    internal void DealDamage(ItemBase source, GameObject target, Vector3 position)
+    [ServerSideOnly]
+    internal void CmdDealDamage(ItemBase source, GameObject target, Vector3 position)
     {
         //todo: crit? if so, what is it?
         //todo: half-damage for duel-weilding
@@ -38,11 +39,11 @@ public abstract class AttackBehaviourBase : MonoBehaviour
 
         //Debug.Log($"Source '{source.Name}' attacked target '{target.name}' for {damageDealt} damage");
 
-        ShowDamage(position, damageDealt.ToString(CultureInfo.InvariantCulture));
+        RpcShowDamage(position, damageDealt.ToString(CultureInfo.InvariantCulture));
     }
 
-    [ClientSideOnlyTemp]
-    private void ShowDamage(Vector3 position, string damage)
+    [ClientSideFromServer]
+    private void RpcShowDamage(Vector3 position, string damage)
     {
         var hit = Instantiate(GameManager.Instance.GameObjects.PrefabHitText);
         hit.transform.SetParent(GameManager.Instance.GameObjects.UiDamageNumbers.transform, false);
@@ -55,9 +56,10 @@ public abstract class AttackBehaviourBase : MonoBehaviour
         sticky.PlayerCamera = PlayerCamera;
         sticky.WorldPosition = position;
 
-        var ttl = hit.gameObject.AddComponent<TimeToLive>();
-        ttl.GameObjectToDestroy = hit.gameObject;
-        ttl.AllowedTime = 1f;
+        //var ttl = hit.gameObject.AddComponent<TimeToLive>();
+        //ttl.GameObjectToDestroy = hit.gameObject;
+        //ttl.AllowedTime = 1f;
+        Destroy(hit, 1f);
     }
 
 }

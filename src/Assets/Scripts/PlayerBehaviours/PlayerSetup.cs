@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Networking;
+using UnityEngine;
 using UnityEngine.Networking;
 
 // ReSharper disable once CheckNamespace
@@ -9,15 +10,20 @@ using UnityEngine.Networking;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
 
-#pragma warning disable CS0618 // Type or member is obsolete
-public class PlayerSetup : NetworkBehaviour
-#pragma warning restore CS0618 // Type or member is obsolete
+public class PlayerSetup : NetworkBehaviour2
 {
     private Camera _sceneCamera;
 
     private void Start()
     {
         var playerCamera = transform.Find("PlayerCamera").GetComponent<Camera>();
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        var networkIdentity = GetComponent<NetworkIdentity>();
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        //todo: let player name themselves
+        gameObject.name = "Player " + networkIdentity.netId;
 
         if (!isLocalPlayer)
         {
@@ -60,4 +66,5 @@ public class PlayerSetup : NetworkBehaviour
             _sceneCamera.gameObject.SetActive(true);
         }
     }
+
 }

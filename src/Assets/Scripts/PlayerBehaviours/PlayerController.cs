@@ -48,18 +48,18 @@ public class PlayerController : MonoBehaviour
                 GameManager.Instance.GameObjects.UiCrafting.SetActive(!GameManager.Instance.GameObjects.UiHud.activeSelf);
 
                 HasMenuOpen = !GameManager.Instance.GameObjects.UiHud.activeSelf;
+            }
 
-                if (HasMenuOpen)
+            if (HasMenuOpen)
+            {
+                if (Cursor.lockState != CursorLockMode.None)
                 {
-                    if (Cursor.lockState != CursorLockMode.None)
-                    {
-                        Cursor.lockState = CursorLockMode.None;
-                    }
+                    Cursor.lockState = CursorLockMode.None;
                 }
-                else if (Cursor.lockState != CursorLockMode.Locked)
-                {
-                    Cursor.lockState = CursorLockMode.Locked;
-                }
+            }
+            else if (Cursor.lockState != CursorLockMode.Locked)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
             }
         }
         catch (Exception ex)

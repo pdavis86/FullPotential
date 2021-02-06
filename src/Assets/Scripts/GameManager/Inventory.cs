@@ -23,7 +23,6 @@ public class Inventory : MonoBehaviour
         Items = new List<ItemBase>();
     }
 
-    [ClientSideOnlyTemp]
     public void LoadFrom(string dataFromServer)
     {
         //todo: load inv from save

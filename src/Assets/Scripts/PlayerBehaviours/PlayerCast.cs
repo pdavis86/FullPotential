@@ -1,8 +1,10 @@
 ﻿using Assets.Scripts.Attributes;
 using Assets.Scripts.Crafting.Results;
+using Assets.Scripts.Networking;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -13,7 +15,7 @@ using UnityEngine;
 // ReSharper disable UnassignedField.Global
 
 [RequireComponent(typeof(PlayerController))]
-public class PlayerCast : MonoBehaviour
+public class PlayerCast : NetworkBehaviour2
 {
     public Camera PlayerCamera;
 
@@ -30,11 +32,11 @@ public class PlayerCast : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
-                CastSpell();
+                CmdCastSpell();
             }
             else if (Input.GetMouseButtonDown(1))
             {
-                CastSpell(true);
+                CmdCastSpell(true);
             }
         }
         catch (Exception ex)
@@ -43,8 +45,8 @@ public class PlayerCast : MonoBehaviour
         }
     }
 
-    [ServerSideOnlyTemp]
-    private Spell GetPlayerActiveSpell()
+    [ServerSideOnly]
+    private Spell CmdGetPlayerActiveSpell()
     {
         //todo: check the player has a spell active and can cast it
         return new Spell
@@ -60,15 +62,15 @@ public class PlayerCast : MonoBehaviour
         };
     }
 
-    [ServerSideOnlyTemp]
-    private void CastSpell(bool leftHand = false)
+    [ServerSideOnly]
+    private void CmdCastSpell(bool leftHand = false)
     {
         if (_playerController.HasMenuOpen)
         {
             return;
         }
 
-        var activeSpell = GetPlayerActiveSpell();
+        var activeSpell = CmdGetPlayerActiveSpell();
 
         if (activeSpell == null)
         {
@@ -94,6 +96,12 @@ public class PlayerCast : MonoBehaviour
                 var spellScript = spell.GetComponent<SpellBehaviour>();
                 spellScript.PlayerCamera = PlayerCamera;
                 spellScript.Spell = activeSpell;
+
+#pragma warning disable CS0618 // Type or member is obsolete
+                spell.AddComponent<NetworkIdentity>();
+#pragma warning restore CS0618 // Type or member is obsolete
+
+                NetworkServer2.Spawn(spell);
 
                 break;
 

@@ -67,7 +67,10 @@ namespace Assets.Scripts.Crafting
             var selectedType = _typeDropdown.options[_typeDropdown.value].text;
             var selectedSubtype = _subTypeDropdown.options.Count > 0 ? _subTypeDropdown.options[_subTypeDropdown.value].text : null;
             var isTwoHanded = _handednessDropdown.options.Count > 0 && _handednessDropdown.options[_handednessDropdown.value].text == Weapon.TwoHanded;
-            var craftedThing = GetCraftedItem(components, selectedType, selectedSubtype, isTwoHanded);
+
+
+
+            var craftedThing = CmdGetCraftedItem(components, selectedType, selectedSubtype, isTwoHanded);
 
             ////copy a row
             //var container = transform.Find("container");
@@ -105,8 +108,8 @@ namespace Assets.Scripts.Crafting
             _textArea.text = sb.ToString();
         }
 
-        [ServerSideOnlyTemp]
-        private ItemBase GetCraftedItem(List<ItemBase> components, string selectedType, string selectedSubtype, bool isTwoHanded)
+        [ServerSideOnly]
+        private ItemBase CmdGetCraftedItem(List<ItemBase> components, string selectedType, string selectedSubtype, bool isTwoHanded)
         {
             //todo: check the components are actually in the player's invesntory
 

@@ -7,7 +7,6 @@ using System.Linq;
 
 namespace Assets.Scripts.Crafting.Results
 {
-    [ServerSideOnlyTemp]
     public class ResultFactory
     {
         // ReSharper disable once InconsistentNaming

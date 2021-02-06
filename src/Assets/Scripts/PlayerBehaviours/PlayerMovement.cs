@@ -75,7 +75,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    [ServerSideOnlyTemp]
     void PerformMovement()
     {
         if (_velocity != Vector3.zero)
