@@ -21,9 +21,14 @@ public abstract class AttackBehaviourBase : MonoBehaviour
     [ServerSideOnlyTemp]
     internal void DealDamage(ItemBase source, GameObject target, Vector3 position)
     {
-        //todo: check target is damagable
         //todo: crit? if so, what is it?
         //todo: half-damage for duel-weilding
+
+        if (target.tag != "Player" && target.tag != "Enemy")
+        {
+            Debug.Log("You hit something not damageable");
+            return;
+        }
 
         //todo: calc damage
         var defenseStrength = 30;

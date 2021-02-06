@@ -10,21 +10,27 @@ using UnityEngine;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
 
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(PlayerController))]
 public class PlayerMovement : MonoBehaviour
 {
     // ReSharper disable InconsistentNaming
-    const float _speed = 5f;
-    const float _lookSensitivity = 3f;
-    const float _cameraRotationLimit = 85f;
     // ReSharper restore InconsistentNaming
+    [SerializeField] private float _speed = 5f;
+    [SerializeField] private float _lookSensitivity = 3f;
+    [SerializeField] private float _cameraRotationLimit = 85f;
+    [SerializeField] private float _jumpForceMultipler = 10500f;
 
     private Rigidbody _rb;
     private PlayerController _playerController;
 
     private Vector3 _velocity;
     private Vector3 _rotation;
+    private Vector3 _jumpForce;
     private float _cameraRotationX;
     private float _currentCameraRotationX;
+    private double _startY;
+    private bool _isJumping;
 
     public Camera PlayerCamera;
 
@@ -32,6 +38,7 @@ public class PlayerMovement : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _playerController = GetComponent<PlayerController>();
+        _startY = Math.Ceiling(transform.position.y);
     }
 
     void Update()
@@ -45,6 +52,18 @@ public class PlayerMovement : MonoBehaviour
             _rotation = new Vector3(0f, Input.GetAxisRaw("Mouse X"), 0f) * _lookSensitivity;
 
             _cameraRotationX = Input.GetAxisRaw("Mouse Y") * _lookSensitivity;
+
+            //if (Input.GetButtonDown("Jump"))
+            //{
+            //    _isJumping = true;
+            //}
+            //else if (Input.GetButtonUp("Jump"))
+            //{
+            //    _isJumping = false;
+            //}
+
+            //_isJumping = Input.GetButton("Jump");
+            _jumpForce = Input.GetButton("Jump") ? Vector3.up * _jumpForceMultipler : Vector3.zero;
         }
         catch (Exception ex)
         {
@@ -60,6 +79,8 @@ public class PlayerMovement : MonoBehaviour
             {
                 PerformMovement();
                 PerformRotation();
+
+                //todo: if within range of interactable, show "Press E to interact"
             }
         }
         catch (Exception ex)
@@ -74,6 +95,24 @@ public class PlayerMovement : MonoBehaviour
         if (_velocity != Vector3.zero)
         {
             _rb.MovePosition(_rb.position + _velocity * Time.fixedDeltaTime);
+        }
+
+        if (!_isJumping && _jumpForce != Vector3.zero)
+        {
+            //if (transform.position.y <= _startY)
+            //{
+            _isJumping = true;
+            _rb.AddForce(_jumpForce * Time.fixedDeltaTime, ForceMode.Acceleration);
+            //}
+            //else
+            //{
+            //    Debug.Log("Still jumping from the last time");
+            //}
+        }
+
+        if (_isJumping && _jumpForce == Vector3.zero)
+        {
+            _isJumping = false;
         }
     }
 

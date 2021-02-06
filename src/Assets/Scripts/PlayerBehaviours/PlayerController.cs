@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     public Camera PlayerCamera;
     public bool HasMenuOpen;
 
-    private bool _doToggle;
+    private bool _doUiToggle;
 
     void Awake()
     {
@@ -25,10 +25,9 @@ public class PlayerController : MonoBehaviour
     {
         try
         {
-            //todo: make a setting
+            //todo: make settings for keys
             if (Input.GetKeyDown(KeyCode.E)) { InteractWith(); }
-
-            if (Input.GetKeyDown(KeyCode.Escape)) { _doToggle = true; }
+            if (Input.GetKeyDown(KeyCode.Escape)) { _doUiToggle = true; }
         }
         catch (Exception ex)
         {
@@ -40,14 +39,26 @@ public class PlayerController : MonoBehaviour
     {
         try
         {
-            if (_doToggle)
+            if (_doUiToggle)
             {
-                _doToggle = false;
+                _doUiToggle = false;
 
                 ObjectAccess.Instance.UiHud.SetActive(!ObjectAccess.Instance.UiHud.activeSelf);
                 ObjectAccess.Instance.UiCrafting.SetActive(!ObjectAccess.Instance.UiHud.activeSelf);
 
                 HasMenuOpen = !ObjectAccess.Instance.UiHud.activeSelf;
+
+                if (HasMenuOpen)
+                {
+                    if (Cursor.lockState != CursorLockMode.None)
+                    {
+                        Cursor.lockState = CursorLockMode.None;
+                    }
+                }
+                else if (Cursor.lockState != CursorLockMode.Locked)
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                }
             }
         }
         catch (Exception ex)
@@ -82,6 +93,15 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.Log("But it's not interactable");
             }
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (ObjectAccess.Instance.UiHud != null)
+        {
+            ObjectAccess.Instance.UiHud.SetActive(false);
+            ObjectAccess.Instance.UiCrafting.SetActive(false);
         }
     }
 

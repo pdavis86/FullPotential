@@ -12,6 +12,7 @@ using UnityEngine;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
 
+[RequireComponent(typeof(PlayerController))]
 public class PlayerCast : MonoBehaviour
 {
     public Camera PlayerCamera;

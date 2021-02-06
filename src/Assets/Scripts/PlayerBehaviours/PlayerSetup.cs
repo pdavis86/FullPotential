@@ -22,6 +22,10 @@ public class PlayerSetup : NetworkBehaviour
         if (!isLocalPlayer)
         {
             playerCamera.gameObject.SetActive(false);
+
+            //playerCamera.GetComponent<Camera>().enabled = false;
+            //playerCamera.GetComponent<AudioListener>().enabled = false;
+
             return;
         }
 
@@ -33,6 +37,7 @@ public class PlayerSetup : NetworkBehaviour
         var pm = gameObject.AddComponent<PlayerMovement>();
         pm.PlayerCamera = playerCamera;
 
+        //todo: maybe merge this with PlayerController?
         var pc = gameObject.AddComponent<PlayerCast>();
         pc.PlayerCamera = playerCamera;
 
