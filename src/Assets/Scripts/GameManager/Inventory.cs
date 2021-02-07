@@ -1,5 +1,4 @@
-﻿using Assets.Scripts.Attributes;
-using Assets.Scripts.Crafting.Results;
+﻿using Assets.Scripts.Crafting.Results;
 using System.Collections.Generic;
 using UnityEngine;
 

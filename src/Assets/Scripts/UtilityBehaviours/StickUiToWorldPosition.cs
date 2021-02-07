@@ -5,8 +5,7 @@
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 
-[System.Obsolete("Use BillboardBehaviour instead")]
-public class StickToWorldPosition : MonoBehaviour
+public class StickUiToWorldPosition : MonoBehaviour
 {
     public Vector3 WorldPosition;
 

@@ -1,5 +1,4 @@
-﻿using Assets.Scripts.Networking;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -11,10 +10,10 @@ using UnityEngine.Networking;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
 
-public class PlayerSetup : NetworkBehaviour2
+public class PlayerSetup : NetworkBehaviour
 {
-    [SerializeField] private TextMeshProUGUI _nameTag;
     [SerializeField] private Camera _playerCamera;
+    [SerializeField] private TextMeshProUGUI _nameTag;
 
     private Camera _sceneCamera;
 
@@ -23,9 +22,7 @@ public class PlayerSetup : NetworkBehaviour2
         _sceneCamera = Camera.main;
 
         //todo: let player name themselves
-#pragma warning disable CS0618 // Type or member is obsolete
         var networkIdentity = GetComponent<NetworkIdentity>();
-#pragma warning restore CS0618 // Type or member is obsolete
         gameObject.name = "Player " + networkIdentity.netId;
 
         //todo: let players specify a URL to a material
@@ -33,6 +30,7 @@ public class PlayerSetup : NetworkBehaviour2
         if (!isLocalPlayer)
         {
             _nameTag.text = gameObject.name;
+            gameObject.GetComponent<PlayerController>().enabled = false;
             return;
         }
 
@@ -47,11 +45,10 @@ public class PlayerSetup : NetworkBehaviour2
 
         GameManager.Instance.GameObjects.UiHud.SetActive(true);
 
-        gameObject.AddComponent<PlayerController>();
-        gameObject.AddComponent<PlayerMovement>();
+        var pm = gameObject.AddComponent<PlayerMovement>();
+        pm.PlayerCamera = _playerCamera;
 
-        //todo: maybe merge this with PlayerController?
-        gameObject.AddComponent<PlayerCast>();
+        ClientScene.RegisterPrefab(GameManager.Instance.GameObjects.PrefabSpell);
     }
 
     private void OnDisable()

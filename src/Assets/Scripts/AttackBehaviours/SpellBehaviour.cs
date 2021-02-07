@@ -12,42 +12,22 @@ public class SpellBehaviour : AttackBehaviourBase
 
     private void Awake()
     {
-        //var ttl = gameObject.AddComponent<TimeToLive>();
-        //ttl.GameObjectToDestroy = gameObject;
-        //ttl.AllowedTime = 3f;
-
-        Destroy(this, 3f);
-
-        //if (ignorePhysics)
-        //{
-        gameObject.GetComponent<Collider>().isTrigger = true;
-        //}
+        Destroy(gameObject, 3f);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         try
         {
-            CmdDealDamage(Spell, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
-            Destroy(gameObject);
+            CmdDealDamage(Spell, gameObject, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
+            
+            //Don't Destroy(). Need it alive for RPC calls
+            gameObject.SetActive(false);
         }
         catch (Exception ex)
         {
             Debug.LogError(ex);
         }
     }
-
-    //private void OnCollisionEnter(Collision collision)
-    //{
-    //    try
-    //    {
-    //        DealDamage(Spell, collision.gameObject, collision.GetContact(0).point);
-    //        Destroy(gameObject);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        Debug.LogError(ex);
-    //    }
-    //}
 
 }

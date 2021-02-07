@@ -1,5 +1,4 @@
-﻿using Assets.Scripts.Attributes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -249,7 +248,7 @@ namespace Assets.Scripts.Crafting.Results
             };
             spell.Shape = GetShape(spell.Targeting, effects);
 
-            if(spell.Effects.Count > 0)
+            if (spell.Effects.Count > 0)
             {
                 spell.Name = spell.Effects.First() + " Spell";
             }

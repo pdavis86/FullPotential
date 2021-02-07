@@ -146,5 +146,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b715f8e638d7cd64c8162412d42ab01e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerCamera: {fileID: 0}
   WorldPosition: {x: 0, y: 0, z: 0}

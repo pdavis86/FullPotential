@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Assets.Scripts.Crafting.Results;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -9,8 +12,10 @@ using UnityEngine;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
+    [SerializeField] private Camera _playerCamera;
+
     public bool HasMenuOpen;
 
     private bool _doUiToggle;
@@ -25,9 +30,12 @@ public class PlayerController : MonoBehaviour
         try
         {
             var mappings = GameManager.Instance.InputMappings;
+
             if (Input.GetKeyDown(mappings.Menu)) { _doUiToggle = true; }
             else if (Input.GetKeyDown(mappings.Inventory)) { OpenInventory(); }
             else if (Input.GetKeyDown(mappings.Interact)) { InteractWith(); }
+            else if (Input.GetMouseButtonDown(0)) { CmdCastSpell(false); }
+            else if (Input.GetMouseButtonDown(1)) { CmdCastSpell(true); }
         }
         catch (Exception ex)
         {
@@ -79,12 +87,81 @@ public class PlayerController : MonoBehaviour
 
 
 
+
+
+    //todo: move this
+    private Spell GetPlayerActiveSpell()
+    {
+        //todo: check the player has a spell active and can cast it
+        return new Spell
+        {
+            Name = "test spell",
+            Targeting = Spell.TargetingOptions.Projectile,
+            Attributes = new Attributes
+            {
+                Strength = 50
+            },
+            Effects = new List<string> { Spell.ElementalEffects.Fire },
+            Shape = Spell.ShapeOptions.Wall
+        };
+    }
+
+    [Command]
+    private void CmdCastSpell(bool leftHand)
+    {
+        if (HasMenuOpen)
+        {
+            return;
+        }
+
+        var activeSpell = GetPlayerActiveSpell();
+
+        if (activeSpell == null)
+        {
+            return;
+        }
+
+        switch (activeSpell.Targeting)
+        {
+            case Spell.TargetingOptions.Projectile:
+                var startPos = transform.position + _playerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
+                var spellObject = Instantiate(GameManager.Instance.GameObjects.PrefabSpell, startPos, transform.rotation, transform);
+                spellObject.SetActive(true);
+
+                var castSpeed = activeSpell.Attributes.Speed / 50f;
+                if (castSpeed < 0.5)
+                {
+                    castSpeed = 0.5f;
+                }
+
+                var spellRb = spellObject.GetComponent<Rigidbody>();
+                spellRb.AddForce(_playerCamera.transform.forward * 20f * castSpeed, ForceMode.VelocityChange);
+
+                var spellScript = spellObject.GetComponent<SpellBehaviour>();
+                spellScript.SourcePlayer = GameManager.GetCurrentPlayerGameObject(_playerCamera);
+                spellScript.Spell = activeSpell;
+
+                NetworkServer.Spawn(spellObject);
+
+                break;
+
+            //todo: other spell targeting options
+            //case Spell.TargetingOptions.Self:
+            //case Spell.TargetingOptions.Touch:
+            //case Spell.TargetingOptions.Beam:
+            //case Spell.TargetingOptions.Cone:
+
+            default:
+                throw new Exception("Unexpected spell targeting: " + activeSpell.Targeting);
+        }
+    }
+
+
+
     void InteractWith()
     {
-        var cameraTransform = Camera.main.transform;
-
-        var startPos = cameraTransform.position;
-        if (Physics.Raycast(startPos, cameraTransform.forward, out var hit))
+        var startPos = _playerCamera.transform.position;
+        if (Physics.Raycast(startPos, _playerCamera.transform.forward, out var hit))
         {
             //Debug.DrawLine(startPos, hit.point, Color.blue, 3);
             //Debug.Log("Ray cast hit " + hit.collider.gameObject.name);
@@ -92,7 +169,7 @@ public class PlayerController : MonoBehaviour
             var interactable = hit.collider.GetComponent<Interactable>();
             if (interactable != null)
             {
-                var distance = Vector3.Distance(cameraTransform.position, interactable.transform.position);
+                var distance = Vector3.Distance(startPos, interactable.transform.position);
                 if (distance <= interactable.Radius)
                 {
                     //Debug.Log("Interacted with " + hit.collider.gameObject.name);

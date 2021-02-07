@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BillboardBehaviour : MonoBehaviour
+public class LookAtMainCamera : MonoBehaviour
 {
     private void LateUpdate()
     {

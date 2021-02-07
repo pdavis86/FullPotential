@@ -40,4 +40,11 @@ public class GameManager : MonoBehaviour
             ResultFactory = new ResultFactory();
         }
     }
+
+    public static GameObject GetCurrentPlayerGameObject(Camera playerCamera)
+    {
+        //var players = GameObject.FindGameObjectsWithTag("Player");
+        return playerCamera.gameObject.transform.parent.gameObject;
+    }
+
 }

@@ -1,5 +1,4 @@
-﻿using Assets.Scripts.Attributes;
-using System;
+﻿using System;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
@@ -14,6 +13,8 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerController))]
 public class PlayerMovement : MonoBehaviour
 {
+    public Camera PlayerCamera;
+
     [SerializeField] private float _speed = 5f;
     [SerializeField] private float _lookSensitivity = 3f;
     [SerializeField] private float _cameraRotationLimit = 85f;
@@ -98,7 +99,7 @@ public class PlayerMovement : MonoBehaviour
 
         _currentCameraRotationX -= _cameraRotationX;
         _currentCameraRotationX = Mathf.Clamp(_currentCameraRotationX, -_cameraRotationLimit, _cameraRotationLimit);
-        Camera.main.transform.localEulerAngles = new Vector3(_currentCameraRotationX, 0f, 0f);
+        PlayerCamera.transform.localEulerAngles = new Vector3(_currentCameraRotationX, 0f, 0f);
     }
 
 }

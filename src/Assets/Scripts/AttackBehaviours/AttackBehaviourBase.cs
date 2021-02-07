@@ -1,10 +1,10 @@
-﻿using Assets.Scripts.Attributes;
-using Assets.Scripts.Crafting.Results;
-using Assets.Scripts.Networking;
+﻿using Assets.Scripts.Crafting.Results;
 using System;
 using System.Globalization;
+using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -12,13 +12,15 @@ using UnityEngine;
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable NotAccessedField.Global
 
-public abstract class AttackBehaviourBase : MonoBehaviour
+public abstract class AttackBehaviourBase : NetworkBehaviour
 {
+    public GameObject SourcePlayer;
+
     // ReSharper disable once InconsistentNaming
     private static readonly System.Random _random = new System.Random();
 
-    [ServerSideOnly]
-    internal void CmdDealDamage(ItemBase source, GameObject target, Vector3 position)
+    [Command]
+    internal void CmdDealDamage(ItemBase sourceItem, GameObject source, GameObject target, Vector3 position)
     {
         //todo: crit? if so, what is it?
         //todo: half-damage for duel-weilding
@@ -33,24 +35,35 @@ public abstract class AttackBehaviourBase : MonoBehaviour
         var defenseStrength = 30;
         var numerator = 100 + _random.Next(0, 10);
         var denominator = 100 + _random.Next(-10, 10);
-        var damageDealt = Math.Round(source.Attributes.Strength * ((double)numerator / (denominator + defenseStrength)), 0);
+        var damageDealt = Math.Round(sourceItem.Attributes.Strength * ((double)numerator / (denominator + defenseStrength)), 0);
 
         //Debug.Log($"Source '{source.Name}' attacked target '{target.name}' for {damageDealt} damage");
 
-        RpcShowDamage(position, damageDealt.ToString(CultureInfo.InvariantCulture));
+        var networkIdentity = SourcePlayer.GetComponent<NetworkIdentity>();
+        TargetRpcShowDamage(networkIdentity.connectionToClient, position, damageDealt.ToString(CultureInfo.InvariantCulture));
+
+        //Don't destroy the object or the RPC will fail. Destroy() is handled in Awake();
+        //NetworkServer.Destroy(source);
     }
 
-    [ClientSideFromServer]
-    private void RpcShowDamage(Vector3 position, string damage)
+    [TargetRpc]
+    private void TargetRpcShowDamage(NetworkConnection playerConnection, Vector3 position, string damage)
     {
         var hit = Instantiate(GameManager.Instance.GameObjects.PrefabHitText);
-        hit.transform.SetParent(GameManager.Instance.GameObjects.UiDamageNumbers.transform, false);
+        hit.transform.SetParent(GameManager.Instance.GameObjects.UiHitNumbers.transform, false);
         hit.gameObject.SetActive(true);
 
         var hitText = hit.GetComponent<TextMeshProUGUI>();
         hitText.text = damage;
 
-        var sticky = hit.GetComponent<StickToWorldPosition>();
+        const int maxDistanceForMinFontSize = 40;
+        var distance = Vector3.Distance(Camera.main.transform.position, position);
+        var fontSize = maxDistanceForMinFontSize - distance;
+        if (fontSize < hitText.fontSizeMin) { fontSize = hitText.fontSizeMin; }
+        else if (fontSize > hitText.fontSizeMax) { fontSize = hitText.fontSizeMax; }
+        hitText.fontSize = fontSize;
+
+        var sticky = hit.GetComponent<StickUiToWorldPosition>();
         sticky.WorldPosition = position;
 
         Destroy(hit, 1f);

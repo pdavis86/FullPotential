@@ -1,5 +1,4 @@
-﻿using Assets.Scripts.Attributes;
-using Assets.Scripts.Crafting.Results;
+﻿using Assets.Scripts.Crafting.Results;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -108,7 +107,7 @@ namespace Assets.Scripts.Crafting
             _textArea.text = sb.ToString();
         }
 
-        [ServerSideOnly]
+        //todo: this needs moving to a NetworkBehaviour to use - [command]
         private ItemBase CmdGetCraftedItem(List<ItemBase> components, string selectedType, string selectedSubtype, bool isTwoHanded)
         {
             //todo: check the components are actually in the player's invesntory
