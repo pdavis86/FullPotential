@@ -10,7 +10,7 @@ using UnityEngine.Networking;
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Global
+// ReSharper disable UnassignedField.Compiler
 
 public class PlayerController : NetworkBehaviour
 {

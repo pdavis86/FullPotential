@@ -1,7 +1,6 @@
 ﻿using Assets.Scripts.Crafting.Results;
 using System;
 using System.Globalization;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -24,6 +23,7 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
     {
         //todo: crit? if so, what is it?
         //todo: half-damage for duel-weilding
+        //todo: give source experience
 
         if (!target.CompareTag("Player") && !target.CompareTag("Enemy"))
         {
@@ -46,6 +46,7 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
         //NetworkServer.Destroy(source);
     }
 
+    // ReSharper disable once UnusedParameter.Local
     [TargetRpc]
     private void TargetRpcShowDamage(NetworkConnection playerConnection, Vector3 position, string damage)
     {

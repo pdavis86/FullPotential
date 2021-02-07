@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     public ResultFactory ResultFactory { get; private set; }
 
 
+    // ReSharper disable once ArrangeAccessorOwnerBody
     private static GameManager _instance;
     public static GameManager Instance { get { return _instance; } }
 
