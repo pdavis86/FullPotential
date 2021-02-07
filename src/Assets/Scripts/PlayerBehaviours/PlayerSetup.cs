@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Networking;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -12,46 +13,45 @@ using UnityEngine.Networking;
 
 public class PlayerSetup : NetworkBehaviour2
 {
+    [SerializeField] private TextMeshProUGUI _nameTag;
+    [SerializeField] private Camera _playerCamera;
+
     private Camera _sceneCamera;
 
     private void Start()
     {
-        var playerCamera = transform.Find("PlayerCamera").GetComponent<Camera>();
+        _sceneCamera = Camera.main;
 
+        //todo: let player name themselves
 #pragma warning disable CS0618 // Type or member is obsolete
         var networkIdentity = GetComponent<NetworkIdentity>();
 #pragma warning restore CS0618 // Type or member is obsolete
-
-        //todo: let player name themselves
         gameObject.name = "Player " + networkIdentity.netId;
+
+        //todo: let players specify a URL to a material
 
         if (!isLocalPlayer)
         {
-            playerCamera.gameObject.SetActive(false);
-
-            //playerCamera.GetComponent<Camera>().enabled = false;
-            //playerCamera.GetComponent<AudioListener>().enabled = false;
-
+            _nameTag.text = gameObject.name;
             return;
         }
 
-        GameManager.Instance.GameObjects.UiHud.SetActive(true);
-
-        var pp = gameObject.AddComponent<PlayerController>();
-        pp.PlayerCamera = playerCamera;
-
-        var pm = gameObject.AddComponent<PlayerMovement>();
-        pm.PlayerCamera = playerCamera;
-
-        //todo: maybe merge this with PlayerController?
-        var pc = gameObject.AddComponent<PlayerCast>();
-        pc.PlayerCamera = playerCamera;
-
-        _sceneCamera = Camera.main;
         if (_sceneCamera != null)
         {
             _sceneCamera.gameObject.SetActive(false);
         }
+
+        _playerCamera.gameObject.SetActive(true);
+
+        _nameTag.text = null;
+
+        GameManager.Instance.GameObjects.UiHud.SetActive(true);
+
+        gameObject.AddComponent<PlayerController>();
+        gameObject.AddComponent<PlayerMovement>();
+
+        //todo: maybe merge this with PlayerController?
+        gameObject.AddComponent<PlayerCast>();
     }
 
     private void OnDisable()

@@ -11,7 +11,6 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public Camera PlayerCamera;
     public bool HasMenuOpen;
 
     private bool _doUiToggle;
@@ -82,8 +81,10 @@ public class PlayerController : MonoBehaviour
 
     void InteractWith()
     {
-        var startPos = PlayerCamera.transform.position;
-        if (Physics.Raycast(startPos, PlayerCamera.transform.forward, out var hit))
+        var cameraTransform = Camera.main.transform;
+
+        var startPos = cameraTransform.position;
+        if (Physics.Raycast(startPos, cameraTransform.forward, out var hit))
         {
             //Debug.DrawLine(startPos, hit.point, Color.blue, 3);
             //Debug.Log("Ray cast hit " + hit.collider.gameObject.name);
@@ -91,7 +92,7 @@ public class PlayerController : MonoBehaviour
             var interactable = hit.collider.GetComponent<Interactable>();
             if (interactable != null)
             {
-                var distance = Vector3.Distance(PlayerCamera.transform.position, interactable.transform.position);
+                var distance = Vector3.Distance(cameraTransform.position, interactable.transform.position);
                 if (distance <= interactable.Radius)
                 {
                     //Debug.Log("Interacted with " + hit.collider.gameObject.name);

@@ -14,8 +14,6 @@ using UnityEngine;
 
 public abstract class AttackBehaviourBase : MonoBehaviour
 {
-    public Camera PlayerCamera;
-
     // ReSharper disable once InconsistentNaming
     private static readonly System.Random _random = new System.Random();
 
@@ -53,7 +51,6 @@ public abstract class AttackBehaviourBase : MonoBehaviour
         hitText.text = damage;
 
         var sticky = hit.GetComponent<StickToWorldPosition>();
-        sticky.PlayerCamera = PlayerCamera;
         sticky.WorldPosition = position;
 
         Destroy(hit, 1f);

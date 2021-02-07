@@ -29,8 +29,6 @@ public class PlayerMovement : MonoBehaviour
     private float _currentCameraRotationX;
     private bool _isJumping;
 
-    public Camera PlayerCamera;
-
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
@@ -97,12 +95,10 @@ public class PlayerMovement : MonoBehaviour
     void PerformRotation()
     {
         _rb.MoveRotation(_rb.rotation * Quaternion.Euler(_rotation));
-        if (PlayerCamera != null)
-        {
-            _currentCameraRotationX -= _cameraRotationX;
-            _currentCameraRotationX = Mathf.Clamp(_currentCameraRotationX, -_cameraRotationLimit, _cameraRotationLimit);
-            PlayerCamera.transform.localEulerAngles = new Vector3(_currentCameraRotationX, 0f, 0f);
-        }
+
+        _currentCameraRotationX -= _cameraRotationX;
+        _currentCameraRotationX = Mathf.Clamp(_currentCameraRotationX, -_cameraRotationLimit, _cameraRotationLimit);
+        Camera.main.transform.localEulerAngles = new Vector3(_currentCameraRotationX, 0f, 0f);
     }
 
 }

@@ -17,8 +17,6 @@ using UnityEngine.Networking;
 [RequireComponent(typeof(PlayerController))]
 public class PlayerCast : NetworkBehaviour2
 {
-    public Camera PlayerCamera;
-
     private PlayerController _playerController;
 
     private void Awake()
@@ -77,10 +75,12 @@ public class PlayerCast : NetworkBehaviour2
             return;
         }
 
+        var cameraTransform = Camera.main.transform;
+
         switch (activeSpell.Targeting)
         {
             case Spell.TargetingOptions.Projectile:
-                var startPos = transform.position + PlayerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
+                var startPos = transform.position + cameraTransform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
                 var spell = Instantiate(GameManager.Instance.GameObjects.PrefabSpell, startPos, transform.rotation);
                 //todo: set parent
                 spell.SetActive(true);
@@ -92,11 +92,13 @@ public class PlayerCast : NetworkBehaviour2
                 }
 
                 var spellRb = spell.GetComponent<Rigidbody>();
-                spellRb.AddForce(PlayerCamera.transform.forward * 20f * castSpeed, ForceMode.VelocityChange);
+                spellRb.AddForce(cameraTransform.forward * 20f * castSpeed, ForceMode.VelocityChange);
 
                 var spellScript = spell.GetComponent<SpellBehaviour>();
-                spellScript.PlayerCamera = PlayerCamera;
                 spellScript.Spell = activeSpell;
+
+
+                //todo: not working
 
 #pragma warning disable CS0618 // Type or member is obsolete
                 spell.AddComponent<NetworkIdentity>();
