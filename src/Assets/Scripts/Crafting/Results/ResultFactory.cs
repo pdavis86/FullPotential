@@ -54,7 +54,7 @@ namespace Assets.Scripts.Crafting.Results
         private string GetTargeting(IEnumerable<string> effectsInput)
         {
             //Only one target
-            var target = effectsInput.Intersect(Spell.TargetingOptions.All).LastOrDefault();
+            var target = effectsInput.Intersect(Spell.TargetingOptions.All).FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(target))
             {
                 return target;
@@ -68,7 +68,7 @@ namespace Assets.Scripts.Crafting.Results
             //Only one shape
             if (targeting != Spell.TargetingOptions.Beam && targeting != Spell.TargetingOptions.Cone)
             {
-                var shape = effectsInput.Intersect(Spell.ShapeOptions.All).LastOrDefault();
+                var shape = effectsInput.Intersect(Spell.ShapeOptions.All).FirstOrDefault();
                 if (!string.IsNullOrWhiteSpace(shape))
                 {
                     return shape;
@@ -117,12 +117,12 @@ namespace Assets.Scripts.Crafting.Results
                 elementalEffects = effects.Intersect(Spell.ElementalEffects.All);
             }
 
-            //Remove all but the last elemental effect
+            //Only one elemental effect
             if (elementalEffects.Count() > 1)
             {
-                var lastElementalEffect = elementalEffects.Last();
+                var elementalEffect = elementalEffects.First();
                 effects = effects
-                    .Except(Spell.ElementalEffects.All.Where(x => x != lastElementalEffect));
+                    .Except(Spell.ElementalEffects.All.Where(x => x != elementalEffect));
             }
 
             if (craftingType == ChooseCraftingType.CraftingTypeArmor || craftingType == ChooseCraftingType.CraftingTypeAccessory)
@@ -181,6 +181,7 @@ namespace Assets.Scripts.Crafting.Results
         internal ItemBase GetLootDrop()
         {
             //todo: limit good drops to higher level players
+            //todo: add small posibility of returning a Relic
 
             var lootDrop = new ItemBase
             {
