@@ -45,8 +45,8 @@ public class PlayerCast : NetworkBehaviour2
         }
     }
 
-    [ServerSideOnly]
-    private Spell CmdGetPlayerActiveSpell()
+    //todo: move this
+    private Spell GetPlayerActiveSpell()
     {
         //todo: check the player has a spell active and can cast it
         return new Spell
@@ -70,7 +70,7 @@ public class PlayerCast : NetworkBehaviour2
             return;
         }
 
-        var activeSpell = CmdGetPlayerActiveSpell();
+        var activeSpell = GetPlayerActiveSpell();
 
         if (activeSpell == null)
         {
@@ -82,6 +82,7 @@ public class PlayerCast : NetworkBehaviour2
             case Spell.TargetingOptions.Projectile:
                 var startPos = transform.position + PlayerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
                 var spell = Instantiate(GameManager.Instance.GameObjects.PrefabSpell, startPos, transform.rotation);
+                //todo: set parent
                 spell.SetActive(true);
 
                 var castSpeed = activeSpell.Attributes.Speed / 50f;

@@ -56,9 +56,6 @@ public abstract class AttackBehaviourBase : MonoBehaviour
         sticky.PlayerCamera = PlayerCamera;
         sticky.WorldPosition = position;
 
-        //var ttl = hit.gameObject.AddComponent<TimeToLive>();
-        //ttl.GameObjectToDestroy = hit.gameObject;
-        //ttl.AllowedTime = 1f;
         Destroy(hit, 1f);
     }
 
