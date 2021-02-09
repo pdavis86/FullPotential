@@ -613,6 +613,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerCamera: {fileID: 7392779647204144589}
   _nameTag: {fileID: 6250991307057261387}
+  _meshRenderer: {fileID: 7392779648629048398}
 --- !u!114 &1201570389013236167
 MonoBehaviour:
   m_ObjectHideFlags: 0

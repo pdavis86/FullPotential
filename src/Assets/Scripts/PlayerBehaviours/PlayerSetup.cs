@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -14,6 +15,9 @@ public class PlayerSetup : NetworkBehaviour
 {
     [SerializeField] private Camera _playerCamera;
     [SerializeField] private TextMeshProUGUI _nameTag;
+    [SerializeField] private MeshRenderer _meshRenderer;
+
+    public string TextureUri;
 
     private Camera _sceneCamera;
 
@@ -21,16 +25,15 @@ public class PlayerSetup : NetworkBehaviour
     {
         _sceneCamera = Camera.main;
 
-        //todo: let player name themselves
-        var networkIdentity = GetComponent<NetworkIdentity>();
-        gameObject.name = "Player " + networkIdentity.netId;
-
-        //todo: let players specify a URL to a material
+        gameObject.name = "Player ID " + netId.Value;
 
         if (!isLocalPlayer)
         {
-            _nameTag.text = gameObject.name;
             gameObject.GetComponent<PlayerController>().enabled = false;
+
+            //todo: let player name themselves
+            _nameTag.text = "Player " + netId.Value;
+
             return;
         }
 
@@ -49,6 +52,17 @@ public class PlayerSetup : NetworkBehaviour
         pm.PlayerCamera = _playerCamera;
 
         ClientScene.RegisterPrefab(GameManager.Instance.GameObjects.PrefabSpell);
+
+        //todo: let players specify a URL to a texture PNG
+        var filePath = @"C:\Users\Paul\Desktop\Untitled.png";
+        if (!string.IsNullOrWhiteSpace(filePath) && System.IO.File.Exists(filePath))
+        {
+            //todo: SetPlayerTexture(filePath);
+            //todo: upload file
+            TextureUri = filePath;
+        }
+
+        CmdRequestingAllPlayerMaterials(TextureUri);
     }
 
     private void OnDisable()
@@ -62,6 +76,44 @@ public class PlayerSetup : NetworkBehaviour
         {
             _sceneCamera.gameObject.SetActive(true);
         }
+    }
+
+    void SetPlayerTexture(string filePath)
+    {
+        var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
+        tex.LoadImage(System.IO.File.ReadAllBytes(filePath));
+        var newMat = new Material(_meshRenderer.material.shader);
+        newMat.mainTexture = tex;
+        _meshRenderer.material = newMat;
+    }
+
+    [Command]
+    void CmdRequestingAllPlayerMaterials(string uriToDownloadAndApply)
+    {
+        if (string.IsNullOrWhiteSpace(uriToDownloadAndApply))
+        {
+            TextureUri = uriToDownloadAndApply;
+        }
+
+        var playerSetups = GameObject.FindGameObjectsWithTag("Player").Select(x => x.GetComponent<PlayerSetup>());
+        foreach (var playerSetup in playerSetups)
+        {
+            playerSetup.RpcSetPlayerMaterial(playerSetup.TextureUri);
+        }
+    }
+
+    [ClientRpc]
+    void RpcSetPlayerMaterial(string uriToDownloadAndApply)
+    {
+        if (string.IsNullOrWhiteSpace(uriToDownloadAndApply))
+        {
+            Debug.LogError($"No texture for player {gameObject.name}");
+        }
+
+        Debug.LogError($"Applying texture {uriToDownloadAndApply} to player {gameObject.name}");
+        //todo: download file
+        var filePath = uriToDownloadAndApply;
+        SetPlayerTexture(filePath);
     }
 
 }
