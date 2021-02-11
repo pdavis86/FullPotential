@@ -14,7 +14,7 @@ using UnityEngine.Networking;
 
 public class PlayerController : NetworkBehaviour
 {
-    [SerializeField] private Camera _playerCamera;
+    public Camera PlayerCamera;
 
     public bool HasMenuOpen;
 
@@ -124,25 +124,7 @@ public class PlayerController : NetworkBehaviour
         switch (activeSpell.Targeting)
         {
             case Spell.TargetingOptions.Projectile:
-                var startPos = transform.position + _playerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
-                var spellObject = Instantiate(GameManager.Instance.GameObjects.PrefabSpell, startPos, transform.rotation, transform);
-                spellObject.SetActive(true);
-
-                var castSpeed = activeSpell.Attributes.Speed / 50f;
-                if (castSpeed < 0.5)
-                {
-                    castSpeed = 0.5f;
-                }
-
-                var spellRb = spellObject.GetComponent<Rigidbody>();
-                spellRb.AddForce(_playerCamera.transform.forward * 20f * castSpeed, ForceMode.VelocityChange);
-
-                var spellScript = spellObject.GetComponent<SpellBehaviour>();
-                spellScript.SourcePlayer = GameManager.GetCurrentPlayerGameObject(_playerCamera);
-                spellScript.Spell = activeSpell;
-
-                NetworkServer.Spawn(spellObject);
-
+                SpawnSpellProjectile(activeSpell, leftHand);
                 break;
 
             //todo: other spell targeting options
@@ -156,12 +138,40 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    //[ClientRpc]
+    //public void RpcSpawnSpellProjectile(Spell activeSpell, bool leftHand)
+    //{
+    //    SpawnSpellProjectile(activeSpell, leftHand);
+    //}
+
+    private void SpawnSpellProjectile(Spell activeSpell, bool leftHand)
+    {
+        var startPos = transform.position + PlayerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
+        var spellObject = Instantiate(GameManager.Instance.GameObjects.PrefabSpell, startPos, transform.rotation, transform);
+        spellObject.SetActive(true);
+
+        var castSpeed = activeSpell.Attributes.Speed / 50f;
+        if (castSpeed < 0.5)
+        {
+            castSpeed = 0.5f;
+        }
+
+        var spellRb = spellObject.GetComponent<Rigidbody>();
+        spellRb.AddForce(PlayerCamera.transform.forward * 20f * castSpeed, ForceMode.VelocityChange);
+
+        var spellScript = spellObject.GetComponent<SpellBehaviour>();
+        spellScript.SourcePlayer = GameManager.GetCurrentPlayerGameObject(PlayerCamera);
+        spellScript.Spell = activeSpell;
+
+        NetworkServer.SpawnWithClientAuthority(spellObject, gameObject);
+    }
+
 
 
     void InteractWith()
     {
-        var startPos = _playerCamera.transform.position;
-        if (Physics.Raycast(startPos, _playerCamera.transform.forward, out var hit))
+        var startPos = PlayerCamera.transform.position;
+        if (Physics.Raycast(startPos, PlayerCamera.transform.forward, out var hit))
         {
             //Debug.DrawLine(startPos, hit.point, Color.blue, 3);
             //Debug.Log("Ray cast hit " + hit.collider.gameObject.name);

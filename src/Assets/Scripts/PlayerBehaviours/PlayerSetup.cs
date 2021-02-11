@@ -62,7 +62,7 @@ public class PlayerSetup : NetworkBehaviour
             TextureUri = filePath;
         }
 
-        CmdRequestingAllPlayerMaterials(TextureUri);
+        CmdSendMeAllPlayerMaterials(TextureUri);
     }
 
     private void OnDisable()
@@ -88,14 +88,18 @@ public class PlayerSetup : NetworkBehaviour
     }
 
     [Command]
-    void CmdRequestingAllPlayerMaterials(string uriToDownloadAndApply)
+    void CmdSendMeAllPlayerMaterials(string uriToDownloadAndApply)
     {
-        if (string.IsNullOrWhiteSpace(uriToDownloadAndApply))
+        if (!string.IsNullOrWhiteSpace(uriToDownloadAndApply))
         {
+            Debug.LogError($"Server: Setting texture for {gameObject.name} to {uriToDownloadAndApply}");
+
             TextureUri = uriToDownloadAndApply;
         }
 
         var playerSetups = GameObject.FindGameObjectsWithTag("Player").Select(x => x.GetComponent<PlayerSetup>());
+
+
         foreach (var playerSetup in playerSetups)
         {
             playerSetup.RpcSetPlayerMaterial(playerSetup.TextureUri);
@@ -108,6 +112,7 @@ public class PlayerSetup : NetworkBehaviour
         if (string.IsNullOrWhiteSpace(uriToDownloadAndApply))
         {
             Debug.LogError($"No texture for player {gameObject.name}");
+            return;
         }
 
         Debug.LogError($"Applying texture {uriToDownloadAndApply} to player {gameObject.name}");

@@ -19,12 +19,10 @@ public class SpellBehaviour : AttackBehaviourBase
     {
         try
         {
-            CmdDealDamage(Spell, gameObject, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
-            
-            //todo: maybe don't sync position. Use and RPC to spawn it in the world instead
-
             //Don't Destroy(). Need it alive for RPC calls
             gameObject.SetActive(false);
+
+            DealDamage(Spell, gameObject, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
         }
         catch (Exception ex)
         {
