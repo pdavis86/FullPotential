@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4991308441274877185}
   - component: {fileID: 3046880562115981654}
   - component: {fileID: 7697724776256515342}
-  - component: {fileID: 1847796803742472922}
+  - component: {fileID: 6447200508839985312}
   m_Layer: 0
   m_Name: Spell
   m_TagString: Untagged
@@ -158,8 +158,8 @@ MonoBehaviour:
     i14: 0
     i15: 0
   m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0
---- !u!114 &1847796803742472922
+  m_LocalPlayerAuthority: 1
+--- !u!114 &6447200508839985312
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

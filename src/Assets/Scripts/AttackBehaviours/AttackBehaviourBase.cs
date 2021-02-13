@@ -18,9 +18,15 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
     // ReSharper disable once InconsistentNaming
     private static readonly System.Random _random = new System.Random();
 
-    [Command]
-    internal void CmdDealDamage(ItemBase sourceItem, GameObject source, GameObject target, Vector3 position)
+    //This puts warnings in the logs: [Server]
+    internal void DealDamage(ItemBase sourceItem, GameObject source, GameObject target, Vector3 position)
     {
+        if (!isServer)
+        {
+            //Debug.LogError("Player tried to deal damage instead of server");
+            return;
+        }
+
         //todo: crit? if so, what is it?
         //todo: half-damage for duel-weilding
         //todo: give source experience

@@ -57,17 +57,17 @@ public class PlayerSetup : NetworkBehaviour
         var filePath = @"C:\Users\Paul\Desktop\Untitled.png";
         if (!string.IsNullOrWhiteSpace(filePath) && System.IO.File.Exists(filePath))
         {
-            //todo: SetPlayerTexture(filePath);
+            SetPlayerTexture(filePath);
             //todo: upload file
             TextureUri = filePath;
         }
 
-        CmdRequestingAllPlayerMaterials(TextureUri);
+        CmdSendMeAllPlayerMaterials(TextureUri);
     }
 
     private void OnDisable()
     {
-        if (GameManager.Instance.GameObjects.UiHud != null)
+        if (GameManager.Instance?.GameObjects.UiHud != null)
         {
             GameManager.Instance.GameObjects.UiHud.SetActive(false);
         }
@@ -85,12 +85,17 @@ public class PlayerSetup : NetworkBehaviour
         var newMat = new Material(_meshRenderer.material.shader);
         newMat.mainTexture = tex;
         _meshRenderer.material = newMat;
+
+        if (isLocalPlayer)
+        {
+            //todo: set texture on hands too
+        }
     }
 
     [Command]
-    void CmdRequestingAllPlayerMaterials(string uriToDownloadAndApply)
+    void CmdSendMeAllPlayerMaterials(string uriToDownloadAndApply)
     {
-        if (string.IsNullOrWhiteSpace(uriToDownloadAndApply))
+        if (!string.IsNullOrWhiteSpace(uriToDownloadAndApply))
         {
             TextureUri = uriToDownloadAndApply;
         }
@@ -107,10 +112,11 @@ public class PlayerSetup : NetworkBehaviour
     {
         if (string.IsNullOrWhiteSpace(uriToDownloadAndApply))
         {
-            Debug.LogError($"No texture for player {gameObject.name}");
+            //Debug.LogError($"No texture for player {gameObject.name}");
+            return;
         }
 
-        Debug.LogError($"Applying texture {uriToDownloadAndApply} to player {gameObject.name}");
+        //Debug.LogError($"Applying texture {uriToDownloadAndApply} to player {gameObject.name}");
         //todo: download file
         var filePath = uriToDownloadAndApply;
         SetPlayerTexture(filePath);

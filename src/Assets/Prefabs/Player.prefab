@@ -614,6 +614,7 @@ MonoBehaviour:
   _playerCamera: {fileID: 7392779647204144589}
   _nameTag: {fileID: 6250991307057261387}
   _meshRenderer: {fileID: 7392779648629048398}
+  TextureUri: 
 --- !u!114 &1201570389013236167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -626,7 +627,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 539a34b53138d9549b95a671dcbf5f06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerCamera: {fileID: 7392779647204144589}
+  PlayerCamera: {fileID: 7392779647204144589}
   HasMenuOpen: 0
 --- !u!1 &7392779647843419169
 GameObject:
