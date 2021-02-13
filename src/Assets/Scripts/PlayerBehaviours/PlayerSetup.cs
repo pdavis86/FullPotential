@@ -15,8 +15,14 @@ public class PlayerSetup : NetworkBehaviour
 {
     [SerializeField] private Camera _playerCamera;
     [SerializeField] private TextMeshProUGUI _nameTag;
-    [SerializeField] private MeshRenderer _meshRenderer;
+    [SerializeField] private MeshRenderer _mainMesh;
+    [SerializeField] private MeshRenderer _leftMesh;
+    [SerializeField] private MeshRenderer _rightMesh;
 
+    [SyncVar]
+    public string PlayerName;
+
+    [SyncVar]
     public string TextureUri;
 
     private Camera _sceneCamera;
@@ -37,8 +43,12 @@ public class PlayerSetup : NetworkBehaviour
         {
             gameObject.GetComponent<PlayerController>().enabled = false;
 
-            //todo: let player name themselves
-            _nameTag.text = "Player " + netId.Value;
+            _nameTag.text = string.IsNullOrWhiteSpace(PlayerName) ? "Player " + netId.Value : PlayerName;
+
+            if (!string.IsNullOrWhiteSpace(TextureUri))
+            {
+                SetPlayerTexture(TextureUri);
+            }
 
             return;
         }
@@ -59,8 +69,12 @@ public class PlayerSetup : NetworkBehaviour
 
         ClientScene.RegisterPrefab(_sceneObjects.PrefabSpell);
 
+
+        var joinParams = NetworkManager.singleton.GetComponent<JoinOrHostGame>();
+
+
         //todo: let players specify a URL to a texture PNG
-        var filePath = @"C:\Users\Paul\Desktop\Untitled.png";
+        var filePath = joinParams.PlayerSkinUrl; // @"C:\Users\Paul\Desktop\Untitled.png";
         if (!string.IsNullOrWhiteSpace(filePath) && System.IO.File.Exists(filePath))
         {
             SetPlayerTexture(filePath);
@@ -68,7 +82,7 @@ public class PlayerSetup : NetworkBehaviour
             TextureUri = filePath;
         }
 
-        CmdSendMeAllPlayerMaterials(TextureUri);
+        CmdHeresMyJoiningDetails(joinParams.PlayerName, joinParams.PlayerSkinUrl);
     }
 
     private void OnDisable()
@@ -84,48 +98,61 @@ public class PlayerSetup : NetworkBehaviour
         }
     }
 
-    void SetPlayerTexture(string filePath)
+    void SetPlayerTexture(string playerSkinUri)
     {
+        //todo: download file
+        var filePath = playerSkinUri;
+
         var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
         tex.LoadImage(System.IO.File.ReadAllBytes(filePath));
-        var newMat = new Material(_meshRenderer.material.shader);
+        var newMat = new Material(_mainMesh.material.shader);
         newMat.mainTexture = tex;
-        _meshRenderer.material = newMat;
+
+        _mainMesh.material = newMat;
 
         if (isLocalPlayer)
         {
-            //todo: set texture on hands too
+            _leftMesh.material = newMat;
+            _rightMesh.material = newMat;
         }
     }
 
     [Command]
-    void CmdSendMeAllPlayerMaterials(string uriToDownloadAndApply)
+    void CmdHeresMyJoiningDetails(string playerName, string playerSkinUri)
     {
-        if (!string.IsNullOrWhiteSpace(uriToDownloadAndApply))
+        if (!string.IsNullOrWhiteSpace(playerName))
         {
-            TextureUri = uriToDownloadAndApply;
+            PlayerName = playerName;
         }
 
-        var playerSetups = GameObject.FindGameObjectsWithTag("Player").Select(x => x.GetComponent<PlayerSetup>());
-        foreach (var playerSetup in playerSetups)
+        if (!string.IsNullOrWhiteSpace(playerSkinUri))
         {
-            playerSetup.RpcSetPlayerMaterial(playerSetup.TextureUri);
+            TextureUri = playerSkinUri;
         }
+
+        //var playerSetups = GameObject.FindGameObjectsWithTag("Player").Select(x => x.GetComponent<PlayerSetup>());
+        //foreach (var playerSetup in playerSetups)
+        //{
+        //    playerSetup.RpcSetPlayerMaterial(playerSetup.TextureUri);
+        //}
+
+        RpcSetPlayerDetails(playerName, playerSkinUri);
     }
 
     [ClientRpc]
-    void RpcSetPlayerMaterial(string uriToDownloadAndApply)
+    void RpcSetPlayerDetails(string playerName, string playerSkinUri)
     {
-        if (string.IsNullOrWhiteSpace(uriToDownloadAndApply))
-        {
-            //Debug.LogError($"No texture for player {gameObject.name}");
-            return;
-        }
+        _nameTag.text = string.IsNullOrWhiteSpace(playerName) ? "Player " + netId.Value : playerName;
 
-        //Debug.LogError($"Applying texture {uriToDownloadAndApply} to player {gameObject.name}");
-        //todo: download file
-        var filePath = uriToDownloadAndApply;
-        SetPlayerTexture(filePath);
+        if (!string.IsNullOrWhiteSpace(playerSkinUri))
+        {
+            //Debug.LogError($"Applying texture {uriToDownloadAndApply} to player {gameObject.name}");
+            SetPlayerTexture(playerSkinUri);
+        }
+        else
+        {
+            Debug.LogError($"No texture for player {_nameTag.text}");
+        }
     }
 
 }

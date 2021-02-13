@@ -613,7 +613,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerCamera: {fileID: 7392779647204144589}
   _nameTag: {fileID: 6250991307057261387}
-  _meshRenderer: {fileID: 7392779648629048398}
+  _mainMesh: {fileID: 7392779648629048398}
+  _leftMesh: {fileID: 7392779647843419196}
+  _rightMesh: {fileID: 7392779647605690758}
+  PlayerName: 
   TextureUri: 
 --- !u!114 &1201570389013236167
 MonoBehaviour:

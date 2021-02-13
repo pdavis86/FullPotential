@@ -1698,7 +1698,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Create Room
+  m_Text: 'Create Game
 
 '
 --- !u!222 &1571292324
