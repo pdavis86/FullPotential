@@ -108,6 +108,8 @@ public class PlayerController : NetworkBehaviour
 
     private void OnDisable()
     {
+        Cursor.lockState = CursorLockMode.None;
+
         if (_sceneObjects.UiHud != null)
         {
             _sceneObjects.UiHud.SetActive(false);

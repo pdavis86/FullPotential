@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Networking;
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -40,6 +41,41 @@ public class GameManager : MonoBehaviour
             ResultFactory = new ResultFactory();
 
             DontDestroyOnLoad(gameObject);
+        }
+    }
+
+    void OnGUI()
+    {
+        if (UnityEngine.Networking.NetworkClient.allClients.Count != 0)
+        {
+            var goPing = GameObject.Find("PingText");
+            if (goPing != null)
+            {
+                var textPing = goPing.GetComponent<UnityEngine.UI.Text>();
+
+                var ping = UnityEngine.Networking.NetworkClient.allClients[0].GetRTT();
+                textPing.text = ping == 0 ? "Host" : ping + " ms";
+
+
+                //textPing.text = "";
+
+                //foreach (var netClient in UnityEngine.Networking.NetworkClient.allClients)
+                //{
+                //    textPing.text += netClient.connection.connectionId + " " + netClient.GetRTT() + " ms\n";
+                //}
+
+                //for (int i = 0; i < NetworkServer.connections.Count; ++i)
+                //{
+                //    var c = NetworkServer.connections[i];
+                //    if (c == null || c.connectionId <= 0)
+                //    {
+                //        continue;
+                //    }
+
+                //    var rtt = NetworkTransport.GetCurrentRtt(c.hostId, c.connectionId, out var error);
+                //    textPing.text += "Conn:" + c.connectionId + ", ping:" + rtt + " ms\n";
+                //}
+            }
         }
     }
 

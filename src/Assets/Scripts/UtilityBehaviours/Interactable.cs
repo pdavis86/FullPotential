@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -8,7 +9,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
 
-public abstract class Interactable : MonoBehaviour
+public abstract class Interactable : NetworkBehaviour
 {
     public float Radius = 3f;
 

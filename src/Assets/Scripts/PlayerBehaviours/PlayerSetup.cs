@@ -65,7 +65,8 @@ public class PlayerSetup : NetworkBehaviour
         var pm = gameObject.AddComponent<PlayerMovement>();
         pm.PlayerCamera = _playerCamera;
 
-        ClientScene.RegisterPrefab(_sceneObjects.PrefabSpell);
+        //Done on network manager now
+        //ClientScene.RegisterPrefab(_sceneObjects.PrefabSpell);
 
 
 

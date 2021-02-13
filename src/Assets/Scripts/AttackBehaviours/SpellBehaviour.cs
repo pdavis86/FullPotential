@@ -21,13 +21,23 @@ public class SpellBehaviour : AttackBehaviourBase
 
     private void Start()
     {
+        if (isServer)
+        {
+            SourcePlayer = NetworkServer.FindLocalObject(new NetworkInstanceId(PlayerNetworkId));
+        }
+        else
+        {
+            SourcePlayer = ClientScene.FindLocalObject(new NetworkInstanceId(PlayerNetworkId));
+        }
+
+        Physics.IgnoreCollision(GetComponent<Collider>(), SourcePlayer.GetComponent<Collider>());
+
         if (!isServer)
         {
             //Debug.LogError("Player tried to deal damage instead of server");
             return;
         }
 
-        SourcePlayer = NetworkServer.FindLocalObject(new NetworkInstanceId(PlayerNetworkId));
         //var test2 = ClientScene.FindLocalObject(new NetworkInstanceId(PlayerNetworkId));
 
         //if (SourcePlayer == null)
@@ -57,6 +67,14 @@ public class SpellBehaviour : AttackBehaviourBase
     {
         try
         {
+            if (!other.gameObject.CompareTag("Player") && !other.gameObject.CompareTag("Enemy"))
+            {
+                //Debug.Log("You hit something not damageable");
+                return;
+            }
+
+            Debug.Log("Collided with " + other.gameObject.name);
+
             //Don't Destroy(). Need it alive for RPC calls
             gameObject.SetActive(false);
 
