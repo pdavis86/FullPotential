@@ -205,7 +205,7 @@ namespace Assets.Scripts.Crafting.Results
 
                 //If lingering is appropriate, add a chance of it being included
                 var elementalEffect = lootDrop.Effects.Intersect(Spell.ElementalEffects.All).FirstOrDefault();
-                if (!string.IsNullOrWhiteSpace(elementalEffect) && _random.Next(0, 2) > 0)
+                if (!string.IsNullOrWhiteSpace(elementalEffect) && Spell.LingeringPairing.ContainsKey(elementalEffect) && _random.Next(0, 2) > 0)
                 {
                     lootDrop.Effects.Add(Spell.LingeringPairing[elementalEffect]);
                 }

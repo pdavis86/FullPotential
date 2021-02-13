@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-// ReSharper disable once CheckNamespace
+﻿// ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
@@ -10,13 +8,5 @@
 
 public class TempGiveLoot : Interactable
 {
-    public Inventory Inventory;
 
-    public override void InteractWith()
-    {
-        Inventory.Add(GameManager.Instance.ResultFactory.GetLootDrop());
-
-        //todo: comment out
-        Debug.Log($"Inventory now has {Inventory.Items.Count} items in it");
-    }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Networking.NetworkSystem;
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -20,10 +21,39 @@ public class PlayerController : NetworkBehaviour
     private bool _doUiToggle;
     private SceneObjects001 _sceneObjects;
 
+
+    private const short _myMsgType = 101;
+
+
+    private Inventory _inventory;
+    private Inventory Inventory
+    {
+        get
+        {
+            return _inventory ?? (_inventory = GetComponent<Inventory>());
+        }
+    }
+
     void Awake()
     {
         _sceneObjects = GameManager.GetSceneObjects().GetComponent<SceneObjects001>();
         _sceneObjects.UiCrafting.SetActive(false);
+    }
+
+    private void Start()
+    {
+        if (isClient)
+        {
+            connectionToServer.RegisterHandler(_myMsgType, OnServerSentMyMessageType);
+        }
+    }
+
+    private void OnServerSentMyMessageType(NetworkMessage netMsg)
+    {
+        var beginMessage = netMsg.ReadMessage<StringMessage>();
+        Debug.LogError("received message: " + beginMessage.value);
+        //Debug.LogError("received message IsClient: " + isClient);
+        //Debug.LogError("received message isServer: " + isServer);
     }
 
     void Update()
@@ -34,7 +64,7 @@ public class PlayerController : NetworkBehaviour
 
             if (Input.GetKeyDown(mappings.Menu)) { _doUiToggle = true; }
             else if (Input.GetKeyDown(mappings.Inventory)) { OpenInventory(); }
-            else if (Input.GetKeyDown(mappings.Interact)) { InteractWith(); }
+            else if (Input.GetKeyDown(mappings.Interact)) { TryToInteract(); }
             else if (Input.GetMouseButtonDown(0)) { CmdCastSpell(false); }
             else if (Input.GetMouseButtonDown(1)) { CmdCastSpell(true); }
         }
@@ -85,28 +115,6 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-
-
-
-
-
-    //todo: move this
-    public Spell GetPlayerActiveSpell()
-    {
-        //todo: check the player has a spell active and can cast it
-        return new Spell
-        {
-            Name = "test spell",
-            Targeting = Spell.TargetingOptions.Projectile,
-            Attributes = new Attributes
-            {
-                Strength = 50
-            },
-            Effects = new List<string> { Spell.ElementalEffects.Fire },
-            Shape = Spell.ShapeOptions.Wall
-        };
-    }
-
     [Command]
     private void CmdCastSpell(bool leftHand)
     {
@@ -139,7 +147,7 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    [Server]
+    [ServerCallback]
     private void SpawnSpellProjectile(Spell activeSpell, bool leftHand)
     {
         var startPos = transform.position + PlayerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
@@ -152,9 +160,7 @@ public class PlayerController : NetworkBehaviour
         NetworkServer.Spawn(spellObject);
     }
 
-
-
-    void InteractWith()
+    void TryToInteract()
     {
         var startPos = PlayerCamera.transform.position;
         if (Physics.Raycast(startPos, PlayerCamera.transform.forward, out var hit))
@@ -169,7 +175,8 @@ public class PlayerController : NetworkBehaviour
                 if (distance <= interactable.Radius)
                 {
                     //Debug.Log("Interacted with " + hit.collider.gameObject.name);
-                    interactable.InteractWith();
+                    //interactable.InteractWith();
+                    CmdInteractWith(interactable.netId);
                 }
                 //else
                 //{
@@ -180,6 +187,30 @@ public class PlayerController : NetworkBehaviour
             //{
             //    Debug.Log("But it's not interactable");
             //}
+        }
+    }
+
+    [Command]
+    public void CmdInteractWith(NetworkInstanceId netId)
+    {
+        var go = NetworkServer.FindLocalObject(netId);
+        var interactable = go.GetComponent<Interactable>();
+        var distance = Vector3.Distance(PlayerCamera.transform.position, interactable.transform.position);
+        if (distance <= interactable.Radius)
+        {
+            Debug.Log("Interacted with " + interactable.gameObject.name);
+
+
+
+            //validation done... then what?
+
+            var lootDrop = GameManager.Instance.ResultFactory.GetLootDrop();
+            Inventory.Add(lootDrop);
+            //Debug.Log($"Inventory now has {Inventory.Items.Count} items in it");
+
+            //todo: send JSON to client
+            connectionToClient.Send(_myMsgType, new StringMessage("This is a test message 1"));
+            //NetworkServer.SendToClient(connectionToClient.connectionId, _myMsgType, new StringMessage("This is a test message 3"));
         }
     }
 
@@ -209,5 +240,29 @@ public class PlayerController : NetworkBehaviour
     //    );
     //    return raycastResults;
     //}
+
+
+
+
+
+
+
+
+    //todo: move this
+    public Spell GetPlayerActiveSpell()
+    {
+        //todo: check the player has a spell active and can cast it
+        return new Spell
+        {
+            Name = "test spell",
+            Targeting = Spell.TargetingOptions.Projectile,
+            Attributes = new Attributes
+            {
+                Strength = 50
+            },
+            Effects = new List<string> { Spell.ElementalEffects.Fire },
+            Shape = Spell.ShapeOptions.Wall
+        };
+    }
 
 }

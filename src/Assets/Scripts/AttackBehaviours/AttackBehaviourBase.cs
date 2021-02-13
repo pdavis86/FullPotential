@@ -24,14 +24,14 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
         return _sceneObjects ?? (_sceneObjects = GameObject.Find("SceneObjects").GetComponent<SceneObjects001>());
     }
 
-    //This puts warnings in the logs: [Server]
+    [ServerCallback]
     internal void DealDamage(ItemBase sourceItem, GameObject source, GameObject target, Vector3 position)
     {
-        if (!isServer)
-        {
-            //Debug.LogError("Player tried to deal damage instead of server");
-            return;
-        }
+        //if (!isServer)
+        //{
+        //    //Debug.LogError("Player tried to deal damage instead of server");
+        //    return;
+        //}
 
         //todo: crit? if so, what is it?
         //todo: half-damage for duel-weilding
@@ -53,6 +53,9 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
 
         var networkIdentity = SourcePlayer.GetComponent<NetworkIdentity>();
         TargetRpcShowDamage(networkIdentity.connectionToClient, position, damageDealt.ToString(CultureInfo.InvariantCulture));
+
+
+        //For dealing damage, look at https://docs.unity3d.com/2018.1/Documentation/ScriptReference/Networking.SyncEventAttribute.html
 
         //Don't destroy the object or the RPC will fail. Destroy() is handled in Awake();
         //NetworkServer.Destroy(source);

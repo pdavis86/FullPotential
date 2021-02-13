@@ -17,7 +17,4 @@ public abstract class Interactable : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, Radius);
     }
-
-    public abstract void InteractWith();
-
 }

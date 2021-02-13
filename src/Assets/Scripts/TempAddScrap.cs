@@ -31,6 +31,10 @@ public class TempAddScrap : MonoBehaviour
             newComp.gameObject.SetActive(true);
 
             UiHelper.Instance.UpdateResults();
+
+            //todo: move this
+            //UnityEngine.Networking.NetworkManager.singleton.StopClient();
+
         }
         catch (Exception ex)
         {

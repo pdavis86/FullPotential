@@ -60,8 +60,6 @@ public class PlayerSetup : NetworkBehaviour
 
         _playerCamera.gameObject.SetActive(true);
 
-        _nameTag.text = null;
-
         _sceneObjects.UiHud.SetActive(true);
 
         var pm = gameObject.AddComponent<PlayerMovement>();
@@ -70,8 +68,12 @@ public class PlayerSetup : NetworkBehaviour
         ClientScene.RegisterPrefab(_sceneObjects.PrefabSpell);
 
 
+
+
+
         var joinParams = NetworkManager.singleton.GetComponent<JoinOrHostGame>();
 
+        _nameTag.text = null;
 
         //todo: let players specify a URL to a texture PNG
         var filePath = joinParams.PlayerSkinUrl; // @"C:\Users\Paul\Desktop\Untitled.png";
@@ -87,15 +89,8 @@ public class PlayerSetup : NetworkBehaviour
 
     private void OnDisable()
     {
-        if (_sceneObjects.UiHud != null)
-        {
-            _sceneObjects.UiHud.SetActive(false);
-        }
-
-        if (_sceneCamera != null)
-        {
-            _sceneCamera.gameObject.SetActive(true);
-        }
+        if (_sceneObjects.UiHud != null) { _sceneObjects.UiHud.SetActive(false); }
+        if (_sceneCamera != null) { _sceneCamera.gameObject.SetActive(true); }
     }
 
     void SetPlayerTexture(string playerSkinUri)
@@ -120,38 +115,18 @@ public class PlayerSetup : NetworkBehaviour
     [Command]
     void CmdHeresMyJoiningDetails(string playerName, string playerSkinUri)
     {
-        if (!string.IsNullOrWhiteSpace(playerName))
-        {
-            PlayerName = playerName;
-        }
-
-        if (!string.IsNullOrWhiteSpace(playerSkinUri))
-        {
-            TextureUri = playerSkinUri;
-        }
-
-        //var playerSetups = GameObject.FindGameObjectsWithTag("Player").Select(x => x.GetComponent<PlayerSetup>());
-        //foreach (var playerSetup in playerSetups)
-        //{
-        //    playerSetup.RpcSetPlayerMaterial(playerSetup.TextureUri);
-        //}
-
+        if (!string.IsNullOrWhiteSpace(playerName)) { PlayerName = playerName; }
+        if (!string.IsNullOrWhiteSpace(playerSkinUri)) { TextureUri = playerSkinUri; }
         RpcSetPlayerDetails(playerName, playerSkinUri);
     }
 
     [ClientRpc]
     void RpcSetPlayerDetails(string playerName, string playerSkinUri)
     {
-        _nameTag.text = string.IsNullOrWhiteSpace(playerName) ? "Player " + netId.Value : playerName;
-
-        if (!string.IsNullOrWhiteSpace(playerSkinUri))
+        if (!isLocalPlayer)
         {
-            //Debug.LogError($"Applying texture {uriToDownloadAndApply} to player {gameObject.name}");
-            SetPlayerTexture(playerSkinUri);
-        }
-        else
-        {
-            Debug.LogError($"No texture for player {_nameTag.text}");
+            _nameTag.text = string.IsNullOrWhiteSpace(playerName) ? "Player " + netId.Value : playerName;
+            if (!string.IsNullOrWhiteSpace(playerSkinUri)) { SetPlayerTexture(playerSkinUri); }
         }
     }
 
