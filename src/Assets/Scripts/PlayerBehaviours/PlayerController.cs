@@ -18,10 +18,12 @@ public class PlayerController : NetworkBehaviour
     public bool HasMenuOpen;
 
     private bool _doUiToggle;
+    private SceneObjects001 _sceneObjects;
 
     void Awake()
     {
-        GameManager.Instance.GameObjects.UiCrafting.SetActive(false);
+        _sceneObjects = GameManager.GetSceneObjects().GetComponent<SceneObjects001>();
+        _sceneObjects.UiCrafting.SetActive(false);
     }
 
     void Update()
@@ -50,10 +52,10 @@ public class PlayerController : NetworkBehaviour
             {
                 _doUiToggle = false;
 
-                GameManager.Instance.GameObjects.UiHud.SetActive(!GameManager.Instance.GameObjects.UiHud.activeSelf);
-                GameManager.Instance.GameObjects.UiCrafting.SetActive(!GameManager.Instance.GameObjects.UiHud.activeSelf);
+                _sceneObjects.UiHud.SetActive(!_sceneObjects.UiHud.activeSelf);
+                _sceneObjects.UiCrafting.SetActive(!_sceneObjects.UiHud.activeSelf);
 
-                HasMenuOpen = !GameManager.Instance.GameObjects.UiHud.activeSelf;
+                HasMenuOpen = !_sceneObjects.UiHud.activeSelf;
             }
 
             if (HasMenuOpen)
@@ -76,10 +78,10 @@ public class PlayerController : NetworkBehaviour
 
     private void OnDisable()
     {
-        if (GameManager.Instance.GameObjects.UiHud != null)
+        if (_sceneObjects.UiHud != null)
         {
-            GameManager.Instance.GameObjects.UiHud.SetActive(false);
-            GameManager.Instance.GameObjects.UiCrafting.SetActive(false);
+            _sceneObjects.UiHud.SetActive(false);
+            _sceneObjects.UiCrafting.SetActive(false);
         }
     }
 
@@ -141,7 +143,7 @@ public class PlayerController : NetworkBehaviour
     private void SpawnSpellProjectile(Spell activeSpell, bool leftHand)
     {
         var startPos = transform.position + PlayerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
-        var spellObject = Instantiate(GameManager.Instance.GameObjects.PrefabSpell, startPos, transform.rotation, transform);
+        var spellObject = Instantiate(_sceneObjects.PrefabSpell, startPos, transform.rotation, transform);
         spellObject.SetActive(true);
 
         var spellScript = spellObject.GetComponent<SpellBehaviour>();

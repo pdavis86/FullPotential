@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Crafting.Results;
+using System.Linq;
 using UnityEngine;
 
 // ReSharper disable once CheckNamespace
@@ -12,8 +13,6 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public ObjectAccess GameObjects { get; private set; }
-
     public Inventory Inventory { get; private set; }
 
     public InputMappings InputMappings { get; private set; }
@@ -35,11 +34,17 @@ public class GameManager : MonoBehaviour
         else
         {
             _instance = this;
-            GameObjects = GetComponent<ObjectAccess>();
             Inventory = GetComponent<Inventory>();
             InputMappings = GetComponent<InputMappings>();
             ResultFactory = new ResultFactory();
+
+            DontDestroyOnLoad(gameObject);
         }
+    }
+
+    public static GameObject GetSceneObjects()
+    {
+        return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects().FirstOrDefault(x => x.name == "SceneObjects");
     }
 
     public static GameObject GetCurrentPlayerGameObject(Camera playerCamera)

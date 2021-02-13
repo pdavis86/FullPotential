@@ -20,6 +20,12 @@ public class PlayerSetup : NetworkBehaviour
     public string TextureUri;
 
     private Camera _sceneCamera;
+    private SceneObjects001 _sceneObjects;
+
+    private void Awake()
+    {
+        _sceneObjects = GameManager.GetSceneObjects().GetComponent<SceneObjects001>();
+    }
 
     private void Start()
     {
@@ -46,12 +52,12 @@ public class PlayerSetup : NetworkBehaviour
 
         _nameTag.text = null;
 
-        GameManager.Instance.GameObjects.UiHud.SetActive(true);
+        _sceneObjects.UiHud.SetActive(true);
 
         var pm = gameObject.AddComponent<PlayerMovement>();
         pm.PlayerCamera = _playerCamera;
 
-        ClientScene.RegisterPrefab(GameManager.Instance.GameObjects.PrefabSpell);
+        ClientScene.RegisterPrefab(_sceneObjects.PrefabSpell);
 
         //todo: let players specify a URL to a texture PNG
         var filePath = @"C:\Users\Paul\Desktop\Untitled.png";
@@ -67,9 +73,9 @@ public class PlayerSetup : NetworkBehaviour
 
     private void OnDisable()
     {
-        if (GameManager.Instance?.GameObjects.UiHud != null)
+        if (_sceneObjects.UiHud != null)
         {
-            GameManager.Instance.GameObjects.UiHud.SetActive(false);
+            _sceneObjects.UiHud.SetActive(false);
         }
 
         if (_sceneCamera != null)

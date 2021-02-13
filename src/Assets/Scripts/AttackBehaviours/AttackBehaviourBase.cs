@@ -18,6 +18,12 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
     // ReSharper disable once InconsistentNaming
     private static readonly System.Random _random = new System.Random();
 
+    private SceneObjects001 _sceneObjects;
+    private SceneObjects001 GetSceneObjects()
+    {
+        return _sceneObjects ?? (_sceneObjects = GameObject.Find("SceneObjects").GetComponent<SceneObjects001>());
+    }
+
     //This puts warnings in the logs: [Server]
     internal void DealDamage(ItemBase sourceItem, GameObject source, GameObject target, Vector3 position)
     {
@@ -56,8 +62,8 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
     [TargetRpc]
     private void TargetRpcShowDamage(NetworkConnection playerConnection, Vector3 position, string damage)
     {
-        var hit = Instantiate(GameManager.Instance.GameObjects.PrefabHitText);
-        hit.transform.SetParent(GameManager.Instance.GameObjects.UiHitNumbers.transform, false);
+        var hit = Instantiate(GetSceneObjects().PrefabHitText);
+        hit.transform.SetParent(GetSceneObjects().UiHitNumbers.transform, false);
         hit.gameObject.SetActive(true);
 
         var hitText = hit.GetComponent<TextMeshProUGUI>();

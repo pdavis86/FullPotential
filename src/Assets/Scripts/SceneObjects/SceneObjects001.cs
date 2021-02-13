@@ -8,7 +8,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
 
-public class ObjectAccess : MonoBehaviour
+public class SceneObjects001 : MonoBehaviour
 {
     public GameObject PrefabSpell;
     public GameObject PrefabHitText;
