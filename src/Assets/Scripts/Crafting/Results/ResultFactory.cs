@@ -184,7 +184,7 @@ namespace Assets.Scripts.Crafting.Results
 
             var lootDrop = new ItemBase
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 Attributes = GetRandomAttributes(),
                 Effects = new List<string>()
             };
@@ -233,7 +233,7 @@ namespace Assets.Scripts.Crafting.Results
             var effects = components.SelectMany(x => x.Effects);
             var spell = new Spell
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 Targeting = GetTargeting(effects),
                 Attributes = new Attributes
                 {
@@ -271,7 +271,7 @@ namespace Assets.Scripts.Crafting.Results
         {
             var item = new Weapon
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 Type = type,
                 IsTwoHanded = isTwoHanded,
                 Attributes = new Attributes
@@ -291,7 +291,7 @@ namespace Assets.Scripts.Crafting.Results
         {
             var item = new Weapon
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 Type = type,
                 IsTwoHanded = isTwoHanded,
                 Attributes = new Attributes
@@ -316,7 +316,7 @@ namespace Assets.Scripts.Crafting.Results
         {
             var item = new Weapon
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 Type = Weapon.Shield,
                 Attributes = new Attributes
                 {
@@ -335,7 +335,7 @@ namespace Assets.Scripts.Crafting.Results
         {
             var item = new Armor
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 Name = "Unnamed Armor",
                 Type = type,
                 Attributes = new Attributes
@@ -352,7 +352,7 @@ namespace Assets.Scripts.Crafting.Results
         {
             var item = new Armor
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 Type = Armor.Barrier,
                 Attributes = new Attributes
                 {
@@ -372,7 +372,7 @@ namespace Assets.Scripts.Crafting.Results
         {
             var item = new Accessory
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 Type = type,
                 Attributes = new Attributes
                 {

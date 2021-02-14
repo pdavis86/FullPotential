@@ -80,8 +80,6 @@ public class PlayerController : NetworkBehaviour
 
     private void OnDisable()
     {
-        Debug.Log("OnDisable() called");
-
         Cursor.lockState = CursorLockMode.None;
 
         if (GameManager.Instance.MainCanvasObjects.Hud != null)

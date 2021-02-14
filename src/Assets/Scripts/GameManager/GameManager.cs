@@ -87,13 +87,13 @@ public class GameManager : MonoBehaviour
 
     public static MainCanvasObjects GetMainCanvasObjects()
     {
-        return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects().FirstOrDefault(x => x.name == "MainCanvas").GetComponent<MainCanvasObjects>();
+        return GameObject.Find("MainCanvas").GetComponent<MainCanvasObjects>();
     }
 
-    public static GameObject GetSceneObjects()
-    {
-        return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects().FirstOrDefault(x => x.name == "SceneObjects");
-    }
+    //public static GameObject GetSceneObjects()
+    //{
+    //    return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects().FirstOrDefault(x => x.name == "SceneObjects");
+    //}
 
     public static GameObject GetCurrentPlayerGameObject(Camera playerCamera)
     {

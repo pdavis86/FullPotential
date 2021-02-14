@@ -17,10 +17,7 @@ using UnityEngine.Networking.NetworkSystem;
 public class Inventory : MonoBehaviour
 {
     public int MaxItems = 10;
-
-
-    [HideInInspector]
-    public List<ItemBase> Items { get; private set; }
+    public List<ItemBase> Items;
 
     private void Awake()
     {
