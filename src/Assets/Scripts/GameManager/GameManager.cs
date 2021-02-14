@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    //Don't work
+    //Doesn't work
     //private void Start()
     //{
     //    //todo: try setting offline scene here
@@ -61,27 +61,28 @@ public class GameManager : MonoBehaviour
 
                 var ping = UnityEngine.Networking.NetworkClient.allClients[0].GetRTT();
                 textPing.text = ping == 0 ? "Host" : ping + " ms";
-
-
-                //textPing.text = "";
-
-                //foreach (var netClient in UnityEngine.Networking.NetworkClient.allClients)
-                //{
-                //    textPing.text += netClient.connection.connectionId + " " + netClient.GetRTT() + " ms\n";
-                //}
-
-                //for (int i = 0; i < NetworkServer.connections.Count; ++i)
-                //{
-                //    var c = NetworkServer.connections[i];
-                //    if (c == null || c.connectionId <= 0)
-                //    {
-                //        continue;
-                //    }
-
-                //    var rtt = NetworkTransport.GetCurrentRtt(c.hostId, c.connectionId, out var error);
-                //    textPing.text += "Conn:" + c.connectionId + ", ping:" + rtt + " ms\n";
-                //}
             }
+        }
+        else
+        {
+            //textPing.text = "";
+
+            //foreach (var netClient in UnityEngine.Networking.NetworkClient.allClients)
+            //{
+            //    textPing.text += netClient.connection.connectionId + " " + netClient.GetRTT() + " ms\n";
+            //}
+
+            //for (int i = 0; i < NetworkServer.connections.Count; ++i)
+            //{
+            //    var c = NetworkServer.connections[i];
+            //    if (c == null || c.connectionId <= 0)
+            //    {
+            //        continue;
+            //    }
+
+            //    var rtt = NetworkTransport.GetCurrentRtt(c.hostId, c.connectionId, out var error);
+            //    textPing.text += "Conn:" + c.connectionId + ", ping:" + rtt + " ms\n";
+            //}
         }
     }
 
@@ -108,4 +109,14 @@ public class GameManager : MonoBehaviour
         UnityEngine.Networking.NetworkManager.singleton.StopClient();
         UnityEngine.Networking.NetworkManager.singleton.StopHost();
     }
+
+    public static void Quit()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit ();
+#endif
+    }
+
 }

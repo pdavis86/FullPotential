@@ -18,14 +18,17 @@ public class PlayerController : NetworkBehaviour
     public Camera PlayerCamera;
     public bool HasMenuOpen;
 
-    private bool _doUiToggle;
+    private MainCanvasObjects _mainCanvasObjects;
+    private bool _escPressed;
+    private bool _openInventory;
 
     void Awake()
     {
-        GameManager.Instance.MainCanvasObjects.CraftingUi.SetActive(false);
+        _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;
+        _mainCanvasObjects.CraftingUi.SetActive(false);
 
         //todo: under what conditions?
-        GameManager.Instance.MainCanvasObjects.DebuggingOverlay.SetActive(true);
+        _mainCanvasObjects.DebuggingOverlay.SetActive(true);
     }
 
     void Update()
@@ -34,8 +37,8 @@ public class PlayerController : NetworkBehaviour
         {
             var mappings = GameManager.Instance.InputMappings;
 
-            if (Input.GetKeyDown(mappings.Menu)) { _doUiToggle = true; }
-            else if (Input.GetKeyDown(mappings.Inventory)) { OpenInventory(); }
+            if (Input.GetKeyDown(mappings.Menu)) { _escPressed = true; }
+            else if (Input.GetKeyDown(mappings.Inventory)) { _openInventory = true; }
             else if (Input.GetKeyDown(mappings.Interact)) { TryToInteract(); }
             else if (Input.GetMouseButtonDown(0)) { CmdCastSpell(false); }
             else if (Input.GetMouseButtonDown(1)) { CmdCastSpell(true); }
@@ -50,14 +53,29 @@ public class PlayerController : NetworkBehaviour
     {
         try
         {
-            if (_doUiToggle)
+            if (_escPressed)
             {
-                _doUiToggle = false;
+                if (HasMenuOpen)
+                {
+                    _mainCanvasObjects.HideAllMenus();
+                }
+                else
+                {
+                    _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.EscMenu);
+                }
+            }
+            else if (_openInventory)
+            {
+                //todo: finish this
+                Debug.Log("Tried to open inventory");
+                _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.InventoryUi);
+            }
 
-                GameManager.Instance.MainCanvasObjects.Hud.SetActive(!GameManager.Instance.MainCanvasObjects.Hud.activeSelf);
-                GameManager.Instance.MainCanvasObjects.CraftingUi.SetActive(!GameManager.Instance.MainCanvasObjects.Hud.activeSelf);
+            if (_escPressed || _openInventory)
+            {
 
-                HasMenuOpen = !GameManager.Instance.MainCanvasObjects.Hud.activeSelf;
+                HasMenuOpen = _mainCanvasObjects.IsAnyMenuOpen();
+                _mainCanvasObjects.Hud.SetActive(!HasMenuOpen);
             }
 
             if (HasMenuOpen)
@@ -71,6 +89,9 @@ public class PlayerController : NetworkBehaviour
             {
                 Cursor.lockState = CursorLockMode.Locked;
             }
+
+            _escPressed = false;
+            _openInventory = false;
         }
         catch (Exception ex)
         {
@@ -82,10 +103,10 @@ public class PlayerController : NetworkBehaviour
     {
         Cursor.lockState = CursorLockMode.None;
 
-        if (GameManager.Instance.MainCanvasObjects.Hud != null)
+        if (_mainCanvasObjects.Hud != null)
         {
-            GameManager.Instance.MainCanvasObjects.Hud.SetActive(false);
-            GameManager.Instance.MainCanvasObjects.CraftingUi.SetActive(false);
+            _mainCanvasObjects.Hud.SetActive(false);
+            _mainCanvasObjects.CraftingUi.SetActive(false);
         }
     }
 
@@ -189,19 +210,13 @@ public class PlayerController : NetworkBehaviour
             //Debug.Log("Interacted with " + interactable.gameObject.name);
 
             var lootDrop = GameManager.Instance.ResultFactory.GetLootDrop();
-            
+
             //todo: is this necessary too? - Inventory.Add(lootDrop);
             //Debug.Log($"Inventory now has {Inventory.Items.Count} items in it");
 
             var lootDropJson = JsonUtility.ToJson(lootDrop);
             connectionToClient.Send(Assets.Scripts.Networking.MessageIds.InventoryAddItem, new StringMessage(lootDropJson));
         }
-    }
-
-    void OpenInventory()
-    {
-        //todo: finish this
-        Debug.Log("Tried to open inventory");
     }
 
 
