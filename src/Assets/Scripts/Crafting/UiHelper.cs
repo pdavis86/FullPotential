@@ -24,7 +24,7 @@ namespace Assets.Scripts.Crafting
             {
                 if (_instance == null)
                 {
-                    var craftingTransform = GameManager.GetSceneObjects().GetComponent<SceneObjects001>().UiCrafting.transform;
+                    var craftingTransform = GameManager.Instance.MainCanvasObjects.CraftingUi.transform;
 
                     _componentsContainer = craftingTransform.Find("ComponentsScrollView").Find("ComponentsContainer");
 

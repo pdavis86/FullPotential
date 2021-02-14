@@ -1,8 +1,6 @@
 ﻿using Assets.Scripts.Crafting.Results;
-using System;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Networking;
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -15,16 +13,12 @@ using UnityEngine.Networking;
 
 public class GameManager : MonoBehaviour
 {
-    public Inventory Inventory { get; private set; }
-
+    public MainCanvasObjects MainCanvasObjects { get; private set; }
+    public Prefabs Prefabs { get; private set; }
     public InputMappings InputMappings { get; private set; }
-
     public ResultFactory ResultFactory { get; private set; }
-
     public string PlayerName { get; set; }
     public string PlayerSkinUrl { get; set; }
-
-    //todo: amke a permanent canvas
 
 
     // ReSharper disable once ArrangeAccessorOwnerBody
@@ -37,17 +31,24 @@ public class GameManager : MonoBehaviour
         if (_instance != null && _instance != this)
         {
             Destroy(this.gameObject);
+            return;
         }
-        else
-        {
-            _instance = this;
-            Inventory = GetComponent<Inventory>();
-            InputMappings = GetComponent<InputMappings>();
-            ResultFactory = new ResultFactory();
 
-            DontDestroyOnLoad(gameObject);
-        }
+        _instance = this;
+        MainCanvasObjects = GetMainCanvasObjects();
+        Prefabs = GetComponent<Prefabs>();
+        InputMappings = GetComponent<InputMappings>();
+        ResultFactory = new ResultFactory();
+
+        DontDestroyOnLoad(gameObject);
     }
+
+    //Don't work
+    //private void Start()
+    //{
+    //    //todo: try setting offline scene here
+    //    UnityEngine.SceneManagement.SceneManager.LoadScene("Offline");
+    //}
 
     void OnGUI()
     {
@@ -82,6 +83,11 @@ public class GameManager : MonoBehaviour
                 //}
             }
         }
+    }
+
+    public static MainCanvasObjects GetMainCanvasObjects()
+    {
+        return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects().FirstOrDefault(x => x.name == "MainCanvas").GetComponent<MainCanvasObjects>();
     }
 
     public static GameObject GetSceneObjects()

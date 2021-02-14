@@ -73,7 +73,7 @@ public class SpellBehaviour : AttackBehaviourBase
                 return;
             }
 
-            Debug.Log("Collided with " + other.gameObject.name);
+            //Debug.Log("Collided with " + other.gameObject.name);
 
             //Don't Destroy(). Need it alive for RPC calls
             gameObject.SetActive(false);

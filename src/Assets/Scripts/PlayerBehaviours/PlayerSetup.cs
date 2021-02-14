@@ -26,12 +26,6 @@ public class PlayerSetup : NetworkBehaviour
     public string TextureUri;
 
     private Camera _sceneCamera;
-    private SceneObjects001 _sceneObjects;
-
-    private void Awake()
-    {
-        _sceneObjects = GameManager.GetSceneObjects().GetComponent<SceneObjects001>();
-    }
 
     private void Start()
     {
@@ -60,7 +54,7 @@ public class PlayerSetup : NetworkBehaviour
 
         _playerCamera.gameObject.SetActive(true);
 
-        _sceneObjects.UiHud.SetActive(true);
+        GameManager.Instance.MainCanvasObjects.Hud.SetActive(true);
 
         var pm = gameObject.AddComponent<PlayerMovement>();
         pm.PlayerCamera = _playerCamera;
@@ -107,7 +101,7 @@ public class PlayerSetup : NetworkBehaviour
             //todo: inv.save()
         }
 
-        if (_sceneObjects.UiHud != null) { _sceneObjects.UiHud.SetActive(false); }
+        if (GameManager.Instance.MainCanvasObjects.Hud != null) { GameManager.Instance.MainCanvasObjects.Hud.SetActive(false); }
         if (_sceneCamera != null) { _sceneCamera.gameObject.SetActive(true); }
     }
 
