@@ -4,6 +4,7 @@
 
 namespace Assets.Scripts.Crafting.Results
 {
+    [System.Serializable]
     public class Weapon : GearBase
     {
         public const string Dagger = "Dagger";
@@ -32,7 +33,7 @@ namespace Assets.Scripts.Crafting.Results
             Shield
         };
 
-        public bool IsTwoHanded { get; set; }
+        public bool IsTwoHanded;
 
         /* todo: weapon reloaders
          * Standard (you lose remaining ammo in the magazine)

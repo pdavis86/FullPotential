@@ -3,9 +3,6 @@ using UnityEngine.Networking;
 
 public class JoinOrHostGame : MonoBehaviour
 {
-    public string PlayerName;
-    public string PlayerSkinUrl;
-
     private NetworkManager _networkManager;
 
     void Start()
@@ -56,12 +53,12 @@ public class JoinOrHostGame : MonoBehaviour
 
     public void SetPlayerName(string value)
     {
-        PlayerName = value;
+       GameManager.Instance.PlayerName = value;
     }
 
     public void SetPlayerSkinUrl(string value)
     {
-        PlayerSkinUrl = value;
+        GameManager.Instance.PlayerSkinUrl = value;
     }
 
 }

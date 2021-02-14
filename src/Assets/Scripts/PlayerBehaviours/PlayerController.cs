@@ -21,39 +21,10 @@ public class PlayerController : NetworkBehaviour
     private bool _doUiToggle;
     private SceneObjects001 _sceneObjects;
 
-
-    private const short _myMsgType = 101;
-
-
-    private Inventory _inventory;
-    private Inventory Inventory
-    {
-        get
-        {
-            return _inventory ?? (_inventory = GetComponent<Inventory>());
-        }
-    }
-
     void Awake()
     {
         _sceneObjects = GameManager.GetSceneObjects().GetComponent<SceneObjects001>();
         _sceneObjects.UiCrafting.SetActive(false);
-    }
-
-    private void Start()
-    {
-        if (isClient)
-        {
-            connectionToServer.RegisterHandler(_myMsgType, OnServerSentMyMessageType);
-        }
-    }
-
-    private void OnServerSentMyMessageType(NetworkMessage netMsg)
-    {
-        var beginMessage = netMsg.ReadMessage<StringMessage>();
-        Debug.LogError("received message: " + beginMessage.value);
-        //Debug.LogError("received message IsClient: " + isClient);
-        //Debug.LogError("received message isServer: " + isServer);
     }
 
     void Update()
@@ -108,6 +79,8 @@ public class PlayerController : NetworkBehaviour
 
     private void OnDisable()
     {
+        Debug.Log("OnDisable() called");
+
         Cursor.lockState = CursorLockMode.None;
 
         if (_sceneObjects.UiHud != null)
@@ -116,6 +89,20 @@ public class PlayerController : NetworkBehaviour
             _sceneObjects.UiCrafting.SetActive(false);
         }
     }
+
+    //private void OnDestroy()
+    //{
+    //    Debug.Log("OnDestroy() called");
+    //}
+
+    //private void OnServerInitialized()
+    //{
+    //    Debug.Log("OnServerInitialized() called");
+    //}
+
+
+
+
 
     [Command]
     private void CmdCastSpell(bool leftHand)
@@ -200,19 +187,15 @@ public class PlayerController : NetworkBehaviour
         var distance = Vector3.Distance(PlayerCamera.transform.position, interactable.transform.position);
         if (distance <= interactable.Radius)
         {
-            Debug.Log("Interacted with " + interactable.gameObject.name);
-
-
-
-            //validation done... then what?
+            //Debug.Log("Interacted with " + interactable.gameObject.name);
 
             var lootDrop = GameManager.Instance.ResultFactory.GetLootDrop();
-            Inventory.Add(lootDrop);
+            
+            //todo: is this necessary too? - Inventory.Add(lootDrop);
             //Debug.Log($"Inventory now has {Inventory.Items.Count} items in it");
 
-            //todo: send JSON to client
-            connectionToClient.Send(_myMsgType, new StringMessage("This is a test message 1"));
-            //NetworkServer.SendToClient(connectionToClient.connectionId, _myMsgType, new StringMessage("This is a test message 3"));
+            var lootDropJson = JsonUtility.ToJson(lootDrop);
+            connectionToClient.Send(Assets.Scripts.Networking.MessageIds.InventoryAddItem, new StringMessage(lootDropJson));
         }
     }
 

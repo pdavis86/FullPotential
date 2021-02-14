@@ -68,28 +68,45 @@ public class PlayerSetup : NetworkBehaviour
         //Done on network manager now
         //ClientScene.RegisterPrefab(_sceneObjects.PrefabSpell);
 
-
-
-
-
-        var joinParams = NetworkManager.singleton.GetComponent<JoinOrHostGame>();
-
         _nameTag.text = null;
 
-        //todo: let players specify a URL to a texture PNG
-        var filePath = joinParams.PlayerSkinUrl; // @"C:\Users\Paul\Desktop\Untitled.png";
-        if (!string.IsNullOrWhiteSpace(filePath) && System.IO.File.Exists(filePath))
+
+
+
+
+
+        if (!string.IsNullOrWhiteSpace(GameManager.Instance.PlayerSkinUrl))
         {
-            SetPlayerTexture(filePath);
-            //todo: upload file
-            TextureUri = filePath;
+            string filePath;
+            if (!GameManager.Instance.PlayerSkinUrl.StartsWith("http"))
+            {
+                //todo: upload file?
+                filePath = GameManager.Instance.PlayerSkinUrl;
+            }
+            else
+            {
+                //todo: download file
+                filePath = GameManager.Instance.PlayerSkinUrl;
+            }
+
+            if (System.IO.File.Exists(filePath))
+            {
+                SetPlayerTexture(filePath);
+                TextureUri = filePath;
+            }
         }
 
-        CmdHeresMyJoiningDetails(joinParams.PlayerName, joinParams.PlayerSkinUrl);
+        CmdHeresMyJoiningDetails(GameManager.Instance.PlayerName, GameManager.Instance.PlayerSkinUrl);
     }
 
     private void OnDisable()
     {
+        if (isServer)
+        {
+            var inv = GetComponent<Inventory>();
+            //todo: inv.save()
+        }
+
         if (_sceneObjects.UiHud != null) { _sceneObjects.UiHud.SetActive(false); }
         if (_sceneCamera != null) { _sceneCamera.gameObject.SetActive(true); }
     }

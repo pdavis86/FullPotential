@@ -7,10 +7,11 @@ using System.Linq;
 
 namespace Assets.Scripts.Crafting.Results
 {
+    [System.Serializable]
     public class Spell : ItemBase
     {
-        public string Targeting { get; set; }
-        public string Shape { get; set; }
+        public string Targeting;
+        public string Shape;
 
 
 

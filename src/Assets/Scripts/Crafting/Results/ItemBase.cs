@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Assets.Scripts.Crafting.Results
 {
+    [System.Serializable]
     public class ItemBase
     {
-        public string Name { get; set; }
-        public Attributes Attributes { get; set; }
-        public List<string> Effects { get; set; }
+        public Guid Id;
+        public string Name;
+        public Attributes Attributes;
+        public List<string> Effects;
     }
 }

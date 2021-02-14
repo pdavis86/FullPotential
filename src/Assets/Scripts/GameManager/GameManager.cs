@@ -21,6 +21,11 @@ public class GameManager : MonoBehaviour
 
     public ResultFactory ResultFactory { get; private set; }
 
+    public string PlayerName { get; set; }
+    public string PlayerSkinUrl { get; set; }
+
+    //todo: amke a permanent canvas
+
 
     // ReSharper disable once ArrangeAccessorOwnerBody
     private static GameManager _instance;
@@ -90,4 +95,11 @@ public class GameManager : MonoBehaviour
         return playerCamera.gameObject.transform.parent.gameObject;
     }
 
+
+
+    public static void Disconnect()
+    {
+        UnityEngine.Networking.NetworkManager.singleton.StopClient();
+        UnityEngine.Networking.NetworkManager.singleton.StopHost();
+    }
 }

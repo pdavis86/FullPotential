@@ -184,6 +184,7 @@ namespace Assets.Scripts.Crafting.Results
 
             var lootDrop = new ItemBase
             {
+                Id = Guid.NewGuid(),
                 Attributes = GetRandomAttributes(),
                 Effects = new List<string>()
             };
@@ -232,6 +233,7 @@ namespace Assets.Scripts.Crafting.Results
             var effects = components.SelectMany(x => x.Effects);
             var spell = new Spell
             {
+                Id = Guid.NewGuid(),
                 Targeting = GetTargeting(effects),
                 Attributes = new Attributes
                 {
@@ -269,6 +271,7 @@ namespace Assets.Scripts.Crafting.Results
         {
             var item = new Weapon
             {
+                Id = Guid.NewGuid(),
                 Type = type,
                 IsTwoHanded = isTwoHanded,
                 Attributes = new Attributes
@@ -288,6 +291,7 @@ namespace Assets.Scripts.Crafting.Results
         {
             var item = new Weapon
             {
+                Id = Guid.NewGuid(),
                 Type = type,
                 IsTwoHanded = isTwoHanded,
                 Attributes = new Attributes
@@ -312,6 +316,7 @@ namespace Assets.Scripts.Crafting.Results
         {
             var item = new Weapon
             {
+                Id = Guid.NewGuid(),
                 Type = Weapon.Shield,
                 Attributes = new Attributes
                 {
@@ -330,6 +335,7 @@ namespace Assets.Scripts.Crafting.Results
         {
             var item = new Armor
             {
+                Id = Guid.NewGuid(),
                 Name = "Unnamed Armor",
                 Type = type,
                 Attributes = new Attributes
@@ -346,6 +352,7 @@ namespace Assets.Scripts.Crafting.Results
         {
             var item = new Armor
             {
+                Id = Guid.NewGuid(),
                 Type = Armor.Barrier,
                 Attributes = new Attributes
                 {
@@ -365,6 +372,7 @@ namespace Assets.Scripts.Crafting.Results
         {
             var item = new Accessory
             {
+                Id = Guid.NewGuid(),
                 Type = type,
                 Attributes = new Attributes
                 {
