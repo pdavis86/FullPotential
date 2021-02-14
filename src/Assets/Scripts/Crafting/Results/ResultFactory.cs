@@ -85,10 +85,12 @@ namespace Assets.Scripts.Crafting.Results
                 .Except(Spell.TargetingOptions.All)
                 .Except(Spell.ShapeOptions.All);
 
-            //If there is a buff or support then remove all debuffs
+            //If there is a buff or support then remove all debuffs and "offensive" effects
             if (effects.Intersect(Spell.BuffEffects.All).Any() || effects.Intersect(Spell.SupportEffects.All).Any())
             {
-                effects = effects.Except(Spell.DebuffEffects.All);
+                effects = effects
+                    .Except(Spell.DebuffEffects.All)
+                    .Except(Spell.ElementalEffects.All);
             }
 
             //Lingering must have matching elemental type
