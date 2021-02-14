@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 6447200508839985312}
   m_Layer: 0
   m_Name: Spell
-  m_TagString: Untagged
+  m_TagString: Spell
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -126,6 +126,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SourcePlayer: {fileID: 0}
+  Spell:
+    Id: 
+    Name: 
+    Attributes:
+      IsActivated: 0
+      IsAutomatic: 0
+      IsSoulbound: 0
+      ExtraAmmoPerShot: 0
+      Strength: 0
+      Cost: 0
+      Range: 0
+      Accuracy: 0
+      Speed: 0
+      Recovery: 0
+      Duration: 0
+    Effects: []
+    Targeting: 
+    Shape: 
+  PlayerNetworkId: 0
 --- !u!114 &7697724776256515342
 MonoBehaviour:
   m_ObjectHideFlags: 0

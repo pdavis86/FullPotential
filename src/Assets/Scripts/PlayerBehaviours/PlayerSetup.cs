@@ -97,7 +97,7 @@ public class PlayerSetup : NetworkBehaviour
 
     private void OnDisable()
     {
-        //todo: Save();
+        Save();
 
         if (GameManager.Instance.MainCanvasObjects.Hud != null) { GameManager.Instance.MainCanvasObjects.Hud.SetActive(false); }
         if (_sceneCamera != null) { _sceneCamera.gameObject.SetActive(true); }

@@ -67,18 +67,24 @@ public class SpellBehaviour : AttackBehaviourBase
     {
         try
         {
-            if (!other.gameObject.CompareTag("Player") && !other.gameObject.CompareTag("Enemy"))
+            //Debug.Log("Collided with " + other.gameObject.name);
+
+            if (other.gameObject.CompareTag("Spell"))
             {
-                //Debug.Log("You hit something not damageable");
+                //Debug.Log("You hit another spell");
                 return;
             }
-
-            //Debug.Log("Collided with " + other.gameObject.name);
 
             //Don't Destroy(). Need it alive for RPC calls
             gameObject.SetActive(false);
 
-            DealDamage(Spell, gameObject, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
+            if (other.gameObject.CompareTag("Player") || other.gameObject.CompareTag("Enemy"))
+            {
+                DealDamage(Spell, gameObject, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
+                return;
+            }
+
+            //Debug.Log("You hit something not damageable");
         }
         catch (Exception ex)
         {
