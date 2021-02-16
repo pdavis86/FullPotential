@@ -11,6 +11,9 @@ using UnityEngine;
 // ReSharper disable UnassignedField.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
+//todo: api for world creation
+//todo: skin library website. By skin type, ordered by popularity
+
 public class GameManager : MonoBehaviour
 {
     public MainCanvasObjects MainCanvasObjects { get; private set; }
@@ -43,11 +46,10 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    //Doesn't work
     //private void Start()
     //{
-    //    //todo: try setting offline scene here
-    //    UnityEngine.SceneManagement.SceneManager.LoadScene("Offline");
+    //    //Doesn't work
+    //    //UnityEngine.SceneManagement.SceneManager.LoadScene("Offline");
     //}
 
     void OnGUI()
@@ -91,10 +93,10 @@ public class GameManager : MonoBehaviour
         return GameObject.Find("MainCanvas").GetComponent<MainCanvasObjects>();
     }
 
-    //public static GameObject GetSceneObjects()
-    //{
-    //    return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects().FirstOrDefault(x => x.name == "SceneObjects");
-    //}
+    public static GameObject GetSceneCanvas()
+    {
+        return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects().FirstOrDefault(x => x.name == "SceneCanvas");
+    }
 
     public static GameObject GetCurrentPlayerGameObject(Camera playerCamera)
     {

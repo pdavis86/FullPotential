@@ -2,10 +2,14 @@
 
 public class MainCanvasObjects : MonoBehaviour
 {
+    //Overlays
+    public GameObject TooltipOverlay;
+    public GameObject DebuggingOverlay;
     public GameObject HitNumberContainer;
     public GameObject Hud;
+
+    //Menus
     public GameObject CraftingUi;
-    public GameObject DebuggingOverlay;
     public GameObject EscMenu;
     public GameObject InventoryUi;
 
@@ -22,6 +26,9 @@ public class MainCanvasObjects : MonoBehaviour
         }
 
         _instance = this;
+
+        //Needs to get instantiated
+        TooltipOverlay.SetActive(true);
         
         DontDestroyOnLoad(gameObject);
     }

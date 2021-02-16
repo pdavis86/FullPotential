@@ -75,6 +75,8 @@ public class SpellBehaviour : AttackBehaviourBase
                 return;
             }
 
+            //todo: after hitting something, becomes active and up in the sky :/
+
             //Don't Destroy(). Need it alive for RPC calls
             gameObject.SetActive(false);
 

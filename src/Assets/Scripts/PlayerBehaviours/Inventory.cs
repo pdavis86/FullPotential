@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Crafting.Results;
+using Assets.Scripts.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ using UnityEngine.Networking.NetworkSystem;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
 
-public class Inventory : MonoBehaviour
+public class Inventory : NetworkBehaviour
 {
     public int MaxItems = 10;
     public List<ItemBase> Items;
@@ -26,7 +27,7 @@ public class Inventory : MonoBehaviour
 
     private void Start()
     {
-        if (NetworkClient.active)
+        if (isLocalPlayer)
         {
             var netId = GetComponent<NetworkIdentity>();
             if (netId == null)
@@ -44,7 +45,7 @@ public class Inventory : MonoBehaviour
 
     private void OnLoadInventory(NetworkMessage netMsg)
     {
-        //todo: load inv from save
+        LoadFromJson(netMsg.ReadMessage<StringMessage>().value);
     }
 
     private void OnAddItemToInventory(NetworkMessage netMsg)
@@ -78,6 +79,19 @@ public class Inventory : MonoBehaviour
 
 
 
+    public void LoadFromJson(string json)
+    {
+        var loadData = JsonUtility.FromJson<PlayerSave>(json);
+
+        if (loadData.Loot != null) { Items.AddRange(loadData.Loot); }
+        if (loadData.Accessories != null) { Items.AddRange(loadData.Accessories); }
+        if (loadData.Armor != null) { Items.AddRange(loadData.Armor); }
+        if (loadData.Spells != null) { Items.AddRange(loadData.Spells); }
+        if (loadData.Weapons != null) { Items.AddRange(loadData.Weapons); }
+
+        Debug.LogError($"There are {Items.Count} items in the inventory after loading on " + (isServer ? "server" : "client") + " for " + gameObject.name);
+    }
+
     private void AddOfType<T>(string stringValue) where T : ItemBase
     {
         Add(JsonUtility.FromJson<T>(stringValue));
@@ -89,6 +103,7 @@ public class Inventory : MonoBehaviour
         if (Items.Count == MaxItems)
         {
             //todo: send to storage instead
+            Debug.Log("Your inventory is at max");
             return;
         }
 
