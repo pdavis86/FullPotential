@@ -126,7 +126,7 @@ namespace Assets.Scripts.Crafting.Results
                     .Except(Spell.ElementalEffects.All.Where(x => x != elementalEffect));
             }
 
-            if (craftingType == ChooseCraftingType.CraftingTypeArmor || craftingType == ChooseCraftingType.CraftingTypeAccessory)
+            if (craftingType == CraftingUi.CraftingTypeArmor || craftingType == CraftingUi.CraftingTypeAccessory)
             {
                 return effects.Intersect(Spell.BuffEffects.All)
                     .Union(effects.Intersect(Spell.SupportEffects.All))
@@ -135,7 +135,7 @@ namespace Assets.Scripts.Crafting.Results
             }
 
             //Weapons have debuffs and elemental (+lingering) only
-            if (craftingType == ChooseCraftingType.CraftingTypeWeapon)
+            if (craftingType == CraftingUi.CraftingTypeWeapon)
             {
                 return effects.Intersect(Spell.DebuffEffects.All)
                     .Union(effects.Intersect(Spell.ElementalEffects.All))
@@ -143,7 +143,7 @@ namespace Assets.Scripts.Crafting.Results
                     .ToList();
             }
 
-            if (craftingType != ChooseCraftingType.CraftingTypeSpell)
+            if (craftingType != CraftingUi.CraftingTypeSpell)
             {
                 throw new Exception($"Unexpected craftingType '{craftingType}'");
             }
@@ -248,7 +248,7 @@ namespace Assets.Scripts.Crafting.Results
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery),
                     Duration = ComputeAttribute(components, x => x.Attributes.Duration)
                 },
-                Effects = GetEffects(ChooseCraftingType.CraftingTypeSpell, effects),
+                Effects = GetEffects(CraftingUi.CraftingTypeSpell, effects),
             };
             spell.Shape = GetShape(spell.Targeting, effects);
 
@@ -283,7 +283,7 @@ namespace Assets.Scripts.Crafting.Results
                     Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed)
                 },
-                Effects = GetEffects(ChooseCraftingType.CraftingTypeWeapon, components.SelectMany(x => x.Effects))
+                Effects = GetEffects(CraftingUi.CraftingTypeWeapon, components.SelectMany(x => x.Effects))
             };
             item.Name = GetItemName("Strength", item);
             return item;
@@ -308,7 +308,7 @@ namespace Assets.Scripts.Crafting.Results
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(ChooseCraftingType.CraftingTypeWeapon, components.SelectMany(x => x.Effects))
+                Effects = GetEffects(CraftingUi.CraftingTypeWeapon, components.SelectMany(x => x.Effects))
             };
             item.Name = GetItemName("Strength", item);
             return item;
@@ -327,7 +327,7 @@ namespace Assets.Scripts.Crafting.Results
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(ChooseCraftingType.CraftingTypeWeapon, components.SelectMany(x => x.Effects))
+                Effects = GetEffects(CraftingUi.CraftingTypeWeapon, components.SelectMany(x => x.Effects))
             };
             item.Name = GetItemName("Defence", item);
             return item;
@@ -344,7 +344,7 @@ namespace Assets.Scripts.Crafting.Results
                 {
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength)
                 },
-                Effects = GetEffects(ChooseCraftingType.CraftingTypeArmor, components.SelectMany(x => x.Effects))
+                Effects = GetEffects(CraftingUi.CraftingTypeArmor, components.SelectMany(x => x.Effects))
             };
             item.Name = GetItemName("Defence", item);
             return item;
@@ -364,7 +364,7 @@ namespace Assets.Scripts.Crafting.Results
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(ChooseCraftingType.CraftingTypeArmor, components.SelectMany(x => x.Effects))
+                Effects = GetEffects(CraftingUi.CraftingTypeArmor, components.SelectMany(x => x.Effects))
             };
             item.Name = GetItemName("Defence", item);
             return item;
@@ -380,7 +380,7 @@ namespace Assets.Scripts.Crafting.Results
                 {
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength)
                 },
-                Effects = GetEffects(ChooseCraftingType.CraftingTypeAccessory, components.SelectMany(x => x.Effects))
+                Effects = GetEffects(CraftingUi.CraftingTypeAccessory, components.SelectMany(x => x.Effects))
             };
             item.Name = GetItemName("Strength", item);
             return item;

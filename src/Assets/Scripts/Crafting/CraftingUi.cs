@@ -16,7 +16,7 @@ using UnityEngine.UI;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
 
-public class Crafting : MonoBehaviour
+public class CraftingUi : MonoBehaviour
 {
     [SerializeField] private GameObject _componentsContainer;
     [SerializeField] private GameObject _rowPrefab;
@@ -28,51 +28,75 @@ public class Crafting : MonoBehaviour
     private Inventory _inventory;
     private List<ItemBase> _components;
 
+    public const string CraftingTypeWeapon = "Weapon";
+    public const string CraftingTypeArmor = "Armor";
+    public const string CraftingTypeAccessory = "Accessory";
+    public const string CraftingTypeSpell = "Spell";
+
+    public static readonly List<string> TypeOptions = new List<string>
+    {
+        CraftingTypeWeapon,
+        CraftingTypeArmor,
+        CraftingTypeAccessory,
+        CraftingTypeSpell
+    };
+
+    public static readonly List<string> HandednessOptions = new List<string>
+    {
+        Weapon.OneHanded,
+        Weapon.TwoHanded
+    };
+
+    public static readonly string[] HandednessSubTypes = new[]
+    {
+        Weapon.Axe,
+        Weapon.Sword,
+        Weapon.Hammer,
+        Weapon.Gun
+    };
+
     private void Awake()
     {
         _components = new List<ItemBase>();
         _inventory = GameManager.Instance.LocalPlayer.GetComponent<Inventory>();
 
         _typeDropdown.onValueChanged.AddListener(TypeOnValueChanged);
-        TypeOnValueChanged(0);
 
-        _subTypeDropdown = transform.GetComponent<Dropdown>();
         _subTypeDropdown.onValueChanged.AddListener(SubTypeOnValueChanged);
-
     }
 
     void SubTypeOnValueChanged(int index)
+    {
+        try
         {
-            try
-            {
-                SetHandednessDropDownVisibility(_handednessDropdown, TypeDropdown.options[TypeDropdown.value].text, _subTypeDropdown.options[index].text);
-                //todo: UiHelper.Instance.UpdateResults();
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError(ex);
-            }
+            SetHandednessDropDownVisibility(_handednessDropdown, _typeDropdown.options[_typeDropdown.value].text, _subTypeDropdown.options[index].text);
+            UpdateResults();
         }
-
-        public static void SetHandednessDropDownVisibility(Dropdown handednessDropdown, string type, string subType)
+        catch (Exception ex)
         {
-            handednessDropdown.gameObject.SetActive(type == ChooseCraftingType.CraftingTypeWeapon && _handednessSubTypes.Contains(subType));
+            Debug.LogError(ex);
+        }
+    }
+
+    public static void SetHandednessDropDownVisibility(Dropdown handednessDropdown, string type, string subType)
+    {
+        handednessDropdown.gameObject.SetActive(type == CraftingTypeWeapon && HandednessSubTypes.Contains(subType));
     }
 
     void TypeOnValueChanged(int index)
     {
         try
         {
-            SubTypeDropdown.ClearOptions();
+            _subTypeDropdown.ClearOptions();
 
             var isSpell = false;
-            var craftingType = _thisDropdown.options[_thisDropdown.value].text;
+            var craftingType = _typeDropdown.options[_typeDropdown.value].text;
 
             switch (craftingType)
             {
-                case CraftingTypeWeapon: SubTypeDropdown.AddOptions(Weapon.WeaponOptions); break;
-                case CraftingTypeArmor: SubTypeDropdown.AddOptions(Armor.ArmorOptions); break;
-                case CraftingTypeAccessory: SubTypeDropdown.AddOptions(Accessory.AccessoryOptions); break;
+                case CraftingTypeWeapon: _subTypeDropdown.AddOptions(Weapon.WeaponOptions); break;
+                case CraftingTypeArmor: _subTypeDropdown.AddOptions(Armor.ArmorOptions); break;
+                case CraftingTypeAccessory: _subTypeDropdown.AddOptions(Accessory.AccessoryOptions); break;
                 case CraftingTypeSpell: isSpell = true; break;
 
                 default:
@@ -81,18 +105,18 @@ public class Crafting : MonoBehaviour
 
             if (isSpell)
             {
-                SubTypeDropdown.gameObject.SetActive(false);
+                _subTypeDropdown.gameObject.SetActive(false);
             }
             else
             {
-                SubTypeDropdown.RefreshShownValue();
-                SubTypeDropdown.gameObject.SetActive(true);
+                _subTypeDropdown.RefreshShownValue();
+                _subTypeDropdown.gameObject.SetActive(true);
             }
 
-            var subType = SubTypeDropdown.options != null && SubTypeDropdown.options.Count > 0 ? SubTypeDropdown.options[SubTypeDropdown.value].text : null;
-            ChooseCraftingSubType.SetHandednessDropDownVisibility(HandednessDropdown, craftingType, subType);
+            var subType = _subTypeDropdown.options != null && _subTypeDropdown.options.Count > 0 ? _subTypeDropdown.options[_subTypeDropdown.value].text : null;
+            SetHandednessDropDownVisibility(_handednessDropdown, craftingType, subType);
 
-            //todo: UiHelper.Instance.UpdateResults();
+            UpdateResults();
         }
         catch (Exception ex)
         {
@@ -103,6 +127,15 @@ public class Crafting : MonoBehaviour
     private void OnEnable()
     {
         LoadInventory();
+
+        _typeDropdown.ClearOptions();
+        _typeDropdown.AddOptions(TypeOptions);
+
+        _handednessDropdown.ClearOptions();
+        _handednessDropdown.AddOptions(HandednessOptions);
+
+        TypeOnValueChanged(0);
+        _handednessDropdown.gameObject.SetActive(false);
     }
 
     private void OnDisable()
@@ -145,7 +178,16 @@ public class Crafting : MonoBehaviour
             var row = Instantiate(_rowPrefab, _componentsContainer.transform);
             //row.GetComponent<RectTransform>().position = rowRectTransform.position + new Vector3(0, rowCounter * rowRectTransform.rect.height);
             //row.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -rowHeight * i);
-            row.transform.Find("ItemName").GetComponent<Text>().text = item.Name;
+
+            if (item.Name == "Scrap" || item.Name == "Shard")
+            {
+                var suffix = int.Parse(item.GetHashCode().ToString().TrimStart('-').Substring(5));
+                row.transform.Find("ItemName").GetComponent<Text>().text = item.Name + $" (Type #{suffix.ToString("D5")})";
+            }
+            else
+            {
+                row.transform.Find("ItemName").GetComponent<Text>().text = item.Name;
+            }
 
             var rowImage = row.GetComponent<Image>();
 
@@ -230,7 +272,7 @@ public class Crafting : MonoBehaviour
         var resultFactory = GameManager.Instance.ResultFactory;
 
         ItemBase craftedThing;
-        if (selectedType == ChooseCraftingType.CraftingTypeSpell)
+        if (selectedType == CraftingTypeSpell)
         {
             craftedThing = resultFactory.GetSpell(components);
         }

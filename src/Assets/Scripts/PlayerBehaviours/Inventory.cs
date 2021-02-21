@@ -45,7 +45,10 @@ public class Inventory : NetworkBehaviour
 
     private void OnLoadInventory(NetworkMessage netMsg)
     {
-        LoadFromJson(netMsg.ReadMessage<StringMessage>().value);
+        //todo: make a generic load method instead of here
+        var loadData = JsonUtility.FromJson<PlayerSave>(netMsg.ReadMessage<StringMessage>().value);
+
+        LoadData(loadData.Inventory);
     }
 
     private void OnAddItemToInventory(NetworkMessage netMsg)
@@ -79,9 +82,9 @@ public class Inventory : NetworkBehaviour
 
 
 
-    public void LoadFromJson(string json)
+    public void LoadData(Assets.Scripts.Data.Inventory loadData)
     {
-        var loadData = JsonUtility.FromJson<PlayerSave>(json);
+        MaxItems = loadData.MaxItems == 0 ? 30 : loadData.MaxItems;
 
         if (loadData.Loot != null) { Items.AddRange(loadData.Loot); }
         if (loadData.Accessories != null) { Items.AddRange(loadData.Accessories); }
@@ -89,16 +92,28 @@ public class Inventory : NetworkBehaviour
         if (loadData.Spells != null) { Items.AddRange(loadData.Spells); }
         if (loadData.Weapons != null) { Items.AddRange(loadData.Weapons); }
 
-        //todo: do this properly
-        MaxItems = 30;
+        //Debug.Log($"There are {Items.Count} items in the inventory after loading on " + (isServer ? "server" : "client") + " for " + gameObject.name);
+    }
 
-        Debug.Log($"There are {Items.Count} items in the inventory after loading on " + (isServer ? "server" : "client") + " for " + gameObject.name);
+    public Assets.Scripts.Data.Inventory GetSaveData()
+    {
+        var groupedItems = Items.GroupBy(x => x.GetType());
+
+        return new Assets.Scripts.Data.Inventory
+        {
+            MaxItems = MaxItems,
+            Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemBase))?.ToArray(),
+            Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray() as Accessory[],
+            Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray() as Armor[],
+            Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray() as Spell[],
+            Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray() as Weapon[]
+        };
     }
 
     private void AddOfType<T>(string stringValue) where T : ItemBase
     {
         Add(JsonUtility.FromJson<T>(stringValue));
-        Debug.Log($"Inventory now has {Items.Count} items in it");
+        //Debug.Log($"Inventory now has {Items.Count} items in it");
     }
 
     public void Add(ItemBase item)
@@ -106,7 +121,7 @@ public class Inventory : NetworkBehaviour
         if (Items.Count == MaxItems)
         {
             //todo: send to storage instead
-            Debug.Log("Your inventory is at max");
+            //Debug.Log("Your inventory is at max");
             return;
         }
 

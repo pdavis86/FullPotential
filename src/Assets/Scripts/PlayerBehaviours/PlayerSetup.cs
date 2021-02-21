@@ -131,7 +131,7 @@ public class PlayerSetup : NetworkBehaviour
         if (!string.IsNullOrWhiteSpace(playerSkinUri)) { TextureUri = playerSkinUri; }
         RpcSetPlayerDetails(playerName, playerSkinUri);
 
-        //todo: finish this
+        //todo: change file path
         var loadJson = System.IO.File.ReadAllText(@"D:\temp\playerguid.json");
         connectionToClient.Send(Assets.Scripts.Networking.MessageIds.InventoryLoad, new StringMessage(loadJson));
     }
@@ -149,28 +149,20 @@ public class PlayerSetup : NetworkBehaviour
     [ServerCallback]
     private void Save()
     {
-        Debug.Log("Saving player data for " + gameObject.name);
+        //Debug.Log("Saving player data for " + gameObject.name);
 
         //todo: remove this
-        _inventory.Add(GameManager.Instance.ResultFactory.GetLootDrop());
-        _inventory.Add(GameManager.Instance.ResultFactory.GetLootDrop());
-        var weapon = GameManager.Instance.ResultFactory.GetMeleeWeapon("Sword", _inventory.Items, false);
-        _inventory.Add(weapon);
-
-        
-        //todo:
-        var groupedItems = _inventory.Items.GroupBy(x => x.GetType());
+        //_inventory.Add(GameManager.Instance.ResultFactory.GetLootDrop());
+        //_inventory.Add(GameManager.Instance.ResultFactory.GetLootDrop());
+        //var weapon = GameManager.Instance.ResultFactory.GetMeleeWeapon("Sword", _inventory.Items, false);
+        //_inventory.Add(weapon);
 
         var saveData = new PlayerSave
         {
-            Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemBase))?.ToArray(),
-            Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray() as Accessory[],
-            Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray() as Armor[],
-            Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray() as Spell[],
-            Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray() as Weapon[]
+            Inventory = _inventory.GetSaveData()
         };
-
         var saveJson = JsonUtility.ToJson(saveData, _debugging);
+        //todo: change file path
         System.IO.File.WriteAllText(@"D:\temp\playerguid.json", saveJson);
     }
 
