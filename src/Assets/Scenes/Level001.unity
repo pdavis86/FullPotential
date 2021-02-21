@@ -888,10 +888,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2064497155}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89d58b4f92eab964199407b4f6490430, type: 3}
+  m_Script: {fileID: 11500000, guid: dbf561e408f9e7848b8566850fd3027c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Radius: 4.5
+  Radius: 3
 --- !u!65 &2064497158
 BoxCollider:
   m_ObjectHideFlags: 0

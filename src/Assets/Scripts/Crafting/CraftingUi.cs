@@ -211,7 +211,7 @@ public class CraftingUi : MonoBehaviour
             var tooltip = row.GetComponent<CraftingTooltip>();
             tooltip.OnPointerEnterForTooltip += pointerEventData =>
             {
-                Tooltip.ShowTooltip(GetItemDescription(item, false));
+                Tooltips.ShowTooltip(GetItemDescription(item, false));
             };
 
             rowCounter++;
@@ -258,6 +258,8 @@ public class CraftingUi : MonoBehaviour
         if (item.Attributes.Speed > 0) { sb.Append($"Speed: {item.Attributes.Speed}\n"); }
         if (item.Attributes.Recovery > 0) { sb.Append($"Recovery: {item.Attributes.Recovery}\n"); }
         if (item.Attributes.Duration > 0) { sb.Append($"Duration: {item.Attributes.Duration}\n"); }
+
+        //todo: this make the tooltip go outside the background
         if (item.Effects.Count > 0) { sb.Append($"Effects: {string.Join(", ", item.Effects)}"); }
 
         return sb.ToString();

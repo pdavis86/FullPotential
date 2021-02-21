@@ -11,9 +11,9 @@ using UnityEngine.UI;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
 
-public class Tooltip : MonoBehaviour
+public class Tooltips : MonoBehaviour
 {
-    private static Tooltip _instance;
+    private static Tooltips _instance;
 
     private Text _tooltipText;
     private RectTransform _rect;
@@ -45,12 +45,12 @@ public class Tooltip : MonoBehaviour
 
     public void Show(string tooltipText)
     {
-        const int padding = 8;
+        const int padding = 15;
+
 
         gameObject.SetActive(true);
-
         _tooltipText.text = tooltipText;
-        _rect.sizeDelta = new Vector2(_tooltipText.preferredWidth + padding, _tooltipText.preferredHeight + padding);
+        _rect.sizeDelta = new Vector2(_tooltipText.preferredWidth + padding, _tooltipText.preferredHeight + 0);
 
 
 
@@ -81,6 +81,7 @@ public class Tooltip : MonoBehaviour
 
     public void Hide()
     {
+        //_tooltipText.text = null;
         gameObject.SetActive(false);
     }
 

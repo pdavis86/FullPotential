@@ -25,7 +25,7 @@ public class CraftingTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        Tooltip.HideTooltip();
+        Tooltips.HideTooltip();
     }
 
 }

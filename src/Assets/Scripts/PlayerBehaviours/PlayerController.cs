@@ -184,8 +184,7 @@ public class PlayerController : NetworkBehaviour
                 var distance = Vector3.Distance(startPos, interactable.transform.position);
                 if (distance <= interactable.Radius)
                 {
-                    //Debug.Log("Interacted with " + hit.collider.gameObject.name);
-                    //interactable.InteractWith();
+                    Debug.Log("Interacted with " + hit.collider.gameObject.name);
                     CmdInteractWith(interactable.netId);
                 }
                 //else
