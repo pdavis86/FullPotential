@@ -1,7 +1,16 @@
-﻿//namespace UnityEngine
-//{
-    //public static class UnityEngineEx
-    //{
+﻿namespace UnityEngine
+{
+    public static class UnityEngineEx
+    {
+        public static Transform Clear(this Transform transform)
+        {
+            foreach (Transform child in transform)
+            {
+                GameObject.Destroy(child.gameObject);
+            }
+            return transform;
+        }
+
         //public static int GetActiveChildCount(this Component parent)
         //{
         //    var i = 0;
@@ -118,5 +127,5 @@
         //    return parent.GetComponents<T>();
         //}
 
-    //}
-//}
+    }
+}

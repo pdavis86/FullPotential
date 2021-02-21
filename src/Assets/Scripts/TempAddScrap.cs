@@ -13,24 +13,25 @@ using UnityEngine.UI;
 
 public class TempAddScrap : MonoBehaviour
 {
-    public GameObject Container;
-    public Transform SlotTemplate;
+    //public GameObject Container;
+    //public Transform SlotTemplate;
 
     void Start()
     {
-        SlotTemplate.gameObject.SetActive(false);
-        transform.GetComponent<Button>().onClick.AddListener(OnClick);
+        //SlotTemplate.gameObject.SetActive(false);
+        //transform.GetComponent<Button>().onClick.AddListener(OnClick);
     }
 
     private void OnClick()
     {
         try
         {
-            var newComp = Instantiate(SlotTemplate, Container.transform);
-            newComp.gameObject.GetComponent<ComponentProperties>().Properties = GameManager.Instance.ResultFactory.GetLootDrop();
-            newComp.gameObject.SetActive(true);
+            //todo: 
+            //var newComp = Instantiate(SlotTemplate, Container.transform);
+            //newComp.gameObject.GetComponent<ComponentProperties>().Properties = GameManager.Instance.ResultFactory.GetLootDrop();
+            //newComp.gameObject.SetActive(true);
 
-            UiHelper.Instance.UpdateResults();
+            //todo: UiHelper.Instance.UpdateResults();
 
             //todo: move this
             //UnityEngine.Networking.NetworkManager.singleton.StopClient();

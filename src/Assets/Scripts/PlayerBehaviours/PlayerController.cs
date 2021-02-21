@@ -42,6 +42,7 @@ public class PlayerController : NetworkBehaviour
             else if (Input.GetKeyDown(mappings.Interact)) { TryToInteract(); }
             else if (Input.GetMouseButtonDown(0)) { CmdCastSpell(false); }
             else if (Input.GetMouseButtonDown(1)) { CmdCastSpell(true); }
+            else if (Input.GetAxis("Mouse ScrollWheel") > 0) { /*todo*/ };
         }
         catch (Exception ex)
         {

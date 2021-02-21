@@ -22,6 +22,9 @@ public class PlayerSetup : NetworkBehaviour
     [SerializeField] private MeshRenderer _leftMesh;
     [SerializeField] private MeshRenderer _rightMesh;
 
+    //todo: when is this false?
+    [SerializeField] private bool _debugging = true;
+
     [SyncVar]
     public string Username;
 
@@ -30,9 +33,6 @@ public class PlayerSetup : NetworkBehaviour
 
     private Camera _sceneCamera;
     private Inventory _inventory;
-
-    //todo: when is this false?
-    private bool _debugging = true;
 
     private void Start()
     {
@@ -93,6 +93,7 @@ public class PlayerSetup : NetworkBehaviour
         //    }
         //}
 
+        GameManager.Instance.LocalPlayer = gameObject;
         CmdHeresMyJoiningDetails(GameManager.Instance.PlayerName, GameManager.Instance.PlayerSkinUrl);
     }
 
@@ -151,26 +152,26 @@ public class PlayerSetup : NetworkBehaviour
         Debug.Log("Saving player data for " + gameObject.name);
 
         //todo: remove this
-        //inv.Add(GameManager.Instance.ResultFactory.GetLootDrop());
-        //inv.Add(GameManager.Instance.ResultFactory.GetLootDrop());
-        //var weapon = GameManager.Instance.ResultFactory.GetMeleeWeapon("Sword", inv.Items, false);
-        //inv.Add(weapon);
+        _inventory.Add(GameManager.Instance.ResultFactory.GetLootDrop());
+        _inventory.Add(GameManager.Instance.ResultFactory.GetLootDrop());
+        var weapon = GameManager.Instance.ResultFactory.GetMeleeWeapon("Sword", _inventory.Items, false);
+        _inventory.Add(weapon);
 
-
+        
         //todo:
-        //var groupedItems = _inventory.Items.GroupBy(x => x.GetType());
+        var groupedItems = _inventory.Items.GroupBy(x => x.GetType());
 
-        //var saveData = new PlayerSave
-        //{
-        //    Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemBase))?.ToArray(),
-        //    Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray() as Accessory[],
-        //    Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray() as Armor[],
-        //    Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray() as Spell[],
-        //    Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray() as Weapon[]
-        //};
+        var saveData = new PlayerSave
+        {
+            Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemBase))?.ToArray(),
+            Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray() as Accessory[],
+            Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray() as Armor[],
+            Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray() as Spell[],
+            Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray() as Weapon[]
+        };
 
-        //var saveJson = JsonUtility.ToJson(saveData, _debugging);
-        //System.IO.File.WriteAllText(@"D:\temp\playerguid.json", saveJson);
+        var saveJson = JsonUtility.ToJson(saveData, _debugging);
+        System.IO.File.WriteAllText(@"D:\temp\playerguid.json", saveJson);
     }
 
 }

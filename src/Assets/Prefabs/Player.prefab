@@ -617,7 +617,8 @@ MonoBehaviour:
   _mainMesh: {fileID: 7392779648629048398}
   _leftMesh: {fileID: 7392779647843419196}
   _rightMesh: {fileID: 7392779647605690758}
-  PlayerName: 
+  _debugging: 1
+  Username: 
   TextureUri: 
 --- !u!114 &1201570389013236167
 MonoBehaviour:
@@ -645,7 +646,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d78daeeb1ec05df4b90fa44c9fb0148e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxItems: 10
+  MaxItems: 0
+  Items: []
 --- !u!1 &7392779647843419169
 GameObject:
   m_ObjectHideFlags: 0

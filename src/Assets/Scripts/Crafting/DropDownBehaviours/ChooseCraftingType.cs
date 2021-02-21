@@ -37,49 +37,6 @@ public class ChooseCraftingType : MonoBehaviour
         _thisDropdown = transform.GetComponent<Dropdown>();
         _thisDropdown.ClearOptions();
         _thisDropdown.AddOptions(TypeOptions);
-        _thisDropdown.onValueChanged.AddListener(OnValueChanged);
-        OnValueChanged(0);
-    }
-
-    void OnValueChanged(int index)
-    {
-        try
-        {
-            SubTypeDropdown.ClearOptions();
-
-            var isSpell = false;
-            var craftingType = _thisDropdown.options[_thisDropdown.value].text;
-
-            switch (craftingType)
-            {
-                case CraftingTypeWeapon: SubTypeDropdown.AddOptions(Weapon.WeaponOptions); break;
-                case CraftingTypeArmor: SubTypeDropdown.AddOptions(Armor.ArmorOptions); break;
-                case CraftingTypeAccessory: SubTypeDropdown.AddOptions(Accessory.AccessoryOptions); break;
-                case CraftingTypeSpell: isSpell = true; break;
-
-                default:
-                    throw new InvalidOperationException("Unknown crafting type");
-            }
-
-            if (isSpell)
-            {
-                SubTypeDropdown.gameObject.SetActive(false);
-            }
-            else
-            {
-                SubTypeDropdown.RefreshShownValue();
-                SubTypeDropdown.gameObject.SetActive(true);
-            }
-
-            var subType = SubTypeDropdown.options != null && SubTypeDropdown.options.Count > 0 ? SubTypeDropdown.options[SubTypeDropdown.value].text : null;
-            ChooseCraftingSubType.SetHandednessDropDownVisibility(HandednessDropdown, craftingType, subType);
-
-            UiHelper.Instance.UpdateResults();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError(ex);
-        }
     }
 
 }

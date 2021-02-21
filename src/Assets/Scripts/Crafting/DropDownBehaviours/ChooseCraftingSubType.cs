@@ -37,30 +37,9 @@ public class ChooseCraftingSubType : MonoBehaviour
 
     void Start()
     {
-        _subTypeDropdown = transform.GetComponent<Dropdown>();
-        _subTypeDropdown.onValueChanged.AddListener(OnValueChanged);
-
         HandednessDropdown.ClearOptions();
         HandednessDropdown.AddOptions(HandednessOptions);
         HandednessDropdown.gameObject.SetActive(false);
-    }
-
-    void OnValueChanged(int index)
-    {
-        try
-        {
-            SetHandednessDropDownVisibility(HandednessDropdown, TypeDropdown.options[TypeDropdown.value].text, _subTypeDropdown.options[index].text);
-            UiHelper.Instance.UpdateResults();
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError(ex);
-        }
-    }
-
-    public static void SetHandednessDropDownVisibility(Dropdown handednessDropdown, string type, string subType)
-    {
-        handednessDropdown.gameObject.SetActive(type == ChooseCraftingType.CraftingTypeWeapon && _handednessSubTypes.Contains(subType));
     }
 
 }

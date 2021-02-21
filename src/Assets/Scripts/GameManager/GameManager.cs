@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
     public ResultFactory ResultFactory { get; private set; }
     public string PlayerName { get; set; }
     public string PlayerSkinUrl { get; set; }
+    public GameObject LocalPlayer { get; set; }
 
 
     // ReSharper disable once ArrangeAccessorOwnerBody

@@ -6,6 +6,8 @@ namespace Assets.Scripts.Crafting.Results
     [System.Serializable]
     public class ItemBase
     {
+        //todo: consumables
+
         public string Id;
         public string Name;
         public Attributes Attributes;

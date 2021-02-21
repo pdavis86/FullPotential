@@ -3,12 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+// ReSharper disable once CheckNamespace
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable UnusedType.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnassignedField.Compiler
+
 public class Tooltip : MonoBehaviour
 {
     private static Tooltip _instance;
 
     private Text _tooltipText;
     private RectTransform _rect;
+    private bool _underPointer;
+    private Vector3 _underOffset;
 
     private void Awake()
     {
@@ -22,7 +32,14 @@ public class Tooltip : MonoBehaviour
     {
         if (gameObject.activeSelf)
         {
-            transform.position = Input.mousePosition;
+            if (!_underPointer)
+            {
+                transform.position = Input.mousePosition + new Vector3(1, 1);
+            }
+            else
+            {
+                transform.position = Input.mousePosition + _underOffset;
+            }
         }
     }
 
@@ -34,6 +51,32 @@ public class Tooltip : MonoBehaviour
 
         _tooltipText.text = tooltipText;
         _rect.sizeDelta = new Vector2(_tooltipText.preferredWidth + padding, _tooltipText.preferredHeight + padding);
+
+
+
+        //Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, Camera.main.transform.position.z);
+        //Debug.Log("screenCenter " + screenCenter);
+
+        //Vector3 screenHeight = new Vector3(Screen.width / 2, Screen.height, Camera.main.transform.position.z);
+        //Debug.Log("screenHeight " + screenHeight);
+
+        //Vector3 screenWidth = new Vector3(Screen.width, Screen.height / 2, Camera.main.transform.position.z);
+        //Debug.Log("screenWidth " + screenWidth);
+
+        //Vector3 goscreen = Camera.main.WorldToScreenPoint(transform.position);
+        //Debug.Log("GoPos " + goscreen);
+
+        //float distX = Vector3.Distance(new Vector3(Screen.width / 2, 0f, 0f), new Vector3(goscreen.x, 0f, 0f));
+        //Debug.Log("distX " + distX);
+
+        //float distY = Vector3.Distance(new Vector3(0f, Screen.height / 2, 0f), new Vector3(0f, goscreen.y, 0f));
+        //Debug.Log("distY " + distY);
+
+        //Debug.Log("Y delta " + _rect.sizeDelta.y);
+        //Debug.Log("Y mouse " + Input.mousePosition.y);
+
+        _underPointer = Input.mousePosition.y + _rect.sizeDelta.y > Screen.height;
+        _underOffset = new Vector3(1, -_rect.sizeDelta.y - 1);
     }
 
     public void Hide()

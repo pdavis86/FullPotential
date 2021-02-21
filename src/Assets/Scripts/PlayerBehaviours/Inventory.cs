@@ -17,7 +17,7 @@ using UnityEngine.Networking.NetworkSystem;
 
 public class Inventory : NetworkBehaviour
 {
-    public int MaxItems = 10;
+    public int MaxItems;
     public List<ItemBase> Items;
 
     private void Awake()
@@ -89,7 +89,10 @@ public class Inventory : NetworkBehaviour
         if (loadData.Spells != null) { Items.AddRange(loadData.Spells); }
         if (loadData.Weapons != null) { Items.AddRange(loadData.Weapons); }
 
-        Debug.LogError($"There are {Items.Count} items in the inventory after loading on " + (isServer ? "server" : "client") + " for " + gameObject.name);
+        //todo: do this properly
+        MaxItems = 30;
+
+        Debug.Log($"There are {Items.Count} items in the inventory after loading on " + (isServer ? "server" : "client") + " for " + gameObject.name);
     }
 
     private void AddOfType<T>(string stringValue) where T : ItemBase
