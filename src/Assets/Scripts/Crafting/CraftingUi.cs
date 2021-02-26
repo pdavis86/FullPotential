@@ -260,9 +260,12 @@ public class CraftingUi : MonoBehaviour
     private ItemBase CmdGetCraftedItem(IEnumerable<string> componentIds, string selectedType, string selectedSubtype, bool isTwoHanded)
     {
         //Security check that the components are actually in the player's inventory
-        var components = _inventory.Items.Where(x => componentIds.Contains(x.Id));
-
-        //GameManager.Instance.LocalPlayer
+        //Load them in the order they are given
+        var components = new List<ItemBase>();
+        foreach (var id in componentIds)
+        {
+            components.Add(_inventory.Items.FirstOrDefault(x => x.Id == id));
+        }
 
         //todo: requirements e.g. strength, speed, accuracy, 6 scrap or less
 
@@ -279,8 +282,8 @@ public class CraftingUi : MonoBehaviour
             {
                 case Weapon.Dagger: craftedThing = resultFactory.GetMeleeWeapon(Weapon.Dagger, components, false); break;
                 case Weapon.Spear: craftedThing = resultFactory.GetMeleeWeapon(Weapon.Spear, components, true); break;
-                case Weapon.Bow: craftedThing = resultFactory.GetRangedWeapon(Weapon.Bow, components, true); break;
-                case Weapon.Crossbow: craftedThing = resultFactory.GetRangedWeapon(Weapon.Crossbow, components, true); break;
+                case Weapon.Bow: craftedThing = resultFactory.GetRangedWeapon(Weapon.Bow, components, true, false); break;
+                case Weapon.Crossbow: craftedThing = resultFactory.GetRangedWeapon(Weapon.Crossbow, components, true, false); break;
                 case Weapon.Shield: craftedThing = resultFactory.GetShield(components); break;
 
                 case Armor.Helm: craftedThing = resultFactory.GetArmor(Armor.Helm, components); break;
@@ -301,7 +304,7 @@ public class CraftingUi : MonoBehaviour
                         case Weapon.Axe: craftedThing = resultFactory.GetMeleeWeapon(Weapon.Axe, components, isTwoHanded); break;
                         case Weapon.Sword: craftedThing = resultFactory.GetMeleeWeapon(Weapon.Sword, components, isTwoHanded); break;
                         case Weapon.Hammer: craftedThing = resultFactory.GetMeleeWeapon(Weapon.Hammer, components, isTwoHanded); break;
-                        case Weapon.Gun: craftedThing = resultFactory.GetRangedWeapon(Weapon.Gun, components, isTwoHanded); break;
+                        case Weapon.Gun: craftedThing = resultFactory.GetRangedWeapon(Weapon.Gun, components, isTwoHanded, true); break;
                         default:
                             throw new System.Exception("Invalid weapon type");
                     }

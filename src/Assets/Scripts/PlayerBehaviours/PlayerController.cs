@@ -45,8 +45,8 @@ public class PlayerController : NetworkBehaviour
             else
             {
                 var mouseScrollWheel = Input.GetAxis("Mouse ScrollWheel");
-                if (mouseScrollWheel > 0) { /*todo*/ Debug.Log("Positive mouse scroll"); }
-                else if (mouseScrollWheel < 0) { /*todo*/ Debug.Log("Negative mouse scroll"); }
+                if (mouseScrollWheel > 0) { /*todo: scrolled up*/ Debug.Log("Positive mouse scroll"); }
+                else if (mouseScrollWheel < 0) { /*todo: scrolled down*/ Debug.Log("Negative mouse scroll"); }
             }
         }
         catch (Exception ex)

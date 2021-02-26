@@ -11,27 +11,15 @@ namespace Assets.Scripts.Crafting.Results
         // ReSharper disable once InconsistentNaming
         private static readonly Random _random = new Random();
 
-        private int GetValue(int rarityThreshold)
-        {
-            return _random.Next(0, 100) > rarityThreshold ? _random.Next(1, 100) : 0;
-        }
-
-        private int ComputeAttribute(IEnumerable<ItemBase> components, Func<ItemBase, int> getProp)
+        private int ComputeAttribute(IEnumerable<ItemBase> components, Func<ItemBase, int> getProp, bool allowMax = true)
         {
             var min = components.Min(getProp);
             var max = components.Max(getProp);
-
             var topEndSkew = max - ((max - min) / 10);
 
-            int result;
-            if (_random.Next(1, 11) < 9)
-            {
-                result = (int)Math.Round(topEndSkew - (0.009 * topEndSkew), MidpointRounding.AwayFromZero);
-            }
-            else
-            {
-                result = topEndSkew;
-            }
+            int result = allowMax
+                ? topEndSkew
+                : (int)Math.Round(topEndSkew - (0.009 * (topEndSkew - 50)), MidpointRounding.AwayFromZero);
 
             if (result == 0)
             {
@@ -41,13 +29,6 @@ namespace Assets.Scripts.Crafting.Results
             //Debug.Log($"{getProp.Method.Name} = Min:{min}, Max:{max}, Skew:{topEndSkew}, Result:{result}");
 
             return result;
-        }
-
-        private int PickValueAtRandom(IEnumerable<ItemBase> components, Func<ItemBase, int> getProp)
-        {
-            var values = components.Select(getProp).ToList();
-            var takeAt = _random.Next(0, values.Count - 1);
-            return values.ElementAt(takeAt);
         }
 
         private string GetTargeting(IEnumerable<string> effectsInput)
@@ -151,20 +132,32 @@ namespace Assets.Scripts.Crafting.Results
             return effects.ToList();
         }
 
+        private int GetAttributeValueIfRandomAbove(int rarityThreshold)
+        {
+            return _random.Next(0, 100) > rarityThreshold ? _random.Next(1, 100) : 0;
+        }
+
+        //private int PickValueAtRandom(IEnumerable<ItemBase> components, Func<ItemBase, int> getProp)
+        //{
+        //    var values = components.Select(getProp).ToList();
+        //    var takeAt = _random.Next(0, values.Count - 1);
+        //    return values.ElementAt(takeAt);
+        //}
+
         private Attributes GetRandomAttributes()
         {
             return new Attributes
             {
                 IsAutomatic = _random.Next(0, 100) > 50,
                 IsSoulbound = _random.Next(0, 100) > 90,
-                ExtraAmmoPerShot = _random.Next(0, 100) > 70 ? _random.Next(1, 2) : 0,
-                Strength = GetValue(25),
-                Cost = GetValue(25),
-                Range = GetValue(25),
-                Accuracy = GetValue(25),
-                Speed = GetValue(25),
-                Recovery = GetValue(25),
-                Duration = GetValue(25)
+                ExtraAmmoPerShot = _random.Next(0, 100) > 70 ? _random.Next(1, 3) : 0,
+                Strength = GetAttributeValueIfRandomAbove(25),
+                Cost = GetAttributeValueIfRandomAbove(25),
+                Range = GetAttributeValueIfRandomAbove(25),
+                Accuracy = GetAttributeValueIfRandomAbove(25),
+                Speed = GetAttributeValueIfRandomAbove(25),
+                Recovery = GetAttributeValueIfRandomAbove(25),
+                Duration = GetAttributeValueIfRandomAbove(25)
             };
         }
 
@@ -286,7 +279,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal ItemBase GetRangedWeapon(string type, IEnumerable<ItemBase> components, bool isTwoHanded)
+        internal ItemBase GetRangedWeapon(string type, IEnumerable<ItemBase> components, bool isTwoHanded, bool allowAutomatic)
         {
             var item = new Weapon
             {
@@ -295,8 +288,8 @@ namespace Assets.Scripts.Crafting.Results
                 IsTwoHanded = isTwoHanded,
                 Attributes = new Attributes
                 {
-                    IsAutomatic = components.Any(x => x.Attributes.IsAutomatic),
-                    ExtraAmmoPerShot = PickValueAtRandom(components, x => x.Attributes.ExtraAmmoPerShot),
+                    IsAutomatic = allowAutomatic && components.Any(x => x.Attributes.IsAutomatic),
+                    ExtraAmmoPerShot = components.FirstOrDefault( x => x.Attributes.ExtraAmmoPerShot > 0)?.Attributes.ExtraAmmoPerShot ?? 0,
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
                     Cost = ComputeAttribute(components, x => x.Attributes.Cost),
                     Range = ComputeAttribute(components, x => x.Attributes.Range),
