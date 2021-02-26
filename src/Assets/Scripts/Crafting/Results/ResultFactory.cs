@@ -16,7 +16,7 @@ namespace Assets.Scripts.Crafting.Results
             return _random.Next(0, 100) > rarityThreshold ? _random.Next(1, 100) : 0;
         }
 
-        private int ComputeAttribute(List<ItemBase> components, Func<ItemBase, int> getProp)
+        private int ComputeAttribute(IEnumerable<ItemBase> components, Func<ItemBase, int> getProp)
         {
             var min = components.Min(getProp);
             var max = components.Max(getProp);
@@ -43,7 +43,7 @@ namespace Assets.Scripts.Crafting.Results
             return result;
         }
 
-        private int PickValueAtRandom(List<ItemBase> components, Func<ItemBase, int> getProp)
+        private int PickValueAtRandom(IEnumerable<ItemBase> components, Func<ItemBase, int> getProp)
         {
             var values = components.Select(getProp).ToList();
             var takeAt = _random.Next(0, values.Count - 1);
@@ -229,7 +229,7 @@ namespace Assets.Scripts.Crafting.Results
         //todo: add validation e.g. at least one effect for a spell
         //todo: add a min level to craftedResult
 
-        internal ItemBase GetSpell(List<ItemBase> components)
+        internal ItemBase GetSpell(IEnumerable<ItemBase> components)
         {
             var effects = components.SelectMany(x => x.Effects);
             var spell = new Spell
@@ -267,7 +267,7 @@ namespace Assets.Scripts.Crafting.Results
             return $"{prefix} {item.Attributes.Strength} {item.Type}";
         }
 
-        internal ItemBase GetMeleeWeapon(string type, List<ItemBase> components, bool isTwoHanded)
+        internal ItemBase GetMeleeWeapon(string type, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
             var item = new Weapon
             {
@@ -286,7 +286,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal ItemBase GetRangedWeapon(string type, List<ItemBase> components, bool isTwoHanded)
+        internal ItemBase GetRangedWeapon(string type, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
             var item = new Weapon
             {
@@ -310,7 +310,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal ItemBase GetShield(List<ItemBase> components)
+        internal ItemBase GetShield(IEnumerable<ItemBase> components)
         {
             var item = new Weapon
             {
@@ -328,7 +328,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal ItemBase GetArmor(string type, List<ItemBase> components)
+        internal ItemBase GetArmor(string type, IEnumerable<ItemBase> components)
         {
             var item = new Armor
             {
@@ -345,7 +345,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal ItemBase GetBarrier(List<ItemBase> components)
+        internal ItemBase GetBarrier(IEnumerable<ItemBase> components)
         {
             var item = new Armor
             {
@@ -364,7 +364,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal ItemBase GetAccessory(string type, List<ItemBase> components)
+        internal ItemBase GetAccessory(string type, IEnumerable<ItemBase> components)
         {
             var item = new Accessory
             {

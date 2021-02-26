@@ -220,11 +220,6 @@ public class CraftingUi : MonoBehaviour
         containerRectTrans.sizeDelta = new Vector2(containerRectTrans.sizeDelta.x, rowCounter * rowRectTransform.rect.height);
     }
 
-    private void Tooltip_onPointerEnter(PointerEventData eventData)
-    {
-        throw new System.NotImplementedException();
-    }
-
     private void UpdateResults()
     {
         if (_components.Count == 0)
@@ -236,7 +231,7 @@ public class CraftingUi : MonoBehaviour
         var selectedType = _typeDropdown.options[_typeDropdown.value].text;
         var selectedSubtype = _subTypeDropdown.options.Count > 0 ? _subTypeDropdown.options[_subTypeDropdown.value].text : null;
         var isTwoHanded = _handednessDropdown.options.Count > 0 && _handednessDropdown.options[_handednessDropdown.value].text == Weapon.TwoHanded;
-        var craftedThing = CmdGetCraftedItem(_components, selectedType, selectedSubtype, isTwoHanded);
+        var craftedThing = CmdGetCraftedItem(_components.Select(x => x.Id), selectedType, selectedSubtype, isTwoHanded);
 
         _outputText.text = GetItemDescription(craftedThing);
     }
@@ -262,9 +257,13 @@ public class CraftingUi : MonoBehaviour
     }
 
     //todo: this needs moving to a NetworkBehaviour to use - [command]
-    private ItemBase CmdGetCraftedItem(List<ItemBase> components, string selectedType, string selectedSubtype, bool isTwoHanded)
+    private ItemBase CmdGetCraftedItem(IEnumerable<string> componentIds, string selectedType, string selectedSubtype, bool isTwoHanded)
     {
-        //todo: check the components are actually in the player's invesntory
+        //Security check that the components are actually in the player's inventory
+        var components = _inventory.Items.Where(x => componentIds.Contains(x.Id));
+
+        //GameManager.Instance.LocalPlayer
+
         //todo: requirements e.g. strength, speed, accuracy, 6 scrap or less
 
         var resultFactory = GameManager.Instance.ResultFactory;
