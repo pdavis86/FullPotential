@@ -47,12 +47,9 @@ public class Tooltips : MonoBehaviour
     {
         const int padding = 15;
 
-
         gameObject.SetActive(true);
         _tooltipText.text = tooltipText;
-        _rect.sizeDelta = new Vector2(_tooltipText.preferredWidth + padding, _tooltipText.preferredHeight + 0);
-
-
+        _rect.sizeDelta = new Vector2(_tooltipText.preferredWidth + padding, _tooltipText.preferredHeight - 5);
 
         //Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, Camera.main.transform.position.z);
         //Debug.Log("screenCenter " + screenCenter);
@@ -81,7 +78,6 @@ public class Tooltips : MonoBehaviour
 
     public void Hide()
     {
-        //_tooltipText.text = null;
         gameObject.SetActive(false);
     }
 

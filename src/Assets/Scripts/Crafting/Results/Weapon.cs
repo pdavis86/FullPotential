@@ -41,5 +41,6 @@ namespace Assets.Scripts.Crafting.Results
          * Teleporter (automatically buys bullets and teleports them into the magazine)
          */
 
+        //todo: cosmetics per part of weapon
     }
 }

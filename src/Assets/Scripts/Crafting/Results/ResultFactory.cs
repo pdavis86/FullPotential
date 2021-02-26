@@ -155,7 +155,6 @@ namespace Assets.Scripts.Crafting.Results
         {
             return new Attributes
             {
-                IsActivated = _random.Next(0, 100) > 50,
                 IsAutomatic = _random.Next(0, 100) > 50,
                 IsSoulbound = _random.Next(0, 100) > 90,
                 ExtraAmmoPerShot = _random.Next(0, 100) > 70 ? _random.Next(1, 2) : 0,
@@ -239,7 +238,6 @@ namespace Assets.Scripts.Crafting.Results
                 Targeting = GetTargeting(effects),
                 Attributes = new Attributes
                 {
-                    IsActivated = true,
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
                     Cost = ComputeAttribute(components, x => x.Attributes.Cost),
                     Range = ComputeAttribute(components, x => x.Attributes.Range),
@@ -278,7 +276,6 @@ namespace Assets.Scripts.Crafting.Results
                 IsTwoHanded = isTwoHanded,
                 Attributes = new Attributes
                 {
-                    IsActivated = components.Any(x => x.Attributes.IsActivated),
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
                     Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed)
@@ -298,7 +295,6 @@ namespace Assets.Scripts.Crafting.Results
                 IsTwoHanded = isTwoHanded,
                 Attributes = new Attributes
                 {
-                    IsActivated = components.Any(x => x.Attributes.IsActivated),
                     IsAutomatic = components.Any(x => x.Attributes.IsAutomatic),
                     ExtraAmmoPerShot = PickValueAtRandom(components, x => x.Attributes.ExtraAmmoPerShot),
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
@@ -322,7 +318,6 @@ namespace Assets.Scripts.Crafting.Results
                 Type = Weapon.Shield,
                 Attributes = new Attributes
                 {
-                    IsActivated = components.Any(x => x.Attributes.IsActivated),
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
@@ -358,7 +353,6 @@ namespace Assets.Scripts.Crafting.Results
                 Type = Armor.Barrier,
                 Attributes = new Attributes
                 {
-                    IsActivated = components.Any(x => x.Attributes.IsActivated),
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
                     Cost = ComputeAttribute(components, x => x.Attributes.Cost),
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),

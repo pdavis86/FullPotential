@@ -1,5 +1,4 @@
-﻿using Assets.Scripts.Crafting.Results;
-using System;
+﻿using System;
 
 namespace Assets.Scripts.Data
 {

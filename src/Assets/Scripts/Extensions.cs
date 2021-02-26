@@ -1,4 +1,6 @@
-﻿namespace UnityEngine
+﻿// ReSharper disable once CheckNamespace
+
+namespace UnityEngine
 {
     public static class UnityEngineEx
     {

@@ -21,14 +21,9 @@ public class SpellBehaviour : AttackBehaviourBase
 
     private void Start()
     {
-        if (isServer)
-        {
-            SourcePlayer = NetworkServer.FindLocalObject(new NetworkInstanceId(PlayerNetworkId));
-        }
-        else
-        {
-            SourcePlayer = ClientScene.FindLocalObject(new NetworkInstanceId(PlayerNetworkId));
-        }
+        SourcePlayer = isServer
+            ? NetworkServer.FindLocalObject(new NetworkInstanceId(PlayerNetworkId))
+            : ClientScene.FindLocalObject(new NetworkInstanceId(PlayerNetworkId));
 
         Physics.IgnoreCollision(GetComponent<Collider>(), SourcePlayer.GetComponent<Collider>());
 
@@ -83,7 +78,6 @@ public class SpellBehaviour : AttackBehaviourBase
             if (other.gameObject.CompareTag("Player") || other.gameObject.CompareTag("Enemy"))
             {
                 DealDamage(Spell, gameObject, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
-                return;
             }
 
             //Debug.Log("You hit something not damageable");

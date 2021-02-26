@@ -1,6 +1,5 @@
 ﻿using Assets.Scripts.Crafting.Results;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -247,7 +246,6 @@ public class CraftingUi : MonoBehaviour
         var sb = new StringBuilder();
 
         if (includeName) { sb.Append($"Name: {item.Name}\n"); }
-        if (item.Attributes.IsActivated) { sb.Append("IsActivated: true\n"); }
         if (item.Attributes.IsAutomatic) { sb.Append("IsAutomatic: true\n"); }
         if (item.Attributes.IsSoulbound) { sb.Append("IsSoulbound: true\n"); }
         if (item.Attributes.ExtraAmmoPerShot > 0) { sb.Append($"ExtraAmmoPerShot: {item.Attributes.ExtraAmmoPerShot}\n"); }
@@ -258,9 +256,7 @@ public class CraftingUi : MonoBehaviour
         if (item.Attributes.Speed > 0) { sb.Append($"Speed: {item.Attributes.Speed}\n"); }
         if (item.Attributes.Recovery > 0) { sb.Append($"Recovery: {item.Attributes.Recovery}\n"); }
         if (item.Attributes.Duration > 0) { sb.Append($"Duration: {item.Attributes.Duration}\n"); }
-
-        //todo: this make the tooltip go outside the background
-        if (item.Effects.Count > 0) { sb.Append($"Effects: {string.Join(", ", item.Effects)}"); }
+        if (item.Effects.Count > 0) { sb.Append($"Effects: {string.Join(", ", item.Effects)}\n"); }
 
         return sb.ToString();
     }

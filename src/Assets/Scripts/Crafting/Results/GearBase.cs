@@ -9,5 +9,6 @@ namespace Assets.Scripts.Crafting.Results
         public int Health;
 
         //todo: elemental resistance. e.g. strength 100 gives 25% damage reduction of element
+        //todo: cosmetics
     }
 }

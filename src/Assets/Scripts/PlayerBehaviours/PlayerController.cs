@@ -42,7 +42,12 @@ public class PlayerController : NetworkBehaviour
             else if (Input.GetKeyDown(mappings.Interact)) { TryToInteract(); }
             else if (Input.GetMouseButtonDown(0)) { CmdCastSpell(false); }
             else if (Input.GetMouseButtonDown(1)) { CmdCastSpell(true); }
-            else if (Input.GetAxis("Mouse ScrollWheel") > 0) { /*todo*/ };
+            else
+            {
+                var mouseScrollWheel = Input.GetAxis("Mouse ScrollWheel");
+                if (mouseScrollWheel > 0) { /*todo*/ Debug.Log("Positive mouse scroll"); }
+                else if (mouseScrollWheel < 0) { /*todo*/ Debug.Log("Negative mouse scroll"); }
+            }
         }
         catch (Exception ex)
         {
@@ -54,29 +59,28 @@ public class PlayerController : NetworkBehaviour
     {
         try
         {
-            if (_escPressed)
+            if (_escPressed || _openInventory)
             {
                 if (HasMenuOpen)
                 {
                     _mainCanvasObjects.HideAllMenus();
                 }
-                else
+                else if (_escPressed)
                 {
                     _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.EscMenu);
                 }
-            }
-            else if (_openInventory)
-            {
-                //todo: finish this
-                Debug.Log("Tried to open inventory");
-                _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.InventoryUi);
-            }
-
-            if (_escPressed || _openInventory)
-            {
+                else if (_openInventory)
+                {
+                    //todo: finish this
+                    Debug.Log("Tried to open inventory");
+                    _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.InventoryUi);
+                }
 
                 HasMenuOpen = _mainCanvasObjects.IsAnyMenuOpen();
                 _mainCanvasObjects.Hud.SetActive(!HasMenuOpen);
+
+                _escPressed = false;
+                _openInventory = false;
             }
 
             if (HasMenuOpen)
@@ -90,9 +94,6 @@ public class PlayerController : NetworkBehaviour
             {
                 Cursor.lockState = CursorLockMode.Locked;
             }
-
-            _escPressed = false;
-            _openInventory = false;
         }
         catch (Exception ex)
         {
