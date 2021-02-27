@@ -39,14 +39,17 @@ public class PlayerController : NetworkBehaviour
 
             if (Input.GetKeyDown(mappings.Menu)) { _escPressed = true; }
             else if (Input.GetKeyDown(mappings.Inventory)) { _openInventory = true; }
-            else if (Input.GetKeyDown(mappings.Interact)) { TryToInteract(); }
-            else if (Input.GetMouseButtonDown(0)) { CmdCastSpell(false); }
-            else if (Input.GetMouseButtonDown(1)) { CmdCastSpell(true); }
-            else
+            else if (!HasMenuOpen)
             {
-                var mouseScrollWheel = Input.GetAxis("Mouse ScrollWheel");
-                if (mouseScrollWheel > 0) { /*todo: scrolled up*/ Debug.Log("Positive mouse scroll"); }
-                else if (mouseScrollWheel < 0) { /*todo: scrolled down*/ Debug.Log("Negative mouse scroll"); }
+                if (Input.GetKeyDown(mappings.Interact)) { TryToInteract(); }
+                else if (Input.GetMouseButtonDown(0)) { CmdCastSpell(false); }
+                else if (Input.GetMouseButtonDown(1)) { CmdCastSpell(true); }
+                else
+                {
+                    var mouseScrollWheel = Input.GetAxis("Mouse ScrollWheel");
+                    if (mouseScrollWheel > 0) { /*todo: scrolled up*/ Debug.Log("Positive mouse scroll"); }
+                    else if (mouseScrollWheel < 0) { /*todo: scrolled down*/ Debug.Log("Negative mouse scroll"); }
+                }
             }
         }
         catch (Exception ex)
@@ -129,11 +132,6 @@ public class PlayerController : NetworkBehaviour
     [Command]
     private void CmdCastSpell(bool leftHand)
     {
-        if (HasMenuOpen)
-        {
-            return;
-        }
-
         var activeSpell = GetPlayerActiveSpell();
 
         if (activeSpell == null)
@@ -161,12 +159,14 @@ public class PlayerController : NetworkBehaviour
     [ServerCallback]
     private void SpawnSpellProjectile(Spell activeSpell, bool leftHand)
     {
-        var startPos = transform.position + PlayerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
+        var startPos = PlayerCamera.transform.position + PlayerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
         var spellObject = Instantiate(GameManager.Instance.Prefabs.Spell, startPos, transform.rotation, transform);
         spellObject.SetActive(true);
 
         var spellScript = spellObject.GetComponent<SpellBehaviour>();
         spellScript.PlayerNetworkId = netId.Value;
+
+        //todo: a second projectile appears in the sky
 
         NetworkServer.Spawn(spellObject);
     }

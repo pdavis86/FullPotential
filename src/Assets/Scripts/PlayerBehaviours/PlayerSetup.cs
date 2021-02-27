@@ -17,6 +17,7 @@ using UnityEngine.Networking.NetworkSystem;
 public class PlayerSetup : NetworkBehaviour
 {
     [SerializeField] private Camera _playerCamera;
+    [SerializeField] private Camera _inFrontOfPlayerCamera;
     [SerializeField] private TextMeshProUGUI _nameTag;
     [SerializeField] private MeshRenderer _mainMesh;
     [SerializeField] private MeshRenderer _leftMesh;
@@ -61,6 +62,7 @@ public class PlayerSetup : NetworkBehaviour
         }
 
         _playerCamera.gameObject.SetActive(true);
+        _inFrontOfPlayerCamera.gameObject.SetActive(true);
 
         GameManager.Instance.MainCanvasObjects.Hud.SetActive(true);
 
@@ -139,11 +141,12 @@ public class PlayerSetup : NetworkBehaviour
     [ClientRpc]
     void RpcSetPlayerDetails(string playerName, string playerSkinUri)
     {
-        //if (!isLocalPlayer)
-        //{
+        if (!isLocalPlayer)
+        {
             _nameTag.text = string.IsNullOrWhiteSpace(playerName) ? "Player " + netId.Value : playerName;
-            if (!string.IsNullOrWhiteSpace(playerSkinUri)) { SetPlayerTexture(playerSkinUri); }
-        //}
+        }
+
+        if (!string.IsNullOrWhiteSpace(playerSkinUri)) { SetPlayerTexture(playerSkinUri); }
     }
 
     [ServerCallback]
