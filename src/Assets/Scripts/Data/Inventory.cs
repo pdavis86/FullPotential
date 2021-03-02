@@ -7,6 +7,7 @@ namespace Assets.Scripts.Data
     public class Inventory
     {
         public int MaxItems;
+
         public ItemBase[] Loot;
         public Accessory[] Accessories;
         public Armor[] Armor;

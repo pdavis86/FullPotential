@@ -1,6 +1,8 @@
 ﻿using Assets.Scripts.Crafting.Results;
+using Assets.Scripts.Data;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.NetworkSystem;
@@ -21,6 +23,7 @@ public class PlayerController : NetworkBehaviour
     private MainCanvasObjects _mainCanvasObjects;
     private bool _escPressed;
     private bool _openInventory;
+    private Inventory _inventory;
 
     void Awake()
     {
@@ -29,6 +32,11 @@ public class PlayerController : NetworkBehaviour
 
         //todo: under what conditions?
         _mainCanvasObjects.DebuggingOverlay.SetActive(true);
+    }
+
+    private void Start()
+    {
+        _inventory = GameManager.Instance.LocalPlayer.GetComponent<Inventory>();
     }
 
     void Update()
@@ -166,7 +174,7 @@ public class PlayerController : NetworkBehaviour
         var spellScript = spellObject.GetComponent<SpellBehaviour>();
         spellScript.PlayerNetworkId = netId.Value;
 
-        //todo: a second projectile appears in the sky
+        //todo: why is there a second projectile in the sky?
 
         NetworkServer.Spawn(spellObject);
     }
@@ -185,7 +193,7 @@ public class PlayerController : NetworkBehaviour
                 var distance = Vector3.Distance(startPos, interactable.transform.position);
                 if (distance <= interactable.Radius)
                 {
-                    Debug.Log("Interacted with " + hit.collider.gameObject.name);
+                    //Debug.Log("Interacted with " + hit.collider.gameObject.name);
                     CmdInteractWith(interactable.netId);
                 }
                 //else
@@ -212,28 +220,45 @@ public class PlayerController : NetworkBehaviour
 
             var lootDrop = GameManager.Instance.ResultFactory.GetLootDrop();
 
-            //todo: is this necessary too? - Inventory.Add(lootDrop);
-            //Debug.Log($"Inventory now has {Inventory.Items.Count} items in it");
+            //todo: Inventory.Add(lootDrop);
 
-            var lootDropJson = JsonUtility.ToJson(lootDrop);
-            connectionToClient.Send(Assets.Scripts.Networking.MessageIds.InventoryAddItem, new StringMessage(lootDropJson));
+            var lootDropJson = JsonUtility.ToJson(new InventoryChange
+            {
+                Loot = new ItemBase[] { lootDrop }
+            });
+            connectionToClient.Send(Assets.Scripts.Networking.MessageIds.InventoryChange, new StringMessage(lootDropJson));
         }
     }
 
     [Command]
     public void CmdCraftItem(IEnumerable<string> componentIds, string selectedType, string selectedSubtype, bool isTwoHanded)
     {
-        //Security check that the components are actually in the player's inventory
-        //Load them in the order they are given
+        //Check that the components are actually in the player's inventory and load them in the order they are given
         var components = new List<ItemBase>();
-        //foreach (var id in componentIds)
-        //{
-        //    components.Add(_inventory.Items.FirstOrDefault(x => x.Id == id));
-        //}
+        foreach (var id in componentIds)
+        {
+            components.Add(_inventory.Items.FirstOrDefault(x => x.Id == id));
+        }
 
-        //todo: 
+        if (components.Count != componentIds.Count())
+        {
+            Debug.LogError("One or more IDs provided are not in the inventory");
+            return;
+        }
 
+        var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(components, selectedType, selectedSubtype, isTwoHanded);
 
+        var craftedType = craftedItem.GetType();
+
+        var itemJson = JsonUtility.ToJson(new InventoryChange
+        {
+            IdsToRemove = componentIds.ToArray(),
+            Accessories = craftedType == typeof(Accessory) ? new Accessory[] { craftedItem as Accessory } : null,
+            Armor = craftedType == typeof(Armor) ? new Armor[] { craftedItem as Armor } : null,
+            Spells = craftedType == typeof(Spell) ? new Spell[] { craftedItem as Spell } : null,
+            Weapons = craftedType == typeof(Weapon) ? new Weapon[] { craftedItem as Weapon } : null
+        });
+        connectionToClient.Send(Assets.Scripts.Networking.MessageIds.InventoryChange, new StringMessage(itemJson));
     }
 
 

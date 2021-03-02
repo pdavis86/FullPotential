@@ -8,6 +8,9 @@ namespace Assets.Scripts.Crafting.Results
 {
     public class ResultFactory
     {
+        public const string LootPrefixScrap = "Scrap";
+        public const string LootPrefixShard = "Shard";
+
         // ReSharper disable once InconsistentNaming
         private static readonly Random _random = new Random();
 
@@ -68,46 +71,18 @@ namespace Assets.Scripts.Crafting.Results
                 .Except(Spell.TargetingOptions.All)
                 .Except(Spell.ShapeOptions.All);
 
-            //If there is a buff or support then remove all debuffs and "offensive" effects
-            if (effects.Intersect(Spell.BuffEffects.All).Any() || effects.Intersect(Spell.SupportEffects.All).Any())
-            {
-                effects = effects
-                    .Except(Spell.DebuffEffects.All)
-                    .Except(Spell.ElementalEffects.All);
-            }
-
-            //Lingering must have matching elemental type
-            var elementalEffects = effects.Intersect(Spell.ElementalEffects.All);
-            var lingeringOptions = effects.Intersect(Spell.LingeringOptions.All);
-            if (lingeringOptions.Any())
-            {
-                var elementalEffectFound = false;
-                foreach (var option in lingeringOptions)
-                {
-                    var expectedElementalEffect = Spell.LingeringPairing.FirstOrDefault(x => x.Value == option).Key;
-                    if (!string.IsNullOrWhiteSpace(expectedElementalEffect) && elementalEffects.Contains(expectedElementalEffect))
-                    {
-                        elementalEffectFound = true;
-                        effects = effects.Except(Spell.LingeringOptions.All.Where(x => x != option));
-                        effects = effects.Except(Spell.ElementalEffects.All.Where(x => x != expectedElementalEffect));
-                        break;
-                    }
-                }
-                if (!elementalEffectFound)
-                {
-                    effects = effects.Except(Spell.LingeringOptions.All);
-                }
-
-                elementalEffects = effects.Intersect(Spell.ElementalEffects.All);
-            }
-
             //Only one elemental effect
-            if (elementalEffects.Count() > 1)
+            var elementalEffects = effects.Intersect(Spell.ElementalEffects.All);
+            var elementalEffect = elementalEffects.FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(elementalEffect))
             {
-                var elementalEffect = elementalEffects.First();
                 effects = effects
                     .Except(Spell.ElementalEffects.All.Where(x => x != elementalEffect));
             }
+
+            //Lingering must have matching elemental type
+            var lingeringEffect = Spell.LingeringPairing.FirstOrDefault(x => x.Key == elementalEffect).Value;
+            effects = effects.Except(Spell.LingeringOptions.All.Where(x => x != lingeringEffect));
 
             if (craftingType == CraftingUi.CraftingTypeArmor || craftingType == CraftingUi.CraftingTypeAccessory)
             {
@@ -129,6 +104,14 @@ namespace Assets.Scripts.Crafting.Results
             if (craftingType != CraftingUi.CraftingTypeSpell)
             {
                 throw new Exception($"Unexpected craftingType '{craftingType}'");
+            }
+
+            //If there is a buff or support then remove all debuffs and "offensive" effects
+            if (effects.Intersect(Spell.BuffEffects.All).Any() || effects.Intersect(Spell.SupportEffects.All).Any())
+            {
+                effects = effects
+                    .Except(Spell.DebuffEffects.All)
+                    .Except(Spell.ElementalEffects.All);
             }
 
             return effects.ToList();
@@ -188,7 +171,7 @@ namespace Assets.Scripts.Crafting.Results
             var isMagical = _random.Next(0, 2) > 0;
             if (isMagical)
             {
-                lootDrop.Name = "Shard";
+                lootDrop.Name = LootPrefixShard;
                 //todo: icon
 
                 var numberOfEffects = GetBiasedNumber(1, 4);
@@ -211,7 +194,7 @@ namespace Assets.Scripts.Crafting.Results
             }
             else
             {
-                lootDrop.Name = "Scrap";
+                lootDrop.Name = LootPrefixScrap;
                 //todo: icon
             }
 
@@ -224,7 +207,7 @@ namespace Assets.Scripts.Crafting.Results
         //todo: add validation e.g. at least one effect for a spell
         //todo: add a min level to craftedResult
 
-        internal ItemBase GetSpell(IEnumerable<ItemBase> components)
+        internal Spell GetSpell(IEnumerable<ItemBase> components)
         {
             var effects = components.SelectMany(x => x.Effects);
             var spell = new Spell
@@ -262,7 +245,7 @@ namespace Assets.Scripts.Crafting.Results
             return $"{prefix} {item.Attributes.Strength} {item.Type}";
         }
 
-        internal ItemBase GetMeleeWeapon(string type, IEnumerable<ItemBase> components, bool isTwoHanded)
+        internal Weapon GetMeleeWeapon(string type, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
             var item = new Weapon
             {
@@ -281,7 +264,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal ItemBase GetRangedWeapon(string type, IEnumerable<ItemBase> components, bool isTwoHanded, bool allowAutomatic)
+        internal Weapon GetRangedWeapon(string type, IEnumerable<ItemBase> components, bool isTwoHanded, bool allowAutomatic)
         {
             var item = new Weapon
             {
@@ -305,7 +288,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal ItemBase GetShield(IEnumerable<ItemBase> components)
+        internal Weapon GetShield(IEnumerable<ItemBase> components)
         {
             var item = new Weapon
             {
@@ -323,7 +306,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal ItemBase GetArmor(string type, IEnumerable<ItemBase> components)
+        internal Armor GetArmor(string type, IEnumerable<ItemBase> components)
         {
             var item = new Armor
             {
@@ -340,7 +323,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal ItemBase GetBarrier(IEnumerable<ItemBase> components)
+        internal Armor GetBarrier(IEnumerable<ItemBase> components)
         {
             var item = new Armor
             {
@@ -359,7 +342,7 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        internal ItemBase GetAccessory(string type, IEnumerable<ItemBase> components)
+        internal Accessory GetAccessory(string type, IEnumerable<ItemBase> components)
         {
             var item = new Accessory
             {
@@ -375,52 +358,48 @@ namespace Assets.Scripts.Crafting.Results
             return item;
         }
 
-        public ItemBase GetCraftedItem<T>(List<ItemBase> components, string selectedType, string selectedSubtype, bool isTwoHanded) where T : ItemBase
+        public ItemBase GetCraftedItem(List<ItemBase> components, string selectedType, string selectedSubtype, bool isTwoHanded)
         {
             //todo: requirements e.g. strength, speed, accuracy, 6 scrap or less
 
-            ItemBase craftedThing;
             if (selectedType == CraftingUi.CraftingTypeSpell)
             {
-                craftedThing = GetSpell(components);
+                return GetSpell(components);
             }
             else
             {
                 switch (selectedSubtype)
                 {
-                    case Weapon.Dagger: craftedThing = GetMeleeWeapon(Weapon.Dagger, components, false); break;
-                    case Weapon.Spear: craftedThing = GetMeleeWeapon(Weapon.Spear, components, true); break;
-                    case Weapon.Bow: craftedThing = GetRangedWeapon(Weapon.Bow, components, true, false); break;
-                    case Weapon.Crossbow: craftedThing = GetRangedWeapon(Weapon.Crossbow, components, true, false); break;
-                    case Weapon.Shield: craftedThing = GetShield(components); break;
+                    case Weapon.Dagger: return GetMeleeWeapon(Weapon.Dagger, components, false);
+                    case Weapon.Spear: return GetMeleeWeapon(Weapon.Spear, components, true);
+                    case Weapon.Bow: return GetRangedWeapon(Weapon.Bow, components, true, false);
+                    case Weapon.Crossbow: return GetRangedWeapon(Weapon.Crossbow, components, true, false);
+                    case Weapon.Shield: return GetShield(components);
 
-                    case Armor.Helm: craftedThing = GetArmor(Armor.Helm, components); break;
-                    case Armor.Chest: craftedThing = GetArmor(Armor.Chest, components); break;
-                    case Armor.Legs: craftedThing = GetArmor(Armor.Legs, components); break;
-                    case Armor.Feet: craftedThing = GetArmor(Armor.Feet, components); break;
-                    case Armor.Gloves: craftedThing = GetArmor(Armor.Gloves, components); break;
-                    case Armor.Barrier: craftedThing = GetBarrier(components); break;
+                    case Armor.Helm: return GetArmor(Armor.Helm, components);
+                    case Armor.Chest: return GetArmor(Armor.Chest, components);
+                    case Armor.Legs: return GetArmor(Armor.Legs, components);
+                    case Armor.Feet: return GetArmor(Armor.Feet, components);
+                    case Armor.Gloves: return GetArmor(Armor.Gloves, components);
+                    case Armor.Barrier: return GetBarrier(components);
 
-                    case Accessory.Amulet: craftedThing = GetAccessory(Accessory.Amulet, components); break;
-                    case Accessory.Ring: craftedThing = GetAccessory(Accessory.Ring, components); break;
-                    case Accessory.Belt: craftedThing = GetAccessory(Accessory.Belt, components); break;
+                    case Accessory.Amulet: return GetAccessory(Accessory.Amulet, components);
+                    case Accessory.Ring: return GetAccessory(Accessory.Ring, components);
+                    case Accessory.Belt: return GetAccessory(Accessory.Belt, components);
 
                     default:
 
                         switch (selectedSubtype)
                         {
-                            case Weapon.Axe: craftedThing = GetMeleeWeapon(Weapon.Axe, components, isTwoHanded); break;
-                            case Weapon.Sword: craftedThing = GetMeleeWeapon(Weapon.Sword, components, isTwoHanded); break;
-                            case Weapon.Hammer: craftedThing = GetMeleeWeapon(Weapon.Hammer, components, isTwoHanded); break;
-                            case Weapon.Gun: craftedThing = GetRangedWeapon(Weapon.Gun, components, isTwoHanded, true); break;
+                            case Weapon.Axe: return GetMeleeWeapon(Weapon.Axe, components, isTwoHanded);
+                            case Weapon.Sword: return GetMeleeWeapon(Weapon.Sword, components, isTwoHanded);
+                            case Weapon.Hammer: return GetMeleeWeapon(Weapon.Hammer, components, isTwoHanded);
+                            case Weapon.Gun: return GetRangedWeapon(Weapon.Gun, components, isTwoHanded, true);
                             default:
                                 throw new System.Exception("Invalid weapon type");
                         }
-                        break;
                 }
             }
-
-            return craftedThing as T;
         }
 
     }

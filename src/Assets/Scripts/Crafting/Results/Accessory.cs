@@ -4,6 +4,7 @@
 
 namespace Assets.Scripts.Crafting.Results
 {
+    [System.Serializable]
     public class Accessory : GearBase
     {
         public const string Amulet = "Amulet";

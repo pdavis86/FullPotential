@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Crafting.Results;
 using Assets.Scripts.Data;
+using Assets.Scripts.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,8 @@ public class Inventory : NetworkBehaviour
     public int MaxItems;
     public List<ItemBase> Items;
 
+    private PlayerController _playerController;
+
     private void Awake()
     {
         Items = new List<ItemBase>();
@@ -34,72 +37,74 @@ public class Inventory : NetworkBehaviour
             {
                 return;
             }
-            netId.connectionToServer.RegisterHandler(Assets.Scripts.Networking.MessageIds.InventoryLoad, OnLoadInventory);
-            netId.connectionToServer.RegisterHandler(Assets.Scripts.Networking.MessageIds.InventoryAddItem, OnAddItemToInventory);
-            netId.connectionToServer.RegisterHandler(Assets.Scripts.Networking.MessageIds.InventoryAddAccessory, OnAddAccessoryToInventory);
-            netId.connectionToServer.RegisterHandler(Assets.Scripts.Networking.MessageIds.InventoryAddArmor, OnAddArmorToInventory);
-            netId.connectionToServer.RegisterHandler(Assets.Scripts.Networking.MessageIds.InventoryAddSpell, OnAddSpellToInventory);
-            netId.connectionToServer.RegisterHandler(Assets.Scripts.Networking.MessageIds.InventoryAddWeapon, OnAddWeaponToInventory);
+            netId.connectionToServer.RegisterHandler(Assets.Scripts.Networking.MessageIds.LoadPlayerData, OnLoadPlayerData);
+            netId.connectionToServer.RegisterHandler(Assets.Scripts.Networking.MessageIds.InventoryChange, OnInventoryChange);
+        }
+
+        _playerController = GetComponent<PlayerController>();
+    }
+
+    //todo: make a generic load method instead of here
+    private void OnLoadPlayerData(NetworkMessage netMsg)
+    {
+        var loadData = JsonUtility.FromJson<PlayerData>(netMsg.ReadMessage<StringMessage>().value);
+
+        ApplyChanges(new InventoryChange(loadData.Inventory));
+    }
+
+    private void OnInventoryChange(NetworkMessage netMsg)
+    {
+        var changes = JsonUtility.FromJson<InventoryChange>(netMsg.ReadMessage<StringMessage>().value);
+        ApplyChanges(changes);
+
+        if (_playerController.HasMenuOpen && GameManager.Instance.MainCanvasObjects.CraftingUi.activeSelf)
+        {
+            var uiScript = GameManager.Instance.MainCanvasObjects.CraftingUi.GetComponent<CraftingUi>();
+            uiScript.ResetUi();
+            uiScript.LoadInventory();
         }
     }
 
-    private void OnLoadInventory(NetworkMessage netMsg)
+    public void ApplyChanges(Assets.Scripts.Data.InventoryChange changes)
     {
-        //todo: make a generic load method instead of here
-        var loadData = JsonUtility.FromJson<PlayerSave>(netMsg.ReadMessage<StringMessage>().value);
+        MaxItems = changes.MaxItems == 0 ? 30 : changes.MaxItems;
 
-        LoadData(loadData.Inventory);
+        var addedItems = changes.Loot
+                .UnionIfNotNull(changes.Accessories)
+                .UnionIfNotNull(changes.Armor)
+                .UnionIfNotNull(changes.Spells)
+                .UnionIfNotNull(changes.Weapons);
+        var addedItemsCount = addedItems.Count();
+
+        Items.AddRange(addedItems);
+
+        if (addedItemsCount == 1)
+        {
+            var addedItem = addedItems.First();
+
+            //todo: make this a slide-out alert instead
+            Debug.Log($"{addedItem.GetFullName()} was added");
+        }
+        else
+        {
+            //todo: make this a slide-out alert instead
+            Debug.Log($"Added {addedItemsCount} items to the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
+        }
+
+        if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
+        {
+            var itemsRemoved = Items.RemoveAll(x => changes.IdsToRemove.Contains(x.Id));
+
+            //todo: make this a slide-out alert instead
+            Debug.Log($"Removed {itemsRemoved} items from the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
+        }
     }
 
-    private void OnAddItemToInventory(NetworkMessage netMsg)
-    {
-        AddOfType<ItemBase>(netMsg.ReadMessage<StringMessage>().value);
-    }
-
-    private void OnAddAccessoryToInventory(NetworkMessage netMsg)
-    {
-        AddOfType<Accessory>(netMsg.ReadMessage<StringMessage>().value);
-    }
-
-    private void OnAddArmorToInventory(NetworkMessage netMsg)
-    {
-        AddOfType<Armor>(netMsg.ReadMessage<StringMessage>().value);
-    }
-
-    private void OnAddSpellToInventory(NetworkMessage netMsg)
-    {
-        AddOfType<Spell>(netMsg.ReadMessage<StringMessage>().value);
-    }
-
-    private void OnAddWeaponToInventory(NetworkMessage netMsg)
-    {
-        AddOfType<Weapon>(netMsg.ReadMessage<StringMessage>().value);
-    }
-
-
-
-
-
-
-
-    public void LoadData(Assets.Scripts.Data.Inventory loadData)
-    {
-        MaxItems = loadData.MaxItems == 0 ? 30 : loadData.MaxItems;
-
-        if (loadData.Loot != null) { Items.AddRange(loadData.Loot); }
-        if (loadData.Accessories != null) { Items.AddRange(loadData.Accessories); }
-        if (loadData.Armor != null) { Items.AddRange(loadData.Armor); }
-        if (loadData.Spells != null) { Items.AddRange(loadData.Spells); }
-        if (loadData.Weapons != null) { Items.AddRange(loadData.Weapons); }
-
-        //Debug.Log($"There are {Items.Count} items in the inventory after loading on " + (isServer ? "server" : "client") + " for " + gameObject.name);
-    }
-
-    public Assets.Scripts.Data.Inventory GetSaveData()
+    public Assets.Scripts.Data.InventoryChange GetSaveData()
     {
         var groupedItems = Items.GroupBy(x => x.GetType());
 
-        return new Assets.Scripts.Data.Inventory
+        return new Assets.Scripts.Data.InventoryChange
         {
             MaxItems = MaxItems,
             Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemBase))?.ToArray(),

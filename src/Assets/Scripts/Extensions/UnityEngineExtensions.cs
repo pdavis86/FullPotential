@@ -2,7 +2,7 @@
 
 namespace UnityEngine
 {
-    public static class UnityEngineEx
+    public static class UnityEngineExtensions
     {
         public static Transform Clear(this Transform transform)
         {

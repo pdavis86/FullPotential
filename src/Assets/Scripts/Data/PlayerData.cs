@@ -3,7 +3,7 @@
 namespace Assets.Scripts.Data
 {
     [Serializable]
-    public class PlayerSave
+    public class PlayerData
     {
         public Inventory Inventory;
     }

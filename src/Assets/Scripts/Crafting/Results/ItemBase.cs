@@ -25,5 +25,15 @@ namespace Assets.Scripts.Crafting.Results
             }
         }
 
+        public string GetFullName()
+        {
+            if (Name == ResultFactory.LootPrefixScrap || Name == ResultFactory.LootPrefixShard)
+            {
+                var suffix = int.Parse(GetHashCode().ToString().TrimStart('-').Substring(5));
+                return Name + $" (Type #{suffix.ToString("D5")})";
+            }
+            return Name;
+        }
+
     }
 }

@@ -23,6 +23,7 @@ public class CraftingUi : MonoBehaviour
     [SerializeField] private Dropdown _typeDropdown;
     [SerializeField] private Dropdown _subTypeDropdown;
     [SerializeField] private Dropdown _handednessDropdown;
+    [SerializeField] private Button _craftButton;
 
     private Inventory _inventory;
     private List<ItemBase> _components;
@@ -62,6 +63,14 @@ public class CraftingUi : MonoBehaviour
         _typeDropdown.onValueChanged.AddListener(TypeOnValueChanged);
 
         _subTypeDropdown.onValueChanged.AddListener(SubTypeOnValueChanged);
+
+        _craftButton.onClick.AddListener(CraftButtonOnClick);
+    }
+
+    private void CraftButtonOnClick()
+    {
+        var pc = GameManager.Instance.LocalPlayer.GetComponent<PlayerController>();
+        pc.CmdCraftItem(_components.Select(x => x.Id), GetSelectedType(), GetSelectedSubType(), GetSelectedHandedness());
     }
 
     void SubTypeOnValueChanged(int index)
@@ -125,16 +134,8 @@ public class CraftingUi : MonoBehaviour
 
     private void OnEnable()
     {
+        ResetUi();
         LoadInventory();
-
-        _typeDropdown.ClearOptions();
-        _typeDropdown.AddOptions(TypeOptions);
-
-        _handednessDropdown.ClearOptions();
-        _handednessDropdown.AddOptions(HandednessOptions);
-
-        TypeOnValueChanged(0);
-        _handednessDropdown.gameObject.SetActive(false);
     }
 
     private void OnDisable()
@@ -164,32 +165,34 @@ public class CraftingUi : MonoBehaviour
         }
     }
 
+    public void ResetUi()
+    {
+        _typeDropdown.ClearOptions();
+        _typeDropdown.AddOptions(TypeOptions);
+
+        _handednessDropdown.ClearOptions();
+        _handednessDropdown.AddOptions(HandednessOptions);
+
+        TypeOnValueChanged(0);
+        _handednessDropdown.gameObject.SetActive(false);
+
+        _outputText.text = null;
+    }
+
     public void LoadInventory()
     {
+        _components.Clear();
         _componentsContainer.transform.Clear();
 
         var rowRectTransform = _rowPrefab.GetComponent<RectTransform>();
         var rowCounter = 0;
 
-        //todo: only appropriate items for crafting type
         foreach (var item in _inventory.Items)
         {
             var row = Instantiate(_rowPrefab, _componentsContainer.transform);
-            //row.GetComponent<RectTransform>().position = rowRectTransform.position + new Vector3(0, rowCounter * rowRectTransform.rect.height);
-            //row.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -rowHeight * i);
-
-            if (item.Name == "Scrap" || item.Name == "Shard")
-            {
-                var suffix = int.Parse(item.GetHashCode().ToString().TrimStart('-').Substring(5));
-                row.transform.Find("ItemName").GetComponent<Text>().text = item.Name + $" (Type #{suffix.ToString("D5")})";
-            }
-            else
-            {
-                row.transform.Find("ItemName").GetComponent<Text>().text = item.Name;
-            }
+            row.transform.Find("ItemName").GetComponent<Text>().text = item.GetFullName();
 
             var rowImage = row.GetComponent<Image>();
-
             var toggle = row.GetComponent<Toggle>();
             toggle.onValueChanged.AddListener(isOn =>
             {
@@ -216,8 +219,24 @@ public class CraftingUi : MonoBehaviour
             rowCounter++;
         }
 
+        const int spacer = 5;
         var containerRectTrans = _componentsContainer.GetComponent<RectTransform>();
-        containerRectTrans.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rowCounter * rowRectTransform.rect.height);
+        containerRectTrans.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rowCounter * (rowRectTransform.rect.height + spacer));
+    }
+
+    private string GetSelectedType()
+    {
+        return _typeDropdown.options[_typeDropdown.value].text;
+    }
+
+    private string GetSelectedSubType()
+    {
+        return _subTypeDropdown.options.Count > 0 ? _subTypeDropdown.options[_subTypeDropdown.value].text : null;
+    }
+
+    private bool GetSelectedHandedness()
+    {
+        return _handednessDropdown.options.Count > 0 && _handednessDropdown.options[_handednessDropdown.value].text == Weapon.TwoHanded;
     }
 
     private void UpdateResults()
@@ -228,10 +247,8 @@ public class CraftingUi : MonoBehaviour
             return;
         }
 
-        var selectedType = _typeDropdown.options[_typeDropdown.value].text;
-        var selectedSubtype = _subTypeDropdown.options.Count > 0 ? _subTypeDropdown.options[_subTypeDropdown.value].text : null;
-        var isTwoHanded = _handednessDropdown.options.Count > 0 && _handednessDropdown.options[_handednessDropdown.value].text == Weapon.TwoHanded;
-        _outputText.text = GetItemDescription(GameManager.Instance.ResultFactory.GetCraftedItem<ItemBase>(_components, selectedType, selectedSubtype, isTwoHanded));
+        var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(_components, GetSelectedType(), GetSelectedSubType(), GetSelectedHandedness());
+        _outputText.text = GetItemDescription(craftedItem);
     }
 
     public static string GetItemDescription(ItemBase item, bool includeName = true)

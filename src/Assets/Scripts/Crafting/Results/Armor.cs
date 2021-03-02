@@ -4,6 +4,7 @@
 
 namespace Assets.Scripts.Crafting.Results
 {
+    [System.Serializable]
     public class Armor : GearBase
     {
         public const string Helm = "Helm";

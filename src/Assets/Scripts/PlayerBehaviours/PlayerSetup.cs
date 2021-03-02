@@ -1,6 +1,4 @@
-﻿using Assets.Scripts.Crafting.Results;
-using Assets.Scripts.Data;
-using System.Linq;
+﻿using Assets.Scripts.Data;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -133,9 +131,15 @@ public class PlayerSetup : NetworkBehaviour
         if (!string.IsNullOrWhiteSpace(playerSkinUri)) { TextureUri = playerSkinUri; }
         RpcSetPlayerDetails(playerName, playerSkinUri);
 
+        //todo configurable server save path
+
         //todo: change file path
-        var loadJson = System.IO.File.ReadAllText(@"D:\temp\playerguid.json");
-        connectionToClient.Send(Assets.Scripts.Networking.MessageIds.InventoryLoad, new StringMessage(loadJson));
+        var filePath = @"D:\temp\playerguid.json";
+        if (System.IO.File.Exists(filePath))
+        {
+            var loadJson = System.IO.File.ReadAllText(filePath);
+            connectionToClient.Send(Assets.Scripts.Networking.MessageIds.LoadPlayerData, new StringMessage(loadJson));
+        }
     }
 
     [ClientRpc]
@@ -160,10 +164,11 @@ public class PlayerSetup : NetworkBehaviour
         //var weapon = GameManager.Instance.ResultFactory.GetMeleeWeapon("Sword", _inventory.Items, false);
         //_inventory.Add(weapon);
 
-        var saveData = new PlayerSave
+        var saveData = new PlayerData
         {
             Inventory = _inventory.GetSaveData()
         };
+
         var saveJson = JsonUtility.ToJson(saveData, _debugging);
         //todo: change file path
         System.IO.File.WriteAllText(@"D:\temp\playerguid.json", saveJson);
