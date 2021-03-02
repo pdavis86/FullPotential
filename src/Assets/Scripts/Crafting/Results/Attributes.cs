@@ -7,7 +7,7 @@
         public bool IsSoulbound;
         public int ExtraAmmoPerShot;
         public int Strength;
-        public int Cost;
+        public int Efficiency;
         public int Range;
         public int Accuracy;
         public int Speed;
@@ -24,7 +24,7 @@
                 
                 hash = hash * 109 + ExtraAmmoPerShot.GetHashCode();
                 hash = hash * 113 + Strength.GetHashCode();
-                hash = hash * 127 + Cost.GetHashCode();
+                hash = hash * 127 + Efficiency.GetHashCode();
                 hash = hash * 131 + Range.GetHashCode();
                 hash = hash * 137 + Accuracy.GetHashCode();
                 hash = hash * 139 + Speed.GetHashCode();

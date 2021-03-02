@@ -217,7 +217,7 @@ public class CraftingUi : MonoBehaviour
         }
 
         var containerRectTrans = _componentsContainer.GetComponent<RectTransform>();
-        containerRectTrans.sizeDelta = new Vector2(containerRectTrans.sizeDelta.x, rowCounter * rowRectTransform.rect.height);
+        containerRectTrans.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rowCounter * rowRectTransform.rect.height);
     }
 
     private void UpdateResults()
@@ -231,9 +231,7 @@ public class CraftingUi : MonoBehaviour
         var selectedType = _typeDropdown.options[_typeDropdown.value].text;
         var selectedSubtype = _subTypeDropdown.options.Count > 0 ? _subTypeDropdown.options[_subTypeDropdown.value].text : null;
         var isTwoHanded = _handednessDropdown.options.Count > 0 && _handednessDropdown.options[_handednessDropdown.value].text == Weapon.TwoHanded;
-        var craftedThing = CmdGetCraftedItem(_components.Select(x => x.Id), selectedType, selectedSubtype, isTwoHanded);
-
-        _outputText.text = GetItemDescription(craftedThing);
+        _outputText.text = GetItemDescription(GameManager.Instance.ResultFactory.GetCraftedItem<ItemBase>(_components, selectedType, selectedSubtype, isTwoHanded));
     }
 
     public static string GetItemDescription(ItemBase item, bool includeName = true)
@@ -241,11 +239,11 @@ public class CraftingUi : MonoBehaviour
         var sb = new StringBuilder();
 
         if (includeName) { sb.Append($"Name: {item.Name}\n"); }
-        if (item.Attributes.IsAutomatic) { sb.Append("IsAutomatic: true\n"); }
-        if (item.Attributes.IsSoulbound) { sb.Append("IsSoulbound: true\n"); }
+        if (item.Attributes.IsAutomatic) { sb.Append("Automatic\n"); }
+        if (item.Attributes.IsSoulbound) { sb.Append("Soulbound\n"); }
         if (item.Attributes.ExtraAmmoPerShot > 0) { sb.Append($"ExtraAmmoPerShot: {item.Attributes.ExtraAmmoPerShot}\n"); }
         if (item.Attributes.Strength > 0) { sb.Append($"Strength: {item.Attributes.Strength}\n"); }
-        if (item.Attributes.Cost > 0) { sb.Append($"Cost: {item.Attributes.Cost}\n"); }
+        if (item.Attributes.Efficiency > 0) { sb.Append($"Efficiency: {item.Attributes.Efficiency}\n"); }
         if (item.Attributes.Range > 0) { sb.Append($"Range: {item.Attributes.Range}\n"); }
         if (item.Attributes.Accuracy > 0) { sb.Append($"Accuracy: {item.Attributes.Accuracy}\n"); }
         if (item.Attributes.Speed > 0) { sb.Append($"Speed: {item.Attributes.Speed}\n"); }
@@ -255,66 +253,5 @@ public class CraftingUi : MonoBehaviour
 
         return sb.ToString();
     }
-
-    //todo: this needs moving to a NetworkBehaviour to use - [command]
-    private ItemBase CmdGetCraftedItem(IEnumerable<string> componentIds, string selectedType, string selectedSubtype, bool isTwoHanded)
-    {
-        //Security check that the components are actually in the player's inventory
-        //Load them in the order they are given
-        var components = new List<ItemBase>();
-        foreach (var id in componentIds)
-        {
-            components.Add(_inventory.Items.FirstOrDefault(x => x.Id == id));
-        }
-
-        //todo: requirements e.g. strength, speed, accuracy, 6 scrap or less
-
-        var resultFactory = GameManager.Instance.ResultFactory;
-
-        ItemBase craftedThing;
-        if (selectedType == CraftingTypeSpell)
-        {
-            craftedThing = resultFactory.GetSpell(components);
-        }
-        else
-        {
-            switch (selectedSubtype)
-            {
-                case Weapon.Dagger: craftedThing = resultFactory.GetMeleeWeapon(Weapon.Dagger, components, false); break;
-                case Weapon.Spear: craftedThing = resultFactory.GetMeleeWeapon(Weapon.Spear, components, true); break;
-                case Weapon.Bow: craftedThing = resultFactory.GetRangedWeapon(Weapon.Bow, components, true, false); break;
-                case Weapon.Crossbow: craftedThing = resultFactory.GetRangedWeapon(Weapon.Crossbow, components, true, false); break;
-                case Weapon.Shield: craftedThing = resultFactory.GetShield(components); break;
-
-                case Armor.Helm: craftedThing = resultFactory.GetArmor(Armor.Helm, components); break;
-                case Armor.Chest: craftedThing = resultFactory.GetArmor(Armor.Chest, components); break;
-                case Armor.Legs: craftedThing = resultFactory.GetArmor(Armor.Legs, components); break;
-                case Armor.Feet: craftedThing = resultFactory.GetArmor(Armor.Feet, components); break;
-                case Armor.Gloves: craftedThing = resultFactory.GetArmor(Armor.Gloves, components); break;
-                case Armor.Barrier: craftedThing = resultFactory.GetBarrier(components); break;
-
-                case Accessory.Amulet: craftedThing = resultFactory.GetAccessory(Accessory.Amulet, components); break;
-                case Accessory.Ring: craftedThing = resultFactory.GetAccessory(Accessory.Ring, components); break;
-                case Accessory.Belt: craftedThing = resultFactory.GetAccessory(Accessory.Belt, components); break;
-
-                default:
-
-                    switch (selectedSubtype)
-                    {
-                        case Weapon.Axe: craftedThing = resultFactory.GetMeleeWeapon(Weapon.Axe, components, isTwoHanded); break;
-                        case Weapon.Sword: craftedThing = resultFactory.GetMeleeWeapon(Weapon.Sword, components, isTwoHanded); break;
-                        case Weapon.Hammer: craftedThing = resultFactory.GetMeleeWeapon(Weapon.Hammer, components, isTwoHanded); break;
-                        case Weapon.Gun: craftedThing = resultFactory.GetRangedWeapon(Weapon.Gun, components, isTwoHanded, true); break;
-                        default:
-                            throw new System.Exception("Invalid weapon type");
-                    }
-                    break;
-            }
-        }
-
-        return craftedThing;
-    }
-
-
 
 }

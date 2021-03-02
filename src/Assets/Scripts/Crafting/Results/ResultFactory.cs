@@ -13,18 +13,20 @@ namespace Assets.Scripts.Crafting.Results
 
         private int ComputeAttribute(IEnumerable<ItemBase> components, Func<ItemBase, int> getProp, bool allowMax = true)
         {
-            var min = components.Min(getProp);
-            var max = components.Max(getProp);
+            var withValue = components.Where(x => getProp(x) > 0);
+
+            if (!withValue.Any())
+            {
+                return 0;
+            }
+
+            var min = withValue.Min(getProp);
+            var max = withValue.Max(getProp);
             var topEndSkew = max - ((max - min) / 10);
 
             int result = allowMax
                 ? topEndSkew
                 : (int)Math.Round(topEndSkew - (0.009 * (topEndSkew - 50)), MidpointRounding.AwayFromZero);
-
-            if (result == 0)
-            {
-                result = 1;
-            }
 
             //Debug.Log($"{getProp.Method.Name} = Min:{min}, Max:{max}, Skew:{topEndSkew}, Result:{result}");
 
@@ -152,7 +154,7 @@ namespace Assets.Scripts.Crafting.Results
                 IsSoulbound = _random.Next(0, 100) > 90,
                 ExtraAmmoPerShot = _random.Next(0, 100) > 70 ? _random.Next(1, 3) : 0,
                 Strength = GetAttributeValueIfRandomAbove(25),
-                Cost = GetAttributeValueIfRandomAbove(25),
+                Efficiency = GetAttributeValueIfRandomAbove(25),
                 Range = GetAttributeValueIfRandomAbove(25),
                 Accuracy = GetAttributeValueIfRandomAbove(25),
                 Speed = GetAttributeValueIfRandomAbove(25),
@@ -232,7 +234,7 @@ namespace Assets.Scripts.Crafting.Results
                 Attributes = new Attributes
                 {
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                    Cost = ComputeAttribute(components, x => x.Attributes.Cost),
+                    Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
                     Range = ComputeAttribute(components, x => x.Attributes.Range),
                     Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
@@ -289,9 +291,9 @@ namespace Assets.Scripts.Crafting.Results
                 Attributes = new Attributes
                 {
                     IsAutomatic = allowAutomatic && components.Any(x => x.Attributes.IsAutomatic),
-                    ExtraAmmoPerShot = components.FirstOrDefault( x => x.Attributes.ExtraAmmoPerShot > 0)?.Attributes.ExtraAmmoPerShot ?? 0,
+                    ExtraAmmoPerShot = components.FirstOrDefault(x => x.Attributes.ExtraAmmoPerShot > 0)?.Attributes.ExtraAmmoPerShot ?? 0,
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                    Cost = ComputeAttribute(components, x => x.Attributes.Cost),
+                    Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
                     Range = ComputeAttribute(components, x => x.Attributes.Range),
                     Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
@@ -347,7 +349,7 @@ namespace Assets.Scripts.Crafting.Results
                 Attributes = new Attributes
                 {
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                    Cost = ComputeAttribute(components, x => x.Attributes.Cost),
+                    Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
@@ -371,6 +373,54 @@ namespace Assets.Scripts.Crafting.Results
             };
             item.Name = GetItemName("Strength", item);
             return item;
+        }
+
+        public ItemBase GetCraftedItem<T>(List<ItemBase> components, string selectedType, string selectedSubtype, bool isTwoHanded) where T : ItemBase
+        {
+            //todo: requirements e.g. strength, speed, accuracy, 6 scrap or less
+
+            ItemBase craftedThing;
+            if (selectedType == CraftingUi.CraftingTypeSpell)
+            {
+                craftedThing = GetSpell(components);
+            }
+            else
+            {
+                switch (selectedSubtype)
+                {
+                    case Weapon.Dagger: craftedThing = GetMeleeWeapon(Weapon.Dagger, components, false); break;
+                    case Weapon.Spear: craftedThing = GetMeleeWeapon(Weapon.Spear, components, true); break;
+                    case Weapon.Bow: craftedThing = GetRangedWeapon(Weapon.Bow, components, true, false); break;
+                    case Weapon.Crossbow: craftedThing = GetRangedWeapon(Weapon.Crossbow, components, true, false); break;
+                    case Weapon.Shield: craftedThing = GetShield(components); break;
+
+                    case Armor.Helm: craftedThing = GetArmor(Armor.Helm, components); break;
+                    case Armor.Chest: craftedThing = GetArmor(Armor.Chest, components); break;
+                    case Armor.Legs: craftedThing = GetArmor(Armor.Legs, components); break;
+                    case Armor.Feet: craftedThing = GetArmor(Armor.Feet, components); break;
+                    case Armor.Gloves: craftedThing = GetArmor(Armor.Gloves, components); break;
+                    case Armor.Barrier: craftedThing = GetBarrier(components); break;
+
+                    case Accessory.Amulet: craftedThing = GetAccessory(Accessory.Amulet, components); break;
+                    case Accessory.Ring: craftedThing = GetAccessory(Accessory.Ring, components); break;
+                    case Accessory.Belt: craftedThing = GetAccessory(Accessory.Belt, components); break;
+
+                    default:
+
+                        switch (selectedSubtype)
+                        {
+                            case Weapon.Axe: craftedThing = GetMeleeWeapon(Weapon.Axe, components, isTwoHanded); break;
+                            case Weapon.Sword: craftedThing = GetMeleeWeapon(Weapon.Sword, components, isTwoHanded); break;
+                            case Weapon.Hammer: craftedThing = GetMeleeWeapon(Weapon.Hammer, components, isTwoHanded); break;
+                            case Weapon.Gun: craftedThing = GetRangedWeapon(Weapon.Gun, components, isTwoHanded, true); break;
+                            default:
+                                throw new System.Exception("Invalid weapon type");
+                        }
+                        break;
+                }
+            }
+
+            return craftedThing as T;
         }
 
     }

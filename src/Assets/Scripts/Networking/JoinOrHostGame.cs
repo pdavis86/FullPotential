@@ -61,4 +61,9 @@ public class JoinOrHostGame : MonoBehaviour
         GameManager.Instance.PlayerSkinUrl = value;
     }
 
+    public void QuitGame()
+    {
+        GameManager.Quit();
+    }
+
 }

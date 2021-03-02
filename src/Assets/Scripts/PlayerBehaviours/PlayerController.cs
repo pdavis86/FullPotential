@@ -220,6 +220,22 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    [Command]
+    public void CmdCraftItem(IEnumerable<string> componentIds, string selectedType, string selectedSubtype, bool isTwoHanded)
+    {
+        //Security check that the components are actually in the player's inventory
+        //Load them in the order they are given
+        var components = new List<ItemBase>();
+        //foreach (var id in componentIds)
+        //{
+        //    components.Add(_inventory.Items.FirstOrDefault(x => x.Id == id));
+        //}
+
+        //todo: 
+
+
+    }
+
 
 
 
