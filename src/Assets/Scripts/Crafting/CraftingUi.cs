@@ -69,6 +69,7 @@ public class CraftingUi : MonoBehaviour
 
     private void CraftButtonOnClick()
     {
+        _craftButton.interactable = false;
         var pc = GameManager.Instance.LocalPlayer.GetComponent<PlayerController>();
         pc.CmdCraftItem(_components.Select(x => x.Id), GetSelectedType(), GetSelectedSubType(), GetSelectedHandedness());
     }
@@ -177,6 +178,7 @@ public class CraftingUi : MonoBehaviour
         _handednessDropdown.gameObject.SetActive(false);
 
         _outputText.text = null;
+        _craftButton.interactable = true;
     }
 
     public void LoadInventory()
