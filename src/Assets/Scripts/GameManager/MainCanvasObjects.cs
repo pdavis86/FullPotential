@@ -26,11 +26,9 @@ public class MainCanvasObjects : MonoBehaviour
         }
 
         _instance = this;
-
-        //Needs to get instantiated
-        TooltipOverlay.SetActive(true);
-        
         DontDestroyOnLoad(gameObject);
+
+        TooltipOverlay.SetActive(true);
     }
 
     public void HideAllMenus()
@@ -56,7 +54,7 @@ public class MainCanvasObjects : MonoBehaviour
     public void BackToMainMenu()
     {
         HideAllMenus();
-        GameManager.Disconnect();
+        JoinOrHostGame.Disconnect();
     }
 
     public void QuitGame()

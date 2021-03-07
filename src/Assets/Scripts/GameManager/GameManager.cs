@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Crafting.Results;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 // ReSharper disable once CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -16,6 +17,10 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    //todo: move these
+    public const string NameCanvasMain = "MainCanvas";
+    public const string NameCanvasScene = "SceneCanvas";
+
     public MainCanvasObjects MainCanvasObjects { get; private set; }
     public Prefabs Prefabs { get; private set; }
     public InputMappings InputMappings { get; private set; }
@@ -29,6 +34,8 @@ public class GameManager : MonoBehaviour
     private static GameManager _instance;
     public static GameManager Instance { get { return _instance; } }
 
+    private Text _pingText;
+
 
     private void Awake()
     {
@@ -39,31 +46,28 @@ public class GameManager : MonoBehaviour
         }
 
         _instance = this;
-        MainCanvasObjects = GetMainCanvasObjects();
+        MainCanvasObjects = GameObject.Find(NameCanvasMain).GetComponent<MainCanvasObjects>();
         Prefabs = GetComponent<Prefabs>();
         InputMappings = GetComponent<InputMappings>();
         ResultFactory = new ResultFactory();
 
+        var pingGo = GameObject.Find("PingText");
+        if (pingGo != null)
+        {
+            _pingText = pingGo.GetComponent<UnityEngine.UI.Text>();
+        }
+
         DontDestroyOnLoad(gameObject);
     }
-
-    //private void Start()
-    //{
-    //    //Doesn't work
-    //    //UnityEngine.SceneManagement.SceneManager.LoadScene("Offline");
-    //}
 
     void OnGUI()
     {
         if (UnityEngine.Networking.NetworkClient.allClients.Count != 0)
         {
-            var goPing = GameObject.Find("PingText");
-            if (goPing != null)
+            if (_pingText != null)
             {
-                var textPing = goPing.GetComponent<UnityEngine.UI.Text>();
-
                 var ping = UnityEngine.Networking.NetworkClient.allClients[0].GetRTT();
-                textPing.text = ping == 0 ? "Host" : ping + " ms";
+                _pingText.text = ping == 0 ? "Host" : ping + " ms";
             }
         }
         else
@@ -89,29 +93,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public static MainCanvasObjects GetMainCanvasObjects()
-    {
-        return GameObject.Find("MainCanvas").GetComponent<MainCanvasObjects>();
-    }
-
-    public static GameObject GetSceneCanvas()
-    {
-        return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects().FirstOrDefault(x => x.name == "SceneCanvas");
-    }
-
-    public static GameObject GetCurrentPlayerGameObject(Camera playerCamera)
-    {
-        //var players = GameObject.FindGameObjectsWithTag("Player");
-        return playerCamera.gameObject.transform.parent.gameObject;
-    }
-
-
-
-    public static void Disconnect()
-    {
-        UnityEngine.Networking.NetworkManager.singleton.StopClient();
-        UnityEngine.Networking.NetworkManager.singleton.StopHost();
-    }
+    //public static GameObject GetCurrentPlayerGameObject(Camera playerCamera)
+    //{
+    //    return playerCamera.gameObject.transform.parent.gameObject;
+    //}
 
     public static void Quit()
     {
@@ -120,6 +105,19 @@ public class GameManager : MonoBehaviour
 #else
         Application.Quit ();
 #endif
+    }
+
+
+
+
+
+
+
+
+    //todo: move this
+    public static GameObject GetObjectAtRoot(string name)
+    {
+        return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects().FirstOrDefault(x => x.name == name);
     }
 
 }

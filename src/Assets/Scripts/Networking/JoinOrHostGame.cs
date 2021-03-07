@@ -8,34 +8,7 @@ public class JoinOrHostGame : MonoBehaviour
     void Start()
     {
         _networkManager = NetworkManager.singleton;
-        //if (_networkManager.matchMaker == null)
-        //{
-        //    _networkManager.StartMatchMaker();
-        //}
     }
-
-    //public void CreateRoom()
-    //{
-    //    var matchSize = 4U;
-    //    var matchAdvertise = true;
-    //    var matchPassword = "";
-    //    var publicClientAddress = "";
-    //    var privateClientAddress = "";
-    //    var eloScoreForMatch = 0;
-    //    var requestDomain = 0;
-
-    //    _networkManager.matchMaker.CreateMatch(
-    //        _roomname ?? "My Room Name",
-    //        matchSize,
-    //        matchAdvertise,
-    //        matchPassword,
-    //        publicClientAddress,
-    //        privateClientAddress,
-    //        eloScoreForMatch,
-    //        requestDomain,
-    //        _networkManager.OnMatchCreate
-    //        );
-    //}
 
     public void HostGame()
     {
@@ -59,6 +32,12 @@ public class JoinOrHostGame : MonoBehaviour
     public void SetPlayerSkinUrl(string value)
     {
         GameManager.Instance.PlayerSkinUrl = value;
+    }
+
+    public static void Disconnect()
+    {
+        UnityEngine.Networking.NetworkManager.singleton.StopClient();
+        UnityEngine.Networking.NetworkManager.singleton.StopHost();
     }
 
     public void QuitGame()

@@ -65,13 +65,11 @@ namespace Assets.Scripts.Crafting.Results
 
         private List<string> GetEffects(string craftingType, IEnumerable<string> effectsInput)
         {
-            //Cannot cast "tap" buffs
             var effects = effectsInput
                 .Except(new[] { Spell.BuffEffects.LifeTap, Spell.BuffEffects.ManaTap })
                 .Except(Spell.TargetingOptions.All)
                 .Except(Spell.ShapeOptions.All);
 
-            //Only one elemental effect
             var elementalEffects = effects.Intersect(Spell.ElementalEffects.All);
             var elementalEffect = elementalEffects.FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(elementalEffect))
@@ -80,7 +78,6 @@ namespace Assets.Scripts.Crafting.Results
                     .Except(Spell.ElementalEffects.All.Where(x => x != elementalEffect));
             }
 
-            //Lingering must have matching elemental type
             var lingeringEffect = Spell.LingeringPairing.FirstOrDefault(x => x.Key == elementalEffect).Value;
             effects = effects.Except(Spell.LingeringOptions.All.Where(x => x != lingeringEffect));
 
@@ -92,7 +89,6 @@ namespace Assets.Scripts.Crafting.Results
                     .ToList();
             }
 
-            //Weapons have debuffs and elemental (+lingering) only
             if (craftingType == CraftingUi.CraftingTypeWeapon)
             {
                 return effects.Intersect(Spell.DebuffEffects.All)
@@ -106,7 +102,6 @@ namespace Assets.Scripts.Crafting.Results
                 throw new Exception($"Unexpected craftingType '{craftingType}'");
             }
 
-            //If there is a buff or support then remove all debuffs and "offensive" effects
             if (effects.Intersect(Spell.BuffEffects.All).Any() || effects.Intersect(Spell.SupportEffects.All).Any())
             {
                 effects = effects
@@ -183,7 +178,6 @@ namespace Assets.Scripts.Crafting.Results
                     lootDrop.Effects.Add(effect);
                 }
 
-                //If lingering is appropriate, add a chance of it being included
                 var elementalEffect = lootDrop.Effects.Intersect(Spell.ElementalEffects.All).FirstOrDefault();
                 if (!string.IsNullOrWhiteSpace(elementalEffect) && Spell.LingeringPairing.ContainsKey(elementalEffect) && _random.Next(0, 2) > 0)
                 {
