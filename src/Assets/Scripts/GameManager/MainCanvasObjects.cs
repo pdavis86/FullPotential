@@ -11,7 +11,7 @@ public class MainCanvasObjects : MonoBehaviour
     //Menus
     public GameObject CraftingUi;
     public GameObject EscMenu;
-    public GameObject InventoryUi;
+    public GameObject CharacterMenu;
 
     // ReSharper disable once ArrangeAccessorOwnerBody
     private static MainCanvasObjects _instance;
@@ -35,14 +35,14 @@ public class MainCanvasObjects : MonoBehaviour
     {
         CraftingUi.SetActive(false);
         EscMenu.SetActive(false);
-        InventoryUi.SetActive(false);
+        CharacterMenu.SetActive(false);
     }
 
     public bool IsAnyMenuOpen()
     {
         return CraftingUi.activeSelf
             || EscMenu.activeSelf
-            || InventoryUi.activeSelf;
+            || CharacterMenu.activeSelf;
     }
 
     public void HideOthersOpenThis(GameObject ui)

@@ -365,7 +365,7 @@ namespace Assets.Scripts.Crafting.Results
                 switch (selectedSubtype)
                 {
                     case Weapon.Dagger: return GetMeleeWeapon(Weapon.Dagger, components, false);
-                    case Weapon.Spear: return GetMeleeWeapon(Weapon.Spear, components, true);
+                    case Weapon.Staff: return GetMeleeWeapon(Weapon.Staff, components, true);
                     case Weapon.Bow: return GetRangedWeapon(Weapon.Bow, components, true, false);
                     case Weapon.Crossbow: return GetRangedWeapon(Weapon.Crossbow, components, true, false);
                     case Weapon.Shield: return GetShield(components);

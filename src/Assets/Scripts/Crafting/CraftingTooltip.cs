@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
 
-//todo: generic tooltip script now!
+//todo: rename as this is a generic tooltip script now
 
 public class CraftingTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -18,8 +18,6 @@ public class CraftingTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        //Tooltip.ShowTooltip(Crafting.GetItemDescription());
-
         OnPointerEnterForTooltip?.Invoke(eventData);
     }
 

@@ -11,7 +11,7 @@ namespace Assets.Scripts.Crafting.Results
         public const string Axe = "Axe";
         public const string Sword = "Sword";
         public const string Hammer = "Hammer";
-        public const string Spear = "Spear";
+        public const string Staff = "Staff";
         public const string Bow = "Bow";
         public const string Crossbow = "Crossbow";
         public const string Gun = "Gun";
@@ -26,7 +26,7 @@ namespace Assets.Scripts.Crafting.Results
             Axe,
             Sword,
             Hammer,
-            Spear,
+            Staff,
             Bow,
             Crossbow,
             Gun,

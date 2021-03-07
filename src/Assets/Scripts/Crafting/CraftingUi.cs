@@ -28,6 +28,7 @@ public class CraftingUi : MonoBehaviour
     private Inventory _inventory;
     private List<ItemBase> _components;
 
+    //todo: move these. used in various places
     public const string CraftingTypeWeapon = "Weapon";
     public const string CraftingTypeArmor = "Armor";
     public const string CraftingTypeAccessory = "Accessory";
@@ -253,6 +254,7 @@ public class CraftingUi : MonoBehaviour
         _outputText.text = GetItemDescription(craftedItem);
     }
 
+    //todo: move this as it is used in various places
     public static string GetItemDescription(ItemBase item, bool includeName = true)
     {
         var sb = new StringBuilder();

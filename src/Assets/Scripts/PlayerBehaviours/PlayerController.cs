@@ -21,8 +21,8 @@ public class PlayerController : NetworkBehaviour
     public bool HasMenuOpen;
 
     private MainCanvasObjects _mainCanvasObjects;
-    private bool _escPressed;
-    private bool _openInventory;
+    private bool _toggleEscMenu;
+    private bool _toggleCharacterMenu;
     private Inventory _inventory;
 
     void Awake()
@@ -45,8 +45,8 @@ public class PlayerController : NetworkBehaviour
         {
             var mappings = GameManager.Instance.InputMappings;
 
-            if (Input.GetKeyDown(mappings.Menu)) { _escPressed = true; }
-            else if (Input.GetKeyDown(mappings.Inventory)) { _openInventory = true; }
+            if (Input.GetKeyDown(mappings.Menu)) { _toggleEscMenu = true; }
+            else if (Input.GetKeyDown(mappings.Inventory)) { _toggleCharacterMenu = true; }
             else if (!HasMenuOpen)
             {
                 if (Input.GetKeyDown(mappings.Interact)) { TryToInteract(); }
@@ -70,28 +70,26 @@ public class PlayerController : NetworkBehaviour
     {
         try
         {
-            if (_escPressed || _openInventory)
+            if (_toggleEscMenu || _toggleCharacterMenu)
             {
                 if (HasMenuOpen)
                 {
                     _mainCanvasObjects.HideAllMenus();
                 }
-                else if (_escPressed)
+                else if (_toggleEscMenu)
                 {
                     _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.EscMenu);
                 }
-                else if (_openInventory)
+                else if (_toggleCharacterMenu)
                 {
-                    //todo: finish this
-                    Debug.Log("Tried to open inventory");
-                    _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.InventoryUi);
+                    _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.CharacterMenu);
                 }
 
                 HasMenuOpen = _mainCanvasObjects.IsAnyMenuOpen();
                 _mainCanvasObjects.Hud.SetActive(!HasMenuOpen);
 
-                _escPressed = false;
-                _openInventory = false;
+                _toggleEscMenu = false;
+                _toggleCharacterMenu = false;
             }
 
             if (HasMenuOpen)
