@@ -19,11 +19,17 @@ public class CharacterMenuUi : MonoBehaviour
     [SerializeField] private GameObject _rowPrefab;
 
     private Inventory _inventory;
+    private PlayerController _playerController;
     private GameObject _activeSlot;
 
     private void Awake()
     {
         _inventory = GameManager.Instance.LocalPlayer.GetComponent<Inventory>();
+    }
+
+    private void Start()
+    {
+        _playerController = GameManager.Instance.LocalPlayer.GetComponent<PlayerController>();
     }
 
     private void OnEnable()
@@ -42,6 +48,7 @@ public class CharacterMenuUi : MonoBehaviour
         switch (clickedObject.name)
         {
             case "Left Hand":
+            case "Right Hand":
                 _activeSlot = clickedObject as GameObject;
                 LoadInventoryItems(new[] { typeof(Weapon), typeof(Spell) });
                 break;
@@ -75,7 +82,13 @@ public class CharacterMenuUi : MonoBehaviour
             {
                 if (isOn)
                 {
-                    SetItemToSlot(item);
+                    Debug.Log($"Setting item for slot {_activeSlot.name} to be {item.Name}");
+
+                    Tooltips.HideTooltip();
+
+                    _playerController.SetItemToSlotOnBoth(_activeSlot.name, item.Id);
+                    _componentsContainer.SetActive(false);
+                    _componentsContainer.transform.Clear();
                 }
             });
 
@@ -91,16 +104,6 @@ public class CharacterMenuUi : MonoBehaviour
         const int spacer = 5;
         var containerRectTrans = _componentsContainer.GetComponent<RectTransform>();
         containerRectTrans.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rowCounter * (rowRectTransform.rect.height + spacer));
-    }
-
-    private void SetItemToSlot(ItemBase item)
-    {
-        //todo: actually do something useful
-        Debug.Log($"Setting item for slot {_activeSlot.name} to be {item.Name}");
-
-        _componentsContainer.SetActive(false);
-
-        //todo: tell the server
     }
 
 }

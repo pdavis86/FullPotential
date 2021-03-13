@@ -13,11 +13,14 @@ namespace Assets.Scripts.Data
         public InventoryChange(Inventory inventory)
         {
             MaxItems = inventory.MaxItems;
+
             Loot = inventory.Loot;
             Accessories = inventory.Accessories;
             Armor = inventory.Armor;
             Spells = inventory.Spells;
             Weapons = inventory.Weapons;
+
+            EquipSlots = inventory.EquipSlots;
         }
     }
 }

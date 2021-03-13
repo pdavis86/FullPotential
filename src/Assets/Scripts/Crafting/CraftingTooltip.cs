@@ -10,7 +10,6 @@ using UnityEngine.EventSystems;
 // ReSharper disable UnassignedField.Compiler
 
 //todo: rename as this is a generic tooltip script now
-
 public class CraftingTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public delegate void PointerEnterEventDelegate(PointerEventData eventData);

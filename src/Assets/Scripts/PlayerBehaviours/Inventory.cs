@@ -19,13 +19,19 @@ using UnityEngine.Networking.NetworkSystem;
 public class Inventory : NetworkBehaviour
 {
     public int MaxItems;
+
+    [HideInInspector]
     public List<ItemBase> Items;
+
+    [HideInInspector]
+    public string[] EquippedItems;
 
     private PlayerController _playerController;
 
     private void Awake()
     {
         Items = new List<ItemBase>();
+        EquippedItems = new string[6];
     }
 
     private void Start()
@@ -48,8 +54,7 @@ public class Inventory : NetworkBehaviour
     private void OnLoadPlayerData(NetworkMessage netMsg)
     {
         var loadData = JsonUtility.FromJson<PlayerData>(netMsg.ReadMessage<StringMessage>().value);
-
-        ApplyChanges(new InventoryChange(loadData.Inventory));
+        ApplyChanges(loadData.Inventory);
     }
 
     private void OnInventoryChange(NetworkMessage netMsg)
@@ -65,15 +70,18 @@ public class Inventory : NetworkBehaviour
         }
     }
 
-    public void ApplyChanges(Assets.Scripts.Data.InventoryChange changes)
+    private void ApplyChanges(Assets.Scripts.Data.Inventory changes)
     {
-        MaxItems = changes.MaxItems == 0 ? 30 : changes.MaxItems;
+        if (changes.MaxItems > 0)
+        {
+            MaxItems = changes.MaxItems;
+        }
 
         var addedItems = changes.Loot
-                .UnionIfNotNull(changes.Accessories)
-                .UnionIfNotNull(changes.Armor)
-                .UnionIfNotNull(changes.Spells)
-                .UnionIfNotNull(changes.Weapons);
+            .UnionIfNotNull(changes.Accessories)
+            .UnionIfNotNull(changes.Armor)
+            .UnionIfNotNull(changes.Spells)
+            .UnionIfNotNull(changes.Weapons);
         var addedItemsCount = addedItems.Count();
 
         Items.AddRange(addedItems);
@@ -91,6 +99,20 @@ public class Inventory : NetworkBehaviour
             Debug.Log($"Added {addedItemsCount} items to the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
         }
 
+        if (changes.EquipSlots.Length == EquippedItems.Length)
+        {
+            EquippedItems = changes.EquipSlots;
+        }
+        else
+        {
+            //todo:
+        }
+    }
+
+    private void ApplyChanges(Assets.Scripts.Data.InventoryChange changes)
+    {
+        ApplyChanges(changes as Assets.Scripts.Data.Inventory);
+
         if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
         {
             var itemsRemoved = Items.RemoveAll(x => changes.IdsToRemove.Contains(x.Id));
@@ -100,26 +122,27 @@ public class Inventory : NetworkBehaviour
         }
     }
 
-    public Assets.Scripts.Data.InventoryChange GetSaveData()
+    public Assets.Scripts.Data.Inventory GetSaveData()
     {
         var groupedItems = Items.GroupBy(x => x.GetType());
 
-        return new Assets.Scripts.Data.InventoryChange
+        return new Assets.Scripts.Data.Inventory
         {
             MaxItems = MaxItems,
             Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemBase))?.ToArray(),
             Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray() as Accessory[],
             Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray() as Armor[],
             Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray() as Spell[],
-            Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray() as Weapon[]
+            Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray() as Weapon[],
+            EquipSlots = EquippedItems
         };
     }
 
-    private void AddOfType<T>(string stringValue) where T : ItemBase
-    {
-        Add(JsonUtility.FromJson<T>(stringValue));
-        //Debug.Log($"Inventory now has {Items.Count} items in it");
-    }
+    //private void AddOfType<T>(string stringValue) where T : ItemBase
+    //{
+    //    Add(JsonUtility.FromJson<T>(stringValue));
+    //    //Debug.Log($"Inventory now has {Items.Count} items in it");
+    //}
 
     public void Add(ItemBase item)
     {
@@ -145,6 +168,29 @@ public class Inventory : NetworkBehaviour
             }
             Items.Remove(matchingItem);
         }
+    }
+
+    public void SetItemToSlot(string slotName, string itemId)
+    {
+        //todo: 
+        //var alreadyEquiped = Equipped.FirstOrDefault(x => x.Value == itemId);
+        //if (!string.IsNullOrWhiteSpace(alreadyEquiped.Key))
+        //{
+        //    Equipped.Remove(alreadyEquiped.Key);
+        //}
+
+
+        //todo: do this better
+        if (slotName == "Left Hand")
+        {
+            EquippedItems[0] = itemId;
+        }
+        else
+        {
+            EquippedItems[1] = itemId;
+        }
+
+        var foo = "";
     }
 
 }

@@ -25,6 +25,8 @@ public class SpellBehaviour : AttackBehaviourBase
             ? NetworkServer.FindLocalObject(new NetworkInstanceId(PlayerNetworkId))
             : ClientScene.FindLocalObject(new NetworkInstanceId(PlayerNetworkId));
 
+        var playerController = SourcePlayer.GetComponent<PlayerController>();
+
         Physics.IgnoreCollision(GetComponent<Collider>(), SourcePlayer.GetComponent<Collider>());
 
         if (!isServer)
@@ -40,7 +42,6 @@ public class SpellBehaviour : AttackBehaviourBase
         //    Debug.LogError("I don't have a SourcePlayer :'(");
         //}
 
-        var playerController = SourcePlayer.GetComponent<PlayerController>();
         Spell = playerController.GetPlayerActiveSpell();
 
         //if (Spell == null)

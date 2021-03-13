@@ -21,7 +21,7 @@ public class PlayerController : NetworkBehaviour
     public bool HasMenuOpen;
 
     private MainCanvasObjects _mainCanvasObjects;
-    private bool _toggleEscMenu;
+    private bool _toggleGameMenu;
     private bool _toggleCharacterMenu;
     private Inventory _inventory;
 
@@ -45,8 +45,8 @@ public class PlayerController : NetworkBehaviour
         {
             var mappings = GameManager.Instance.InputMappings;
 
-            if (Input.GetKeyDown(mappings.Menu)) { _toggleEscMenu = true; }
-            else if (Input.GetKeyDown(mappings.Inventory)) { _toggleCharacterMenu = true; }
+            if (Input.GetKeyDown(mappings.GameMenu)) { _toggleGameMenu = true; }
+            else if (Input.GetKeyDown(mappings.CharacterMenu)) { _toggleCharacterMenu = true; }
             else if (!HasMenuOpen)
             {
                 if (Input.GetKeyDown(mappings.Interact)) { TryToInteract(); }
@@ -70,13 +70,13 @@ public class PlayerController : NetworkBehaviour
     {
         try
         {
-            if (_toggleEscMenu || _toggleCharacterMenu)
+            if (_toggleGameMenu || _toggleCharacterMenu)
             {
                 if (HasMenuOpen)
                 {
                     _mainCanvasObjects.HideAllMenus();
                 }
-                else if (_toggleEscMenu)
+                else if (_toggleGameMenu)
                 {
                     _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.EscMenu);
                 }
@@ -88,7 +88,7 @@ public class PlayerController : NetworkBehaviour
                 HasMenuOpen = _mainCanvasObjects.IsAnyMenuOpen();
                 _mainCanvasObjects.Hud.SetActive(!HasMenuOpen);
 
-                _toggleEscMenu = false;
+                _toggleGameMenu = false;
                 _toggleCharacterMenu = false;
             }
 
@@ -257,6 +257,18 @@ public class PlayerController : NetworkBehaviour
             Weapons = craftedType == typeof(Weapon) ? new Weapon[] { craftedItem as Weapon } : null
         });
         connectionToClient.Send(Assets.Scripts.Networking.MessageIds.InventoryChange, new StringMessage(itemJson));
+    }
+
+    public void SetItemToSlotOnBoth(string slotName, string itemId)
+    {
+        _inventory.SetItemToSlot(slotName, itemId);
+        //todo: ? CmdSetItemToSlot(slotName, itemId);
+    }
+
+    [Command]
+    private void CmdSetItemToSlot(string slotName, string itemId)
+    {
+        _inventory.SetItemToSlot(slotName, itemId);
     }
 
 

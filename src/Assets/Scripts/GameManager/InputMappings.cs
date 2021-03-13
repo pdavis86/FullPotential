@@ -10,7 +10,7 @@
 
 public class InputMappings : MonoBehaviour
 {
-    public KeyCode Menu = KeyCode.Escape;
-    public KeyCode Inventory = KeyCode.Tab;
+    public KeyCode GameMenu = KeyCode.Escape;
+    public KeyCode CharacterMenu = KeyCode.Tab;
     public KeyCode Interact = KeyCode.E;
 }

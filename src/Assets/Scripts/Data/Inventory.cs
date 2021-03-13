@@ -13,5 +13,7 @@ namespace Assets.Scripts.Data
         public Armor[] Armor;
         public Spell[] Spells;
         public Weapon[] Weapons;
+
+        public string[] EquipSlots;
     }
 }

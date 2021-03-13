@@ -51,7 +51,8 @@ public class GameManager : MonoBehaviour
         InputMappings = GetComponent<InputMappings>();
         ResultFactory = new ResultFactory();
 
-        var pingGo = GameObject.Find("PingText");
+        //todo: do this better
+        var pingGo = MainCanvasObjects.DebuggingOverlay.transform.Find("PingText");
         if (pingGo != null)
         {
             _pingText = pingGo.GetComponent<UnityEngine.UI.Text>();
@@ -60,6 +61,7 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    //todo: mvoe this to a UI
     void OnGUI()
     {
         if (UnityEngine.Networking.NetworkClient.allClients.Count != 0)

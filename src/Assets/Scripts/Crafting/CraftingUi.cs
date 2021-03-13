@@ -26,6 +26,7 @@ public class CraftingUi : MonoBehaviour
     [SerializeField] private Button _craftButton;
 
     private Inventory _inventory;
+    private PlayerController _playerController;
     private List<ItemBase> _components;
 
     //todo: move these. used in various places
@@ -59,7 +60,9 @@ public class CraftingUi : MonoBehaviour
     private void Awake()
     {
         _components = new List<ItemBase>();
+
         _inventory = GameManager.Instance.LocalPlayer.GetComponent<Inventory>();
+        _playerController = GameManager.Instance.LocalPlayer.GetComponent<PlayerController>();
 
         _typeDropdown.onValueChanged.AddListener(TypeOnValueChanged);
 
@@ -71,8 +74,7 @@ public class CraftingUi : MonoBehaviour
     private void CraftButtonOnClick()
     {
         _craftButton.interactable = false;
-        var pc = GameManager.Instance.LocalPlayer.GetComponent<PlayerController>();
-        pc.CmdCraftItem(_components.Select(x => x.Id), GetSelectedType(), GetSelectedSubType(), GetSelectedHandedness());
+        _playerController.CmdCraftItem(_components.Select(x => x.Id), GetSelectedType(), GetSelectedSubType(), GetSelectedHandedness());
     }
 
     void SubTypeOnValueChanged(int index)

@@ -105,7 +105,7 @@ public class PlayerSetup : NetworkBehaviour
         if (_sceneCamera != null) { _sceneCamera.gameObject.SetActive(true); }
     }
 
-    void SetPlayerTexture(string playerSkinUri)
+    private void SetPlayerTexture(string playerSkinUri)
     {
         //todo: download file
         var filePath = playerSkinUri;
@@ -124,26 +124,8 @@ public class PlayerSetup : NetworkBehaviour
         }
     }
 
-    [Command]
-    void CmdHeresMyJoiningDetails(string playerName, string playerSkinUri)
-    {
-        if (!string.IsNullOrWhiteSpace(playerName)) { Username = playerName; }
-        if (!string.IsNullOrWhiteSpace(playerSkinUri)) { TextureUri = playerSkinUri; }
-        RpcSetPlayerDetails(playerName, playerSkinUri);
-
-        //todo configurable server save path
-
-        //todo: change file path
-        var filePath = @"D:\temp\playerguid.json";
-        if (System.IO.File.Exists(filePath))
-        {
-            var loadJson = System.IO.File.ReadAllText(filePath);
-            connectionToClient.Send(Assets.Scripts.Networking.MessageIds.LoadPlayerData, new StringMessage(loadJson));
-        }
-    }
-
     [ClientRpc]
-    void RpcSetPlayerDetails(string playerName, string playerSkinUri)
+    private void RpcSetPlayerDetails(string playerName, string playerSkinUri)
     {
         if (!isLocalPlayer)
         {
@@ -153,16 +135,34 @@ public class PlayerSetup : NetworkBehaviour
         if (!string.IsNullOrWhiteSpace(playerSkinUri)) { SetPlayerTexture(playerSkinUri); }
     }
 
-    [ServerCallback]
+    private string GetPlayerSavePath()
+    {
+        //todo configurable server save path
+        //todo: change file path
+        return @"D:\temp\playerguid.json";
+    }
+
+    [Command]
+    private void CmdHeresMyJoiningDetails(string playerName, string playerSkinUri)
+    {
+        if (!string.IsNullOrWhiteSpace(playerName)) { Username = playerName; }
+        if (!string.IsNullOrWhiteSpace(playerSkinUri)) { TextureUri = playerSkinUri; }
+
+        RpcSetPlayerDetails(playerName, playerSkinUri);
+
+        var filePath = GetPlayerSavePath();
+        if (System.IO.File.Exists(filePath))
+        {
+            var loadJson = System.IO.File.ReadAllText(filePath);
+            connectionToClient.Send(Assets.Scripts.Networking.MessageIds.LoadPlayerData, new StringMessage(loadJson));
+        }
+    }
+
     private void Save()
     {
         //Debug.Log("Saving player data for " + gameObject.name);
 
-        //todo: remove this
-        //_inventory.Add(GameManager.Instance.ResultFactory.GetLootDrop());
-        //_inventory.Add(GameManager.Instance.ResultFactory.GetLootDrop());
-        //var weapon = GameManager.Instance.ResultFactory.GetMeleeWeapon("Sword", _inventory.Items, false);
-        //_inventory.Add(weapon);
+        //todo: figure out how to avoid saving after a load failed
 
         var saveData = new PlayerData
         {
@@ -170,8 +170,7 @@ public class PlayerSetup : NetworkBehaviour
         };
 
         var saveJson = JsonUtility.ToJson(saveData, _debugging);
-        //todo: change file path
-        System.IO.File.WriteAllText(@"D:\temp\playerguid.json", saveJson);
+        System.IO.File.WriteAllText(GetPlayerSavePath(), saveJson);
     }
 
 }
