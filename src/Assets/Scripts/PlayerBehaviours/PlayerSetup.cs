@@ -70,6 +70,8 @@ public class PlayerSetup : NetworkBehaviour
         //Done on network manager now
         //ClientScene.RegisterPrefab(_sceneObjects.PrefabSpell);
 
+        connectionToServer.RegisterHandler(Assets.Scripts.Networking.MessageIds.LoadPlayerData, OnLoadPlayerData);
+
         _nameTag.text = null;
 
         //if (!string.IsNullOrWhiteSpace(GameManager.Instance.PlayerSkinUrl))
@@ -148,26 +150,53 @@ public class PlayerSetup : NetworkBehaviour
         if (!string.IsNullOrWhiteSpace(playerName)) { Username = playerName; }
         if (!string.IsNullOrWhiteSpace(playerSkinUri)) { TextureUri = playerSkinUri; }
 
+        //todo: this can be merged into Load()
         RpcSetPlayerDetails(playerName, playerSkinUri);
 
         var filePath = GetPlayerSavePath();
         if (System.IO.File.Exists(filePath))
         {
             var loadJson = System.IO.File.ReadAllText(filePath);
-            connectionToClient.Send(Assets.Scripts.Networking.MessageIds.LoadPlayerData, new StringMessage(loadJson));
+
+            Load(loadJson);
+
+            if (!isLocalPlayer)
+            {
+                connectionToClient.Send(Assets.Scripts.Networking.MessageIds.LoadPlayerData, new StringMessage(loadJson));
+            }
         }
     }
 
+    private void OnLoadPlayerData(NetworkMessage netMsg)
+    {
+        Load(netMsg.ReadMessage<StringMessage>().value);
+    }
+
+    private void Load(string loadJson)
+    {
+        var loadData = JsonUtility.FromJson<PlayerData>(loadJson);
+
+        _inventory.ApplyChanges(loadData.Inventory);
+
+        //todo: load other player data into correct objects
+    }
+
+    [Server]
     private void Save()
     {
         //Debug.Log("Saving player data for " + gameObject.name);
-
-        //todo: figure out how to avoid saving after a load failed
 
         var saveData = new PlayerData
         {
             Inventory = _inventory.GetSaveData()
         };
+
+        //todo: figure out how to avoid saving after a load failed
+        if (saveData.Inventory.Weapons == null || saveData.Inventory.Weapons.Length == 0)
+        {
+            Debug.LogError("Save data got corrupted. Aborting save!");
+            return;
+        }
 
         var saveJson = JsonUtility.ToJson(saveData, _debugging);
         System.IO.File.WriteAllText(GetPlayerSavePath(), saveJson);

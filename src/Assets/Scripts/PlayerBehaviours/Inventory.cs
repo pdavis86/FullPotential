@@ -43,22 +43,16 @@ public class Inventory : NetworkBehaviour
             {
                 return;
             }
-            netId.connectionToServer.RegisterHandler(Assets.Scripts.Networking.MessageIds.LoadPlayerData, OnLoadPlayerData);
-            netId.connectionToServer.RegisterHandler(Assets.Scripts.Networking.MessageIds.InventoryChange, OnInventoryChange);
+            connectionToServer.RegisterHandler(Assets.Scripts.Networking.MessageIds.InventoryChange, OnInventoryChange);
         }
 
         _playerController = GetComponent<PlayerController>();
     }
 
-    //todo: make a generic load method instead of here
-    private void OnLoadPlayerData(NetworkMessage netMsg)
-    {
-        var loadData = JsonUtility.FromJson<PlayerData>(netMsg.ReadMessage<StringMessage>().value);
-        ApplyChanges(loadData.Inventory);
-    }
-
     private void OnInventoryChange(NetworkMessage netMsg)
     {
+        //Debug.LogError("Recieved OnInventoryChange network message");
+
         var changes = JsonUtility.FromJson<InventoryChange>(netMsg.ReadMessage<StringMessage>().value);
         ApplyChanges(changes);
 
@@ -70,7 +64,7 @@ public class Inventory : NetworkBehaviour
         }
     }
 
-    private void ApplyChanges(Assets.Scripts.Data.Inventory changes)
+    public void ApplyChanges(Assets.Scripts.Data.Inventory changes)
     {
         if (changes.MaxItems > 0)
         {
@@ -82,21 +76,22 @@ public class Inventory : NetworkBehaviour
             .UnionIfNotNull(changes.Armor)
             .UnionIfNotNull(changes.Spells)
             .UnionIfNotNull(changes.Weapons);
-        var addedItemsCount = addedItems.Count();
 
         Items.AddRange(addedItems);
+
+        var addedItemsCount = addedItems.Count();
 
         if (addedItemsCount == 1)
         {
             var addedItem = addedItems.First();
 
             //todo: make this a slide-out alert instead
-            Debug.Log($"{addedItem.GetFullName()} was added");
+            Debug.LogError($"{addedItem.GetFullName()} was added");
         }
         else
         {
             //todo: make this a slide-out alert instead
-            Debug.Log($"Added {addedItemsCount} items to the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
+            Debug.LogError($"Added {addedItemsCount} items to the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
         }
 
         if (changes.EquipSlots.Length == EquippedItems.Length)
@@ -105,7 +100,19 @@ public class Inventory : NetworkBehaviour
         }
         else
         {
-            //todo:
+            Debug.LogError("EquipSlots differed in length from EquippedItems");
+
+            if (changes.EquipSlots.Length > EquippedItems.Length)
+            {
+                EquippedItems = changes.EquipSlots;
+            }
+            else
+            {
+                for (var i = 0; i < changes.EquipSlots.Length; i++)
+                {
+                    EquippedItems[i] = changes.EquipSlots[i];
+                }
+            }
         }
     }
 
@@ -154,6 +161,12 @@ public class Inventory : NetworkBehaviour
         }
 
         Items.Add(item);
+
+        if (!isLocalPlayer)
+        {
+            var changeJson = JsonUtility.ToJson(new InventoryChange { Loot = new ItemBase[] { item } });
+            connectionToClient.Send(Assets.Scripts.Networking.MessageIds.InventoryChange, new StringMessage(changeJson));
+        }
     }
 
     public void RemoveIds(IEnumerable<string> idEnumerable)
@@ -168,6 +181,50 @@ public class Inventory : NetworkBehaviour
             }
             Items.Remove(matchingItem);
         }
+    }
+
+    [Command]
+    public void CmdCraftItem(string[] componentIds, string selectedType, string selectedSubtype, bool isTwoHanded)
+    {
+        //Check that the components are actually in the player's inventory and load them in the order they are given
+        var components = new List<ItemBase>();
+        foreach (var id in componentIds)
+        {
+            components.Add(Items.FirstOrDefault(x => x.Id == id));
+        }
+
+        if (components.Count != componentIds.Count())
+        {
+            Debug.LogError("One or more IDs provided are not in the inventory");
+            return;
+        }
+
+        var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(components, selectedType, selectedSubtype, isTwoHanded);
+
+        var craftedType = craftedItem.GetType();
+
+        var invChange = new InventoryChange
+        {
+            IdsToRemove = componentIds.ToArray(),
+            Accessories = craftedType == typeof(Accessory) ? new Accessory[] { craftedItem as Accessory } : null,
+            Armor = craftedType == typeof(Armor) ? new Armor[] { craftedItem as Armor } : null,
+            Spells = craftedType == typeof(Spell) ? new Spell[] { craftedItem as Spell } : null,
+            Weapons = craftedType == typeof(Weapon) ? new Weapon[] { craftedItem as Weapon } : null
+        };
+
+        ApplyChanges(invChange);
+
+        if (!isLocalPlayer)
+        {
+            var itemJson = JsonUtility.ToJson(invChange);
+            connectionToClient.Send(Assets.Scripts.Networking.MessageIds.InventoryChange, new StringMessage(itemJson));
+        }
+    }
+
+    public void SetItemToSlotOnBoth(string slotName, string itemId)
+    {
+        SetItemToSlot(slotName, itemId);
+        CmdSetItemToSlot(slotName, itemId);
     }
 
     public void SetItemToSlot(string slotName, string itemId)
@@ -189,8 +246,12 @@ public class Inventory : NetworkBehaviour
         {
             EquippedItems[1] = itemId;
         }
+    }
 
-        var foo = "";
+    [Command]
+    private void CmdSetItemToSlot(string slotName, string itemId)
+    {
+        SetItemToSlot(slotName, itemId);
     }
 
 }

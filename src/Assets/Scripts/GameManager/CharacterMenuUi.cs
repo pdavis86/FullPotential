@@ -19,17 +19,11 @@ public class CharacterMenuUi : MonoBehaviour
     [SerializeField] private GameObject _rowPrefab;
 
     private Inventory _inventory;
-    private PlayerController _playerController;
     private GameObject _activeSlot;
 
     private void Awake()
     {
         _inventory = GameManager.Instance.LocalPlayer.GetComponent<Inventory>();
-    }
-
-    private void Start()
-    {
-        _playerController = GameManager.Instance.LocalPlayer.GetComponent<PlayerController>();
     }
 
     private void OnEnable()
@@ -40,7 +34,6 @@ public class CharacterMenuUi : MonoBehaviour
     public void ResetUi()
     {
         _componentsContainer.SetActive(false);
-        //todo:
     }
 
     public void OnSlotClick(Object clickedObject)
@@ -71,7 +64,14 @@ public class CharacterMenuUi : MonoBehaviour
         var rowRectTransform = _rowPrefab.GetComponent<RectTransform>();
         var rowCounter = 0;
 
-        foreach (var item in _inventory.Items.Where(x => itemTypes.Contains(x.GetType())))
+        var itemsOfTypes = _inventory.Items.Where(x => itemTypes.Contains(x.GetType()));
+
+        if (itemsOfTypes.Count() == 0)
+        {
+            Debug.LogWarning("There are no items of the correct type");
+        }
+
+        foreach (var item in itemsOfTypes)
         {
             var row = Instantiate(_rowPrefab, _componentsContainer.transform);
             row.transform.Find("ItemName").GetComponent<Text>().text = item.GetFullName();
@@ -86,7 +86,7 @@ public class CharacterMenuUi : MonoBehaviour
 
                     Tooltips.HideTooltip();
 
-                    _playerController.SetItemToSlotOnBoth(_activeSlot.name, item.Id);
+                    _inventory.SetItemToSlotOnBoth(_activeSlot.name, item.Id);
                     _componentsContainer.SetActive(false);
                     _componentsContainer.transform.Clear();
                 }

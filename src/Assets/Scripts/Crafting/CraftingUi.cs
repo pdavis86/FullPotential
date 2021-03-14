@@ -74,7 +74,7 @@ public class CraftingUi : MonoBehaviour
     private void CraftButtonOnClick()
     {
         _craftButton.interactable = false;
-        _playerController.CmdCraftItem(_components.Select(x => x.Id), GetSelectedType(), GetSelectedSubType(), GetSelectedHandedness());
+        _inventory.CmdCraftItem(_components.Select(x => x.Id).ToArray(), GetSelectedType(), GetSelectedSubType(), GetSelectedHandedness());
     }
 
     void SubTypeOnValueChanged(int index)
@@ -186,6 +186,8 @@ public class CraftingUi : MonoBehaviour
 
     public void LoadInventory()
     {
+        Debug.LogError("Reloading inv list");
+
         _components.Clear();
         _componentsContainer.transform.Clear();
 

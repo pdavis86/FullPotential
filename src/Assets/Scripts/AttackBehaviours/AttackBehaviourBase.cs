@@ -24,7 +24,8 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
     //    return _sceneObjects ?? (_sceneObjects = GameObject.Find("SceneObjects").GetComponent<SceneObjects001>());
     //}
 
-    [ServerCallback]
+    //todo find out why the client is trying to do damage
+    [Server]
     internal void DealDamage(ItemBase sourceItem, GameObject source, GameObject target, Vector3 position)
     {
         //if (!isServer)

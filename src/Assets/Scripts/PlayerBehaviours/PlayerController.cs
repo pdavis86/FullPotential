@@ -88,6 +88,8 @@ public class PlayerController : NetworkBehaviour
                 HasMenuOpen = _mainCanvasObjects.IsAnyMenuOpen();
                 _mainCanvasObjects.Hud.SetActive(!HasMenuOpen);
 
+                Tooltips.HideTooltip();
+
                 _toggleGameMenu = false;
                 _toggleCharacterMenu = false;
             }
@@ -162,7 +164,7 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    [ServerCallback]
+    [Server]
     private void SpawnSpellProjectile(Spell activeSpell, bool leftHand)
     {
         var startPos = PlayerCamera.transform.position + PlayerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
@@ -216,59 +218,9 @@ public class PlayerController : NetworkBehaviour
         {
             //Debug.Log("Interacted with " + interactable.gameObject.name);
 
-            var lootDrop = GameManager.Instance.ResultFactory.GetLootDrop();
-
-            //todo: Inventory.Add(lootDrop);
-
-            var lootDropJson = JsonUtility.ToJson(new InventoryChange
-            {
-                Loot = new ItemBase[] { lootDrop }
-            });
-            connectionToClient.Send(Assets.Scripts.Networking.MessageIds.InventoryChange, new StringMessage(lootDropJson));
+            //todo: move this into a script on the interactable
+            _inventory.Add(GameManager.Instance.ResultFactory.GetLootDrop());
         }
-    }
-
-    [Command]
-    public void CmdCraftItem(IEnumerable<string> componentIds, string selectedType, string selectedSubtype, bool isTwoHanded)
-    {
-        //Check that the components are actually in the player's inventory and load them in the order they are given
-        var components = new List<ItemBase>();
-        foreach (var id in componentIds)
-        {
-            components.Add(_inventory.Items.FirstOrDefault(x => x.Id == id));
-        }
-
-        if (components.Count != componentIds.Count())
-        {
-            Debug.LogError("One or more IDs provided are not in the inventory");
-            return;
-        }
-
-        var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(components, selectedType, selectedSubtype, isTwoHanded);
-
-        var craftedType = craftedItem.GetType();
-
-        var itemJson = JsonUtility.ToJson(new InventoryChange
-        {
-            IdsToRemove = componentIds.ToArray(),
-            Accessories = craftedType == typeof(Accessory) ? new Accessory[] { craftedItem as Accessory } : null,
-            Armor = craftedType == typeof(Armor) ? new Armor[] { craftedItem as Armor } : null,
-            Spells = craftedType == typeof(Spell) ? new Spell[] { craftedItem as Spell } : null,
-            Weapons = craftedType == typeof(Weapon) ? new Weapon[] { craftedItem as Weapon } : null
-        });
-        connectionToClient.Send(Assets.Scripts.Networking.MessageIds.InventoryChange, new StringMessage(itemJson));
-    }
-
-    public void SetItemToSlotOnBoth(string slotName, string itemId)
-    {
-        _inventory.SetItemToSlot(slotName, itemId);
-        //todo: ? CmdSetItemToSlot(slotName, itemId);
-    }
-
-    [Command]
-    private void CmdSetItemToSlot(string slotName, string itemId)
-    {
-        _inventory.SetItemToSlot(slotName, itemId);
     }
 
 
