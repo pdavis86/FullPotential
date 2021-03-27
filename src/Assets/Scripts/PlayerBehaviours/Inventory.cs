@@ -23,15 +23,31 @@ public class Inventory : NetworkBehaviour
     [HideInInspector]
     public List<ItemBase> Items;
 
-    [HideInInspector]
-    public string[] EquippedItems;
-
+    private string[] _equipSlots;
     private PlayerController _playerController;
+
+    private enum SlotIndexToGameObjectName
+    {
+        Helm,
+        Chest,
+        Legs,
+        Feet,
+        Barrier,
+        LeftHand,
+        RightHand,
+        LeftRing,
+        RightRing,
+        Gloves,
+        Belt,
+        Amulet
+    }
 
     private void Awake()
     {
         Items = new List<ItemBase>();
-        EquippedItems = new string[6];
+
+        //Must be the same length as SlotIndexToGameObjectName
+        _equipSlots = new string[12];
     }
 
     private void Start()
@@ -94,26 +110,28 @@ public class Inventory : NetworkBehaviour
             Debug.LogError($"Added {addedItemsCount} items to the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
         }
 
-        if (changes.EquipSlots.Length == EquippedItems.Length)
+        if (changes.EquipSlots.Length == _equipSlots.Length)
         {
-            EquippedItems = changes.EquipSlots;
+            _equipSlots = changes.EquipSlots;
         }
         else
         {
-            Debug.LogError("EquipSlots differed in length from EquippedItems");
+            Debug.LogError("Incoming EquipSlots length differed to existing");
 
-            if (changes.EquipSlots.Length > EquippedItems.Length)
+            if (changes.EquipSlots.Length > _equipSlots.Length)
             {
-                EquippedItems = changes.EquipSlots;
+                _equipSlots = changes.EquipSlots;
             }
             else
             {
                 for (var i = 0; i < changes.EquipSlots.Length; i++)
                 {
-                    EquippedItems[i] = changes.EquipSlots[i];
+                    _equipSlots[i] = changes.EquipSlots[i];
                 }
             }
         }
+
+        DebugLogEquippedItems();
     }
 
     private void ApplyChanges(Assets.Scripts.Data.InventoryChange changes)
@@ -141,7 +159,7 @@ public class Inventory : NetworkBehaviour
             Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray() as Armor[],
             Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray() as Spell[],
             Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray() as Weapon[],
-            EquipSlots = EquippedItems
+            EquipSlots = _equipSlots
         };
     }
 
@@ -236,15 +254,14 @@ public class Inventory : NetworkBehaviour
         //    Equipped.Remove(alreadyEquiped.Key);
         //}
 
-
         //todo: do this better
         if (slotName == "Left Hand")
         {
-            EquippedItems[0] = itemId;
+            _equipSlots[0] = itemId;
         }
         else
         {
-            EquippedItems[1] = itemId;
+            _equipSlots[1] = itemId;
         }
     }
 
@@ -252,6 +269,26 @@ public class Inventory : NetworkBehaviour
     private void CmdSetItemToSlot(string slotName, string itemId)
     {
         SetItemToSlot(slotName, itemId);
+    }
+
+
+
+
+
+    private void DebugLogEquippedItems()
+    {
+        for (var i = 0; i < _equipSlots.Length; i++)
+        {
+            if (_equipSlots[i] == string.Empty)
+            {
+                continue;
+            }
+
+            var item = Items.FirstOrDefault(x => x.Id == _equipSlots[i]);
+            var slotName = Enum.GetName(typeof(SlotIndexToGameObjectName), i);
+
+            Debug.Log($"Equiped '{item?.Name}' to slot '{slotName}'");
+        }
     }
 
 }
