@@ -40,8 +40,8 @@ public class CharacterMenuUi : MonoBehaviour
     {
         switch (clickedObject.name)
         {
-            case "Left Hand":
-            case "Right Hand":
+            case "LeftHand":
+            case "RightHand":
                 _activeSlot = clickedObject as GameObject;
                 LoadInventoryItems(new[] { typeof(Weapon), typeof(Spell) });
                 break;
@@ -82,7 +82,7 @@ public class CharacterMenuUi : MonoBehaviour
             {
                 if (isOn)
                 {
-                    Debug.Log($"Setting item for slot {_activeSlot.name} to be {item.Name}");
+                    Debug.Log($"Setting item for slot '{_activeSlot.name}' to be '{item.Name}'");
 
                     Tooltips.HideTooltip();
 
