@@ -17,8 +17,8 @@ public class Tooltips : MonoBehaviour
 
     private Text _tooltipText;
     private RectTransform _rect;
-    private bool _underPointer;
     private Vector3 _underOffset;
+    private Vector3 _leftOffset;
 
     private void Awake()
     {
@@ -32,14 +32,21 @@ public class Tooltips : MonoBehaviour
     {
         if (gameObject.activeSelf)
         {
-            if (!_underPointer)
-            {
-                transform.position = Input.mousePosition + new Vector3(1, 1);
-            }
-            else
-            {
-                transform.position = Input.mousePosition + _underOffset;
-            }
+            //if (!_underPointer)
+            //{
+            //    transform.position = Input.mousePosition + new Vector3(1, 1);
+            //}
+            //else
+            //{
+            //    transform.position = Input.mousePosition + _underOffset;
+            //}
+
+            var underPointer = Input.mousePosition.y + _rect.sizeDelta.y > Screen.height;
+            var leftOfPointer = Input.mousePosition.x + _rect.sizeDelta.x > Screen.width;
+
+            transform.position = Input.mousePosition +
+                (underPointer ? _underOffset : new Vector3(0, 1))
+                + (leftOfPointer ? _leftOffset : new Vector3(1, 0));
         }
     }
 
@@ -50,6 +57,9 @@ public class Tooltips : MonoBehaviour
         gameObject.SetActive(true);
         _tooltipText.text = tooltipText;
         _rect.sizeDelta = new Vector2(_tooltipText.preferredWidth + padding, _tooltipText.preferredHeight - 5);
+
+        _underOffset = new Vector3(1, -_rect.sizeDelta.y - 1);
+        _leftOffset = new Vector3(-_rect.sizeDelta.x - 1, 1);
 
         //Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, Camera.main.transform.position.z);
         //Debug.Log("screenCenter " + screenCenter);
@@ -71,9 +81,6 @@ public class Tooltips : MonoBehaviour
 
         //Debug.Log("Y delta " + _rect.sizeDelta.y);
         //Debug.Log("Y mouse " + Input.mousePosition.y);
-
-        _underPointer = Input.mousePosition.y + _rect.sizeDelta.y > Screen.height;
-        _underOffset = new Vector3(1, -_rect.sizeDelta.y - 1);
     }
 
     public void Hide()

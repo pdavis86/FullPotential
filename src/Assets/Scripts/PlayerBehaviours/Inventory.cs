@@ -75,16 +75,9 @@ public class Inventory : NetworkBehaviour
 
         var changes = JsonUtility.FromJson<InventoryChange>(netMsg.ReadMessage<StringMessage>().value);
         ApplyChanges(changes);
-
-        if (_playerController.HasMenuOpen && GameManager.Instance.MainCanvasObjects.CraftingUi.activeSelf)
-        {
-            var uiScript = GameManager.Instance.MainCanvasObjects.CraftingUi.GetComponent<CraftingUi>();
-            uiScript.ResetUi();
-            uiScript.LoadInventory();
-        }
     }
 
-    public void ApplyChanges(Assets.Scripts.Data.Inventory changes)
+    public void ApplyChanges(Assets.Scripts.Data.Inventory changes, bool firstSetup = false)
     {
         if (changes.MaxItems > 0)
         {
@@ -99,27 +92,50 @@ public class Inventory : NetworkBehaviour
 
         Items.AddRange(addedItems);
 
-        var addedItemsCount = addedItems.Count();
-
-        if (addedItemsCount == 1)
+        if (!firstSetup)
         {
-            var addedItem = addedItems.First();
+            var addedItemsCount = addedItems.Count();
 
-            //todo: make this a slide-out alert instead
-            Debug.LogWarning($"{addedItem.GetFullName()} was added");
-        }
-        else
-        {
-            //todo: make this a slide-out alert instead
-            //todo: only after initial setup
-            Debug.LogWarning($"Added {addedItemsCount} items to the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
+            if (addedItemsCount == 1)
+            {
+                var addedItem = addedItems.First();
+
+                //todo: make this a slide-out alert instead
+                Debug.LogWarning($"{addedItem.GetFullName()} was added");
+            }
+            else
+            {
+                //todo: make this a slide-out alert instead
+                //todo: only after initial setup
+                Debug.LogWarning($"Added {addedItemsCount} items to the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
+            }
         }
 
-        if (changes.EquipSlots.Length == EquipSlots.Length)
+        if (changes.EquipSlots != null)
         {
-            EquipSlots = changes.EquipSlots;
+            if (changes.EquipSlots.Length == EquipSlots.Length)
+            {
+                EquipSlots = changes.EquipSlots;
+            }
+            else
+            {
+                HandleOldSaveFile(changes);
+            }
+
+            //DebugLogEquippedItems();
         }
-        else
+
+        if (_playerController != null && _playerController.HasMenuOpen && GameManager.Instance.MainCanvasObjects.CraftingUi.activeSelf)
+        {
+            var uiScript = GameManager.Instance.MainCanvasObjects.CraftingUi.GetComponent<CraftingUi>();
+            uiScript.ResetUi();
+            uiScript.LoadInventory();
+        }
+    }
+
+    private void HandleOldSaveFile(Assets.Scripts.Data.Inventory changes)
+    {
+        if (changes.EquipSlots.Length != EquipSlots.Length)
         {
             Debug.LogWarning("Incoming EquipSlots length differed to existing");
 
@@ -135,8 +151,6 @@ public class Inventory : NetworkBehaviour
                 }
             }
         }
-
-        DebugLogEquippedItems();
     }
 
     private void ApplyChanges(Assets.Scripts.Data.InventoryChange changes)
@@ -278,20 +292,20 @@ public class Inventory : NetworkBehaviour
 
 
 
-    private void DebugLogEquippedItems()
-    {
-        for (var i = 0; i < EquipSlots.Length; i++)
-        {
-            if (EquipSlots[i] == string.Empty)
-            {
-                continue;
-            }
+    //private void DebugLogEquippedItems()
+    //{
+    //    for (var i = 0; i < EquipSlots.Length; i++)
+    //    {
+    //        if (EquipSlots[i] == string.Empty)
+    //        {
+    //            continue;
+    //        }
 
-            var item = Items.FirstOrDefault(x => x.Id == EquipSlots[i]);
-            var slotName = Enum.GetName(typeof(SlotIndexToGameObjectName), i);
+    //        var item = Items.FirstOrDefault(x => x.Id == EquipSlots[i]);
+    //        var slotName = Enum.GetName(typeof(SlotIndexToGameObjectName), i);
 
-            Debug.Log($"Equiped '{item?.Name}' to slot '{slotName}'");
-        }
-    }
+    //        Debug.Log($"Equiped '{item?.Name}' to slot '{slotName}'");
+    //    }
+    //}
 
 }

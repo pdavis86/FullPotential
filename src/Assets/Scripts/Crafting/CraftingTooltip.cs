@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 // ReSharper disable once CheckNamespace
@@ -9,7 +10,7 @@ using UnityEngine.EventSystems;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
 
-//todo: rename as this is a generic tooltip script now
+//todo: rename to TooltipBehaviour
 public class CraftingTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public delegate void PointerEnterEventDelegate(PointerEventData eventData);
@@ -23,6 +24,18 @@ public class CraftingTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public void OnPointerExit(PointerEventData eventData)
     {
         Tooltips.HideTooltip();
+    }
+
+    public void ClearHandlers()
+    {
+        if (OnPointerEnterForTooltip == null)
+        {
+            return;
+        }
+        foreach (Delegate d in OnPointerEnterForTooltip.GetInvocationList())
+        {
+            OnPointerEnterForTooltip -= (PointerEnterEventDelegate)d;
+        }
     }
 
 }

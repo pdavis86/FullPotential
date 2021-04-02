@@ -186,7 +186,7 @@ public class CraftingUi : MonoBehaviour
 
     public void LoadInventory()
     {
-        Debug.LogError("Reloading inv list");
+        //Debug.Log("Reloading inv list");
 
         _components.Clear();
         _componentsContainer.transform.Clear();

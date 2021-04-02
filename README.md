@@ -2,9 +2,8 @@
 Inspired by the Minecraft mod Ars Magica 2, Skyrim, the Borderlands series, Final Fantasy 12 and the Oasis from the book Ready Player One, this game allows the player to explore their abilities in a new way.
 
 ## Key Features
-- At the beginning, the player has no mana regeneration. They must unlock augments to gain mana from a variety of sources and actions.
-- Spells have randomly generated stats meaning the player must level up to be able to craft a more powerful version.
-- To unlock the next tier of abilities, players must level up the abilities they currently have.
+- There is no player level. Each weapon type and spell type has its own level.
+- Components for crafting items or spells have randomly generated stats. This means you can craft any level item/spell but can only use it once you reach the required level.
 
 ## Credit
 - I mainly learned how to use Unity from the tutorials on https://www.youtube.com/user/Brackeys
@@ -23,24 +22,30 @@ Inspired by the Minecraft mod Ars Magica 2, Skyrim, the Borderlands series, Fina
 - Network play
 - Basic mod support
 
-### v0.2 - Fleshing out
+### v0.2 - More features
 - Armor
 - Elemental resitances
-- Stamina + Mana
-- Skill tree
-- Consumables
+- Weapon/skill leveling
 - Breaking down of items
-- Weapon reloaders
 
-### v0.3 - Vehicles
+### v0.5 - Vehicles
 - Nuff said
 
-### v0.4 Better Graphices
+### v0.4 - Final Features
+- Stamina + Mana
+- Weapon reloaders
+- Consumables
+- Localisation
+
+### v0.5 Better Graphices
 With the gameplay working, I want to make it look better!
 - Ability to customise cosmetics of gear
 
-### v0.3 - Beginnings of a story
+### v0.6 - Beginnings of a story
 - I have some ideas but they need more work
 
 ### v1.0 - First stable version
-- who knows...
+- ???
+
+### v1.1 - Multiple worlds
+- ???

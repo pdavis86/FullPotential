@@ -176,7 +176,7 @@ public class PlayerSetup : NetworkBehaviour
     {
         var loadData = JsonUtility.FromJson<PlayerData>(loadJson);
 
-        _inventory.ApplyChanges(loadData.Inventory);
+        _inventory.ApplyChanges(loadData.Inventory, true);
 
         //todo: load other player data into correct objects
     }
