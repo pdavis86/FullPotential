@@ -238,7 +238,7 @@ namespace Assets.Scripts.Crafting.Results
 
         private string GetItemName(string prefix, GearBase item)
         {
-            return $"{prefix} {item.Attributes.Strength} {item.Type}";
+            return $"{prefix} {item.Attributes.Strength} {item.SubType}";
         }
 
         internal Weapon GetMeleeWeapon(string type, IEnumerable<ItemBase> components, bool isTwoHanded)
@@ -246,7 +246,7 @@ namespace Assets.Scripts.Crafting.Results
             var item = new Weapon
             {
                 Id = Guid.NewGuid().ToString(),
-                Type = type,
+                SubType = type,
                 IsTwoHanded = isTwoHanded,
                 Attributes = new Attributes
                 {
@@ -265,7 +265,7 @@ namespace Assets.Scripts.Crafting.Results
             var item = new Weapon
             {
                 Id = Guid.NewGuid().ToString(),
-                Type = type,
+                SubType = type,
                 IsTwoHanded = isTwoHanded,
                 Attributes = new Attributes
                 {
@@ -289,7 +289,7 @@ namespace Assets.Scripts.Crafting.Results
             var item = new Weapon
             {
                 Id = Guid.NewGuid().ToString(),
-                Type = Weapon.Shield,
+                SubType = Weapon.Shield,
                 Attributes = new Attributes
                 {
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
@@ -308,7 +308,7 @@ namespace Assets.Scripts.Crafting.Results
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = "Unnamed Armor",
-                Type = type,
+                SubType = type,
                 Attributes = new Attributes
                 {
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength)
@@ -324,7 +324,7 @@ namespace Assets.Scripts.Crafting.Results
             var item = new Armor
             {
                 Id = Guid.NewGuid().ToString(),
-                Type = Armor.Barrier,
+                SubType = Armor.Barrier,
                 Attributes = new Attributes
                 {
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
@@ -343,7 +343,7 @@ namespace Assets.Scripts.Crafting.Results
             var item = new Accessory
             {
                 Id = Guid.NewGuid().ToString(),
-                Type = type,
+                SubType = type,
                 Attributes = new Attributes
                 {
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength)
@@ -376,9 +376,9 @@ namespace Assets.Scripts.Crafting.Results
                     case Armor.Chest: return GetArmor(Armor.Chest, components);
                     case Armor.Legs: return GetArmor(Armor.Legs, components);
                     case Armor.Feet: return GetArmor(Armor.Feet, components);
-                    case Armor.Gloves: return GetArmor(Armor.Gloves, components);
                     case Armor.Barrier: return GetBarrier(components);
 
+                    case Accessory.Gloves: return GetAccessory(Accessory.Gloves, components);
                     case Accessory.Amulet: return GetAccessory(Accessory.Amulet, components);
                     case Accessory.Ring: return GetAccessory(Accessory.Ring, components);
                     case Accessory.Belt: return GetAccessory(Accessory.Belt, components);

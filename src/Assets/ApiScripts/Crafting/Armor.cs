@@ -11,7 +11,6 @@ namespace Assets.Scripts.Crafting.Results
         public const string Chest = "Chest";
         public const string Legs = "Legs";
         public const string Feet = "Feet";
-        public const string Gloves = "Gloves";
         public const string Barrier = "Barrier";
 
         public static readonly List<string> ArmorOptions = new List<string>
@@ -20,7 +19,6 @@ namespace Assets.Scripts.Crafting.Results
             Chest,
             Legs,
             Feet,
-            Gloves,
             Barrier
         };
 
