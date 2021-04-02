@@ -261,22 +261,25 @@ public class Inventory : NetworkBehaviour
     public void SetItemToSlotOnBoth(string slotName, string itemId)
     {
         SetItemToSlot(slotName, itemId);
-        CmdSetItemToSlot(slotName, itemId);
+        if (!isServer)
+        {
+            CmdSetItemToSlot(slotName, itemId);
+        }
     }
 
     public void SetItemToSlot(string slotName, string itemId)
     {
-        //todo: 
-        //var alreadyEquiped = Equipped.FirstOrDefault(x => x.Value == itemId);
-        //if (!string.IsNullOrWhiteSpace(alreadyEquiped.Key))
-        //{
-        //    Equipped.Remove(alreadyEquiped.Key);
-        //}
-
         if (!Enum.TryParse<SlotIndexToGameObjectName>(slotName, out var slotReult))
         {
             Debug.LogError($"Failed to find slot for name {slotName}");
             return;
+        }
+
+        var equippedIndex = Array.IndexOf(EquipSlots, itemId);
+        if (equippedIndex >= 0)
+        {
+            Debug.Log($"{itemId} is already assigned to slot {equippedIndex}");
+            EquipSlots[equippedIndex] = null;
         }
 
         EquipSlots[(int)slotReult] = itemId;

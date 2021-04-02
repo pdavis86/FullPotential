@@ -26,7 +26,6 @@ public class CraftingUi : MonoBehaviour
     [SerializeField] private Button _craftButton;
 
     private Inventory _inventory;
-    private PlayerController _playerController;
     private List<ItemBase> _components;
 
     //todo: move these. used in various places
@@ -62,7 +61,6 @@ public class CraftingUi : MonoBehaviour
         _components = new List<ItemBase>();
 
         _inventory = GameManager.Instance.LocalPlayer.GetComponent<Inventory>();
-        _playerController = GameManager.Instance.LocalPlayer.GetComponent<PlayerController>();
 
         _typeDropdown.onValueChanged.AddListener(TypeOnValueChanged);
 
@@ -261,6 +259,11 @@ public class CraftingUi : MonoBehaviour
     //todo: move this as it is used in various places
     public static string GetItemDescription(ItemBase item, bool includeName = true)
     {
+        if (item == null)
+        {
+            return null;
+        }
+
         var sb = new StringBuilder();
 
         if (includeName) { sb.Append($"Name: {item.Name}\n"); }

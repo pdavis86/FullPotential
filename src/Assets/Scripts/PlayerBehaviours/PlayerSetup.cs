@@ -101,10 +101,16 @@ public class PlayerSetup : NetworkBehaviour
 
     private void OnDisable()
     {
-        Save();
+        if (isServer)
+        {
+            Save();
+        }
 
-        if (GameManager.Instance.MainCanvasObjects.Hud != null) { GameManager.Instance.MainCanvasObjects.Hud.SetActive(false); }
-        if (_sceneCamera != null) { _sceneCamera.gameObject.SetActive(true); }
+        if (GameManager.Instance != null)
+        {
+            if (GameManager.Instance.MainCanvasObjects.Hud != null) { GameManager.Instance.MainCanvasObjects.Hud.SetActive(false); }
+            if (_sceneCamera != null) { _sceneCamera.gameObject.SetActive(true); }
+        }
     }
 
     private void SetPlayerTexture(string playerSkinUri)

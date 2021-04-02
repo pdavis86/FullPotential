@@ -20,7 +20,7 @@ public class CharacterMenuUi : MonoBehaviour
     [SerializeField] private GameObject _slotsContainer;
 
     private Inventory _inventory;
-    private GameObject _activeSlot;
+    private GameObject _lastClickedSlot;
 
     private void Awake()
     {
@@ -36,7 +36,7 @@ public class CharacterMenuUi : MonoBehaviour
     {
         //todo: set to image of the item selected instead
         var slotImage = slot.transform.Find("Image").GetComponent<Image>();
-        slotImage.sprite = null;
+        slotImage.color = item != null ? Color.white : Color.clear;
 
         var tooltip = slot.GetComponent<CraftingTooltip>();
         if (tooltip != null)
@@ -75,18 +75,23 @@ public class CharacterMenuUi : MonoBehaviour
     {
         _componentsContainer.SetActive(false);
         _componentsContainer.transform.Clear();
-        _activeSlot = null;
+        _lastClickedSlot = null;
 
         if (reloadSlots)
         {
             for (var i = 0; i < _inventory.EquipSlots.Length; i++)
             {
+                var slotName = System.Enum.GetName(typeof(Inventory.SlotIndexToGameObjectName), i);
+
                 var itemId = _inventory.EquipSlots[i];
                 if (!string.IsNullOrWhiteSpace(itemId))
                 {
-                    var slotName = System.Enum.GetName(typeof(Inventory.SlotIndexToGameObjectName), i);
                     //Debug.Log($"Displaying '{itemId}' in UI slot '{slotName}'");
-                    SetSlot(GetSlot(slotName), _inventory.Items.First(x => x.Id == itemId));
+                    SetSlot(GetSlot(slotName), _inventory.Items.FirstOrDefault(x => x.Id == itemId));
+                }
+                else
+                {
+                    SetSlot(GetSlot(slotName), null);
                 }
             }
         }
@@ -94,7 +99,7 @@ public class CharacterMenuUi : MonoBehaviour
 
     public void OnSlotClick(GameObject clickedObject)
     {
-        if (_activeSlot == clickedObject)
+        if (_lastClickedSlot == clickedObject)
         {
             ResetUi();
             return;
@@ -102,31 +107,31 @@ public class CharacterMenuUi : MonoBehaviour
 
         switch (clickedObject.name)
         {
-            case nameof(Inventory.SlotIndexToGameObjectName.Helm): LoadInventoryItems(new[] { typeof(Armor) }, Armor.Helm); break;
-            case nameof(Inventory.SlotIndexToGameObjectName.Chest): LoadInventoryItems(new[] { typeof(Armor) }, Armor.Chest); break;
-            case nameof(Inventory.SlotIndexToGameObjectName.Legs): LoadInventoryItems(new[] { typeof(Armor) }, Armor.Legs); break;
-            case nameof(Inventory.SlotIndexToGameObjectName.Feet): LoadInventoryItems(new[] { typeof(Armor) }, Armor.Feet); break;
-            case nameof(Inventory.SlotIndexToGameObjectName.Barrier): LoadInventoryItems(new[] { typeof(Armor) }, Armor.Barrier); break;
+            case nameof(Inventory.SlotIndexToGameObjectName.Helm): LoadInventoryItems(clickedObject, new[] { typeof(Armor) }, Armor.Helm); break;
+            case nameof(Inventory.SlotIndexToGameObjectName.Chest): LoadInventoryItems(clickedObject, new[] { typeof(Armor) }, Armor.Chest); break;
+            case nameof(Inventory.SlotIndexToGameObjectName.Legs): LoadInventoryItems(clickedObject, new[] { typeof(Armor) }, Armor.Legs); break;
+            case nameof(Inventory.SlotIndexToGameObjectName.Feet): LoadInventoryItems(clickedObject, new[] { typeof(Armor) }, Armor.Feet); break;
+            case nameof(Inventory.SlotIndexToGameObjectName.Barrier): LoadInventoryItems(clickedObject, new[] { typeof(Armor) }, Armor.Barrier); break;
 
             case nameof(Inventory.SlotIndexToGameObjectName.LeftHand):
-            case nameof(Inventory.SlotIndexToGameObjectName.RightHand): LoadInventoryItems(new[] { typeof(Weapon), typeof(Spell) }); break;
+            case nameof(Inventory.SlotIndexToGameObjectName.RightHand): LoadInventoryItems(clickedObject, new[] { typeof(Weapon), typeof(Spell) }); break;
 
             case nameof(Inventory.SlotIndexToGameObjectName.LeftRing):
-            case nameof(Inventory.SlotIndexToGameObjectName.RightRing): LoadInventoryItems(new[] { typeof(Accessory) }, Accessory.Ring); break;
+            case nameof(Inventory.SlotIndexToGameObjectName.RightRing): LoadInventoryItems(clickedObject, new[] { typeof(Accessory) }, Accessory.Ring); break;
 
-            case nameof(Inventory.SlotIndexToGameObjectName.Gloves): LoadInventoryItems(new[] { typeof(Accessory) }, Accessory.Gloves); break;
-            case nameof(Inventory.SlotIndexToGameObjectName.Amulet): LoadInventoryItems(new[] { typeof(Accessory) }, Accessory.Amulet); break;
-            case nameof(Inventory.SlotIndexToGameObjectName.Belt): LoadInventoryItems(new[] { typeof(Accessory) }, Accessory.Belt); break;
+            case nameof(Inventory.SlotIndexToGameObjectName.Gloves): LoadInventoryItems(clickedObject, new[] { typeof(Accessory) }, Accessory.Gloves); break;
+            case nameof(Inventory.SlotIndexToGameObjectName.Amulet): LoadInventoryItems(clickedObject, new[] { typeof(Accessory) }, Accessory.Amulet); break;
+            case nameof(Inventory.SlotIndexToGameObjectName.Belt): LoadInventoryItems(clickedObject, new[] { typeof(Accessory) }, Accessory.Belt); break;
 
             default:
                 Debug.LogError($"Cannot handle click for slot {clickedObject.name}");
                 return;
         }
 
-        _activeSlot = clickedObject;
+        _lastClickedSlot = clickedObject;
     }
 
-    private void LoadInventoryItems(IEnumerable<System.Type> itemTypes, string gearSubType = null)
+    private void LoadInventoryItems(GameObject slot, IEnumerable<System.Type> itemTypes, string gearSubType = null)
     {
         //todo: once this is working make the gameobjects and code code common with crafting ui
 
@@ -143,11 +148,11 @@ public class CharacterMenuUi : MonoBehaviour
 
             if (!string.IsNullOrWhiteSpace(gearSubType) && x is GearBase gearItem)
             {
-                return !_inventory.EquipSlots.Contains(x.Id) && gearItem.SubType == gearSubType;
+                return gearItem.SubType == gearSubType;
             }
             else
             {
-                return !_inventory.EquipSlots.Contains(x.Id) && itemTypes.Contains(itemType);
+                return itemTypes.Contains(itemType);
             }
         });
 
@@ -162,6 +167,12 @@ public class CharacterMenuUi : MonoBehaviour
             var row = Instantiate(_rowPrefab, _componentsContainer.transform);
             row.transform.Find("ItemName").GetComponent<Text>().text = item.GetFullName();
 
+            var rowImage = row.GetComponent<Image>();
+            if (_inventory.EquipSlots.Contains(item.Id))
+            {
+                rowImage.color = Color.green;
+            }
+
             var toggle = row.GetComponent<Toggle>();
             toggle.onValueChanged.AddListener(isOn =>
             {
@@ -169,13 +180,13 @@ public class CharacterMenuUi : MonoBehaviour
                 {
                     Tooltips.HideTooltip();
 
-                    //Debug.Log($"Setting item for slot '{_activeSlot.name}' to be '{item.Name}'");
+                    //Debug.Log($"Setting item for slot '{slot.name}' to be '{item.Name}'");
 
-                    _inventory.SetItemToSlotOnBoth(_activeSlot.name, item.Id);
+                    _inventory.SetItemToSlotOnBoth(slot.name, item.Id);
 
-                    SetSlot(_activeSlot, item);
+                    SetSlot(slot, item);
 
-                    ResetUi();
+                    ResetUi(true);
                 }
             });
 

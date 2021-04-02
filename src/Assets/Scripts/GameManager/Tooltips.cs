@@ -90,7 +90,10 @@ public class Tooltips : MonoBehaviour
 
     public static void ShowTooltip(string tooltipText)
     {
-        _instance.Show(tooltipText);
+        if (!string.IsNullOrWhiteSpace(tooltipText))
+        {
+            _instance.Show(tooltipText);
+        }
     }
 
     public static void HideTooltip()
