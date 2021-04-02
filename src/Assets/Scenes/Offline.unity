@@ -7473,6 +7473,7 @@ MonoBehaviour:
   _componentsContainer: {fileID: 752858000}
   _rowPrefab: {fileID: 1968345984366169301, guid: abf3e7803ab9d2d428a182dd689563e9,
     type: 3}
+  _slotsContainer: {fileID: 1802245224}
 --- !u!224 &1711951092375246250
 RectTransform:
   m_ObjectHideFlags: 0
