@@ -24,15 +24,15 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
     //    return _sceneObjects ?? (_sceneObjects = GameObject.Find("SceneObjects").GetComponent<SceneObjects001>());
     //}
 
-    //todo find out why the client is trying to do damage
-    [Server]
+    //todo: [Server]
     internal void DealDamage(ItemBase sourceItem, GameObject source, GameObject target, Vector3 position)
     {
-        //if (!isServer)
-        //{
-        //    //Debug.LogError("Player tried to deal damage instead of server");
-        //    return;
-        //}
+        //todo find out why the client is trying to do damage
+        if (!isServer)
+        {
+            Debug.LogError("Player tried to deal damage instead of server");
+            return;
+        }
 
         //todo: crit? if so, what is it?
         //todo: half-damage for duel-weilding

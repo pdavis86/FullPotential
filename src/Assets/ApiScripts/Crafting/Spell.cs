@@ -15,6 +15,10 @@ namespace Assets.Scripts.Crafting.Results
 
 
 
+
+
+        //todo: everything below here should be "registered" rather than hard-coded
+
         public abstract class BuffEffects
         {
             public const string Regen = "Regen";

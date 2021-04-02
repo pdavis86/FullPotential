@@ -25,13 +25,12 @@ public class SpellBehaviour : AttackBehaviourBase
             ? NetworkServer.FindLocalObject(new NetworkInstanceId(PlayerNetworkId))
             : ClientScene.FindLocalObject(new NetworkInstanceId(PlayerNetworkId));
 
-        var playerController = SourcePlayer.GetComponent<PlayerController>();
-
         Physics.IgnoreCollision(GetComponent<Collider>(), SourcePlayer.GetComponent<Collider>());
 
         if (!isServer)
         {
-            //Debug.LogError("Player tried to deal damage instead of server");
+            //todo: this check should not be necessary
+            Debug.LogError("Player tried to deal damage instead of server");
             return;
         }
 
@@ -41,6 +40,8 @@ public class SpellBehaviour : AttackBehaviourBase
         //{
         //    Debug.LogError("I don't have a SourcePlayer :'(");
         //}
+
+        var playerController = SourcePlayer.GetComponent<PlayerController>();
 
         Spell = playerController.GetPlayerActiveSpell();
 
@@ -61,6 +62,8 @@ public class SpellBehaviour : AttackBehaviourBase
 
     private void OnTriggerEnter(Collider other)
     {
+        //todo: allow spell to be triggered after number of seconds, not just on collision
+
         try
         {
             //Debug.Log("Collided with " + other.gameObject.name);
