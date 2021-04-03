@@ -1,4 +1,5 @@
-﻿using Assets.Core.Crafting;
+﻿using Assets.Core.Constants;
+using Assets.Core.Crafting;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -73,16 +74,13 @@ public class SpellBehaviour : AttackBehaviourBase
         {
             //Debug.Log("Collided with " + other.gameObject.name);
 
-            if (other.gameObject.CompareTag("Projectile"))
+            if (other.gameObject.CompareTag(Tags.Projectile))
             {
                 //Debug.Log("You hit a Projectile");
                 return;
             }
 
-            if (other.gameObject.CompareTag("Player") || other.gameObject.CompareTag("Enemy"))
-            {
-                DealDamage(Spell, gameObject, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
-            }
+            DealDamage(Spell, gameObject, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
 
             //Debug.Log("You hit something not damageable");
 

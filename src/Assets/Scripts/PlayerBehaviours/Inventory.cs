@@ -84,7 +84,7 @@ public class Inventory : NetworkBehaviour
         {
             if (changes == null)
             {
-                Debug.Log("No inventory changes supplied");
+                //Debug.Log("No inventory changes supplied");
                 return true;
             }
 
@@ -178,7 +178,7 @@ public class Inventory : NetworkBehaviour
             var itemsRemoved = Items.RemoveAll(x => changes.IdsToRemove.Contains(x.Id));
 
             //todo: make this a slide-out alert instead
-            Debug.Log($"Removed {itemsRemoved} items from the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
+            Debug.LogWarning($"Removed {itemsRemoved} items from the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
         }
     }
 
@@ -294,7 +294,7 @@ public class Inventory : NetworkBehaviour
         var equippedIndex = Array.IndexOf(EquipSlots, itemId);
         if (equippedIndex >= 0)
         {
-            Debug.Log($"{itemId} is already assigned to slot {equippedIndex}");
+            //Debug.Log($"{itemId} is already assigned to slot {equippedIndex}");
             EquipSlots[equippedIndex] = null;
         }
 

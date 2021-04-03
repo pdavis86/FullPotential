@@ -1,4 +1,5 @@
-﻿using Assets.Core.Crafting;
+﻿using Assets.Core.Constants;
+using Assets.Core.Crafting;
 using System;
 using System.Globalization;
 using UnityEngine;
@@ -29,25 +30,29 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
         //todo: half-damage for duel-weilding
         //todo: give source experience
 
-        if (!target.CompareTag("Player") && !target.CompareTag("Enemy"))
+        var targetIsPlayer = target.CompareTag(Tags.Player);
+        var targetIsEnemy = target.CompareTag(Tags.Enemy);
+
+        if (!targetIsPlayer && !targetIsEnemy)
         {
             //Debug.Log("You hit something not damageable");
             return;
         }
 
-        //todo: calc damage
+        //todo: calc defense
         var defenseStrength = 30;
+
         var numerator = 100 + _random.Next(0, 10);
         var denominator = 100 + _random.Next(-10, 10);
         var damageDealt = Math.Round(sourceItem.Attributes.Strength * ((double)numerator / (denominator + defenseStrength)), 0);
 
         Debug.Log($"Source '{sourceItem.Name}' attacked target '{target.name}' for {damageDealt} damage");
 
+        //todo: For dealing damage, look at https://docs.unity3d.com/2018.1/Documentation/ScriptReference/Networking.SyncEventAttribute.html
+
         var networkIdentity = SourcePlayer.GetComponent<NetworkIdentity>();
         var controller = SourcePlayer.GetComponent<PlayerController>();
         controller.TargetRpcShowDamage(networkIdentity.connectionToClient, position, damageDealt.ToString(CultureInfo.InvariantCulture));
-
-        //todo: For dealing damage, look at https://docs.unity3d.com/2018.1/Documentation/ScriptReference/Networking.SyncEventAttribute.html
     }
 
 }

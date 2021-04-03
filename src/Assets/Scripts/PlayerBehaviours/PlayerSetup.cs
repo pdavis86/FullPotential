@@ -149,7 +149,7 @@ public class PlayerSetup : NetworkBehaviour
         }
         else
         {
-            Debug.Log("No save file found");
+            //Debug.Log("No save file found");
             LoadFromPlayerData(new PlayerData
             {
                 //todo: finish load code

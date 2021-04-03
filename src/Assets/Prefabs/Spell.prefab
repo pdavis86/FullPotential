@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 6447200508839985312}
   m_Layer: 0
   m_Name: Spell
-  m_TagString: Spell
+  m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -146,6 +146,7 @@ MonoBehaviour:
     Targeting: 
     Shape: 
   PlayerNetworkId: 0
+  SpellId: 
 --- !u!114 &7697724776256515342
 MonoBehaviour:
   m_ObjectHideFlags: 0

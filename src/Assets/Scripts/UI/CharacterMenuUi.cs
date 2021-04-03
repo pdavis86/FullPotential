@@ -53,8 +53,6 @@ public class CharacterMenuUi : MonoBehaviour
 
     private GameObject GetSlot(string slotName)
     {
-        //todo: do this better
-
         var lhs = _slotsContainer.transform.Find("LHS");
         var leftAttempt = lhs.Find(slotName);
         if (leftAttempt != null)
@@ -69,7 +67,7 @@ public class CharacterMenuUi : MonoBehaviour
             return rightAttempt.gameObject;
         }
 
-        Debug.Log($"Failed to find slot {slotName}");
+        Debug.LogError($"Failed to find slot {slotName}");
         return null;
     }
 
