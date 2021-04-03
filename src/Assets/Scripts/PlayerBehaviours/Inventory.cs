@@ -208,7 +208,6 @@ public class Inventory : NetworkBehaviour
     {
         if (Items.Count == MaxItems)
         {
-            //todo: send to storage instead
             //Debug.Log("Your inventory is at max");
             return;
         }

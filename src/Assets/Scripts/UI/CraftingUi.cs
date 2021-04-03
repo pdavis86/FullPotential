@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 // ReSharper disable CheckNamespace
@@ -177,49 +178,80 @@ public class CraftingUi : MonoBehaviour
 
     public void LoadInventory()
     {
-        //Debug.Log("Reloading inv list");
-
         _components.Clear();
-        _componentsContainer.transform.Clear();
 
-        var rowRectTransform = _rowPrefab.GetComponent<RectTransform>();
-        var rowCounter = 0;
+        InventoryItemsList.LoadInventoryItems(
+            null,
+            _componentsContainer,
+            _rowPrefab,
+            _inventory,
+            HandleRowToggle, 
+            null,
+            null,
+            false
+        );
 
-        foreach (var item in _inventory.Items)
+        //_componentsContainer.transform.Clear();
+
+        //var rowRectTransform = _rowPrefab.GetComponent<RectTransform>();
+        //var rowCounter = 0;
+
+        //foreach (var item in _inventory.Items)
+        //{
+        //    var row = Instantiate(_rowPrefab, _componentsContainer.transform);
+        //    row.transform.Find("ItemName").GetComponent<Text>().text = item.GetFullName();
+
+        //    var rowImage = row.GetComponent<Image>();
+        //    var toggle = row.GetComponent<Toggle>();
+        //    toggle.onValueChanged.AddListener(isOn =>
+        //    {
+        //        if (isOn)
+        //        {
+        //            rowImage.color = Color.green;
+        //            AddComponent(item.Id);
+        //        }
+        //        else
+        //        {
+        //            rowImage.color = Color.white;
+        //            RemoveComponent(item.Id);
+        //        }
+
+        //        UpdateResults();
+        //    });
+
+        //    var tooltip = row.GetComponent<Tooltip>();
+        //    tooltip.OnPointerEnterForTooltip += pointerEventData =>
+        //    {
+        //        Tooltips.ShowTooltip(ResultFactory.GetItemDescription(item, false));
+        //    };
+
+        //    rowCounter++;
+        //}
+
+        //const int spacer = 5;
+        //var containerRectTrans = _componentsContainer.GetComponent<RectTransform>();
+        //containerRectTrans.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rowCounter * (rowRectTransform.rect.height + spacer));
+    }
+
+    private void HandleRowToggle(GameObject row, GameObject slot, ItemBase item)
+    {
+        var rowImage = row.GetComponent<Image>();
+        var toggle = row.GetComponent<Toggle>();
+        toggle.onValueChanged.AddListener(isOn =>
         {
-            var row = Instantiate(_rowPrefab, _componentsContainer.transform);
-            row.transform.Find("ItemName").GetComponent<Text>().text = item.GetFullName();
-
-            var rowImage = row.GetComponent<Image>();
-            var toggle = row.GetComponent<Toggle>();
-            toggle.onValueChanged.AddListener(isOn =>
+            if (isOn)
             {
-                if (isOn)
-                {
-                    rowImage.color = Color.green;
-                    AddComponent(item.Id);
-                }
-                else
-                {
-                    rowImage.color = Color.white;
-                    RemoveComponent(item.Id);
-                }
-
-                UpdateResults();
-            });
-
-            var tooltip = row.GetComponent<Tooltip>();
-            tooltip.OnPointerEnterForTooltip += pointerEventData =>
+                rowImage.color = Color.green;
+                AddComponent(item.Id);
+            }
+            else
             {
-                Tooltips.ShowTooltip(ResultFactory.GetItemDescription(item, false));
-            };
+                rowImage.color = Color.white;
+                RemoveComponent(item.Id);
+            }
 
-            rowCounter++;
-        }
-
-        const int spacer = 5;
-        var containerRectTrans = _componentsContainer.GetComponent<RectTransform>();
-        containerRectTrans.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rowCounter * (rowRectTransform.rect.height + spacer));
+            UpdateResults();
+        });
     }
 
     private string GetSelectedType()
