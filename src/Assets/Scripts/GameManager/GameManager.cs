@@ -13,9 +13,6 @@ using UnityEngine.UI;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable ArrangeAccessorOwnerBody
 
-//todo: api for world creation
-//todo: skin library website. By skin type, ordered by popularity
-
 public class GameManager : MonoBehaviour
 {
     //todo: move these

@@ -34,13 +34,5 @@ namespace Assets.Core.Crafting
         };
 
         public bool IsTwoHanded;
-
-        /* todo: weapon reloaders
-         * Standard (you lose remaining ammo in the magazine)
-         * Consolidator (automatically extracts remaining ammo and moves into a non-full magazine)
-         * Teleporter (automatically buys bullets and teleports them into the magazine)
-         */
-
-        //todo: cosmetics per part of weapon
     }
 }

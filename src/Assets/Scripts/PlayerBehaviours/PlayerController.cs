@@ -41,7 +41,6 @@ public class PlayerController : NetworkBehaviour
     {
         try
         {
-            //todo: Keep controls simple so they can be mapped to PS4 controller
             var mappings = GameManager.Instance.InputMappings;
 
             if (Input.GetKeyDown(mappings.GameMenu)) { _toggleGameMenu = true; }

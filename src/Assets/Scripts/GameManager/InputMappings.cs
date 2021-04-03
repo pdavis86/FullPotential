@@ -10,7 +10,10 @@
 
 public class InputMappings : MonoBehaviour
 {
-    /*Start*/public KeyCode GameMenu = KeyCode.Escape;
+    //NOTE: Keep controls simple so they can be mapped to PS4 controller
+
+    /*Start*/
+    public KeyCode GameMenu = KeyCode.Escape;
     /*Options*/public KeyCode CharacterMenu = KeyCode.Tab;
 
     /*Square*/public KeyCode Interact = KeyCode.E;

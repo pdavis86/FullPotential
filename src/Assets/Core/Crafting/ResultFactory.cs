@@ -11,8 +11,6 @@ namespace Assets.Core.Crafting
         public const string LootPrefixScrap = "Scrap";
         public const string LootPrefixShard = "Shard";
 
-        //todo: Build cars: distribute points to top speed acceleration etc. Using scrap with high enough values
-
         // ReSharper disable once InconsistentNaming
         private static readonly Random _random = new Random();
 
