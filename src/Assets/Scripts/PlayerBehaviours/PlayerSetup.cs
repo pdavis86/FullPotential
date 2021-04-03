@@ -171,7 +171,7 @@ public class PlayerSetup : NetworkBehaviour
 
     private void LoadFromPlayerData(PlayerData loadData)
     {
-        //todo:
+        //todo: set texture URI
         _textureUri = string.Empty;
         _loadWasSuccessful = _inventory.ApplyChanges(loadData.Inventory, true);
     }
