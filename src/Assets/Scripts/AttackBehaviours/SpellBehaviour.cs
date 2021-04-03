@@ -1,5 +1,6 @@
 ﻿using Assets.Core.Crafting;
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -13,6 +14,9 @@ public class SpellBehaviour : AttackBehaviourBase
 
     [SyncVar]
     public uint PlayerNetworkId;
+
+    [SyncVar]
+    public string SpellId;
 
     private void Awake()
     {
@@ -33,18 +37,7 @@ public class SpellBehaviour : AttackBehaviourBase
 
         Physics.IgnoreCollision(GetComponent<Collider>(), SourcePlayer.GetComponent<Collider>());
 
-        //todo: replace hard-coded spell
-        Spell = new Spell
-        {
-            Name = "test spell",
-            Targeting = Spell.TargetingOptions.Projectile,
-            Attributes = new Attributes
-            {
-                Strength = 50
-            },
-            Effects = new System.Collections.Generic.List<string> { Spell.ElementalEffects.Fire },
-            Shape = Spell.ShapeOptions.Wall
-        };
+        Spell = SourcePlayer.GetComponent<Inventory>().Items.FirstOrDefault(x => x.Id == SpellId) as Spell;
 
         if (Spell == null)
         {
@@ -64,24 +57,27 @@ public class SpellBehaviour : AttackBehaviourBase
         spellRb.AddForce(playerController.PlayerCamera.transform.forward * 20f * castSpeed, ForceMode.VelocityChange);
     }
 
+    //private void Update()
+    //{
+    //    Debug.Log($"Active '{gameObject.activeInHierarchy}', position '{gameObject.transform.position}'");
+    //}
+
     private void OnTriggerEnter(Collider other)
     {
-        //todo: allow spell to be triggered after number of seconds, not just on collision
+        if (!isServer)
+        {
+            return;
+        }
 
         try
         {
             //Debug.Log("Collided with " + other.gameObject.name);
 
-            if (other.gameObject.CompareTag("Spell"))
+            if (other.gameObject.CompareTag("Projectile"))
             {
-                //Debug.Log("You hit another spell");
+                //Debug.Log("You hit a Projectile");
                 return;
             }
-
-            //todo: after hitting something, becomes active and up in the sky :/
-
-            //Don't Destroy(). Need it alive for RPC calls
-            gameObject.SetActive(false);
 
             if (other.gameObject.CompareTag("Player") || other.gameObject.CompareTag("Enemy"))
             {
@@ -89,6 +85,8 @@ public class SpellBehaviour : AttackBehaviourBase
             }
 
             //Debug.Log("You hit something not damageable");
+
+            NetworkServer.Destroy(gameObject);
         }
         catch (Exception ex)
         {

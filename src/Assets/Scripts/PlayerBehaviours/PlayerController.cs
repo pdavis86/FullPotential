@@ -1,5 +1,6 @@
 ﻿using Assets.Core.Crafting;
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -157,8 +158,7 @@ public class PlayerController : NetworkBehaviour
 
         var spellScript = spellObject.GetComponent<SpellBehaviour>();
         spellScript.PlayerNetworkId = netId.Value;
-
-        //todo: why is there a second projectile in the sky?
+        spellScript.SpellId = activeSpell.Id;
 
         NetworkServer.Spawn(spellObject);
     }
@@ -207,25 +207,28 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    // ReSharper disable once UnusedParameter.Local
+    [TargetRpc]
+    public void TargetRpcShowDamage(NetworkConnection playerConnection, Vector3 position, string damage)
+    {
+        var hit = Instantiate(GameManager.Instance.Prefabs.HitText);
+        hit.transform.SetParent(GameManager.Instance.MainCanvasObjects.HitNumberContainer.transform, false);
+        hit.gameObject.SetActive(true);
 
+        var hitText = hit.GetComponent<TextMeshProUGUI>();
+        hitText.text = damage;
 
+        const int maxDistanceForMinFontSize = 40;
+        var distance = Vector3.Distance(Camera.main.transform.position, position);
+        var fontSize = maxDistanceForMinFontSize - distance;
+        if (fontSize < hitText.fontSizeMin) { fontSize = hitText.fontSizeMin; }
+        else if (fontSize > hitText.fontSizeMax) { fontSize = hitText.fontSizeMax; }
+        hitText.fontSize = fontSize;
 
-    //public static bool IsPointerOverUIElement(List<RaycastResult> eventSystemRaysastResults)
-    //{
-    //    var uiLayer = LayerMask.NameToLayer("UI");
-    //    return GetEventSystemRaycastResults().FirstOrDefault(x => x.gameObject.layer == uiLayer).gameObject != null;
-    //}
+        var sticky = hit.GetComponent<StickUiToWorldPosition>();
+        sticky.WorldPosition = position;
 
-    //static List<RaycastResult> GetEventSystemRaycastResults()
-    //{
-    //    var raycastResults = new List<RaycastResult>();
-    //    EventSystem.current.RaycastAll(
-    //        new PointerEventData(EventSystem.current)
-    //        {
-    //            position = Input.mousePosition
-    //        }, raycastResults
-    //    );
-    //    return raycastResults;
-    //}
+        Destroy(hit, 1f);
+    }
 
 }

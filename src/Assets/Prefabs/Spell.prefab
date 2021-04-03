@@ -60,6 +60,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -84,6 +85,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!135 &4991308441274877184
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -130,12 +132,11 @@ MonoBehaviour:
     Id: 
     Name: 
     Attributes:
-      IsActivated: 0
       IsAutomatic: 0
       IsSoulbound: 0
       ExtraAmmoPerShot: 0
       Strength: 0
-      Cost: 0
+      Efficiency: 0
       Range: 0
       Accuracy: 0
       Speed: 0

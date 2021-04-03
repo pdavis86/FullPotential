@@ -309,18 +309,13 @@ public class Inventory : NetworkBehaviour
 
     public Spell GetSpellInHand(bool leftHand)
     {
-        //todo: finish implementing
-        return new Spell
-        {
-            Name = "test spell",
-            Targeting = Spell.TargetingOptions.Projectile,
-            Attributes = new Attributes
-            {
-                Strength = 50
-            },
-            Effects = new List<string> { Spell.ElementalEffects.Fire },
-            Shape = Spell.ShapeOptions.Wall
-        };
+        var itemId = leftHand
+            ? EquipSlots[(int)SlotIndexToGameObjectName.LeftHand]
+            : EquipSlots[(int)SlotIndexToGameObjectName.RightHand];
+
+        var item = Items.FirstOrDefault(x => x.Id == itemId);
+
+        return item is Spell ? item as Spell : null;
     }
 
 
