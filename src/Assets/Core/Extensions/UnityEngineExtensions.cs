@@ -1,16 +1,17 @@
-﻿// ReSharper disable once CheckNamespace
+﻿using UnityEngine;
 
-namespace UnityEngine
+// ReSharper disable AccessToStaticMemberViaDerivedType
+
+namespace Assets.Core.Extensions
 {
     public static class UnityEngineExtensions
     {
-        public static Transform Clear(this Transform transform)
+        public static void Clear(this Transform transform)
         {
             foreach (Transform child in transform)
             {
                 GameObject.Destroy(child.gameObject);
             }
-            return transform;
         }
 
         //public static int GetActiveChildCount(this Component parent)

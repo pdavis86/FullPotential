@@ -1,7 +1,6 @@
-﻿using Assets.Scripts.Crafting.Results;
-using System;
+﻿using System;
 
-namespace Assets.Scripts.Data
+namespace Assets.Core.Data
 {
     [Serializable]
     public class InventoryChange : Inventory

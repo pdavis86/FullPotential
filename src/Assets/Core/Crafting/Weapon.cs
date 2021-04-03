@@ -2,7 +2,7 @@
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace Assets.Scripts.Crafting.Results
+namespace Assets.Core.Crafting
 {
     [System.Serializable]
     public class Weapon : GearBase

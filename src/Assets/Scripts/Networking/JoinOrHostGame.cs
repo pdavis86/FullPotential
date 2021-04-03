@@ -1,6 +1,15 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 
+// ReSharper disable CheckNamespace
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable UnusedType.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnassignedField.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
 public class JoinOrHostGame : MonoBehaviour
 {
     private NetworkManager _networkManager;
@@ -36,8 +45,8 @@ public class JoinOrHostGame : MonoBehaviour
 
     public static void Disconnect()
     {
-        UnityEngine.Networking.NetworkManager.singleton.StopClient();
-        UnityEngine.Networking.NetworkManager.singleton.StopHost();
+        NetworkManager.singleton.StopClient();
+        NetworkManager.singleton.StopHost();
     }
 
     public void QuitGame()

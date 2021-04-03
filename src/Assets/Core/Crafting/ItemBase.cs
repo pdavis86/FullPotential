@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 
-namespace Assets.Scripts.Crafting.Results
+// ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable UseFormatSpecifierInInterpolation
+
+namespace Assets.Core.Crafting
 {
     [System.Serializable]
     public class ItemBase
     {
-        //todo: consumables
-
         public string Id;
         public string Name;
         public Attributes Attributes;

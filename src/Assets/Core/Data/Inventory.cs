@@ -1,7 +1,7 @@
-﻿using Assets.Scripts.Crafting.Results;
+﻿using Assets.Core.Crafting;
 using System;
 
-namespace Assets.Scripts.Data
+namespace Assets.Core.Data
 {
     [Serializable]
     public class Inventory

@@ -1,6 +1,6 @@
 ﻿// ReSharper disable UnusedMember.Global
 
-namespace Assets.Scripts.Crafting.Results
+namespace Assets.Core.Crafting
 {
     [System.Serializable]
     public abstract class GearBase : ItemBase

@@ -1,6 +1,6 @@
-﻿using Assets.Scripts.Crafting.Results;
-using Assets.Scripts.Data;
-using Assets.Scripts.Extensions;
+﻿using Assets.Core.Crafting;
+using Assets.Core.Data;
+using Assets.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,13 +8,14 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.NetworkSystem;
 
-// ReSharper disable once CheckNamespace
+// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
+// ReSharper disable PossibleMultipleEnumeration
 
 public class Inventory : NetworkBehaviour
 {
@@ -58,8 +59,8 @@ public class Inventory : NetworkBehaviour
     {
         if (isLocalPlayer)
         {
-            var netId = GetComponent<NetworkIdentity>();
-            if (netId == null)
+            var netIdent = GetComponent<NetworkIdentity>();
+            if (netIdent == null)
             {
                 return;
             }
@@ -77,7 +78,7 @@ public class Inventory : NetworkBehaviour
         ApplyChanges(changes);
     }
 
-    public void ApplyChanges(Assets.Scripts.Data.Inventory changes, bool firstSetup = false)
+    public void ApplyChanges(Assets.Core.Data.Inventory changes, bool firstSetup = false)
     {
         if (changes.MaxItems > 0)
         {
@@ -133,7 +134,7 @@ public class Inventory : NetworkBehaviour
         }
     }
 
-    private void HandleOldSaveFile(Assets.Scripts.Data.Inventory changes)
+    private void HandleOldSaveFile(Assets.Core.Data.Inventory changes)
     {
         if (changes.EquipSlots.Length != EquipSlots.Length)
         {
@@ -153,9 +154,9 @@ public class Inventory : NetworkBehaviour
         }
     }
 
-    private void ApplyChanges(Assets.Scripts.Data.InventoryChange changes)
+    private void ApplyChanges(InventoryChange changes)
     {
-        ApplyChanges(changes as Assets.Scripts.Data.Inventory);
+        ApplyChanges(changes as Assets.Core.Data.Inventory);
 
         if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
         {
@@ -166,18 +167,18 @@ public class Inventory : NetworkBehaviour
         }
     }
 
-    public Assets.Scripts.Data.Inventory GetSaveData()
+    public Assets.Core.Data.Inventory GetSaveData()
     {
         var groupedItems = Items.GroupBy(x => x.GetType());
 
-        return new Assets.Scripts.Data.Inventory
+        return new Assets.Core.Data.Inventory
         {
             MaxItems = MaxItems,
             Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemBase))?.ToArray(),
-            Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray() as Accessory[],
-            Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray() as Armor[],
-            Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray() as Spell[],
-            Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray() as Weapon[],
+            Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray(),
+            Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
+            Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray(),
+            Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
             EquipSlots = EquipSlots
         };
     }

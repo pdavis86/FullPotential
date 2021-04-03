@@ -1,9 +1,9 @@
-﻿using Assets.Scripts.Crafting.Results;
+﻿using Assets.Core.Crafting;
 using System;
 using UnityEngine;
 using UnityEngine.Networking;
 
-// ReSharper disable once CheckNamespace
+// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 

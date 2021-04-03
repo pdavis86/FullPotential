@@ -1,17 +1,19 @@
-﻿using Assets.Scripts.Crafting.Results;
-using System.Collections;
+﻿using Assets.Core.Crafting;
+using Assets.Core.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable once CheckNamespace
+// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
+// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
+// ReSharper disable PossibleMultipleEnumeration
 
 public class CharacterMenuUi : MonoBehaviour
 {
@@ -49,25 +51,25 @@ public class CharacterMenuUi : MonoBehaviour
         }
     }
 
-    private GameObject GetSlot(string name)
+    private GameObject GetSlot(string slotName)
     {
         //todo: do this better
 
         var lhs = _slotsContainer.transform.Find("LHS");
-        var leftAttempt = lhs.Find(name);
+        var leftAttempt = lhs.Find(slotName);
         if (leftAttempt != null)
         {
             return leftAttempt.gameObject;
         }
 
         var rhs = _slotsContainer.transform.Find("RHS");
-        var rightAttempt = rhs.Find(name);
+        var rightAttempt = rhs.Find(slotName);
         if (rightAttempt != null)
         {
             return rightAttempt.gameObject;
         }
 
-        Debug.Log($"Failed to find slot {name}");
+        Debug.Log($"Failed to find slot {slotName}");
         return null;
     }
 
@@ -156,7 +158,7 @@ public class CharacterMenuUi : MonoBehaviour
             }
         });
 
-        if (itemsOfTypes.Count() == 0)
+        if (!itemsOfTypes.Any())
         {
             Debug.LogWarning("There are no items of the correct type");
             return;

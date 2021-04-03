@@ -4,7 +4,7 @@ using System.Linq;
 
 // ReSharper disable PossibleMultipleEnumeration
 
-namespace Assets.Scripts.Crafting.Results
+namespace Assets.Core.Crafting
 {
     public class ResultFactory
     {
@@ -392,7 +392,7 @@ namespace Assets.Scripts.Crafting.Results
                             case Weapon.Hammer: return GetMeleeWeapon(Weapon.Hammer, components, isTwoHanded);
                             case Weapon.Gun: return GetRangedWeapon(Weapon.Gun, components, isTwoHanded, true);
                             default:
-                                throw new System.Exception("Invalid weapon type");
+                                throw new Exception("Invalid weapon type");
                         }
                 }
             }

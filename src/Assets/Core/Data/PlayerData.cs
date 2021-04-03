@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Assets.Scripts.Data
+namespace Assets.Core.Data
 {
     [Serializable]
     public class PlayerData

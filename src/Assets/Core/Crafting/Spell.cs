@@ -5,7 +5,7 @@ using System.Linq;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
-namespace Assets.Scripts.Crafting.Results
+namespace Assets.Core.Crafting
 {
     [System.Serializable]
     public class Spell : ItemBase

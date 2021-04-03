@@ -1,9 +1,9 @@
-﻿using Assets.Scripts.Crafting.Results;
+﻿using Assets.Core.Crafting;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable once CheckNamespace
+// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
@@ -11,6 +11,7 @@ using UnityEngine.UI;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable ArrangeAccessorOwnerBody
 
 //todo: api for world creation
 //todo: skin library website. By skin type, ordered by popularity
@@ -55,7 +56,7 @@ public class GameManager : MonoBehaviour
         var pingGo = MainCanvasObjects.DebuggingOverlay.transform.Find("PingText");
         if (pingGo != null)
         {
-            _pingText = pingGo.GetComponent<UnityEngine.UI.Text>();
+            _pingText = pingGo.GetComponent<Text>();
         }
 
         DontDestroyOnLoad(gameObject);

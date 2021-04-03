@@ -1,19 +1,17 @@
-﻿using Assets.Scripts.Crafting.Results;
-using Assets.Scripts.Data;
+﻿using Assets.Core.Crafting;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.Networking.NetworkSystem;
 
-// ReSharper disable once CheckNamespace
+// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
+// ReSharper disable UnassignedField.Global
 
 public class PlayerController : NetworkBehaviour
 {
@@ -168,6 +166,8 @@ public class PlayerController : NetworkBehaviour
     [Server]
     private void SpawnSpellProjectile(Spell activeSpell, bool leftHand)
     {
+        //todo: style projectile based on activeSpell
+
         var startPos = PlayerCamera.transform.position + PlayerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
         var spellObject = Instantiate(GameManager.Instance.Prefabs.Spell, startPos, transform.rotation, transform);
         spellObject.SetActive(true);
@@ -210,9 +210,9 @@ public class PlayerController : NetworkBehaviour
     }
 
     [Command]
-    public void CmdInteractWith(NetworkInstanceId netId)
+    public void CmdInteractWith(NetworkInstanceId instanceId)
     {
-        var go = NetworkServer.FindLocalObject(netId);
+        var go = NetworkServer.FindLocalObject(instanceId);
         var interactable = go.GetComponent<Interactable>();
         var distance = Vector3.Distance(PlayerCamera.transform.position, interactable.transform.position);
         if (distance <= interactable.Radius)

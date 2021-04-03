@@ -28,3 +28,7 @@ See the [Project Trello Board](https://trello.com/b/biH6NdE0/oasis "Go to Trello
 - Attack and Defence (inc. elemental resitances)
 - Weapon/skill leveling
 - Breaking down of items
+
+
+## Dependencies
+- Requires the TextMeshPro package to be reinstalled

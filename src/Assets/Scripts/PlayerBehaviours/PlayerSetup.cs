@@ -1,10 +1,10 @@
-﻿using Assets.Scripts.Data;
+﻿using Assets.Core.Data;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.NetworkSystem;
 
-// ReSharper disable once CheckNamespace
+// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
@@ -120,8 +120,10 @@ public class PlayerSetup : NetworkBehaviour
 
         var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
         tex.LoadImage(System.IO.File.ReadAllBytes(filePath));
-        var newMat = new Material(_mainMesh.material.shader);
-        newMat.mainTexture = tex;
+        var newMat = new Material(_mainMesh.material.shader)
+        {
+            mainTexture = tex
+        };
 
         _mainMesh.material = newMat;
 
