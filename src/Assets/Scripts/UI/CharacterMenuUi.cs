@@ -46,7 +46,7 @@ public class CharacterMenuUi : MonoBehaviour
             tooltip.ClearHandlers();
             tooltip.OnPointerEnterForTooltip += pointerEventData =>
             {
-                Tooltips.ShowTooltip(CraftingUi.GetItemDescription(item));
+                Tooltips.ShowTooltip(ResultFactory.GetItemDescription(item));
             };
         }
     }
@@ -195,7 +195,7 @@ public class CharacterMenuUi : MonoBehaviour
             var tooltip = row.GetComponent<Tooltip>();
             tooltip.OnPointerEnterForTooltip += pointerEventData =>
             {
-                Tooltips.ShowTooltip(CraftingUi.GetItemDescription(item, false));
+                Tooltips.ShowTooltip(ResultFactory.GetItemDescription(item, false));
             };
 
             rowCounter++;

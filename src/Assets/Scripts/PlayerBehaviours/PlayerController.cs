@@ -1,6 +1,5 @@
 ﻿using Assets.Core.Crafting;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -28,8 +27,10 @@ public class PlayerController : NetworkBehaviour
         _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;
         _mainCanvasObjects.CraftingUi.SetActive(false);
 
-        //todo: under what conditions?
-        _mainCanvasObjects.DebuggingOverlay.SetActive(true);
+        if (Debug.isDebugBuild)
+        {
+            _mainCanvasObjects.DebuggingOverlay.SetActive(true);
+        }
     }
 
     private void Start()
@@ -138,7 +139,7 @@ public class PlayerController : NetworkBehaviour
     [Command]
     private void CmdCastSpell(bool leftHand)
     {
-        var activeSpell = GetPlayerActiveSpell();
+        var activeSpell = _inventory.GetSpellInHand(leftHand);
 
         if (activeSpell == null)
         {
@@ -243,29 +244,5 @@ public class PlayerController : NetworkBehaviour
     //    );
     //    return raycastResults;
     //}
-
-
-
-
-
-
-
-
-    //todo: move this
-    public Spell GetPlayerActiveSpell()
-    {
-        //todo: check the player has a spell active and can cast it
-        return new Spell
-        {
-            Name = "test spell",
-            Targeting = Spell.TargetingOptions.Projectile,
-            Attributes = new Attributes
-            {
-                Strength = 50
-            },
-            Effects = new List<string> { Spell.ElementalEffects.Fire },
-            Shape = Spell.ShapeOptions.Wall
-        };
-    }
 
 }

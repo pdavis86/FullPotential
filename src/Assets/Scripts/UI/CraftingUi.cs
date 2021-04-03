@@ -3,7 +3,6 @@ using Assets.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,18 +27,12 @@ public class CraftingUi : MonoBehaviour
     private Inventory _inventory;
     private List<ItemBase> _components;
 
-    //todo: move these. used in various places
-    public const string CraftingTypeWeapon = "Weapon";
-    public const string CraftingTypeArmor = "Armor";
-    public const string CraftingTypeAccessory = "Accessory";
-    public const string CraftingTypeSpell = "Spell";
-
     public static readonly List<string> TypeOptions = new List<string>
     {
-        CraftingTypeWeapon,
-        CraftingTypeArmor,
-        CraftingTypeAccessory,
-        CraftingTypeSpell
+        ResultFactory.CraftingTypeWeapon,
+        ResultFactory.CraftingTypeArmor,
+        ResultFactory.CraftingTypeAccessory,
+        ResultFactory.CraftingTypeSpell
     };
 
     public static readonly List<string> HandednessOptions = new List<string>
@@ -90,7 +83,7 @@ public class CraftingUi : MonoBehaviour
 
     public static void SetHandednessDropDownVisibility(Dropdown handednessDropdown, string type, string subType)
     {
-        handednessDropdown.gameObject.SetActive(type == CraftingTypeWeapon && HandednessSubTypes.Contains(subType));
+        handednessDropdown.gameObject.SetActive(type == ResultFactory.CraftingTypeWeapon && HandednessSubTypes.Contains(subType));
     }
 
     void TypeOnValueChanged(int index)
@@ -104,10 +97,10 @@ public class CraftingUi : MonoBehaviour
 
             switch (craftingType)
             {
-                case CraftingTypeWeapon: _subTypeDropdown.AddOptions(Weapon.WeaponOptions); break;
-                case CraftingTypeArmor: _subTypeDropdown.AddOptions(Armor.ArmorOptions); break;
-                case CraftingTypeAccessory: _subTypeDropdown.AddOptions(Accessory.AccessoryOptions); break;
-                case CraftingTypeSpell: isSpell = true; break;
+                case ResultFactory.CraftingTypeWeapon: _subTypeDropdown.AddOptions(Weapon.WeaponOptions); break;
+                case ResultFactory.CraftingTypeArmor: _subTypeDropdown.AddOptions(Armor.ArmorOptions); break;
+                case ResultFactory.CraftingTypeAccessory: _subTypeDropdown.AddOptions(Accessory.AccessoryOptions); break;
+                case ResultFactory.CraftingTypeSpell: isSpell = true; break;
 
                 default:
                     throw new InvalidOperationException("Unknown crafting type");
@@ -218,7 +211,7 @@ public class CraftingUi : MonoBehaviour
             var tooltip = row.GetComponent<Tooltip>();
             tooltip.OnPointerEnterForTooltip += pointerEventData =>
             {
-                Tooltips.ShowTooltip(GetItemDescription(item, false));
+                Tooltips.ShowTooltip(ResultFactory.GetItemDescription(item, false));
             };
 
             rowCounter++;
@@ -253,33 +246,7 @@ public class CraftingUi : MonoBehaviour
         }
 
         var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(_components, GetSelectedType(), GetSelectedSubType(), GetSelectedHandedness());
-        _outputText.text = GetItemDescription(craftedItem);
-    }
-
-    //todo: move this as it is used in various places
-    public static string GetItemDescription(ItemBase item, bool includeName = true)
-    {
-        if (item == null)
-        {
-            return null;
-        }
-
-        var sb = new StringBuilder();
-
-        if (includeName) { sb.Append($"Name: {item.Name}\n"); }
-        if (item.Attributes.IsAutomatic) { sb.Append("Automatic\n"); }
-        if (item.Attributes.IsSoulbound) { sb.Append("Soulbound\n"); }
-        if (item.Attributes.ExtraAmmoPerShot > 0) { sb.Append($"ExtraAmmoPerShot: {item.Attributes.ExtraAmmoPerShot}\n"); }
-        if (item.Attributes.Strength > 0) { sb.Append($"Strength: {item.Attributes.Strength}\n"); }
-        if (item.Attributes.Efficiency > 0) { sb.Append($"Efficiency: {item.Attributes.Efficiency}\n"); }
-        if (item.Attributes.Range > 0) { sb.Append($"Range: {item.Attributes.Range}\n"); }
-        if (item.Attributes.Accuracy > 0) { sb.Append($"Accuracy: {item.Attributes.Accuracy}\n"); }
-        if (item.Attributes.Speed > 0) { sb.Append($"Speed: {item.Attributes.Speed}\n"); }
-        if (item.Attributes.Recovery > 0) { sb.Append($"Recovery: {item.Attributes.Recovery}\n"); }
-        if (item.Attributes.Duration > 0) { sb.Append($"Duration: {item.Attributes.Duration}\n"); }
-        if (item.Effects.Count > 0) { sb.Append($"Effects: {string.Join(", ", item.Effects)}\n"); }
-
-        return sb.ToString();
+        _outputText.text = ResultFactory.GetItemDescription(craftedItem);
     }
 
 }

@@ -96,7 +96,6 @@ namespace Assets.Core.Crafting
 
         public abstract class ElementalEffects
         {
-            //todo: is this necessary?: public const string Force = "Force"; 
             public const string Fire = "Fire";
             public const string Lightning = "Lightning";
             public const string Ice = "Ice";
@@ -106,7 +105,6 @@ namespace Assets.Core.Crafting
 
             public static readonly List<string> All = new List<string>
             {
-                //Not needed for loot creation: Force,
                 Fire,
                 Lightning,
                 Ice,

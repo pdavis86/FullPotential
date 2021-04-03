@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Core.Helpers;
+using UnityEngine;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -12,7 +13,7 @@ public class SceneObjectsOffline : MonoBehaviour
 {
     void Start()
     {
-        GameManager.GetObjectAtRoot(GameManager.NameCanvasScene).SetActive(true);
+        UnityHelper.GetObjectAtRoot(GameManager.NameCanvasScene).SetActive(true);
     }
     
 }

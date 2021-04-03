@@ -35,12 +35,7 @@ public class JoinOrHostGame : MonoBehaviour
 
     public void SetPlayerName(string value)
     {
-       GameManager.Instance.PlayerName = value;
-    }
-
-    public void SetPlayerSkinUrl(string value)
-    {
-        GameManager.Instance.PlayerSkinUrl = value;
+       GameManager.Instance.Username = value;
     }
 
     public static void Disconnect()

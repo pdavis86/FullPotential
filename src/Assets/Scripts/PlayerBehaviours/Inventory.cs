@@ -78,59 +78,74 @@ public class Inventory : NetworkBehaviour
         ApplyChanges(changes);
     }
 
-    public void ApplyChanges(Assets.Core.Data.Inventory changes, bool firstSetup = false)
+    public bool ApplyChanges(Assets.Core.Data.Inventory changes, bool firstSetup = false)
     {
-        if (changes.MaxItems > 0)
+        try
         {
-            MaxItems = changes.MaxItems;
+            if (changes == null)
+            {
+                Debug.Log("No inventory changes supplied");
+                return true;
+            }
+
+            if (changes.MaxItems > 0)
+            {
+                MaxItems = changes.MaxItems;
+            }
+
+            var addedItems = changes.Loot
+                .UnionIfNotNull(changes.Accessories)
+                .UnionIfNotNull(changes.Armor)
+                .UnionIfNotNull(changes.Spells)
+                .UnionIfNotNull(changes.Weapons);
+
+            Items.AddRange(addedItems);
+
+            if (!firstSetup)
+            {
+                var addedItemsCount = addedItems.Count();
+
+                if (addedItemsCount == 1)
+                {
+                    var addedItem = addedItems.First();
+
+                    //todo: make this a slide-out alert instead
+                    Debug.LogWarning($"{addedItem.GetFullName()} was added");
+                }
+                else
+                {
+                    //todo: make this a slide-out alert instead
+                    Debug.LogWarning($"Added {addedItemsCount} items to the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
+                }
+            }
+
+            if (changes.EquipSlots != null)
+            {
+                if (changes.EquipSlots.Length == EquipSlots.Length)
+                {
+                    EquipSlots = changes.EquipSlots;
+                }
+                else
+                {
+                    HandleOldSaveFile(changes);
+                }
+
+                //DebugLogEquippedItems();
+            }
+
+            if (_playerController != null && _playerController.HasMenuOpen && GameManager.Instance.MainCanvasObjects.CraftingUi.activeSelf)
+            {
+                var uiScript = GameManager.Instance.MainCanvasObjects.CraftingUi.GetComponent<CraftingUi>();
+                uiScript.ResetUi();
+                uiScript.LoadInventory();
+            }
+
+            return true;
         }
-
-        var addedItems = changes.Loot
-            .UnionIfNotNull(changes.Accessories)
-            .UnionIfNotNull(changes.Armor)
-            .UnionIfNotNull(changes.Spells)
-            .UnionIfNotNull(changes.Weapons);
-
-        Items.AddRange(addedItems);
-
-        if (!firstSetup)
+        catch (Exception ex)
         {
-            var addedItemsCount = addedItems.Count();
-
-            if (addedItemsCount == 1)
-            {
-                var addedItem = addedItems.First();
-
-                //todo: make this a slide-out alert instead
-                Debug.LogWarning($"{addedItem.GetFullName()} was added");
-            }
-            else
-            {
-                //todo: make this a slide-out alert instead
-                //todo: only after initial setup
-                Debug.LogWarning($"Added {addedItemsCount} items to the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
-            }
-        }
-
-        if (changes.EquipSlots != null)
-        {
-            if (changes.EquipSlots.Length == EquipSlots.Length)
-            {
-                EquipSlots = changes.EquipSlots;
-            }
-            else
-            {
-                HandleOldSaveFile(changes);
-            }
-
-            //DebugLogEquippedItems();
-        }
-
-        if (_playerController != null && _playerController.HasMenuOpen && GameManager.Instance.MainCanvasObjects.CraftingUi.activeSelf)
-        {
-            var uiScript = GameManager.Instance.MainCanvasObjects.CraftingUi.GetComponent<CraftingUi>();
-            uiScript.ResetUi();
-            uiScript.LoadInventory();
+            Debug.LogError(ex);
+            return false;
         }
     }
 
@@ -290,6 +305,22 @@ public class Inventory : NetworkBehaviour
     private void CmdSetItemToSlot(string slotName, string itemId)
     {
         SetItemToSlot(slotName, itemId);
+    }
+
+    public Spell GetSpellInHand(bool leftHand)
+    {
+        //todo: finish implementing
+        return new Spell
+        {
+            Name = "test spell",
+            Targeting = Spell.TargetingOptions.Projectile,
+            Attributes = new Attributes
+            {
+                Strength = 50
+            },
+            Effects = new List<string> { Spell.ElementalEffects.Fire },
+            Shape = Spell.ShapeOptions.Wall
+        };
     }
 
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 // ReSharper disable PossibleMultipleEnumeration
 
@@ -10,6 +11,11 @@ namespace Assets.Core.Crafting
     {
         public const string LootPrefixScrap = "Scrap";
         public const string LootPrefixShard = "Shard";
+
+        public const string CraftingTypeWeapon = "Weapon";
+        public const string CraftingTypeArmor = "Armor";
+        public const string CraftingTypeAccessory = "Accessory";
+        public const string CraftingTypeSpell = "Spell";
 
         // ReSharper disable once InconsistentNaming
         private static readonly Random _random = new Random();
@@ -81,7 +87,7 @@ namespace Assets.Core.Crafting
             var lingeringEffect = Spell.LingeringPairing.FirstOrDefault(x => x.Key == elementalEffect).Value;
             effects = effects.Except(Spell.LingeringOptions.All.Where(x => x != lingeringEffect));
 
-            if (craftingType == CraftingUi.CraftingTypeArmor || craftingType == CraftingUi.CraftingTypeAccessory)
+            if (craftingType == CraftingTypeArmor || craftingType == CraftingTypeAccessory)
             {
                 return effects.Intersect(Spell.BuffEffects.All)
                     .Union(effects.Intersect(Spell.SupportEffects.All))
@@ -89,7 +95,7 @@ namespace Assets.Core.Crafting
                     .ToList();
             }
 
-            if (craftingType == CraftingUi.CraftingTypeWeapon)
+            if (craftingType == CraftingTypeWeapon)
             {
                 return effects.Intersect(Spell.DebuffEffects.All)
                     .Union(effects.Intersect(Spell.ElementalEffects.All))
@@ -97,7 +103,7 @@ namespace Assets.Core.Crafting
                     .ToList();
             }
 
-            if (craftingType != CraftingUi.CraftingTypeSpell)
+            if (craftingType != CraftingTypeSpell)
             {
                 throw new Exception($"Unexpected craftingType '{craftingType}'");
             }
@@ -195,7 +201,6 @@ namespace Assets.Core.Crafting
             return lootDrop;
         }
 
-        //todo: add ability to break down an item/spell
         //todo: add ability to name item
         //todo: add validation e.g. enough scrap to make a two-handed weapon
         //todo: add validation e.g. at least one effect for a spell
@@ -218,7 +223,7 @@ namespace Assets.Core.Crafting
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery),
                     Duration = ComputeAttribute(components, x => x.Attributes.Duration)
                 },
-                Effects = GetEffects(CraftingUi.CraftingTypeSpell, effects),
+                Effects = GetEffects(CraftingTypeSpell, effects),
             };
             spell.Shape = GetShape(spell.Targeting, effects);
 
@@ -252,7 +257,7 @@ namespace Assets.Core.Crafting
                     Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed)
                 },
-                Effects = GetEffects(CraftingUi.CraftingTypeWeapon, components.SelectMany(x => x.Effects))
+                Effects = GetEffects(CraftingTypeWeapon, components.SelectMany(x => x.Effects))
             };
             item.Name = GetItemName("Strength", item);
             return item;
@@ -276,7 +281,7 @@ namespace Assets.Core.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(CraftingUi.CraftingTypeWeapon, components.SelectMany(x => x.Effects))
+                Effects = GetEffects(CraftingTypeWeapon, components.SelectMany(x => x.Effects))
             };
             item.Name = GetItemName("Strength", item);
             return item;
@@ -294,7 +299,7 @@ namespace Assets.Core.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(CraftingUi.CraftingTypeWeapon, components.SelectMany(x => x.Effects))
+                Effects = GetEffects(CraftingTypeWeapon, components.SelectMany(x => x.Effects))
             };
             item.Name = GetItemName("Defence", item);
             return item;
@@ -311,7 +316,7 @@ namespace Assets.Core.Crafting
                 {
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength)
                 },
-                Effects = GetEffects(CraftingUi.CraftingTypeArmor, components.SelectMany(x => x.Effects))
+                Effects = GetEffects(CraftingTypeArmor, components.SelectMany(x => x.Effects))
             };
             item.Name = GetItemName("Defence", item);
             return item;
@@ -330,7 +335,7 @@ namespace Assets.Core.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(CraftingUi.CraftingTypeArmor, components.SelectMany(x => x.Effects))
+                Effects = GetEffects(CraftingTypeArmor, components.SelectMany(x => x.Effects))
             };
             item.Name = GetItemName("Defence", item);
             return item;
@@ -346,7 +351,7 @@ namespace Assets.Core.Crafting
                 {
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength)
                 },
-                Effects = GetEffects(CraftingUi.CraftingTypeAccessory, components.SelectMany(x => x.Effects))
+                Effects = GetEffects(CraftingTypeAccessory, components.SelectMany(x => x.Effects))
             };
             item.Name = GetItemName("Strength", item);
             return item;
@@ -356,7 +361,7 @@ namespace Assets.Core.Crafting
         {
             //todo: requirements e.g. strength, speed, accuracy, 6 scrap or less
 
-            if (selectedType == CraftingUi.CraftingTypeSpell)
+            if (selectedType == CraftingTypeSpell)
             {
                 return GetSpell(components);
             }
@@ -394,6 +399,31 @@ namespace Assets.Core.Crafting
                         }
                 }
             }
+        }
+
+        public static string GetItemDescription(ItemBase item, bool includeName = true)
+        {
+            if (item == null)
+            {
+                return null;
+            }
+
+            var sb = new StringBuilder();
+
+            if (includeName) { sb.Append($"Name: {item.Name}\n"); }
+            if (item.Attributes.IsAutomatic) { sb.Append("Automatic\n"); }
+            if (item.Attributes.IsSoulbound) { sb.Append("Soulbound\n"); }
+            if (item.Attributes.ExtraAmmoPerShot > 0) { sb.Append($"ExtraAmmoPerShot: {item.Attributes.ExtraAmmoPerShot}\n"); }
+            if (item.Attributes.Strength > 0) { sb.Append($"Strength: {item.Attributes.Strength}\n"); }
+            if (item.Attributes.Efficiency > 0) { sb.Append($"Efficiency: {item.Attributes.Efficiency}\n"); }
+            if (item.Attributes.Range > 0) { sb.Append($"Range: {item.Attributes.Range}\n"); }
+            if (item.Attributes.Accuracy > 0) { sb.Append($"Accuracy: {item.Attributes.Accuracy}\n"); }
+            if (item.Attributes.Speed > 0) { sb.Append($"Speed: {item.Attributes.Speed}\n"); }
+            if (item.Attributes.Recovery > 0) { sb.Append($"Recovery: {item.Attributes.Recovery}\n"); }
+            if (item.Attributes.Duration > 0) { sb.Append($"Duration: {item.Attributes.Duration}\n"); }
+            if (item.Effects.Count > 0) { sb.Append($"Effects: {string.Join(", ", item.Effects)}\n"); }
+
+            return sb.ToString();
         }
 
     }

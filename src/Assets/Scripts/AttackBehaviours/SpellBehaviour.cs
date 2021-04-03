@@ -25,36 +25,47 @@ public class SpellBehaviour : AttackBehaviourBase
             ? NetworkServer.FindLocalObject(new NetworkInstanceId(PlayerNetworkId))
             : ClientScene.FindLocalObject(new NetworkInstanceId(PlayerNetworkId));
 
+        if (SourcePlayer == null)
+        {
+            Debug.LogError("No SourcePlayer found");
+            return;
+        }
+
         Physics.IgnoreCollision(GetComponent<Collider>(), SourcePlayer.GetComponent<Collider>());
 
         if (!isServer)
         {
-            //todo: this check should not be necessary
+            //todo: investigate why the player spell is trying to deal damage
             Debug.LogError("Player tried to deal damage instead of server");
             return;
         }
 
-        //var test2 = ClientScene.FindLocalObject(new NetworkInstanceId(PlayerNetworkId));
+        //todo: replace hard-coded spell
+        Spell = new Spell
+        {
+            Name = "test spell",
+            Targeting = Spell.TargetingOptions.Projectile,
+            Attributes = new Attributes
+            {
+                Strength = 50
+            },
+            Effects = new System.Collections.Generic.List<string> { Spell.ElementalEffects.Fire },
+            Shape = Spell.ShapeOptions.Wall
+        };
 
-        //if (SourcePlayer == null)
-        //{
-        //    Debug.LogError("I don't have a SourcePlayer :'(");
-        //}
-
-        var playerController = SourcePlayer.GetComponent<PlayerController>();
-
-        Spell = playerController.GetPlayerActiveSpell();
-
-        //if (Spell == null)
-        //{
-        //    Debug.LogError("I don't have a Spell :'(");
-        //}
+        if (Spell == null)
+        {
+            Debug.LogError("No spell set");
+            return;
+        }
 
         var castSpeed = Spell.Attributes.Speed / 50f;
         if (castSpeed < 0.5)
         {
             castSpeed = 0.5f;
         }
+
+        var playerController = SourcePlayer.GetComponent<PlayerController>();
 
         var spellRb = GetComponent<Rigidbody>();
         spellRb.AddForce(playerController.PlayerCamera.transform.forward * 20f * castSpeed, ForceMode.VelocityChange);

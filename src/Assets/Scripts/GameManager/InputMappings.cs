@@ -21,10 +21,11 @@ public class InputMappings : MonoBehaviour
     /*Circle*/
     /*X*/
 
-    /*Up*/
-    /*Right*/
-    /*Left*/
-    /*Down*/
+    /*Up*/ /*Scroll forwards*/
+    /*Down*/ /*Scroll backwards*/
+
+    /*Right*/ /*Forward button*/
+    /*Left*/ /*Back button*/
 
     /*L1*/
     /*L2*/
