@@ -15,37 +15,16 @@ Inspired by the Minecraft mod Ars Magica 2, Skyrim, the Borderlands series, Fina
 
 ## Product Roadmap
 
-### v0.1 - Alpha release
-- Weapon and Spell crafting
+See the [Project Trello Board](https://trello.com/b/biH6NdE0/oasis "Go to Trello") for a better depiction of where the game currently stands.
+
+### v0.1 - Core Gameplay Basics
+- Crafting
+- Network play
 - At least a useable weapon of each type (dagger, axe, sword, hammer, staff, bow, crossbow, gun, shield)
 - At least one spell in each category (buff, debuff, support, elemental, lingering)
-- Network play
 - Basic mod support
 
-### v0.2 - More features
-- Armor
-- Elemental resitances
+### v0.2 - Additional Core Gameplay
+- Attack and Defence (inc. elemental resitances)
 - Weapon/skill leveling
 - Breaking down of items
-
-### v0.5 - Vehicles
-- Nuff said
-
-### v0.4 - Final Features
-- Stamina + Mana
-- Weapon reloaders
-- Consumables
-- Localisation
-
-### v0.5 Better Graphices
-With the gameplay working, I want to make it look better!
-- Ability to customise cosmetics of gear
-
-### v0.6 - Beginnings of a story
-- I have some ideas but they need more work
-
-### v1.0 - First stable version
-- ???
-
-### v1.1 - Multiple worlds
-- ???
