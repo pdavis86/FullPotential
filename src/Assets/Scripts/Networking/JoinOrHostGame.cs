@@ -13,29 +13,53 @@ using UnityEngine.Networking;
 public class JoinOrHostGame : MonoBehaviour
 {
     private NetworkManager _networkManager;
+    private string _networkAddress;
+    private string _networkPort;
 
     void Start()
     {
         _networkManager = NetworkManager.singleton;
     }
 
+    private void SetNetworkAddressAndPort()
+    {
+        _networkManager.networkAddress = !string.IsNullOrWhiteSpace(_networkAddress)
+            ? _networkAddress
+            : "localhost";
+
+        if (!int.TryParse(_networkPort, out var port))
+        {
+            port = 7777;
+        }
+        _networkManager.networkPort = port;
+    }
+
     public void HostGame()
     {
-        _networkManager.networkAddress = "localhost";
-        _networkManager.networkPort = 7777;
+        SetNetworkAddressAndPort();
         _networkManager.StartHost();
     }
 
     public void JoinGame()
     {
-        _networkManager.networkAddress = "localhost";
-        _networkManager.networkPort = 7777;
+        SetNetworkAddressAndPort();
         _networkManager.StartClient();
     }
 
     public void SetPlayerName(string value)
     {
-       GameManager.Instance.Username = value;
+        //todo: username must be file name safe
+        GameManager.Instance.Username = value;
+    }
+
+    public void SetNetworkAddress(string value)
+    {
+        _networkAddress = value;
+    }
+
+    public void SetNetworkPort(string value)
+    {
+        _networkPort = value;
     }
 
     public static void Disconnect()

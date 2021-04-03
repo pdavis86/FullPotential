@@ -33,13 +33,6 @@ public class SpellBehaviour : AttackBehaviourBase
 
         Physics.IgnoreCollision(GetComponent<Collider>(), SourcePlayer.GetComponent<Collider>());
 
-        if (!isServer)
-        {
-            //todo: investigate why the player spell is trying to deal damage
-            Debug.LogError("Player tried to deal damage instead of server");
-            return;
-        }
-
         //todo: replace hard-coded spell
         Spell = new Spell
         {
