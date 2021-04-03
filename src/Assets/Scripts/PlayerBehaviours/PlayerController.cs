@@ -31,11 +31,8 @@ public class PlayerController : NetworkBehaviour
         {
             _mainCanvasObjects.DebuggingOverlay.SetActive(true);
         }
-    }
 
-    private void Start()
-    {
-        _inventory = GameManager.Instance.LocalPlayer.GetComponent<Inventory>();
+        _inventory = GetComponent<Inventory>();
     }
 
     void Update()
@@ -121,20 +118,6 @@ public class PlayerController : NetworkBehaviour
             _mainCanvasObjects.CraftingUi.SetActive(false);
         }
     }
-
-    //private void OnDestroy()
-    //{
-    //    Debug.Log("OnDestroy() called");
-    //}
-
-    //private void OnServerInitialized()
-    //{
-    //    Debug.Log("OnServerInitialized() called");
-    //}
-
-
-
-
 
     [Command]
     private void CmdCastSpell(bool leftHand)
