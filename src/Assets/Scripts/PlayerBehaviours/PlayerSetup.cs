@@ -39,7 +39,7 @@ public class PlayerSetup : NetworkBehaviour
         if (!isLocalPlayer)
         {
             gameObject.GetComponent<PlayerController>().enabled = false;
-            _nameTag.text = string.IsNullOrWhiteSpace(GameManager.Instance.Username) ? "Player " + netId.Value : GameManager.Instance.Username;
+            _nameTag.text = string.IsNullOrWhiteSpace(Username) ? "Player " + netId.Value : Username;
             return;
         }
 
