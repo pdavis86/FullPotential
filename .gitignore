@@ -1,9 +1,2 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
-
-/src/Assets/Standard Assets
-/src/Assets/SampleScenes
-/src/Assets/SampleScenes.meta
-/src/Assets/Standard Assets.meta
-/src/.vsconfig
+﻿/src/.vsconfig
+/src/Assets/TextMesh Pro
