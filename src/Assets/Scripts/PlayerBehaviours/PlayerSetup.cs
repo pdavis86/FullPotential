@@ -1,4 +1,5 @@
 ﻿using Assets.Core.Data;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -31,7 +32,6 @@ public class PlayerSetup : NetworkBehaviour
 
     private void Start()
     {
-        _sceneCamera = Camera.main;
         _inventory = GetComponent<Inventory>();
 
         gameObject.name = "Player ID " + netId.Value;
@@ -39,17 +39,14 @@ public class PlayerSetup : NetworkBehaviour
         if (!isLocalPlayer)
         {
             gameObject.GetComponent<PlayerController>().enabled = false;
-
-            _nameTag.text = string.IsNullOrWhiteSpace(Username) ? "Player " + netId.Value : Username;
-
-            //if (!string.IsNullOrWhiteSpace(TextureUri))
-            //{
-            //    SetPlayerTexture(TextureUri);
-            //}
-
+            _nameTag.text = string.IsNullOrWhiteSpace(GameManager.Instance.Username) ? "Player " + netId.Value : GameManager.Instance.Username;
             return;
         }
 
+        GameManager.Instance.LocalPlayer = gameObject;
+        _nameTag.text = null;
+
+        _sceneCamera = Camera.main;
         if (_sceneCamera != null)
         {
             _sceneCamera.gameObject.SetActive(false);
@@ -58,16 +55,13 @@ public class PlayerSetup : NetworkBehaviour
         _playerCamera.gameObject.SetActive(true);
         _inFrontOfPlayerCamera.gameObject.SetActive(true);
 
-        GameManager.Instance.MainCanvasObjects.Hud.SetActive(true);
-
         var pm = gameObject.AddComponent<PlayerMovement>();
         pm.PlayerCamera = _playerCamera;
 
         connectionToServer.RegisterHandler(Assets.Scripts.Networking.MessageIds.LoadPlayerData, OnLoadPlayerData);
 
-        _nameTag.text = null;
+        GameManager.Instance.MainCanvasObjects.Hud.SetActive(true);
 
-        GameManager.Instance.LocalPlayer = gameObject;
         CmdHeresMyJoiningDetails(GameManager.Instance.Username);
     }
 
@@ -87,7 +81,7 @@ public class PlayerSetup : NetworkBehaviour
 
     private void SetPlayerTexture(string playerSkinUri)
     {
-        //todo: download file
+        //todo: download player texture
         var filePath = playerSkinUri;
 
         var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
