@@ -3721,9 +3721,9 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 674796176}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: SetPlayerName
+      - m_Target: {fileID: 8533790816139666107}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: SetPlayerUsername
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

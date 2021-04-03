@@ -48,6 +48,12 @@ public class GameManager : MonoBehaviour
     //    return playerCamera.gameObject.transform.parent.gameObject;
     //}
 
+    public void SetPlayerUsername(string value)
+    {
+        //todo: username must be file name safe
+        Username = value;
+    }
+
     public static void Quit()
     {
 #if UNITY_EDITOR

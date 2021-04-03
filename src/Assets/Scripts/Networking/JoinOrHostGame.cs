@@ -46,12 +46,6 @@ public class JoinOrHostGame : MonoBehaviour
         _networkManager.StartClient();
     }
 
-    public void SetPlayerName(string value)
-    {
-        //todo: username must be file name safe
-        GameManager.Instance.Username = value;
-    }
-
     public void SetNetworkAddress(string value)
     {
         _networkAddress = value;
