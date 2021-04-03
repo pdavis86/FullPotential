@@ -10,8 +10,7 @@ using UnityEngine.EventSystems;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
 
-//todo: rename to TooltipBehaviour
-public class CraftingTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class Tooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public delegate void PointerEnterEventDelegate(PointerEventData eventData);
     public event PointerEnterEventDelegate OnPointerEnterForTooltip;

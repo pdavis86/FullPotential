@@ -215,7 +215,7 @@ public class CraftingUi : MonoBehaviour
                 UpdateResults();
             });
 
-            var tooltip = row.GetComponent<CraftingTooltip>();
+            var tooltip = row.GetComponent<Tooltip>();
             tooltip.OnPointerEnterForTooltip += pointerEventData =>
             {
                 Tooltips.ShowTooltip(GetItemDescription(item, false));

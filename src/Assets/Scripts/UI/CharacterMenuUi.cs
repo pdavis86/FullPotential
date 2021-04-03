@@ -38,7 +38,7 @@ public class CharacterMenuUi : MonoBehaviour
         var slotImage = slot.transform.Find("Image").GetComponent<Image>();
         slotImage.color = item != null ? Color.white : Color.clear;
 
-        var tooltip = slot.GetComponent<CraftingTooltip>();
+        var tooltip = slot.GetComponent<Tooltip>();
         if (tooltip != null)
         {
             tooltip.ClearHandlers();
@@ -190,7 +190,7 @@ public class CharacterMenuUi : MonoBehaviour
                 }
             });
 
-            var tooltip = row.GetComponent<CraftingTooltip>();
+            var tooltip = row.GetComponent<Tooltip>();
             tooltip.OnPointerEnterForTooltip += pointerEventData =>
             {
                 Tooltips.ShowTooltip(CraftingUi.GetItemDescription(item, false));
