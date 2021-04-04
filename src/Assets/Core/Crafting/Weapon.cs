@@ -7,6 +7,8 @@ namespace Assets.Core.Crafting
     [System.Serializable]
     public class Weapon : GearBase
     {
+        //todo: need to register a prefab when registering a weapon type
+
         public const string Dagger = "Dagger";
         public const string Axe = "Axe";
         public const string Sword = "Sword";

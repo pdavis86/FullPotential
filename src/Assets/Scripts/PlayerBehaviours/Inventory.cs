@@ -17,6 +17,7 @@ using UnityEngine.Networking.NetworkSystem;
 // ReSharper disable UnassignedField.Global
 // ReSharper disable PossibleMultipleEnumeration
 
+//todo: rename to PlayerInventory
 public class Inventory : NetworkBehaviour
 {
     public int MaxItems;
@@ -26,6 +27,9 @@ public class Inventory : NetworkBehaviour
 
     [HideInInspector]
     public string[] EquipSlots;
+
+    [HideInInspector]
+    public GameObject[] EquippedObjects;
 
     private PlayerController _playerController;
 
@@ -53,6 +57,7 @@ public class Inventory : NetworkBehaviour
 
         //Must be the same length as SlotIndexToGameObjectName
         EquipSlots = new string[12];
+        EquippedObjects = new GameObject[12];
     }
 
     private void Start()
@@ -64,7 +69,7 @@ public class Inventory : NetworkBehaviour
             {
                 return;
             }
-            connectionToServer.RegisterHandler(Assets.Scripts.Networking.MessageIds.InventoryChange, OnInventoryChange);
+            connectionToServer.RegisterHandler(Assets.Core.Networking.MessageIds.InventoryChange, OnInventoryChange);
         }
 
         _playerController = GetComponent<PlayerController>();
@@ -132,6 +137,8 @@ public class Inventory : NetworkBehaviour
 
                 //DebugLogEquippedItems();
             }
+
+            EquipItems();
 
             if (_playerController != null && _playerController.HasMenuOpen && GameManager.Instance.MainCanvasObjects.CraftingUi.activeSelf)
             {
@@ -217,7 +224,7 @@ public class Inventory : NetworkBehaviour
         if (!isLocalPlayer)
         {
             var changeJson = JsonUtility.ToJson(new InventoryChange { Loot = new ItemBase[] { item } });
-            connectionToClient.Send(Assets.Scripts.Networking.MessageIds.InventoryChange, new StringMessage(changeJson));
+            connectionToClient.Send(Assets.Core.Networking.MessageIds.InventoryChange, new StringMessage(changeJson));
         }
     }
 
@@ -269,7 +276,7 @@ public class Inventory : NetworkBehaviour
         if (!isLocalPlayer)
         {
             var itemJson = JsonUtility.ToJson(invChange);
-            connectionToClient.Send(Assets.Scripts.Networking.MessageIds.InventoryChange, new StringMessage(itemJson));
+            connectionToClient.Send(Assets.Core.Networking.MessageIds.InventoryChange, new StringMessage(itemJson));
         }
     }
 
@@ -284,7 +291,7 @@ public class Inventory : NetworkBehaviour
 
     public void SetItemToSlot(string slotName, string itemId)
     {
-        if (!Enum.TryParse<SlotIndexToGameObjectName>(slotName, out var slotReult))
+        if (!Enum.TryParse<SlotIndexToGameObjectName>(slotName, out var slotResult))
         {
             Debug.LogError($"Failed to find slot for name {slotName}");
             return;
@@ -294,10 +301,12 @@ public class Inventory : NetworkBehaviour
         if (equippedIndex >= 0)
         {
             //Debug.Log($"{itemId} is already assigned to slot {equippedIndex}");
-            EquipSlots[equippedIndex] = null;
+            //EquipSlots[equippedIndex] = null;
+            EquipItem(equippedIndex, null);
         }
 
-        EquipSlots[(int)slotReult] = itemId;
+        //EquipSlots[(int)slotResult] = itemId;
+        EquipItem((int)slotResult, itemId);
     }
 
     [Command]
@@ -315,6 +324,62 @@ public class Inventory : NetworkBehaviour
         var item = Items.FirstOrDefault(x => x.Id == itemId);
 
         return item is Spell ? item as Spell : null;
+    }
+
+    public void SpawnItemInHand(int index, ItemBase item, bool leftHand = true)
+    {
+        //var sword = Instantiate(GameManager.Instance.Prefabs.Weapons.Sword1, gameObject.transform);
+        //sword.transform.rotation = Quaternion.identity;
+        //sword.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, -2.1f, 0.75f);
+
+        var currentlyInGame = EquippedObjects[index];
+        if (currentlyInGame != null)
+        {
+            Destroy(currentlyInGame);
+        }
+
+        if (item is Weapon weapon)
+        {
+            var prefab = ResultFactory.GetPrefabForWeaponType(weapon.SubType, weapon.IsTwoHanded);
+            var weaponGo = Instantiate(prefab, gameObject.transform);
+            weaponGo.transform.localEulerAngles = new Vector3(0, 90);
+            weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, 0.3f, 0.75f);
+            EquippedObjects[index] = weaponGo;
+        }
+        else
+        {
+            //todo: implement other items
+            Debug.Log($"Not implemented handling for item {item.Name} yet");
+        }
+    }
+
+    public void EquipItem(int slotIndex, string itemId)
+    {
+        if (string.IsNullOrWhiteSpace(itemId))
+        {
+            EquipSlots[slotIndex] = null;
+            //todo: destroy game object
+            return;
+        }
+
+        EquipSlots[slotIndex] = itemId;
+
+        if (slotIndex == (int)Inventory.SlotIndexToGameObjectName.LeftHand)
+        {
+            SpawnItemInHand(slotIndex, Items.First(x => x.Id == itemId), true);
+        }
+        else if (slotIndex == (int)Inventory.SlotIndexToGameObjectName.RightHand)
+        {
+            SpawnItemInHand(slotIndex, Items.First(x => x.Id == itemId), false);
+        }
+    }
+
+    private void EquipItems()
+    {
+        for (var i = 0; i < EquipSlots.Length; i++)
+        {
+            EquipItem(i, EquipSlots[i]);
+        }
     }
 
 

@@ -153,7 +153,7 @@ public class PlayerController : NetworkBehaviour
         //todo: style projectile based on activeSpell
 
         var startPos = PlayerCamera.transform.position + PlayerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
-        var spellObject = Instantiate(GameManager.Instance.Prefabs.Spell, startPos, transform.rotation, transform);
+        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.Spell, startPos, transform.rotation, transform);
         spellObject.SetActive(true);
 
         var spellScript = spellObject.GetComponent<SpellBehaviour>();
@@ -211,7 +211,7 @@ public class PlayerController : NetworkBehaviour
     [TargetRpc]
     public void TargetRpcShowDamage(NetworkConnection playerConnection, Vector3 position, string damage)
     {
-        var hit = Instantiate(GameManager.Instance.Prefabs.HitText);
+        var hit = Instantiate(GameManager.Instance.Prefabs.Combat.HitText);
         hit.transform.SetParent(GameManager.Instance.MainCanvasObjects.HitNumberContainer.transform, false);
         hit.gameObject.SetActive(true);
 

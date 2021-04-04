@@ -58,7 +58,7 @@ public class PlayerSetup : NetworkBehaviour
         var pm = gameObject.AddComponent<PlayerMovement>();
         pm.PlayerCamera = _playerCamera;
 
-        connectionToServer.RegisterHandler(Assets.Scripts.Networking.MessageIds.LoadPlayerData, OnLoadPlayerData);
+        connectionToServer.RegisterHandler(Assets.Core.Networking.MessageIds.LoadPlayerData, OnLoadPlayerData);
 
         GameManager.Instance.MainCanvasObjects.Hud.SetActive(true);
 
@@ -144,7 +144,7 @@ public class PlayerSetup : NetworkBehaviour
 
             if (!isLocalPlayer)
             {
-                connectionToClient.Send(Assets.Scripts.Networking.MessageIds.LoadPlayerData, new StringMessage(loadJson));
+                connectionToClient.Send(Assets.Core.Networking.MessageIds.LoadPlayerData, new StringMessage(loadJson));
             }
         }
         else

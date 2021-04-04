@@ -7337,8 +7337,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67128d38d75dacc41a2818854b1cb9e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Spell: {fileID: 4991308441274877191, guid: 7297a77e0760fc442a8de9c1615f5d4c, type: 3}
-  HitText: {fileID: 4232121126068313654, guid: e4d26bf7e17ee2b4ea2339e95a75588a, type: 3}
+  Combat:
+    Spell: {fileID: 4991308441274877191, guid: 7297a77e0760fc442a8de9c1615f5d4c, type: 3}
+    HitText: {fileID: 4232121126068313654, guid: e4d26bf7e17ee2b4ea2339e95a75588a,
+      type: 3}
+  Weapons:
+    Dagger: {fileID: 2957964262902122440, guid: c254c49e9e23f1f478f7fe1c7e5f7726,
+      type: 3}
+    Axe1: {fileID: 3422181861286336217, guid: 620e7d7564c784a43b86f2a97542709a, type: 3}
+    Sword1: {fileID: 5384239969658181431, guid: 391bac2c0773fe348bd5f01f1e13ce91,
+      type: 3}
+    Sword2: {fileID: 0}
+    Hammer1: {fileID: 1298449815235322938, guid: d083539429da01f4a948d98d0bd435dc,
+      type: 3}
+    Hammer2: {fileID: 0}
+    Staff: {fileID: 4180034521190121356, guid: 9db79d108cde9f548a4ba1d52c1ea2b4, type: 3}
+    Bow: {fileID: 6070991472796377898, guid: 49b96cb05dc76f841a03a0533ed3240c, type: 3}
+    Crossbow: {fileID: 9130404379367930867, guid: 91ecae8b81a7bbe45bda67732f076637,
+      type: 3}
+    Gun1: {fileID: 7065878381452502910, guid: 8c0273065c6f88d4e9a0cbe91a6925f4, type: 3}
+    Gun2: {fileID: 0}
+    Shield: {fileID: 7837204811977536374, guid: dba1d53db226b6a43b3cab4703b67937,
+      type: 3}
 --- !u!1 &1549162085111107810
 GameObject:
   m_ObjectHideFlags: 0

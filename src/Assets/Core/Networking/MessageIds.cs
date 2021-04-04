@@ -1,4 +1,4 @@
-﻿namespace Assets.Scripts.Networking
+﻿namespace Assets.Core.Networking
 {
     public static class MessageIds
     {

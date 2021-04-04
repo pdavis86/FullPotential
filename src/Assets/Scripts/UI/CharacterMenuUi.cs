@@ -86,8 +86,11 @@ public class CharacterMenuUi : MonoBehaviour
                 var itemId = _inventory.EquipSlots[i];
                 if (!string.IsNullOrWhiteSpace(itemId))
                 {
+                    var item = _inventory.Items.FirstOrDefault(x => x.Id == itemId);
+
                     //Debug.Log($"Displaying '{itemId}' in UI slot '{slotName}'");
-                    SetSlot(GetSlot(slotName), _inventory.Items.FirstOrDefault(x => x.Id == itemId));
+
+                    SetSlot(GetSlot(slotName), item);
                 }
                 else
                 {

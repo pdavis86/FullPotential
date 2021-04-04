@@ -11,6 +11,31 @@
 
 public class Prefabs : MonoBehaviour
 {
-    public GameObject Spell;
-    public GameObject HitText;
+    public CombatClass Combat;
+    public WeaponsClass Weapons;
+
+    [System.Serializable]
+    public class CombatClass
+    {
+        public GameObject Spell;
+        public GameObject HitText;
+    }
+
+    [System.Serializable]
+    public class WeaponsClass
+    {
+        public GameObject Dagger;
+        public GameObject Axe1;
+        public GameObject Axe2;
+        public GameObject Sword1;
+        public GameObject Sword2;
+        public GameObject Hammer1;
+        public GameObject Hammer2;
+        public GameObject Staff;
+        public GameObject Bow;
+        public GameObject Crossbow;
+        public GameObject Gun1;
+        public GameObject Gun2;
+        public GameObject Shield;
+    }
 }
