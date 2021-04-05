@@ -10,7 +10,14 @@
             Spell
         }
 
+        /// <summary>
+        /// The category of this craftable
+        /// </summary>
         CraftingCategory Category { get; }
+
+        /// <summary>
+        /// The name used to identify this craftable type
+        /// </summary>
         string TypeName { get; }
 
         //todo: need to register a prefab when registering

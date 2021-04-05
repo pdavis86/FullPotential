@@ -11,6 +11,9 @@
             Barrier
         }
 
+        /// <summary>
+        /// The type of Armor
+        /// </summary>
         ArmorCategory SubCategory { get; }
     }
 }
