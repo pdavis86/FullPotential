@@ -10,6 +10,7 @@ namespace Assets.Core.Crafting
 {
     public class ResultFactory
     {
+        //todo: remove these in favour of the Assets.ApiScripts.Crafting.ICraftable.CraftingCategory values
         public const string CraftingTypeWeapon = "Weapon";
         public const string CraftingTypeArmor = "Armor";
         public const string CraftingTypeAccessory = "Accessory";

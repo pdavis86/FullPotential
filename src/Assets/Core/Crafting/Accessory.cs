@@ -15,6 +15,7 @@ namespace Assets.Core.Crafting
 
 
 
+        //todo: everything below here should be "registered" rather than hard-coded
 
         public const string Gloves = "Gloves";
         public const string Amulet = "Amulet";
@@ -23,10 +24,10 @@ namespace Assets.Core.Crafting
 
         public static readonly List<string> AccessoryOptions = new List<string>
         {
-            Gloves,
             Amulet,
-            Ring,
-            Belt
+            Belt,
+            Gloves,
+            Ring
         };
 
     }

@@ -17,6 +17,7 @@ namespace Assets.Core.Crafting
 
 
 
+        //todo: everything below here should be "registered" rather than hard-coded
 
         public const string Helm = "Helm";
         public const string Chest = "Chest";
