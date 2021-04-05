@@ -7345,6 +7345,7 @@ MonoBehaviour:
     Dagger: {fileID: 2957964262902122440, guid: c254c49e9e23f1f478f7fe1c7e5f7726,
       type: 3}
     Axe1: {fileID: 3422181861286336217, guid: 620e7d7564c784a43b86f2a97542709a, type: 3}
+    Axe2: {fileID: 0}
     Sword1: {fileID: 5384239969658181431, guid: 391bac2c0773fe348bd5f01f1e13ce91,
       type: 3}
     Sword2: {fileID: 0}
@@ -7355,9 +7356,9 @@ MonoBehaviour:
     Bow: {fileID: 6070991472796377898, guid: 49b96cb05dc76f841a03a0533ed3240c, type: 3}
     Crossbow: {fileID: 9130404379367930867, guid: 91ecae8b81a7bbe45bda67732f076637,
       type: 3}
-    Gun1: {fileID: 7065878381452502910, guid: 8c0273065c6f88d4e9a0cbe91a6925f4, type: 3}
+    Gun1: {fileID: 24308273732913702, guid: 8c0273065c6f88d4e9a0cbe91a6925f4, type: 3}
     Gun2: {fileID: 0}
-    Shield: {fileID: 7837204811977536374, guid: dba1d53db226b6a43b3cab4703b67937,
+    Shield: {fileID: 1047650512018476516, guid: dba1d53db226b6a43b3cab4703b67937,
       type: 3}
 --- !u!1 &1549162085111107810
 GameObject:
