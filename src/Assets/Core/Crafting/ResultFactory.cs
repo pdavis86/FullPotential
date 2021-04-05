@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.ApiScripts.Crafting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,9 +10,6 @@ namespace Assets.Core.Crafting
 {
     public class ResultFactory
     {
-        public const string LootPrefixScrap = "Scrap";
-        public const string LootPrefixShard = "Shard";
-
         public const string CraftingTypeWeapon = "Weapon";
         public const string CraftingTypeArmor = "Armor";
         public const string CraftingTypeAccessory = "Accessory";
@@ -26,7 +24,7 @@ namespace Assets.Core.Crafting
 
             if (!withValue.Any())
             {
-                return 0;
+                return 1;
             }
 
             var min = withValue.Min(getProp);
@@ -39,7 +37,7 @@ namespace Assets.Core.Crafting
 
             //Debug.Log($"{getProp.Method.Name} = Min:{min}, Max:{max}, Skew:{topEndSkew}, Result:{result}");
 
-            return result;
+            return result == 0 ? 1 : result;
         }
 
         private string GetTargeting(IEnumerable<string> effectsInput)
@@ -172,7 +170,7 @@ namespace Assets.Core.Crafting
             var isMagical = _random.Next(0, 2) > 0;
             if (isMagical)
             {
-                lootDrop.Name = LootPrefixShard;
+                lootDrop.Name = ItemBase.LootPrefixShard;
                 //todo: icon
 
                 var numberOfEffects = GetBiasedNumber(1, 4);
@@ -194,7 +192,7 @@ namespace Assets.Core.Crafting
             }
             else
             {
-                lootDrop.Name = LootPrefixScrap;
+                lootDrop.Name = ItemBase.LootPrefixScrap;
                 //todo: icon
             }
 
@@ -239,165 +237,133 @@ namespace Assets.Core.Crafting
             return spell;
         }
 
-        private string GetItemName(string prefix, GearBase item)
+        private string GetItemName(string prefix, GearBase item, string suffix)
         {
-            return $"{prefix} {item.Attributes.Strength} {item.SubType}";
+            return $"{prefix} {item.Attributes.Strength} {suffix}";
         }
 
-        internal Weapon GetMeleeWeapon(string type, IEnumerable<ItemBase> components, bool isTwoHanded)
+        internal Weapon FillMeleeWeapon(Weapon weapon, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
-            var item = new Weapon
+            weapon.Id = Guid.NewGuid().ToString();
+            weapon.IsTwoHanded = weapon.EnforceTwoHanded || (weapon.AllowTwoHanded && isTwoHanded);
+            weapon.Attributes = new Attributes
             {
-                Id = Guid.NewGuid().ToString(),
-                SubType = type,
-                IsTwoHanded = isTwoHanded,
-                Attributes = new Attributes
-                {
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                    Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
-                    Speed = ComputeAttribute(components, x => x.Attributes.Speed)
-                },
-                Effects = GetEffects(CraftingTypeWeapon, components.SelectMany(x => x.Effects))
+                Strength = ComputeAttribute(components, x => x.Attributes.Strength),
+                Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
+                Speed = ComputeAttribute(components, x => x.Attributes.Speed)
             };
-            item.Name = GetItemName("Strength", item);
-            return item;
+            weapon.Effects = GetEffects(CraftingTypeWeapon, components.SelectMany(x => x.Effects));
+            weapon.Name = GetItemName("Strength", weapon, weapon.TypeName);
+            return weapon;
         }
 
-        internal Weapon GetRangedWeapon(string type, IEnumerable<ItemBase> components, bool isTwoHanded, bool allowAutomatic)
+        internal Weapon FillRangedWeapon(Weapon weapon, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
-            var item = new Weapon
+            weapon.Id = Guid.NewGuid().ToString();
+            weapon.IsTwoHanded = weapon.EnforceTwoHanded || (weapon.AllowTwoHanded && isTwoHanded);
+            weapon.Attributes = new Attributes
             {
-                Id = Guid.NewGuid().ToString(),
-                SubType = type,
-                IsTwoHanded = isTwoHanded,
-                Attributes = new Attributes
-                {
-                    IsAutomatic = allowAutomatic && components.Any(x => x.Attributes.IsAutomatic),
-                    ExtraAmmoPerShot = components.FirstOrDefault(x => x.Attributes.ExtraAmmoPerShot > 0)?.Attributes.ExtraAmmoPerShot ?? 0,
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                    Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
-                    Range = ComputeAttribute(components, x => x.Attributes.Range),
-                    Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
-                    Speed = ComputeAttribute(components, x => x.Attributes.Speed),
-                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
-                },
-                Effects = GetEffects(CraftingTypeWeapon, components.SelectMany(x => x.Effects))
+                IsAutomatic = weapon.AllowAutomatic && components.Any(x => x.Attributes.IsAutomatic),
+                ExtraAmmoPerShot = components.FirstOrDefault(x => x.Attributes.ExtraAmmoPerShot > 0)?.Attributes.ExtraAmmoPerShot ?? 0,
+                Strength = ComputeAttribute(components, x => x.Attributes.Strength),
+                Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
+                Range = ComputeAttribute(components, x => x.Attributes.Range),
+                Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
+                Speed = ComputeAttribute(components, x => x.Attributes.Speed),
+                Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
             };
-            item.Name = GetItemName("Strength", item);
-            return item;
+            weapon.Effects = GetEffects(CraftingTypeWeapon, components.SelectMany(x => x.Effects));
+            weapon.Name = GetItemName("Strength", weapon, weapon.TypeName);
+            return weapon;
         }
 
-        internal Weapon GetShield(IEnumerable<ItemBase> components)
+        internal Weapon FillDefensiveWeapon(Weapon weapon, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
-            var item = new Weapon
+            weapon.Id = Guid.NewGuid().ToString();
+            weapon.IsTwoHanded = weapon.EnforceTwoHanded || (weapon.AllowTwoHanded && isTwoHanded);
+            weapon.Attributes = new Attributes
             {
-                Id = Guid.NewGuid().ToString(),
-                SubType = Weapon.Shield,
-                Attributes = new Attributes
-                {
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                    Speed = ComputeAttribute(components, x => x.Attributes.Speed),
-                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
-                },
-                Effects = GetEffects(CraftingTypeWeapon, components.SelectMany(x => x.Effects))
+                Strength = ComputeAttribute(components, x => x.Attributes.Strength),
+                Speed = ComputeAttribute(components, x => x.Attributes.Speed),
+                Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
             };
-            item.Name = GetItemName("Defence", item);
-            return item;
+            weapon.Effects = GetEffects(CraftingTypeWeapon, components.SelectMany(x => x.Effects));
+            weapon.Name = GetItemName("Defence", weapon, weapon.TypeName);
+            return weapon;
         }
 
-        internal Armor GetArmor(string type, IEnumerable<ItemBase> components)
+        internal Armor FillArmor(Armor armor, IEnumerable<ItemBase> components)
         {
-            var item = new Armor
+            armor.Id = Guid.NewGuid().ToString();
+            armor.Attributes = new Attributes
             {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Unnamed Armor",
-                SubType = type,
-                Attributes = new Attributes
-                {
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength)
-                },
-                Effects = GetEffects(CraftingTypeArmor, components.SelectMany(x => x.Effects))
+                Strength = ComputeAttribute(components, x => x.Attributes.Strength)
             };
-            item.Name = GetItemName("Defence", item);
-            return item;
+            armor.Effects = GetEffects(CraftingTypeArmor, components.SelectMany(x => x.Effects));
+            armor.Name = GetItemName("Defence", armor, armor.TypeName);
+            return armor;
         }
 
-        internal Armor GetBarrier(IEnumerable<ItemBase> components)
+        internal Armor FillBarrier(Armor armor, IEnumerable<ItemBase> components)
         {
-            var item = new Armor
+            armor.Id = Guid.NewGuid().ToString();
+            armor.Attributes = new Attributes
             {
-                Id = Guid.NewGuid().ToString(),
-                SubType = Armor.Barrier,
-                Attributes = new Attributes
-                {
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                    Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
-                    Speed = ComputeAttribute(components, x => x.Attributes.Speed),
-                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
-                },
-                Effects = GetEffects(CraftingTypeArmor, components.SelectMany(x => x.Effects))
+                Strength = ComputeAttribute(components, x => x.Attributes.Strength),
+                Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
+                Speed = ComputeAttribute(components, x => x.Attributes.Speed),
+                Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
             };
-            item.Name = GetItemName("Defence", item);
-            return item;
+            armor.Effects = GetEffects(CraftingTypeArmor, components.SelectMany(x => x.Effects));
+            armor.Name = GetItemName("Defence", armor, armor.TypeName);
+            return armor;
         }
 
-        internal Accessory GetAccessory(string type, IEnumerable<ItemBase> components)
+        internal Accessory FillAccessory(Accessory accessory, IEnumerable<ItemBase> components)
         {
-            var item = new Accessory
+            accessory.Id = Guid.NewGuid().ToString();
+            accessory.Attributes = new Attributes
             {
-                Id = Guid.NewGuid().ToString(),
-                SubType = type,
-                Attributes = new Attributes
-                {
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength)
-                },
-                Effects = GetEffects(CraftingTypeAccessory, components.SelectMany(x => x.Effects))
+                Strength = ComputeAttribute(components, x => x.Attributes.Strength)
             };
-            item.Name = GetItemName("Strength", item);
-            return item;
+            accessory.Effects = GetEffects(CraftingTypeAccessory, components.SelectMany(x => x.Effects));
+            accessory.Name = GetItemName("Strength", accessory, accessory.TypeName);
+            return accessory;
         }
 
-        public ItemBase GetCraftedItem(List<ItemBase> components, string selectedType, string selectedSubtype, bool isTwoHanded)
+        public ItemBase GetCraftedItem(string categoryName, string typeName, List<ItemBase> components, bool isTwoHanded)
         {
-            //todo: requirements e.g. strength, speed, accuracy, 6 scrap or less
+            var craftingResult = CraftingRegister.Instance.GetCraftingItem(categoryName, typeName);
 
-            if (selectedType == CraftingTypeSpell)
+            switch (craftingResult.Category)
             {
-                return GetSpell(components);
-            }
-            else
-            {
-                switch (selectedSubtype)
-                {
-                    case Weapon.Dagger: return GetMeleeWeapon(Weapon.Dagger, components, false);
-                    case Weapon.Staff: return GetMeleeWeapon(Weapon.Staff, components, true);
-                    case Weapon.Bow: return GetRangedWeapon(Weapon.Bow, components, true, false);
-                    case Weapon.Crossbow: return GetRangedWeapon(Weapon.Crossbow, components, true, false);
-                    case Weapon.Shield: return GetShield(components);
+                case ICraftable.CraftingCategory.Spell:
+                    return GetSpell(components);
 
-                    case Armor.Helm: return GetArmor(Armor.Helm, components);
-                    case Armor.Chest: return GetArmor(Armor.Chest, components);
-                    case Armor.Legs: return GetArmor(Armor.Legs, components);
-                    case Armor.Feet: return GetArmor(Armor.Feet, components);
-                    case Armor.Barrier: return GetBarrier(components);
+                case ICraftable.CraftingCategory.Weapon:
+                    var newWeapon = craftingResult as Weapon;
+                    switch (newWeapon.SubCategory)
+                    {
+                        case ICraftableWeapon.WeaponCategory.Melee: return FillMeleeWeapon(newWeapon, components, isTwoHanded);
+                        case ICraftableWeapon.WeaponCategory.Ranged: return FillRangedWeapon(newWeapon, components, isTwoHanded);
+                        case ICraftableWeapon.WeaponCategory.Defensive: return FillDefensiveWeapon(newWeapon, components, isTwoHanded);
+                        default: throw new Exception($"Unexpected weapon category '{newWeapon.SubCategory}'");
+                    }
 
-                    case Accessory.Gloves: return GetAccessory(Accessory.Gloves, components);
-                    case Accessory.Amulet: return GetAccessory(Accessory.Amulet, components);
-                    case Accessory.Ring: return GetAccessory(Accessory.Ring, components);
-                    case Accessory.Belt: return GetAccessory(Accessory.Belt, components);
+                case ICraftable.CraftingCategory.Armor:
+                    var armor = craftingResult as Armor;
+                    if (armor.SubCategory == ICraftableArmor.ArmorCategory.Barrier)
+                    {
+                        return FillBarrier(armor, components);
+                    }
+                    return FillArmor(armor, components);
 
-                    default:
+                case ICraftable.CraftingCategory.Accessory:
+                    var accessory = craftingResult as Accessory;
+                    return FillAccessory(accessory, components);
 
-                        switch (selectedSubtype)
-                        {
-                            case Weapon.Axe: return GetMeleeWeapon(Weapon.Axe, components, isTwoHanded);
-                            case Weapon.Sword: return GetMeleeWeapon(Weapon.Sword, components, isTwoHanded);
-                            case Weapon.Hammer: return GetMeleeWeapon(Weapon.Hammer, components, isTwoHanded);
-                            case Weapon.Gun: return GetRangedWeapon(Weapon.Gun, components, isTwoHanded, true);
-                            default:
-                                throw new Exception("Invalid weapon type");
-                        }
-                }
+                default:
+                    throw new Exception($"Unexpected craftable category '{craftingResult.Category}'");
             }
         }
 
@@ -424,24 +390,6 @@ namespace Assets.Core.Crafting
             if (item.Effects.Count > 0) { sb.Append($"Effects: {string.Join(", ", item.Effects)}\n"); }
 
             return sb.ToString();
-        }
-
-        //todo: move this to type registration
-        public static UnityEngine.GameObject GetPrefabForWeaponType(string weaponType, bool twoHanded)
-        {
-            switch (weaponType)
-            {
-                case Weapon.Axe: return twoHanded ? GameManager.Instance.Prefabs.Weapons.Axe2 : GameManager.Instance.Prefabs.Weapons.Axe1;
-                case Weapon.Bow: return GameManager.Instance.Prefabs.Weapons.Bow;
-                case Weapon.Crossbow: return GameManager.Instance.Prefabs.Weapons.Crossbow;
-                case Weapon.Dagger: return GameManager.Instance.Prefabs.Weapons.Dagger;
-                case Weapon.Gun: return twoHanded ? GameManager.Instance.Prefabs.Weapons.Gun2 : GameManager.Instance.Prefabs.Weapons.Gun1;
-                case Weapon.Hammer: return twoHanded ? GameManager.Instance.Prefabs.Weapons.Hammer2 : GameManager.Instance.Prefabs.Weapons.Hammer1;
-                case Weapon.Shield: return GameManager.Instance.Prefabs.Weapons.Shield;
-                case Weapon.Staff: return GameManager.Instance.Prefabs.Weapons.Staff;
-                case Weapon.Sword: return twoHanded ? GameManager.Instance.Prefabs.Weapons.Sword2 : GameManager.Instance.Prefabs.Weapons.Sword1;
-                default: throw new Exception($"Unexpected weapon type {weaponType}");
-            }
         }
 
     }

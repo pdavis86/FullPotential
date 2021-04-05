@@ -1,12 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using Assets.ApiScripts.Crafting;
+using System.Collections.Generic;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace Assets.Core.Crafting
 {
     [System.Serializable]
-    public class Armor : GearBase
+    public class Armor : GearBase, ICraftableArmor
     {
+        public string TypeName { get; set; }
+
+        public ICraftable.CraftingCategory Category { get; set; }
+
+        public ICraftableArmor.ArmorCategory SubCategory { get; set; }
+
+
+
+
+
         public const string Helm = "Helm";
         public const string Chest = "Chest";
         public const string Legs = "Legs";

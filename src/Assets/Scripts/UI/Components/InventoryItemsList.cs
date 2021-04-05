@@ -1,4 +1,5 @@
-﻿using Assets.Core.Crafting;
+﻿using Assets.ApiScripts.Crafting;
+using Assets.Core.Crafting;
 using Assets.Core.Extensions;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,7 @@ public class InventoryItemsList : MonoBehaviour
 
             if (!string.IsNullOrWhiteSpace(gearSubType) && x is GearBase gearItem)
             {
-                return gearItem.SubType == gearSubType;
+                return ((ICraftable)gearItem).TypeName == gearSubType;
             }
             else
             {

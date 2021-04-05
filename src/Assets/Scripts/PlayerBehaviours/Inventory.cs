@@ -98,7 +98,8 @@ public class Inventory : NetworkBehaviour
                 MaxItems = changes.MaxItems;
             }
 
-            var addedItems = changes.Loot
+            var addedItems = Enumerable.Empty<ItemBase>()
+                .UnionIfNotNull(changes.Loot)
                 .UnionIfNotNull(changes.Accessories)
                 .UnionIfNotNull(changes.Armor)
                 .UnionIfNotNull(changes.Spells)
@@ -196,7 +197,7 @@ public class Inventory : NetworkBehaviour
         return new Assets.Core.Data.Inventory
         {
             MaxItems = MaxItems,
-            Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemBase))?.ToArray(),
+            Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(Loot))?.Select(x => x as Loot).ToArray(),
             Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray(),
             Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
             Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray(),
@@ -223,7 +224,9 @@ public class Inventory : NetworkBehaviour
 
         if (!isLocalPlayer)
         {
-            var changeJson = JsonUtility.ToJson(new InventoryChange { Loot = new ItemBase[] { item } });
+            //todo: what type is the item being added?
+            var changeJson = JsonUtility.ToJson(new InventoryChange { Loot = new Loot[] { item as Loot } });
+
             connectionToClient.Send(Assets.Core.Networking.MessageIds.InventoryChange, new StringMessage(changeJson));
         }
     }
@@ -258,7 +261,7 @@ public class Inventory : NetworkBehaviour
             return;
         }
 
-        var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(components, selectedType, selectedSubtype, isTwoHanded);
+        var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(selectedType, selectedSubtype, components, isTwoHanded);
 
         var craftedType = craftedItem.GetType();
 
@@ -328,10 +331,6 @@ public class Inventory : NetworkBehaviour
 
     public void SpawnItemInHand(int index, ItemBase item, bool leftHand = true)
     {
-        //var sword = Instantiate(GameManager.Instance.Prefabs.Weapons.Sword1, gameObject.transform);
-        //sword.transform.rotation = Quaternion.identity;
-        //sword.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, -2.1f, 0.75f);
-
         var currentlyInGame = EquippedObjects[index];
         if (currentlyInGame != null)
         {
@@ -340,7 +339,7 @@ public class Inventory : NetworkBehaviour
 
         if (item is Weapon weapon)
         {
-            var prefab = ResultFactory.GetPrefabForWeaponType(weapon.SubType, weapon.IsTwoHanded);
+            var prefab = CraftingRegister.GetPrefabForWeaponType(weapon.TypeName, weapon.IsTwoHanded);
             var weaponGo = Instantiate(prefab, gameObject.transform);
             weaponGo.transform.localEulerAngles = new Vector3(0, 90);
             weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, 0.3f, 0.75f);

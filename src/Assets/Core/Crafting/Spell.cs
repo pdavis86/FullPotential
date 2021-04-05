@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Assets.ApiScripts.Crafting;
+using System.Collections.Generic;
 using System.Linq;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -8,8 +9,13 @@ using System.Linq;
 namespace Assets.Core.Crafting
 {
     [System.Serializable]
-    public class Spell : ItemBase
+    public class Spell : ItemBase, ICraftableSpell
     {
+        public string TypeName { get; set; }
+
+        public ICraftable.CraftingCategory Category { get; set; }
+
+
         public string Targeting;
         public string Shape;
 

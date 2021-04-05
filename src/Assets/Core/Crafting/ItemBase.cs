@@ -5,9 +5,14 @@
 
 namespace Assets.Core.Crafting
 {
+    //todo: can I make this an abstract class?
+
     [System.Serializable]
     public class ItemBase
     {
+        public const string LootPrefixScrap = "Scrap";
+        public const string LootPrefixShard = "Shard";
+
         public string Id;
         public string Name;
         public Attributes Attributes;
@@ -28,7 +33,7 @@ namespace Assets.Core.Crafting
 
         public string GetFullName()
         {
-            if (Name == ResultFactory.LootPrefixScrap || Name == ResultFactory.LootPrefixShard)
+            if (Name == LootPrefixScrap || Name == LootPrefixShard)
             {
                 var suffix = int.Parse(GetHashCode().ToString().TrimStart('-').Substring(5));
                 return Name + $" (Type #{suffix.ToString("D5")})";

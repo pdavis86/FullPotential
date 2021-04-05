@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Assets.Core.Data
+﻿namespace Assets.Core.Data
 {
-    [Serializable]
+    [System.Serializable]
     public class InventoryChange : Inventory
     {
         public string[] IdsToRemove;

@@ -1,40 +1,26 @@
-﻿using System.Collections.Generic;
+﻿// ReSharper disable UnusedAutoPropertyAccessor.Global
 
-// ReSharper disable UnusedAutoPropertyAccessor.Global
+using Assets.ApiScripts.Crafting;
 
 namespace Assets.Core.Crafting
 {
     [System.Serializable]
-    public class Weapon : GearBase
+    public class Weapon : GearBase, ICraftableWeapon
     {
-        //todo: need to register a prefab when registering a weapon type
+        public string TypeName { get; set; }
 
-        public const string Dagger = "Dagger";
-        public const string Axe = "Axe";
-        public const string Sword = "Sword";
-        public const string Hammer = "Hammer";
-        public const string Staff = "Staff";
-        public const string Bow = "Bow";
-        public const string Crossbow = "Crossbow";
-        public const string Gun = "Gun";
-        public const string Shield = "Shield";
+        public ICraftable.CraftingCategory Category { get; set; }
 
-        public const string OneHanded = "One-handed";
-        public const string TwoHanded = "Two-handed";
+        public ICraftableWeapon.WeaponCategory SubCategory { get; set; }
 
-        public static readonly List<string> WeaponOptions = new List<string>
-        {
-            Dagger,
-            Axe,
-            Sword,
-            Hammer,
-            Staff,
-            Bow,
-            Crossbow,
-            Gun,
-            Shield
-        };
+        public bool AllowAutomatic { get; set; }
+
+        public bool AllowTwoHanded { get; set; }
+
+        public bool EnforceTwoHanded { get; set; }
+
 
         public bool IsTwoHanded;
+
     }
 }

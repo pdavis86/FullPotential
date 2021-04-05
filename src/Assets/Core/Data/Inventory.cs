@@ -1,14 +1,13 @@
 ﻿using Assets.Core.Crafting;
-using System;
 
 namespace Assets.Core.Data
 {
-    [Serializable]
+    [System.Serializable]
     public class Inventory
     {
         public int MaxItems;
 
-        public ItemBase[] Loot;
+        public Loot[] Loot;
         public Accessory[] Accessories;
         public Armor[] Armor;
         public Spell[] Spells;

@@ -40,6 +40,8 @@ public class GameManager : MonoBehaviour
         InputMappings = GetComponent<InputMappings>();
         ResultFactory = new ResultFactory();
 
+        CraftingRegister.Instance.FindAndRegisterAll();
+
         DontDestroyOnLoad(gameObject);
     }
 

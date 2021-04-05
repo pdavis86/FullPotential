@@ -1,4 +1,5 @@
-﻿using Assets.Core.Constants;
+﻿using Assets.ApiScripts.Crafting;
+using Assets.Core.Constants;
 using Assets.Core.Crafting;
 using System;
 using System.Globalization;
