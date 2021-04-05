@@ -25,7 +25,27 @@ namespace Assets.Core.Crafting
         {
             _registeredCraftables = new List<ICraftable>();
 
+            RegisterStandardCraftables();
+
             //todo: how do we scan for registrable types?
+        }
+
+        private void RegisterStandardCraftables()
+        {
+            _registeredCraftables.Add(new Accessory() { Category = ICraftable.CraftingCategory.Accessory, TypeName = Accessory.Amulet });
+            _registeredCraftables.Add(new Accessory() { Category = ICraftable.CraftingCategory.Accessory, TypeName = Accessory.Belt });
+            _registeredCraftables.Add(new Accessory() { Category = ICraftable.CraftingCategory.Accessory, TypeName = Accessory.Gloves });
+            _registeredCraftables.Add(new Accessory() { Category = ICraftable.CraftingCategory.Accessory, TypeName = Accessory.Ring });
+
+            _registeredCraftables.Add(new Armor() { Category = ICraftable.CraftingCategory.Armor, SubCategory = ICraftableArmor.ArmorCategory.Helm, TypeName = Armor.Helm });
+            _registeredCraftables.Add(new Armor() { Category = ICraftable.CraftingCategory.Armor, SubCategory = ICraftableArmor.ArmorCategory.Chest, TypeName = Armor.Chest });
+            _registeredCraftables.Add(new Armor() { Category = ICraftable.CraftingCategory.Armor, SubCategory = ICraftableArmor.ArmorCategory.Legs, TypeName = Armor.Legs });
+            _registeredCraftables.Add(new Armor() { Category = ICraftable.CraftingCategory.Armor, SubCategory = ICraftableArmor.ArmorCategory.Feet, TypeName = Armor.Feet });
+            _registeredCraftables.Add(new Armor() { Category = ICraftable.CraftingCategory.Armor, SubCategory = ICraftableArmor.ArmorCategory.Barrier, TypeName = Armor.Barrier });
+
+            //todo: don't register spells. Register effects
+            _registeredCraftables.Add(new Spell() { Category = ICraftable.CraftingCategory.Spell, TypeName = nameof(ICraftable.CraftingCategory.Spell) });
+
             ValidateAndRegister<Axe>();
             ValidateAndRegister<Bow>();
             ValidateAndRegister<Crossbow>();
@@ -71,6 +91,8 @@ namespace Assets.Core.Crafting
 
         private void RegisterWeapon(ICraftableWeapon craftableWeapon)
         {
+            //todo: Needed for serialzation but can we keep the oginal class to retain its code for events?
+
             var defType = typeof(ICraftableWeapon);
             var defProps = defType.GetInterfaces().SelectMany(x => x.GetProperties()).Union(defType.GetProperties());
 
@@ -101,20 +123,6 @@ namespace Assets.Core.Crafting
 
             if (!matches.Any())
             {
-                //todo: finish implementing standard classes
-                switch (categoryName)
-                {
-                    case "Accessory": return new Accessory() { Category = ICraftable.CraftingCategory.Accessory, TypeName = typeName };
-                    case "Armor":
-                        return new Armor()
-                        {
-                            Category = ICraftable.CraftingCategory.Armor,
-                            SubCategory = (ICraftableArmor.ArmorCategory)Enum.Parse(typeof(ICraftableArmor.ArmorCategory), typeName),
-                            TypeName = typeName
-                        };
-                    case "Spell": return new Spell() { Category = ICraftable.CraftingCategory.Spell, TypeName = typeName };
-                }
-
                 throw new Exception($"Could not find a match for '{categoryName}' and '{typeName}'");
             }
             else if (matches.Count() > 1)
