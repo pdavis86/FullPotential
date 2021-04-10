@@ -1,10 +1,13 @@
 ﻿using Assets.ApiScripts.Crafting;
+using System;
 
 namespace Assets.Standard.Weapons
 {
     public class Crossbow : IGearWeapon
     {
-        public string TypeName => "Crossbow";
+        public Guid TypeId => new Guid("3d8be950-b8b0-44c6-ab84-1bf8434d67bd");
+
+        public string TypeName => nameof(Crossbow);
 
         public IGearWeapon.WeaponCategory Category => IGearWeapon.WeaponCategory.Ranged;
 

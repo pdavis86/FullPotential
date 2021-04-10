@@ -1,11 +1,14 @@
 ﻿using Assets.ApiScripts.Crafting;
+using System;
 
 namespace Assets.Standard.Accessories
 {
     public class Amulet : IGearAccessory
     {
-        public string TypeName => "Amulet";
+        public Guid TypeId => new Guid("ddeafb61-0163-4888-b355-16a37d3a33b5");
 
-        public IGearAccessory.AccessorySlots InventorySlot => IGearAccessory.AccessorySlots.Amulet;
+        public string TypeName => nameof(Amulet);
+
+        public IGearAccessory.AccessorySlot InventorySlot => IGearAccessory.AccessorySlot.Amulet;
     }
 }

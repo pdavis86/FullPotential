@@ -1,10 +1,13 @@
 ﻿using Assets.ApiScripts.Crafting;
+using System;
 
 namespace Assets.Standard.Weapons
 {
     public class Staff : IGearWeapon
     {
-        public string TypeName => "Staff";
+        public Guid TypeId => new Guid("081f7708-9909-424f-bdd1-f39f487c018a");
+
+        public string TypeName => nameof(Staff);
 
         public IGearWeapon.WeaponCategory Category => IGearWeapon.WeaponCategory.Melee;
 
