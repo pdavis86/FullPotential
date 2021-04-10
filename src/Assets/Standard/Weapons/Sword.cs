@@ -2,14 +2,12 @@
 
 namespace Assets.Standard.Weapons
 {
-    public class Sword : ICraftableWeapon
+    public class Sword : IGearWeapon
     {
         public string TypeName => "Sword";
 
-        public ICraftable.CraftingCategory Category => ICraftable.CraftingCategory.Weapon;
+        public IGearWeapon.WeaponCategory Category => IGearWeapon.WeaponCategory.Melee;
 
-        public ICraftableWeapon.WeaponCategory SubCategory => ICraftableWeapon.WeaponCategory.Melee;
-        
         public bool AllowAutomatic => false;
 
         public bool AllowTwoHanded => true;

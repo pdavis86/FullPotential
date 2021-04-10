@@ -1,18 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using Assets.ApiScripts.Crafting;
+using System.Collections.Generic;
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UseFormatSpecifierInInterpolation
 
 namespace Assets.Core.Crafting
 {
-    //todo: can I make this an abstract class?
-
     [System.Serializable]
-    public class ItemBase
+    public abstract class ItemBase
     {
-        public const string LootPrefixScrap = "Scrap";
-        public const string LootPrefixShard = "Shard";
-
         public string Id;
         public string Name;
         public Attributes Attributes;
@@ -33,7 +29,7 @@ namespace Assets.Core.Crafting
 
         public string GetFullName()
         {
-            if (Name == LootPrefixScrap || Name == LootPrefixShard)
+            if (this is Loot)
             {
                 var suffix = int.Parse(GetHashCode().ToString().TrimStart('-').Substring(5));
                 return Name + $" (Type #{suffix.ToString("D5")})";

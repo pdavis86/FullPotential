@@ -9,13 +9,8 @@ using System.Linq;
 namespace Assets.Core.Crafting
 {
     [System.Serializable]
-    public class Spell : ItemBase, ICraftableSpell
+    public class Spell : ItemBase
     {
-        public string TypeName { get; set; }
-
-        public ICraftable.CraftingCategory Category { get; set; }
-
-
         public string Targeting;
         public string Shape;
 

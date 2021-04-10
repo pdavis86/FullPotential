@@ -2,13 +2,11 @@
 
 namespace Assets.Standard.Weapons
 {
-    public class Staff : ICraftableWeapon
+    public class Staff : IGearWeapon
     {
         public string TypeName => "Staff";
 
-        public ICraftable.CraftingCategory Category => ICraftable.CraftingCategory.Weapon;
-
-        public ICraftableWeapon.WeaponCategory SubCategory => ICraftableWeapon.WeaponCategory.Melee;
+        public IGearWeapon.WeaponCategory Category => IGearWeapon.WeaponCategory.Melee;
 
         public bool AllowAutomatic => false;
 

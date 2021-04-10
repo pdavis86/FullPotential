@@ -31,15 +31,17 @@ public class CraftingUi : MonoBehaviour
 
     private Inventory _inventory;
     private List<ItemBase> _components;
+    private List<string> _armorTypeNames;
+    private List<string> _accessoryTypeNames;
     private List<string> _weaponTypeNames;
     private List<string> _twoHandedWeaponTypeNames;
 
     private readonly List<string> _craftingCategories = new List<string>
     {
-        ResultFactory.CraftingTypeWeapon,
-        ResultFactory.CraftingTypeArmor,
-        ResultFactory.CraftingTypeAccessory,
-        ResultFactory.CraftingTypeSpell
+        nameof(Weapon),
+        nameof(Armor),
+        nameof(Accessory),
+        nameof(Spell)
     };
 
     private readonly List<string> _handednessOptions = new List<string>
@@ -60,7 +62,17 @@ public class CraftingUi : MonoBehaviour
 
         _craftButton.onClick.AddListener(CraftButtonOnClick);
 
-        var weaponTypes = CraftingRegister.Instance.GetWeaponCraftables();
+        _armorTypeNames = CraftingRegister.Instance.GetCraftables<IGearArmor>()
+            .Select(x => x.TypeName)
+            .OrderBy(x => x)
+            .ToList();
+
+        _accessoryTypeNames = CraftingRegister.Instance.GetCraftables<IGearAccessory>()
+            .Select(x => x.TypeName)
+            .OrderBy(x => x)
+            .ToList();
+
+        var weaponTypes = CraftingRegister.Instance.GetCraftables<IGearWeapon>();
 
         _weaponTypeNames = weaponTypes
             .Select(x => x.TypeName)
@@ -70,7 +82,7 @@ public class CraftingUi : MonoBehaviour
         _twoHandedWeaponTypeNames = weaponTypes
             .Where(x =>
             {
-                var weapon = (ICraftableWeapon)x;
+                var weapon = (IGearWeapon)x;
                 return !weapon.EnforceTwoHanded && weapon.AllowTwoHanded;
             })
             .Select(x => x.TypeName)
@@ -99,7 +111,7 @@ public class CraftingUi : MonoBehaviour
 
     private void SetHandednessDropDownVisibility(Dropdown handednessDropdown, string type, string subType)
     {
-        handednessDropdown.gameObject.SetActive(type == ResultFactory.CraftingTypeWeapon && _twoHandedWeaponTypeNames.Contains(subType));
+        handednessDropdown.gameObject.SetActive(type == nameof(Weapon) && _twoHandedWeaponTypeNames.Contains(subType));
     }
 
     void TypeOnValueChanged(int index)
@@ -113,10 +125,10 @@ public class CraftingUi : MonoBehaviour
 
             switch (craftingType)
             {
-                case ResultFactory.CraftingTypeWeapon: _subTypeDropdown.AddOptions(_weaponTypeNames); break;
-                case ResultFactory.CraftingTypeArmor: _subTypeDropdown.AddOptions(Armor.ArmorOptions); break;
-                case ResultFactory.CraftingTypeAccessory: _subTypeDropdown.AddOptions(Accessory.AccessoryOptions); break;
-                case ResultFactory.CraftingTypeSpell: isSpell = true; break;
+                case nameof(Weapon): _subTypeDropdown.AddOptions(_weaponTypeNames); break;
+                case nameof(Armor): _subTypeDropdown.AddOptions(_armorTypeNames); break;
+                case nameof(Accessory): _subTypeDropdown.AddOptions(_accessoryTypeNames); break;
+                case nameof(Spell): isSpell = true; break;
 
                 default:
                     throw new InvalidOperationException("Unknown crafting type");
@@ -200,7 +212,6 @@ public class CraftingUi : MonoBehaviour
             _rowPrefab,
             _inventory,
             HandleRowToggle,
-            null,
             null,
             false
         );

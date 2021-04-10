@@ -2,13 +2,11 @@
 
 namespace Assets.Standard.Weapons
 {
-    public class Axe : ICraftableWeapon
+    public class Axe : IGearWeapon
     {
         public string TypeName => "Axe";
 
-        public ICraftable.CraftingCategory Category => ICraftable.CraftingCategory.Weapon;
-
-        public ICraftableWeapon.WeaponCategory SubCategory => ICraftableWeapon.WeaponCategory.Melee;
+        public IGearWeapon.WeaponCategory Category => IGearWeapon.WeaponCategory.Melee;
 
         public bool AllowAutomatic => false;
 

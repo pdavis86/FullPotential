@@ -1,5 +1,5 @@
 ﻿using Assets.ApiScripts.Crafting;
-using Assets.Standard.Weapons;
+using Assets.Core.Crafting.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,10 @@ namespace Assets.Core.Crafting
 {
     public class CraftingRegister
     {
-        private List<ICraftable> _registeredCraftables;
+        private List<IGearAccessory> _accessories = new List<IGearAccessory>();
+        private List<IGearArmor> _armor = new List<IGearArmor>();
+        private List<IGearWeapon> _weapons = new List<IGearWeapon>();
+        private List<IGearLoot> _loot = new List<IGearLoot>();
 
         protected CraftingRegister() { }
 
@@ -23,8 +26,6 @@ namespace Assets.Core.Crafting
 
         public void FindAndRegisterAll()
         {
-            _registeredCraftables = new List<ICraftable>();
-
             RegisterStandardCraftables();
 
             //todo: how do we scan for registrable types?
@@ -32,29 +33,28 @@ namespace Assets.Core.Crafting
 
         private void RegisterStandardCraftables()
         {
-            _registeredCraftables.Add(new Accessory() { Category = ICraftable.CraftingCategory.Accessory, TypeName = Accessory.Amulet });
-            _registeredCraftables.Add(new Accessory() { Category = ICraftable.CraftingCategory.Accessory, TypeName = Accessory.Belt });
-            _registeredCraftables.Add(new Accessory() { Category = ICraftable.CraftingCategory.Accessory, TypeName = Accessory.Gloves });
-            _registeredCraftables.Add(new Accessory() { Category = ICraftable.CraftingCategory.Accessory, TypeName = Accessory.Ring });
+            ValidateAndRegister<Standard.Accessories.Amulet>();
+            ValidateAndRegister<Standard.Accessories.Belt>();
+            ValidateAndRegister<Standard.Accessories.Ring>();
 
-            _registeredCraftables.Add(new Armor() { Category = ICraftable.CraftingCategory.Armor, SubCategory = ICraftableArmor.ArmorCategory.Helm, TypeName = Armor.Helm });
-            _registeredCraftables.Add(new Armor() { Category = ICraftable.CraftingCategory.Armor, SubCategory = ICraftableArmor.ArmorCategory.Chest, TypeName = Armor.Chest });
-            _registeredCraftables.Add(new Armor() { Category = ICraftable.CraftingCategory.Armor, SubCategory = ICraftableArmor.ArmorCategory.Legs, TypeName = Armor.Legs });
-            _registeredCraftables.Add(new Armor() { Category = ICraftable.CraftingCategory.Armor, SubCategory = ICraftableArmor.ArmorCategory.Feet, TypeName = Armor.Feet });
-            _registeredCraftables.Add(new Armor() { Category = ICraftable.CraftingCategory.Armor, SubCategory = ICraftableArmor.ArmorCategory.Barrier, TypeName = Armor.Barrier });
+            ValidateAndRegister<Standard.Armor.Helm>();
+            ValidateAndRegister<Standard.Armor.Chest>();
+            ValidateAndRegister<Standard.Armor.Legs>();
+            ValidateAndRegister<Standard.Armor.Feet>();
+            ValidateAndRegister<Standard.Armor.Barrier>();
 
-            //todo: don't register spells. Register effects
-            _registeredCraftables.Add(new Spell() { Category = ICraftable.CraftingCategory.Spell, TypeName = nameof(ICraftable.CraftingCategory.Spell) });
+            ValidateAndRegister<Standard.Weapons.Axe>();
+            ValidateAndRegister<Standard.Weapons.Bow>();
+            ValidateAndRegister<Standard.Weapons.Crossbow>();
+            ValidateAndRegister<Standard.Weapons.Dagger>();
+            ValidateAndRegister<Standard.Weapons.Gun>();
+            ValidateAndRegister<Standard.Weapons.Hammer>();
+            ValidateAndRegister<Standard.Weapons.Shield>();
+            ValidateAndRegister<Standard.Weapons.Staff>();
+            ValidateAndRegister<Standard.Weapons.Sword>();
 
-            ValidateAndRegister<Axe>();
-            ValidateAndRegister<Bow>();
-            ValidateAndRegister<Crossbow>();
-            ValidateAndRegister<Dagger>();
-            ValidateAndRegister<Gun>();
-            ValidateAndRegister<Hammer>();
-            ValidateAndRegister<Shield>();
-            ValidateAndRegister<Staff>();
-            ValidateAndRegister<Sword>();
+            ValidateAndRegister<Standard.Loot.Scrap>();
+            ValidateAndRegister<Standard.Loot.Shard>();
         }
 
         private void ValidateAndRegister<T>() where T : new()
@@ -74,69 +74,91 @@ namespace Assets.Core.Crafting
                 UnityEngine.Debug.LogError($"No TypeName was specified for class '{tType.FullName}'");
             }
 
-            var match = _registeredCraftables.FirstOrDefault(x => x.TypeName.Equals(toRegister.TypeName, StringComparison.OrdinalIgnoreCase));
-            if (match != null)
+            if (toRegister is IGearAccessory accessory)
             {
-                UnityEngine.Debug.LogError($"A type with name '{toRegister.TypeName}' has already been registered");
+                Register(_accessories, accessory);
+                return;
             }
-
-            if (toRegister is ICraftableWeapon craftableWeapon)
+            else if (toRegister is IGearArmor armor)
             {
-                RegisterWeapon(craftableWeapon);
+                Register(_armor, armor);
+                return;
+            }
+            else if (toRegister is IGearWeapon craftableWeapon)
+            {
+                Register(_weapons, craftableWeapon);
+                return;
+            }
+            else if (toRegister is IGearLoot loot)
+            {
+                Register(_loot, loot);
                 return;
             }
 
             UnityEngine.Debug.LogError($"{tType.Name} does not implement any of the valid interfaces");
         }
 
-        private void RegisterWeapon(ICraftableWeapon craftableWeapon)
+        private void Register<T>(List<T> list, T item) where T : ICraftable
         {
-            //todo: Needed for serialzation but can we keep the oginal class to retain its code for events?
-
-            var defType = typeof(ICraftableWeapon);
-            var defProps = defType.GetInterfaces().SelectMany(x => x.GetProperties()).Union(defType.GetProperties());
-
-            var inProps = typeof(Weapon).GetProperties();
-
-            var weapon = new Weapon();
-
-            foreach (var defProp in defProps)
+            var match = list.FirstOrDefault(x => x.TypeName.Equals(item.TypeName, StringComparison.OrdinalIgnoreCase));
+            if (match != null)
             {
-                var inProp = inProps.First(x => x.Name == defProp.Name);
-                inProp.SetValue(weapon, defProp.GetValue(craftableWeapon));
+                UnityEngine.Debug.LogError($"A type with name '{item.TypeName}' has already been registered");
+                return;
             }
 
-            _registeredCraftables.Add(weapon);
+            list.Add(item);
         }
 
-        public ICraftable GetCraftingItem(string categoryName, string typeName)
+        public T GetCraftableType<T>(string typeName) where T : ICraftable
         {
-            if (!Enum.TryParse<ICraftableWeapon.CraftingCategory>(categoryName, out var craftableCategory))
-            {
-                throw new Exception($"Unexpected category '{categoryName}'");
-            }
-
-            var matches = _registeredCraftables.Where(x =>
-                x.Category == craftableCategory
-                && (string.IsNullOrWhiteSpace(typeName) || x.TypeName == typeName)
-            );
+            var matches = GetCraftables<T>().Where(x => x.TypeName == typeName);
 
             if (!matches.Any())
             {
-                throw new Exception($"Could not find a match for '{categoryName}' and '{typeName}'");
+                throw new Exception($"Could not find a match for '{typeof(T).Name}' and '{typeName}'");
             }
             else if (matches.Count() > 1)
             {
-                throw new Exception($"How is there more than one match for '{categoryName}' and '{typeName}'");
+                throw new Exception($"How is there more than one match for '{typeof(T).Name}' and '{typeName}'");
             }
 
-            return matches.First();
+            return (T)matches.First();
         }
 
-        public IEnumerable<ICraftable> GetWeaponCraftables()
+        public ICraftable GetCraftableType(CraftableBase craftable)
         {
-            return _registeredCraftables
-                .Where(x => x.Category == ICraftable.CraftingCategory.Weapon);
+            if (craftable is Accessory)
+            {
+                return GetCraftableType<IGearAccessory>(craftable.TypeName);
+            }
+            else if (craftable is Armor)
+            {
+                return GetCraftableType<IGearArmor>(craftable.TypeName);
+            }
+            else if (craftable is Weapon)
+            {
+                return GetCraftableType<IGearWeapon>(craftable.TypeName);
+            }
+            else if (craftable is Loot)
+            {
+                return GetCraftableType<IGearLoot>(craftable.TypeName);
+            }
+
+            return null;
+        }
+
+        public IEnumerable<ICraftable> GetCraftables<T>()
+        {
+            var typeName = typeof(T).Name;
+            switch (typeName)
+            {
+                case nameof(IGearAccessory): return _accessories;
+                case nameof(IGearArmor): return _armor;
+                case nameof(IGearWeapon): return _weapons;
+                case nameof(IGearLoot): return _loot;
+                default: throw new Exception($"Unexpected category {typeName}");
+            }
         }
 
         //todo: un-hardcode this

@@ -2,13 +2,11 @@
 
 namespace Assets.Standard.Weapons
 {
-    public class Shield : ICraftableWeapon
+    public class Shield : IGearWeapon
     {
         public string TypeName => "Shield";
 
-        public ICraftable.CraftingCategory Category => ICraftable.CraftingCategory.Weapon;
-
-        public ICraftableWeapon.WeaponCategory SubCategory => ICraftableWeapon.WeaponCategory.Defensive;
+        public IGearWeapon.WeaponCategory Category => IGearWeapon.WeaponCategory.Defensive;
 
         public bool AllowAutomatic => false;
 

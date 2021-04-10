@@ -2,13 +2,11 @@
 
 namespace Assets.Standard.Weapons
 {
-    public class Dagger : ICraftableWeapon
+    public class Dagger : IGearWeapon
     {
         public string TypeName => "Dagger";
 
-        public ICraftable.CraftingCategory Category => ICraftable.CraftingCategory.Weapon;
-
-        public ICraftableWeapon.WeaponCategory SubCategory => ICraftableWeapon.WeaponCategory.Melee;
+        public IGearWeapon.WeaponCategory Category => IGearWeapon.WeaponCategory.Melee;
 
         public bool AllowAutomatic => false;
 

@@ -2,13 +2,11 @@
 
 namespace Assets.Standard.Weapons
 {
-    public class Bow : ICraftableWeapon
+    public class Bow : IGearWeapon
     {
         public string TypeName => "Bow";
 
-        public ICraftable.CraftingCategory Category => ICraftable.CraftingCategory.Weapon;
-
-        public ICraftableWeapon.WeaponCategory SubCategory => ICraftableWeapon.WeaponCategory.Ranged;
+        public IGearWeapon.WeaponCategory Category => IGearWeapon.WeaponCategory.Ranged;
 
         public bool AllowAutomatic => false;
 

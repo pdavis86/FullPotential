@@ -1,4 +1,6 @@
-﻿using Assets.Core.Crafting;
+﻿using Assets.ApiScripts.Crafting;
+using Assets.Core.Crafting;
+using Assets.Core.Crafting.Base;
 using Assets.Core.Data;
 using Assets.Core.Extensions;
 using System;
@@ -46,7 +48,6 @@ public class Inventory : NetworkBehaviour
         RightHand,
         LeftRing,
         RightRing,
-        Gloves,
         Belt,
         Amulet
     }
@@ -55,9 +56,9 @@ public class Inventory : NetworkBehaviour
     {
         Items = new List<ItemBase>();
 
-        //Must be the same length as SlotIndexToGameObjectName
-        EquipSlots = new string[12];
-        EquippedObjects = new GameObject[12];
+        var slotCount = Enum.GetNames(typeof(SlotIndexToGameObjectName)).Length;
+        EquipSlots = new string[slotCount];
+        EquippedObjects = new GameObject[slotCount];
     }
 
     private void Start()
@@ -106,6 +107,11 @@ public class Inventory : NetworkBehaviour
                 .UnionIfNotNull(changes.Weapons);
 
             Items.AddRange(addedItems);
+
+            foreach (CraftableBase craftable in Items.Where(x => x is CraftableBase y && y.CraftableType == null))
+            {
+                craftable.CraftableType = CraftingRegister.Instance.GetCraftableType(craftable);
+            }
 
             if (!firstSetup)
             {
@@ -163,16 +169,9 @@ public class Inventory : NetworkBehaviour
         {
             Debug.LogWarning("Incoming EquipSlots length differed to existing");
 
-            if (changes.EquipSlots.Length > EquipSlots.Length)
+            for (var i = 0; i < EquipSlots.Length; i++)
             {
-                EquipSlots = changes.EquipSlots;
-            }
-            else
-            {
-                for (var i = 0; i < changes.EquipSlots.Length; i++)
-                {
-                    EquipSlots[i] = changes.EquipSlots[i];
-                }
+                EquipSlots[i] = changes.EquipSlots[i];
             }
         }
     }
@@ -192,6 +191,7 @@ public class Inventory : NetworkBehaviour
 
     public Assets.Core.Data.Inventory GetSaveData()
     {
+        //todo: feasible to use separate lists for different types of item?
         var groupedItems = Items.GroupBy(x => x.GetType());
 
         return new Assets.Core.Data.Inventory
@@ -227,7 +227,7 @@ public class Inventory : NetworkBehaviour
             //todo: what type is the item being added?
             var changeJson = JsonUtility.ToJson(new InventoryChange { Loot = new Loot[] { item as Loot } });
 
-            connectionToClient.Send(Assets.Core.Networking.MessageIds.InventoryChange, new StringMessage(changeJson));
+            //todo: connectionToClient.Send(Assets.Core.Networking.MessageIds.InventoryChange, new StringMessage(changeJson));
         }
     }
 

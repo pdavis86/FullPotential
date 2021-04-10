@@ -15,8 +15,7 @@ public class InventoryItemsList : MonoBehaviour
         GameObject rowPrefab,
         Inventory inventory,
         Action<GameObject, GameObject, ItemBase> toggleAction,
-        IEnumerable<System.Type> itemTypes,
-        string gearSubType = null,
+        IGear.InventorySlots? inventorySlot = null,
         bool showEquippedItems = true
     )
     {
@@ -26,27 +25,20 @@ public class InventoryItemsList : MonoBehaviour
         var rowRectTransform = rowPrefab.GetComponent<RectTransform>();
         var rowCounter = 0;
 
-        var itemsOfTypes = inventory.Items.Where(x =>
-        {
-            var itemType = x.GetType();
+        var itemsForSlot = inventory.Items.Where(x =>
+            inventorySlot == null
+            || (x is Accessory acc && (int)((IGearAccessory)acc.CraftableType).InventorySlot == (int)inventorySlot)
+            || (x is Armor armor && (int)((IGearArmor)armor.CraftableType).InventorySlot == (int)inventorySlot)
+            || ((x is Weapon || x is Spell) && inventorySlot == IGear.InventorySlots.Hand)
+        );
 
-            if (!string.IsNullOrWhiteSpace(gearSubType) && x is GearBase gearItem)
-            {
-                return ((ICraftable)gearItem).TypeName == gearSubType;
-            }
-            else
-            {
-                return itemTypes == null || !itemTypes.Any() || itemTypes.Contains(itemType);
-            }
-        });
-
-        if (!itemsOfTypes.Any())
+        if (!itemsForSlot.Any())
         {
             Debug.LogWarning("There are no items of the correct type");
             return;
         }
 
-        foreach (var item in itemsOfTypes)
+        foreach (var item in itemsForSlot)
         {
             var isEquipped = inventory.EquipSlots.Contains(item.Id);
 

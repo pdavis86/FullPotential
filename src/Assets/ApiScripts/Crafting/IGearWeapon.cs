@@ -1,6 +1,6 @@
 ﻿namespace Assets.ApiScripts.Crafting
 {
-    public interface ICraftableWeapon : ICraftable
+    public interface IGearWeapon : IGear
     {
         public enum WeaponCategory
         {
@@ -10,9 +10,9 @@
         }
 
         /// <summary>
-        /// The style of weapon
+        /// The category of weapon
         /// </summary>
-        WeaponCategory SubCategory { get; }
+        WeaponCategory Category { get; }
 
         /// <summary>
         /// Whether the weapon has the capability of automatic fire

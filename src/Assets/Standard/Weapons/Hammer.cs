@@ -2,13 +2,11 @@
 
 namespace Assets.Standard.Weapons
 {
-    public class Hammer : ICraftableWeapon
+    public class Hammer : IGearWeapon
     {
         public string TypeName => "Hammer";
 
-        public ICraftable.CraftingCategory Category => ICraftable.CraftingCategory.Weapon;
-
-        public ICraftableWeapon.WeaponCategory SubCategory => ICraftableWeapon.WeaponCategory.Melee;
+        public IGearWeapon.WeaponCategory Category => IGearWeapon.WeaponCategory.Melee;
 
         public bool AllowAutomatic => false;
 
