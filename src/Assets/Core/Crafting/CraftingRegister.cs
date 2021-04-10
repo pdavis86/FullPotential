@@ -34,6 +34,7 @@ namespace Assets.Core.Crafting
 
         private void RegisterStandardCraftables()
         {
+            //todo: move this into the standard namespace
             ValidateAndRegister<Standard.Accessories.Amulet>();
             ValidateAndRegister<Standard.Accessories.Belt>();
             ValidateAndRegister<Standard.Accessories.Ring>();
@@ -57,7 +58,8 @@ namespace Assets.Core.Crafting
             ValidateAndRegister<Standard.Loot.Scrap>();
             ValidateAndRegister<Standard.Loot.Shard>();
 
-            ValidateAndRegister<Standard.Effects.Dummy>();
+            ValidateAndRegister<Standard.Effects.LifeTap>();
+            ValidateAndRegister<Standard.Effects.LifeDrain>();
         }
 
         private void ValidateAndRegister<T>() where T : new()
@@ -118,6 +120,19 @@ namespace Assets.Core.Crafting
             list.Add(item);
         }
 
+        public T GetCraftableTypeByName<T>(string typeName) where T : ICraftable
+        {
+            var interfaceName = typeof(T).Name;
+            switch (interfaceName)
+            {
+                case nameof(IGearAccessory): return (T)_accessories.FirstOrDefault(x => x.TypeName.Equals(typeName, StringComparison.OrdinalIgnoreCase));
+                case nameof(IGearArmor): return (T)_armor.FirstOrDefault(x => x.TypeName.Equals(typeName, StringComparison.OrdinalIgnoreCase));
+                case nameof(IGearWeapon): return (T)_weapons.FirstOrDefault(x => x.TypeName.Equals(typeName, StringComparison.OrdinalIgnoreCase));
+                case nameof(IGearLoot): return (T)_loot.FirstOrDefault(x => x.TypeName.Equals(typeName, StringComparison.OrdinalIgnoreCase));
+                default: throw new Exception($"Unexpected type {interfaceName}");
+            }
+        }
+
         public T GetCraftableType<T>(string typeId) where T : ICraftable
         {
             var craftablesOfType = GetCraftables<T>();
@@ -125,12 +140,6 @@ namespace Assets.Core.Crafting
             if (string.IsNullOrWhiteSpace(typeId))
             {
                 return (T)(object)null;
-            }
-
-            //todo: remove
-            if (!Guid.TryParse(typeId, out var ggg))
-            {
-                var foo = "";
             }
 
             var matches = craftablesOfType.Where(x => x.TypeId == new Guid(typeId));
@@ -178,7 +187,7 @@ namespace Assets.Core.Crafting
                 case nameof(IGearArmor): return _armor;
                 case nameof(IGearWeapon): return _weapons;
                 case nameof(IGearLoot): return _loot;
-                default: throw new Exception($"Unexpected category {interfaceName}");
+                default: throw new Exception($"Unexpected type {interfaceName}");
             }
         }
 
@@ -200,21 +209,11 @@ namespace Assets.Core.Crafting
             }
         }
 
-
-
         public List<IEffect> GetLootPossibilities()
         {
-            return _effects;
-
-            //todo:
-            //BuffEffects.All 
-            //.Union(DebuffEffects.All)
-            //.Union(SupportEffects.All)
-            //.Union(ElementalEffects.All)
-            ////Do not include as it needs pairing: .Union(_lingeringEffects)
-            //.Union(TargetingOptions.All)
-            //.Union(ShapeOptions.All)
-            //.ToList();
+            return _effects
+                .Where(x => !x.IsSideEffect)
+                .ToList();
         }
 
         public IEffect GetEffect(Guid typeId)

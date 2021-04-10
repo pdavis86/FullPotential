@@ -130,13 +130,13 @@ public class PlayerController : NetworkBehaviour
             return;
         }
 
+        //todo: other spell targeting options
         switch (activeSpell.Targeting)
         {
-            case Spell.TargetingOptions.Projectile:
+            case "Projectile":
                 SpawnSpellProjectile(activeSpell, leftHand);
                 break;
 
-            //todo: other spell targeting options
             //case Spell.TargetingOptions.Self:
             //case Spell.TargetingOptions.Touch:
             //case Spell.TargetingOptions.Beam:

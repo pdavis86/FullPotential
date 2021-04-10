@@ -13,13 +13,17 @@ namespace Assets.Core.Crafting
         // ReSharper disable once InconsistentNaming
         private static readonly Random _random = new Random();
 
-        private readonly IEnumerable<IGearLoot> _lootTypes;
+        private readonly List<IGearLoot> _lootTypes;
+        private readonly List<IEffect> _effectsForLoot;
 
         public ResultFactory()
         {
             _lootTypes = CraftingRegister.Instance
                 .GetCraftables<IGearLoot>()
-                .Select(x => x as IGearLoot);
+                .Select(x => x as IGearLoot)
+                .ToList();
+
+            _effectsForLoot = CraftingRegister.Instance.GetLootPossibilities();
         }
 
         private int ComputeAttribute(IEnumerable<ItemBase> components, Func<ItemBase, int> getProp, bool allowMax = true)
@@ -44,64 +48,61 @@ namespace Assets.Core.Crafting
             return result == 0 ? 1 : result;
         }
 
-        private string GetTargeting(IEnumerable<string> effectsInput)
+        //private ISpellTargeting GetTargeting(IEnumerable<string> effectNames)
+        //{
+        //    //Only one target
+        //    var target = effectNames.Intersect(_targetingOptionNames).FirstOrDefault();
+        //    if (!string.IsNullOrWhiteSpace(target))
+        //    {
+        //        return null; // target as ISpellTargeting;
+        //    }
+
+        //    return _targetingOptions.First();
+        //}
+
+        //private ISpellShape GetShape(ISpellTargeting targeting, IEnumerable<string> effectNames)
+        //{
+        //    //Only one shape
+        //    if (!targeting.HasShape)
+        //    {
+        //        return null;
+        //    }
+
+        //    var shape = effectNames.Intersect(_shapeNames).FirstOrDefault();
+        //    return null; // shape;
+        //}
+
+        private List<IEffect> GetEffects(string craftingType, IEnumerable<IEffect> effects)
         {
-            //Only one target
-            var target = effectsInput.Intersect(Spell.TargetingOptions.All).FirstOrDefault();
-            if (!string.IsNullOrWhiteSpace(target))
-            {
-                return target;
-            }
-
-            return Spell.TargetingOptions.Projectile;
-        }
-
-        private string GetShape(string targeting, IEnumerable<string> effectsInput)
-        {
-            //Only one shape
-            if (targeting != Spell.TargetingOptions.Beam && targeting != Spell.TargetingOptions.Cone)
-            {
-                var shape = effectsInput.Intersect(Spell.ShapeOptions.All).FirstOrDefault();
-                if (!string.IsNullOrWhiteSpace(shape))
-                {
-                    return shape;
-                }
-            }
-
-            return null;
-        }
-
-        private List<string> GetEffects(string craftingType, IEnumerable<string> effectsInput)
-        {
-            var effects = effectsInput
-                .Except(new[] { Spell.BuffEffects.LifeTap, Spell.BuffEffects.ManaTap })
-                .Except(Spell.TargetingOptions.All)
-                .Except(Spell.ShapeOptions.All);
-
-            var elementalEffects = effects.Intersect(Spell.ElementalEffects.All);
+            var elementalEffects = effects.Where(x => x is IElement);
             var elementalEffect = elementalEffects.FirstOrDefault();
-            if (!string.IsNullOrWhiteSpace(elementalEffect))
+            if (elementalEffect != null)
             {
                 effects = effects
-                    .Except(Spell.ElementalEffects.All.Where(x => x != elementalEffect));
+                    .Except(elementalEffects.Where(x => x != elementalEffect));
             }
 
-            var lingeringEffect = Spell.LingeringPairing.FirstOrDefault(x => x.Key == elementalEffect).Value;
-            effects = effects.Except(Spell.LingeringOptions.All.Where(x => x != lingeringEffect));
+            //todo: deal with lingering
+            //var lingeringEffect = Spell.LingeringPairing.FirstOrDefault(x => x.Key == elementalEffect).Value;
+            //effects = effects.Except(Spell.LingeringOptions.All.Where(x => x != lingeringEffect));
 
             if (craftingType == nameof(Armor) || craftingType == nameof(Accessory))
             {
-                return effects.Intersect(Spell.BuffEffects.All)
-                    .Union(effects.Intersect(Spell.SupportEffects.All))
-                    .Union(effects.Intersect(Spell.ElementalEffects.All))
+                return effects
+                    .Where(x =>
+                         x is IEffectBuff
+                        || x is IEffectSupport
+                        || x is IElement)
                     .ToList();
             }
 
             if (craftingType == nameof(Weapon))
             {
-                return effects.Intersect(Spell.DebuffEffects.All)
-                    .Union(effects.Intersect(Spell.ElementalEffects.All))
-                    .Union(effects.Intersect(Spell.LingeringOptions.All))
+                //todo: and lingering
+                return effects
+                    .Where(x =>
+                        x is IEffectDebuff
+                        || x is IElement)
                     .ToList();
             }
 
@@ -110,11 +111,12 @@ namespace Assets.Core.Crafting
                 throw new Exception($"Unexpected craftingType '{craftingType}'");
             }
 
-            if (effects.Intersect(Spell.BuffEffects.All).Any() || effects.Intersect(Spell.SupportEffects.All).Any())
+            if (effects.Any(x => x is IEffectBuff || x is IEffectSupport))
             {
                 effects = effects
-                    .Except(Spell.DebuffEffects.All)
-                    .Except(Spell.ElementalEffects.All);
+                    .Where(x =>
+                        !(x is IEffectDebuff)
+                        && !(x is IElement));
             }
 
             return effects.ToList();
@@ -149,9 +151,9 @@ namespace Assets.Core.Crafting
             };
         }
 
-        private string GetRandomEffect()
+        private IEffect GetRandomEffect()
         {
-            return Spell.LootEffectsAndOptions.ElementAt(_random.Next(0, Spell.LootEffectsAndOptions.Count - 1));
+            return _effectsForLoot.ElementAt(_random.Next(0, _effectsForLoot.Count));
         }
 
         private int GetBiasedNumber(int min, int max)
@@ -167,8 +169,7 @@ namespace Assets.Core.Crafting
             var lootDrop = new Loot
             {
                 Id = Guid.NewGuid().ToString(),
-                Attributes = GetRandomAttributes(),
-                Effects = new List<string>()
+                Attributes = GetRandomAttributes()
             };
 
             var isMagical = _random.Next(0, 2) > 0;
@@ -177,22 +178,37 @@ namespace Assets.Core.Crafting
                 lootDrop.CraftableType = _lootTypes
                     .Where(x => x.Category == IGearLoot.LootCategory.Magic)
                     .OrderBy(x => _random.Next())
-                    .First();
+                    .FirstOrDefault();
 
-                var numberOfEffects = GetBiasedNumber(1, 4);
+                var effects = new List<IEffect>();
+                var numberOfEffects = GetBiasedNumber(1, Math.Min(4, _effectsForLoot.Count));
+                var fallback = 0;
                 for (var i = 1; i <= numberOfEffects; i++)
                 {
-                    string effect;
-                    do { effect = GetRandomEffect(); }
-                    while (lootDrop.Effects.Contains(effect));
-                    lootDrop.Effects.Add(effect);
+                    IEffect effect;
+                    fallback = 0;
+                    do
+                    {
+                        effect = GetRandomEffect();
+                        fallback++;
+                    }
+                    while (fallback < 10 && (effect == null || effects.Contains(effect)));
+                    effects.Add(effect);
+
+                    if (fallback >= 10)
+                    {
+                        UnityEngine.Debug.LogError("Infinite loop situation here. Go fix it!");
+                    }
                 }
 
-                var elementalEffect = lootDrop.Effects.Intersect(Spell.ElementalEffects.All).FirstOrDefault();
-                if (!string.IsNullOrWhiteSpace(elementalEffect) && Spell.LingeringPairing.ContainsKey(elementalEffect) && _random.Next(0, 2) > 0)
-                {
-                    lootDrop.Effects.Add(Spell.LingeringPairing[elementalEffect]);
-                }
+                //todo: deal with lingering
+                //var elementalEffect = lootDrop.Effects.Intersect(Spell.ElementalEffects.All).FirstOrDefault();
+                //if (!string.IsNullOrWhiteSpace(elementalEffect) && Spell.LingeringPairing.ContainsKey(elementalEffect) && _random.Next(0, 2) > 0)
+                //{
+                //    lootDrop.Effects.Add(Spell.LingeringPairing[elementalEffect]);
+                //}
+
+                lootDrop.Effects = effects.ToList();
 
                 //Debug.Log($"Added {numberOfEffects} effects: {string.Join(", ", lootDrop.Effects)}");
             }
@@ -201,11 +217,10 @@ namespace Assets.Core.Crafting
                 lootDrop.CraftableType = _lootTypes
                     .Where(x => x.Category == IGearLoot.LootCategory.Technology)
                     .OrderBy(x => _random.Next())
-                    .First();
-
+                    .FirstOrDefault();
             }
 
-            lootDrop.Name = lootDrop.TypeName;
+            lootDrop.Name = lootDrop.CraftableType.TypeName;
 
             //todo: icon
 
@@ -219,11 +234,10 @@ namespace Assets.Core.Crafting
 
         internal Spell GetSpell(IEnumerable<ItemBase> components)
         {
-            var effects = components.SelectMany(x => x.Effects);
             var spell = new Spell
             {
                 Id = Guid.NewGuid().ToString(),
-                Targeting = GetTargeting(effects),
+                //Targeting = targeting.TypeId.ToString(),
                 Attributes = new Attributes
                 {
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
@@ -234,9 +248,9 @@ namespace Assets.Core.Crafting
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery),
                     Duration = ComputeAttribute(components, x => x.Attributes.Duration)
                 },
-                Effects = GetEffects(nameof(Spell), effects),
+                Effects = GetEffects(nameof(Spell), components.SelectMany(x => x.Effects))
             };
-            spell.Shape = GetShape(spell.Targeting, effects);
+            //spell.Shape = GetShape(targeting, effectNames).TypeId.ToString();
 
             if (spell.Effects.Count > 0)
             {
@@ -270,7 +284,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Weapon), components.SelectMany(x => x.Effects))
             };
-            weapon.Name = GetItemName("Strength", weapon, weapon.TypeName);
+            weapon.Name = GetItemName("Strength", weapon, weapon.CraftableType.TypeName);
             return weapon;
         }
 
@@ -294,7 +308,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Weapon), components.SelectMany(x => x.Effects))
             };
-            weapon.Name = GetItemName("Strength", weapon, weapon.TypeName);
+            weapon.Name = GetItemName("Strength", weapon, weapon.CraftableType.TypeName);
             return weapon;
         }
 
@@ -313,7 +327,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Weapon), components.SelectMany(x => x.Effects))
             };
-            weapon.Name = GetItemName("Defence", weapon, weapon.TypeName);
+            weapon.Name = GetItemName("Defence", weapon, weapon.CraftableType.TypeName);
             return weapon;
         }
 
@@ -329,7 +343,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Armor), components.SelectMany(x => x.Effects))
             };
-            armor.Name = GetItemName("Defence", armor, armor.TypeName);
+            armor.Name = GetItemName("Defence", armor, armor.CraftableType.TypeName);
             return armor;
         }
 
@@ -348,7 +362,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Armor), components.SelectMany(x => x.Effects))
             };
-            armor.Name = GetItemName("Defence", armor, armor.TypeName);
+            armor.Name = GetItemName("Defence", armor, armor.CraftableType.TypeName);
             return armor;
         }
 
@@ -364,7 +378,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Accessory), components.SelectMany(x => x.Effects))
             };
-            accessory.Name = GetItemName("Strength", accessory, accessory.TypeName);
+            accessory.Name = GetItemName("Strength", accessory, accessory.CraftableType.TypeName);
             return accessory;
         }
 
@@ -378,7 +392,7 @@ namespace Assets.Core.Crafting
             switch (categoryName)
             {
                 case nameof(Weapon):
-                    var craftableWeapon = CraftingRegister.Instance.GetCraftableType<IGearWeapon>(typeName);
+                    var craftableWeapon = CraftingRegister.Instance.GetCraftableTypeByName<IGearWeapon>(typeName);
                     switch (craftableWeapon.Category)
                     {
                         case IGearWeapon.WeaponCategory.Melee: return GetMeleeWeapon(craftableWeapon, components, isTwoHanded);
@@ -388,15 +402,15 @@ namespace Assets.Core.Crafting
                     }
 
                 case nameof(Armor):
-                    var craftableArmor = CraftingRegister.Instance.GetCraftableType<IGearArmor>(typeName);
-                    if (craftableArmor.InventorySlot == IGearArmor.ArmorSlots.Barrier)
+                    var craftableArmor = CraftingRegister.Instance.GetCraftableTypeByName<IGearArmor>(typeName);
+                    if (craftableArmor.InventorySlot == IGearArmor.ArmorSlot.Barrier)
                     {
                         return FillBarrier(craftableArmor, components);
                     }
                     return FillArmor(craftableArmor, components);
 
                 case nameof(Accessory):
-                    var craftableAccessory = CraftingRegister.Instance.GetCraftableType<IGearAccessory>(typeName);
+                    var craftableAccessory = CraftingRegister.Instance.GetCraftableTypeByName<IGearAccessory>(typeName);
                     return FillAccessory(craftableAccessory, components);
 
                 default:
@@ -411,6 +425,8 @@ namespace Assets.Core.Crafting
                 return null;
             }
 
+            var effects = item.Effects;
+
             var sb = new StringBuilder();
 
             if (includeName) { sb.Append($"Name: {item.Name}\n"); }
@@ -424,7 +440,7 @@ namespace Assets.Core.Crafting
             if (item.Attributes.Speed > 0) { sb.Append($"Speed: {item.Attributes.Speed}\n"); }
             if (item.Attributes.Recovery > 0) { sb.Append($"Recovery: {item.Attributes.Recovery}\n"); }
             if (item.Attributes.Duration > 0) { sb.Append($"Duration: {item.Attributes.Duration}\n"); }
-            if (item.Effects.Count > 0) { sb.Append($"Effects: {string.Join(", ", item.Effects)}\n"); }
+            if (effects != null && effects.Count > 0) { sb.Append($"Effects: {string.Join(", ", effects.Select(x => x.TypeName))}\n"); }
 
             return sb.ToString();
         }
