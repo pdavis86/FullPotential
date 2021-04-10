@@ -183,9 +183,9 @@ namespace Assets.Core.Crafting
         }
 
         //todo: un-hardcode this
-        public static UnityEngine.GameObject GetPrefabForWeaponType(string weaponType, bool twoHanded)
+        public static UnityEngine.GameObject GetPrefabForWeaponType(string typeName, bool twoHanded)
         {
-            switch (weaponType)
+            switch (typeName)
             {
                 case "Axe": return twoHanded ? GameManager.Instance.Prefabs.Weapons.Axe2 : GameManager.Instance.Prefabs.Weapons.Axe1;
                 case "Bow": return GameManager.Instance.Prefabs.Weapons.Bow;
@@ -196,7 +196,7 @@ namespace Assets.Core.Crafting
                 case "Shield": return GameManager.Instance.Prefabs.Weapons.Shield;
                 case "Staff": return GameManager.Instance.Prefabs.Weapons.Staff;
                 case "Sword": return twoHanded ? GameManager.Instance.Prefabs.Weapons.Sword2 : GameManager.Instance.Prefabs.Weapons.Sword1;
-                default: throw new Exception($"Unexpected weapon type {weaponType}");
+                default: throw new Exception($"Unexpected weapon type {typeName}");
             }
         }
 
