@@ -173,7 +173,7 @@ public class PlayerSetup : NetworkBehaviour
     {
         //todo: set texture URI
         _textureUri = string.Empty;
-        _loadWasSuccessful = _inventory.ApplyChanges(loadData.Inventory, true);
+        _loadWasSuccessful = _inventory.ApplyChanges(loadData?.Inventory, true);
     }
 
     [Server]

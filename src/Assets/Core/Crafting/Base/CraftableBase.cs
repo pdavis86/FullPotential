@@ -14,10 +14,10 @@ namespace Assets.Core.Crafting.Base
             set
             {
                 _craftableType = value;
-                TypeName = _craftableType.TypeName;
+                TypeId = _craftableType.TypeId.ToString();
             }
         }
 
-        public string TypeName;
+        public string TypeId;
     }
 }

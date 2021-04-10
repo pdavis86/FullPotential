@@ -7,17 +7,19 @@
 
         public InventoryChange() { }
 
-        public InventoryChange(Inventory inventory)
-        {
-            MaxItems = inventory.MaxItems;
+        //public InventoryChange(Inventory inventory)
+        //{
+        //    //MaxItems = inventory.MaxItems;
 
-            Loot = inventory.Loot;
-            Accessories = inventory.Accessories;
-            Armor = inventory.Armor;
-            Spells = inventory.Spells;
-            Weapons = inventory.Weapons;
+        //    //Loot = inventory.Loot;
+        //    //Accessories = inventory.Accessories;
+        //    //Armor = inventory.Armor;
+        //    //Spells = inventory.Spells;
+        //    //Weapons = inventory.Weapons;
 
-            EquipSlots = inventory.EquipSlots;
-        }
+        //    //EquipSlots = inventory.EquipSlots;
+
+        //    JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(inventory), this);
+        //}
     }
 }

@@ -22,7 +22,7 @@ using UnityEngine.Networking.NetworkSystem;
 //todo: rename to PlayerInventory
 public class Inventory : NetworkBehaviour
 {
-    public int MaxItems;
+    public int MaxItems = 30;
 
     [HideInInspector]
     public List<ItemBase> Items;
@@ -113,21 +113,24 @@ public class Inventory : NetworkBehaviour
                 craftable.CraftableType = CraftingRegister.Instance.GetCraftableType(craftable);
             }
 
+            foreach (var item in Items.Where(x => x.EffectIds != null && x.EffectIds.Length > 0))
+            {
+                item.Effects = item.EffectIds.Select(x => CraftingRegister.Instance.GetEffect(new Guid(x))).ToList();
+            }
+
             if (!firstSetup)
             {
                 var addedItemsCount = addedItems.Count();
 
                 if (addedItemsCount == 1)
                 {
-                    var addedItem = addedItems.First();
-
                     //todo: make this a slide-out alert instead
-                    Debug.LogWarning($"{addedItem.GetFullName()} was added");
+                    Debug.Log($"{addedItems.First().GetFullName()} was added");
                 }
                 else
                 {
                     //todo: make this a slide-out alert instead
-                    Debug.LogWarning($"Added {addedItemsCount} items to the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
+                    Debug.Log($"Added {addedItemsCount} items to the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
                 }
             }
 
@@ -216,18 +219,19 @@ public class Inventory : NetworkBehaviour
     {
         if (Items.Count == MaxItems)
         {
-            //Debug.Log("Your inventory is at max");
+            Debug.Log("Your inventory is at max");
             return;
         }
 
-        Items.Add(item);
+        //todo: what type is the item being added?
+        var change = new InventoryChange { Loot = new Loot[] { item as Loot } };
+
+        ApplyChanges(change);
 
         if (!isLocalPlayer)
         {
-            //todo: what type is the item being added?
-            var changeJson = JsonUtility.ToJson(new InventoryChange { Loot = new Loot[] { item as Loot } });
-
-            //todo: connectionToClient.Send(Assets.Core.Networking.MessageIds.InventoryChange, new StringMessage(changeJson));
+            var changeJson = JsonUtility.ToJson(change);
+            connectionToClient.Send(Assets.Core.Networking.MessageIds.InventoryChange, new StringMessage(changeJson));
         }
     }
 
@@ -339,7 +343,7 @@ public class Inventory : NetworkBehaviour
 
         if (item is Weapon weapon)
         {
-            var prefab = CraftingRegister.GetPrefabForWeaponType(weapon.TypeName, weapon.IsTwoHanded);
+            var prefab = CraftingRegister.GetPrefabForWeaponType(weapon.CraftableType.TypeName, weapon.IsTwoHanded);
             var weaponGo = Instantiate(prefab, gameObject.transform);
             weaponGo.transform.localEulerAngles = new Vector3(0, 90);
             weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, 0.3f, 0.75f);

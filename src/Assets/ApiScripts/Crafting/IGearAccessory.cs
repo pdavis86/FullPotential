@@ -2,16 +2,16 @@
 {
     public interface IGearAccessory : IGear
     {
-        public enum AccessorySlots
+        public enum AccessorySlot
         {
-            Ring = IGear.InventorySlots.Ring,
-            Belt = IGear.InventorySlots.Belt,
-            Amulet = IGear.InventorySlots.Amulet
+            Ring = IGear.GearSlot.Ring,
+            Belt = IGear.GearSlot.Belt,
+            Amulet = IGear.GearSlot.Amulet
         }
 
         /// <summary>
         /// Which accessory slot this item can occupy
         /// </summary>
-        AccessorySlots InventorySlot { get; }
+        AccessorySlot InventorySlot { get; }
     }
 }

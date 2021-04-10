@@ -35,12 +35,13 @@ public class GameManager : MonoBehaviour
         }
 
         _instance = this;
+
         MainCanvasObjects = GameObject.Find(NameCanvasMain).GetComponent<MainCanvasObjects>();
         Prefabs = GetComponent<Prefabs>();
         InputMappings = GetComponent<InputMappings>();
-        ResultFactory = new ResultFactory();
 
         CraftingRegister.Instance.FindAndRegisterAll();
+        ResultFactory = new ResultFactory();
 
         DontDestroyOnLoad(gameObject);
     }

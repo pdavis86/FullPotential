@@ -12,6 +12,7 @@ namespace Assets.Core.Crafting
         private List<IGearArmor> _armor = new List<IGearArmor>();
         private List<IGearWeapon> _weapons = new List<IGearWeapon>();
         private List<IGearLoot> _loot = new List<IGearLoot>();
+        private List<IEffect> _effects = new List<IEffect>();
 
         protected CraftingRegister() { }
 
@@ -55,23 +56,25 @@ namespace Assets.Core.Crafting
 
             ValidateAndRegister<Standard.Loot.Scrap>();
             ValidateAndRegister<Standard.Loot.Shard>();
+
+            ValidateAndRegister<Standard.Effects.Dummy>();
         }
 
         private void ValidateAndRegister<T>() where T : new()
         {
             var tType = typeof(T);
 
-            if (!typeof(ICraftable).IsAssignableFrom(tType))
+            if (!typeof(IRegisterable).IsAssignableFrom(tType))
             {
-                UnityEngine.Debug.LogError($"{tType.Name} does not implement ICraftable");
+                UnityEngine.Debug.LogError($"{tType.Name} does not implement {nameof(IRegisterable)}");
                 return;
             }
 
-            var toRegister = (ICraftable)new T();
+            var toRegister = (IRegisterable)new T();
 
-            if (string.IsNullOrWhiteSpace(toRegister.TypeName))
+            if (toRegister.TypeId == null)
             {
-                UnityEngine.Debug.LogError($"No TypeName was specified for class '{tType.FullName}'");
+                UnityEngine.Debug.LogError($"No {nameof(IRegisterable.TypeId)} was specified for class '{tType.FullName}'");
             }
 
             if (toRegister is IGearAccessory accessory)
@@ -94,33 +97,51 @@ namespace Assets.Core.Crafting
                 Register(_loot, loot);
                 return;
             }
+            else if (toRegister is IEffect effect)
+            {
+                Register(_effects, effect);
+                return;
+            }
 
             UnityEngine.Debug.LogError($"{tType.Name} does not implement any of the valid interfaces");
         }
 
-        private void Register<T>(List<T> list, T item) where T : ICraftable
+        private void Register<T>(List<T> list, T item) where T : IRegisterable
         {
-            var match = list.FirstOrDefault(x => x.TypeName.Equals(item.TypeName, StringComparison.OrdinalIgnoreCase));
+            var match = list.FirstOrDefault(x => x.TypeId == item.TypeId);
             if (match != null)
             {
-                UnityEngine.Debug.LogError($"A type with name '{item.TypeName}' has already been registered");
+                UnityEngine.Debug.LogError($"A type with name '{item.TypeId}' has already been registered");
                 return;
             }
 
             list.Add(item);
         }
 
-        public T GetCraftableType<T>(string typeName) where T : ICraftable
+        public T GetCraftableType<T>(string typeId) where T : ICraftable
         {
-            var matches = GetCraftables<T>().Where(x => x.TypeName == typeName);
+            var craftablesOfType = GetCraftables<T>();
+
+            if (string.IsNullOrWhiteSpace(typeId))
+            {
+                return (T)(object)null;
+            }
+
+            //todo: remove
+            if (!Guid.TryParse(typeId, out var ggg))
+            {
+                var foo = "";
+            }
+
+            var matches = craftablesOfType.Where(x => x.TypeId == new Guid(typeId));
 
             if (!matches.Any())
             {
-                throw new Exception($"Could not find a match for '{typeof(T).Name}' and '{typeName}'");
+                throw new Exception($"Could not find a match for '{typeof(T).Name}' and '{typeId}'");
             }
             else if (matches.Count() > 1)
             {
-                throw new Exception($"How is there more than one match for '{typeof(T).Name}' and '{typeName}'");
+                throw new Exception($"How is there more than one match for '{typeof(T).Name}' and '{typeId}'");
             }
 
             return (T)matches.First();
@@ -130,19 +151,19 @@ namespace Assets.Core.Crafting
         {
             if (craftable is Accessory)
             {
-                return GetCraftableType<IGearAccessory>(craftable.TypeName);
+                return GetCraftableType<IGearAccessory>(craftable.TypeId);
             }
             else if (craftable is Armor)
             {
-                return GetCraftableType<IGearArmor>(craftable.TypeName);
+                return GetCraftableType<IGearArmor>(craftable.TypeId);
             }
             else if (craftable is Weapon)
             {
-                return GetCraftableType<IGearWeapon>(craftable.TypeName);
+                return GetCraftableType<IGearWeapon>(craftable.TypeId);
             }
             else if (craftable is Loot)
             {
-                return GetCraftableType<IGearLoot>(craftable.TypeName);
+                return GetCraftableType<IGearLoot>(craftable.TypeId);
             }
 
             return null;
@@ -150,14 +171,14 @@ namespace Assets.Core.Crafting
 
         public IEnumerable<ICraftable> GetCraftables<T>()
         {
-            var typeName = typeof(T).Name;
-            switch (typeName)
+            var interfaceName = typeof(T).Name;
+            switch (interfaceName)
             {
                 case nameof(IGearAccessory): return _accessories;
                 case nameof(IGearArmor): return _armor;
                 case nameof(IGearWeapon): return _weapons;
                 case nameof(IGearLoot): return _loot;
-                default: throw new Exception($"Unexpected category {typeName}");
+                default: throw new Exception($"Unexpected category {interfaceName}");
             }
         }
 
@@ -177,6 +198,28 @@ namespace Assets.Core.Crafting
                 case "Sword": return twoHanded ? GameManager.Instance.Prefabs.Weapons.Sword2 : GameManager.Instance.Prefabs.Weapons.Sword1;
                 default: throw new Exception($"Unexpected weapon type {weaponType}");
             }
+        }
+
+
+
+        public List<IEffect> GetLootPossibilities()
+        {
+            return _effects;
+
+            //todo:
+            //BuffEffects.All 
+            //.Union(DebuffEffects.All)
+            //.Union(SupportEffects.All)
+            //.Union(ElementalEffects.All)
+            ////Do not include as it needs pairing: .Union(_lingeringEffects)
+            //.Union(TargetingOptions.All)
+            //.Union(ShapeOptions.All)
+            //.ToList();
+        }
+
+        public IEffect GetEffect(Guid typeId)
+        {
+            return _effects.FirstOrDefault(x => x.TypeId == typeId);
         }
 
     }

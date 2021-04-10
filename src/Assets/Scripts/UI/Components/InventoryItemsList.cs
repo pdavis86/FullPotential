@@ -15,7 +15,7 @@ public class InventoryItemsList : MonoBehaviour
         GameObject rowPrefab,
         Inventory inventory,
         Action<GameObject, GameObject, ItemBase> toggleAction,
-        IGear.InventorySlots? inventorySlot = null,
+        IGear.GearSlot? inventorySlot = null,
         bool showEquippedItems = true
     )
     {
@@ -29,7 +29,7 @@ public class InventoryItemsList : MonoBehaviour
             inventorySlot == null
             || (x is Accessory acc && (int)((IGearAccessory)acc.CraftableType).InventorySlot == (int)inventorySlot)
             || (x is Armor armor && (int)((IGearArmor)armor.CraftableType).InventorySlot == (int)inventorySlot)
-            || ((x is Weapon || x is Spell) && inventorySlot == IGear.InventorySlots.Hand)
+            || ((x is Weapon || x is Spell) && inventorySlot == IGear.GearSlot.Hand)
         );
 
         if (!itemsForSlot.Any())
