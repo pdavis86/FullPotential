@@ -27,56 +27,27 @@ namespace Assets.Core.Crafting
 
         public void FindAndRegisterAll()
         {
-            RegisterStandardCraftables();
-
             //todo: how do we scan for registrable types?
-        }
 
-        private void RegisterStandardCraftables()
-        {
-            //todo: move this into the standard namespace
-            ValidateAndRegister<Standard.Accessories.Amulet>();
-            ValidateAndRegister<Standard.Accessories.Belt>();
-            ValidateAndRegister<Standard.Accessories.Ring>();
-
-            ValidateAndRegister<Standard.Armor.Helm>();
-            ValidateAndRegister<Standard.Armor.Chest>();
-            ValidateAndRegister<Standard.Armor.Legs>();
-            ValidateAndRegister<Standard.Armor.Feet>();
-            ValidateAndRegister<Standard.Armor.Barrier>();
-
-            ValidateAndRegister<Standard.Weapons.Axe>();
-            ValidateAndRegister<Standard.Weapons.Bow>();
-            ValidateAndRegister<Standard.Weapons.Crossbow>();
-            ValidateAndRegister<Standard.Weapons.Dagger>();
-            ValidateAndRegister<Standard.Weapons.Gun>();
-            ValidateAndRegister<Standard.Weapons.Hammer>();
-            ValidateAndRegister<Standard.Weapons.Shield>();
-            ValidateAndRegister<Standard.Weapons.Staff>();
-            ValidateAndRegister<Standard.Weapons.Sword>();
-
-            ValidateAndRegister<Standard.Loot.Scrap>();
-            ValidateAndRegister<Standard.Loot.Shard>();
-
-            ValidateAndRegister<Standard.Effects.LifeTap>();
-            ValidateAndRegister<Standard.Effects.LifeDrain>();
-        }
-
-        private void ValidateAndRegister<T>() where T : new()
-        {
-            var tType = typeof(T);
-
-            if (!typeof(IRegisterable).IsAssignableFrom(tType))
+            foreach (var t in new Standard.Registration().GetRegisterables())
             {
-                UnityEngine.Debug.LogError($"{tType.Name} does not implement {nameof(IRegisterable)}");
+                ValidateAndRegister(t);
+            }
+        }
+
+        private void ValidateAndRegister(Type type)
+        {
+            if (!typeof(IRegisterable).IsAssignableFrom(type))
+            {
+                UnityEngine.Debug.LogError($"{type.Name} does not implement {nameof(IRegisterable)}");
                 return;
             }
 
-            var toRegister = (IRegisterable)new T();
+            var toRegister = (IRegisterable)Activator.CreateInstance(type);
 
             if (toRegister.TypeId == null)
             {
-                UnityEngine.Debug.LogError($"No {nameof(IRegisterable.TypeId)} was specified for class '{tType.FullName}'");
+                UnityEngine.Debug.LogError($"No {nameof(IRegisterable.TypeId)} was specified for class '{type.FullName}'");
             }
 
             if (toRegister is IGearAccessory accessory)
@@ -105,7 +76,8 @@ namespace Assets.Core.Crafting
                 return;
             }
 
-            UnityEngine.Debug.LogError($"{tType.Name} does not implement any of the valid interfaces");
+            UnityEngine.Debug.LogError($"{type.Name} does not implement any of the valid interfaces");
+
         }
 
         private void Register<T>(List<T> list, T item) where T : IRegisterable

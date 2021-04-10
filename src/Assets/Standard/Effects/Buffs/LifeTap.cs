@@ -1,7 +1,7 @@
 ﻿using Assets.ApiScripts.Crafting;
 using System;
 
-namespace Assets.Standard.Effects
+namespace Assets.Standard.Effects.Buffs
 {
     public class LifeTap : IEffectBuff
     {

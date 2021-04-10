@@ -254,7 +254,7 @@ namespace Assets.Core.Crafting
 
             if (spell.Effects.Count > 0)
             {
-                spell.Name = spell.Effects.First() + " Spell";
+                spell.Name = spell.Effects.First().TypeName + " Spell";
             }
             else
             {
