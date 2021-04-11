@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour
         Prefabs = GetComponent<Prefabs>();
         InputMappings = GetComponent<InputMappings>();
 
-        CraftingRegister.Instance.FindAndRegisterAll();
+        ApiRegister.Instance.FindAndRegisterAll();
         ResultFactory = new ResultFactory();
 
         DontDestroyOnLoad(gameObject);

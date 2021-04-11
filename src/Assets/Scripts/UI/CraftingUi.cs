@@ -1,5 +1,6 @@
 ﻿using Assets.ApiScripts.Crafting;
 using Assets.Core.Crafting;
+using Assets.Core.Crafting.Types;
 using Assets.Core.Extensions;
 using System;
 using System.Collections.Generic;
@@ -62,17 +63,17 @@ public class CraftingUi : MonoBehaviour
 
         _craftButton.onClick.AddListener(CraftButtonOnClick);
 
-        _armorTypeNames = CraftingRegister.Instance.GetCraftables<IGearArmor>()
+        _armorTypeNames = ApiRegister.Instance.GetCraftables<IGearArmor>()
             .Select(x => x.TypeName)
             .OrderBy(x => x)
             .ToList();
 
-        _accessoryTypeNames = CraftingRegister.Instance.GetCraftables<IGearAccessory>()
+        _accessoryTypeNames = ApiRegister.Instance.GetCraftables<IGearAccessory>()
             .Select(x => x.TypeName)
             .OrderBy(x => x)
             .ToList();
 
-        var weaponTypes = CraftingRegister.Instance.GetCraftables<IGearWeapon>();
+        var weaponTypes = ApiRegister.Instance.GetCraftables<IGearWeapon>();
 
         _weaponTypeNames = weaponTypes
             .Select(x => x.TypeName)
@@ -302,7 +303,13 @@ public class CraftingUi : MonoBehaviour
             return;
         }
 
-        var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(GetSelectedType(), GetSelectedSubType(), _components, GetSelectedHandedness());
+        var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(
+            GetSelectedType(),
+            GetSelectedSubType(),
+            GetSelectedHandedness(),
+            _components
+        );
+
         _outputText.text = ResultFactory.GetItemDescription(craftedItem);
     }
 

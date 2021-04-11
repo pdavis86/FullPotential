@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Assets.Core.Crafting
 {
-    public class CraftingRegister
+    public class ApiRegister
     {
         private List<IGearAccessory> _accessories = new List<IGearAccessory>();
         private List<IGearArmor> _armor = new List<IGearArmor>();
@@ -14,14 +14,14 @@ namespace Assets.Core.Crafting
         private List<IGearLoot> _loot = new List<IGearLoot>();
         private List<IEffect> _effects = new List<IEffect>();
 
-        protected CraftingRegister() { }
+        protected ApiRegister() { }
 
-        private static CraftingRegister _instance;
-        public static CraftingRegister Instance
+        private static ApiRegister _instance;
+        public static ApiRegister Instance
         {
             get
             {
-                return _instance ?? (_instance = new CraftingRegister());
+                return _instance ?? (_instance = new ApiRegister());
             }
         }
 

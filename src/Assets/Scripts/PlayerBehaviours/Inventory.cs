@@ -1,6 +1,7 @@
 ﻿using Assets.ApiScripts.Crafting;
 using Assets.Core.Crafting;
 using Assets.Core.Crafting.Base;
+using Assets.Core.Crafting.Types;
 using Assets.Core.Data;
 using Assets.Core.Extensions;
 using System;
@@ -110,12 +111,12 @@ public class Inventory : NetworkBehaviour
 
             foreach (CraftableBase craftable in Items.Where(x => x is CraftableBase y && y.CraftableType == null))
             {
-                craftable.CraftableType = CraftingRegister.Instance.GetCraftableType(craftable);
+                craftable.CraftableType = ApiRegister.Instance.GetCraftableType(craftable);
             }
 
             foreach (var item in Items.Where(x => x.EffectIds != null && x.EffectIds.Length > 0))
             {
-                item.Effects = item.EffectIds.Select(x => CraftingRegister.Instance.GetEffect(new Guid(x))).ToList();
+                item.Effects = item.EffectIds.Select(x => ApiRegister.Instance.GetEffect(new Guid(x))).ToList();
             }
 
             if (!firstSetup)
@@ -265,7 +266,12 @@ public class Inventory : NetworkBehaviour
             return;
         }
 
-        var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(selectedType, selectedSubtype, components, isTwoHanded);
+        var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(
+            selectedType, 
+            selectedSubtype, 
+            isTwoHanded, 
+            components
+        );
 
         var craftedType = craftedItem.GetType();
 
@@ -343,7 +349,7 @@ public class Inventory : NetworkBehaviour
 
         if (item is Weapon weapon)
         {
-            var prefab = CraftingRegister.GetPrefabForWeaponType(weapon.CraftableType.TypeName, weapon.IsTwoHanded);
+            var prefab = ApiRegister.GetPrefabForWeaponType(weapon.CraftableType.TypeName, weapon.IsTwoHanded);
             var weaponGo = Instantiate(prefab, gameObject.transform);
             weaponGo.transform.localEulerAngles = new Vector3(0, 90);
             weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, 0.3f, 0.75f);
