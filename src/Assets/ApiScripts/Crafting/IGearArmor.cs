@@ -4,11 +4,11 @@
     {
         public enum ArmorSlot
         {
-            Helm = IGear.GearSlot.Helm,
-            Chest = IGear.GearSlot.Chest,
-            Legs = IGear.GearSlot.Legs,
-            Feet = IGear.GearSlot.Feet,
-            Barrier = IGear.GearSlot.Barrier
+            Helm = GearSlot.Helm,
+            Chest = GearSlot.Chest,
+            Legs = GearSlot.Legs,
+            Feet = GearSlot.Feet,
+            Barrier = GearSlot.Barrier
         }
 
         /// <summary>

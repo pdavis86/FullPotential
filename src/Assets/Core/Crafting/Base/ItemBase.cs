@@ -1,11 +1,13 @@
 ﻿using Assets.ApiScripts.Crafting;
+using Assets.Core.Crafting.Types;
 using System.Collections.Generic;
 using System.Linq;
 
 // ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable UseFormatSpecifierInInterpolation
+// ReSharper disable ArrangeAccessorOwnerBody
 
-namespace Assets.Core.Crafting
+namespace Assets.Core.Crafting.Base
 {
     [System.Serializable]
     public abstract class ItemBase

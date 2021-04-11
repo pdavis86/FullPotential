@@ -1,4 +1,7 @@
-﻿namespace Assets.ApiScripts.Crafting
+﻿
+// ReSharper disable UnusedMember.Global
+
+namespace Assets.ApiScripts.Crafting
 {
     public interface IElement : IEffect
     {

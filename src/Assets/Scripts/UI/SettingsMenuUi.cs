@@ -1,6 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
+// ReSharper disable CheckNamespace
 
 public class SettingsMenuUi : MonoBehaviour
 {

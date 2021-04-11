@@ -1,7 +1,6 @@
 ﻿using Assets.Core.Crafting.Base;
-using Assets.Core.Crafting.Types;
 
-namespace Assets.Core.Crafting
+namespace Assets.Core.Crafting.Types
 {
     [System.Serializable]
     public class Loot : CraftableBase, IMagical

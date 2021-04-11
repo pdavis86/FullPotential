@@ -1,20 +1,25 @@
 ﻿using Assets.ApiScripts.Crafting;
 using Assets.Core.Crafting.Base;
+using Assets.Core.Crafting.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Assets.Core.Crafting
+// ReSharper disable ArrangeAccessorOwnerBody
+// ReSharper disable ConvertToNullCoalescingCompoundAssignment
+// ReSharper disable PossibleMultipleEnumeration
+
+namespace Assets.Core
 {
     public class ApiRegister
     {
-        private List<IGearAccessory> _accessories = new List<IGearAccessory>();
-        private List<IGearArmor> _armor = new List<IGearArmor>();
-        private List<IGearWeapon> _weapons = new List<IGearWeapon>();
-        private List<IGearLoot> _loot = new List<IGearLoot>();
-        private List<IEffect> _effects = new List<IEffect>();
+        private readonly List<IGearAccessory> _accessories = new List<IGearAccessory>();
+        private readonly List<IGearArmor> _armor = new List<IGearArmor>();
+        private readonly List<IGearWeapon> _weapons = new List<IGearWeapon>();
+        private readonly List<IGearLoot> _loot = new List<IGearLoot>();
+        private readonly List<IEffect> _effects = new List<IEffect>();
 
-        protected ApiRegister() { }
+        private ApiRegister() { }
 
         private static ApiRegister _instance;
         public static ApiRegister Instance
@@ -44,11 +49,6 @@ namespace Assets.Core.Crafting
             }
 
             var toRegister = (IRegisterable)Activator.CreateInstance(type);
-
-            if (toRegister.TypeId == null)
-            {
-                UnityEngine.Debug.LogError($"No {nameof(IRegisterable.TypeId)} was specified for class '{type.FullName}'");
-            }
 
             if (toRegister is IGearAccessory accessory)
             {
@@ -105,7 +105,7 @@ namespace Assets.Core.Crafting
             }
         }
 
-        public T GetCraftableType<T>(string typeId) where T : ICraftable
+        private T GetCraftableType<T>(string typeId) where T : ICraftable
         {
             var craftablesOfType = GetCraftables<T>();
 

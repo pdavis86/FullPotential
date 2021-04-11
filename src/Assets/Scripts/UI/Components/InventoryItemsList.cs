@@ -1,11 +1,16 @@
 ﻿using Assets.ApiScripts.Crafting;
 using Assets.Core.Crafting;
+using Assets.Core.Crafting.Base;
+using Assets.Core.Crafting.Types;
 using Assets.Core.Extensions;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PossibleMultipleEnumeration
 
 public class InventoryItemsList : MonoBehaviour
 {
@@ -13,7 +18,7 @@ public class InventoryItemsList : MonoBehaviour
         GameObject slot,
         GameObject componentsContainer,
         GameObject rowPrefab,
-        Inventory inventory,
+        PlayerInventory inventory,
         Action<GameObject, GameObject, ItemBase> toggleAction,
         IGear.GearSlot? inventorySlot = null,
         bool showEquippedItems = true

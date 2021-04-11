@@ -1,8 +1,6 @@
-﻿using Assets.Core.Crafting.Base;
+﻿// ReSharper disable UnusedMember.Global
 
-// ReSharper disable UnusedMember.Global
-
-namespace Assets.Core.Crafting
+namespace Assets.Core.Crafting.Base
 {
     [System.Serializable]
     public abstract class GearBase : CraftableBase

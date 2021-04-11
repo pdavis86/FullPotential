@@ -1,5 +1,4 @@
-﻿using Assets.ApiScripts.Crafting;
-using Assets.Core.Crafting;
+﻿using Assets.Core;
 using Assets.Core.Crafting.Base;
 using Assets.Core.Crafting.Types;
 using Assets.Core.Data;
@@ -20,8 +19,7 @@ using UnityEngine.Networking.NetworkSystem;
 // ReSharper disable UnassignedField.Global
 // ReSharper disable PossibleMultipleEnumeration
 
-//todo: rename to PlayerInventory
-public class Inventory : NetworkBehaviour
+public class PlayerInventory : NetworkBehaviour
 {
     public int MaxItems = 30;
 
@@ -85,7 +83,7 @@ public class Inventory : NetworkBehaviour
         ApplyChanges(changes);
     }
 
-    public bool ApplyChanges(Assets.Core.Data.Inventory changes, bool firstSetup = false)
+    public bool ApplyChanges(Inventory changes, bool firstSetup = false)
     {
         try
         {
@@ -109,12 +107,14 @@ public class Inventory : NetworkBehaviour
 
             Items.AddRange(addedItems);
 
+            // ReSharper disable once PossibleInvalidCastExceptionInForeachLoop
+            // ReSharper disable once MergeSequentialPatterns
             foreach (CraftableBase craftable in Items.Where(x => x is CraftableBase y && y.CraftableType == null))
             {
                 craftable.CraftableType = ApiRegister.Instance.GetCraftableType(craftable);
             }
 
-            foreach (var item in Items.Where(x => x.EffectIds != null && x.EffectIds.Length > 0))
+            foreach (var item in Items.Where(x => x.Effects == null && x.EffectIds != null && x.EffectIds.Length > 0))
             {
                 item.Effects = item.EffectIds.Select(x => ApiRegister.Instance.GetEffect(new Guid(x))).ToList();
             }
@@ -167,7 +167,7 @@ public class Inventory : NetworkBehaviour
         }
     }
 
-    private void HandleOldSaveFile(Assets.Core.Data.Inventory changes)
+    private void HandleOldSaveFile(Inventory changes)
     {
         if (changes.EquipSlots.Length != EquipSlots.Length)
         {
@@ -182,7 +182,7 @@ public class Inventory : NetworkBehaviour
 
     private void ApplyChanges(InventoryChange changes)
     {
-        ApplyChanges(changes as Assets.Core.Data.Inventory);
+        ApplyChanges(changes as Inventory);
 
         if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
         {
@@ -193,12 +193,12 @@ public class Inventory : NetworkBehaviour
         }
     }
 
-    public Assets.Core.Data.Inventory GetSaveData()
+    public Inventory GetSaveData()
     {
         //todo: feasible to use separate lists for different types of item?
         var groupedItems = Items.GroupBy(x => x.GetType());
 
-        return new Assets.Core.Data.Inventory
+        return new Inventory
         {
             MaxItems = MaxItems,
             Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(Loot))?.Select(x => x as Loot).ToArray(),
@@ -225,7 +225,7 @@ public class Inventory : NetworkBehaviour
         }
 
         //todo: what type is the item being added?
-        var change = new InventoryChange { Loot = new Loot[] { item as Loot } };
+        var change = new InventoryChange { Loot = new [] { item as Loot } };
 
         ApplyChanges(change);
 
@@ -260,7 +260,7 @@ public class Inventory : NetworkBehaviour
             components.Add(Items.FirstOrDefault(x => x.Id == id));
         }
 
-        if (components.Count != componentIds.Count())
+        if (components.Count != componentIds.Length)
         {
             Debug.LogError("One or more IDs provided are not in the inventory");
             return;
@@ -278,10 +278,10 @@ public class Inventory : NetworkBehaviour
         var invChange = new InventoryChange
         {
             IdsToRemove = componentIds.ToArray(),
-            Accessories = craftedType == typeof(Accessory) ? new Accessory[] { craftedItem as Accessory } : null,
-            Armor = craftedType == typeof(Armor) ? new Armor[] { craftedItem as Armor } : null,
-            Spells = craftedType == typeof(Spell) ? new Spell[] { craftedItem as Spell } : null,
-            Weapons = craftedType == typeof(Weapon) ? new Weapon[] { craftedItem as Weapon } : null
+            Accessories = craftedType == typeof(Accessory) ? new [] { craftedItem as Accessory } : null,
+            Armor = craftedType == typeof(Armor) ? new [] { craftedItem as Armor } : null,
+            Spells = craftedType == typeof(Spell) ? new [] { craftedItem as Spell } : null,
+            Weapons = craftedType == typeof(Weapon) ? new [] { craftedItem as Weapon } : null
         };
 
         ApplyChanges(invChange);
@@ -336,7 +336,7 @@ public class Inventory : NetworkBehaviour
 
         var item = Items.FirstOrDefault(x => x.Id == itemId);
 
-        return item is Spell ? item as Spell : null;
+        return item as Spell;
     }
 
     public void SpawnItemInHand(int index, ItemBase item, bool leftHand = true)
@@ -373,11 +373,11 @@ public class Inventory : NetworkBehaviour
 
         EquipSlots[slotIndex] = itemId;
 
-        if (slotIndex == (int)Inventory.SlotIndexToGameObjectName.LeftHand)
+        if (slotIndex == (int)SlotIndexToGameObjectName.LeftHand)
         {
-            SpawnItemInHand(slotIndex, Items.First(x => x.Id == itemId), true);
+            SpawnItemInHand(slotIndex, Items.First(x => x.Id == itemId));
         }
-        else if (slotIndex == (int)Inventory.SlotIndexToGameObjectName.RightHand)
+        else if (slotIndex == (int)SlotIndexToGameObjectName.RightHand)
         {
             SpawnItemInHand(slotIndex, Items.First(x => x.Id == itemId), false);
         }

@@ -1,4 +1,4 @@
-﻿using Assets.Core.Crafting;
+﻿using Assets.Core.Crafting.Types;
 using System;
 using TMPro;
 using UnityEngine;
@@ -21,7 +21,7 @@ public class PlayerController : NetworkBehaviour
     private MainCanvasObjects _mainCanvasObjects;
     private bool _toggleGameMenu;
     private bool _toggleCharacterMenu;
-    private Inventory _inventory;
+    private PlayerInventory _inventory;
 
     void Awake()
     {
@@ -33,7 +33,7 @@ public class PlayerController : NetworkBehaviour
             _mainCanvasObjects.DebuggingOverlay.SetActive(true);
         }
 
-        _inventory = GetComponent<Inventory>();
+        _inventory = GetComponent<PlayerInventory>();
     }
 
     void Update()
@@ -207,7 +207,7 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    // ReSharper disable once UnusedParameter.Local
+    // ReSharper disable once UnusedParameter.Global
     [TargetRpc]
     public void TargetRpcShowDamage(NetworkConnection playerConnection, Vector3 position, string damage)
     {

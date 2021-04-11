@@ -5,7 +5,7 @@
     {
         public string[] IdsToRemove;
 
-        public InventoryChange() { }
+        //public InventoryChange() { }
 
         //public InventoryChange(Inventory inventory)
         //{

@@ -1,12 +1,13 @@
 ﻿using Assets.ApiScripts.Crafting;
+using Assets.Core;
 using Assets.Core.Crafting;
+using Assets.Core.Crafting.Base;
 using Assets.Core.Crafting.Types;
 using Assets.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 // ReSharper disable CheckNamespace
@@ -16,6 +17,7 @@ using UnityEngine.UI;
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
+// ReSharper disable PossibleMultipleEnumeration
 
 public class CraftingUi : MonoBehaviour
 {
@@ -30,7 +32,7 @@ public class CraftingUi : MonoBehaviour
     [SerializeField] private Dropdown _handednessDropdown;
     [SerializeField] private Button _craftButton;
 
-    private Inventory _inventory;
+    private PlayerInventory _inventory;
     private List<ItemBase> _components;
     private List<string> _armorTypeNames;
     private List<string> _accessoryTypeNames;
@@ -55,7 +57,7 @@ public class CraftingUi : MonoBehaviour
     {
         _components = new List<ItemBase>();
 
-        _inventory = GameManager.Instance.LocalPlayer.GetComponent<Inventory>();
+        _inventory = GameManager.Instance.LocalPlayer.GetComponent<PlayerInventory>();
 
         _typeDropdown.onValueChanged.AddListener(TypeOnValueChanged);
 

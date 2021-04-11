@@ -1,6 +1,5 @@
-﻿using Assets.ApiScripts.Crafting;
-using Assets.Core.Constants;
-using Assets.Core.Crafting;
+﻿using Assets.Core.Constants;
+using Assets.Core.Crafting.Base;
 using System;
 using System.Globalization;
 using UnityEngine;
@@ -14,7 +13,7 @@ using UnityEngine.Networking;
 
 public abstract class AttackBehaviourBase : NetworkBehaviour
 {
-    public GameObject SourcePlayer;
+    protected GameObject SourcePlayer;
 
     // ReSharper disable once InconsistentNaming
     private static readonly System.Random _random = new System.Random();
@@ -29,7 +28,9 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
 
         //todo: crit? if so, what is it?
         //todo: half-damage for duel-weilding
+
         //todo: give source experience
+        Debug.Log($"Source {source.name} would gain experience");
 
         var targetIsPlayer = target.CompareTag(Tags.Player);
         var targetIsEnemy = target.CompareTag(Tags.Enemy);

@@ -1,5 +1,7 @@
 ﻿using Assets.ApiScripts.Crafting;
 
+// ReSharper disable ArrangeAccessorOwnerBody
+
 namespace Assets.Core.Crafting.Base
 {
     public class CraftableBase : ItemBase

@@ -4,9 +4,9 @@
     {
         public enum AccessorySlot
         {
-            Ring = IGear.GearSlot.Ring,
-            Belt = IGear.GearSlot.Belt,
-            Amulet = IGear.GearSlot.Amulet
+            Ring = GearSlot.Ring,
+            Belt = GearSlot.Belt,
+            Amulet = GearSlot.Amulet
         }
 
         /// <summary>

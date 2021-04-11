@@ -1,5 +1,4 @@
 ﻿using Assets.Core.Data;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -26,13 +25,13 @@ public class PlayerSetup : NetworkBehaviour
     public string Username;
 
     private Camera _sceneCamera;
-    private Inventory _inventory;
+    private PlayerInventory _inventory;
     private bool _loadWasSuccessful;
     private string _textureUri;
 
     private void Start()
     {
-        _inventory = GetComponent<Inventory>();
+        _inventory = GetComponent<PlayerInventory>();
 
         gameObject.name = "Player ID " + netId.Value;
 
@@ -149,11 +148,7 @@ public class PlayerSetup : NetworkBehaviour
         }
         else
         {
-            //Debug.Log("No save file found");
-            LoadFromPlayerData(new PlayerData
-            {
-                //todo: finish load code
-            });
+            LoadFromPlayerData(new PlayerData());
         }
 
         RpcSetPlayerDetails(username, _textureUri);

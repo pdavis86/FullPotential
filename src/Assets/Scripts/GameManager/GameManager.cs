@@ -1,4 +1,5 @@
-﻿using Assets.Core.Crafting;
+﻿using Assets.Core;
+using Assets.Core.Crafting;
 using UnityEngine;
 
 // ReSharper disable CheckNamespace

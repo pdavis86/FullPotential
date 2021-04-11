@@ -1,5 +1,5 @@
 ﻿using Assets.Core.Constants;
-using Assets.Core.Crafting;
+using Assets.Core.Crafting.Types;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -11,7 +11,7 @@ using UnityEngine.Networking;
 
 public class SpellBehaviour : AttackBehaviourBase
 {
-    public Spell Spell;
+    private Spell _spell;
 
     [SyncVar]
     public uint PlayerNetworkId;
@@ -38,15 +38,15 @@ public class SpellBehaviour : AttackBehaviourBase
 
         Physics.IgnoreCollision(GetComponent<Collider>(), SourcePlayer.GetComponent<Collider>());
 
-        Spell = SourcePlayer.GetComponent<Inventory>().Items.FirstOrDefault(x => x.Id == SpellId) as Spell;
+        _spell = SourcePlayer.GetComponent<PlayerInventory>().Items.FirstOrDefault(x => x.Id == SpellId) as Spell;
 
-        if (Spell == null)
+        if (_spell == null)
         {
             Debug.LogError("No spell set");
             return;
         }
 
-        var castSpeed = Spell.Attributes.Speed / 50f;
+        var castSpeed = _spell.Attributes.Speed / 50f;
         if (castSpeed < 0.5)
         {
             castSpeed = 0.5f;
@@ -80,7 +80,7 @@ public class SpellBehaviour : AttackBehaviourBase
                 return;
             }
 
-            DealDamage(Spell, gameObject, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
+            DealDamage(_spell, gameObject, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
 
             //Debug.Log("You hit something not damageable");
 

@@ -1,4 +1,5 @@
 ﻿using Assets.ApiScripts.Crafting;
+using Assets.Core.Crafting.Base;
 using Assets.Core.Crafting.SpellShapes;
 using Assets.Core.Crafting.SpellTargeting;
 using Assets.Core.Crafting.Types;
@@ -20,7 +21,6 @@ namespace Assets.Core.Crafting
         private readonly List<IEffect> _effectsForLoot;
         private readonly List<ISpellTargeting> _spellTargetingOptions;
         private readonly List<ISpellShape> _spellShapeOptions;
-        private readonly List<string> _spellOptionNames;
 
         public ResultFactory()
         {
@@ -33,22 +33,18 @@ namespace Assets.Core.Crafting
 
             _spellTargetingOptions = new List<ISpellTargeting>
             {
-                new SpellTargeting.Beam(),
-                new SpellTargeting.Cone(),
-                new SpellTargeting.Projectile(),
-                new SpellTargeting.Self(),
-                new SpellTargeting.Touch()
+                new Beam(),
+                new Cone(),
+                new Projectile(),
+                new Self(),
+                new Touch()
             };
 
             _spellShapeOptions = new List<ISpellShape>
             {
-                new SpellShapes.Wall(),
-                new SpellShapes.Zone()
+                new Wall(),
+                new Zone()
             };
-
-            _spellOptionNames = new List<string>();
-            _spellOptionNames.AddRange(_spellTargetingOptions.Select(x => x.TypeName));
-            _spellOptionNames.AddRange(_spellShapeOptions.Select(x => x.TypeName));
         }
 
         private int ComputeAttribute(IEnumerable<ItemBase> components, Func<ItemBase, int> getProp, bool allowMax = true)
@@ -80,7 +76,7 @@ namespace Assets.Core.Crafting
 
             if (string.IsNullOrWhiteSpace(targeting))
             {
-                targeting = nameof(SpellTargeting.Projectile);
+                targeting = nameof(Projectile);
             }
 
             return _spellTargetingOptions.First(x => x.TypeName == targeting);
@@ -218,21 +214,22 @@ namespace Assets.Core.Crafting
                 Attributes = GetRandomAttributes()
             };
 
-            var isMagical = _random.Next(0, 2) > 0;
+            var magicalLootTypes = _lootTypes.Where(x => x.Category == IGearLoot.LootCategory.Magic);
+            var techLootTypes = _lootTypes.Where(x => x.Category == IGearLoot.LootCategory.Technology);
+
+            var isMagical = magicalLootTypes.Any() && _random.Next(0, 2) > 0;
             if (isMagical)
             {
-                lootDrop.CraftableType = _lootTypes
-                    .Where(x => x.Category == IGearLoot.LootCategory.Magic)
+                lootDrop.CraftableType = magicalLootTypes
                     .OrderBy(x => _random.Next())
-                    .FirstOrDefault();
+                    .First();
 
                 var effects = new List<IEffect>();
                 var numberOfEffects = GetBiasedNumber(1, Math.Min(4, _effectsForLoot.Count));
-                var debugCounter = 0;
                 for (var i = 1; i <= numberOfEffects; i++)
                 {
                     IEffect effect;
-                    debugCounter = 0;
+                    var debugCounter = 0;
                     do
                     {
                         effect = GetRandomEffect();
@@ -263,10 +260,9 @@ namespace Assets.Core.Crafting
             }
             else
             {
-                lootDrop.CraftableType = _lootTypes
-                    .Where(x => x.Category == IGearLoot.LootCategory.Technology)
+                lootDrop.CraftableType = techLootTypes
                     .OrderBy(x => _random.Next())
-                    .FirstOrDefault();
+                    .First();
             }
 
             lootDrop.Name = lootDrop.CraftableType.TypeName;
@@ -281,9 +277,9 @@ namespace Assets.Core.Crafting
         //todo: add validation e.g. at least one effect for a spell
         //todo: add a min level to craftedResult
 
-        internal Spell GetSpell(IEnumerable<ItemBase> components)
+        private Spell GetSpell(IEnumerable<ItemBase> components)
         {
-            var spellComponents = components.Where(x => x is IMagical).Select(x => x as IMagical);
+            var spellComponents = components.OfType<IMagical>(); // .Where(x => x is IMagical).Select(x => x as IMagical);
 
             var targeting = GetTargeting(spellComponents);
 
@@ -291,6 +287,7 @@ namespace Assets.Core.Crafting
             {
                 Id = Guid.NewGuid().ToString(),
                 Targeting = targeting.TypeName,
+                Shape = GetShape(targeting, spellComponents)?.TypeName,
                 Attributes = new Attributes
                 {
                     IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
@@ -304,7 +301,6 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Spell), components)
             };
-            spell.Shape = GetShape(targeting, spellComponents)?.TypeName;
 
             if (spell.Effects.Count > 0)
             {
@@ -323,7 +319,7 @@ namespace Assets.Core.Crafting
             return $"{prefix} {item.Attributes.Strength} {suffix}";
         }
 
-        internal Weapon GetMeleeWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
+        private Weapon GetMeleeWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon()
             {
@@ -343,7 +339,7 @@ namespace Assets.Core.Crafting
             return weapon;
         }
 
-        internal Weapon GetRangedWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
+        private Weapon GetRangedWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon()
             {
@@ -368,7 +364,7 @@ namespace Assets.Core.Crafting
             return weapon;
         }
 
-        internal Weapon GetDefensiveWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
+        private Weapon GetDefensiveWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon()
             {
@@ -388,7 +384,7 @@ namespace Assets.Core.Crafting
             return weapon;
         }
 
-        internal Armor GetArmor(IGearArmor craftableType, IEnumerable<ItemBase> components)
+        private Armor GetArmor(IGearArmor craftableType, IEnumerable<ItemBase> components)
         {
             var armor = new Armor()
             {
@@ -405,7 +401,7 @@ namespace Assets.Core.Crafting
             return armor;
         }
 
-        internal Armor GetBarrier(IGearArmor craftableType, IEnumerable<ItemBase> components)
+        private Armor GetBarrier(IGearArmor craftableType, IEnumerable<ItemBase> components)
         {
             var armor = new Armor()
             {
@@ -425,7 +421,7 @@ namespace Assets.Core.Crafting
             return armor;
         }
 
-        internal Accessory GetAccessory(IGearAccessory craftableType, IEnumerable<ItemBase> components)
+        private Accessory GetAccessory(IGearAccessory craftableType, IEnumerable<ItemBase> components)
         {
             var accessory = new Accessory()
             {
