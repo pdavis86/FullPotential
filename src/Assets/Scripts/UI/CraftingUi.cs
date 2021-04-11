@@ -39,6 +39,7 @@ public class CraftingUi : MonoBehaviour
     private List<string> _weaponTypeNames;
     private List<string> _twoHandedWeaponTypeNames;
 
+    //todo: localize
     private readonly List<string> _craftingCategories = new List<string>
     {
         nameof(Weapon),
@@ -47,6 +48,7 @@ public class CraftingUi : MonoBehaviour
         nameof(Spell)
     };
 
+    //todo: localize
     private readonly List<string> _handednessOptions = new List<string>
     {
         OneHanded,
@@ -65,11 +67,13 @@ public class CraftingUi : MonoBehaviour
 
         _craftButton.onClick.AddListener(CraftButtonOnClick);
 
+        //todo: localize
         _armorTypeNames = ApiRegister.Instance.GetCraftables<IGearArmor>()
             .Select(x => x.TypeName)
             .OrderBy(x => x)
             .ToList();
 
+        //todo: localize
         _accessoryTypeNames = ApiRegister.Instance.GetCraftables<IGearAccessory>()
             .Select(x => x.TypeName)
             .OrderBy(x => x)
@@ -77,11 +81,13 @@ public class CraftingUi : MonoBehaviour
 
         var weaponTypes = ApiRegister.Instance.GetCraftables<IGearWeapon>();
 
+        //todo: localize
         _weaponTypeNames = weaponTypes
             .Select(x => x.TypeName)
             .OrderBy(x => x)
             .ToList();
 
+        //todo: localize
         _twoHandedWeaponTypeNames = weaponTypes
             .Where(x =>
             {

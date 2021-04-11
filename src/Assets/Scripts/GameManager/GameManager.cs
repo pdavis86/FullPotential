@@ -37,6 +37,8 @@ public class GameManager : MonoBehaviour
 
         _instance = this;
 
+        Assets.Core.Localization.Localizer.Instance.LoadLocalizationFile();
+
         MainCanvasObjects = GameObject.Find(NameCanvasMain).GetComponent<MainCanvasObjects>();
         Prefabs = GetComponent<Prefabs>();
         InputMappings = GetComponent<InputMappings>();

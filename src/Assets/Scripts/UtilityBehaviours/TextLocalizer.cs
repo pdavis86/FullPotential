@@ -7,22 +7,34 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Text))]
 public class TextLocalizer : MonoBehaviour
 {
-    public string id;
+    private Text _textComponent;
+    private bool _hasStarted;
+
+    public string TranslationId;
+    public bool FireOnValidate = false;
+
+    void Awake()
+    {
+        _textComponent = GetComponent<Text>();
+    }
 
     void Start()
     {
-        GetComponent<Text>().text = ResolveStringValue(id);
+        ResolveStringValue(TranslationId);
+        _hasStarted = true;
     }
 
     void OnValidate()
     {
-        GetComponent<Text>().text = ResolveStringValue(id);
+        if (_hasStarted && FireOnValidate)
+        {
+            ResolveStringValue(TranslationId);
+        }
     }
 
-    public string ResolveStringValue(string id)
+    void ResolveStringValue(string id)
     {
-        //todo: based on set language and ID, return the translation
-        return id;
+        _textComponent.text = Assets.Core.Localization.Localizer.Instance.Translate(id);
     }
 
 }

@@ -1,0 +1,9 @@
+{
+    "Culture": "en-GB",
+    "Translations": [
+        {
+            "Key": "login.username",
+            "Value": "uname goes here"
+        }
+    ]
+}
