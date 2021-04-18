@@ -251,7 +251,7 @@ public class PlayerInventory : NetworkBehaviour
     }
 
     [Command]
-    public void CmdCraftItem(string[] componentIds, string selectedType, string selectedSubtype, bool isTwoHanded)
+    public void CmdCraftItem(string[] componentIds, string categoryName, string craftableTypeName, bool isTwoHanded)
     {
         //Check that the components are actually in the player's inventory and load them in the order they are given
         var components = new List<ItemBase>();
@@ -267,8 +267,8 @@ public class PlayerInventory : NetworkBehaviour
         }
 
         var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(
-            selectedType, 
-            selectedSubtype, 
+            categoryName, 
+            craftableTypeName, 
             isTwoHanded, 
             components
         );

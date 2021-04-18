@@ -3,6 +3,7 @@ using Assets.Core.Crafting.Base;
 using Assets.Core.Crafting.SpellShapes;
 using Assets.Core.Crafting.SpellTargeting;
 using Assets.Core.Crafting.Types;
+using Assets.Core.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,9 @@ namespace Assets.Core.Crafting
 {
     public class ResultFactory
     {
+        private const string _attackNamePrefixId = "crafting.name.prefix.attack";
+        private const string _defenceNamePrefixId = "crafting.name.prefix.defence";
+
         // ReSharper disable once InconsistentNaming
         private static readonly Random _random = new Random();
 
@@ -265,6 +269,7 @@ namespace Assets.Core.Crafting
                     .First();
             }
 
+            //todo: localise
             lootDrop.Name = lootDrop.CraftableType.TypeName;
 
             //todo: icon
@@ -304,19 +309,22 @@ namespace Assets.Core.Crafting
 
             if (spell.Effects.Count > 0)
             {
-                spell.Name = spell.Effects.First().TypeName + " Spell";
+                //todo: localise effect
+                spell.Name = spell.Effects.First().TypeName + " " + Localizer.Instance.Translate("crafting.category.spell");
             }
             else
             {
-                spell.Name = $"Strength {spell.Attributes.Strength} {spell.Targeting} Spell";
+                //todo: localise targeting 
+                spell.Name = $"{Localizer.Instance.Translate(_attackNamePrefixId)} {spell.Attributes.Strength} {spell.Targeting} {Localizer.Instance.Translate("crafting.category.spell")}";
             }
 
             return spell;
         }
 
-        private string GetItemName(string prefix, GearBase item, string suffix)
+        private string GetItemName(string prefixTranslationId, GearBase item, string suffix)
         {
-            return $"{prefix} {item.Attributes.Strength} {suffix}";
+            //todo: localise suffix
+            return $"{Localizer.Instance.Translate(prefixTranslationId)} {item.Attributes.Strength} {suffix}";
         }
 
         private Weapon GetMeleeWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
@@ -335,7 +343,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Weapon), components)
             };
-            weapon.Name = GetItemName("Strength", weapon, weapon.CraftableType.TypeName);
+            weapon.Name = GetItemName(_attackNamePrefixId, weapon, weapon.CraftableType.TypeName);
             return weapon;
         }
 
@@ -360,7 +368,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Weapon), components)
             };
-            weapon.Name = GetItemName("Strength", weapon, weapon.CraftableType.TypeName);
+            weapon.Name = GetItemName(_attackNamePrefixId, weapon, weapon.CraftableType.TypeName);
             return weapon;
         }
 
@@ -380,7 +388,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Weapon), components)
             };
-            weapon.Name = GetItemName("Defence", weapon, weapon.CraftableType.TypeName);
+            weapon.Name = GetItemName(_defenceNamePrefixId, weapon, weapon.CraftableType.TypeName);
             return weapon;
         }
 
@@ -397,7 +405,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Armor), components)
             };
-            armor.Name = GetItemName("Defence", armor, armor.CraftableType.TypeName);
+            armor.Name = GetItemName(_defenceNamePrefixId, armor, armor.CraftableType.TypeName);
             return armor;
         }
 
@@ -417,7 +425,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Armor), components)
             };
-            armor.Name = GetItemName("Defence", armor, armor.CraftableType.TypeName);
+            armor.Name = GetItemName(_defenceNamePrefixId, armor, armor.CraftableType.TypeName);
             return armor;
         }
 
@@ -434,7 +442,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Accessory), components)
             };
-            accessory.Name = GetItemName("Strength", accessory, accessory.CraftableType.TypeName);
+            accessory.Name = GetItemName(_attackNamePrefixId, accessory, accessory.CraftableType.TypeName);
             return accessory;
         }
 
@@ -485,6 +493,7 @@ namespace Assets.Core.Crafting
 
             var sb = new StringBuilder();
 
+            //todo: localise
             if (includeName) { sb.Append($"Name: {item.Name}\n"); }
             if (item.Attributes.IsAutomatic) { sb.Append("Automatic\n"); }
             if (item.Attributes.IsSoulbound) { sb.Append("Soulbound\n"); }

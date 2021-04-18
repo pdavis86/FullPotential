@@ -150,15 +150,15 @@ namespace Assets.Core
             return null;
         }
 
-        public IEnumerable<ICraftable> GetCraftables<T>()
+        public IEnumerable<T> GetCraftables<T>() where T : ICraftable
         {
             var interfaceName = typeof(T).Name;
             switch (interfaceName)
             {
-                case nameof(IGearAccessory): return _accessories;
-                case nameof(IGearArmor): return _armor;
-                case nameof(IGearWeapon): return _weapons;
-                case nameof(IGearLoot): return _loot;
+                case nameof(IGearAccessory): return (IEnumerable<T>)_accessories;
+                case nameof(IGearArmor): return (IEnumerable<T>)_armor;
+                case nameof(IGearWeapon): return (IEnumerable<T>)_weapons;
+                case nameof(IGearLoot): return (IEnumerable<T>)_loot;
                 default: throw new Exception($"Unexpected type {interfaceName}");
             }
         }

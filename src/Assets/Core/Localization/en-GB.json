@@ -3,7 +3,43 @@
     "Translations": [
         {
             "Key": "login.username",
-            "Value": "uname goes here"
+            "Value": "Username"
+        },
+        {
+            "Key": "crafting.category.weapon",
+            "Value": "Weapon"
+        },
+        {
+            "Key": "crafting.category.armor",
+            "Value": "Armor"
+        },
+        {
+            "Key": "crafting.category.accessory",
+            "Value": "Accessory"
+        },
+        {
+            "Key": "crafting.category.spell",
+            "Value": "Spell"
+        },
+        {
+            "Key": "crafting.handedness.one",
+            "Value": "One-handed"
+        },
+        {
+            "Key": "crafting.handedness.two",
+            "Value": "Two-handed"
+        },
+        {
+            "Key": "crafting.name.prefix.attack",
+            "Value": "Strength"
+        },
+        {
+            "Key": "crafting.name.prefix.defence",
+            "Value": "Defence"
+        },
+        {
+            "Key": "weapon.axe",
+            "Value": "Axe"
         }
     ]
 }

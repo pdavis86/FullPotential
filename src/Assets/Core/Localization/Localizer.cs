@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.Core.Localization
@@ -39,22 +40,32 @@ namespace Assets.Core.Localization
 
         public string Translate(string id)
         {
+            id = id.ToLower();
+
             if (_translations.ContainsKey(id))
             {
                 return _translations[id];
             }
 
             Debug.LogWarning($"Missing translation for '{id}'");
-            return "**MISSING TRANSLATION**";
+            return $"{id} translation is missing";
         }
 
-        public string TranslateWithFallback(string id, string fallback)
+        //Avoid using this to avoid mistakes
+        //public string TranslateWithFallback(string id, string fallback)
+        //{
+        //    if (_translations.ContainsKey(id))
+        //    {
+        //        return _translations[id];
+        //    }
+        //    return fallback;
+        //}
+
+        public Dictionary<string, string> GetTranslations(IEnumerable<string> idList)
         {
-            if (_translations.ContainsKey(id))
-            {
-                return _translations[id];
-            }
-            return fallback;
+            return idList
+                .Select(x => Tuple.Create(x, Translate(x)))
+                .ToDictionary(x => x.Item1, x=> x.Item2);
         }
 
     }

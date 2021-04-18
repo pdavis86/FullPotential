@@ -32,7 +32,6 @@ namespace Assets.Core.Crafting.Base
             }
         }
 
-
         public override int GetHashCode()
         {
             unchecked

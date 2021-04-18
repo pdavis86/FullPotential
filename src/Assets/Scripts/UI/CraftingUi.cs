@@ -4,6 +4,7 @@ using Assets.Core.Crafting;
 using Assets.Core.Crafting.Base;
 using Assets.Core.Crafting.Types;
 using Assets.Core.Extensions;
+using Assets.Core.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,9 +22,6 @@ using UnityEngine.UI;
 
 public class CraftingUi : MonoBehaviour
 {
-    public const string OneHanded = "One-handed";
-    public const string TwoHanded = "Two-handed";
-
     [SerializeField] private GameObject _componentsContainer;
     [SerializeField] private GameObject _rowPrefab;
     [SerializeField] private Text _outputText;
@@ -34,26 +32,12 @@ public class CraftingUi : MonoBehaviour
 
     private PlayerInventory _inventory;
     private List<ItemBase> _components;
-    private List<string> _armorTypeNames;
-    private List<string> _accessoryTypeNames;
-    private List<string> _weaponTypeNames;
-    private List<string> _twoHandedWeaponTypeNames;
-
-    //todo: localize
-    private readonly List<string> _craftingCategories = new List<string>
-    {
-        nameof(Weapon),
-        nameof(Armor),
-        nameof(Accessory),
-        nameof(Spell)
-    };
-
-    //todo: localize
-    private readonly List<string> _handednessOptions = new List<string>
-    {
-        OneHanded,
-        TwoHanded
-    };
+    private Dictionary<Type, string> _craftingCategories;
+    private Dictionary<IGearArmor, string> _armorTypes;
+    private Dictionary<IGearAccessory, string> _accessoryTypes;
+    private Dictionary<IGearWeapon, string> _weaponTypes;
+    private Dictionary<string, string> _handednessOptions;
+    private List<int?> _optionalTwoHandedWeaponIndexes;
 
     private void Awake()
     {
@@ -67,49 +51,57 @@ public class CraftingUi : MonoBehaviour
 
         _craftButton.onClick.AddListener(CraftButtonOnClick);
 
-        //todo: localize
-        _armorTypeNames = ApiRegister.Instance.GetCraftables<IGearArmor>()
-            .Select(x => x.TypeName)
-            .OrderBy(x => x)
-            .ToList();
+        _craftingCategories = new Dictionary<Type, string>
+        {
+            { typeof(Weapon), Localizer.Instance.Translate("crafting.category.weapon") },
+            { typeof(Armor), Localizer.Instance.Translate("crafting.category.armor") },
+            { typeof(Accessory), Localizer.Instance.Translate("crafting.category.accessory") },
+            { typeof(Spell), Localizer.Instance.Translate("crafting.category.spell") }
+        };
 
-        //todo: localize
-        _accessoryTypeNames = ApiRegister.Instance.GetCraftables<IGearAccessory>()
-            .Select(x => x.TypeName)
-            .OrderBy(x => x)
-            .ToList();
+        _handednessOptions = Localizer.Instance.GetTranslations(new[]
+        {
+            "crafting.handedness.one",
+            "crafting.handedness.two"
+        });
 
-        var weaponTypes = ApiRegister.Instance.GetCraftables<IGearWeapon>();
+        _armorTypes = ApiRegister.Instance.GetCraftables<IGearArmor>()
+            .ToDictionary(x => x, x => Localizer.Instance.Translate("armor." + x.TypeName))
+            .OrderBy(x => x.Value)
+            .ToDictionary(x => x.Key, x => x.Value);
 
-        //todo: localize
-        _weaponTypeNames = weaponTypes
-            .Select(x => x.TypeName)
-            .OrderBy(x => x)
-            .ToList();
+        _accessoryTypes = ApiRegister.Instance.GetCraftables<IGearAccessory>()
+            .ToDictionary(x => x, x => Localizer.Instance.Translate("accessory." + x.TypeName))
+            .OrderBy(x => x.Value)
+            .ToDictionary(x => x.Key, x => x.Value);
 
-        //todo: localize
-        _twoHandedWeaponTypeNames = weaponTypes
-            .Where(x =>
+        _weaponTypes = ApiRegister.Instance.GetCraftables<IGearWeapon>()
+            .ToDictionary(x => x, x => Localizer.Instance.Translate("weapon." + x.TypeName))
+            .OrderBy(x => x.Value)
+            .ToDictionary(x => x.Key, x => x.Value);
+
+        _optionalTwoHandedWeaponIndexes = _weaponTypes
+            .Select((x, i) =>
             {
-                var weapon = (IGearWeapon)x;
-                return !weapon.EnforceTwoHanded && weapon.AllowTwoHanded;
+                return !x.Key.EnforceTwoHanded && x.Key.AllowTwoHanded ? (int?)i : null;
             })
-            .Select(x => x.TypeName)
-            .OrderBy(x => x)
+            .Where(x => x != null)
             .ToList();
     }
 
     private void CraftButtonOnClick()
     {
         _craftButton.interactable = false;
-        _inventory.CmdCraftItem(_components.Select(x => x.Id).ToArray(), GetSelectedType(), GetSelectedSubType(), GetSelectedHandedness());
+
+        var selectedType = GetCraftingCategory();
+        _inventory.CmdCraftItem(_components.Select(x => x.Id).ToArray(), selectedType, GetCraftableTypeName(selectedType), IsTwoHandedSelected());
     }
 
     void SubTypeOnValueChanged(int index)
     {
         try
         {
-            SetHandednessDropDownVisibility(_handednessDropdown, _typeDropdown.options[_typeDropdown.value].text, _subTypeDropdown.options[index].text);
+            SetHandednessDropDownVisibility();
             UpdateResults();
         }
         catch (Exception ex)
@@ -118,9 +110,9 @@ public class CraftingUi : MonoBehaviour
         }
     }
 
-    private void SetHandednessDropDownVisibility(Dropdown handednessDropdown, string type, string subType)
+    private void SetHandednessDropDownVisibility()
     {
-        handednessDropdown.gameObject.SetActive(type == nameof(Weapon) && _twoHandedWeaponTypeNames.Contains(subType));
+        _handednessDropdown.gameObject.SetActive(GetCraftingCategory() == nameof(Weapon) && _optionalTwoHandedWeaponIndexes.Contains(_subTypeDropdown.value));
     }
 
     void TypeOnValueChanged(int index)
@@ -130,13 +122,12 @@ public class CraftingUi : MonoBehaviour
             _subTypeDropdown.ClearOptions();
 
             var isSpell = false;
-            var craftingType = _typeDropdown.options[_typeDropdown.value].text;
 
-            switch (craftingType)
+            switch (GetCraftingCategory())
             {
-                case nameof(Weapon): _subTypeDropdown.AddOptions(_weaponTypeNames); break;
-                case nameof(Armor): _subTypeDropdown.AddOptions(_armorTypeNames); break;
-                case nameof(Accessory): _subTypeDropdown.AddOptions(_accessoryTypeNames); break;
+                case nameof(Weapon): _subTypeDropdown.AddOptions(_weaponTypes.Select(x => x.Value).ToList()); break;
+                case nameof(Armor): _subTypeDropdown.AddOptions(_armorTypes.Select(x => x.Value).ToList()); break;
+                case nameof(Accessory): _subTypeDropdown.AddOptions(_accessoryTypes.Select(x => x.Value).ToList()); break;
                 case nameof(Spell): isSpell = true; break;
 
                 default:
@@ -153,8 +144,7 @@ public class CraftingUi : MonoBehaviour
                 _subTypeDropdown.gameObject.SetActive(true);
             }
 
-            var subType = _subTypeDropdown.options != null && _subTypeDropdown.options.Count > 0 ? _subTypeDropdown.options[_subTypeDropdown.value].text : null;
-            SetHandednessDropDownVisibility(_handednessDropdown, craftingType, subType);
+            SetHandednessDropDownVisibility();
 
             UpdateResults();
         }
@@ -200,10 +190,10 @@ public class CraftingUi : MonoBehaviour
     public void ResetUi()
     {
         _typeDropdown.ClearOptions();
-        _typeDropdown.AddOptions(_craftingCategories);
+        _typeDropdown.AddOptions(_craftingCategories.Select(x => x.Value).ToList());
 
         _handednessDropdown.ClearOptions();
-        _handednessDropdown.AddOptions(_handednessOptions);
+        _handednessDropdown.AddOptions(_handednessOptions.Select(x => x.Value).ToList());
 
         TypeOnValueChanged(0);
 
@@ -224,47 +214,6 @@ public class CraftingUi : MonoBehaviour
             null,
             false
         );
-
-        //_componentsContainer.transform.Clear();
-
-        //var rowRectTransform = _rowPrefab.GetComponent<RectTransform>();
-        //var rowCounter = 0;
-
-        //foreach (var item in _inventory.Items)
-        //{
-        //    var row = Instantiate(_rowPrefab, _componentsContainer.transform);
-        //    row.transform.Find("ItemName").GetComponent<Text>().text = item.GetFullName();
-
-        //    var rowImage = row.GetComponent<Image>();
-        //    var toggle = row.GetComponent<Toggle>();
-        //    toggle.onValueChanged.AddListener(isOn =>
-        //    {
-        //        if (isOn)
-        //        {
-        //            rowImage.color = Color.green;
-        //            AddComponent(item.Id);
-        //        }
-        //        else
-        //        {
-        //            rowImage.color = Color.white;
-        //            RemoveComponent(item.Id);
-        //        }
-
-        //        UpdateResults();
-        //    });
-
-        //    var tooltip = row.GetComponent<Tooltip>();
-        //    tooltip.OnPointerEnterForTooltip += pointerEventData =>
-        //    {
-        //        Tooltips.ShowTooltip(ResultFactory.GetItemDescription(item, false));
-        //    };
-
-        //    rowCounter++;
-        //}
-
-        //const int spacer = 5;
-        //var containerRectTrans = _componentsContainer.GetComponent<RectTransform>();
-        //containerRectTrans.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rowCounter * (rowRectTransform.rect.height + spacer));
     }
 
     private void HandleRowToggle(GameObject row, GameObject slot, ItemBase item)
@@ -288,19 +237,29 @@ public class CraftingUi : MonoBehaviour
         });
     }
 
-    private string GetSelectedType()
+    private string GetCraftingCategory()
     {
-        return _typeDropdown.options[_typeDropdown.value].text;
+        return _craftingCategories.ElementAt(_typeDropdown.value).Key.Name;
     }
 
-    private string GetSelectedSubType()
+    private string GetCraftableTypeName(string craftingCategory)
     {
-        return _subTypeDropdown.options.Count > 0 ? _subTypeDropdown.options[_subTypeDropdown.value].text : null;
+        switch (craftingCategory)
+        {
+            case nameof(Weapon): return (_weaponTypes.ElementAt(_subTypeDropdown.value).Key as IGearWeapon).TypeName;
+            case nameof(Armor): return (_armorTypes.ElementAt(_subTypeDropdown.value).Key as IGearArmor).TypeName;
+            case nameof(Accessory): return (_accessoryTypes.ElementAt(_subTypeDropdown.value).Key as IGearAccessory).TypeName;
+            
+            //todo: what should this be?
+            case nameof(Spell): return "todo";
+
+            default: throw new InvalidOperationException("Unknown crafting type");
+        }
     }
 
-    private bool GetSelectedHandedness()
+    private bool IsTwoHandedSelected()
     {
-        return _handednessDropdown.options.Count > 0 && _handednessDropdown.options[_handednessDropdown.value].text == TwoHanded;
+        return _handednessDropdown.options.Count > 0 && _handednessDropdown.value == 1;
     }
 
     private void UpdateResults()
@@ -311,10 +270,11 @@ public class CraftingUi : MonoBehaviour
             return;
         }
 
+        var craftingCategory = GetCraftingCategory();
         var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(
-            GetSelectedType(),
-            GetSelectedSubType(),
-            GetSelectedHandedness(),
+            craftingCategory,
+            GetCraftableTypeName(craftingCategory),
+            IsTwoHandedSelected(),
             _components
         );
 

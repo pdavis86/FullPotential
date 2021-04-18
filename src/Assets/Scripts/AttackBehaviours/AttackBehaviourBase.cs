@@ -41,12 +41,12 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
             return;
         }
 
-        //todo: calc defense
-        var defenseStrength = 30;
+        //todo: calc defence
+        var defenceStrength = 30;
 
         var numerator = 100 + _random.Next(0, 10);
         var denominator = 100 + _random.Next(-10, 10);
-        var damageDealt = Math.Round(sourceItem.Attributes.Strength * ((double)numerator / (denominator + defenseStrength)), 0);
+        var damageDealt = Math.Round(sourceItem.Attributes.Strength * ((double)numerator / (denominator + defenceStrength)), 0);
 
         Debug.Log($"Source '{sourceItem.Name}' attacked target '{target.name}' for {damageDealt} damage");
 
