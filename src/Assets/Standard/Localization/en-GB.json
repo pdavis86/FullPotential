@@ -1,0 +1,90 @@
+{
+    "Culture": "en-GB",
+    "Translations": [
+        {
+            "Key": "accessory.amulet",
+            "Value": "Amulet"
+        },
+        {
+            "Key": "accessory.belt",
+            "Value": "Belt"
+        },
+        {
+            "Key": "accessory.ring",
+            "Value": "Ring"
+        },
+		
+		
+        {
+            "Key": "armor.helm",
+            "Value": "Helm"
+        },
+        {
+            "Key": "armor.chest",
+            "Value": "Chest"
+        },
+        {
+            "Key": "armor.legs",
+            "Value": "Legs"
+        },
+        {
+            "Key": "armor.feet",
+            "Value": "Feet"
+        },
+        {
+            "Key": "armor.barrier",
+            "Value": "Barrier"
+        },
+		
+		
+        {
+            "Key": "loot.scrap",
+            "Value": "Scrap"
+        },
+        {
+            "Key": "loot.shard",
+            "Value": "Shard"
+        },
+		
+		
+        {
+            "Key": "weapon.axe",
+            "Value": "Axe"
+        },
+        {
+            "Key": "weapon.bow",
+            "Value": "Bow"
+        },
+        {
+            "Key": "weapon.crossbow",
+            "Value": "Crossbow"
+        },
+        {
+            "Key": "weapon.dagger",
+            "Value": "Dagger"
+        },
+        {
+            "Key": "weapon.gun",
+            "Value": "Gun"
+        },
+        {
+            "Key": "weapon.hammer",
+            "Value": "Hammer"
+        },
+        {
+            "Key": "weapon.shield",
+            "Value": "Shield"
+        },
+        {
+            "Key": "weapon.staff",
+            "Value": "Staff"
+        },
+        {
+            "Key": "weapon.sword",
+            "Value": "Sword"
+        }
+		
+		
+		
+    ]
+}

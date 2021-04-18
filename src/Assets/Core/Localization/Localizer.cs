@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.ApiScripts.Crafting;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,27 +16,48 @@ namespace Assets.Core.Localization
         private static Localizer _instance = new Localizer();
         public static Localizer Instance { get { return _instance; } }
 
-        public void LoadLocalizationFile(string culture = null)
+        public void LoadLocalizationFiles(string culture = null, IEnumerable<string> modFilePaths = null)
         {
-            var dataDir = Path.Combine(Application.dataPath, "Core/Localization");
-            string filePath = Path.Combine(dataDir, culture + ".json");
+            IEnumerable<string> filepaths = new[] { "Core/Localization" };
 
-            if (!File.Exists(filePath))
+            if (modFilePaths != null && modFilePaths.Any())
             {
-                Debug.LogWarning($"Failed to find translations for culture '{culture}'. Defaulting to 'en-GB'");
+                filepaths = filepaths.Union(modFilePaths);
+            }
 
-                culture = "en-GB";
-                filePath = Path.Combine(dataDir, culture + ".json");
+            _translations = new Dictionary<string, string>();
+
+            foreach (var relativePath in filepaths)
+            {
+                var dataDir = Path.Combine(Application.dataPath, relativePath);
+                var filePath = Path.Combine(dataDir, culture + ".json");
 
                 if (!File.Exists(filePath))
                 {
-                    throw new Exception("Failed to find any localization file");
+                    Debug.LogWarning($"Failed to find translations for culture '{culture}'. Defaulting to 'en-GB'");
+
+                    culture = "en-GB";
+                    filePath = Path.Combine(dataDir, culture + ".json");
+
+                    if (!File.Exists(filePath))
+                    {
+                        throw new Exception("Failed to find any localization file");
+                    }
+                }
+
+                var data = JsonUtility.FromJson<Assets.Core.Data.Localization>(File.ReadAllText(filePath));
+                foreach (var item in data.Translations)
+                {
+                    if (!_translations.ContainsKey(item.Key))
+                    {
+                        _translations.Add(item.Key, item.Value);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Translations already contains a value for key '{item.Key}'");
+                    }
                 }
             }
-
-            var data = JsonUtility.FromJson<Assets.Core.Data.Localization>(File.ReadAllText(filePath));
-
-            _translations = data.GetDictionary();
         }
 
         public string Translate(string id)
@@ -51,21 +73,13 @@ namespace Assets.Core.Localization
             return $"{id} translation is missing";
         }
 
-        //Avoid using this to avoid mistakes
-        //public string TranslateWithFallback(string id, string fallback)
-        //{
-        //    if (_translations.ContainsKey(id))
-        //    {
-        //        return _translations[id];
-        //    }
-        //    return fallback;
-        //}
-
-        public Dictionary<string, string> GetTranslations(IEnumerable<string> idList)
+        public string GetTranslatedTypeName(ICraftable craftableItem)
         {
-            return idList
-                .Select(x => Tuple.Create(x, Translate(x)))
-                .ToDictionary(x => x.Item1, x=> x.Item2);
+            if (craftableItem is IGearAccessory) { return Translate("accessory." + craftableItem.TypeName); }
+            if (craftableItem is IGearArmor) { return Translate("armor." + craftableItem.TypeName); }
+            if (craftableItem is IGearWeapon) { return Translate("weapon." + craftableItem.TypeName); }
+            if (craftableItem is ILoot) { return Translate("loot." + craftableItem.TypeName); }
+            return "Unexpected ICraftable type";
         }
 
     }

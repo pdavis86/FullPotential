@@ -30,6 +30,9 @@ public class CraftingUi : MonoBehaviour
     [SerializeField] private Dropdown _handednessDropdown;
     [SerializeField] private Button _craftButton;
 
+    private const string _craftingHandednessOne = "crafting.handedness.one";
+    private const string _craftingHandednessTwo = "crafting.handedness.two";
+
     private PlayerInventory _inventory;
     private List<ItemBase> _components;
     private Dictionary<Type, string> _craftingCategories;
@@ -53,30 +56,29 @@ public class CraftingUi : MonoBehaviour
 
         _craftingCategories = new Dictionary<Type, string>
         {
-            { typeof(Weapon), Localizer.Instance.Translate("crafting.category.weapon") },
-            { typeof(Armor), Localizer.Instance.Translate("crafting.category.armor") },
-            { typeof(Accessory), Localizer.Instance.Translate("crafting.category.accessory") },
-            { typeof(Spell), Localizer.Instance.Translate("crafting.category.spell") }
+            { typeof(Weapon), Localizer.Instance.Translate(ResultFactory.CraftingCategoryIdWeapon) },
+            { typeof(Armor), Localizer.Instance.Translate(ResultFactory.CraftingCategoryIdArmor) },
+            { typeof(Accessory), Localizer.Instance.Translate(ResultFactory.CraftingCategoryIdAccessory) },
+            { typeof(Spell), Localizer.Instance.Translate(ResultFactory.CraftingCategoryIdSpell) }
         };
 
-        _handednessOptions = Localizer.Instance.GetTranslations(new[]
-        {
-            "crafting.handedness.one",
-            "crafting.handedness.two"
-        });
+        _handednessOptions = new Dictionary<string, string> {
+            { _craftingHandednessOne, Localizer.Instance.Translate(_craftingHandednessOne) },
+            { _craftingHandednessTwo, Localizer.Instance.Translate(_craftingHandednessTwo) }
+        };
 
         _armorTypes = ApiRegister.Instance.GetCraftables<IGearArmor>()
-            .ToDictionary(x => x, x => Localizer.Instance.Translate("armor." + x.TypeName))
+            .ToDictionary(x => x, x => Localizer.Instance.GetTranslatedTypeName(x))
             .OrderBy(x => x.Value)
             .ToDictionary(x => x.Key, x => x.Value);
 
         _accessoryTypes = ApiRegister.Instance.GetCraftables<IGearAccessory>()
-            .ToDictionary(x => x, x => Localizer.Instance.Translate("accessory." + x.TypeName))
+            .ToDictionary(x => x, x => Localizer.Instance.GetTranslatedTypeName(x))
             .OrderBy(x => x.Value)
             .ToDictionary(x => x.Key, x => x.Value);
 
         _weaponTypes = ApiRegister.Instance.GetCraftables<IGearWeapon>()
-            .ToDictionary(x => x, x => Localizer.Instance.Translate("weapon." + x.TypeName))
+            .ToDictionary(x => x, x => Localizer.Instance.GetTranslatedTypeName(x))
             .OrderBy(x => x.Value)
             .ToDictionary(x => x.Key, x => x.Value);
 

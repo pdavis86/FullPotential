@@ -16,7 +16,7 @@ namespace Assets.Core
         private readonly List<IGearAccessory> _accessories = new List<IGearAccessory>();
         private readonly List<IGearArmor> _armor = new List<IGearArmor>();
         private readonly List<IGearWeapon> _weapons = new List<IGearWeapon>();
-        private readonly List<IGearLoot> _loot = new List<IGearLoot>();
+        private readonly List<ILoot> _loot = new List<ILoot>();
         private readonly List<IEffect> _effects = new List<IEffect>();
 
         private ApiRegister() { }
@@ -65,7 +65,7 @@ namespace Assets.Core
                 Register(_weapons, craftableWeapon);
                 return;
             }
-            else if (toRegister is IGearLoot loot)
+            else if (toRegister is ILoot loot)
             {
                 Register(_loot, loot);
                 return;
@@ -100,7 +100,7 @@ namespace Assets.Core
                 case nameof(IGearAccessory): return (T)_accessories.FirstOrDefault(x => x.TypeName.Equals(typeName, StringComparison.OrdinalIgnoreCase));
                 case nameof(IGearArmor): return (T)_armor.FirstOrDefault(x => x.TypeName.Equals(typeName, StringComparison.OrdinalIgnoreCase));
                 case nameof(IGearWeapon): return (T)_weapons.FirstOrDefault(x => x.TypeName.Equals(typeName, StringComparison.OrdinalIgnoreCase));
-                case nameof(IGearLoot): return (T)_loot.FirstOrDefault(x => x.TypeName.Equals(typeName, StringComparison.OrdinalIgnoreCase));
+                case nameof(ILoot): return (T)_loot.FirstOrDefault(x => x.TypeName.Equals(typeName, StringComparison.OrdinalIgnoreCase));
                 default: throw new Exception($"Unexpected type {interfaceName}");
             }
         }
@@ -144,7 +144,7 @@ namespace Assets.Core
             }
             else if (craftable is Loot)
             {
-                return GetCraftableType<IGearLoot>(craftable.TypeId);
+                return GetCraftableType<ILoot>(craftable.TypeId);
             }
 
             return null;
@@ -158,7 +158,7 @@ namespace Assets.Core
                 case nameof(IGearAccessory): return (IEnumerable<T>)_accessories;
                 case nameof(IGearArmor): return (IEnumerable<T>)_armor;
                 case nameof(IGearWeapon): return (IEnumerable<T>)_weapons;
-                case nameof(IGearLoot): return (IEnumerable<T>)_loot;
+                case nameof(ILoot): return (IEnumerable<T>)_loot;
                 default: throw new Exception($"Unexpected type {interfaceName}");
             }
         }

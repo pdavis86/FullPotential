@@ -1,6 +1,6 @@
 ﻿namespace Assets.ApiScripts.Crafting
 {
-    public interface IGearLoot : IGear
+    public interface ILoot : ICraftable
     {
         public enum LootCategory
         {

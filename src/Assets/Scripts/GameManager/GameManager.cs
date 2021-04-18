@@ -37,7 +37,10 @@ public class GameManager : MonoBehaviour
 
         _instance = this;
 
-        Assets.Core.Localization.Localizer.Instance.LoadLocalizationFile();
+        //todo: get from settings
+        var culture = "en-GB";
+        var modPaths = new[] { "Standard/Localization" };
+        Assets.Core.Localization.Localizer.Instance.LoadLocalizationFiles(culture, modPaths);
 
         MainCanvasObjects = GameObject.Find(NameCanvasMain).GetComponent<MainCanvasObjects>();
         Prefabs = GetComponent<Prefabs>();

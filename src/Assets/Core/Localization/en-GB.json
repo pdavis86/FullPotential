@@ -2,10 +2,6 @@
     "Culture": "en-GB",
     "Translations": [
         {
-            "Key": "login.username",
-            "Value": "Username"
-        },
-        {
             "Key": "crafting.category.weapon",
             "Value": "Weapon"
         },
@@ -37,9 +33,62 @@
             "Key": "crafting.name.prefix.defence",
             "Value": "Defence"
         },
+		
+
         {
-            "Key": "weapon.axe",
-            "Value": "Axe"
+            "Key": "attributes.name",
+            "Value": "Name"
+        },
+        {
+            "Key": "attributes.isautomatic",
+            "Value": "Automatic"
+        },
+        {
+            "Key": "attributes.issoulbound",
+            "Value": "Soulbound"
+        },
+        {
+            "Key": "attributes.extraammopershot",
+            "Value": "Extra ammo per shot"
+        },
+        {
+            "Key": "attributes.strength",
+            "Value": "Strength"
+        },
+        {
+            "Key": "attributes.efficiency",
+            "Value": "Efficiency"
+        },
+        {
+            "Key": "attributes.range",
+            "Value": "Range"
+        },
+        {
+            "Key": "attributes.accuracy",
+            "Value": "Accuracy"
+        },
+        {
+            "Key": "attributes.speed",
+            "Value": "Speed"
+        },
+        {
+            "Key": "attributes.recovery",
+            "Value": "Recovery"
+        },
+        {
+            "Key": "attributes.duration",
+            "Value": "Duration"
+        },
+        {
+            "Key": "attributes.effects",
+            "Value": "Effects"
+        },
+		
+		
+        {
+            "Key": "login.username",
+            "Value": "Username"
         }
+		
     ]
 }
