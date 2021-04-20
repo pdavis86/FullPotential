@@ -67,17 +67,17 @@ public class CraftingUi : MonoBehaviour
             { _craftingHandednessTwo, Localizer.Instance.Translate(_craftingHandednessTwo) }
         };
 
-        _armorTypes = ApiRegister.Instance.GetCraftables<IGearArmor>()
+        _armorTypes = ApiRegister.Instance.GetRegisteredTypes<IGearArmor>()
             .ToDictionary(x => x, x => Localizer.Instance.GetTranslatedTypeName(x))
             .OrderBy(x => x.Value)
             .ToDictionary(x => x.Key, x => x.Value);
 
-        _accessoryTypes = ApiRegister.Instance.GetCraftables<IGearAccessory>()
+        _accessoryTypes = ApiRegister.Instance.GetRegisteredTypes<IGearAccessory>()
             .ToDictionary(x => x, x => Localizer.Instance.GetTranslatedTypeName(x))
             .OrderBy(x => x.Value)
             .ToDictionary(x => x.Key, x => x.Value);
 
-        _weaponTypes = ApiRegister.Instance.GetCraftables<IGearWeapon>()
+        _weaponTypes = ApiRegister.Instance.GetRegisteredTypes<IGearWeapon>()
             .ToDictionary(x => x, x => Localizer.Instance.GetTranslatedTypeName(x))
             .OrderBy(x => x.Value)
             .ToDictionary(x => x.Key, x => x.Value);

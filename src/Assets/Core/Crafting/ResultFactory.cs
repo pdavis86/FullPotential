@@ -34,12 +34,13 @@ namespace Assets.Core.Crafting
         public ResultFactory()
         {
             _lootTypes = ApiRegister.Instance
-                .GetCraftables<ILoot>()
+                .GetRegisteredTypes<ILoot>()
                 .Select(x => x as ILoot)
                 .ToList();
 
             _effectsForLoot = ApiRegister.Instance.GetLootPossibilities();
 
+            //todo: move these to a Core registry
             _spellTargetingOptions = new List<ISpellTargeting>
             {
                 new Beam(),
@@ -49,6 +50,7 @@ namespace Assets.Core.Crafting
                 new Touch()
             };
 
+            //todo: move these to a Core registry
             _spellShapeOptions = new List<ISpellShape>
             {
                 new Wall(),
@@ -78,10 +80,15 @@ namespace Assets.Core.Crafting
             return result == 0 ? 1 : result;
         }
 
-        private ISpellTargeting GetTargeting(IEnumerable<IMagical> spellComponents)
+        public ISpellTargeting GetSpellTargeting(string typeName)
+        {
+            return _spellTargetingOptions.First(x => x.TypeName == typeName);
+        }
+
+        private ISpellTargeting GetSpellTargeting(IEnumerable<IMagical> spellComponents)
         {
             //Exactly one targeting option
-            var targeting = spellComponents.Select(x => x.GetTargetingTypeName()).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+            var targeting = spellComponents.Select(x => x.Targeting.TypeName).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
 
             if (string.IsNullOrWhiteSpace(targeting))
             {
@@ -91,7 +98,12 @@ namespace Assets.Core.Crafting
             return _spellTargetingOptions.First(x => x.TypeName == targeting);
         }
 
-        private ISpellShape GetShape(ISpellTargeting targeting, IEnumerable<IMagical> spellComponents)
+        public ISpellShape GetSpellShape(string typeName)
+        {
+            return _spellShapeOptions.First(x => x.TypeName == typeName);
+        }
+
+        private ISpellShape GetSpellShape(ISpellTargeting targeting, IEnumerable<IMagical> spellComponents)
         {
             //Only one shape, if any
             if (!targeting.HasShape)
@@ -99,7 +111,7 @@ namespace Assets.Core.Crafting
                 return null;
             }
 
-            var shape = spellComponents.Select(x => x.GetShapeTypeName()).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+            var shape = spellComponents.Select(x => x.Shape.TypeName).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
             return _spellShapeOptions.FirstOrDefault(x => x.TypeName == shape);
         }
 
@@ -155,33 +167,14 @@ namespace Assets.Core.Crafting
             return effects.ToList();
         }
 
-        private int GetAttributeValueIfRandomAbove(int rarityThreshold)
+        private bool IsLucky(int percentageChance)
         {
-            return _random.Next(0, 100) > rarityThreshold ? _random.Next(1, 100) : 0;
+            return _random.Next(1, 101) <= percentageChance;
         }
 
-        //private int PickValueAtRandom(IEnumerable<ItemBase> components, Func<ItemBase, int> getProp)
-        //{
-        //    var values = components.Select(getProp).ToList();
-        //    var takeAt = _random.Next(0, values.Count - 1);
-        //    return values.ElementAt(takeAt);
-        //}
-
-        private Attributes GetRandomAttributes()
+        private int GetAttributeValueIfLucky(int percentageChance)
         {
-            return new Attributes
-            {
-                IsAutomatic = _random.Next(0, 100) > 50,
-                IsSoulbound = _random.Next(0, 100) > 90,
-                ExtraAmmoPerShot = _random.Next(0, 100) > 70 ? _random.Next(1, 3) : 0,
-                Strength = GetAttributeValueIfRandomAbove(25),
-                Efficiency = GetAttributeValueIfRandomAbove(25),
-                Range = GetAttributeValueIfRandomAbove(25),
-                Accuracy = GetAttributeValueIfRandomAbove(25),
-                Speed = GetAttributeValueIfRandomAbove(25),
-                Recovery = GetAttributeValueIfRandomAbove(25),
-                Duration = GetAttributeValueIfRandomAbove(25)
-            };
+            return IsLucky(percentageChance) ? _random.Next(1, 100) : 0;
         }
 
         private IEffect GetRandomEffect()
@@ -191,20 +184,20 @@ namespace Assets.Core.Crafting
 
         private ISpellTargeting GetRandomSpellTargeting()
         {
-            if (_random.Next(0, 2) > 0)
+            if (IsLucky(50))
             {
-                return null;
+                return _spellTargetingOptions.ElementAt(_random.Next(0, _spellTargetingOptions.Count));
             }
-            return _spellTargetingOptions.ElementAt(_random.Next(0, _spellTargetingOptions.Count));
+            return null;
         }
 
         private ISpellShape GetRandomSpellShape()
         {
-            if (_random.Next(0, 2) > 0)
+            if (IsLucky(10))
             {
-                return null;
+                return _spellShapeOptions.ElementAt(_random.Next(0, _spellShapeOptions.Count));
             }
-            return _spellShapeOptions.ElementAt(_random.Next(0, _spellShapeOptions.Count));
+            return null;
         }
 
         private int GetBiasedNumber(int min, int max)
@@ -220,16 +213,28 @@ namespace Assets.Core.Crafting
             var lootDrop = new Loot
             {
                 Id = Guid.NewGuid().ToString(),
-                Attributes = GetRandomAttributes()
+                Attributes = new Attributes
+                {
+                    IsAutomatic = IsLucky(50),
+                    IsSoulbound = IsLucky(10),
+                    ExtraAmmoPerShot = IsLucky(20) ? _random.Next(1, 4) : 0,
+                    Strength = GetAttributeValueIfLucky(75),
+                    Efficiency = GetAttributeValueIfLucky(75),
+                    Range = GetAttributeValueIfLucky(75),
+                    Accuracy = GetAttributeValueIfLucky(75),
+                    Speed = GetAttributeValueIfLucky(75),
+                    Recovery = GetAttributeValueIfLucky(75),
+                    Duration = GetAttributeValueIfLucky(75)
+                }
             };
 
             var magicalLootTypes = _lootTypes.Where(x => x.Category == ILoot.LootCategory.Magic);
             var techLootTypes = _lootTypes.Where(x => x.Category == ILoot.LootCategory.Technology);
 
-            var isMagical = magicalLootTypes.Any() && _random.Next(0, 2) > 0;
+            var isMagical = magicalLootTypes.Any() && IsLucky(50);
             if (isMagical)
             {
-                lootDrop.CraftableType = magicalLootTypes
+                lootDrop.RegistryType = magicalLootTypes
                     .OrderBy(x => _random.Next())
                     .First();
 
@@ -255,26 +260,26 @@ namespace Assets.Core.Crafting
 
                 //todo: deal with lingering
                 //var elementalEffect = lootDrop.Effects.Intersect(Spell.ElementalEffects.All).FirstOrDefault();
-                //if (!string.IsNullOrWhiteSpace(elementalEffect) && Spell.LingeringPairing.ContainsKey(elementalEffect) && _random.Next(0, 2) > 0)
+                //if (!string.IsNullOrWhiteSpace(elementalEffect) && Spell.LingeringPairing.ContainsKey(elementalEffect) && ChanceWin(50) == 0)
                 //{
                 //    lootDrop.Effects.Add(Spell.LingeringPairing[elementalEffect]);
                 //}
 
                 lootDrop.Effects = effects.ToList();
 
-                lootDrop.Targeting = GetRandomSpellTargeting()?.TypeName;
-                lootDrop.Shape = GetRandomSpellShape()?.TypeName;
+                lootDrop.Targeting = GetRandomSpellTargeting();
+                lootDrop.Shape = GetRandomSpellShape();
 
                 //Debug.Log($"Added {numberOfEffects} effects: {string.Join(", ", lootDrop.Effects)}");
             }
             else
             {
-                lootDrop.CraftableType = techLootTypes
+                lootDrop.RegistryType = techLootTypes
                     .OrderBy(x => _random.Next())
                     .First();
             }
 
-            lootDrop.Name = Localizer.Instance.GetTranslatedTypeName(lootDrop.CraftableType);
+            lootDrop.Name = Localizer.Instance.GetTranslatedTypeName(lootDrop.RegistryType);
 
             //todo: icon
 
@@ -288,15 +293,15 @@ namespace Assets.Core.Crafting
 
         private Spell GetSpell(IEnumerable<ItemBase> components)
         {
-            var spellComponents = components.OfType<IMagical>(); // .Where(x => x is IMagical).Select(x => x as IMagical);
+            var spellComponents = components.OfType<IMagical>();
 
-            var targeting = GetTargeting(spellComponents);
+            var targeting = GetSpellTargeting(spellComponents);
 
             var spell = new Spell
             {
                 Id = Guid.NewGuid().ToString(),
-                Targeting = targeting.TypeName,
-                Shape = GetShape(targeting, spellComponents)?.TypeName,
+                Targeting = targeting,
+                Shape = GetSpellShape(targeting, spellComponents),
                 Attributes = new Attributes
                 {
                     IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
@@ -329,14 +334,14 @@ namespace Assets.Core.Crafting
 
         private string GetItemName(string prefixTranslationId, GearBase item)
         {
-            return $"{Localizer.Instance.Translate(prefixTranslationId)} {item.Attributes.Strength} {Localizer.Instance.GetTranslatedTypeName(item.CraftableType)}";
+            return $"{Localizer.Instance.Translate(prefixTranslationId)} {item.Attributes.Strength} {Localizer.Instance.GetTranslatedTypeName(item.RegistryType)}";
         }
 
         private Weapon GetMeleeWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon()
             {
-                CraftableType = craftableType,
+                RegistryType = craftableType,
                 Id = Guid.NewGuid().ToString(),
                 IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
                 Attributes = new Attributes
@@ -356,7 +361,7 @@ namespace Assets.Core.Crafting
         {
             var weapon = new Weapon()
             {
-                CraftableType = craftableType,
+                RegistryType = craftableType,
                 Id = Guid.NewGuid().ToString(),
                 IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
                 Attributes = new Attributes
@@ -381,7 +386,7 @@ namespace Assets.Core.Crafting
         {
             var weapon = new Weapon()
             {
-                CraftableType = craftableType,
+                RegistryType = craftableType,
                 Id = Guid.NewGuid().ToString(),
                 IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
                 Attributes = new Attributes
@@ -401,7 +406,7 @@ namespace Assets.Core.Crafting
         {
             var armor = new Armor()
             {
-                CraftableType = craftableType,
+                RegistryType = craftableType,
                 Id = Guid.NewGuid().ToString(),
                 Attributes = new Attributes
                 {
@@ -418,7 +423,7 @@ namespace Assets.Core.Crafting
         {
             var armor = new Armor()
             {
-                CraftableType = craftableType,
+                RegistryType = craftableType,
                 Id = Guid.NewGuid().ToString(),
                 Attributes = new Attributes
                 {
@@ -438,7 +443,7 @@ namespace Assets.Core.Crafting
         {
             var accessory = new Accessory()
             {
-                CraftableType = craftableType,
+                RegistryType = craftableType,
                 Id = Guid.NewGuid().ToString(),
                 Attributes = new Attributes
                 {
@@ -461,7 +466,7 @@ namespace Assets.Core.Crafting
             switch (categoryName)
             {
                 case nameof(Weapon):
-                    var craftableWeapon = ApiRegister.Instance.GetCraftableTypeByName<IGearWeapon>(typeName);
+                    var craftableWeapon = ApiRegister.Instance.GetRegisteredByTypeName<IGearWeapon>(typeName);
                     switch (craftableWeapon.Category)
                     {
                         case IGearWeapon.WeaponCategory.Melee: return GetMeleeWeapon(craftableWeapon, components, isTwoHanded);
@@ -471,7 +476,7 @@ namespace Assets.Core.Crafting
                     }
 
                 case nameof(Armor):
-                    var craftableArmor = ApiRegister.Instance.GetCraftableTypeByName<IGearArmor>(typeName);
+                    var craftableArmor = ApiRegister.Instance.GetRegisteredByTypeName<IGearArmor>(typeName);
                     if (craftableArmor.InventorySlot == IGearArmor.ArmorSlot.Barrier)
                     {
                         return GetBarrier(craftableArmor, components);
@@ -479,7 +484,7 @@ namespace Assets.Core.Crafting
                     return GetArmor(craftableArmor, components);
 
                 case nameof(Accessory):
-                    var craftableAccessory = ApiRegister.Instance.GetCraftableTypeByName<IGearAccessory>(typeName);
+                    var craftableAccessory = ApiRegister.Instance.GetRegisteredByTypeName<IGearAccessory>(typeName);
                     return GetAccessory(craftableAccessory, components);
 
                 default:
@@ -508,6 +513,14 @@ namespace Assets.Core.Crafting
             if (item.Attributes.Recovery > 0) { sb.Append($"{Localizer.Instance.Translate("attributes.recovery")}: {item.Attributes.Recovery}\n"); }
             if (item.Attributes.Duration > 0) { sb.Append($"{Localizer.Instance.Translate("attributes.duration")}: {item.Attributes.Duration}\n"); }
             if (item.Effects != null && item.Effects.Count > 0) { sb.Append($"{Localizer.Instance.Translate("attributes.effects")}: {string.Join(", ", item.Effects.Select(x => x.TypeName))}\n"); }
+            if (item.Attributes.Duration > 0) { sb.Append($"{Localizer.Instance.Translate("attributes.duration")}: {item.Attributes.Duration}\n"); }
+
+            if (item is IMagical spell)
+            {
+                //todo: localise
+                if (spell.Targeting != null) { sb.Append($"{Localizer.Instance.Translate("attributes.spelltargeting")}: {spell.Targeting.TypeName}\n"); }
+                if (spell.Shape != null) { sb.Append($"{Localizer.Instance.Translate("attributes.spellshape")}: {spell.Shape.TypeName}\n"); }
+            }
 
             return sb.ToString();
         }

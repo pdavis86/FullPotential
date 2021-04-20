@@ -73,12 +73,12 @@ namespace Assets.Core.Localization
             return $"{id} translation is missing";
         }
 
-        public string GetTranslatedTypeName(ICraftable craftableItem)
+        public string GetTranslatedTypeName(IRegisterable registeredItem)
         {
-            if (craftableItem is IGearAccessory) { return Translate("accessory." + craftableItem.TypeName); }
-            if (craftableItem is IGearArmor) { return Translate("armor." + craftableItem.TypeName); }
-            if (craftableItem is IGearWeapon) { return Translate("weapon." + craftableItem.TypeName); }
-            if (craftableItem is ILoot) { return Translate("loot." + craftableItem.TypeName); }
+            if (registeredItem is IGearAccessory) { return Translate("accessory." + registeredItem.TypeName); }
+            if (registeredItem is IGearArmor) { return Translate("armor." + registeredItem.TypeName); }
+            if (registeredItem is IGearWeapon) { return Translate("weapon." + registeredItem.TypeName); }
+            if (registeredItem is ILoot) { return Translate("loot." + registeredItem.TypeName); }
             return "Unexpected ICraftable type";
         }
 

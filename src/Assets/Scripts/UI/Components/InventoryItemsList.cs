@@ -32,8 +32,8 @@ public class InventoryItemsList : MonoBehaviour
 
         var itemsForSlot = inventory.Items.Where(x =>
             inventorySlot == null
-            || (x is Accessory acc && (int)((IGearAccessory)acc.CraftableType).InventorySlot == (int)inventorySlot)
-            || (x is Armor armor && (int)((IGearArmor)armor.CraftableType).InventorySlot == (int)inventorySlot)
+            || (x is Accessory acc && (int)((IGearAccessory)acc.RegistryType).InventorySlot == (int)inventorySlot)
+            || (x is Armor armor && (int)((IGearArmor)armor.RegistryType).InventorySlot == (int)inventorySlot)
             || ((x is Weapon || x is Spell) && inventorySlot == IGear.GearSlot.Hand)
         );
 

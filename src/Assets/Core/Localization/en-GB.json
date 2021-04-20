@@ -83,6 +83,14 @@
             "Key": "attributes.effects",
             "Value": "Effects"
         },
+        {
+            "Key": "attributes.spelltargeting",
+            "Value": "Targeting"
+        },
+        {
+            "Key": "attributes.spellshape",
+            "Value": "Shape"
+        },
 		
 		
         {

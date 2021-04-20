@@ -92,7 +92,7 @@ namespace Assets.Core
             list.Add(item);
         }
 
-        public T GetCraftableTypeByName<T>(string typeName) where T : ICraftable
+        public T GetRegisteredByTypeName<T>(string typeName) where T : IRegisterable
         {
             var interfaceName = typeof(T).Name;
             switch (interfaceName)
@@ -105,9 +105,9 @@ namespace Assets.Core
             }
         }
 
-        private T GetCraftableType<T>(string typeId) where T : ICraftable
+        private T GetRegisteredById<T>(string typeId) where T : IRegisterable
         {
-            var craftablesOfType = GetCraftables<T>();
+            var craftablesOfType = GetRegisteredTypes<T>();
 
             if (string.IsNullOrWhiteSpace(typeId))
             {
@@ -128,29 +128,29 @@ namespace Assets.Core
             return (T)matches.First();
         }
 
-        public ICraftable GetCraftableType(CraftableBase craftable)
+        public IRegisterable GetRegisteredForItem(ItemBase item)
         {
-            if (craftable is Accessory)
+            if (item is Accessory)
             {
-                return GetCraftableType<IGearAccessory>(craftable.TypeId);
+                return GetRegisteredById<IGearAccessory>(item.RegistryTypeId);
             }
-            else if (craftable is Armor)
+            else if (item is Armor)
             {
-                return GetCraftableType<IGearArmor>(craftable.TypeId);
+                return GetRegisteredById<IGearArmor>(item.RegistryTypeId);
             }
-            else if (craftable is Weapon)
+            else if (item is Weapon)
             {
-                return GetCraftableType<IGearWeapon>(craftable.TypeId);
+                return GetRegisteredById<IGearWeapon>(item.RegistryTypeId);
             }
-            else if (craftable is Loot)
+            else if (item is Loot)
             {
-                return GetCraftableType<ILoot>(craftable.TypeId);
+                return GetRegisteredById<ILoot>(item.RegistryTypeId);
             }
 
             return null;
         }
 
-        public IEnumerable<T> GetCraftables<T>() where T : ICraftable
+        public IEnumerable<T> GetRegisteredTypes<T>() where T : IRegisterable
         {
             var interfaceName = typeof(T).Name;
             switch (interfaceName)

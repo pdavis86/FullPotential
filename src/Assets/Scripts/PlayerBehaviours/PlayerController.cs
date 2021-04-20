@@ -1,4 +1,5 @@
-﻿using Assets.Core.Crafting.Types;
+﻿using Assets.Core.Crafting.SpellTargeting;
+using Assets.Core.Crafting.Types;
 using System;
 using TMPro;
 using UnityEngine;
@@ -131,8 +132,9 @@ public class PlayerController : NetworkBehaviour
         }
 
         //todo: other spell targeting options
-        switch (activeSpell.Targeting)
+        switch (activeSpell.Targeting.TypeName)
         {
+            //todo: get this from Core registry
             case "Projectile":
                 SpawnSpellProjectile(activeSpell, leftHand);
                 break;
