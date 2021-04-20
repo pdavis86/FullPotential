@@ -107,16 +107,29 @@ public class PlayerInventory : NetworkBehaviour
 
             Items.AddRange(addedItems);
 
-            // ReSharper disable once PossibleInvalidCastExceptionInForeachLoop
-            // ReSharper disable once MergeSequentialPatterns
-            foreach (CraftableBase craftable in Items.Where(x => x is CraftableBase y && y.CraftableType == null))
+            foreach (var item in Items)
             {
-                craftable.CraftableType = ApiRegister.Instance.GetCraftableType(craftable);
-            }
+                if (!string.IsNullOrWhiteSpace(item.RegistryTypeId) && item.RegistryType == null)
+                {
+                    item.RegistryType = ApiRegister.Instance.GetRegisteredForItem(item);
+                }
 
-            foreach (var item in Items.Where(x => x.Effects == null && x.EffectIds != null && x.EffectIds.Length > 0))
-            {
-                item.Effects = item.EffectIds.Select(x => ApiRegister.Instance.GetEffect(new Guid(x))).ToList();
+                if (item is MagicalItemBase magicalItem)
+                {
+                    if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeName))
+                    {
+                        magicalItem.Shape = GameManager.Instance.ResultFactory.GetSpellShape(magicalItem.ShapeTypeName);
+                    }
+                    if (!string.IsNullOrWhiteSpace(magicalItem.TargetingTypeName))
+                    {
+                        magicalItem.Targeting = GameManager.Instance.ResultFactory.GetSpellTargeting(magicalItem.TargetingTypeName);
+                    }
+                }
+
+                if (item.EffectIds != null && item.EffectIds.Length > 0 && item.Effects == null)
+                {
+                    item.Effects = item.EffectIds.Select(x => ApiRegister.Instance.GetEffect(new Guid(x))).ToList();
+                }
             }
 
             if (!firstSetup)
@@ -182,8 +195,6 @@ public class PlayerInventory : NetworkBehaviour
 
     private void ApplyChanges(InventoryChange changes)
     {
-        ApplyChanges(changes as Inventory);
-
         if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
         {
             var itemsRemoved = Items.RemoveAll(x => changes.IdsToRemove.Contains(x.Id));
@@ -191,6 +202,8 @@ public class PlayerInventory : NetworkBehaviour
             //todo: make this a slide-out alert instead
             Debug.LogWarning($"Removed {itemsRemoved} items from the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
         }
+
+        ApplyChanges(changes as Inventory);
     }
 
     public Inventory GetSaveData()
@@ -225,7 +238,7 @@ public class PlayerInventory : NetworkBehaviour
         }
 
         //todo: what type is the item being added?
-        var change = new InventoryChange { Loot = new [] { item as Loot } };
+        var change = new InventoryChange { Loot = new[] { item as Loot } };
 
         ApplyChanges(change);
 
@@ -267,9 +280,9 @@ public class PlayerInventory : NetworkBehaviour
         }
 
         var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(
-            categoryName, 
-            craftableTypeName, 
-            isTwoHanded, 
+            categoryName,
+            craftableTypeName,
+            isTwoHanded,
             components
         );
 
@@ -278,10 +291,10 @@ public class PlayerInventory : NetworkBehaviour
         var invChange = new InventoryChange
         {
             IdsToRemove = componentIds.ToArray(),
-            Accessories = craftedType == typeof(Accessory) ? new [] { craftedItem as Accessory } : null,
-            Armor = craftedType == typeof(Armor) ? new [] { craftedItem as Armor } : null,
-            Spells = craftedType == typeof(Spell) ? new [] { craftedItem as Spell } : null,
-            Weapons = craftedType == typeof(Weapon) ? new [] { craftedItem as Weapon } : null
+            Accessories = craftedType == typeof(Accessory) ? new[] { craftedItem as Accessory } : null,
+            Armor = craftedType == typeof(Armor) ? new[] { craftedItem as Armor } : null,
+            Spells = craftedType == typeof(Spell) ? new[] { craftedItem as Spell } : null,
+            Weapons = craftedType == typeof(Weapon) ? new[] { craftedItem as Weapon } : null
         };
 
         ApplyChanges(invChange);
@@ -349,7 +362,7 @@ public class PlayerInventory : NetworkBehaviour
 
         if (item is Weapon weapon)
         {
-            var prefab = ApiRegister.GetPrefabForWeaponType(weapon.CraftableType.TypeName, weapon.IsTwoHanded);
+            var prefab = ApiRegister.GetPrefabForWeaponType(weapon.RegistryType.TypeName, weapon.IsTwoHanded);
             var weaponGo = Instantiate(prefab, gameObject.transform);
             weaponGo.transform.localEulerAngles = new Vector3(0, 90);
             weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, 0.3f, 0.75f);
