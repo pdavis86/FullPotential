@@ -5,6 +5,11 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
+// ReSharper disable ConvertToAutoProperty
+// ReSharper disable ArrangeAccessorOwnerBody
+// ReSharper disable PossibleMultipleEnumeration
+// ReSharper disable InconsistentNaming
+
 namespace Assets.Core.Localization
 {
     public class Localizer
@@ -13,7 +18,7 @@ namespace Assets.Core.Localization
 
         private Localizer() { }
 
-        private static Localizer _instance = new Localizer();
+        private static readonly Localizer _instance = new Localizer();
         public static Localizer Instance { get { return _instance; } }
 
         public void LoadLocalizationFiles(string culture = null, IEnumerable<string> modFilePaths = null)

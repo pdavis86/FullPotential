@@ -125,7 +125,7 @@ namespace Assets.Core
                 throw new Exception($"How is there more than one match for '{typeof(T).Name}' and '{typeId}'");
             }
 
-            return (T)matches.First();
+            return matches.First();
         }
 
         public IRegisterable GetRegisteredForItem(ItemBase item)

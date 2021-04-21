@@ -19,6 +19,7 @@ using UnityEngine.UI;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
 // ReSharper disable PossibleMultipleEnumeration
+// ReSharper disable InconsistentNaming
 
 public class CraftingUi : MonoBehaviour
 {
@@ -83,10 +84,7 @@ public class CraftingUi : MonoBehaviour
             .ToDictionary(x => x.Key, x => x.Value);
 
         _optionalTwoHandedWeaponIndexes = _weaponTypes
-            .Select((x, i) =>
-            {
-                return !x.Key.EnforceTwoHanded && x.Key.AllowTwoHanded ? (int?)i : null;
-            })
+            .Select((x, i) => !x.Key.EnforceTwoHanded && x.Key.AllowTwoHanded ? (int?)i : null)
             .Where(x => x != null)
             .ToList();
     }
@@ -248,10 +246,10 @@ public class CraftingUi : MonoBehaviour
     {
         switch (craftingCategory)
         {
-            case nameof(Weapon): return (_weaponTypes.ElementAt(_subTypeDropdown.value).Key as IGearWeapon).TypeName;
-            case nameof(Armor): return (_armorTypes.ElementAt(_subTypeDropdown.value).Key as IGearArmor).TypeName;
-            case nameof(Accessory): return (_accessoryTypes.ElementAt(_subTypeDropdown.value).Key as IGearAccessory).TypeName;
-            
+            case nameof(Weapon): return (_weaponTypes.ElementAt(_subTypeDropdown.value).Key).TypeName;
+            case nameof(Armor): return (_armorTypes.ElementAt(_subTypeDropdown.value).Key).TypeName;
+            case nameof(Accessory): return (_accessoryTypes.ElementAt(_subTypeDropdown.value).Key).TypeName;
+
             //todo: what should this be?
             case nameof(Spell): return "todo";
 

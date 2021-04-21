@@ -1,6 +1,7 @@
 ﻿using Assets.Core.Crafting.SpellShapes;
 using Assets.Core.Crafting.SpellTargeting;
-using Assets.Core.Crafting.Types;
+
+// ReSharper disable ArrangeAccessorOwnerBody
 
 namespace Assets.Core.Crafting.Base
 {

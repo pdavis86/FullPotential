@@ -1,6 +1,7 @@
 using UnityEngine;
 
 // ReSharper disable CheckNamespace
+// ReSharper disable UnusedType.Global
 
 public class SettingsMenuUi : MonoBehaviour
 {

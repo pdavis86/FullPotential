@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnassignedField.Global
 
 namespace Assets.Core.Data
 {

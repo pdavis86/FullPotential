@@ -1,5 +1,4 @@
-﻿using Assets.Core.Crafting.SpellTargeting;
-using Assets.Core.Crafting.Types;
+﻿using Assets.Core.Crafting.Types;
 using System;
 using TMPro;
 using UnityEngine;

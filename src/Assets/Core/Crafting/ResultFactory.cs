@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 
 // ReSharper disable PossibleMultipleEnumeration
+// ReSharper disable InconsistentNaming
 
 namespace Assets.Core.Crafting
 {
@@ -23,7 +24,6 @@ namespace Assets.Core.Crafting
         private const string _attackNamePrefixId = "crafting.name.prefix.attack";
         private const string _defenceNamePrefixId = "crafting.name.prefix.defence";
 
-        // ReSharper disable once InconsistentNaming
         private static readonly Random _random = new Random();
 
         private readonly List<ILoot> _lootTypes;
@@ -35,7 +35,6 @@ namespace Assets.Core.Crafting
         {
             _lootTypes = ApiRegister.Instance
                 .GetRegisteredTypes<ILoot>()
-                .Select(x => x as ILoot)
                 .ToList();
 
             _effectsForLoot = ApiRegister.Instance.GetLootPossibilities();

@@ -3,6 +3,9 @@ using UnityEngine.UI;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedType.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Local
+// ReSharper disable UnassignedField.Global
 
 [RequireComponent(typeof(Text))]
 public class TextLocalizer : MonoBehaviour
