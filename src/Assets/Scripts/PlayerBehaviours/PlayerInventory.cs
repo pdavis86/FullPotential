@@ -1,8 +1,8 @@
-﻿using Assets.Core;
-using Assets.Core.Crafting.Base;
-using Assets.Core.Crafting.Types;
-using Assets.Core.Data;
+﻿using Assets.Core.Data;
 using Assets.Core.Extensions;
+using Assets.Core.Registry;
+using Assets.Core.Registry.Base;
+using Assets.Core.Registry.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -111,7 +111,7 @@ public class PlayerInventory : NetworkBehaviour
             {
                 if (!string.IsNullOrWhiteSpace(item.RegistryTypeId) && item.RegistryType == null)
                 {
-                    item.RegistryType = ApiRegister.Instance.GetRegisteredForItem(item);
+                    item.RegistryType = TypeRegistry.Instance.GetRegisteredForItem(item);
                 }
 
                 if (item is MagicalItemBase magicalItem)
@@ -128,7 +128,7 @@ public class PlayerInventory : NetworkBehaviour
 
                 if (item.EffectIds != null && item.EffectIds.Length > 0 && item.Effects == null)
                 {
-                    item.Effects = item.EffectIds.Select(x => ApiRegister.Instance.GetEffect(new Guid(x))).ToList();
+                    item.Effects = item.EffectIds.Select(x => TypeRegistry.Instance.GetEffect(new Guid(x))).ToList();
                 }
             }
 
@@ -139,7 +139,7 @@ public class PlayerInventory : NetworkBehaviour
                 if (addedItemsCount == 1)
                 {
                     //todo: make this a slide-out alert instead
-                    Debug.Log($"{addedItems.First().GetFullName()} was added");
+                    Debug.Log($"{addedItems.First().Name} was added");
                 }
                 else
                 {
@@ -362,7 +362,7 @@ public class PlayerInventory : NetworkBehaviour
 
         if (item is Weapon weapon)
         {
-            var prefab = ApiRegister.GetPrefabForWeaponType(weapon.RegistryType.TypeName, weapon.IsTwoHanded);
+            var prefab = TypeRegistry.GetPrefabForWeaponType(weapon.RegistryType.TypeName, weapon.IsTwoHanded);
             var weaponGo = Instantiate(prefab, gameObject.transform);
             weaponGo.transform.localEulerAngles = new Vector3(0, 90);
             weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, 0.3f, 0.75f);

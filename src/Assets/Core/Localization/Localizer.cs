@@ -1,4 +1,6 @@
-﻿using Assets.ApiScripts.Crafting;
+﻿using Assets.ApiScripts.Registry;
+using Assets.Core.Spells.Shapes;
+using Assets.Core.Spells.Targeting;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -84,7 +86,30 @@ namespace Assets.Core.Localization
             if (registeredItem is IGearArmor) { return Translate("armor." + registeredItem.TypeName); }
             if (registeredItem is IGearWeapon) { return Translate("weapon." + registeredItem.TypeName); }
             if (registeredItem is ILoot) { return Translate("loot." + registeredItem.TypeName); }
+            if (registeredItem is IEffect) { return Translate("effect." + registeredItem.TypeName); }
+            if (registeredItem is ISpellShape) { return Translate("spell.shape." + registeredItem.TypeName); }
+            if (registeredItem is ISpellTargeting) { return Translate("spell.targeting." + registeredItem.TypeName); }
             return "Unexpected ICraftable type";
+        }
+
+        public enum TranslationType
+        {
+            CraftingCategory,
+            CraftingNamePrefix,
+            WeaponHandedness,
+            Attribute
+        }
+
+        public string Translate(TranslationType type, string suffix)
+        {
+            switch (type)
+            {
+                case TranslationType.CraftingCategory: return Translate("crafting.category." + suffix);
+                case TranslationType.CraftingNamePrefix: return Translate("crafting.name.prefix." + suffix);
+                case TranslationType.WeaponHandedness: return Translate("crafting.handedness." + suffix);
+                case TranslationType.Attribute: return Translate("attribute." + suffix);
+                default: return "Unexpected translation type";
+            }
         }
 
     }

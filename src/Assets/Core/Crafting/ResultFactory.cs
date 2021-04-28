@@ -1,9 +1,10 @@
-﻿using Assets.ApiScripts.Crafting;
-using Assets.Core.Crafting.Base;
-using Assets.Core.Crafting.SpellShapes;
-using Assets.Core.Crafting.SpellTargeting;
-using Assets.Core.Crafting.Types;
+﻿using Assets.ApiScripts.Registry;
 using Assets.Core.Localization;
+using Assets.Core.Registry;
+using Assets.Core.Registry.Base;
+using Assets.Core.Registry.Types;
+using Assets.Core.Spells.Shapes;
+using Assets.Core.Spells.Targeting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,14 +17,6 @@ namespace Assets.Core.Crafting
 {
     public class ResultFactory
     {
-        public const string CraftingCategoryIdWeapon = "crafting.category.weapon";
-        public const string CraftingCategoryIdArmor = "crafting.category.armor";
-        public const string CraftingCategoryIdAccessory = "crafting.category.accessory";
-        public const string CraftingCategoryIdSpell = "crafting.category.spell";
-
-        private const string _attackNamePrefixId = "crafting.name.prefix.attack";
-        private const string _defenceNamePrefixId = "crafting.name.prefix.defence";
-
         private static readonly Random _random = new Random();
 
         private readonly List<ILoot> _lootTypes;
@@ -33,28 +26,13 @@ namespace Assets.Core.Crafting
 
         public ResultFactory()
         {
-            _lootTypes = ApiRegister.Instance
-                .GetRegisteredTypes<ILoot>()
-                .ToList();
+            _lootTypes = TypeRegistry.Instance.GetRegisteredTypes<ILoot>().ToList();
 
-            _effectsForLoot = ApiRegister.Instance.GetLootPossibilities();
+            _effectsForLoot = TypeRegistry.Instance.GetLootPossibilities();
 
-            //todo: move these to a Core registry
-            _spellTargetingOptions = new List<ISpellTargeting>
-            {
-                new Beam(),
-                new Cone(),
-                new Projectile(),
-                new Self(),
-                new Touch()
-            };
+            _spellTargetingOptions = TypeRegistry.Instance.GetRegisteredTypes<ISpellTargeting>().ToList();
 
-            //todo: move these to a Core registry
-            _spellShapeOptions = new List<ISpellShape>
-            {
-                new Wall(),
-                new Zone()
-            };
+            _spellShapeOptions = TypeRegistry.Instance.GetRegisteredTypes<ISpellShape>().ToList();
         }
 
         private int ComputeAttribute(IEnumerable<ItemBase> components, Func<ItemBase, int> getProp, bool allowMax = true)
@@ -87,14 +65,14 @@ namespace Assets.Core.Crafting
         private ISpellTargeting GetSpellTargeting(IEnumerable<IMagical> spellComponents)
         {
             //Exactly one targeting option
-            var targeting = spellComponents.Select(x => x.Targeting.TypeName).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+            var targetingComponent = spellComponents.FirstOrDefault(x => x.Targeting != null);
 
-            if (string.IsNullOrWhiteSpace(targeting))
+            if (targetingComponent == null)
             {
-                targeting = nameof(Projectile);
+                return _spellTargetingOptions.First(x => x is Projectile);
             }
 
-            return _spellTargetingOptions.First(x => x.TypeName == targeting);
+            return targetingComponent.Targeting;
         }
 
         public ISpellShape GetSpellShape(string typeName)
@@ -110,8 +88,14 @@ namespace Assets.Core.Crafting
                 return null;
             }
 
-            var shape = spellComponents.Select(x => x.Shape.TypeName).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
-            return _spellShapeOptions.FirstOrDefault(x => x.TypeName == shape);
+            var shapeComponent = spellComponents.FirstOrDefault(x => x.Shape != null);
+
+            if (shapeComponent == null)
+            {
+                return null;
+            }
+
+            return _spellShapeOptions.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
         }
 
         private List<IEffect> GetEffects(string craftingType, IEnumerable<ItemBase> components)
@@ -278,7 +262,9 @@ namespace Assets.Core.Crafting
                     .First();
             }
 
-            lootDrop.Name = Localizer.Instance.GetTranslatedTypeName(lootDrop.RegistryType);
+            var typeTranslation = Localizer.Instance.Translate("crafting.loot.type");
+            var suffix = int.Parse(lootDrop.GetHashCode().ToString().TrimStart('-').Substring(5));
+            lootDrop.Name = $"{Localizer.Instance.GetTranslatedTypeName(lootDrop.RegistryType)} ({typeTranslation} #{suffix.ToString("D5")})";
 
             //todo: icon
 
@@ -315,25 +301,32 @@ namespace Assets.Core.Crafting
                 Effects = GetEffects(nameof(Spell), components)
             };
 
-            var suffix = Localizer.Instance.Translate(ResultFactory.CraftingCategoryIdSpell);
+            var suffix = Localizer.Instance.Translate(Localizer.TranslationType.CraftingCategory, nameof(Spell));
 
             if (spell.Effects.Count > 0)
             {
-                //todo: localise effect
-                spell.Name = spell.Effects.First().TypeName + " " + suffix;
+                spell.Name = Localizer.Instance.GetTranslatedTypeName(spell.Effects.First()) + " " + suffix;
             }
             else
             {
-                //todo: localise targeting 
-                spell.Name = $"{Localizer.Instance.Translate(_attackNamePrefixId)} {spell.Attributes.Strength} {spell.Targeting} {suffix}";
+                var customSuffix = Localizer.Instance.GetTranslatedTypeName(spell.Targeting) + " " + suffix;
+                spell.Name = GetItemName(true, spell, customSuffix);
             }
 
             return spell;
         }
 
-        private string GetItemName(string prefixTranslationId, GearBase item)
+        private string GetItemNamePrefix(bool isAttack)
         {
-            return $"{Localizer.Instance.Translate(prefixTranslationId)} {item.Attributes.Strength} {Localizer.Instance.GetTranslatedTypeName(item.RegistryType)}";
+            return Localizer.Instance.Translate(Localizer.TranslationType.CraftingNamePrefix, isAttack ? "attack" : "defence");
+        }
+
+        private string GetItemName(bool isAttack, ItemBase item, string customSuffix = null)
+        {
+            var suffix = string.IsNullOrWhiteSpace(customSuffix) 
+                ? Localizer.Instance.GetTranslatedTypeName(item.RegistryType)
+                : customSuffix;
+            return $"{GetItemNamePrefix(isAttack)} {item.Attributes.Strength} {suffix}";
         }
 
         private Weapon GetMeleeWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
@@ -352,7 +345,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Weapon), components)
             };
-            weapon.Name = GetItemName(_attackNamePrefixId, weapon);
+            weapon.Name = GetItemName(true, weapon);
             return weapon;
         }
 
@@ -377,7 +370,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Weapon), components)
             };
-            weapon.Name = GetItemName(_attackNamePrefixId, weapon);
+            weapon.Name = GetItemName(true, weapon);
             return weapon;
         }
 
@@ -397,7 +390,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Weapon), components)
             };
-            weapon.Name = GetItemName(_defenceNamePrefixId, weapon);
+            weapon.Name = GetItemName(false, weapon);
             return weapon;
         }
 
@@ -414,7 +407,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Armor), components)
             };
-            armor.Name = GetItemName(_defenceNamePrefixId, armor);
+            armor.Name = GetItemName(false, armor);
             return armor;
         }
 
@@ -434,7 +427,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Armor), components)
             };
-            armor.Name = GetItemName(_defenceNamePrefixId, armor);
+            armor.Name = GetItemName(false, armor);
             return armor;
         }
 
@@ -451,7 +444,7 @@ namespace Assets.Core.Crafting
                 },
                 Effects = GetEffects(nameof(Accessory), components)
             };
-            accessory.Name = GetItemName(_attackNamePrefixId, accessory);
+            accessory.Name = GetItemName(true, accessory);
             return accessory;
         }
 
@@ -465,7 +458,7 @@ namespace Assets.Core.Crafting
             switch (categoryName)
             {
                 case nameof(Weapon):
-                    var craftableWeapon = ApiRegister.Instance.GetRegisteredByTypeName<IGearWeapon>(typeName);
+                    var craftableWeapon = TypeRegistry.Instance.GetRegisteredByTypeName<IGearWeapon>(typeName);
                     switch (craftableWeapon.Category)
                     {
                         case IGearWeapon.WeaponCategory.Melee: return GetMeleeWeapon(craftableWeapon, components, isTwoHanded);
@@ -475,7 +468,7 @@ namespace Assets.Core.Crafting
                     }
 
                 case nameof(Armor):
-                    var craftableArmor = ApiRegister.Instance.GetRegisteredByTypeName<IGearArmor>(typeName);
+                    var craftableArmor = TypeRegistry.Instance.GetRegisteredByTypeName<IGearArmor>(typeName);
                     if (craftableArmor.InventorySlot == IGearArmor.ArmorSlot.Barrier)
                     {
                         return GetBarrier(craftableArmor, components);
@@ -483,12 +476,17 @@ namespace Assets.Core.Crafting
                     return GetArmor(craftableArmor, components);
 
                 case nameof(Accessory):
-                    var craftableAccessory = ApiRegister.Instance.GetRegisteredByTypeName<IGearAccessory>(typeName);
+                    var craftableAccessory = TypeRegistry.Instance.GetRegisteredByTypeName<IGearAccessory>(typeName);
                     return GetAccessory(craftableAccessory, components);
 
                 default:
                     throw new Exception($"Unexpected craftable category '{categoryName}'");
             }
+        }
+
+        private static string GetAttributeTranslation(string suffix)
+        {
+            return Localizer.Instance.Translate(Localizer.TranslationType.Attribute, suffix);
         }
 
         public static string GetItemDescription(ItemBase item, bool includeName = true)
@@ -500,25 +498,28 @@ namespace Assets.Core.Crafting
 
             var sb = new StringBuilder();
 
-            if (includeName) { sb.Append($"{Localizer.Instance.Translate("attributes.name")}: {item.Name}\n"); }
-            if (item.Attributes.IsAutomatic) { sb.Append(Localizer.Instance.Translate("attributes.isautomatic") + "\n"); }
-            if (item.Attributes.IsSoulbound) { sb.Append(Localizer.Instance.Translate("attributes.issoulbound") + "\n"); }
-            if (item.Attributes.ExtraAmmoPerShot > 0) { sb.Append($"{Localizer.Instance.Translate("attributes.extraammopershot")}: {item.Attributes.ExtraAmmoPerShot}\n"); }
-            if (item.Attributes.Strength > 0) { sb.Append($"{Localizer.Instance.Translate("attributes.strength")}: {item.Attributes.Strength}\n"); }
-            if (item.Attributes.Efficiency > 0) { sb.Append($"{Localizer.Instance.Translate("attributes.efficiency")}: {item.Attributes.Efficiency}\n"); }
-            if (item.Attributes.Range > 0) { sb.Append($"{Localizer.Instance.Translate("attributes.range")}: {item.Attributes.Range}\n"); }
-            if (item.Attributes.Accuracy > 0) { sb.Append($"{Localizer.Instance.Translate("attributes.accuracy")}: {item.Attributes.Accuracy}\n"); }
-            if (item.Attributes.Speed > 0) { sb.Append($"{Localizer.Instance.Translate("attributes.speed")}: {item.Attributes.Speed}\n"); }
-            if (item.Attributes.Recovery > 0) { sb.Append($"{Localizer.Instance.Translate("attributes.recovery")}: {item.Attributes.Recovery}\n"); }
-            if (item.Attributes.Duration > 0) { sb.Append($"{Localizer.Instance.Translate("attributes.duration")}: {item.Attributes.Duration}\n"); }
-            if (item.Effects != null && item.Effects.Count > 0) { sb.Append($"{Localizer.Instance.Translate("attributes.effects")}: {string.Join(", ", item.Effects.Select(x => x.TypeName))}\n"); }
-            if (item.Attributes.Duration > 0) { sb.Append($"{Localizer.Instance.Translate("attributes.duration")}: {item.Attributes.Duration}\n"); }
+            if (includeName) { sb.Append($"{GetAttributeTranslation(nameof(item.Name))}: {item.Name}\n"); }
+            if (item.Attributes.IsAutomatic) { sb.Append(GetAttributeTranslation(nameof(item.Attributes.IsAutomatic)) + "\n"); }
+            if (item.Attributes.IsSoulbound) { sb.Append(GetAttributeTranslation(nameof(item.Attributes.IsSoulbound)) + "\n"); }
+            if (item.Attributes.ExtraAmmoPerShot > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.ExtraAmmoPerShot))}: {item.Attributes.ExtraAmmoPerShot}\n"); }
+            if (item.Attributes.Strength > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.Strength))}: {item.Attributes.Strength}\n"); }
+            if (item.Attributes.Efficiency > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.Efficiency))}: {item.Attributes.Efficiency}\n"); }
+            if (item.Attributes.Range > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.Range))}: {item.Attributes.Range}\n"); }
+            if (item.Attributes.Accuracy > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.Accuracy))}: {item.Attributes.Accuracy}\n"); }
+            if (item.Attributes.Speed > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.Speed))}: {item.Attributes.Speed}\n"); }
+            if (item.Attributes.Recovery > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.Recovery))}: {item.Attributes.Recovery}\n"); }
+            if (item.Attributes.Duration > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.Duration))}: {item.Attributes.Duration}\n"); }
+
+            if (item.Effects != null && item.Effects.Count > 0)
+            {
+                var localisedEffects = item.Effects.Select(x => Localizer.Instance.GetTranslatedTypeName(x));
+                sb.Append($"{GetAttributeTranslation(nameof(item.Effects))}: {string.Join(", ", localisedEffects)}\n");
+            }
 
             if (item is IMagical spell)
             {
-                //todo: localise
-                if (spell.Targeting != null) { sb.Append($"{Localizer.Instance.Translate("attributes.spelltargeting")}: {spell.Targeting.TypeName}\n"); }
-                if (spell.Shape != null) { sb.Append($"{Localizer.Instance.Translate("attributes.spellshape")}: {spell.Shape.TypeName}\n"); }
+                if (spell.Targeting != null) { sb.Append($"{GetAttributeTranslation(nameof(spell.Targeting))}: {Localizer.Instance.GetTranslatedTypeName(spell.Targeting)}\n"); }
+                if (spell.Shape != null) { sb.Append($"{GetAttributeTranslation(nameof(spell.Shape))}: {Localizer.Instance.GetTranslatedTypeName(spell.Shape)}\n"); }
             }
 
             return sb.ToString();

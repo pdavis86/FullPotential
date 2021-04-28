@@ -1,7 +1,7 @@
-﻿using Assets.ApiScripts.Crafting;
+﻿using Assets.ApiScripts.Registry;
 using Assets.Core.Crafting;
-using Assets.Core.Crafting.Base;
 using Assets.Core.Extensions;
+using Assets.Core.Registry.Base;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;

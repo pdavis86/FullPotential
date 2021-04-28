@@ -1,4 +1,4 @@
-﻿using Assets.Core.Crafting.Types;
+﻿using Assets.Core.Registry.Types;
 using System;
 using TMPro;
 using UnityEngine;

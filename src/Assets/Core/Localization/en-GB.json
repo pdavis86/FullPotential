@@ -1,102 +1,144 @@
 {
-    "Culture": "en-GB",
-    "Translations": [
-        {
-            "Key": "crafting.category.weapon",
-            "Value": "Weapon"
-        },
-        {
-            "Key": "crafting.category.armor",
-            "Value": "Armor"
-        },
-        {
-            "Key": "crafting.category.accessory",
-            "Value": "Accessory"
-        },
-        {
-            "Key": "crafting.category.spell",
-            "Value": "Spell"
-        },
-        {
-            "Key": "crafting.handedness.one",
-            "Value": "One-handed"
-        },
-        {
-            "Key": "crafting.handedness.two",
-            "Value": "Two-handed"
-        },
-        {
-            "Key": "crafting.name.prefix.attack",
-            "Value": "Strength"
-        },
-        {
-            "Key": "crafting.name.prefix.defence",
-            "Value": "Defence"
-        },
-		
+  "Culture": "en-GB",
+  "Translations": [
+    {
+      "Key": "crafting.category.weapon",
+      "Value": "Weapon"
+    },
+    {
+      "Key": "crafting.category.armor",
+      "Value": "Armor"
+    },
+    {
+      "Key": "crafting.category.accessory",
+      "Value": "Accessory"
+    },
+    {
+      "Key": "crafting.category.spell",
+      "Value": "Spell"
+    },
 
-        {
-            "Key": "attributes.name",
-            "Value": "Name"
-        },
-        {
-            "Key": "attributes.isautomatic",
-            "Value": "Automatic"
-        },
-        {
-            "Key": "attributes.issoulbound",
-            "Value": "Soulbound"
-        },
-        {
-            "Key": "attributes.extraammopershot",
-            "Value": "Extra ammo per shot"
-        },
-        {
-            "Key": "attributes.strength",
-            "Value": "Strength"
-        },
-        {
-            "Key": "attributes.efficiency",
-            "Value": "Efficiency"
-        },
-        {
-            "Key": "attributes.range",
-            "Value": "Range"
-        },
-        {
-            "Key": "attributes.accuracy",
-            "Value": "Accuracy"
-        },
-        {
-            "Key": "attributes.speed",
-            "Value": "Speed"
-        },
-        {
-            "Key": "attributes.recovery",
-            "Value": "Recovery"
-        },
-        {
-            "Key": "attributes.duration",
-            "Value": "Duration"
-        },
-        {
-            "Key": "attributes.effects",
-            "Value": "Effects"
-        },
-        {
-            "Key": "attributes.spelltargeting",
-            "Value": "Targeting"
-        },
-        {
-            "Key": "attributes.spellshape",
-            "Value": "Shape"
-        },
-		
-		
-        {
-            "Key": "login.username",
-            "Value": "Username"
-        }
-		
-    ]
+
+    {
+      "Key": "crafting.loot.type",
+      "Value": "Type"
+    },
+
+
+    {
+      "Key": "crafting.handedness.one",
+      "Value": "One-handed"
+    },
+    {
+      "Key": "crafting.handedness.two",
+      "Value": "Two-handed"
+    },
+
+
+    {
+      "Key": "crafting.name.prefix.attack",
+      "Value": "Attack"
+    },
+    {
+      "Key": "crafting.name.prefix.defence",
+      "Value": "Defence"
+    },
+
+
+    {
+      "Key": "attribute.name",
+      "Value": "Name"
+    },
+    {
+      "Key": "attribute.isautomatic",
+      "Value": "Automatic"
+    },
+    {
+      "Key": "attribute.issoulbound",
+      "Value": "Soulbound"
+    },
+    {
+      "Key": "attribute.extraammopershot",
+      "Value": "Extra ammo per shot"
+    },
+    {
+      "Key": "attribute.strength",
+      "Value": "Strength"
+    },
+    {
+      "Key": "attribute.efficiency",
+      "Value": "Efficiency"
+    },
+    {
+      "Key": "attribute.range",
+      "Value": "Range"
+    },
+    {
+      "Key": "attribute.accuracy",
+      "Value": "Accuracy"
+    },
+    {
+      "Key": "attribute.speed",
+      "Value": "Speed"
+    },
+    {
+      "Key": "attribute.recovery",
+      "Value": "Recovery"
+    },
+    {
+      "Key": "attribute.duration",
+      "Value": "Duration"
+    },
+    {
+      "Key": "attribute.effects",
+      "Value": "Effects"
+    },
+    {
+      "Key": "attribute.targeting",
+      "Value": "Targeting"
+    },
+    {
+      "Key": "attribute.shape",
+      "Value": "Shape"
+    },
+
+
+    {
+      "Key": "spell.shape.wall",
+      "Value": "Wall"
+    },
+    {
+      "Key": "spell.shape.zone",
+      "Value": "Zone"
+    },
+
+
+    {
+      "Key": "spell.targeting.beam",
+      "Value": "Beam"
+    },
+    {
+      "Key": "spell.targeting.cone",
+      "Value": "Cone"
+    },
+    {
+      "Key": "spell.targeting.projectile",
+      "Value": "Projectile"
+    },
+    {
+      "Key": "spell.targeting.self",
+      "Value": "Self"
+    },
+    {
+      "Key": "spell.targeting.touch",
+      "Value": "Touch"
+    },
+
+
+    {
+      "Key": "login.username",
+      "Value": "Username"
+    }
+
+  ]
 }

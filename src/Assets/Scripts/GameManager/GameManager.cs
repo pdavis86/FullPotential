@@ -1,5 +1,5 @@
-﻿using Assets.Core;
-using Assets.Core.Crafting;
+﻿using Assets.Core.Crafting;
+using Assets.Core.Registry;
 using UnityEngine;
 
 // ReSharper disable CheckNamespace
@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
         Prefabs = GetComponent<Prefabs>();
         InputMappings = GetComponent<InputMappings>();
 
-        ApiRegister.Instance.FindAndRegisterAll();
+        TypeRegistry.Instance.FindAndRegisterAll();
         ResultFactory = new ResultFactory();
 
         DontDestroyOnLoad(gameObject);

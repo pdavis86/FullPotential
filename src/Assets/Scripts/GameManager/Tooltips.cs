@@ -39,8 +39,8 @@ public class Tooltips : MonoBehaviour
             //    transform.position = Input.mousePosition + _underOffset;
             //}
 
-            var underPointer = Input.mousePosition.y + _rect.sizeDelta.y > Screen.height;
-            var leftOfPointer = Input.mousePosition.x + _rect.sizeDelta.x > Screen.width;
+            var underPointer = (Input.mousePosition.y + _rect.sizeDelta.y > Screen.height) && _rect.sizeDelta.y < Screen.height;
+            var leftOfPointer = (Input.mousePosition.x + _rect.sizeDelta.x > Screen.width) && _rect.sizeDelta.x < Screen.width;
 
             transform.position = Input.mousePosition +
                 (underPointer ? _underOffset : new Vector3(0, 1))

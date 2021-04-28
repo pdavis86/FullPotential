@@ -1,10 +1,10 @@
-﻿using Assets.ApiScripts.Crafting;
-using Assets.Core;
+﻿using Assets.ApiScripts.Registry;
 using Assets.Core.Crafting;
-using Assets.Core.Crafting.Base;
-using Assets.Core.Crafting.Types;
 using Assets.Core.Extensions;
 using Assets.Core.Localization;
+using Assets.Core.Registry;
+using Assets.Core.Registry.Base;
+using Assets.Core.Registry.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,16 +31,13 @@ public class CraftingUi : MonoBehaviour
     [SerializeField] private Dropdown _handednessDropdown;
     [SerializeField] private Button _craftButton;
 
-    private const string _craftingHandednessOne = "crafting.handedness.one";
-    private const string _craftingHandednessTwo = "crafting.handedness.two";
-
     private PlayerInventory _inventory;
     private List<ItemBase> _components;
     private Dictionary<Type, string> _craftingCategories;
     private Dictionary<IGearArmor, string> _armorTypes;
     private Dictionary<IGearAccessory, string> _accessoryTypes;
     private Dictionary<IGearWeapon, string> _weaponTypes;
-    private Dictionary<string, string> _handednessOptions;
+    private List<string> _handednessOptions;
     private List<int?> _optionalTwoHandedWeaponIndexes;
 
     private void Awake()
@@ -57,28 +54,28 @@ public class CraftingUi : MonoBehaviour
 
         _craftingCategories = new Dictionary<Type, string>
         {
-            { typeof(Weapon), Localizer.Instance.Translate(ResultFactory.CraftingCategoryIdWeapon) },
-            { typeof(Armor), Localizer.Instance.Translate(ResultFactory.CraftingCategoryIdArmor) },
-            { typeof(Accessory), Localizer.Instance.Translate(ResultFactory.CraftingCategoryIdAccessory) },
-            { typeof(Spell), Localizer.Instance.Translate(ResultFactory.CraftingCategoryIdSpell) }
+            { typeof(Weapon), Localizer.Instance.Translate(Localizer.TranslationType.CraftingCategory, nameof(Weapon)) },
+            { typeof(Armor), Localizer.Instance.Translate(Localizer.TranslationType.CraftingCategory, nameof(Armor)) },
+            { typeof(Accessory), Localizer.Instance.Translate(Localizer.TranslationType.CraftingCategory, nameof(Accessory)) },
+            { typeof(Spell), Localizer.Instance.Translate(Localizer.TranslationType.CraftingCategory, nameof(Spell)) }
         };
 
-        _handednessOptions = new Dictionary<string, string> {
-            { _craftingHandednessOne, Localizer.Instance.Translate(_craftingHandednessOne) },
-            { _craftingHandednessTwo, Localizer.Instance.Translate(_craftingHandednessTwo) }
+        _handednessOptions = new List<string> {
+            { Localizer.Instance.Translate(Localizer.TranslationType.WeaponHandedness, "one") },
+            { Localizer.Instance.Translate(Localizer.TranslationType.WeaponHandedness, "two") }
         };
 
-        _armorTypes = ApiRegister.Instance.GetRegisteredTypes<IGearArmor>()
+        _armorTypes = TypeRegistry.Instance.GetRegisteredTypes<IGearArmor>()
             .ToDictionary(x => x, x => Localizer.Instance.GetTranslatedTypeName(x))
             .OrderBy(x => x.Value)
             .ToDictionary(x => x.Key, x => x.Value);
 
-        _accessoryTypes = ApiRegister.Instance.GetRegisteredTypes<IGearAccessory>()
+        _accessoryTypes = TypeRegistry.Instance.GetRegisteredTypes<IGearAccessory>()
             .ToDictionary(x => x, x => Localizer.Instance.GetTranslatedTypeName(x))
             .OrderBy(x => x.Value)
             .ToDictionary(x => x.Key, x => x.Value);
 
-        _weaponTypes = ApiRegister.Instance.GetRegisteredTypes<IGearWeapon>()
+        _weaponTypes = TypeRegistry.Instance.GetRegisteredTypes<IGearWeapon>()
             .ToDictionary(x => x, x => Localizer.Instance.GetTranslatedTypeName(x))
             .OrderBy(x => x.Value)
             .ToDictionary(x => x.Key, x => x.Value);
@@ -193,7 +190,7 @@ public class CraftingUi : MonoBehaviour
         _typeDropdown.AddOptions(_craftingCategories.Select(x => x.Value).ToList());
 
         _handednessDropdown.ClearOptions();
-        _handednessDropdown.AddOptions(_handednessOptions.Select(x => x.Value).ToList());
+        _handednessDropdown.AddOptions(_handednessOptions);
 
         TypeOnValueChanged(0);
 

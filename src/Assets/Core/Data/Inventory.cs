@@ -1,4 +1,4 @@
-﻿using Assets.Core.Crafting.Types;
+﻿using Assets.Core.Registry.Types;
 
 namespace Assets.Core.Data
 {

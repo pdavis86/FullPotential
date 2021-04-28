@@ -26,7 +26,7 @@ namespace Assets.Standard
                 typeof(Effects.Buffs.LifeTap),
                 typeof(Effects.Buffs.ManaTap),
                 typeof(Effects.Buffs.Regeneration),
-                typeof(Effects.Buffs.Strengthen),
+                typeof(Effects.Buffs.Strength),
 
                 typeof(Effects.Debuffs.Distract),
                 typeof(Effects.Debuffs.Fear),
@@ -34,7 +34,7 @@ namespace Assets.Standard
                 typeof(Effects.Debuffs.ManaDrain),
                 typeof(Effects.Debuffs.Poison),
                 typeof(Effects.Debuffs.Slow),
-                typeof(Effects.Debuffs.Weaken),
+                typeof(Effects.Debuffs.Weakness),
 
                 typeof(Effects.Elements.Air),
                 typeof(Effects.Elements.Earth),

@@ -1,5 +1,5 @@
 ﻿using Assets.Core.Constants;
-using Assets.Core.Crafting.Base;
+using Assets.Core.Registry.Base;
 using System;
 using System.Globalization;
 using UnityEngine;

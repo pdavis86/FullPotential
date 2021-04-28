@@ -1,8 +1,8 @@
-﻿using Assets.ApiScripts.Crafting;
+﻿using Assets.ApiScripts.Registry;
 using Assets.Core.Crafting;
-using Assets.Core.Crafting.Base;
-using Assets.Core.Crafting.Types;
 using Assets.Core.Extensions;
+using Assets.Core.Registry.Base;
+using Assets.Core.Registry.Types;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -53,7 +53,7 @@ public class InventoryItemsList : MonoBehaviour
             }
 
             var row = Instantiate(rowPrefab, componentsContainer.transform);
-            row.transform.Find("ItemName").GetComponent<Text>().text = item.GetFullName();
+            row.transform.Find("ItemName").GetComponent<Text>().text = item.Name;
 
             if (isEquipped)
             {
