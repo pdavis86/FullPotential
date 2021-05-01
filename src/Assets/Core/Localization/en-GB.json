@@ -133,11 +133,73 @@
       "Key": "spell.targeting.touch",
       "Value": "Touch"
     },
+	
+	
+	{
+      "Key": "ui.quit",
+      "Value": "Quit"
+    },
 
 
     {
-      "Key": "login.username",
-      "Value": "Username"
+      "Key": "ui.login.intro",
+      "Value": "Welcome!"
+    },
+	{
+      "Key": "ui.login.username",
+      "Value": "Username..."
+    },
+	{
+      "Key": "ui.login.password",
+      "Value": "Password..."
+    },
+	
+	{
+      "Key": "ui.connect.address",
+      "Value": "Address..."
+    },
+	{
+      "Key": "ui.connect.port",
+      "Value": "Port..."
+    },
+	{
+      "Key": "ui.connect.create",
+      "Value": "Create"
+    },
+	{
+      "Key": "ui.connect.join",
+      "Value": "Join"
+    },
+	
+	{
+      "Key": "ui.debugging.host",
+      "Value": "Host"
+    },
+	
+	{
+      "Key": "ui.esc.settings",
+      "Value": "Settings"
+    },
+	{
+      "Key": "ui.esc.mainmenu",
+      "Value": "Back to Main Menu"
+    },
+	
+	{
+      "Key": "ui.character.tabs.equipment",
+      "Value": "Equipment"
+    },
+	{
+      "Key": "ui.character.tabs.inventory",
+      "Value": "TODO - Inventory"
+    },
+	{
+      "Key": "ui.character.tabs.quests",
+      "Value": "TODO - Quests"
+    },
+	{
+      "Key": "ui.character.tabs.map",
+      "Value": "TODO - Map"
     }
 
   ]

@@ -29,7 +29,9 @@ public class DebuggingUi : MonoBehaviour
             if (_pingText != null)
             {
                 var ping = UnityEngine.Networking.NetworkClient.allClients[0].GetRTT();
-                _pingText.text = ping == 0 ? "Host" : ping + " ms";
+                _pingText.text = ping == 0 
+                    ? GameManager.Instance.Localizer.Translate("ui.debugging.host")
+                    : ping + " ms";
             }
         }
         else
