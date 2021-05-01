@@ -54,29 +54,29 @@ public class CraftingUi : MonoBehaviour
 
         _craftingCategories = new Dictionary<Type, string>
         {
-            { typeof(Weapon), Localizer.Instance.Translate(Localizer.TranslationType.CraftingCategory, nameof(Weapon)) },
-            { typeof(Armor), Localizer.Instance.Translate(Localizer.TranslationType.CraftingCategory, nameof(Armor)) },
-            { typeof(Accessory), Localizer.Instance.Translate(Localizer.TranslationType.CraftingCategory, nameof(Accessory)) },
-            { typeof(Spell), Localizer.Instance.Translate(Localizer.TranslationType.CraftingCategory, nameof(Spell)) }
+            { typeof(Weapon), GameManager.Instance.Localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Weapon)) },
+            { typeof(Armor), GameManager.Instance.Localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Armor)) },
+            { typeof(Accessory), GameManager.Instance.Localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Accessory)) },
+            { typeof(Spell), GameManager.Instance.Localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Spell)) }
         };
 
         _handednessOptions = new List<string> {
-            { Localizer.Instance.Translate(Localizer.TranslationType.WeaponHandedness, "one") },
-            { Localizer.Instance.Translate(Localizer.TranslationType.WeaponHandedness, "two") }
+            { GameManager.Instance.Localizer.Translate(Localizer.TranslationType.WeaponHandedness, "one") },
+            { GameManager.Instance.Localizer.Translate(Localizer.TranslationType.WeaponHandedness, "two") }
         };
 
-        _armorTypes = TypeRegistry.Instance.GetRegisteredTypes<IGearArmor>()
-            .ToDictionary(x => x, x => Localizer.Instance.GetTranslatedTypeName(x))
+        _armorTypes = GameManager.Instance.TypeRegistry.GetRegisteredTypes<IGearArmor>()
+            .ToDictionary(x => x, x => GameManager.Instance.Localizer.GetTranslatedTypeName(x))
             .OrderBy(x => x.Value)
             .ToDictionary(x => x.Key, x => x.Value);
 
-        _accessoryTypes = TypeRegistry.Instance.GetRegisteredTypes<IGearAccessory>()
-            .ToDictionary(x => x, x => Localizer.Instance.GetTranslatedTypeName(x))
+        _accessoryTypes = GameManager.Instance.TypeRegistry.GetRegisteredTypes<IGearAccessory>()
+            .ToDictionary(x => x, x => GameManager.Instance.Localizer.GetTranslatedTypeName(x))
             .OrderBy(x => x.Value)
             .ToDictionary(x => x.Key, x => x.Value);
 
-        _weaponTypes = TypeRegistry.Instance.GetRegisteredTypes<IGearWeapon>()
-            .ToDictionary(x => x, x => Localizer.Instance.GetTranslatedTypeName(x))
+        _weaponTypes = GameManager.Instance.TypeRegistry.GetRegisteredTypes<IGearWeapon>()
+            .ToDictionary(x => x, x => GameManager.Instance.Localizer.GetTranslatedTypeName(x))
             .OrderBy(x => x.Value)
             .ToDictionary(x => x.Key, x => x.Value);
 
@@ -275,7 +275,7 @@ public class CraftingUi : MonoBehaviour
             _components
         );
 
-        _outputText.text = ResultFactory.GetItemDescription(craftedItem);
+        _outputText.text = GameManager.Instance.ResultFactory.GetItemDescription(craftedItem);
     }
 
 }

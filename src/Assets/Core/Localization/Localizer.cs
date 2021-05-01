@@ -18,11 +18,6 @@ namespace Assets.Core.Localization
     {
         private Dictionary<string, string> _translations;
 
-        private Localizer() { }
-
-        private static readonly Localizer _instance = new Localizer();
-        public static Localizer Instance { get { return _instance; } }
-
         public void LoadLocalizationFiles(string culture = null, IEnumerable<string> modFilePaths = null)
         {
             IEnumerable<string> filepaths = new[] { "Core/Localization" };

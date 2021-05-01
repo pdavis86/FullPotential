@@ -111,7 +111,7 @@ public class PlayerInventory : NetworkBehaviour
             {
                 if (!string.IsNullOrWhiteSpace(item.RegistryTypeId) && item.RegistryType == null)
                 {
-                    item.RegistryType = TypeRegistry.Instance.GetRegisteredForItem(item);
+                    item.RegistryType = GameManager.Instance.TypeRegistry.GetRegisteredForItem(item);
                 }
 
                 if (item is MagicalItemBase magicalItem)
@@ -128,7 +128,7 @@ public class PlayerInventory : NetworkBehaviour
 
                 if (item.EffectIds != null && item.EffectIds.Length > 0 && item.Effects == null)
                 {
-                    item.Effects = item.EffectIds.Select(x => TypeRegistry.Instance.GetEffect(new Guid(x))).ToList();
+                    item.Effects = item.EffectIds.Select(x => GameManager.Instance.TypeRegistry.GetEffect(new Guid(x))).ToList();
                 }
             }
 

@@ -37,7 +37,7 @@ public class TextLocalizer : MonoBehaviour
 
     void ResolveStringValue(string id)
     {
-        _textComponent.text = Assets.Core.Localization.Localizer.Instance.Translate(id);
+        _textComponent.text = GameManager.Instance.Localizer.Translate(id);
     }
 
 }

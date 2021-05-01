@@ -66,7 +66,7 @@ public class InventoryItemsList : MonoBehaviour
             var tooltip = row.GetComponent<Tooltip>();
             tooltip.OnPointerEnterForTooltip += pointerEventData =>
             {
-                Tooltips.ShowTooltip(ResultFactory.GetItemDescription(item, false));
+                Tooltips.ShowTooltip(GameManager.Instance.ResultFactory.GetItemDescription(item, false));
             };
 
             rowCounter++;

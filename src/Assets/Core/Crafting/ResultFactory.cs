@@ -19,20 +19,22 @@ namespace Assets.Core.Crafting
     {
         private static readonly Random _random = new Random();
 
+        private readonly TypeRegistry _typeRegistry;
+        private readonly Localizer _localizer;
         private readonly List<ILoot> _lootTypes;
         private readonly List<IEffect> _effectsForLoot;
         private readonly List<ISpellTargeting> _spellTargetingOptions;
         private readonly List<ISpellShape> _spellShapeOptions;
 
-        public ResultFactory()
+        public ResultFactory(TypeRegistry typeRegistry, Localizer localizer)
         {
-            _lootTypes = TypeRegistry.Instance.GetRegisteredTypes<ILoot>().ToList();
+            _typeRegistry = typeRegistry;
+            _localizer = localizer;
 
-            _effectsForLoot = TypeRegistry.Instance.GetLootPossibilities();
-
-            _spellTargetingOptions = TypeRegistry.Instance.GetRegisteredTypes<ISpellTargeting>().ToList();
-
-            _spellShapeOptions = TypeRegistry.Instance.GetRegisteredTypes<ISpellShape>().ToList();
+            _lootTypes = _typeRegistry.GetRegisteredTypes<ILoot>().ToList();
+            _effectsForLoot = _typeRegistry.GetLootPossibilities();
+            _spellTargetingOptions = _typeRegistry.GetRegisteredTypes<ISpellTargeting>().ToList();
+            _spellShapeOptions = _typeRegistry.GetRegisteredTypes<ISpellShape>().ToList();
         }
 
         private int ComputeAttribute(IEnumerable<ItemBase> components, Func<ItemBase, int> getProp, bool allowMax = true)
@@ -262,9 +264,9 @@ namespace Assets.Core.Crafting
                     .First();
             }
 
-            var typeTranslation = Localizer.Instance.Translate("crafting.loot.type");
+            var typeTranslation = _localizer.Translate("crafting.loot.type");
             var suffix = int.Parse(lootDrop.GetHashCode().ToString().TrimStart('-').Substring(5));
-            lootDrop.Name = $"{Localizer.Instance.GetTranslatedTypeName(lootDrop.RegistryType)} ({typeTranslation} #{suffix.ToString("D5")})";
+            lootDrop.Name = $"{_localizer.GetTranslatedTypeName(lootDrop.RegistryType)} ({typeTranslation} #{suffix.ToString("D5")})";
 
             //todo: icon
 
@@ -301,15 +303,15 @@ namespace Assets.Core.Crafting
                 Effects = GetEffects(nameof(Spell), components)
             };
 
-            var suffix = Localizer.Instance.Translate(Localizer.TranslationType.CraftingCategory, nameof(Spell));
+            var suffix = _localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Spell));
 
             if (spell.Effects.Count > 0)
             {
-                spell.Name = Localizer.Instance.GetTranslatedTypeName(spell.Effects.First()) + " " + suffix;
+                spell.Name = _localizer.GetTranslatedTypeName(spell.Effects.First()) + " " + suffix;
             }
             else
             {
-                var customSuffix = Localizer.Instance.GetTranslatedTypeName(spell.Targeting) + " " + suffix;
+                var customSuffix = _localizer.GetTranslatedTypeName(spell.Targeting) + " " + suffix;
                 spell.Name = GetItemName(true, spell, customSuffix);
             }
 
@@ -318,13 +320,13 @@ namespace Assets.Core.Crafting
 
         private string GetItemNamePrefix(bool isAttack)
         {
-            return Localizer.Instance.Translate(Localizer.TranslationType.CraftingNamePrefix, isAttack ? "attack" : "defence");
+            return _localizer.Translate(Localizer.TranslationType.CraftingNamePrefix, isAttack ? "attack" : "defence");
         }
 
         private string GetItemName(bool isAttack, ItemBase item, string customSuffix = null)
         {
-            var suffix = string.IsNullOrWhiteSpace(customSuffix) 
-                ? Localizer.Instance.GetTranslatedTypeName(item.RegistryType)
+            var suffix = string.IsNullOrWhiteSpace(customSuffix)
+                ? _localizer.GetTranslatedTypeName(item.RegistryType)
                 : customSuffix;
             return $"{GetItemNamePrefix(isAttack)} {item.Attributes.Strength} {suffix}";
         }
@@ -458,7 +460,7 @@ namespace Assets.Core.Crafting
             switch (categoryName)
             {
                 case nameof(Weapon):
-                    var craftableWeapon = TypeRegistry.Instance.GetRegisteredByTypeName<IGearWeapon>(typeName);
+                    var craftableWeapon = _typeRegistry.GetRegisteredByTypeName<IGearWeapon>(typeName);
                     switch (craftableWeapon.Category)
                     {
                         case IGearWeapon.WeaponCategory.Melee: return GetMeleeWeapon(craftableWeapon, components, isTwoHanded);
@@ -468,7 +470,7 @@ namespace Assets.Core.Crafting
                     }
 
                 case nameof(Armor):
-                    var craftableArmor = TypeRegistry.Instance.GetRegisteredByTypeName<IGearArmor>(typeName);
+                    var craftableArmor = _typeRegistry.GetRegisteredByTypeName<IGearArmor>(typeName);
                     if (craftableArmor.InventorySlot == IGearArmor.ArmorSlot.Barrier)
                     {
                         return GetBarrier(craftableArmor, components);
@@ -476,7 +478,7 @@ namespace Assets.Core.Crafting
                     return GetArmor(craftableArmor, components);
 
                 case nameof(Accessory):
-                    var craftableAccessory = TypeRegistry.Instance.GetRegisteredByTypeName<IGearAccessory>(typeName);
+                    var craftableAccessory = _typeRegistry.GetRegisteredByTypeName<IGearAccessory>(typeName);
                     return GetAccessory(craftableAccessory, components);
 
                 default:
@@ -484,12 +486,12 @@ namespace Assets.Core.Crafting
             }
         }
 
-        private static string GetAttributeTranslation(string suffix)
+        private string GetAttributeTranslation(string suffix)
         {
-            return Localizer.Instance.Translate(Localizer.TranslationType.Attribute, suffix);
+            return _localizer.Translate(Localizer.TranslationType.Attribute, suffix);
         }
 
-        public static string GetItemDescription(ItemBase item, bool includeName = true)
+        public string GetItemDescription(ItemBase item, bool includeName = true)
         {
             if (item == null)
             {
@@ -512,14 +514,14 @@ namespace Assets.Core.Crafting
 
             if (item.Effects != null && item.Effects.Count > 0)
             {
-                var localisedEffects = item.Effects.Select(x => Localizer.Instance.GetTranslatedTypeName(x));
+                var localisedEffects = item.Effects.Select(x => _localizer.GetTranslatedTypeName(x));
                 sb.Append($"{GetAttributeTranslation(nameof(item.Effects))}: {string.Join(", ", localisedEffects)}\n");
             }
 
             if (item is IMagical spell)
             {
-                if (spell.Targeting != null) { sb.Append($"{GetAttributeTranslation(nameof(spell.Targeting))}: {Localizer.Instance.GetTranslatedTypeName(spell.Targeting)}\n"); }
-                if (spell.Shape != null) { sb.Append($"{GetAttributeTranslation(nameof(spell.Shape))}: {Localizer.Instance.GetTranslatedTypeName(spell.Shape)}\n"); }
+                if (spell.Targeting != null) { sb.Append($"{GetAttributeTranslation(nameof(spell.Targeting))}: {_localizer.GetTranslatedTypeName(spell.Targeting)}\n"); }
+                if (spell.Shape != null) { sb.Append($"{GetAttributeTranslation(nameof(spell.Shape))}: {_localizer.GetTranslatedTypeName(spell.Shape)}\n"); }
             }
 
             return sb.ToString();

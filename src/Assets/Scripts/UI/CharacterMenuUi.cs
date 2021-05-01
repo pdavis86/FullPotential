@@ -47,7 +47,7 @@ public class CharacterMenuUi : MonoBehaviour
             tooltip.ClearHandlers();
             tooltip.OnPointerEnterForTooltip += pointerEventData =>
             {
-                Tooltips.ShowTooltip(ResultFactory.GetItemDescription(item));
+                Tooltips.ShowTooltip(GameManager.Instance.ResultFactory.GetItemDescription(item));
             };
         }
     }

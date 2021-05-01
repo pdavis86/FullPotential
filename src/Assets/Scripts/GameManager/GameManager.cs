@@ -17,13 +17,21 @@ public class GameManager : MonoBehaviour
     public const string NameCanvasMain = "MainCanvas";
     public const string NameCanvasScene = "SceneCanvas";
 
+    //Core components
+    public Assets.Core.Localization.Localizer Localizer { get; private set; }
+    public TypeRegistry TypeRegistry { get; private set; }
+    public ResultFactory ResultFactory { get; private set; }
+
+    //Behaviours
     public MainCanvasObjects MainCanvasObjects { get; private set; }
     public Prefabs Prefabs { get; private set; }
     public InputMappings InputMappings { get; private set; }
-    public ResultFactory ResultFactory { get; private set; }
-    public string Username { get; set; }
     public GameObject LocalPlayer { get; set; }
 
+    //Variables
+    public string Username { get; set; }
+
+    //Singleton
     private static GameManager _instance;
     public static GameManager Instance { get { return _instance; } }
 
@@ -38,16 +46,19 @@ public class GameManager : MonoBehaviour
         _instance = this;
 
         //todo: get from settings
+        Localizer = new Assets.Core.Localization.Localizer();
         var culture = "en-GB";
         var modPaths = new[] { "Standard/Localization" };
-        Assets.Core.Localization.Localizer.Instance.LoadLocalizationFiles(culture, modPaths);
+        Localizer.LoadLocalizationFiles(culture, modPaths);
+
+        TypeRegistry = new Assets.Core.Registry.TypeRegistry();
+        TypeRegistry.FindAndRegisterAll();
+
+        ResultFactory = new ResultFactory(TypeRegistry, Localizer);
 
         MainCanvasObjects = GameObject.Find(NameCanvasMain).GetComponent<MainCanvasObjects>();
         Prefabs = GetComponent<Prefabs>();
         InputMappings = GetComponent<InputMappings>();
-
-        TypeRegistry.Instance.FindAndRegisterAll();
-        ResultFactory = new ResultFactory();
 
         DontDestroyOnLoad(gameObject);
     }

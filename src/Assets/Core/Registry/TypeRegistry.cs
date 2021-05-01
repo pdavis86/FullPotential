@@ -23,17 +23,6 @@ namespace Assets.Core.Registry
         private readonly List<ISpellShape> _shapes = new List<ISpellShape>();
         private readonly List<ISpellTargeting> _targeting = new List<ISpellTargeting>();
 
-        private TypeRegistry() { }
-
-        private static TypeRegistry _instance;
-        public static TypeRegistry Instance
-        {
-            get
-            {
-                return _instance ?? (_instance = new TypeRegistry());
-            }
-        }
-
         public void FindAndRegisterAll()
         {
             RegisterCoreTypes();
