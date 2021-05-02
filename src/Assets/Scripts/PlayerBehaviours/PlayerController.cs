@@ -1,4 +1,5 @@
 ﻿using Assets.Core.Registry.Types;
+using Assets.Core.Spells.Targeting;
 using System;
 using TMPro;
 using UnityEngine;
@@ -130,22 +131,18 @@ public class PlayerController : NetworkBehaviour
             return;
         }
 
-        //todo: other spell targeting options
-        switch (activeSpell.Targeting.TypeName)
+        if (activeSpell.Targeting is Projectile)
         {
-            //todo: get this from Core registry
-            case "Projectile":
-                SpawnSpellProjectile(activeSpell, leftHand);
-                break;
-
-            //case Spell.TargetingOptions.Self:
-            //case Spell.TargetingOptions.Touch:
-            //case Spell.TargetingOptions.Beam:
-            //case Spell.TargetingOptions.Cone:
-
-            default:
-                throw new Exception("Unexpected spell targeting: " + activeSpell.Targeting);
+            SpawnSpellProjectile(activeSpell, leftHand);
         }
+
+        //todo: other spell targeting options
+        //case Spell.TargetingOptions.Self:
+        //case Spell.TargetingOptions.Touch:
+        //case Spell.TargetingOptions.Beam:
+        //case Spell.TargetingOptions.Cone:
+
+        throw new Exception($"Unexpected spell targeting with TypeName: '{activeSpell.Targeting.TypeName}'");
     }
 
     [Server]

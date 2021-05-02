@@ -1,6 +1,4 @@
-﻿using Assets.Core.Crafting;
-using Assets.Core.Registry;
-using UnityEngine;
+﻿using UnityEngine;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -18,9 +16,9 @@ public class GameManager : MonoBehaviour
     public const string NameCanvasScene = "SceneCanvas";
 
     //Core components
+    public Assets.Core.Registry.TypeRegistry TypeRegistry { get; private set; }
     public Assets.Core.Localization.Localizer Localizer { get; private set; }
-    public TypeRegistry TypeRegistry { get; private set; }
-    public ResultFactory ResultFactory { get; private set; }
+    public Assets.Core.Crafting.ResultFactory ResultFactory { get; private set; }
 
     //Behaviours
     public MainCanvasObjects MainCanvasObjects { get; private set; }
@@ -45,16 +43,16 @@ public class GameManager : MonoBehaviour
 
         _instance = this;
 
-        //todo: get from settings
-        Localizer = new Assets.Core.Localization.Localizer();
-        var culture = "en-GB";
-        var modPaths = new[] { "Standard/Localization" };
-        Localizer.LoadLocalizationFiles(culture, modPaths);
-
         TypeRegistry = new Assets.Core.Registry.TypeRegistry();
         TypeRegistry.FindAndRegisterAll();
 
-        ResultFactory = new ResultFactory(TypeRegistry, Localizer);
+        //todo: get culture from settings
+        var culture = "en-GB";
+
+        Localizer = new Assets.Core.Localization.Localizer();
+        Localizer.LoadLocalizationFiles(culture, TypeRegistry.GetRegisteredModPaths());
+
+        ResultFactory = new Assets.Core.Crafting.ResultFactory(TypeRegistry, Localizer);
 
         MainCanvasObjects = GameObject.Find(NameCanvasMain).GetComponent<MainCanvasObjects>();
         Prefabs = GetComponent<Prefabs>();
@@ -70,7 +68,6 @@ public class GameManager : MonoBehaviour
 
     public void SetPlayerUsername(string value)
     {
-        //todo: username must be file name safe
         Username = value;
     }
 

@@ -35,6 +35,12 @@ namespace Assets.Core.Registry
             }
         }
 
+        public string[] GetRegisteredModPaths()
+        {
+            //todo: set mod paths after discovery
+            return new[] { "Standard" };
+        }
+
         private void RegisterCoreTypes()
         {
             ValidateAndRegister(typeof(Wall));
@@ -184,31 +190,6 @@ namespace Assets.Core.Registry
         public IEffect GetEffect(Guid typeId)
         {
             return _effects.FirstOrDefault(x => x.TypeId == typeId);
-        }
-
-
-
-
-
-
-
-
-        //todo: un-hardcode this
-        public static UnityEngine.GameObject GetPrefabForWeaponType(string typeName, bool twoHanded)
-        {
-            switch (typeName)
-            {
-                case "Axe": return twoHanded ? GameManager.Instance.Prefabs.Weapons.Axe2 : GameManager.Instance.Prefabs.Weapons.Axe1;
-                case "Bow": return GameManager.Instance.Prefabs.Weapons.Bow;
-                case "Crossbow": return GameManager.Instance.Prefabs.Weapons.Crossbow;
-                case "Dagger": return GameManager.Instance.Prefabs.Weapons.Dagger;
-                case "Gun": return twoHanded ? GameManager.Instance.Prefabs.Weapons.Gun2 : GameManager.Instance.Prefabs.Weapons.Gun1;
-                case "Hammer": return twoHanded ? GameManager.Instance.Prefabs.Weapons.Hammer2 : GameManager.Instance.Prefabs.Weapons.Hammer1;
-                case "Shield": return GameManager.Instance.Prefabs.Weapons.Shield;
-                case "Staff": return GameManager.Instance.Prefabs.Weapons.Staff;
-                case "Sword": return twoHanded ? GameManager.Instance.Prefabs.Weapons.Sword2 : GameManager.Instance.Prefabs.Weapons.Sword1;
-                default: throw new Exception($"Unexpected weapon type {typeName}");
-            }
         }
 
     }

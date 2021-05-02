@@ -20,7 +20,7 @@ namespace Assets.Core.Localization
 
         public void LoadLocalizationFiles(string culture = null, IEnumerable<string> modFilePaths = null)
         {
-            IEnumerable<string> filepaths = new[] { "Core/Localization" };
+            IEnumerable<string> filepaths = new[] { "Core" };
 
             if (modFilePaths != null && modFilePaths.Any())
             {
@@ -31,7 +31,7 @@ namespace Assets.Core.Localization
 
             foreach (var relativePath in filepaths)
             {
-                var dataDir = Path.Combine(Application.dataPath, relativePath);
+                var dataDir = Path.Combine(Application.dataPath, relativePath, "Localization");
                 var filePath = Path.Combine(dataDir, culture + ".json");
 
                 if (!File.Exists(filePath))

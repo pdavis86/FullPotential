@@ -115,10 +115,8 @@ public class PlayerSetup : NetworkBehaviour
 
     private string GetPlayerSavePath()
     {
-        var filename = string.IsNullOrWhiteSpace(Username)
-            ? SystemInfo.deviceUniqueIdentifier
-            : Username;
-        return System.IO.Path.Combine(Application.persistentDataPath, filename + ".json");
+        //todo: filename should be their user ID, not the device ID
+        return System.IO.Path.Combine(Application.persistentDataPath, SystemInfo.deviceUniqueIdentifier + ".json");
     }
 
     [Command]
