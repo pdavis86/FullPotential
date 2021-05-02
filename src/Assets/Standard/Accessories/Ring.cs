@@ -10,5 +10,8 @@ namespace Assets.Standard.Accessories
         public string TypeName => nameof(Ring);
 
         public IGearAccessory.AccessorySlot InventorySlot => IGearAccessory.AccessorySlot.Ring;
+
+        //todo: missing prefab
+        public string PrefabAddress => throw new NotImplementedException();
     }
 }

@@ -13,9 +13,6 @@ public class Prefabs : MonoBehaviour
 {
     public CombatClass Combat;
 
-    //todo: remove once prefabs are part of registration
-    public WeaponsClass Weapons;
-
     [System.Serializable]
     public class CombatClass
     {
@@ -24,21 +21,4 @@ public class Prefabs : MonoBehaviour
         //todo: show when elemental effects are in use - public GameObject ElementalText;
     }
 
-    [System.Serializable]
-    public class WeaponsClass
-    {
-        public GameObject Dagger;
-        public GameObject Axe1;
-        public GameObject Axe2;
-        public GameObject Sword1;
-        public GameObject Sword2;
-        public GameObject Hammer1;
-        public GameObject Hammer2;
-        public GameObject Staff;
-        public GameObject Bow;
-        public GameObject Crossbow;
-        public GameObject Gun1;
-        public GameObject Gun2;
-        public GameObject Shield;
-    }
 }

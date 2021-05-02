@@ -10,5 +10,8 @@ namespace Assets.Standard.Armor
         public string TypeName => nameof(Legs);
 
         public IGearArmor.ArmorSlot InventorySlot => IGearArmor.ArmorSlot.Legs;
+
+        //todo: missing prefab
+        public string PrefabAddress => throw new NotImplementedException();
     }
 }

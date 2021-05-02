@@ -16,5 +16,9 @@ namespace Assets.Standard.Weapons
         public bool AllowTwoHanded => true;
 
         public bool EnforceTwoHanded => true;
+
+        public string PrefabAddress => null;
+
+        public string PrefabAddressTwoHanded => "Standard/Prefabs/Crossbow.prefab";
     }
 }

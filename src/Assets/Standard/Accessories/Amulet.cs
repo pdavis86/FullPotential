@@ -10,5 +10,8 @@ namespace Assets.Standard.Accessories
         public string TypeName => nameof(Amulet);
 
         public IGearAccessory.AccessorySlot InventorySlot => IGearAccessory.AccessorySlot.Amulet;
+
+        //todo: missing prefab
+        public string PrefabAddress => throw new NotImplementedException();
     }
 }

@@ -17,6 +17,5 @@
             Amulet
         }
 
-        //todo: need to register a prefab when registering
     }
 }

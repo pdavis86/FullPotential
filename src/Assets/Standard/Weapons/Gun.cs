@@ -16,5 +16,10 @@ namespace Assets.Standard.Weapons
         public bool AllowTwoHanded => true;
 
         public bool EnforceTwoHanded => false;
+
+        public string PrefabAddress => "Standard/Prefabs/Gun.prefab";
+
+        //todo: different prefab for two-handed
+        public string PrefabAddressTwoHanded => "Standard/Prefabs/Gun.prefab";
     }
 }

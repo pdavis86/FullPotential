@@ -9,5 +9,8 @@ namespace Assets.Standard.Armor
         public string TypeName => nameof(Chest);
 
         public IGearArmor.ArmorSlot InventorySlot => IGearArmor.ArmorSlot.Chest;
+
+        //todo: missing prefab
+        public string PrefabAddress => throw new NotImplementedException();
     }
 }

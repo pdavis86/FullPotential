@@ -1,6 +1,6 @@
-﻿using Assets.Core.Data;
+﻿using Assets.ApiScripts.Registry;
+using Assets.Core.Data;
 using Assets.Core.Extensions;
-using Assets.Core.Registry;
 using Assets.Core.Registry.Base;
 using Assets.Core.Registry.Types;
 using System;
@@ -354,33 +354,38 @@ public class PlayerInventory : NetworkBehaviour
 
     public void SpawnItemInHand(int index, ItemBase item, bool leftHand = true)
     {
-        var currentlyInGame = EquippedObjects[index];
-        if (currentlyInGame != null)
-        {
-            Destroy(currentlyInGame);
-        }
-
         if (item is Weapon weapon)
         {
-            var prefab = TypeRegistry.GetPrefabForWeaponType(weapon.RegistryType.TypeName, weapon.IsTwoHanded);
-            var weaponGo = Instantiate(prefab, gameObject.transform);
-            weaponGo.transform.localEulerAngles = new Vector3(0, 90);
-            weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, 0.3f, 0.75f);
-            EquippedObjects[index] = weaponGo;
+            var registryType = item.RegistryType as IGearWeapon;
+            GameManager.Instance.TypeRegistry.LoadAddessable(
+                weapon.IsTwoHanded ? registryType.PrefabAddressTwoHanded : registryType.PrefabAddress,
+                prefab =>
+                {
+                    var weaponGo = Instantiate(prefab, gameObject.transform);
+                    weaponGo.transform.localEulerAngles = new Vector3(0, 90);
+                    weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, 0.3f, 0.75f);
+                    EquippedObjects[index] = weaponGo;
+                }
+                );
         }
         else
         {
             //todo: implement other items
-            Debug.Log($"Not implemented handling for item {item.Name} yet");
+            Debug.LogWarning($"Not implemented handling for item {item.Name} yet");
         }
     }
 
     public void EquipItem(int slotIndex, string itemId)
     {
+        var currentlyInGame = EquippedObjects[slotIndex];
+        if (currentlyInGame != null)
+        {
+            Destroy(currentlyInGame);
+        }
+
         if (string.IsNullOrWhiteSpace(itemId))
         {
             EquipSlots[slotIndex] = null;
-            //todo: destroy game object
             return;
         }
 

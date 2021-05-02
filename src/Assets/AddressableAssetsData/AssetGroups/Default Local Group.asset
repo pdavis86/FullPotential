@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Default Local Group
+  m_EditorClassIdentifier: 
+  m_GroupName: Default Local Group
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 105f2f79d7d24494f8cd35e100c8ea63
+  m_SerializeEntries:
+  - m_GUID: 620e7d7564c784a43b86f2a97542709a
+    m_Address: Standard/Prefabs/Axe.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 3422181861286336217, guid: 620e7d7564c784a43b86f2a97542709a,
+      type: 3}
+    m_TargetAsset: {fileID: 3422181861286336217, guid: 620e7d7564c784a43b86f2a97542709a,
+      type: 3}
+  - m_GUID: 49b96cb05dc76f841a03a0533ed3240c
+    m_Address: Standard/Prefabs/Bow.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 91ecae8b81a7bbe45bda67732f076637
+    m_Address: Standard/Prefabs/Crossbow.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: c254c49e9e23f1f478f7fe1c7e5f7726
+    m_Address: Standard/Prefabs/Dagger.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 8c0273065c6f88d4e9a0cbe91a6925f4
+    m_Address: Standard/Prefabs/Gun.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: d083539429da01f4a948d98d0bd435dc
+    m_Address: Standard/Prefabs/Hammer.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: dba1d53db226b6a43b3cab4703b67937
+    m_Address: Standard/Prefabs/Shield.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 9db79d108cde9f548a4ba1d52c1ea2b4
+    m_Address: Standard/Prefabs/Staff.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 391bac2c0773fe348bd5f01f1e13ce91
+    m_Address: Standard/Prefabs/Sword.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 101452080fc0cca43abdd31fc4649980, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: bf626c240807ac149b811ab6ea3408dd, type: 2}
+    - {fileID: 11400000, guid: 5fe8bfb9e23fbd74890eeb6ac241fdc2, type: 2}

@@ -16,5 +16,9 @@ namespace Assets.Standard.Weapons
         public bool AllowTwoHanded => false;
 
         public bool EnforceTwoHanded => false;
+
+        public string PrefabAddress => "Standard/Prefabs/Dagger.prefab";
+
+        public string PrefabAddressTwoHanded => null;
     }
 }

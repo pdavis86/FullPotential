@@ -6,6 +6,7 @@ using Assets.Core.Spells.Targeting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.AddressableAssets;
 
 // ReSharper disable ArrangeAccessorOwnerBody
 // ReSharper disable ConvertToNullCoalescingCompoundAssignment
@@ -22,6 +23,8 @@ namespace Assets.Core.Registry
         private readonly List<IEffect> _effects = new List<IEffect>();
         private readonly List<ISpellShape> _shapes = new List<ISpellShape>();
         private readonly List<ISpellTargeting> _targeting = new List<ISpellTargeting>();
+
+        private Dictionary<string, UnityEngine.GameObject> _loadedAddressables = new Dictionary<string, UnityEngine.GameObject>();
 
         public void FindAndRegisterAll()
         {
@@ -190,6 +193,32 @@ namespace Assets.Core.Registry
         public IEffect GetEffect(Guid typeId)
         {
             return _effects.FirstOrDefault(x => x.TypeId == typeId);
+        }
+
+        public void LoadAddessable(string address, Action<UnityEngine.GameObject> action)
+        {
+            //Addressables.ReleaseInstance(go) : Destroys objects created by Addressables.InstantiateAsync(address)
+            //Addressables.Release(opHandle) : Remove the addressable from memory
+
+            if (_loadedAddressables.ContainsKey(address))
+            {
+                action(_loadedAddressables[address]);
+            }
+            else
+            {
+                var asyncOp = Addressables.LoadAssetAsync<UnityEngine.GameObject>(address);
+                asyncOp.Completed += opHandle =>
+                {
+                    var prefab = opHandle.Result;
+
+                    if (!_loadedAddressables.ContainsKey(address))
+                    {
+                        _loadedAddressables.Add(address, prefab);
+                    }
+
+                    action(prefab);
+                };
+            }
         }
 
     }
