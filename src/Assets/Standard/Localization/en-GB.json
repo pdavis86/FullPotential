@@ -194,6 +194,117 @@
     {
       "Key": "effect.soften",
       "Value": "Soften"
+    },
+	
+	{
+      "Key": "effect.courage.description",
+      "Value": "Boosts max HP"
+    },
+    {
+      "Key": "effect.focus.description",
+      "Value": "Boosts max mana"
+    },
+    {
+      "Key": "effect.haste.description",
+      "Value": "Boosts speed attribute"
+    },
+    {
+      "Key": "effect.lifetap.description",
+      "Value": "Periodically steals HP from a target with the Life Drain debuff"
+    },
+    {
+      "Key": "effect.manatap.description",
+      "Value": "Periodically steals mana from a target with the Mana Drain debuff"
+    },
+    {
+      "Key": "effect.regeneration.description",
+      "Value": "Periodically increases your HP"
+    },
+    {
+      "Key": "effect.strength.description",
+      "Value": "Boosts strength attribute"
+    },
+
+
+    {
+      "Key": "effect.distract.description",
+      "Value": "Decreases max mana"
+    },
+    {
+      "Key": "effect.fear.description",
+      "Value": "Decreases max HP"
+    },
+    {
+      "Key": "effect.lifedrain.description",
+      "Value": "Periodically steals HP to give to the originator"
+    },
+    {
+      "Key": "effect.manadrain.description",
+      "Value": "Periodically steals mana to give to the originator"
+    },
+    {
+      "Key": "effect.poison.description",
+      "Value": "Periodically decreases your HP"
+    },
+    {
+      "Key": "effect.slow.description",
+      "Value": "Decreases speed attribute"
+    },
+    {
+      "Key": "effect.weakness.description",
+      "Value": "Decreases strength attribute"
+    },
+
+
+    {
+      "Key": "effect.air.description",
+      "Value": "Imbue with the Air element"
+    },
+    {
+      "Key": "effect.earth.description",
+      "Value": "Imbue with the Earth element"
+    },
+    {
+      "Key": "effect.fire.description",
+      "Value": "Imbue with the Fire element"
+    },
+    {
+      "Key": "effect.ice.description",
+      "Value": "Imbue with the Ice element"
+    },
+    {
+      "Key": "effect.lightning.description",
+      "Value": "Imbue with the Lighning element"
+    },
+    {
+      "Key": "effect.water.description",
+      "Value": "Imbue with the Water element"
+    },
+
+
+    {
+      "Key": "effect.absorb.description",
+      "Value": "Reduces damage taken from magic attacks"
+    },
+    {
+      "Key": "effect.blink.description",
+      "Value": "Instantly move from one place to another"
+    },
+    {
+      "Key": "effect.deflect.description",
+      "Value": "Reduces damage taken from physical attacks"
+    },
+    {
+      "Key": "effect.heal.description",
+      "Value": "Increases HP"
+    },
+    {
+      "Key": "effect.leap.description",
+      "Value": "Jump to an increased height"
+    },
+    {
+      "Key": "effect.soften.description",
+      "Value": "Reduces fall damage"
     }
   ]
 }

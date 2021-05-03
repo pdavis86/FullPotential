@@ -43,6 +43,20 @@
       "Key": "crafting.name.prefix.defence",
       "Value": "Defence"
     },
+	
+	
+	{
+      "Key": "crafting.error.spellmissingeffect",
+      "Value": "A spell needs at least one effect"
+    },
+	{
+      "Key": "crafting.error.toomanycomponents",
+      "Value": "Too many components"
+    },
+	{
+      "Key": "crafting.error.toomanyforonehanded",
+      "Value": "Too many components for a one-handed weapon"
+    },
 
 
     {

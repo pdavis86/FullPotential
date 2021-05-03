@@ -263,8 +263,7 @@ public class PlayerInventory : NetworkBehaviour
         }
     }
 
-    [Command]
-    public void CmdCraftItem(string[] componentIds, string categoryName, string craftableTypeName, bool isTwoHanded)
+    private List<ItemBase> GetComponentsFromIds(string[] componentIds)
     {
         //Check that the components are actually in the player's inventory and load them in the order they are given
         var components = new List<ItemBase>();
@@ -272,10 +271,46 @@ public class PlayerInventory : NetworkBehaviour
         {
             components.Add(Items.FirstOrDefault(x => x.Id == id));
         }
+        return components;
+    }
+
+    public List<string> ValidateIsCraftable(string[] componentIds, ItemBase itemToCraft)
+    {
+        var components = GetComponentsFromIds(componentIds);
+
+        var errors = new List<string>();
+        if (itemToCraft is Spell spell)
+        {
+            if (spell.EffectIds.Length == 0)
+            {
+                errors.Add(GameManager.Instance.Localizer.Translate("crafting.error.spellmissingeffect"));
+            }
+        }
+        else if (itemToCraft is Weapon weapon)
+        {
+            if (components.Count > 8)
+            {
+                errors.Add(GameManager.Instance.Localizer.Translate("crafting.error.toomanycomponents"));
+            }
+            if (components.Count > 4 && !weapon.IsTwoHanded)
+            {
+                errors.Add(GameManager.Instance.Localizer.Translate("crafting.error.toomanyforonehanded"));
+            }
+        }
+
+        return errors;
+    }
+
+    [Command]
+    public void CmdCraftItem(string[] componentIds, string categoryName, string craftableTypeName, bool isTwoHanded, string itemName)
+    {
+        //todo: add a min level to craftedResult
+
+        var components = GetComponentsFromIds(componentIds);
 
         if (components.Count != componentIds.Length)
         {
-            Debug.LogError("One or more IDs provided are not in the inventory");
+            Debug.LogError("Someone tried cheating: One or more IDs provided are not in the inventory");
             return;
         }
 
@@ -285,6 +320,17 @@ public class PlayerInventory : NetworkBehaviour
             isTwoHanded,
             components
         );
+
+        if (ValidateIsCraftable(componentIds, craftedItem).Any())
+        {
+            Debug.LogError("Someone tried cheating: validation was skipped");
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(itemName))
+        {
+            craftedItem.Name = itemName;
+        }
 
         var craftedType = craftedItem.GetType();
 

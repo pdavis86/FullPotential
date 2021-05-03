@@ -29,7 +29,9 @@ public class CraftingUi : MonoBehaviour
     [SerializeField] private Dropdown _typeDropdown;
     [SerializeField] private Dropdown _subTypeDropdown;
     [SerializeField] private Dropdown _handednessDropdown;
+    [SerializeField] private InputField _craftName;
     [SerializeField] private Button _craftButton;
+    [SerializeField] private Text _craftErrors;
 
     private PlayerInventory _inventory;
     private List<ItemBase> _components;
@@ -49,6 +51,8 @@ public class CraftingUi : MonoBehaviour
         _typeDropdown.onValueChanged.AddListener(TypeOnValueChanged);
 
         _subTypeDropdown.onValueChanged.AddListener(SubTypeOnValueChanged);
+
+        _handednessDropdown.onValueChanged.AddListener(HandednessOnValueChanged);
 
         _craftButton.onClick.AddListener(CraftButtonOnClick);
 
@@ -90,8 +94,12 @@ public class CraftingUi : MonoBehaviour
     {
         _craftButton.interactable = false;
 
+        var componentIds = _components.Select(x => x.Id).ToArray();
         var selectedType = GetCraftingCategory();
-        _inventory.CmdCraftItem(_components.Select(x => x.Id).ToArray(), selectedType, GetCraftableTypeName(selectedType), IsTwoHandedSelected());
+        var selectedSubType = GetCraftableTypeName(selectedType);
+        var isTwoHanded = IsTwoHandedSelected();
+
+        _inventory.CmdCraftItem(componentIds, selectedType, selectedSubType, isTwoHanded, _craftName.text);
     }
 
     void SubTypeOnValueChanged(int index)
@@ -105,6 +113,11 @@ public class CraftingUi : MonoBehaviour
         {
             Debug.LogError(ex);
         }
+    }
+
+    void HandednessOnValueChanged(int index)
+    {
+        UpdateResults();
     }
 
     private void SetHandednessDropDownVisibility()
@@ -194,8 +207,16 @@ public class CraftingUi : MonoBehaviour
 
         TypeOnValueChanged(0);
 
+        ResetUiText();
+
+        _craftButton.interactable = false;
+    }
+
+    private void ResetUiText()
+    {
         _outputText.text = null;
-        _craftButton.interactable = true;
+        _craftName.text = null;
+        _craftErrors.text = null;
     }
 
     public void LoadInventory()
@@ -246,10 +267,7 @@ public class CraftingUi : MonoBehaviour
             case nameof(Weapon): return (_weaponTypes.ElementAt(_subTypeDropdown.value).Key).TypeName;
             case nameof(Armor): return (_armorTypes.ElementAt(_subTypeDropdown.value).Key).TypeName;
             case nameof(Accessory): return (_accessoryTypes.ElementAt(_subTypeDropdown.value).Key).TypeName;
-
-            //todo: what should this be?
-            case nameof(Spell): return "todo";
-
+            case nameof(Spell): return null;
             default: throw new InvalidOperationException("Unknown crafting type");
         }
     }
@@ -261,13 +279,15 @@ public class CraftingUi : MonoBehaviour
 
     private void UpdateResults()
     {
+        ResetUiText();
+
         if (_components.Count == 0)
         {
-            _outputText.text = null;
             return;
         }
 
         var craftingCategory = GetCraftingCategory();
+
         var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(
             craftingCategory,
             GetCraftableTypeName(craftingCategory),
@@ -275,6 +295,15 @@ public class CraftingUi : MonoBehaviour
             _components
         );
 
+        var errors = _inventory.ValidateIsCraftable(_components.Select(x => x.Id).ToArray(), craftedItem);
+        if (errors.Any())
+        {
+            _craftErrors.text = string.Join(Environment.NewLine, errors);
+            _craftButton.interactable = false;
+            return;
+        }
+
+        _craftButton.interactable = true;
         _outputText.text = GameManager.Instance.ResultFactory.GetItemDescription(craftedItem);
     }
 

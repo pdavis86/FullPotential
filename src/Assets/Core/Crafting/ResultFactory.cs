@@ -100,7 +100,7 @@ namespace Assets.Core.Crafting
             return _spellShapeOptions.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
         }
 
-        private List<IEffect> GetEffects(string craftingType, IEnumerable<ItemBase> components)
+        public List<IEffect> GetEffects(string craftingType, IEnumerable<ItemBase> components)
         {
             var effects = components.Where(x => x.Effects != null).SelectMany(x => x.Effects);
 
@@ -272,11 +272,6 @@ namespace Assets.Core.Crafting
 
             return lootDrop;
         }
-
-        //todo: add ability to name item
-        //todo: add validation e.g. enough scrap to make a two-handed weapon
-        //todo: add validation e.g. at least one effect for a spell
-        //todo: add a min level to craftedResult
 
         private Spell GetSpell(IEnumerable<ItemBase> components)
         {
