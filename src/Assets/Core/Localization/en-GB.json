@@ -185,10 +185,12 @@
       "Value": "Join"
     },
 	
+	
 	{
       "Key": "ui.debugging.host",
       "Value": "Host"
     },
+	
 	
 	{
       "Key": "ui.esc.settings",
@@ -214,6 +216,12 @@
 	{
       "Key": "ui.character.tabs.map",
       "Value": "TODO - Map"
+    },
+	
+	
+	{
+      "Key": "ui.interact.shop",
+      "Value": "Press '{0}' to shop"
     }
 
   ]

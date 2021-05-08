@@ -1,5 +1,4 @@
 ﻿using Assets.Core.Registry.Types;
-using Assets.Core.Spells.Targeting;
 using System;
 using TMPro;
 using UnityEngine;
@@ -24,6 +23,11 @@ public class PlayerController : NetworkBehaviour
     private bool _toggleCharacterMenu;
     private PlayerInventory _inventory;
 
+    private Interactable _focusedInteractable;
+
+
+    #region Unity event handlers
+
     void Awake()
     {
         _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;
@@ -41,6 +45,8 @@ public class PlayerController : NetworkBehaviour
     {
         try
         {
+            CheckForInteractable();
+
             var mappings = GameManager.Instance.InputMappings;
 
             if (Input.GetKeyDown(mappings.GameMenu)) { _toggleGameMenu = true; }
@@ -48,8 +54,8 @@ public class PlayerController : NetworkBehaviour
             else if (!HasMenuOpen)
             {
                 if (Input.GetKeyDown(mappings.Interact)) { TryToInteract(); }
-                else if (Input.GetMouseButtonDown(0)) { CmdCastSpell(true); }
-                else if (Input.GetMouseButtonDown(1)) { CmdCastSpell(false); }
+                else if (Input.GetMouseButtonDown(0)) { TryToAttack(true); }
+                else if (Input.GetMouseButtonDown(1)) { TryToAttack(false); }
                 else
                 {
                     var mouseScrollWheel = Input.GetAxis("Mouse ScrollWheel");
@@ -121,6 +127,73 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    #endregion
+
+    private void CheckForInteractable()
+    {
+        Ray ray = PlayerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, maxDistance: 1000))
+        {
+            var interactable = hit.collider.GetComponent<Interactable>();
+            if (interactable != null)
+            {
+                var distance = Vector3.Distance(PlayerCamera.transform.position, interactable.transform.position);
+                if (distance <= interactable.Radius)
+                {
+                    if (interactable != _focusedInteractable)
+                    {
+                        if (_focusedInteractable != null)
+                        {
+                            _focusedInteractable.OnBlur();
+                        }
+                        _focusedInteractable = interactable;
+                        _focusedInteractable.OnFocus();
+                    }
+
+                    return;
+                }
+            }
+        }
+
+        if (_focusedInteractable != null)
+        {
+            _focusedInteractable.OnBlur();
+            _focusedInteractable = null;
+        }
+    }
+
+    void TryToInteract()
+    {
+        if (_focusedInteractable == null)
+        {
+            //todo: play a sound to indicate failed interaction
+            return;
+        }
+
+        CmdInteractWith(_focusedInteractable.netId);
+    }
+
+    [Command]
+    public void CmdInteractWith(NetworkInstanceId interactableNetId)
+    {
+        var interactable = NetworkServer.FindLocalObject(interactableNetId).GetComponent<Interactable>();
+
+        Debug.Log($"Trying to interact with {interactable.name}");
+
+        var distance = Vector3.Distance(PlayerCamera.transform.position, interactable.transform.position);
+        if (distance <= interactable.Radius)
+        {
+            interactable.OnInteract(netId);
+        }
+    }
+
+    void TryToAttack(bool leftHand)
+    {
+        //todo: implement this
+        CmdCastSpell(leftHand);
+    }
+
     [Command]
     private void CmdCastSpell(bool leftHand)
     {
@@ -131,18 +204,22 @@ public class PlayerController : NetworkBehaviour
             return;
         }
 
-        if (activeSpell.Targeting is Projectile)
+        switch (activeSpell.Targeting)
         {
-            SpawnSpellProjectile(activeSpell, leftHand);
+            case Assets.Core.Spells.Targeting.Projectile _:
+                SpawnSpellProjectile(activeSpell, leftHand);
+                break;
+
+            case Assets.Core.Spells.Targeting.Self _:
+            case Assets.Core.Spells.Targeting.Touch _:
+            case Assets.Core.Spells.Targeting.Beam _:
+            case Assets.Core.Spells.Targeting.Cone _:
+                //todo: other spell targeting options
+                throw new NotImplementedException();
+
+            default:
+                throw new Exception($"Unexpected spell targeting with TypeName: '{activeSpell.Targeting.TypeName}'");
         }
-
-        //todo: other spell targeting options
-        //case Spell.TargetingOptions.Self:
-        //case Spell.TargetingOptions.Touch:
-        //case Spell.TargetingOptions.Beam:
-        //case Spell.TargetingOptions.Cone:
-
-        throw new Exception($"Unexpected spell targeting with TypeName: '{activeSpell.Targeting.TypeName}'");
     }
 
     [Server]
@@ -159,50 +236,6 @@ public class PlayerController : NetworkBehaviour
         spellScript.SpellId = activeSpell.Id;
 
         NetworkServer.Spawn(spellObject);
-    }
-
-    void TryToInteract()
-    {
-        var startPos = PlayerCamera.transform.position;
-        if (Physics.Raycast(startPos, PlayerCamera.transform.forward, out var hit))
-        {
-            //Debug.DrawLine(startPos, hit.point, Color.blue, 3);
-            //Debug.Log("Ray cast hit " + hit.collider.gameObject.name);
-
-            var interactable = hit.collider.GetComponent<Interactable>();
-            if (interactable != null)
-            {
-                var distance = Vector3.Distance(startPos, interactable.transform.position);
-                if (distance <= interactable.Radius)
-                {
-                    //Debug.Log("Interacted with " + hit.collider.gameObject.name);
-                    CmdInteractWith(interactable.netId);
-                }
-                //else
-                //{
-                //    Debug.Log($"But not close enough ({distance})");
-                //}
-            }
-            //else
-            //{
-            //    Debug.Log("But it's not interactable");
-            //}
-        }
-    }
-
-    [Command]
-    public void CmdInteractWith(NetworkInstanceId instanceId)
-    {
-        var go = NetworkServer.FindLocalObject(instanceId);
-        var interactable = go.GetComponent<Interactable>();
-        var distance = Vector3.Distance(PlayerCamera.transform.position, interactable.transform.position);
-        if (distance <= interactable.Radius)
-        {
-            //Debug.Log("Interacted with " + interactable.gameObject.name);
-
-            //todo: move this into a script on the interactable
-            _inventory.Add(GameManager.Instance.ResultFactory.GetLootDrop());
-        }
     }
 
     // ReSharper disable once UnusedParameter.Global

@@ -2254,14 +2254,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 24.26
+  m_fontSizeBase: 24.26
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -2290,7 +2290,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -117.9485, y: 0, z: -118.79791, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -3587,6 +3587,7 @@ MonoBehaviour:
   TooltipOverlay: {fileID: 1234199707}
   DebuggingOverlay: {fileID: 7011060653823878784}
   HitNumberContainer: {fileID: 7011060654747651869}
+  InteractionBubble: {fileID: 679548639}
   Hud: {fileID: 7011060654785410894}
   CraftingUi: {fileID: 7011060654617723808}
   EscMenu: {fileID: 4559024457428667746}

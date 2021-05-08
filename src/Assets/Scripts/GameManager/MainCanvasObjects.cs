@@ -16,6 +16,7 @@ public class MainCanvasObjects : MonoBehaviour
     public GameObject TooltipOverlay;
     public GameObject DebuggingOverlay;
     public GameObject HitNumberContainer;
+    public GameObject InteractionBubble;
     public GameObject Hud;
 
     //Menus

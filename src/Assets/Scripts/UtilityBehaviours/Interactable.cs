@@ -13,9 +13,22 @@ public abstract class Interactable : NetworkBehaviour
 {
     public float Radius = 3f;
 
-    private void OnDrawGizmosSelected()
+    internal TMPro.TextMeshProUGUI _interactionBubble;
+
+    void Start()
+    {
+        _interactionBubble = GameManager.Instance.MainCanvasObjects.InteractionBubble.GetComponent<TMPro.TextMeshProUGUI>();
+    }
+
+    void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, Radius);
     }
+
+    public abstract void OnFocus();
+
+    public abstract void OnInteract(NetworkInstanceId playerNetId);
+
+    public abstract void OnBlur();
 }
