@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -20,20 +23,28 @@ public class GameManager : MonoBehaviour
     public Assets.Core.Localization.Localizer Localizer { get; private set; }
     public Assets.Core.Crafting.ResultFactory ResultFactory { get; private set; }
 
+    //todo: private blah UserManager { get; private set; }
+
     //Behaviours
     public MainCanvasObjects MainCanvasObjects { get; private set; }
     public Prefabs Prefabs { get; private set; }
+
+
+    //todo: use Unity's built-in system instead?
     public InputMappings InputMappings { get; private set; }
-    public GameObject LocalPlayer { get; set; }
+
+    //todo: move this inside the user manager
+    public string Username { get; set; }
 
     //Variables
-    public string Username { get; set; }
+    public GameObject LocalPlayer { get; set; }
+
 
     //Singleton
     private static GameManager _instance;
     public static GameManager Instance { get { return _instance; } }
 
-    private void Awake()
+    async void Awake()
     {
         if (_instance != null && _instance != this)
         {
@@ -42,15 +53,19 @@ public class GameManager : MonoBehaviour
         }
 
         _instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
 
         TypeRegistry = new Assets.Core.Registry.TypeRegistry();
         TypeRegistry.FindAndRegisterAll();
 
-        //todo: get culture from settings
-        var culture = "en-GB";
+        Localizer = new Assets.Core.Localization.Localizer(TypeRegistry.GetRegisteredModPaths());
 
-        Localizer = new Assets.Core.Localization.Localizer();
-        Localizer.LoadLocalizationFiles(culture, TypeRegistry.GetRegisteredModPaths());
+        //todo: get culture from settings
+        var culture = "en-GB" ?? Localizer.GetAvailableCultures().First();
+
+        await Localizer.LoadLocalizationFiles(culture);
 
         ResultFactory = new Assets.Core.Crafting.ResultFactory(TypeRegistry, Localizer);
 
@@ -58,17 +73,7 @@ public class GameManager : MonoBehaviour
         Prefabs = GetComponent<Prefabs>();
         InputMappings = GetComponent<InputMappings>();
 
-        DontDestroyOnLoad(gameObject);
-    }
-
-    //public static GameObject GetCurrentPlayerGameObject(Camera playerCamera)
-    //{
-    //    return playerCamera.gameObject.transform.parent.gameObject;
-    //}
-
-    public void SetPlayerUsername(string value)
-    {
-        Username = value;
+        SceneManager.LoadSceneAsync(1);
     }
 
     public static void Quit()
@@ -78,6 +83,18 @@ public class GameManager : MonoBehaviour
 #else
         Application.Quit ();
 #endif
+    }
+
+
+
+
+
+
+
+    //todo: move this inside the user manager
+    public void SetPlayerUsername(string value)
+    {
+        Username = value;
     }
 
 }

@@ -41,7 +41,7 @@ namespace Assets.Core.Registry
         public string[] GetRegisteredModPaths()
         {
             //todo: set mod paths after discovery
-            return new[] { "Standard" };
+            return new[] { "Core", "Standard" };
         }
 
         private void RegisterCoreTypes()

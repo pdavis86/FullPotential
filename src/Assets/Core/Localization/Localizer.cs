@@ -1,11 +1,11 @@
 ﻿using Assets.ApiScripts.Registry;
 using Assets.Core.Spells.Shapes;
 using Assets.Core.Spells.Targeting;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 // ReSharper disable ConvertToAutoProperty
 // ReSharper disable ArrangeAccessorOwnerBody
@@ -16,50 +16,65 @@ namespace Assets.Core.Localization
 {
     public class Localizer
     {
+        private IEnumerable<string> _modPathStems;
         private Dictionary<string, string> _translations;
 
-        public void LoadLocalizationFiles(string culture = null, IEnumerable<string> modFilePaths = null)
+        public Localizer(IEnumerable<string> modPathStems)
         {
-            IEnumerable<string> filepaths = new[] { "Core" };
+            _modPathStems = modPathStems;
+        }
 
-            if (modFilePaths != null && modFilePaths.Any())
+        public List<string> GetAvailableCultures()
+        {
+            var cultures = new List<string>();
+            foreach (var rl in Addressables.ResourceLocators)
             {
-                filepaths = filepaths.Union(modFilePaths);
+                cultures.AddRange(rl.Keys
+                    .Where(x => x is string)
+                    .Select(x => x as string)
+                    .Where(x => x.StartsWith("Core/Localization/") && x.EndsWith(".json"))
+                    .Select(x => System.IO.Path.GetFileNameWithoutExtension(x))
+                    );
             }
+            return cultures;
+        }
 
+        public async Task<bool> LoadLocalizationFiles(string culture)
+        {
             _translations = new Dictionary<string, string>();
 
-            foreach (var relativePath in filepaths)
+            foreach (var modName in _modPathStems)
             {
-                var dataDir = Path.Combine(Application.dataPath, relativePath, "Localization");
-                var filePath = Path.Combine(dataDir, culture + ".json");
+                var address = $"{modName}/Localization/{culture}.json";
 
-                if (!File.Exists(filePath))
+                var checkTask = Addressables.LoadResourceLocationsAsync(address).Task;
+                await checkTask;
+
+                if (checkTask.Result.Count == 0)
                 {
-                    Debug.LogWarning($"Failed to find translations for culture '{culture}'. Defaulting to 'en-GB'");
-
-                    culture = "en-GB";
-                    filePath = Path.Combine(dataDir, culture + ".json");
-
-                    if (!File.Exists(filePath))
-                    {
-                        throw new Exception("Failed to find any localization file");
-                    }
+                    Debug.LogError($"Failed to find translations for '{address}'");
+                    continue;
                 }
 
-                var data = JsonUtility.FromJson<Assets.Core.Data.Localization>(File.ReadAllText(filePath));
+                var loadTask = Addressables.LoadAssetAsync<TextAsset>(address).Task;
+                await loadTask;
+                var data = JsonUtility.FromJson<Assets.Core.Data.Localization>(loadTask.Result.text);
                 foreach (var item in data.Translations)
                 {
-                    if (!_translations.ContainsKey(item.Key))
-                    {
-                        _translations.Add(item.Key, item.Value);
-                    }
-                    else
+                    if (_translations.ContainsKey(item.Key))
                     {
                         Debug.LogWarning($"Translations already contains a value for key '{item.Key}'");
                     }
+                    else
+                    {
+                        _translations.Add(item.Key, item.Value);
+                    }
                 }
+
+                Addressables.Release(loadTask.Result);
             }
+
+            return true;
         }
 
         public string Translate(string id)

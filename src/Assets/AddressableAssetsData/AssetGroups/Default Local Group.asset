@@ -21,10 +21,8 @@ MonoBehaviour:
     m_Address: Standard/Prefabs/Axe.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
-    m_MainAsset: {fileID: 3422181861286336217, guid: 620e7d7564c784a43b86f2a97542709a,
-      type: 3}
-    m_TargetAsset: {fileID: 3422181861286336217, guid: 620e7d7564c784a43b86f2a97542709a,
-      type: 3}
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
   - m_GUID: 49b96cb05dc76f841a03a0533ed3240c
     m_Address: Standard/Prefabs/Bow.prefab
     m_ReadOnly: 0
@@ -69,6 +67,18 @@ MonoBehaviour:
     m_TargetAsset: {fileID: 0}
   - m_GUID: 391bac2c0773fe348bd5f01f1e13ce91
     m_Address: Standard/Prefabs/Sword.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 5bb08d678285f4743b5823478c0c85a5
+    m_Address: Standard/Localization/en-GB.json
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: e6e95d7b1c9b08c4d99fd24ba141b94f
+    m_Address: Core/Localization/en-GB.json
     m_ReadOnly: 0
     m_SerializedLabels: []
     m_MainAsset: {fileID: 0}
