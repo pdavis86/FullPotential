@@ -8,6 +8,7 @@ using UnityEngine.Networking;
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
+// ReSharper disable InconsistentNaming
 
 public abstract class Interactable : NetworkBehaviour
 {

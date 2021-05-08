@@ -2,6 +2,10 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 
+// ReSharper disable CheckNamespace
+// ReSharper disable UnusedType.Global
+// ReSharper disable AccessToStaticMemberViaDerivedType
+
 [InitializeOnLoadAttribute]
 public static class DefaultSceneLoader
 {

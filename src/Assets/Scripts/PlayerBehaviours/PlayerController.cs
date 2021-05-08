@@ -131,9 +131,8 @@ public class PlayerController : NetworkBehaviour
 
     private void CheckForInteractable()
     {
-        Ray ray = PlayerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, maxDistance: 1000))
+        var ray = PlayerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
+        if (Physics.Raycast(ray, out var hit, maxDistance: 1000))
         {
             var interactable = hit.collider.GetComponent<Interactable>();
             if (interactable != null)

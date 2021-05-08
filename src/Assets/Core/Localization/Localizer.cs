@@ -11,12 +11,13 @@ using UnityEngine.AddressableAssets;
 // ReSharper disable ArrangeAccessorOwnerBody
 // ReSharper disable PossibleMultipleEnumeration
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
 namespace Assets.Core.Localization
 {
     public class Localizer
     {
-        private IEnumerable<string> _modPathStems;
+        private readonly IEnumerable<string> _modPathStems;
         private Dictionary<string, string> _translations;
 
         public Localizer(IEnumerable<string> modPathStems)
@@ -30,15 +31,15 @@ namespace Assets.Core.Localization
             foreach (var rl in Addressables.ResourceLocators)
             {
                 cultures.AddRange(rl.Keys
-                    .Where(x => x is string)
-                    .Select(x => x as string)
+                    .OfType<string>()
                     .Where(x => x.StartsWith("Core/Localization/") && x.EndsWith(".json"))
-                    .Select(x => System.IO.Path.GetFileNameWithoutExtension(x))
+                    .Select(System.IO.Path.GetFileNameWithoutExtension)
                     );
             }
             return cultures;
         }
 
+        // ReSharper disable once UnusedMethodReturnValue.Global
         public async Task<bool> LoadLocalizationFiles(string culture)
         {
             _translations = new Dictionary<string, string>();

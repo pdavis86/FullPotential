@@ -7,6 +7,7 @@ using Assets.Core.Spells.Shapes;
 using Assets.Core.Spells.Targeting;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -100,7 +101,7 @@ namespace Assets.Core.Crafting
             return _spellShapeOptions.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
         }
 
-        public List<IEffect> GetEffects(string craftingType, IEnumerable<ItemBase> components)
+        private List<IEffect> GetEffects(string craftingType, IEnumerable<ItemBase> components)
         {
             var effects = components.Where(x => x.Effects != null).SelectMany(x => x.Effects);
 
@@ -266,7 +267,7 @@ namespace Assets.Core.Crafting
 
             var typeTranslation = _localizer.Translate("crafting.loot.type");
             var suffix = int.Parse(lootDrop.GetHashCode().ToString().TrimStart('-').Substring(5));
-            lootDrop.Name = $"{_localizer.GetTranslatedTypeName(lootDrop.RegistryType)} ({typeTranslation} #{suffix.ToString("D5")})";
+            lootDrop.Name = $"{_localizer.GetTranslatedTypeName(lootDrop.RegistryType)} ({typeTranslation} #{suffix.ToString("D5", CultureInfo.InvariantCulture)})";
 
             //todo: icon
 

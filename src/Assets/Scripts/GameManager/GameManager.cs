@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 // ReSharper disable CheckNamespace
@@ -63,7 +61,7 @@ public class GameManager : MonoBehaviour
         Localizer = new Assets.Core.Localization.Localizer(TypeRegistry.GetRegisteredModPaths());
 
         //todo: get culture from settings
-        var culture = "en-GB" ?? Localizer.GetAvailableCultures().First();
+        var culture = "en-GB"; // ?? Localizer.GetAvailableCultures().First();
 
         await Localizer.LoadLocalizationFiles(culture);
 

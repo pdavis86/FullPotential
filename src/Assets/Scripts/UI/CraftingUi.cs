@@ -1,8 +1,6 @@
 ﻿using Assets.ApiScripts.Registry;
-using Assets.Core.Crafting;
 using Assets.Core.Extensions;
 using Assets.Core.Localization;
-using Assets.Core.Registry;
 using Assets.Core.Registry.Base;
 using Assets.Core.Registry.Types;
 using System;

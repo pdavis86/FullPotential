@@ -23,8 +23,7 @@ namespace Assets.Core.Registry
         private readonly List<IEffect> _effects = new List<IEffect>();
         private readonly List<ISpellShape> _shapes = new List<ISpellShape>();
         private readonly List<ISpellTargeting> _targeting = new List<ISpellTargeting>();
-
-        private Dictionary<string, UnityEngine.GameObject> _loadedAddressables = new Dictionary<string, UnityEngine.GameObject>();
+        private readonly Dictionary<string, UnityEngine.GameObject> _loadedAddressables = new Dictionary<string, UnityEngine.GameObject>();
 
         public void FindAndRegisterAll()
         {

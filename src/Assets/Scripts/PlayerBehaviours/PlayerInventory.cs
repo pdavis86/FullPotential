@@ -403,6 +403,13 @@ public class PlayerInventory : NetworkBehaviour
         if (item is Weapon weapon)
         {
             var registryType = item.RegistryType as IGearWeapon;
+
+            if (registryType == null)
+            {
+                Debug.LogError("Weapon did not have a RegistryType");
+                return;
+            }
+
             GameManager.Instance.TypeRegistry.LoadAddessable(
                 weapon.IsTwoHanded ? registryType.PrefabAddressTwoHanded : registryType.PrefabAddress,
                 prefab =>
