@@ -16,23 +16,18 @@ public class GameManager : MonoBehaviour
     public const string NameCanvasMain = "MainCanvas";
     public const string NameCanvasScene = "SceneCanvas";
 
+
     //Core components
     public Assets.Core.Registry.TypeRegistry TypeRegistry { get; private set; }
     public Assets.Core.Localization.Localizer Localizer { get; private set; }
     public Assets.Core.Crafting.ResultFactory ResultFactory { get; private set; }
+    public Assets.Core.Registry.UserRegistry UserRegistry { get; private set; }
 
-    //todo: private blah UserManager { get; private set; }
 
     //Behaviours
     public MainCanvasObjects MainCanvasObjects { get; private set; }
     public Prefabs Prefabs { get; private set; }
 
-
-    //todo: use Unity's built-in system instead?
-    public InputMappings InputMappings { get; private set; }
-
-    //todo: move this inside the user manager
-    public string Username { get; set; }
 
     //Variables
     public GameObject LocalPlayer { get; set; }
@@ -41,6 +36,7 @@ public class GameManager : MonoBehaviour
     //Singleton
     private static GameManager _instance;
     public static GameManager Instance { get { return _instance; } }
+
 
     async void Awake()
     {
@@ -67,9 +63,10 @@ public class GameManager : MonoBehaviour
 
         ResultFactory = new Assets.Core.Crafting.ResultFactory(TypeRegistry, Localizer);
 
+        UserRegistry = new Assets.Core.Registry.UserRegistry();
+
         MainCanvasObjects = GameObject.Find(NameCanvasMain).GetComponent<MainCanvasObjects>();
         Prefabs = GetComponent<Prefabs>();
-        InputMappings = GetComponent<InputMappings>();
 
         SceneManager.LoadSceneAsync(1);
     }
@@ -81,18 +78,6 @@ public class GameManager : MonoBehaviour
 #else
         Application.Quit ();
 #endif
-    }
-
-
-
-
-
-
-
-    //todo: move this inside the user manager
-    public void SetPlayerUsername(string value)
-    {
-        Username = value;
     }
 
 }

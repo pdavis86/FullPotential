@@ -2,6 +2,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Networking;
 
 // ReSharper disable CheckNamespace
@@ -41,28 +42,62 @@ public class PlayerController : NetworkBehaviour
         _inventory = GetComponent<PlayerInventory>();
     }
 
+    void OnInteract()
+    {
+        if (HasMenuOpen)
+        {
+            return;
+        }
+
+        if (_focusedInteractable == null)
+        {
+            //todo: play a sound to indicate failed interaction
+            return;
+        }
+
+        CmdInteractWith(_focusedInteractable.netId);
+    }
+
+    void OnOpenCharacterMenu()
+    {
+        _toggleCharacterMenu = true;
+    }
+
+    void OnCancel()
+    {
+        _toggleGameMenu = true;
+    }
+
+    void OnLeftAttack()
+    {
+        TryToAttack(true);
+    }
+
+    void OnRightAttack()
+    {
+        TryToAttack(false);
+    }
+
     void Update()
     {
         try
         {
             CheckForInteractable();
 
-            var mappings = GameManager.Instance.InputMappings;
-
-            if (Input.GetKeyDown(mappings.GameMenu)) { _toggleGameMenu = true; }
-            else if (Input.GetKeyDown(mappings.CharacterMenu)) { _toggleCharacterMenu = true; }
-            else if (!HasMenuOpen)
-            {
-                if (Input.GetKeyDown(mappings.Interact)) { TryToInteract(); }
-                else if (Input.GetMouseButtonDown(0)) { TryToAttack(true); }
-                else if (Input.GetMouseButtonDown(1)) { TryToAttack(false); }
-                else
-                {
-                    var mouseScrollWheel = Input.GetAxis("Mouse ScrollWheel");
-                    if (mouseScrollWheel > 0) { /*todo: scrolled up*/ Debug.Log("Positive mouse scroll"); }
-                    else if (mouseScrollWheel < 0) { /*todo: scrolled down*/ Debug.Log("Negative mouse scroll"); }
-                }
-            }
+            //if (Input.GetKeyDown(mappings.GameMenu)) { _toggleGameMenu = true; }
+            //else if (Input.GetKeyDown(mappings.CharacterMenu)) { _toggleCharacterMenu = true; }
+            //else if (!HasMenuOpen)
+            //{
+            //    if (Input.GetKeyDown(mappings.Interact)) { TryToInteract(); }
+            //    else if (Input.GetMouseButtonDown(0)) { TryToAttack(true); }
+            //    else if (Input.GetMouseButtonDown(1)) { TryToAttack(false); }
+            //    else
+            //    {
+            //        var mouseScrollWheel = Input.GetAxis("Mouse ScrollWheel");
+            //        if (mouseScrollWheel > 0) { /*todo: scrolled up*/ Debug.Log("Positive mouse scroll"); }
+            //        else if (mouseScrollWheel < 0) { /*todo: scrolled down*/ Debug.Log("Negative mouse scroll"); }
+            //    }
+            //}
         }
         catch (Exception ex)
         {
@@ -160,17 +195,6 @@ public class PlayerController : NetworkBehaviour
             _focusedInteractable.OnBlur();
             _focusedInteractable = null;
         }
-    }
-
-    void TryToInteract()
-    {
-        if (_focusedInteractable == null)
-        {
-            //todo: play a sound to indicate failed interaction
-            return;
-        }
-
-        CmdInteractWith(_focusedInteractable.netId);
     }
 
     [Command]

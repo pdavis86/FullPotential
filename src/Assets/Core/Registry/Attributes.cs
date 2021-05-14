@@ -16,6 +16,7 @@ namespace Assets.Core.Registry
         public int Speed;
         public int Recovery;
         public int Duration;
+        public int Luck;
 
         public override int GetHashCode()
         {
@@ -33,6 +34,7 @@ namespace Assets.Core.Registry
                 hash = hash * 139 + Speed.GetHashCode();
                 hash = hash * 149 + Recovery.GetHashCode();
                 hash = hash * 151 + Duration.GetHashCode();
+                hash = hash * 157 + Luck.GetHashCode();
 
                 return hash;
             }

@@ -13,12 +13,31 @@ using UnityEngine.Networking;
 public class JoinOrHostGame : MonoBehaviour
 {
     private NetworkManager _networkManager;
+
+    private string _username;
+    private string _password;
     private string _networkAddress;
     private string _networkPort;
 
     void Start()
     {
         _networkManager = NetworkManager.singleton;
+    }
+
+    public void SetPlayerUsername(string value)
+    {
+        _username = value;
+    }
+
+    public void SetPlayerPassword(string value)
+    {
+        _password = value;
+    }
+
+    public void SignIn()
+    {
+        GameManager.Instance.UserRegistry.SignIn(_username, _password);
+        _username = _password = null;
     }
 
     private void SetNetworkAddressAndPort()

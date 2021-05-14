@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -16,17 +17,16 @@ public class PlayerMovement : MonoBehaviour
     public Camera PlayerCamera;
 
     [SerializeField] private float _speed = 5f;
-    [SerializeField] private float _lookSensitivity = 3f;
+    [SerializeField] private float _lookSensitivity = 0.7f;
     [SerializeField] private float _cameraRotationLimit = 85f;
     [SerializeField] private float _jumpForceMultipler = 10500f;
 
     private Rigidbody _rb;
     private PlayerController _playerController;
 
-    private Vector3 _velocity;
-    private Vector3 _rotation;
+    private Vector2 _moveVal;
+    private Vector2 _lookVal;
     private Vector3 _jumpForce;
-    private float _cameraRotationX;
     private float _currentCameraRotationX;
     private bool _isJumping;
 
@@ -36,24 +36,19 @@ public class PlayerMovement : MonoBehaviour
         _playerController = GetComponent<PlayerController>();
     }
 
-    void Update()
+    void OnMove(InputValue value)
     {
-        try
-        {
-            var moveX = transform.right * Input.GetAxis("Horizontal");
-            var moveZ = transform.forward * Input.GetAxis("Vertical");
-            _velocity = (moveX + moveZ) * _speed;
+        _moveVal = value.Get<Vector2>();
+    }
 
-            _rotation = new Vector3(0f, Input.GetAxisRaw("Mouse X"), 0f) * _lookSensitivity;
+    void OnLook(InputValue value)
+    {
+        _lookVal = value.Get<Vector2>();
+    }
 
-            _cameraRotationX = Input.GetAxisRaw("Mouse Y") * _lookSensitivity;
-
-            _jumpForce = Input.GetButton("Jump") ? Vector3.up * _jumpForceMultipler : Vector3.zero;
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError(ex);
-        }
+    void OnJump()
+    {
+        _jumpForce = Vector3.up * _jumpForceMultipler;
     }
 
     void FixedUpdate()
@@ -64,8 +59,6 @@ public class PlayerMovement : MonoBehaviour
             {
                 PerformMovement();
                 PerformRotation();
-
-                //todo: if within range of interactable, show "Press E to interact"
             }
         }
         catch (Exception ex)
@@ -76,18 +69,22 @@ public class PlayerMovement : MonoBehaviour
 
     void PerformMovement()
     {
-        if (_velocity != Vector3.zero)
+        var moveX = transform.right * _moveVal.x;
+        var moveZ = transform.forward * _moveVal.y;
+        var velocity = (moveX + moveZ) * _speed;
+
+        if (velocity != Vector3.zero)
         {
-            _rb.MovePosition(_rb.position + _velocity * Time.fixedDeltaTime);
+            _rb.MovePosition(_rb.position + velocity * Time.fixedDeltaTime);
         }
 
         if (!_isJumping && _jumpForce != Vector3.zero)
         {
             _isJumping = true;
             _rb.AddForce(_jumpForce * Time.fixedDeltaTime, ForceMode.Acceleration);
+            _jumpForce = Vector3.zero;
         }
-
-        if (_isJumping && _jumpForce == Vector3.zero)
+        else if (_isJumping && _jumpForce == Vector3.zero)
         {
             _isJumping = false;
         }
@@ -95,9 +92,11 @@ public class PlayerMovement : MonoBehaviour
 
     void PerformRotation()
     {
-        _rb.MoveRotation(_rb.rotation * Quaternion.Euler(_rotation));
+        var rotation = new Vector3(0f, _lookVal.x, 0f) * _lookSensitivity;
+        _rb.MoveRotation(_rb.rotation * Quaternion.Euler(rotation));
 
-        _currentCameraRotationX -= _cameraRotationX;
+        var cameraRotationX = _lookVal.y * _lookSensitivity;
+        _currentCameraRotationX -= cameraRotationX;
         _currentCameraRotationX = Mathf.Clamp(_currentCameraRotationX, -_cameraRotationLimit, _cameraRotationLimit);
         PlayerCamera.transform.localEulerAngles = new Vector3(_currentCameraRotationX, 0f, 0f);
     }

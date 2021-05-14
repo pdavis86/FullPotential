@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 // ReSharper disable CheckNamespace
@@ -30,19 +31,13 @@ public class Tooltips : MonoBehaviour
     {
         if (gameObject.activeSelf)
         {
-            //if (!_underPointer)
-            //{
-            //    transform.position = Input.mousePosition + new Vector3(1, 1);
-            //}
-            //else
-            //{
-            //    transform.position = Input.mousePosition + _underOffset;
-            //}
+            //todo: check input position, NOT mouse
+            var mousePosition = Mouse.current.position.ReadValue();
 
-            var underPointer = (Input.mousePosition.y + _rect.sizeDelta.y > Screen.height) && _rect.sizeDelta.y < Screen.height;
-            var leftOfPointer = (Input.mousePosition.x + _rect.sizeDelta.x > Screen.width) && _rect.sizeDelta.x < Screen.width;
+            var underPointer = (mousePosition.y + _rect.sizeDelta.y > Screen.height) && _rect.sizeDelta.y < Screen.height;
+            var leftOfPointer = (mousePosition.x + _rect.sizeDelta.x > Screen.width) && _rect.sizeDelta.x < Screen.width;
 
-            transform.position = Input.mousePosition +
+            transform.position = new Vector3(mousePosition.x, mousePosition.y) +
                 (underPointer ? _underOffset : new Vector3(0, 1))
                 + (leftOfPointer ? _leftOffset : new Vector3(1, 0));
         }

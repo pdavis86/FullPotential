@@ -26,8 +26,8 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
             return;
         }
 
-        //todo: crit? if so, what is it?
-        //todo: half-damage for duel-weilding
+        //todo: implement AttackBehaviourBase crit? if so, what is it?
+        //todo: implement AttackBehaviourBase half-damage for duel-weilding
 
         //todo: give source experience
         Debug.Log($"Source {source.name} would gain experience");
@@ -51,6 +51,11 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
         Debug.Log($"Source '{sourceItem.Name}' attacked target '{target.name}' for {damageDealt} damage");
 
         //todo: For dealing damage, look at https://docs.unity3d.com/2018.1/Documentation/ScriptReference/Networking.SyncEventAttribute.html
+
+
+
+        //todo: check Luck then apply lingering
+
 
         var networkIdentity = SourcePlayer.GetComponent<NetworkIdentity>();
         var controller = SourcePlayer.GetComponent<PlayerController>();

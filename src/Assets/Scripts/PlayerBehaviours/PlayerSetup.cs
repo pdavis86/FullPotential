@@ -27,7 +27,6 @@ public class PlayerSetup : NetworkBehaviour
     private Camera _sceneCamera;
     private PlayerInventory _inventory;
     private bool _loadWasSuccessful;
-    private string _textureUri;
 
     private void Start()
     {
@@ -61,7 +60,7 @@ public class PlayerSetup : NetworkBehaviour
 
         GameManager.Instance.MainCanvasObjects.Hud.SetActive(true);
 
-        CmdHeresMyJoiningDetails(GameManager.Instance.Username);
+        CmdHeresMyJoiningDetails(GameManager.Instance.UserRegistry.Token);
     }
 
     private void OnDisable()
@@ -120,24 +119,23 @@ public class PlayerSetup : NetworkBehaviour
     }
 
     [Command]
-    private void CmdHeresMyJoiningDetails(string username)
+    private void CmdHeresMyJoiningDetails(string token)
     {
-        if (!string.IsNullOrWhiteSpace(username))
+        if (!string.IsNullOrWhiteSpace(token))
         {
-            Username = username;
+            Username = GameManager.Instance.UserRegistry.GetUsername(token);
         }
 
-        //if (!string.IsNullOrWhiteSpace(playerSkinUri))
-        //{
-        //    TextureUri = playerSkinUri;
-        //}
+        PlayerData playerData;
 
         var filePath = GetPlayerSavePath();
         if (System.IO.File.Exists(filePath))
         {
             var loadJson = System.IO.File.ReadAllText(filePath);
 
-            LoadFromJson(loadJson);
+            playerData = JsonUtility.FromJson<PlayerData>(loadJson);
+
+            LoadFromPlayerData(playerData);
 
             if (!isLocalPlayer)
             {
@@ -146,26 +144,21 @@ public class PlayerSetup : NetworkBehaviour
         }
         else
         {
-            LoadFromPlayerData(new PlayerData());
+            playerData = new PlayerData();
+            LoadFromPlayerData(playerData);
         }
 
-        RpcSetPlayerDetails(username, _textureUri);
+        RpcSetPlayerDetails(Username, playerData.TextureUrl);
     }
 
     private void OnLoadPlayerData(NetworkMessage netMsg)
     {
-        LoadFromJson(netMsg.ReadMessage<StringMessage>().value);
-    }
-
-    private void LoadFromJson(string loadJson)
-    {
-        LoadFromPlayerData(JsonUtility.FromJson<PlayerData>(loadJson));
+        var playerData = JsonUtility.FromJson<PlayerData>(netMsg.ReadMessage<StringMessage>().value);
+        LoadFromPlayerData(playerData);
     }
 
     private void LoadFromPlayerData(PlayerData loadData)
     {
-        //todo: set texture URI
-        _textureUri = string.Empty;
         _loadWasSuccessful = _inventory.ApplyChanges(loadData?.Inventory, true);
     }
 

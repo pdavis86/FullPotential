@@ -155,18 +155,23 @@
     },
 
 
-    {
-      "Key": "ui.login.intro",
-      "Value": "Welcome!"
-    },
 	{
-      "Key": "ui.login.username",
+      "Key": "ui.signin.username",
       "Value": "Username..."
     },
 	{
-      "Key": "ui.login.password",
+      "Key": "ui.signin.password",
       "Value": "Password..."
     },
+		{
+      "Key": "ui.signin.button",
+      "Value": "Sign In"
+    },
+	    {
+      "Key": "ui.signin.intro",
+      "Value": "Welcome!"
+    },
+	
 	
 	{
       "Key": "ui.connect.address",

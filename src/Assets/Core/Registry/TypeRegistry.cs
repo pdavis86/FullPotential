@@ -16,6 +16,7 @@ namespace Assets.Core.Registry
 {
     public class TypeRegistry
     {
+        private readonly List<string> _modPaths = new List<string>();
         private readonly List<IGearAccessory> _accessories = new List<IGearAccessory>();
         private readonly List<IGearArmor> _armor = new List<IGearArmor>();
         private readonly List<IGearWeapon> _weapons = new List<IGearWeapon>();
@@ -24,24 +25,6 @@ namespace Assets.Core.Registry
         private readonly List<ISpellShape> _shapes = new List<ISpellShape>();
         private readonly List<ISpellTargeting> _targeting = new List<ISpellTargeting>();
         private readonly Dictionary<string, UnityEngine.GameObject> _loadedAddressables = new Dictionary<string, UnityEngine.GameObject>();
-
-        public void FindAndRegisterAll()
-        {
-            RegisterCoreTypes();
-
-            //todo: how do we scan for registrable types?
-
-            foreach (var t in new Standard.Registration().GetRegisterables())
-            {
-                ValidateAndRegister(t);
-            }
-        }
-
-        public string[] GetRegisteredModPaths()
-        {
-            //todo: set mod paths after discovery
-            return new[] { "Core", "Standard" };
-        }
 
         private void RegisterCoreTypes()
         {
@@ -53,6 +36,23 @@ namespace Assets.Core.Registry
             ValidateAndRegister(typeof(Projectile));
             ValidateAndRegister(typeof(Self));
             ValidateAndRegister(typeof(Touch));
+        }
+
+        public void FindAndRegisterAll()
+        {
+            _modPaths.Add("Core");
+            RegisterCoreTypes();
+
+            _modPaths.Add("Standard");
+            foreach (var t in new Standard.Registration().GetRegisterables())
+            {
+                ValidateAndRegister(t);
+            }
+        }
+
+        public IEnumerable<string> GetRegisteredModPaths()
+        {
+            return _modPaths;
         }
 
         private void ValidateAndRegister(Type type)

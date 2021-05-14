@@ -23,6 +23,10 @@ public class TextLocalizer : MonoBehaviour
 
     void Start()
     {
+        if (GameManager.Instance == null)
+        {
+            return;
+        }
         ResolveStringValue(TranslationId);
         _hasStarted = true;
     }

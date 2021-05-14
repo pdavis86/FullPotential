@@ -113,10 +113,6 @@ namespace Assets.Core.Crafting
                     .Except(elementalEffects.Where(x => x != elementalEffect));
             }
 
-            //todo: deal with lingering
-            //var lingeringEffect = Spell.LingeringPairing.FirstOrDefault(x => x.Key == elementalEffect).Value;
-            //effects = effects.Except(Spell.LingeringOptions.All.Where(x => x != lingeringEffect));
-
             if (craftingType == nameof(Armor) || craftingType == nameof(Accessory))
             {
                 return effects
@@ -129,7 +125,6 @@ namespace Assets.Core.Crafting
 
             if (craftingType == nameof(Weapon))
             {
-                //todo: and lingering
                 return effects
                     .Where(x =>
                         x is IEffectDebuff
@@ -153,14 +148,14 @@ namespace Assets.Core.Crafting
             return effects.ToList();
         }
 
-        private bool IsLucky(int percentageChance)
+        private bool IsSuccess(int percentageChance)
         {
             return _random.Next(1, 101) <= percentageChance;
         }
 
-        private int GetAttributeValueIfLucky(int percentageChance)
+        private int GetAttributeValue(int percentageChance, int cap)
         {
-            return IsLucky(percentageChance) ? _random.Next(1, 100) : 0;
+            return IsSuccess(percentageChance) ? _random.Next(1, cap) : 0;
         }
 
         private IEffect GetRandomEffect()
@@ -170,7 +165,7 @@ namespace Assets.Core.Crafting
 
         private ISpellTargeting GetRandomSpellTargeting()
         {
-            if (IsLucky(50))
+            if (IsSuccess(50))
             {
                 return _spellTargetingOptions.ElementAt(_random.Next(0, _spellTargetingOptions.Count));
             }
@@ -179,45 +174,46 @@ namespace Assets.Core.Crafting
 
         private ISpellShape GetRandomSpellShape()
         {
-            if (IsLucky(10))
+            if (IsSuccess(10))
             {
                 return _spellShapeOptions.ElementAt(_random.Next(0, _spellShapeOptions.Count));
             }
             return null;
         }
 
-        private int GetBiasedNumber(int min, int max)
+        private int GetMinBiasedNumber(int min, int max)
         {
             return min + (int)Math.Round((max - min) * Math.Pow(_random.NextDouble(), 3), 0);
         }
 
-        internal ItemBase GetLootDrop()
+        internal ItemBase GetLootDrop(UnityEngine.GameObject playerGameObject)
         {
-            //todo: limit good drops to higher level players
-            //todo: add small posibility of returning a Relic
+            //todo: get player level from playerGameObject
+            var playerLevel = 100;
 
             var lootDrop = new Loot
             {
                 Id = Guid.NewGuid().ToString(),
                 Attributes = new Attributes
                 {
-                    IsAutomatic = IsLucky(50),
-                    IsSoulbound = IsLucky(10),
-                    ExtraAmmoPerShot = IsLucky(20) ? _random.Next(1, 4) : 0,
-                    Strength = GetAttributeValueIfLucky(75),
-                    Efficiency = GetAttributeValueIfLucky(75),
-                    Range = GetAttributeValueIfLucky(75),
-                    Accuracy = GetAttributeValueIfLucky(75),
-                    Speed = GetAttributeValueIfLucky(75),
-                    Recovery = GetAttributeValueIfLucky(75),
-                    Duration = GetAttributeValueIfLucky(75)
+                    IsAutomatic = IsSuccess(50),
+                    IsSoulbound = IsSuccess(10),
+                    ExtraAmmoPerShot = IsSuccess(20) ? _random.Next(1, 4) : 0,
+                    Strength = GetAttributeValue(75, playerLevel),
+                    Efficiency = GetAttributeValue(75, playerLevel),
+                    Range = GetAttributeValue(75, playerLevel),
+                    Accuracy = GetAttributeValue(75, playerLevel),
+                    Speed = GetAttributeValue(75, playerLevel),
+                    Recovery = GetAttributeValue(75, playerLevel),
+                    Duration = GetAttributeValue(75, playerLevel),
+                    Luck = GetAttributeValue(75, playerLevel)
                 }
             };
 
             var magicalLootTypes = _lootTypes.Where(x => x.Category == ILoot.LootCategory.Magic);
             var techLootTypes = _lootTypes.Where(x => x.Category == ILoot.LootCategory.Technology);
 
-            var isMagical = magicalLootTypes.Any() && IsLucky(50);
+            var isMagical = magicalLootTypes.Any() && IsSuccess(50);
             if (isMagical)
             {
                 lootDrop.RegistryType = magicalLootTypes
@@ -225,7 +221,7 @@ namespace Assets.Core.Crafting
                     .First();
 
                 var effects = new List<IEffect>();
-                var numberOfEffects = GetBiasedNumber(1, Math.Min(4, _effectsForLoot.Count));
+                var numberOfEffects = GetMinBiasedNumber(1, Math.Min(4, _effectsForLoot.Count));
                 for (var i = 1; i <= numberOfEffects; i++)
                 {
                     IEffect effect;
@@ -244,13 +240,6 @@ namespace Assets.Core.Crafting
                     }
                 }
 
-                //todo: deal with lingering
-                //var elementalEffect = lootDrop.Effects.Intersect(Spell.ElementalEffects.All).FirstOrDefault();
-                //if (!string.IsNullOrWhiteSpace(elementalEffect) && Spell.LingeringPairing.ContainsKey(elementalEffect) && ChanceWin(50) == 0)
-                //{
-                //    lootDrop.Effects.Add(Spell.LingeringPairing[elementalEffect]);
-                //}
-
                 lootDrop.Effects = effects.ToList();
 
                 lootDrop.Targeting = GetRandomSpellTargeting();
@@ -268,8 +257,6 @@ namespace Assets.Core.Crafting
             var typeTranslation = _localizer.Translate("crafting.loot.type");
             var suffix = int.Parse(lootDrop.GetHashCode().ToString().TrimStart('-').Substring(5));
             lootDrop.Name = $"{_localizer.GetTranslatedTypeName(lootDrop.RegistryType)} ({typeTranslation} #{suffix.ToString("D5", CultureInfo.InvariantCulture)})";
-
-            //todo: icon
 
             return lootDrop;
         }
