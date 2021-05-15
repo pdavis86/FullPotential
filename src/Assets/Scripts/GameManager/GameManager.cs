@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 // ReSharper disable CheckNamespace
@@ -56,8 +57,12 @@ public class GameManager : MonoBehaviour
 
         Localizer = new Assets.Core.Localization.Localizer(TypeRegistry.GetRegisteredModPaths());
 
-        //todo: get culture from settings
-        var culture = "en-GB"; // ?? Localizer.GetAvailableCultures().First();
+        var culture = GetLastUsedCulture();
+        if (string.IsNullOrWhiteSpace(culture))
+        {
+            culture = Localizer.GetAvailableCultures().First();
+            SetLastUsedCulture(culture);
+        }
 
         await Localizer.LoadLocalizationFiles(culture);
 
@@ -69,6 +74,28 @@ public class GameManager : MonoBehaviour
         Prefabs = GetComponent<Prefabs>();
 
         SceneManager.LoadSceneAsync(1);
+    }
+
+    private static string GetAppLoadOptions()
+    {
+        return System.IO.Path.Combine(Application.persistentDataPath, "LoadOptions.json");
+    }
+
+    public static void SetLastUsedCulture(string culture)
+    {
+        System.IO.File.WriteAllText(GetAppLoadOptions(), culture);
+    }
+
+    public static string GetLastUsedCulture()
+    {
+        var path = GetAppLoadOptions();
+
+        if (!System.IO.File.Exists(path))
+        {
+            return null;
+        }
+
+        return System.IO.File.ReadAllText(path);
     }
 
     public static void Quit()

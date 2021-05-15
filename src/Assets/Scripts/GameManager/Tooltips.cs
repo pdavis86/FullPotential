@@ -31,13 +31,12 @@ public class Tooltips : MonoBehaviour
     {
         if (gameObject.activeSelf)
         {
-            //todo: check input position, NOT mouse
-            var mousePosition = Mouse.current.position.ReadValue();
+            var pointerPosition = Mouse.current.position.ReadValue();
 
-            var underPointer = (mousePosition.y + _rect.sizeDelta.y > Screen.height) && _rect.sizeDelta.y < Screen.height;
-            var leftOfPointer = (mousePosition.x + _rect.sizeDelta.x > Screen.width) && _rect.sizeDelta.x < Screen.width;
+            var underPointer = (pointerPosition.y + _rect.sizeDelta.y > Screen.height) && _rect.sizeDelta.y < Screen.height;
+            var leftOfPointer = (pointerPosition.x + _rect.sizeDelta.x > Screen.width) && _rect.sizeDelta.x < Screen.width;
 
-            transform.position = new Vector3(mousePosition.x, mousePosition.y) +
+            transform.position = new Vector3(pointerPosition.x, pointerPosition.y) +
                 (underPointer ? _underOffset : new Vector3(0, 1))
                 + (leftOfPointer ? _leftOffset : new Vector3(1, 0));
         }

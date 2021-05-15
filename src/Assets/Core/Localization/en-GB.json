@@ -153,6 +153,10 @@
       "Key": "ui.quit",
       "Value": "Quit"
     },
+	{
+      "Key": "ui.close",
+      "Value": "Close"
+    },
 
 
 	{
@@ -227,6 +231,12 @@
 	{
       "Key": "ui.interact.shop",
       "Value": "Press '{0}' to shop"
+    },
+	
+	
+	{
+      "Key": "ui.settings.language",
+      "Value": "Language"
     }
 
   ]

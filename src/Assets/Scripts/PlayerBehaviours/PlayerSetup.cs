@@ -112,43 +112,20 @@ public class PlayerSetup : NetworkBehaviour
         }
     }
 
-    private string GetPlayerSavePath()
-    {
-        //todo: filename should be their user ID, not the device ID
-        return System.IO.Path.Combine(Application.persistentDataPath, SystemInfo.deviceUniqueIdentifier + ".json");
-    }
-
     [Command]
     private void CmdHeresMyJoiningDetails(string token)
     {
-        if (!string.IsNullOrWhiteSpace(token))
+        var playerData = GameManager.Instance.UserRegistry.Load(token);
+
+        LoadFromPlayerData(playerData);
+
+        if (!isLocalPlayer)
         {
-            Username = GameManager.Instance.UserRegistry.GetUsername(token);
+            var loadJson = JsonUtility.ToJson(playerData);
+            connectionToClient.Send(Assets.Core.Networking.MessageIds.LoadPlayerData, new StringMessage(loadJson));
         }
 
-        PlayerData playerData;
-
-        var filePath = GetPlayerSavePath();
-        if (System.IO.File.Exists(filePath))
-        {
-            var loadJson = System.IO.File.ReadAllText(filePath);
-
-            playerData = JsonUtility.FromJson<PlayerData>(loadJson);
-
-            LoadFromPlayerData(playerData);
-
-            if (!isLocalPlayer)
-            {
-                connectionToClient.Send(Assets.Core.Networking.MessageIds.LoadPlayerData, new StringMessage(loadJson));
-            }
-        }
-        else
-        {
-            playerData = new PlayerData();
-            LoadFromPlayerData(playerData);
-        }
-
-        RpcSetPlayerDetails(Username, playerData.TextureUrl);
+        RpcSetPlayerDetails(Username, playerData.Options.TextureUrl);
     }
 
     private void OnLoadPlayerData(NetworkMessage netMsg)
@@ -157,9 +134,10 @@ public class PlayerSetup : NetworkBehaviour
         LoadFromPlayerData(playerData);
     }
 
-    private void LoadFromPlayerData(PlayerData loadData)
+    private void LoadFromPlayerData(PlayerData playerData)
     {
-        _loadWasSuccessful = _inventory.ApplyChanges(loadData?.Inventory, true);
+        Username = playerData.Username;
+        _loadWasSuccessful = _inventory.ApplyChanges(playerData?.Inventory, true);
     }
 
     [Server]
@@ -184,9 +162,7 @@ public class PlayerSetup : NetworkBehaviour
         //    return;
         //}
 
-        var prettyPrint = Debug.isDebugBuild;
-        var saveJson = JsonUtility.ToJson(saveData, prettyPrint);
-        System.IO.File.WriteAllText(GetPlayerSavePath(), saveJson);
+        GameManager.Instance.UserRegistry.Save(saveData);
     }
 
 }

@@ -19,8 +19,9 @@ public class TempGiveLoot : Interactable
 
     public override void OnInteract(NetworkInstanceId playerNetId)
     {
+        var loot = GameManager.Instance.ResultFactory.GetLootDrop();
+
         var playerObj = NetworkServer.FindLocalObject(playerNetId);
-        var loot = GameManager.Instance.ResultFactory.GetLootDrop(playerObj);
         playerObj.GetComponent<PlayerInventory>().Add(loot);
     }
 

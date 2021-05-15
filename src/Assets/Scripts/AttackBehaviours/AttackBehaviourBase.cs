@@ -28,6 +28,7 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
 
         //todo: implement AttackBehaviourBase crit? if so, what is it?
         //todo: implement AttackBehaviourBase half-damage for duel-weilding
+        //todo: show when elemental effects are in use - GameManager.Instance.Prefabs.Combat.ElementalText
 
         //todo: give source experience
         Debug.Log($"Source {source.name} would gain experience");

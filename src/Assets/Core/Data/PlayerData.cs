@@ -4,7 +4,7 @@
     public class PlayerData
     {
         public string Username;
-        public string TextureUrl;
+        public Options Options;
         public Inventory Inventory;
     }
 }

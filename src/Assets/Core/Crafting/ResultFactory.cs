@@ -153,9 +153,9 @@ namespace Assets.Core.Crafting
             return _random.Next(1, 101) <= percentageChance;
         }
 
-        private int GetAttributeValue(int percentageChance, int cap)
+        private int GetAttributeValue(int percentageChance)
         {
-            return IsSuccess(percentageChance) ? _random.Next(1, cap) : 0;
+            return IsSuccess(percentageChance) ? _random.Next(1, 100) : 0;
         }
 
         private IEffect GetRandomEffect()
@@ -186,11 +186,8 @@ namespace Assets.Core.Crafting
             return min + (int)Math.Round((max - min) * Math.Pow(_random.NextDouble(), 3), 0);
         }
 
-        internal ItemBase GetLootDrop(UnityEngine.GameObject playerGameObject)
+        internal ItemBase GetLootDrop()
         {
-            //todo: get player level from playerGameObject
-            var playerLevel = 100;
-
             var lootDrop = new Loot
             {
                 Id = Guid.NewGuid().ToString(),
@@ -199,14 +196,14 @@ namespace Assets.Core.Crafting
                     IsAutomatic = IsSuccess(50),
                     IsSoulbound = IsSuccess(10),
                     ExtraAmmoPerShot = IsSuccess(20) ? _random.Next(1, 4) : 0,
-                    Strength = GetAttributeValue(75, playerLevel),
-                    Efficiency = GetAttributeValue(75, playerLevel),
-                    Range = GetAttributeValue(75, playerLevel),
-                    Accuracy = GetAttributeValue(75, playerLevel),
-                    Speed = GetAttributeValue(75, playerLevel),
-                    Recovery = GetAttributeValue(75, playerLevel),
-                    Duration = GetAttributeValue(75, playerLevel),
-                    Luck = GetAttributeValue(75, playerLevel)
+                    Strength = GetAttributeValue(75),
+                    Efficiency = GetAttributeValue(75),
+                    Range = GetAttributeValue(75),
+                    Accuracy = GetAttributeValue(75),
+                    Speed = GetAttributeValue(75),
+                    Recovery = GetAttributeValue(75),
+                    Duration = GetAttributeValue(75),
+                    Luck = GetAttributeValue(75)
                 }
             };
 

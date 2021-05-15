@@ -70,11 +70,21 @@ public class PlayerController : NetworkBehaviour
 
     void OnLeftAttack()
     {
+        if (HasMenuOpen)
+        {
+            return;
+        }
+
         TryToAttack(true);
     }
 
     void OnRightAttack()
     {
+        if (HasMenuOpen)
+        {
+            return;
+        }
+
         TryToAttack(false);
     }
 
@@ -124,14 +134,14 @@ public class PlayerController : NetworkBehaviour
                     _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.CharacterMenu);
                 }
 
-                HasMenuOpen = _mainCanvasObjects.IsAnyMenuOpen();
-                _mainCanvasObjects.Hud.SetActive(!HasMenuOpen);
-
                 Tooltips.HideTooltip();
 
                 _toggleGameMenu = false;
                 _toggleCharacterMenu = false;
             }
+
+            HasMenuOpen = _mainCanvasObjects.IsAnyMenuOpen();
+            _mainCanvasObjects.Hud.SetActive(!HasMenuOpen);
 
             if (HasMenuOpen)
             {
@@ -213,7 +223,7 @@ public class PlayerController : NetworkBehaviour
 
     void TryToAttack(bool leftHand)
     {
-        //todo: implement this
+        //todo: implement attack animations and actions
         CmdCastSpell(leftHand);
     }
 

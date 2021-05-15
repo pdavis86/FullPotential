@@ -61,6 +61,7 @@ public class JoinOrHostGame : MonoBehaviour
 
     public void JoinGame()
     {
+        SignIn();
         SetNetworkAddressAndPort();
         _networkManager.StartClient();
     }

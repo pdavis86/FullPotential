@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -23,6 +25,8 @@ public class MainCanvasObjects : MonoBehaviour
     public GameObject CraftingUi;
     public GameObject EscMenu;
     public GameObject CharacterMenu;
+    public GameObject SettingsUi;
+    private List<GameObject> _menus;
 
     // ReSharper disable once ArrangeAccessorOwnerBody
     private static MainCanvasObjects _instance;
@@ -40,20 +44,27 @@ public class MainCanvasObjects : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         TooltipOverlay.SetActive(true);
+
+        //NOTE: Be sure to add any new menus!
+        _menus.AddRange(new[] {
+            CraftingUi,
+            EscMenu,
+            CharacterMenu,
+            SettingsUi
+        });
     }
 
     public void HideAllMenus()
     {
-        CraftingUi.SetActive(false);
-        EscMenu.SetActive(false);
-        CharacterMenu.SetActive(false);
+        foreach (var menu in _menus)
+        {
+            menu.SetActive(false);
+        }
     }
 
     public bool IsAnyMenuOpen()
     {
-        return CraftingUi.activeSelf
-            || EscMenu.activeSelf
-            || CharacterMenu.activeSelf;
+        return _menus.Any(x => x.activeSelf);
     }
 
     public void HideOthersOpenThis(GameObject ui)

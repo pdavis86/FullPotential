@@ -18,7 +18,7 @@ public class Prefabs : MonoBehaviour
     {
         public GameObject Spell;
         public GameObject HitText;
-        //todo: show when elemental effects are in use - public GameObject ElementalText;
+        public GameObject ElementalText;
     }
 
 }
