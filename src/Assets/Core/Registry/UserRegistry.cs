@@ -10,6 +10,12 @@ namespace Assets.Core.Registry
         public void SignIn(string username, string password)
         {
             //todo: implement UserRegistry.SignIn()
+
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                username = SystemInfo.deviceUniqueIdentifier;
+            }
+
             Token = username;
         }
 
@@ -17,10 +23,7 @@ namespace Assets.Core.Registry
         {
             if (string.IsNullOrWhiteSpace(username))
             {
-                //todo: remove
-                username = SystemInfo.deviceUniqueIdentifier;
-
-                //todo: throw new System.ArgumentException($"No username supplied to {nameof(GetPlayerSavePath)}()");
+                throw new System.ArgumentException($"No username supplied to {nameof(GetPlayerSavePath)}()");
             }
 
             //todo: username must be a filesystem-safe string
@@ -42,7 +45,14 @@ namespace Assets.Core.Registry
             }
 
             var loadJson = System.IO.File.ReadAllText(filePath);
-            return JsonUtility.FromJson<PlayerData>(loadJson);
+            var playerData = JsonUtility.FromJson<PlayerData>(loadJson);
+
+            if (string.IsNullOrWhiteSpace(playerData.Username))
+            {
+                playerData.Username = username;
+            }
+
+            return playerData;
         }
 
         public void Save(PlayerData playerData)

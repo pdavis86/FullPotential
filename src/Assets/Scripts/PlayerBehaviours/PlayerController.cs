@@ -42,6 +42,7 @@ public class PlayerController : NetworkBehaviour
         _inventory = GetComponent<PlayerInventory>();
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity Input System Event")]
     void OnInteract()
     {
         if (HasMenuOpen)
@@ -58,16 +59,19 @@ public class PlayerController : NetworkBehaviour
         CmdInteractWith(_focusedInteractable.netId);
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity Input System Event")]
     void OnOpenCharacterMenu()
     {
         _toggleCharacterMenu = true;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity Input System Event")]
     void OnCancel()
     {
         _toggleGameMenu = true;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity Input System Event")]
     void OnLeftAttack()
     {
         if (HasMenuOpen)
@@ -78,6 +82,7 @@ public class PlayerController : NetworkBehaviour
         TryToAttack(true);
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity Input System Event")]
     void OnRightAttack()
     {
         if (HasMenuOpen)
@@ -223,7 +228,6 @@ public class PlayerController : NetworkBehaviour
 
     void TryToAttack(bool leftHand)
     {
-        //todo: implement attack animations and actions
         CmdCastSpell(leftHand);
     }
 

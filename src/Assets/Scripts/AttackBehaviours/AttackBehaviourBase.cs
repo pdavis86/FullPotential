@@ -57,9 +57,11 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
 
         //todo: check Luck then apply lingering
 
-
+        //todo: get these in Start()
         var networkIdentity = SourcePlayer.GetComponent<NetworkIdentity>();
         var controller = SourcePlayer.GetComponent<PlayerController>();
+
+
         controller.TargetRpcShowDamage(networkIdentity.connectionToClient, position, damageDealt.ToString(CultureInfo.InvariantCulture));
     }
 

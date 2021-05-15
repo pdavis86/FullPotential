@@ -46,6 +46,7 @@ public class MainCanvasObjects : MonoBehaviour
         TooltipOverlay.SetActive(true);
 
         //NOTE: Be sure to add any new menus!
+        _menus = new List<GameObject>();
         _menus.AddRange(new[] {
             CraftingUi,
             EscMenu,

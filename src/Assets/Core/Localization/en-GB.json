@@ -154,8 +154,8 @@
       "Value": "Quit"
     },
 	{
-      "Key": "ui.close",
-      "Value": "Close"
+      "Key": "ui.save",
+      "Value": "Save"
     },
 
 
@@ -237,6 +237,34 @@
 	{
       "Key": "ui.settings.language",
       "Value": "Language"
+    },
+	{
+		"Key": "ui.settings.skin",
+		"Value": "Skin URL"
+	},
+	{
+		"Key": "ui.settings.skinplaceholder",
+		"Value": "Enter URL..."
+	},
+	
+	
+	{
+      "Key": "ui.alert.itemadded",
+      "Value": "{0} was added"
+    },
+	{
+      "Key": "ui.alert.itemsadded",
+      "Value": "Added {0} items"
+    },
+	
+	
+	{
+      "Key": "culture.en-gb",
+      "Value": "English (United Kingdom)"
+    },
+	{
+      "Key": "culture.en-pirate",
+      "Value": "English (Pirate)"
     }
 
   ]

@@ -24,6 +24,9 @@ public class PlayerSetup : NetworkBehaviour
     [SyncVar]
     public string Username;
 
+    [SyncVar]
+    public string TextureUrl;
+
     private Camera _sceneCamera;
     private PlayerInventory _inventory;
     private bool _loadWasSuccessful;
@@ -37,7 +40,8 @@ public class PlayerSetup : NetworkBehaviour
         if (!isLocalPlayer)
         {
             gameObject.GetComponent<PlayerController>().enabled = false;
-            _nameTag.text = string.IsNullOrWhiteSpace(Username) ? "Player " + netId.Value : Username;
+            SetNameTag();
+            SetTexture();
             return;
         }
 
@@ -72,15 +76,65 @@ public class PlayerSetup : NetworkBehaviour
 
         if (GameManager.Instance != null)
         {
-            if (GameManager.Instance.MainCanvasObjects.Hud != null) { GameManager.Instance.MainCanvasObjects.Hud.SetActive(false); }
-            if (_sceneCamera != null) { _sceneCamera.gameObject.SetActive(true); }
+            GameManager.Instance.MainCanvasObjects.Hud.SetActive(false);
+        }
+
+        if (_sceneCamera != null)
+        {
+            _sceneCamera.gameObject.SetActive(true);
         }
     }
 
-    private void SetPlayerTexture(string playerSkinUri)
+    [Command]
+    private void CmdHeresMyJoiningDetails(string token)
     {
+        var playerData = GameManager.Instance.UserRegistry.Load(token);
+
+        if (playerData.Options == null)
+        {
+            playerData.Options = new Options();
+        }
+        if (string.IsNullOrWhiteSpace(playerData.Options.Culture))
+        {
+            playerData.Options.Culture = GameManager.Instance.Localizer.CurrentCulture;
+        }
+
+        LoadFromPlayerData(playerData);
+
+        if (!isLocalPlayer)
+        {
+            var loadJson = JsonUtility.ToJson(playerData);
+            connectionToClient.Send(Assets.Core.Networking.MessageIds.LoadPlayerData, new StringMessage(loadJson));
+        }
+
+        RpcSetPlayerDetails();
+    }
+
+    [ClientRpc]
+    private void RpcSetPlayerDetails()
+    {
+        if (!isLocalPlayer)
+        {
+            SetNameTag();
+        }
+
+        SetTexture();
+    }
+
+    private void SetNameTag()
+    {
+        _nameTag.text = string.IsNullOrWhiteSpace(Username) ? "Player " + netId.Value : Username;
+    }
+
+    private void SetTexture()
+    {
+        if (string.IsNullOrWhiteSpace(TextureUrl))
+        {
+            return;
+        }
+
         //todo: download player texture
-        var filePath = playerSkinUri;
+        var filePath = TextureUrl;
 
         var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
         tex.LoadImage(System.IO.File.ReadAllBytes(filePath));
@@ -98,34 +152,18 @@ public class PlayerSetup : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
-    private void RpcSetPlayerDetails(string username, string playerSkinUri)
-    {
-        if (!isLocalPlayer)
-        {
-            _nameTag.text = string.IsNullOrWhiteSpace(username) ? "Player " + netId.Value : username;
-        }
+    //public void UpdateTexture(string textureUrl)
+    //{
+    //    //todo: store the new textureUrl
 
-        if (!string.IsNullOrWhiteSpace(playerSkinUri))
-        {
-            SetPlayerTexture(playerSkinUri);
-        }
-    }
+    //    CmdUpdateTexture(textureUrl);
+    //}
 
     [Command]
-    private void CmdHeresMyJoiningDetails(string token)
+    public void CmdUpdateTexture(string textureUrl)
     {
-        var playerData = GameManager.Instance.UserRegistry.Load(token);
-
-        LoadFromPlayerData(playerData);
-
-        if (!isLocalPlayer)
-        {
-            var loadJson = JsonUtility.ToJson(playerData);
-            connectionToClient.Send(Assets.Core.Networking.MessageIds.LoadPlayerData, new StringMessage(loadJson));
-        }
-
-        RpcSetPlayerDetails(Username, playerData.Options.TextureUrl);
+        TextureUrl = textureUrl;
+        RpcSetPlayerDetails();
     }
 
     private void OnLoadPlayerData(NetworkMessage netMsg)
@@ -137,6 +175,10 @@ public class PlayerSetup : NetworkBehaviour
     private void LoadFromPlayerData(PlayerData playerData)
     {
         Username = playerData.Username;
+        TextureUrl = playerData.Options.TextureUrl;
+
+        GameManager.Instance.MainCanvasObjects.SettingsUi.GetComponent<SettingsMenuUi>().LoadFromPlayerData(playerData);
+
         _loadWasSuccessful = _inventory.ApplyChanges(playerData?.Inventory, true);
     }
 
@@ -153,6 +195,7 @@ public class PlayerSetup : NetworkBehaviour
 
         var saveData = new PlayerData
         {
+            Username = Username,
             Inventory = _inventory.GetSaveData()
         };
 

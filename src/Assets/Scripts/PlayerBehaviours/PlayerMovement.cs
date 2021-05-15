@@ -36,16 +36,19 @@ public class PlayerMovement : MonoBehaviour
         _playerController = GetComponent<PlayerController>();
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity Input System Event")]
     void OnMove(InputValue value)
     {
         _moveVal = value.Get<Vector2>();
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity Input System Event")]
     void OnLook(InputValue value)
     {
         _lookVal = value.Get<Vector2>();
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity Input System Event")]
     void OnJump()
     {
         _jumpForce = Vector3.up * _jumpForceMultipler;

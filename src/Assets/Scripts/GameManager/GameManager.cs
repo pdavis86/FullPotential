@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour
         var culture = GetLastUsedCulture();
         if (string.IsNullOrWhiteSpace(culture))
         {
-            culture = Localizer.GetAvailableCultures().First();
+            culture = Localizer.GetAvailableCultureCodes().First();
             SetLastUsedCulture(culture);
         }
 
@@ -100,6 +100,8 @@ public class GameManager : MonoBehaviour
 
     public static void Quit()
     {
+        JoinOrHostGame.Disconnect();
+
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else

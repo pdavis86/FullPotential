@@ -33,6 +33,8 @@ public class PlayerInventory : NetworkBehaviour
     public GameObject[] EquippedObjects;
 
     private PlayerController _playerController;
+    private CraftingUi _craftingUi;
+    private Hud _hud;
 
     //todo: Cache effective stats based on armour
 
@@ -73,6 +75,9 @@ public class PlayerInventory : NetworkBehaviour
         }
 
         _playerController = GetComponent<PlayerController>();
+
+        _craftingUi = GameManager.Instance.MainCanvasObjects.CraftingUi.GetComponent<CraftingUi>();
+        _hud = GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>();
     }
 
     private void OnInventoryChange(NetworkMessage netMsg)
@@ -138,17 +143,18 @@ public class PlayerInventory : NetworkBehaviour
 
                 if (addedItemsCount == 1)
                 {
-                    //todo: make this a slide-out alert instead
-                    Debug.Log($"{addedItems.First().Name} was added");
+                    var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemadded");
+                    _hud.ShowAlert(string.Format(alertText, addedItems.First().Name));
                 }
                 else
                 {
-                    //todo: make this a slide-out alert instead
-                    Debug.Log($"Added {addedItemsCount} items to the inventory after handling message on " + (isServer ? "server" : "client") + " for " + gameObject.name);
+                    var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemsadded");
+                    _hud.ShowAlert(string.Format(alertText, addedItemsCount));
+                    //Debug.Log($"Added {addedItemsCount} items to the inventory after handling message on {(isServer ? "server" : "client")} for {gameObject.name}");
                 }
             }
 
-            if (changes.EquipSlots != null)
+            if (changes.EquipSlots != null && changes.EquipSlots.Any())
             {
                 if (changes.EquipSlots.Length == EquipSlots.Length)
                 {
@@ -166,9 +172,8 @@ public class PlayerInventory : NetworkBehaviour
 
             if (_playerController != null && _playerController.HasMenuOpen && GameManager.Instance.MainCanvasObjects.CraftingUi.activeSelf)
             {
-                var uiScript = GameManager.Instance.MainCanvasObjects.CraftingUi.GetComponent<CraftingUi>();
-                uiScript.ResetUi();
-                uiScript.LoadInventory();
+                _craftingUi.ResetUi();
+                _craftingUi.LoadInventory();
             }
 
             return true;
@@ -186,7 +191,7 @@ public class PlayerInventory : NetworkBehaviour
         {
             Debug.LogWarning("Incoming EquipSlots length differed to existing");
 
-            for (var i = 0; i < EquipSlots.Length; i++)
+            for (var i = 0; i < Math.Min(EquipSlots.Length, changes.EquipSlots.Length); i++)
             {
                 EquipSlots[i] = changes.EquipSlots[i];
             }
@@ -304,8 +309,6 @@ public class PlayerInventory : NetworkBehaviour
     [Command]
     public void CmdCraftItem(string[] componentIds, string categoryName, string craftableTypeName, bool isTwoHanded, string itemName)
     {
-        //todo: add a min level to craftedResult
-
         var components = GetComponentsFromIds(componentIds);
 
         if (components.Count != componentIds.Length)

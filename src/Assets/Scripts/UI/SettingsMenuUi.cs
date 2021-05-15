@@ -1,3 +1,6 @@
+using Assets.Core.Data;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,10 +12,24 @@ public class SettingsMenuUi : MonoBehaviour
     [SerializeField]
     private Dropdown _languageDropDown;
 
+    [SerializeField]
+    private InputField _skinUrlInput;
+
+    private Dictionary<string, string> _cultures;
+
+    private void LoadCultures()
+    {
+        if (_cultures == null)
+        {
+            _cultures = GameManager.Instance.Localizer.GetAvailableCultures();
+        }
+    }
+
     void Awake()
     {
+        LoadCultures();
         _languageDropDown.options.Clear();
-        _languageDropDown.AddOptions(GameManager.Instance.Localizer.GetAvailableCultures());
+        _languageDropDown.AddOptions(_cultures.Select(x => x.Value).ToList());
 
         //    if (!string.IsNullOrWhiteSpace(GameManager.Instance.PlayerSkinUrl))
         //    {
@@ -36,10 +53,36 @@ public class SettingsMenuUi : MonoBehaviour
         //    }
     }
 
-    public void SetLanguage(string value)
+    public void LoadFromPlayerData(PlayerData playerData)
     {
-        Debug.Log("Setting language to " + value);
-        GameManager.SetLastUsedCulture(value);
+        LoadCultures();
+
+        int i;
+        for (i = 0; i < _cultures.Count; i++)
+        {
+            if (_cultures.ElementAt(i).Key == playerData.Options.Culture)
+            {
+                break;
+            }
+        }
+        _languageDropDown.value = i;
+
+        _skinUrlInput.text = playerData.Options.TextureUrl;
+    }
+
+    public void SetLanguage(int index) //string value)
+    {
+        var match = _cultures.ElementAt(index);
+
+        Debug.Log("Setting language to " + match.Value);
+
+        GameManager.SetLastUsedCulture(match.Key);
+    }
+
+    public void SaveAndClose()
+    {
+        GameManager.Instance.LocalPlayer.GetComponent<PlayerSetup>().CmdUpdateTexture(_skinUrlInput.text);
+        GameManager.Instance.MainCanvasObjects.HideAllMenus();
     }
 
 }

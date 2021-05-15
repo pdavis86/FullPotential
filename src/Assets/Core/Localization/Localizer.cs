@@ -20,12 +20,14 @@ namespace Assets.Core.Localization
         private readonly IEnumerable<string> _modPathStems;
         private Dictionary<string, string> _translations;
 
+        public string CurrentCulture { get; private set; }
+
         public Localizer(IEnumerable<string> modPathStems)
         {
             _modPathStems = modPathStems;
         }
 
-        public List<string> GetAvailableCultures()
+        public List<string> GetAvailableCultureCodes()
         {
             var cultures = new List<string>();
             foreach (var rl in Addressables.ResourceLocators)
@@ -35,6 +37,16 @@ namespace Assets.Core.Localization
                     .Where(x => x.StartsWith("Core/Localization/") && x.EndsWith(".json"))
                     .Select(System.IO.Path.GetFileNameWithoutExtension)
                     );
+            }
+            return cultures;
+        }
+
+        public Dictionary<string, string> GetAvailableCultures()
+        {
+            var cultures = new Dictionary<string, string>();
+            foreach (var code in GetAvailableCultureCodes())
+            {
+                cultures.Add(code, Translate("culture." + code));
             }
             return cultures;
         }
@@ -53,13 +65,19 @@ namespace Assets.Core.Localization
 
                 if (checkTask.Result.Count == 0)
                 {
-                    Debug.LogError($"Failed to find translations for '{address}'");
-                    continue;
+                    //NOTE: Failure to find the file causes the app to hang
+                    throw new System.Exception($"Failed to find translations for '{address}'");
                 }
 
                 var loadTask = Addressables.LoadAssetAsync<TextAsset>(address).Task;
                 await loadTask;
                 var data = JsonUtility.FromJson<Assets.Core.Data.Localization>(loadTask.Result.text);
+
+                if (data?.Translations == null)
+                {
+                    throw new System.Exception($"Failed to load any translations from '{address}'");
+                }
+
                 foreach (var item in data.Translations)
                 {
                     if (_translations.ContainsKey(item.Key))
@@ -74,6 +92,8 @@ namespace Assets.Core.Localization
 
                 Addressables.Release(loadTask.Result);
             }
+
+            CurrentCulture = culture;
 
             return true;
         }
