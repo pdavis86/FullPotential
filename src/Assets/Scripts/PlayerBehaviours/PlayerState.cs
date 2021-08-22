@@ -40,6 +40,7 @@ public class PlayerState : NetworkBehaviour
         TextureUrl.OnValueChanged += OnTextureChanged;
 
         _inventory = GetComponent<PlayerInventory>();
+
         GameManager.Instance.DataStore.LocalPlayer = gameObject;
     }
 
@@ -63,8 +64,6 @@ public class PlayerState : NetworkBehaviour
 
         CustomMessagingManager.RegisterNamedMessageHandler(nameof(Assets.Core.Networking.MessageType.LoadPlayerData), OnLoadPlayerData);
         RequestPlayerDataServerRpc();
-
-        GameManager.Instance.MainCanvasObjects.Hud.SetActive(true);
     }
 
     private void OnDisable()
@@ -104,7 +103,7 @@ public class PlayerState : NetworkBehaviour
         using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
         {
             writer.WriteString(json);
-            CustomMessagingManager.SendNamedMessage(nameof(Assets.Core.Networking.MessageType.LoadPlayerData), ClientId.Value, stream);
+            CustomMessagingManager.SendNamedMessage(nameof(Assets.Core.Networking.MessageType.LoadPlayerData), OwnerClientId, stream);
         }
     }
 

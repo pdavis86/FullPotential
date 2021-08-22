@@ -25,16 +25,10 @@ public class PlayerInventory : NetworkBehaviour
 {
     public int MaxItems = 30;
 
-    [HideInInspector]
-    public List<ItemBase> Items;
+    [HideInInspector] public List<ItemBase> Items;
+    [HideInInspector] public string[] EquipSlots;
+    [HideInInspector] public GameObject[] EquippedObjects;
 
-    [HideInInspector]
-    public string[] EquipSlots;
-
-    [HideInInspector]
-    public GameObject[] EquippedObjects;
-
-    private PlayerState _playerState;
     private PlayerClientSide _playerClientSide;
     private CraftingUi _craftingUi;
 
@@ -62,15 +56,14 @@ public class PlayerInventory : NetworkBehaviour
         var slotCount = Enum.GetNames(typeof(SlotIndexToGameObjectName)).Length;
         EquipSlots = new string[slotCount];
         EquippedObjects = new GameObject[slotCount];
+
+        _playerClientSide = GetComponent<PlayerClientSide>();
+
+        _craftingUi = GameManager.Instance.MainCanvasObjects.CraftingUi.GetComponent<CraftingUi>();
     }
 
     private void Start()
     {
-        _playerState = GetComponent<PlayerState>();
-        _playerClientSide = GetComponent<PlayerClientSide>();
-
-        _craftingUi = GameManager.Instance.MainCanvasObjects.CraftingUi.GetComponent<CraftingUi>();
-
         if (IsLocalPlayer)
         {
             CustomMessagingManager.RegisterNamedMessageHandler(nameof(Assets.Core.Networking.MessageType.InventoryChange), OnInventoryChange);
@@ -140,24 +133,21 @@ public class PlayerInventory : NetworkBehaviour
                 }
             }
 
-            //todo: this method is a mix of server-side and client-side logic!
+            if (!firstSetup)
+            {
+                var addedItemsCount = addedItems.Count();
 
-            //todo: 
-            //if (!firstSetup)
-            //{
-            //    var addedItemsCount = addedItems.Count();
-
-            //    if (addedItemsCount == 1)
-            //    {
-            //        var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemadded");
-            //        _playerController.ShowAlert(string.Format(alertText, addedItems.First().Name));
-            //    }
-            //    else
-            //    {
-            //        var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemsadded");
-            //        _playerController.ShowAlert(string.Format(alertText, addedItemsCount));
-            //    }
-            //}
+                if (addedItemsCount == 1)
+                {
+                    var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemadded");
+                    _playerClientSide.ShowAlert(string.Format(alertText, addedItems.First().Name));
+                }
+                else
+                {
+                    var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemsadded");
+                    _playerClientSide.ShowAlert(string.Format(alertText, addedItemsCount));
+                }
+            }
 
             if (changes.EquipSlots != null && changes.EquipSlots.Any())
             {
@@ -173,14 +163,13 @@ public class PlayerInventory : NetworkBehaviour
                 //DebugLogEquippedItems();
             }
 
-            //todo:
-            //EquipItems();
+            EquipItems();
 
-            //if (_playerController != null && _playerController.HasMenuOpen && GameManager.Instance.MainCanvasObjects.CraftingUi.activeSelf)
-            //{
-            //    _craftingUi.ResetUi();
-            //    _craftingUi.LoadInventory();
-            //}
+            if (_craftingUi.gameObject.activeSelf)
+            {
+                _craftingUi.ResetUi();
+                _craftingUi.LoadInventory();
+            }
 
             return true;
         }
@@ -258,15 +247,11 @@ public class PlayerInventory : NetworkBehaviour
 
         var json = JsonUtility.ToJson(change);
 
-        //todo: are these both the same?
-        var clientId = OwnerClientId;
-        clientId = _playerState.ClientId.Value;
-
         var stream = PooledNetworkBuffer.Get();
         using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
         {
             writer.WriteString(json);
-            CustomMessagingManager.SendNamedMessage(nameof(Assets.Core.Networking.MessageType.InventoryChange), clientId, stream);
+            CustomMessagingManager.SendNamedMessage(nameof(Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId, stream);
         }
     }
 
@@ -366,14 +351,11 @@ public class PlayerInventory : NetworkBehaviour
 
         var json = JsonUtility.ToJson(invChange);
 
-        var clientId = OwnerClientId;
-        clientId = _playerState.ClientId.Value;
-
         var stream = PooledNetworkBuffer.Get();
         using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
         {
             writer.WriteString(json);
-            CustomMessagingManager.SendNamedMessage(nameof(Assets.Core.Networking.MessageType.InventoryChange), clientId, stream);
+            CustomMessagingManager.SendNamedMessage(nameof(Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId, stream);
         }
     }
 

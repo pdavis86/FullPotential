@@ -37,6 +37,11 @@ public class PlayerClientSide : NetworkBehaviour
 
     void Start()
     {
+        if (!IsLocalPlayer)
+        {
+            return;
+        }
+
         _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;
         _mainCanvasObjects.CraftingUi.SetActive(false);
 
