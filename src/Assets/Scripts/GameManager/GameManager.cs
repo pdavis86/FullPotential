@@ -1,4 +1,4 @@
-﻿using Assets.Core.Data;
+﻿using Assets.Scripts.GameManager.Models;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
 
 
     //Properties
-    public GameManagerData DataStore = new GameManagerData();
+    public readonly GameManagerData DataStore = new GameManagerData();
 
 
     //Singleton

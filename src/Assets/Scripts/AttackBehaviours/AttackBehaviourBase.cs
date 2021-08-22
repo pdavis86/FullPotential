@@ -11,12 +11,14 @@ using UnityEngine;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable NotAccessedField.Global
+// ReSharper disable InconsistentNaming
 
 public abstract class AttackBehaviourBase : NetworkBehaviour
 {
     protected GameObject _sourcePlayer;
-    protected ClientRpcParams _clientRpcParams;
-    protected PlayerController _playerController;
+
+    private PlayerController _playerController;
+    private ClientRpcParams _clientRpcParams;
 
     // ReSharper disable once InconsistentNaming
     private static readonly System.Random _random = new System.Random();
@@ -39,7 +41,7 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
             {
                 Send = new ClientRpcSendParams
                 {
-                    TargetClientIds = new ulong[] { playerSettings.ClientId }
+                    TargetClientIds = new[] { playerSettings.ClientId.Value }
                 }
             };
         }

@@ -6,7 +6,10 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // ReSharper disable CheckNamespace
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedType.Global
+// ReSharper disable ConvertIfStatementToNullCoalescingAssignment
 
 public class SettingsMenuUi : MonoBehaviour
 {

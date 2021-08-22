@@ -64,6 +64,7 @@ public class InventoryItemsList : MonoBehaviour
 
             var tooltip = row.GetComponent<Tooltip>();
             tooltip.ClearHandlers();
+            // ReSharper disable once UnusedParameter.Local
             tooltip.OnPointerEnterForTooltip += pointerEventData =>
             {
                 Tooltips.ShowTooltip(GameManager.Instance.ResultFactory.GetItemDescription(item, false));

@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global

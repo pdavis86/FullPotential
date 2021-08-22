@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 
-namespace Assets.Core.Data
+// ReSharper disable ArrangeAccessorOwnerBody
+
+namespace Assets.Scripts.GameManager.Models
 {
     public class GameManagerData
     {

@@ -14,6 +14,9 @@ using UnityEngine;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
 // ReSharper disable UnassignedField.Global
+// ReSharper disable RedundantDiscardDesignation
+
+//todo: re-think this class. It should just be for the player to control their interation with the game
 
 public class PlayerController : NetworkBehaviour
 {
@@ -207,12 +210,14 @@ public class PlayerController : NetworkBehaviour
         ShowAlertClientRpc(alertText, pars);
     }
 
+    // ReSharper disable once UnusedParameter.Global
     [ClientRpc]
     public void ShowAlertClientRpc(string alertText, ClientRpcParams clientRpcParams = default)
     {
         _hud.ShowAlert(alertText);
     }
 
+    // ReSharper disable once UnusedParameter.Global
     [ServerRpc]
     public void InteractServerRpc(string gameObjectName, ServerRpcParams serverRpcParams = default)
     {
@@ -221,11 +226,11 @@ public class PlayerController : NetworkBehaviour
         Interactable interactable = null;
         //todo: replace hard-coded radius
         var collidersInRange = Physics.OverlapSphere(player.gameObject.transform.position, 5f);
-        foreach (var collider in collidersInRange)
+        foreach (var colliderNearby in collidersInRange)
         {
-            if (collider.gameObject.name == gameObjectName)
+            if (colliderNearby.gameObject.name == gameObjectName)
             {
-                var colliderInteractable = collider.gameObject.GetComponent<Interactable>();
+                var colliderInteractable = colliderNearby.gameObject.GetComponent<Interactable>();
                 if (colliderInteractable != null)
                 {
                     interactable = colliderInteractable;
@@ -237,6 +242,7 @@ public class PlayerController : NetworkBehaviour
         if (interactable == null)
         {
             Debug.LogError("Failed to find the interactable with gameObjectName " + gameObjectName);
+            return;
         }
 
         Debug.Log($"Trying to interact with {interactable.name}");
@@ -244,7 +250,7 @@ public class PlayerController : NetworkBehaviour
         var distance = Vector3.Distance(PlayerCamera.transform.position, interactable.transform.position);
         if (distance <= interactable.Radius)
         {
-            interactable.OnInteract(NetworkManager.Singleton.LocalClientId);
+            interactable.OnInteract(serverRpcParams.Receive.SenderClientId);
         }
     }
 
@@ -299,13 +305,15 @@ public class PlayerController : NetworkBehaviour
         var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.Spell, startPos, Quaternion.identity, GameManager.Instance.MainCanvasObjects.RuntimeObjectsContainer.transform);
 
         var spellScript = spellObject.GetComponent<SpellBehaviour>();
-        spellScript.PlayerClientId = new NetworkVariable<ulong>(GetComponent<PlayerSetup>().ClientId);
+        spellScript.PlayerClientId = new NetworkVariable<ulong>(clientId);
         spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
         spellScript.SpellDirection = new NetworkVariable<Vector3>(direction);
 
         spellObject.GetComponent<NetworkObject>().Spawn(null, true);
     }
 
+    //todo: move this method
+    // ReSharper disable once UnusedParameter.Global
     [ClientRpc]
     public void ShowDamageClientRpc(Vector3 position, string damage, ClientRpcParams clientRpcParams = default)
     {

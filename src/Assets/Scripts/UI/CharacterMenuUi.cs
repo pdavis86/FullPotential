@@ -46,6 +46,7 @@ public class CharacterMenuUi : MonoBehaviour
         if (tooltip != null)
         {
             tooltip.ClearHandlers();
+            // ReSharper disable once UnusedParameter.Local
             tooltip.OnPointerEnterForTooltip += pointerEventData =>
             {
                 Tooltips.ShowTooltip(GameManager.Instance.ResultFactory.GetItemDescription(item));

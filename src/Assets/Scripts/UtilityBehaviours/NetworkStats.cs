@@ -3,6 +3,12 @@ using MLAPI.Messaging;
 using System.Collections.Generic;
 using UnityEngine;
 
+// ReSharper disable CheckNamespace
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
+// ReSharper disable ClassNeverInstantiated.Global
+
 //NOTE: Copied and adapted from the NetworkStats class from https://github.com/Unity-Technologies/com.unity.multiplayer.samples.coop/releases/tag/v0.2.1
 
 [RequireComponent(typeof(NetworkObject))]
@@ -23,10 +29,11 @@ public class NetworkStats : NetworkBehaviour
 
     float _maxWindowSize => _maxWindowSizeSeconds / _pingIntervalSeconds;
 
+    readonly Queue<float> _movingWindow = new Queue<float>();
+    readonly Dictionary<int, float> _pingHistoryStartTimes = new Dictionary<int, float>();
+
     float _lastPingTime;
     int _currentPingId;
-    Queue<float> _movingWindow = new Queue<float>();
-    Dictionary<int, float> _pingHistoryStartTimes = new Dictionary<int, float>();
     ClientRpcParams _pongClientParams;
 
     public override void NetworkStart()
@@ -52,21 +59,23 @@ public class NetworkStats : NetworkBehaviour
         {
             // We could have had a ping/pong where the ping sends the pong and the pong sends the ping. Issue with this
             // is the higher the latency, the lower the sampling would be. We need pings to be sent at a regular interval
-            PingServerRPC(_currentPingId);
+            PingServerRpc(_currentPingId);
             _pingHistoryStartTimes[_currentPingId] = Time.realtimeSinceStartup;
             _currentPingId++;
             _lastPingTime = Time.realtimeSinceStartup;
         }
     }
 
+    // ReSharper disable once UnusedParameter.Local
     [ServerRpc(RequireOwnership = false)]
-    public void PingServerRPC(int pingId, ServerRpcParams serverParams = default)
+    private void PingServerRpc(int pingId, ServerRpcParams serverParams = default)
     {
-        PongClientRPC(pingId, _pongClientParams);
+        PongClientRpc(pingId, _pongClientParams);
     }
 
+    // ReSharper disable once UnusedParameter.Local
     [ClientRpc]
-    public void PongClientRPC(int pingId, ClientRpcParams clientParams = default)
+    private void PongClientRpc(int pingId, ClientRpcParams clientParams = default)
     {
         var startTime = _pingHistoryStartTimes[pingId];
         _pingHistoryStartTimes.Remove(pingId);

@@ -12,6 +12,8 @@ using UnityEngine.SceneManagement;
 // ReSharper disable UnassignedField.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
+//https://docs-multiplayer.unity3d.com/docs/getting-started/about-mlapi
+
 public class JoinOrHostGame : MonoBehaviour
 {
     private NetworkManager _networkManager;
@@ -72,7 +74,7 @@ public class JoinOrHostGame : MonoBehaviour
     private void SignIn()
     {
         //todo: make a server-side call to sign in
-        GameManager.Instance.DataStore.PlayerToken = Assets.Core.Registry.UserRegistry.SignIn(_username, _password); ;
+        GameManager.Instance.DataStore.PlayerToken = Assets.Core.Registry.UserRegistry.SignIn(_username, _password);
 
         _username = _password = null;
     }
@@ -93,7 +95,7 @@ public class JoinOrHostGame : MonoBehaviour
         SignIn();
 
         SetNetworkAddressAndPort();
-        var startResult = _networkManager.StartHost();
+        _networkManager.StartHost();
 
         //todo: startResult is useless for findint out if we actualyl connected correctly
 
@@ -105,7 +107,7 @@ public class JoinOrHostGame : MonoBehaviour
         SignIn();
 
         SetNetworkAddressAndPort();
-        var startResult = _networkManager.StartClient();
+        _networkManager.StartClient();
 
         //todo: startResult is useless for findint out if we actualyl connected correctly
 

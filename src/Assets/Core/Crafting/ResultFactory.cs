@@ -213,8 +213,9 @@ namespace Assets.Core.Crafting
             var isMagical = magicalLootTypes.Any() && IsSuccess(50);
             if (isMagical)
             {
+                // ReSharper disable once UnusedParameter.Local
                 lootDrop.RegistryType = magicalLootTypes
-                    .OrderBy(x => _random.Next())
+                    .OrderBy(x =>_random.Next())
                     .First();
 
                 var effects = new List<IEffect>();
@@ -246,6 +247,7 @@ namespace Assets.Core.Crafting
             }
             else
             {
+                // ReSharper disable once UnusedParameter.Local
                 lootDrop.RegistryType = techLootTypes
                     .OrderBy(x => _random.Next())
                     .First();

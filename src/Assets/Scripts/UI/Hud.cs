@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+
 public class Hud : MonoBehaviour
 {
 #pragma warning disable 0649

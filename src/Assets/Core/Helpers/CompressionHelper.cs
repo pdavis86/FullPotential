@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable ArrangeAccessorOwnerBody
 
 namespace Assets.Core.Helpers
 {
-	//
-	// http://forum.unity3d.com/threads/lzf-compression-and-decompression-for-unity.152579/
-	//
+    //
+    // http://forum.unity3d.com/threads/lzf-compression-and-decompression-for-unity.152579/
+    //
 
-	/*
+    /*
 	 * Improved version to C# LibLZF Port:
 	 * Copyright (c) 2010 Roman Atachiants <kelindar@gmail.com>
 	 *
@@ -55,7 +54,7 @@ namespace Assets.Core.Helpers
 	 * of this file under either the BSD or the GPL.
 	 */
 
-	/* Benchmark with Alice29 Canterbury Corpus
+    /* Benchmark with Alice29 Canterbury Corpus
 			---------------------------------------
 			(Compression) Original CLZF C#
 			Raw = 152089, Compressed = 101092
@@ -90,12 +89,13 @@ namespace Assets.Core.Helpers
 			 21,0012 ms.
 		*/
 
-	using System;
-	using System.IO;
-	using System.Text;
+    using System;
+    using System.IO;
+    using System.Text;
 
 	/// <summary>
 	/// Improved C# LZF Compressor, a very small data compression library. The compression algorithm is extremely fast.
+	/// </summary>
 	public static class CompressionHelper
 	{
 		private static readonly uint HLOG = 14;
@@ -111,19 +111,19 @@ namespace Assets.Core.Helpers
 
 		public static byte[] CompressBytes(byte[] input)
 		{
-			return ActOnBytes(input, LZFCompress);
+			return ActOnBytes(input, LzfCompress);
 		}
 
 		public static byte[] DecompressBytes(byte[] input)
 		{
-			return ActOnBytes(input, LZFDecompress);
+			return ActOnBytes(input, LzfDecompress);
 		}
 
 		private static byte[] ActOnBytes(byte[] inputBytes, Func<byte[], OutputBuffer, int> act)
 		{
 			// Starting guess, increase it later if needed
 			int outputByteCountGuess = inputBytes.Length;
-			int byteCount = 0;
+			int byteCount;
 			OutputBuffer buffer;
 
 			// If byteCount is 0, then increase buffer and try again
@@ -136,7 +136,7 @@ namespace Assets.Core.Helpers
 			while (byteCount == 0);
 
 			byte[] outputBytes = new byte[byteCount];
-			Buffer.BlockCopy(buffer.bytes, 0, outputBytes, 0, byteCount);
+			Buffer.BlockCopy(buffer.Bytes, 0, outputBytes, 0, byteCount);
 			return outputBytes;
 		}
 
@@ -176,16 +176,16 @@ namespace Assets.Core.Helpers
 
 		public struct OutputBuffer
 		{
-			public byte[] bytes;
+			public byte[] Bytes;
 
 			public int Length
 			{
-				get { return bytes.Length; }
+				get { return Bytes.Length; }
 			}
 
 			public static implicit operator OutputBuffer(byte[] input)
 			{
-				return new OutputBuffer { bytes = input };
+				return new OutputBuffer { Bytes = input };
 			}
 		}
 
@@ -193,23 +193,19 @@ namespace Assets.Core.Helpers
 		/// Compresses the data using LibLZF algorithm
 		/// </summary>
 		/// <param name="input">Reference to the data to compress</param>
-		/// <param name="output">Reference to a buffer which will contain the compressed data</param>
+		/// <param name="buffer">Reference to a buffer which will contain the compressed data</param>
 		/// <returns>The size of the compressed archive in the output buffer</returns>
-		public static int LZFCompress(byte[] input, OutputBuffer buffer)
+		public static int LzfCompress(byte[] input, OutputBuffer buffer)
 		{
-			byte[] output = buffer.bytes;
+			byte[] output = buffer.Bytes;
 			int inputLength = input.Length;
 			int outputLength = output.Length;
 
 			Array.Clear(HashTable, 0, (int)HSIZE);
 
-			long hslot;
 			uint iidx = 0;
 			uint oidx = 0;
-			long reference;
-
 			uint hval = (uint)(((input[iidx]) << 8) | input[iidx + 1]); // FRST(in_data, iidx);
-			long off;
 			int lit = 0;
 
 			for (; ; )
@@ -217,10 +213,11 @@ namespace Assets.Core.Helpers
 				if (iidx < inputLength - 2)
 				{
 					hval = (hval << 8) | input[iidx + 2];
-					hslot = ((hval ^ (hval << 5)) >> (int)(((3 * 8 - HLOG)) - hval * 5) & (HSIZE - 1));
-					reference = HashTable[hslot];
-					HashTable[hslot] = (long)iidx;
+					long hslot = ((hval ^ (hval << 5)) >> (int)(((3 * 8 - HLOG)) - hval * 5) & (HSIZE - 1));
+					long reference = HashTable[hslot];
+					HashTable[hslot] = iidx;
 
+					long off;
 
 					if ((off = iidx - reference - 1) < MAX_OFF
 						&& iidx + 4 < inputLength
@@ -319,11 +316,11 @@ namespace Assets.Core.Helpers
 		/// Decompresses the data using LibLZF algorithm
 		/// </summary>
 		/// <param name="input">Reference to the data to decompress</param>
-		/// <param name="output">Reference to a buffer which will contain the decompressed data</param>
+		/// <param name="buffer">Reference to a buffer which will contain the decompressed data</param>
 		/// <returns>Returns decompressed size</returns>
-		public static int LZFDecompress(byte[] input, OutputBuffer buffer)
+		public static int LzfDecompress(byte[] input, OutputBuffer buffer)
 		{
-			byte[] output = buffer.bytes;
+			byte[] output = buffer.Bytes;
 			int inputLength = input.Length;
 			int outputLength = output.Length;
 

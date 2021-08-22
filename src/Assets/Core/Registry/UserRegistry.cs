@@ -1,6 +1,8 @@
 ﻿using Assets.Core.Data;
 using UnityEngine;
 
+// ReSharper disable ConvertIfStatementToNullCoalescingAssignment
+
 namespace Assets.Core.Registry
 {
     public static class UserRegistry
@@ -57,7 +59,7 @@ namespace Assets.Core.Registry
 
             if (playerData.Options == null)
             {
-                playerData.Options = new Assets.Core.Data.Options();
+                playerData.Options = new Options();
             }
 
             return playerData;

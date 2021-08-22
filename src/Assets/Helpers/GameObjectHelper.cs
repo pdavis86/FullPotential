@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 
-namespace Assets.Extensions
+// ReSharper disable ConditionIsAlwaysTrueOrFalse
+
+namespace Assets.Helpers
 {
-    public static class GameObjectExtensions
+    public static class GameObjectHelper
     {
-        public static bool IsDestroyed(this GameObject gameObject)
+        public static bool IsDestroyed(GameObject gameObject)
         {
             // UnityEngine overloads the == opeator for the GameObject type
             // and returns null when the object has been destroyed, but 

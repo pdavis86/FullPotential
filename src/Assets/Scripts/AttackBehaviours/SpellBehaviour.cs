@@ -1,6 +1,6 @@
 ﻿using Assets.Core.Constants;
 using Assets.Core.Registry.Types;
-using Assets.Extensions;
+using Assets.Helpers;
 using MLAPI;
 using MLAPI.NetworkVariable;
 using System;
@@ -80,7 +80,7 @@ public class SpellBehaviour : AttackBehaviourBase
 
             DealDamage(_spell, gameObject, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
 
-            if (!gameObject.IsDestroyed())
+            if (!GameObjectHelper.IsDestroyed(gameObject))
             {
                 Destroy(gameObject);
             }

@@ -1,5 +1,8 @@
 ﻿using Assets.Core.Registry.Types;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnassignedField.Global
+
 namespace Assets.Core.Data
 {
     [System.Serializable]

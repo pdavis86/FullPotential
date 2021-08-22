@@ -1,5 +1,4 @@
 using MLAPI;
-using MLAPI.Connection;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +9,7 @@ using UnityEngine.UI;
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
+// ReSharper disable ConvertToNullCoalescingCompoundAssignment
 
 public class DebuggingUi : MonoBehaviour
 {
@@ -45,9 +45,12 @@ public class DebuggingUi : MonoBehaviour
 
     private NetworkStats GetNetworkStats()
     {
-        return GameManager.Instance.DataStore.LocalPlayer != null
-            ? _networkStats ?? (_networkStats = GameManager.Instance.DataStore.LocalPlayer.GetComponent<NetworkStats>())
-            : null;
+        if (GameManager.Instance.DataStore.LocalPlayer == null)
+        {
+            return null;
+        }
+
+        return _networkStats ?? (_networkStats = GameManager.Instance.DataStore.LocalPlayer.GetComponent<NetworkStats>());
     }
 
 }

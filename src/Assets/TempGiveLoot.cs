@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using MLAPI;
+﻿using MLAPI;
 
 public class TempGiveLoot : Interactable
 {
