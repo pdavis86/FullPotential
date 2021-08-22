@@ -13,8 +13,9 @@ using UnityEngine;
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
+// ReSharper disable ConvertToUsingDeclaration
 
-//todo: rename to PlayerSettings
+//todo: rename to ?PlayerSettings?
 public class PlayerSetup : NetworkBehaviour
 {
 #pragma warning disable 0649
@@ -27,9 +28,9 @@ public class PlayerSetup : NetworkBehaviour
     [SerializeField] private MeshRenderer _rightMesh;
 #pragma warning restore 0649
 
-    public NetworkVariable<string> Username = new NetworkVariable<string>();
-    public NetworkVariable<string> TextureUrl = new NetworkVariable<string>();
-    public ulong ClientId;
+    public readonly NetworkVariable<ulong> ClientId = new NetworkVariable<ulong>();
+    public readonly NetworkVariable<string> Username = new NetworkVariable<string>();
+    public readonly NetworkVariable<string> TextureUrl = new NetworkVariable<string>();
 
     private Camera _sceneCamera;
     private PlayerInventory _inventory;
@@ -74,7 +75,7 @@ public class PlayerSetup : NetworkBehaviour
         var pm = gameObject.GetComponent<PlayerMovement>();
         pm.PlayerCamera = _playerCamera;
 
-        if (!IsServer && IsClient)
+        if (IsLocalPlayer)
         {
             CustomMessagingManager.RegisterNamedMessageHandler(nameof(Assets.Core.Networking.MessageType.LoadPlayerData), OnLoadPlayerData);
             RequestPlayerDataServerRpc();
@@ -130,7 +131,7 @@ public class PlayerSetup : NetworkBehaviour
         using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
         {
             writer.WriteString(json);
-            CustomMessagingManager.SendNamedMessage(nameof(Assets.Core.Networking.MessageType.LoadPlayerData), ClientId, stream, MLAPI.Transports.NetworkChannel.Internal);
+            CustomMessagingManager.SendNamedMessage(nameof(Assets.Core.Networking.MessageType.LoadPlayerData), ClientId.Value, stream);
         }
     }
 
@@ -197,7 +198,7 @@ public class PlayerSetup : NetworkBehaviour
     {
         Username.Value = playerData.Username;
         TextureUrl.Value = playerData.Options.TextureUrl;
-        _loadWasSuccessful = _inventory.ApplyInventory(playerData?.Inventory, true);
+        _loadWasSuccessful = _inventory.ApplyInventory(playerData.Inventory, true);
     }
 
     private void Save()
