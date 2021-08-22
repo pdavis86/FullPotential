@@ -186,7 +186,7 @@ namespace Assets.Core.Crafting
             return min + (int)Math.Round((max - min) * Math.Pow(_random.NextDouble(), 3), 0);
         }
 
-        internal ItemBase GetLootDrop()
+        public ItemBase GetLootDrop()
         {
             var lootDrop = new Loot
             {

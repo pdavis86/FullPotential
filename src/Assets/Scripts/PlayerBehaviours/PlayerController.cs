@@ -1,9 +1,10 @@
 ﻿using Assets.Core.Registry.Types;
+using MLAPI;
+using MLAPI.Messaging;
+using MLAPI.NetworkVariable;
 using System;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Networking;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -23,9 +24,8 @@ public class PlayerController : NetworkBehaviour
     private bool _toggleGameMenu;
     private bool _toggleCharacterMenu;
     private PlayerInventory _inventory;
-
     private Interactable _focusedInteractable;
-
+    private Hud _hud;
 
     #region Unity event handlers
 
@@ -33,6 +33,8 @@ public class PlayerController : NetworkBehaviour
     {
         _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;
         _mainCanvasObjects.CraftingUi.SetActive(false);
+
+        _hud = _mainCanvasObjects.Hud.GetComponent<Hud>();
 
         if (Debug.isDebugBuild)
         {
@@ -42,7 +44,6 @@ public class PlayerController : NetworkBehaviour
         _inventory = GetComponent<PlayerInventory>();
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity Input System Event")]
     void OnInteract()
     {
         if (HasMenuOpen)
@@ -52,44 +53,30 @@ public class PlayerController : NetworkBehaviour
 
         if (_focusedInteractable == null)
         {
-            //todo: play a sound to indicate failed interaction
+            //todo: play a sound to indicate a failed interaction
             return;
         }
 
-        CmdInteractWith(_focusedInteractable.netId);
+        InteractServerRpc(_focusedInteractable.gameObject.name);
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity Input System Event")]
     void OnOpenCharacterMenu()
     {
         _toggleCharacterMenu = true;
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity Input System Event")]
     void OnCancel()
     {
         _toggleGameMenu = true;
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity Input System Event")]
     void OnLeftAttack()
     {
-        if (HasMenuOpen)
-        {
-            return;
-        }
-
         TryToAttack(true);
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Unity Input System Event")]
     void OnRightAttack()
     {
-        if (HasMenuOpen)
-        {
-            return;
-        }
-
         TryToAttack(false);
     }
 
@@ -212,27 +199,67 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    [Command]
-    public void CmdInteractWith(NetworkInstanceId interactableNetId)
+    public void ShowAlert(string alertText)
     {
-        var interactable = NetworkServer.FindLocalObject(interactableNetId).GetComponent<Interactable>();
+        //todo: cache this
+        var pars = new ClientRpcParams { Send = new ClientRpcSendParams() { TargetClientIds = new[] { OwnerClientId } } };
+
+        ShowAlertClientRpc(alertText, pars);
+    }
+
+    [ClientRpc]
+    public void ShowAlertClientRpc(string alertText, ClientRpcParams clientRpcParams = default)
+    {
+        _hud.ShowAlert(alertText);
+    }
+
+    [ServerRpc]
+    public void InteractServerRpc(string gameObjectName, ServerRpcParams serverRpcParams = default)
+    {
+        var player = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject;
+
+        Interactable interactable = null;
+        //todo: replace hard-coded radius
+        var collidersInRange = Physics.OverlapSphere(player.gameObject.transform.position, 5f);
+        foreach (var collider in collidersInRange)
+        {
+            if (collider.gameObject.name == gameObjectName)
+            {
+                var colliderInteractable = collider.gameObject.GetComponent<Interactable>();
+                if (colliderInteractable != null)
+                {
+                    interactable = colliderInteractable;
+                    break;
+                }
+            }
+        }
+
+        if (interactable == null)
+        {
+            Debug.LogError("Failed to find the interactable with gameObjectName " + gameObjectName);
+        }
 
         Debug.Log($"Trying to interact with {interactable.name}");
 
         var distance = Vector3.Distance(PlayerCamera.transform.position, interactable.transform.position);
         if (distance <= interactable.Radius)
         {
-            interactable.OnInteract(netId);
+            interactable.OnInteract(NetworkManager.Singleton.LocalClientId);
         }
     }
 
     void TryToAttack(bool leftHand)
     {
-        CmdCastSpell(leftHand);
+        if (HasMenuOpen)
+        {
+            return;
+        }
+
+        CastSpellServerRpc(leftHand, PlayerCamera.transform.forward);
     }
 
-    [Command]
-    private void CmdCastSpell(bool leftHand)
+    [ServerRpc]
+    private void CastSpellServerRpc(bool leftHand, Vector3 direction, ServerRpcParams serverRpcParams = default)
     {
         var activeSpell = _inventory.GetSpellInHand(leftHand);
 
@@ -244,7 +271,7 @@ public class PlayerController : NetworkBehaviour
         switch (activeSpell.Targeting)
         {
             case Assets.Core.Spells.Targeting.Projectile _:
-                SpawnSpellProjectile(activeSpell, leftHand);
+                SpawnSpellProjectile(activeSpell, leftHand, direction, serverRpcParams.Receive.SenderClientId);
                 break;
 
             case Assets.Core.Spells.Targeting.Self _:
@@ -259,25 +286,28 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    [Server]
-    private void SpawnSpellProjectile(Spell activeSpell, bool leftHand)
+    private void SpawnSpellProjectile(Spell activeSpell, bool leftHand, Vector3 direction, ulong clientId)
     {
+        if (!IsServer)
+        {
+            Debug.LogWarning("Tried to spawn a projectile when not on the server");
+        }
+
         //todo: style projectile based on activeSpell
 
         var startPos = PlayerCamera.transform.position + PlayerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
-        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.Spell, startPos, transform.rotation, transform);
-        spellObject.SetActive(true);
+        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.Spell, startPos, Quaternion.identity, GameManager.Instance.MainCanvasObjects.RuntimeObjectsContainer.transform);
 
         var spellScript = spellObject.GetComponent<SpellBehaviour>();
-        spellScript.PlayerNetworkId = netId.Value;
-        spellScript.SpellId = activeSpell.Id;
+        spellScript.PlayerClientId = new NetworkVariable<ulong>(GetComponent<PlayerSetup>().ClientId);
+        spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
+        spellScript.SpellDirection = new NetworkVariable<Vector3>(direction);
 
-        NetworkServer.Spawn(spellObject);
+        spellObject.GetComponent<NetworkObject>().Spawn(null, true);
     }
 
-    // ReSharper disable once UnusedParameter.Global
-    [TargetRpc]
-    public void TargetRpcShowDamage(NetworkConnection playerConnection, Vector3 position, string damage)
+    [ClientRpc]
+    public void ShowDamageClientRpc(Vector3 position, string damage, ClientRpcParams clientRpcParams = default)
     {
         var hit = Instantiate(GameManager.Instance.Prefabs.Combat.HitText);
         hit.transform.SetParent(GameManager.Instance.MainCanvasObjects.HitNumberContainer.transform, false);

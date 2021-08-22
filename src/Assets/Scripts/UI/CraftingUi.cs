@@ -21,6 +21,7 @@ using UnityEngine.UI;
 
 public class CraftingUi : MonoBehaviour
 {
+#pragma warning disable 0649
     [SerializeField] private GameObject _componentsContainer;
     [SerializeField] private GameObject _rowPrefab;
     [SerializeField] private Text _outputText;
@@ -30,6 +31,7 @@ public class CraftingUi : MonoBehaviour
     [SerializeField] private InputField _craftName;
     [SerializeField] private Button _craftButton;
     [SerializeField] private Text _craftErrors;
+#pragma warning restore 0649
 
     private PlayerInventory _inventory;
     private List<ItemBase> _components;
@@ -44,7 +46,7 @@ public class CraftingUi : MonoBehaviour
     {
         _components = new List<ItemBase>();
 
-        _inventory = GameManager.Instance.LocalPlayer.GetComponent<PlayerInventory>();
+        _inventory = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerInventory>();
 
         _typeDropdown.onValueChanged.AddListener(TypeOnValueChanged);
 
@@ -97,7 +99,7 @@ public class CraftingUi : MonoBehaviour
         var selectedSubType = GetCraftableTypeName(selectedType);
         var isTwoHanded = IsTwoHandedSelected();
 
-        _inventory.CmdCraftItem(componentIds, selectedType, selectedSubType, isTwoHanded, _craftName.text);
+        _inventory.CraftItemServerRpc(componentIds, selectedType, selectedSubType, isTwoHanded, _craftName.text);
     }
 
     void SubTypeOnValueChanged(int index)

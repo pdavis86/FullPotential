@@ -1,3 +1,5 @@
+using MLAPI;
+using MLAPI.Connection;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,50 +13,41 @@ using UnityEngine.UI;
 
 public class DebuggingUi : MonoBehaviour
 {
-    private Text _pingText;
+#pragma warning disable 0649
+    [SerializeField] private Text _pingText;
+#pragma warning restore 0649
 
-    private void Awake()
+    private string _hostString;
+    private NetworkStats _networkStats;
+
+    private void Start()
     {
-        var pingGo = GameManager.Instance.MainCanvasObjects.DebuggingOverlay.transform.Find("PingText");
-        if (pingGo != null)
+        if (!GameManager.Instance.DataStore.IsDebugging)
         {
-            _pingText = pingGo.GetComponent<Text>();
+            Destroy(gameObject);
+            return;
         }
+
+        //todo: update this when client changes settings
+        _hostString = GameManager.Instance.Localizer.Translate("ui.debugging.host");
     }
 
     void OnGUI()
     {
-        if (UnityEngine.Networking.NetworkClient.allClients.Count != 0)
+        var networkStats = GetNetworkStats();
+        if (networkStats != null)
         {
-            if (_pingText != null)
-            {
-                var ping = UnityEngine.Networking.NetworkClient.allClients[0].GetRTT();
-                _pingText.text = ping == 0 
-                    ? GameManager.Instance.Localizer.Translate("ui.debugging.host")
-                    : ping + " ms";
-            }
+            _pingText.text = NetworkManager.Singleton.IsServer
+                ? _hostString
+                : networkStats.LastRtt + " ms";
         }
-        else
-        {
-            //textPing.text = "";
+    }
 
-            //foreach (var netClient in UnityEngine.Networking.NetworkClient.allClients)
-            //{
-            //    textPing.text += netClient.connection.connectionId + " " + netClient.GetRTT() + " ms\n";
-            //}
-
-            //for (int i = 0; i < NetworkServer.connections.Count; ++i)
-            //{
-            //    var c = NetworkServer.connections[i];
-            //    if (c == null || c.connectionId <= 0)
-            //    {
-            //        continue;
-            //    }
-
-            //    var rtt = NetworkTransport.GetCurrentRtt(c.hostId, c.connectionId, out var error);
-            //    textPing.text += "Conn:" + c.connectionId + ", ping:" + rtt + " ms\n";
-            //}
-        }
+    private NetworkStats GetNetworkStats()
+    {
+        return GameManager.Instance.DataStore.LocalPlayer != null
+            ? _networkStats ?? (_networkStats = GameManager.Instance.DataStore.LocalPlayer.GetComponent<NetworkStats>())
+            : null;
     }
 
 }

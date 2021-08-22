@@ -3,23 +3,22 @@ using UnityEngine;
 
 namespace Assets.Core.Registry
 {
-    public class UserRegistry
+    public static class UserRegistry
     {
-        public string Token { get; private set; }
-
-        public void SignIn(string username, string password)
+        public static string SignIn(string username, string password)
         {
             //todo: implement UserRegistry.SignIn()
 
+            //todo: remove once implemented properly
             if (string.IsNullOrWhiteSpace(username))
             {
                 username = SystemInfo.deviceUniqueIdentifier;
             }
 
-            Token = username;
+            return username;
         }
 
-        private string GetPlayerSavePath(string username)
+        private static string GetPlayerSavePath(string username)
         {
             if (string.IsNullOrWhiteSpace(username))
             {
@@ -30,10 +29,14 @@ namespace Assets.Core.Registry
             return System.IO.Path.Combine(Application.persistentDataPath, username + ".json");
         }
 
-        public PlayerData Load(string token)
+        public static PlayerData Load(string token)
         {
-            var username = token;
+            //todo: implement this
+            return LoadFromUsername(token);
+        }
 
+        public static PlayerData LoadFromUsername(string username)
+        {
             var filePath = GetPlayerSavePath(username);
 
             if (!System.IO.File.Exists(filePath))
@@ -52,10 +55,15 @@ namespace Assets.Core.Registry
                 playerData.Username = username;
             }
 
+            if (playerData.Options == null)
+            {
+                playerData.Options = new Assets.Core.Data.Options();
+            }
+
             return playerData;
         }
 
-        public void Save(PlayerData playerData)
+        public static void Save(PlayerData playerData)
         {
             var prettyPrint = Debug.isDebugBuild;
             var saveJson = JsonUtility.ToJson(playerData, prettyPrint);

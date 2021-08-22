@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEngine.Networking;
+﻿using System;
+using UnityEngine;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -10,11 +10,11 @@ using UnityEngine.Networking;
 // ReSharper disable UnassignedField.Global
 // ReSharper disable InconsistentNaming
 
-public abstract class Interactable : NetworkBehaviour
+public abstract class Interactable : MonoBehaviour
 {
     public float Radius = 3f;
 
-    internal TMPro.TextMeshProUGUI _interactionBubble;
+    protected TMPro.TextMeshProUGUI _interactionBubble;
 
     void Start()
     {
@@ -29,7 +29,7 @@ public abstract class Interactable : NetworkBehaviour
 
     public abstract void OnFocus();
 
-    public abstract void OnInteract(NetworkInstanceId playerNetId);
+    public abstract void OnInteract(ulong playerNetId);
 
     public abstract void OnBlur();
 }

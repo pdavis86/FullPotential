@@ -1,5 +1,7 @@
-﻿using UnityEngine;
-using UnityEngine.Networking;
+﻿using MLAPI;
+using MLAPI.Transports.UNET;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -13,7 +15,9 @@ using UnityEngine.Networking;
 public class JoinOrHostGame : MonoBehaviour
 {
     private NetworkManager _networkManager;
+    private UNetTransport _networkTransport;
 
+    private string _scene2Name;
     private string _username;
     private string _password;
     private string _networkAddress;
@@ -21,8 +25,12 @@ public class JoinOrHostGame : MonoBehaviour
 
     void Start()
     {
-        _networkManager = NetworkManager.singleton;
+        _networkManager = NetworkManager.Singleton;
+        _networkTransport = _networkManager.GetComponent<UNetTransport>();
+        _scene2Name = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(2));
     }
+
+    #region Button Event Handlers
 
     public void SetPlayerUsername(string value)
     {
@@ -32,39 +40,6 @@ public class JoinOrHostGame : MonoBehaviour
     public void SetPlayerPassword(string value)
     {
         _password = value;
-    }
-
-    public void SignIn()
-    {
-        GameManager.Instance.UserRegistry.SignIn(_username, _password);
-        _username = _password = null;
-    }
-
-    private void SetNetworkAddressAndPort()
-    {
-        _networkManager.networkAddress = !string.IsNullOrWhiteSpace(_networkAddress)
-            ? _networkAddress
-            : "localhost";
-
-        if (!int.TryParse(_networkPort, out var port))
-        {
-            port = 7777;
-        }
-        _networkManager.networkPort = port;
-    }
-
-    public void HostGame()
-    {
-        SignIn();
-        SetNetworkAddressAndPort();
-        _networkManager.StartHost();
-    }
-
-    public void JoinGame()
-    {
-        SignIn();
-        SetNetworkAddressAndPort();
-        _networkManager.StartClient();
     }
 
     public void SetNetworkAddress(string value)
@@ -77,15 +52,76 @@ public class JoinOrHostGame : MonoBehaviour
         _networkPort = value;
     }
 
-    public static void Disconnect()
+    public void HostGame()
     {
-        NetworkManager.singleton.StopClient();
-        NetworkManager.singleton.StopHost();
+        HostGameInternal();
+    }
+
+    public void JoinGame()
+    {
+        JoinGameInternal();
     }
 
     public void QuitGame()
     {
         GameManager.Quit();
+    }
+
+    #endregion
+
+    private void SignIn()
+    {
+        //todo: make a server-side call to sign in
+        GameManager.Instance.DataStore.PlayerToken = Assets.Core.Registry.UserRegistry.SignIn(_username, _password); ;
+
+        _username = _password = null;
+    }
+
+    private void SetNetworkAddressAndPort()
+    {
+        _networkTransport.ConnectAddress = !string.IsNullOrWhiteSpace(_networkAddress)
+            ? _networkAddress
+            : "127.0.0.1";
+
+        _networkTransport.ConnectPort = int.TryParse(_networkPort, out var port)
+            ? port
+            : 7777;
+    }
+
+    private void HostGameInternal()
+    {
+        SignIn();
+
+        SetNetworkAddressAndPort();
+        var startResult = _networkManager.StartHost();
+
+        //todo: startResult is useless for findint out if we actualyl connected correctly
+
+        MLAPI.SceneManagement.NetworkSceneManager.SwitchScene(_scene2Name);
+    }
+
+    private void JoinGameInternal()
+    {
+        SignIn();
+
+        SetNetworkAddressAndPort();
+        var startResult = _networkManager.StartClient();
+
+        //todo: startResult is useless for findint out if we actualyl connected correctly
+
+        //NOTE: Do not need to change scene. This is handled by the server
+    }
+
+    public static void Disconnect()
+    {
+        if (NetworkManager.Singleton.IsHost)
+        {
+            NetworkManager.Singleton.StopHost();
+        }
+        else if (NetworkManager.Singleton.IsClient)
+        {
+            NetworkManager.Singleton.StopClient();
+        }
     }
 
 }

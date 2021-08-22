@@ -1,4 +1,5 @@
 using Assets.Core.Data;
+using Assets.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,11 +10,10 @@ using UnityEngine.UI;
 
 public class SettingsMenuUi : MonoBehaviour
 {
-    [SerializeField]
-    private Dropdown _languageDropDown;
-
-    [SerializeField]
-    private InputField _skinUrlInput;
+#pragma warning disable 0649
+    [SerializeField] private Dropdown _languageDropDown;
+    [SerializeField] private InputField _skinUrlInput;
+#pragma warning restore 0649
 
     private Dictionary<string, string> _cultures;
 
@@ -53,6 +53,8 @@ public class SettingsMenuUi : MonoBehaviour
         //    }
     }
 
+    //todo: on open,         GameManager.Instance.MainCanvasObjects.SettingsUi.GetComponent<SettingsMenuUi>().LoadFromPlayerData(playerData);
+
     public void LoadFromPlayerData(PlayerData playerData)
     {
         LoadCultures();
@@ -60,7 +62,7 @@ public class SettingsMenuUi : MonoBehaviour
         int i;
         for (i = 0; i < _cultures.Count; i++)
         {
-            if (_cultures.ElementAt(i).Key == playerData.Options.Culture)
+            if (_cultures.ElementAt(i).Key == playerData.Options.Culture.OrIfNullOrWhitespace(GameManager.Instance.Localizer.CurrentCulture))
             {
                 break;
             }
@@ -81,7 +83,7 @@ public class SettingsMenuUi : MonoBehaviour
 
     public void SaveAndClose()
     {
-        GameManager.Instance.LocalPlayer.GetComponent<PlayerSetup>().CmdUpdateTexture(_skinUrlInput.text);
+        GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerSetup>().UpdatePlayerSettingsServerRpc(_skinUrlInput.text);
         GameManager.Instance.MainCanvasObjects.HideAllMenus();
     }
 

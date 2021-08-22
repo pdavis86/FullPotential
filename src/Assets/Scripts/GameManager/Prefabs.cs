@@ -11,6 +11,8 @@
 
 public class Prefabs : MonoBehaviour
 {
+    public GameObject Player;
+
     public CombatClass Combat;
 
     [System.Serializable]

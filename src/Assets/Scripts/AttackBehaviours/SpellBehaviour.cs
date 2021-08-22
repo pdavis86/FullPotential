@@ -1,9 +1,11 @@
 ﻿using Assets.Core.Constants;
 using Assets.Core.Registry.Types;
+using Assets.Extensions;
+using MLAPI;
+using MLAPI.NetworkVariable;
 using System;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Networking;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Local
@@ -13,36 +15,34 @@ public class SpellBehaviour : AttackBehaviourBase
 {
     private Spell _spell;
 
-    [SyncVar]
-    public uint PlayerNetworkId;
-
-    [SyncVar]
-    public string SpellId;
+    public NetworkVariable<ulong> PlayerClientId;
+    public NetworkVariable<string> SpellId;
+    public NetworkVariable<Vector3> SpellDirection;
 
     private void Awake()
     {
-        Destroy(gameObject, 3f);
+        if (NetworkManager.Singleton.IsServer)
+        {
+            Destroy(gameObject, 3f);
+        }
     }
 
     private void Start()
     {
-        SourcePlayer = isServer
-            ? NetworkServer.FindLocalObject(new NetworkInstanceId(PlayerNetworkId))
-            : ClientScene.FindLocalObject(new NetworkInstanceId(PlayerNetworkId));
-
-        if (SourcePlayer == null)
+        if (!IsServer)
         {
-            Debug.LogError("No SourcePlayer found");
             return;
         }
 
-        Physics.IgnoreCollision(GetComponent<Collider>(), SourcePlayer.GetComponent<Collider>());
+        _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId.Value].PlayerObject.gameObject;
 
-        _spell = SourcePlayer.GetComponent<PlayerInventory>().Items.FirstOrDefault(x => x.Id == SpellId) as Spell;
+        Physics.IgnoreCollision(GetComponent<Collider>(), _sourcePlayer.GetComponent<Collider>());
+
+        _spell = _sourcePlayer.GetComponent<PlayerInventory>().Items.FirstOrDefault(x => x.Id == SpellId.Value) as Spell;
 
         if (_spell == null)
         {
-            Debug.LogError("No spell set");
+            Debug.LogError($"No spell found in player inventory with ID {SpellId.Value}");
             return;
         }
 
@@ -52,10 +52,8 @@ public class SpellBehaviour : AttackBehaviourBase
             castSpeed = 0.5f;
         }
 
-        var playerController = SourcePlayer.GetComponent<PlayerController>();
-
         var spellRb = GetComponent<Rigidbody>();
-        spellRb.AddForce(playerController.PlayerCamera.transform.forward * 20f * castSpeed, ForceMode.VelocityChange);
+        spellRb.AddForce(SpellDirection.Value * 20f * castSpeed, ForceMode.VelocityChange);
     }
 
     //private void Update()
@@ -65,7 +63,7 @@ public class SpellBehaviour : AttackBehaviourBase
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!isServer)
+        if (!IsServer)
         {
             return;
         }
@@ -82,9 +80,10 @@ public class SpellBehaviour : AttackBehaviourBase
 
             DealDamage(_spell, gameObject, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
 
-            //Debug.Log("You hit something not damageable");
-
-            NetworkServer.Destroy(gameObject);
+            if (!gameObject.IsDestroyed())
+            {
+                Destroy(gameObject);
+            }
         }
         catch (Exception ex)
         {

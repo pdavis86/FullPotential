@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.Networking;
+using MLAPI;
 
 public class TempGiveLoot : Interactable
 {
@@ -17,11 +17,10 @@ public class TempGiveLoot : Interactable
         _interactionBubble.gameObject.SetActive(true);
     }
 
-    public override void OnInteract(NetworkInstanceId playerNetId)
+    public override void OnInteract(ulong playerNetId)
     {
         var loot = GameManager.Instance.ResultFactory.GetLootDrop();
-
-        var playerObj = NetworkServer.FindLocalObject(playerNetId);
+        var playerObj = NetworkManager.Singleton.ConnectedClients[playerNetId].PlayerObject;
         playerObj.GetComponent<PlayerInventory>().Add(loot);
     }
 

@@ -13,6 +13,7 @@ public class SceneObjectsOffline : MonoBehaviour
 {
     void Start()
     {
+        //todo: generalise and use in all scenes (if not null)
         UnityHelper.GetObjectAtRoot(GameManager.NameCanvasScene).SetActive(true);
     }
     

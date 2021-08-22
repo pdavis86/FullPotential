@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEngine;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedType.Global
@@ -22,7 +23,12 @@ public static class DefaultSceneLoader
         }
         else if (state == PlayModeStateChange.EnteredPlayMode)
         {
-            EditorSceneManager.LoadScene(0);
+            var activeScene = EditorSceneManager.GetActiveScene();
+            if (activeScene.buildIndex != 0)
+            {
+                EditorSceneManager.LoadScene(0);
+                Debug.Log("Scene 0 force loaded");
+            }
         }
     }
 }

@@ -3,11 +3,10 @@ using UnityEngine.UI;
 
 public class Hud : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject _alertsContainer;
-
-    [SerializeField]
-    private GameObject _alertPrefab;
+#pragma warning disable 0649
+    [SerializeField] private GameObject _alertsContainer;
+    [SerializeField] private GameObject _alertPrefab;
+#pragma warning restore 0649
 
     public void ShowAlert(string alertText)
     {

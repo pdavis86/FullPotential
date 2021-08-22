@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using Assets.Core.Data;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,24 +15,26 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public const string NameCanvasMain = "MainCanvas";
     public const string NameCanvasScene = "SceneCanvas";
+    public const string NameSpawnPoints = "SpawnPoints";
 
+#pragma warning disable 0649
+    [SerializeField] private GameObject _mainCanvas;
+#pragma warning restore 0649
 
     //Core components
     public Assets.Core.Registry.TypeRegistry TypeRegistry { get; private set; }
     public Assets.Core.Localization.Localizer Localizer { get; private set; }
     public Assets.Core.Crafting.ResultFactory ResultFactory { get; private set; }
-    public Assets.Core.Registry.UserRegistry UserRegistry { get; private set; }
 
 
     //Behaviours
-    public MainCanvasObjects MainCanvasObjects { get; private set; }
     public Prefabs Prefabs { get; private set; }
+    public MainCanvasObjects MainCanvasObjects { get; private set; }
 
 
-    //Variables
-    public GameObject LocalPlayer { get; set; }
+    //Properties
+    public GameManagerData DataStore = new GameManagerData();
 
 
     //Singleton
@@ -68,10 +71,8 @@ public class GameManager : MonoBehaviour
 
         ResultFactory = new Assets.Core.Crafting.ResultFactory(TypeRegistry, Localizer);
 
-        UserRegistry = new Assets.Core.Registry.UserRegistry();
-
-        MainCanvasObjects = GameObject.Find(NameCanvasMain).GetComponent<MainCanvasObjects>();
         Prefabs = GetComponent<Prefabs>();
+        MainCanvasObjects = _mainCanvas.GetComponent<MainCanvasObjects>();
 
         SceneManager.LoadSceneAsync(1);
     }

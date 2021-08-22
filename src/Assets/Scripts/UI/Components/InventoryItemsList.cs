@@ -63,6 +63,7 @@ public class InventoryItemsList : MonoBehaviour
             toggleAction(row, slot, item);
 
             var tooltip = row.GetComponent<Tooltip>();
+            tooltip.ClearHandlers();
             tooltip.OnPointerEnterForTooltip += pointerEventData =>
             {
                 Tooltips.ShowTooltip(GameManager.Instance.ResultFactory.GetItemDescription(item, false));

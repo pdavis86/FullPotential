@@ -13,16 +13,16 @@ GameObject:
   - component: {fileID: 4991308441274877187}
   - component: {fileID: 4991308441274877184}
   - component: {fileID: 4991308441274877185}
-  - component: {fileID: 3046880562115981654}
-  - component: {fileID: 7697724776256515342}
-  - component: {fileID: 6447200508839985312}
+  - component: {fileID: 6852525036430249213}
+  - component: {fileID: 1246217807953253087}
+  - component: {fileID: 2001124297341657288}
   m_Layer: 0
   m_Name: Spell
   m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4991308441274877190
 Transform:
   m_ObjectHideFlags: 0
@@ -31,7 +31,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4991308441274877191}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.26, y: 0.46, z: -2.3}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
   m_Children: []
   m_Father: {fileID: 0}
@@ -115,7 +115,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &3046880562115981654
+--- !u!114 &6852525036430249213
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,27 +127,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f74119543f7dc6c438666df024bba6e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SourcePlayer: {fileID: 0}
-  Spell:
-    Id: 
-    Name: 
-    Attributes:
-      IsAutomatic: 0
-      IsSoulbound: 0
-      ExtraAmmoPerShot: 0
-      Strength: 0
-      Efficiency: 0
-      Range: 0
-      Accuracy: 0
-      Speed: 0
-      Recovery: 0
-      Duration: 0
-    Effects: []
-    Targeting: 
-    Shape: 
-  PlayerNetworkId: 0
-  SpellId: 
---- !u!114 &7697724776256515342
+  PlayerNetworkId:
+    m_InternalValue: 0
+  SpellId:
+    m_InternalValue: 
+--- !u!114 &1246217807953253087
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -156,31 +140,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 4991308441274877191}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8258ea15b8f74c4889ce485d21cbbb1, type: 3}
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SceneId:
-    m_Value: 0
-  m_AssetId:
-    i0: 0
-    i1: 0
-    i2: 0
-    i3: 0
-    i4: 0
-    i5: 0
-    i6: 0
-    i7: 0
-    i8: 0
-    i9: 0
-    i10: 0
-    i11: 0
-    i12: 0
-    i13: 0
-    i14: 0
-    i15: 0
-  m_ServerOnly: 0
-  m_LocalPlayerAuthority: 1
---- !u!114 &6447200508839985312
+  NetworkInstanceId: 0
+  PrefabHash: 5777910667363331705
+  PrefabHashGenerator: Spell
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+--- !u!114 &2001124297341657288
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -189,16 +157,42 @@ MonoBehaviour:
   m_GameObject: {fileID: 4991308441274877191}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13d6c522af31447398568cc65334232b, type: 3}
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TransformSyncMode: 3
-  m_SendInterval: 0.1
-  m_SyncRotationAxis: 7
-  m_RotationSyncCompression: 0
-  m_SyncSpin: 0
-  m_MovementTheshold: 0.001
-  m_VelocityThreshold: 0.0001
-  m_SnapThreshold: 5
-  m_InterpolateRotation: 1
-  m_InterpolateMovement: 1
+  FixedSendsPerSecond: 20
+  AssumeSyncedSends: 1
+  InterpolatePosition: 1
+  SnapDistance: 10
+  InterpolateServer: 1
+  MinMeters: 0.15
+  MinDegrees: 1.5
+  ExtrapolatePosition: 0
+  MaxSendsToExtrapolate: 5
+  Channel: 
+  EnableRange: 0
+  EnableNonProvokedResendChecks: 0
+  DistanceSendrate:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 20
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 500
+      value: 20
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

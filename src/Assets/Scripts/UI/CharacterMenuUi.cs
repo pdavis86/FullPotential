@@ -17,16 +17,18 @@ using UnityEngine.UI;
 
 public class CharacterMenuUi : MonoBehaviour
 {
+#pragma warning disable 0649
     [SerializeField] private GameObject _componentsContainer;
     [SerializeField] private GameObject _rowPrefab;
     [SerializeField] private GameObject _slotsContainer;
+#pragma warning restore 0649
 
     private PlayerInventory _inventory;
     private GameObject _lastClickedSlot;
 
     private void Awake()
     {
-        _inventory = GameManager.Instance.LocalPlayer.GetComponent<PlayerInventory>();
+        _inventory = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerInventory>();
     }
 
     private void OnEnable()

@@ -1,8 +1,10 @@
 ﻿using Assets.Core.Data;
+using MLAPI;
+using MLAPI.Messaging;
+using MLAPI.NetworkVariable;
+using MLAPI.Serialization.Pooled;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.Networking.NetworkSystem;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -12,41 +14,53 @@ using UnityEngine.Networking.NetworkSystem;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
 
+//todo: rename to PlayerSettings
 public class PlayerSetup : NetworkBehaviour
 {
+#pragma warning disable 0649
+    [SerializeField] private Behaviour[] _objectsToDisable;
     [SerializeField] private Camera _playerCamera;
     [SerializeField] private Camera _inFrontOfPlayerCamera;
     [SerializeField] private TextMeshProUGUI _nameTag;
     [SerializeField] private MeshRenderer _mainMesh;
     [SerializeField] private MeshRenderer _leftMesh;
     [SerializeField] private MeshRenderer _rightMesh;
+#pragma warning restore 0649
 
-    [SyncVar]
-    public string Username;
-
-    [SyncVar]
-    public string TextureUrl;
+    public NetworkVariable<string> Username = new NetworkVariable<string>();
+    public NetworkVariable<string> TextureUrl = new NetworkVariable<string>();
+    public ulong ClientId;
 
     private Camera _sceneCamera;
     private PlayerInventory _inventory;
     private bool _loadWasSuccessful;
 
+    #region Event handlers
+
+    private void Awake()
+    {
+        Username.OnValueChanged += OnUsernameChanged;
+        TextureUrl.OnValueChanged += OnTextureChanged;
+
+        _inventory = GetComponent<PlayerInventory>();
+        GameManager.Instance.DataStore.LocalPlayer = gameObject;
+    }
+
     private void Start()
     {
-        _inventory = GetComponent<PlayerInventory>();
+        gameObject.name = "Player ID " + NetworkObjectId;
 
-        gameObject.name = "Player ID " + netId.Value;
-
-        if (!isLocalPlayer)
+        if (!IsLocalPlayer)
         {
-            gameObject.GetComponent<PlayerController>().enabled = false;
+            foreach (var comp in _objectsToDisable)
+            {
+                comp.enabled = false;
+            }
+
             SetNameTag();
             SetTexture();
             return;
         }
-
-        GameManager.Instance.LocalPlayer = gameObject;
-        _nameTag.text = null;
 
         _sceneCamera = Camera.main;
         if (_sceneCamera != null)
@@ -57,24 +71,29 @@ public class PlayerSetup : NetworkBehaviour
         _playerCamera.gameObject.SetActive(true);
         _inFrontOfPlayerCamera.gameObject.SetActive(true);
 
-        var pm = gameObject.AddComponent<PlayerMovement>();
+        var pm = gameObject.GetComponent<PlayerMovement>();
         pm.PlayerCamera = _playerCamera;
 
-        connectionToServer.RegisterHandler(Assets.Core.Networking.MessageIds.LoadPlayerData, OnLoadPlayerData);
+        if (!IsServer && IsClient)
+        {
+            CustomMessagingManager.RegisterNamedMessageHandler(nameof(Assets.Core.Networking.MessageType.LoadPlayerData), OnLoadPlayerData);
+            RequestPlayerDataServerRpc();
+        }
 
         GameManager.Instance.MainCanvasObjects.Hud.SetActive(true);
-
-        CmdHeresMyJoiningDetails(GameManager.Instance.UserRegistry.Token);
     }
 
     private void OnDisable()
     {
-        if (isServer)
+        Username.OnValueChanged -= OnUsernameChanged;
+        TextureUrl.OnValueChanged -= OnTextureChanged;
+
+        if (IsServer)
         {
             Save();
         }
 
-        if (GameManager.Instance != null)
+        if (GameManager.Instance?.MainCanvasObjects?.Hud != null)
         {
             GameManager.Instance.MainCanvasObjects.Hud.SetActive(false);
         }
@@ -85,56 +104,64 @@ public class PlayerSetup : NetworkBehaviour
         }
     }
 
-    [Command]
-    private void CmdHeresMyJoiningDetails(string token)
+    private void OnTextureChanged(string previousValue, string newValue)
     {
-        var playerData = GameManager.Instance.UserRegistry.Load(token);
-
-        if (playerData.Options == null)
-        {
-            playerData.Options = new Options();
-        }
-        if (string.IsNullOrWhiteSpace(playerData.Options.Culture))
-        {
-            playerData.Options.Culture = GameManager.Instance.Localizer.CurrentCulture;
-        }
-
-        LoadFromPlayerData(playerData);
-
-        if (!isLocalPlayer)
-        {
-            var loadJson = JsonUtility.ToJson(playerData);
-            connectionToClient.Send(Assets.Core.Networking.MessageIds.LoadPlayerData, new StringMessage(loadJson));
-        }
-
-        RpcSetPlayerDetails();
+        SetTexture();
     }
 
-    [ClientRpc]
-    private void RpcSetPlayerDetails()
+    private void OnUsernameChanged(string previousValue, string newValue)
     {
-        if (!isLocalPlayer)
-        {
-            SetNameTag();
-        }
+        SetNameTag();
+    }
 
-        SetTexture();
+    #endregion
+
+    [ServerRpc]
+    public void RequestPlayerDataServerRpc()
+    {
+        var playerData = Assets.Core.Registry.UserRegistry.LoadFromUsername(Username.Value);
+
+        //Debug.LogError("Sending playerData to clientId " + ClientId);
+
+        var json = JsonUtility.ToJson(playerData);
+        //todo: use compression? - var jsonCompressed = Assets.Core.Helpers.CompressionHelper.CompressString(json);
+
+        var stream = PooledNetworkBuffer.Get();
+        using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
+        {
+            writer.WriteString(json);
+            CustomMessagingManager.SendNamedMessage(nameof(Assets.Core.Networking.MessageType.LoadPlayerData), ClientId, stream, MLAPI.Transports.NetworkChannel.Internal);
+        }
+    }
+
+    [ServerRpc]
+    public void UpdatePlayerSettingsServerRpc(string textureUrl)
+    {
+        TextureUrl.Value = textureUrl;
     }
 
     private void SetNameTag()
     {
-        _nameTag.text = string.IsNullOrWhiteSpace(Username) ? "Player " + netId.Value : Username;
+        if (IsLocalPlayer)
+        {
+            _nameTag.text = null;
+            return;
+        }
+
+        _nameTag.text = string.IsNullOrWhiteSpace(Username.Value)
+            ? "Player " + NetworkObjectId
+            : Username.Value;
     }
 
     private void SetTexture()
     {
-        if (string.IsNullOrWhiteSpace(TextureUrl))
+        if (string.IsNullOrWhiteSpace(TextureUrl.Value))
         {
             return;
         }
 
         //todo: download player texture
-        var filePath = TextureUrl;
+        var filePath = TextureUrl.Value;
 
         var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
         tex.LoadImage(System.IO.File.ReadAllBytes(filePath));
@@ -145,46 +172,41 @@ public class PlayerSetup : NetworkBehaviour
 
         _mainMesh.material = newMat;
 
-        if (isLocalPlayer)
+        if (IsLocalPlayer)
         {
             _leftMesh.material = newMat;
             _rightMesh.material = newMat;
         }
     }
 
-    //public void UpdateTexture(string textureUrl)
-    //{
-    //    //todo: store the new textureUrl
-
-    //    CmdUpdateTexture(textureUrl);
-    //}
-
-    [Command]
-    public void CmdUpdateTexture(string textureUrl)
+    private void OnLoadPlayerData(ulong clientId, System.IO.Stream stream)
     {
-        TextureUrl = textureUrl;
-        RpcSetPlayerDetails();
-    }
+        //Debug.LogError("Recieved playerData from the server at clientId " + NetworkManager.Singleton.LocalClientId);
 
-    private void OnLoadPlayerData(NetworkMessage netMsg)
-    {
-        var playerData = JsonUtility.FromJson<PlayerData>(netMsg.ReadMessage<StringMessage>().value);
+        string message;
+        using (PooledNetworkReader reader = PooledNetworkReader.Get(stream))
+        {
+            message = reader.ReadString().ToString();
+        }
+
+        var playerData = JsonUtility.FromJson<PlayerData>(message);
         LoadFromPlayerData(playerData);
     }
 
-    private void LoadFromPlayerData(PlayerData playerData)
+    public void LoadFromPlayerData(PlayerData playerData)
     {
-        Username = playerData.Username;
-        TextureUrl = playerData.Options.TextureUrl;
-
-        GameManager.Instance.MainCanvasObjects.SettingsUi.GetComponent<SettingsMenuUi>().LoadFromPlayerData(playerData);
-
-        _loadWasSuccessful = _inventory.ApplyChanges(playerData?.Inventory, true);
+        Username.Value = playerData.Username;
+        TextureUrl.Value = playerData.Options.TextureUrl;
+        _loadWasSuccessful = _inventory.ApplyInventory(playerData?.Inventory, true);
     }
 
-    [Server]
     private void Save()
     {
+        if (!IsServer)
+        {
+            Debug.LogWarning("Tried to save when not on the server");
+        }
+
         //Debug.Log("Saving player data for " + gameObject.name);
 
         if (!_loadWasSuccessful)
@@ -195,7 +217,7 @@ public class PlayerSetup : NetworkBehaviour
 
         var saveData = new PlayerData
         {
-            Username = Username,
+            Username = Username.Value,
             Inventory = _inventory.GetSaveData()
         };
 
@@ -205,7 +227,7 @@ public class PlayerSetup : NetworkBehaviour
         //    return;
         //}
 
-        GameManager.Instance.UserRegistry.Save(saveData);
+        Assets.Core.Registry.UserRegistry.Save(saveData);
     }
 
 }
