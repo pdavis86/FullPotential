@@ -831,7 +831,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 539a34b53138d9549b95a671dcbf5f06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HasMenuOpen: 0
   _playerCamera: {fileID: 7392779647204144589}
   _inFrontOfPlayerCamera: {fileID: 8117841901429913958}
 --- !u!114 &8498825506124217745
@@ -861,7 +860,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5046254fc5ea4349a715ea4e6aa53f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerCamera: {fileID: 7392779647204144589}
+  _playerCamera: {fileID: 7392779647204144589}
   _speed: 5
   _lookSensitivity: 0.7
   _cameraRotationLimit: 85

@@ -35,7 +35,7 @@ public class PlayerClientSide : NetworkBehaviour
 
     #region Unity event handlers
 
-    void Awake()
+    void Start()
     {
         _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;
         _mainCanvasObjects.CraftingUi.SetActive(false);
@@ -50,13 +50,14 @@ public class PlayerClientSide : NetworkBehaviour
         _inventory = GetComponent<PlayerInventory>();
         _playerMovement = GetComponent<PlayerMovement>();
 
-        _inFrontOfPlayerCamera.gameObject.SetActive(true);
-
         _sceneCamera = Camera.main;
         if (_sceneCamera != null)
         {
             _sceneCamera.gameObject.SetActive(false);
         }
+
+        _inFrontOfPlayerCamera.gameObject.SetActive(true);
+        _playerCamera.gameObject.SetActive(true);
     }
 
     void OnInteract()
@@ -173,7 +174,7 @@ public class PlayerClientSide : NetworkBehaviour
     {
         Cursor.lockState = CursorLockMode.None;
 
-        if (_mainCanvasObjects.Hud != null)
+        if (_mainCanvasObjects?.Hud != null)
         {
             _mainCanvasObjects.Hud.SetActive(false);
             _mainCanvasObjects.CraftingUi.SetActive(false);

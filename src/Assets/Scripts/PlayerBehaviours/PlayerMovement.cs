@@ -13,12 +13,13 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMovement : MonoBehaviour
 {
-    public Camera PlayerCamera;
-
+#pragma warning disable 0649
+    [SerializeField] private Camera _playerCamera;
     [SerializeField] private float _speed = 5f;
     [SerializeField] private float _lookSensitivity = 0.7f;
     [SerializeField] private float _cameraRotationLimit = 85f;
     [SerializeField] private float _jumpForceMultipler = 10500f;
+#pragma warning restore 0649
 
     private Rigidbody _rb;
 
@@ -31,8 +32,6 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
-
-        PlayerCamera.gameObject.SetActive(true);
     }
 
     void OnMove(InputValue value)
@@ -87,7 +86,7 @@ public class PlayerMovement : MonoBehaviour
         var cameraRotationX = _lookVal.y * _lookSensitivity;
         _currentCameraRotationX -= cameraRotationX;
         _currentCameraRotationX = Mathf.Clamp(_currentCameraRotationX, -_cameraRotationLimit, _cameraRotationLimit);
-        PlayerCamera.transform.localEulerAngles = new Vector3(_currentCameraRotationX, 0f, 0f);
+        _playerCamera.transform.localEulerAngles = new Vector3(_currentCameraRotationX, 0f, 0f);
     }
 
 }
