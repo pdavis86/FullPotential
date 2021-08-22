@@ -34,8 +34,8 @@ public class PlayerInventory : NetworkBehaviour
     [HideInInspector]
     public GameObject[] EquippedObjects;
 
-    private PlayerSetup _playerSettings;
-    private PlayerController _playerController;
+    private PlayerState _playerState;
+    private PlayerClientSide _playerClientSide;
     private CraftingUi _craftingUi;
 
     //todo: Cache effective stats based on armour
@@ -66,8 +66,8 @@ public class PlayerInventory : NetworkBehaviour
 
     private void Start()
     {
-        _playerSettings = GetComponent<PlayerSetup>();
-        _playerController = GetComponent<PlayerController>();
+        _playerState = GetComponent<PlayerState>();
+        _playerClientSide = GetComponent<PlayerClientSide>();
 
         _craftingUi = GameManager.Instance.MainCanvasObjects.CraftingUi.GetComponent<CraftingUi>();
 
@@ -260,7 +260,7 @@ public class PlayerInventory : NetworkBehaviour
 
         //todo: are these both the same?
         var clientId = OwnerClientId;
-        clientId = _playerSettings.ClientId.Value;
+        clientId = _playerState.ClientId.Value;
 
         var stream = PooledNetworkBuffer.Get();
         using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
@@ -367,7 +367,7 @@ public class PlayerInventory : NetworkBehaviour
         var json = JsonUtility.ToJson(invChange);
 
         var clientId = OwnerClientId;
-        clientId = _playerSettings.ClientId.Value;
+        clientId = _playerState.ClientId.Value;
 
         var stream = PooledNetworkBuffer.Get();
         using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))

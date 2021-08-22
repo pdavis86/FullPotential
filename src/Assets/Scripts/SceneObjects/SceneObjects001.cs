@@ -50,13 +50,13 @@ public class SceneObjects001 : NetworkBehaviour
         var chosenSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Count)];
         var playerNetObj = Instantiate(_playerPrefabNetObj, chosenSpawnPoint.position, chosenSpawnPoint.rotation);
 
-        var playerSetup = playerNetObj.GetComponent<PlayerSetup>();
-        playerSetup.ClientId.Value = clientId;
+        var playerState = playerNetObj.GetComponent<PlayerState>();
+        playerState.ClientId.Value = clientId;
 
         playerNetObj.SpawnAsPlayerObject(clientId);
 
         var playerData = Assets.Core.Registry.UserRegistry.Load(playerToken);
-        playerSetup.LoadFromPlayerData(playerData);
+        playerState.LoadFromPlayerData(playerData);
     }
 
 }

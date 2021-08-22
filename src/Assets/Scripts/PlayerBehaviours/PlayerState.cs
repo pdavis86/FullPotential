@@ -15,13 +15,10 @@ using UnityEngine;
 // ReSharper disable UnassignedField.Compiler
 // ReSharper disable ConvertToUsingDeclaration
 
-//todo: rename to ?PlayerSettings?
-public class PlayerSetup : NetworkBehaviour
+public class PlayerState : NetworkBehaviour
 {
 #pragma warning disable 0649
-    [SerializeField] private Behaviour[] _objectsToDisable;
-    [SerializeField] private Camera _playerCamera;
-    [SerializeField] private Camera _inFrontOfPlayerCamera;
+    [SerializeField] private Behaviour[] _behavioursToDisable;
     [SerializeField] private TextMeshProUGUI _nameTag;
     [SerializeField] private MeshRenderer _mainMesh;
     [SerializeField] private MeshRenderer _leftMesh;
@@ -32,7 +29,6 @@ public class PlayerSetup : NetworkBehaviour
     public readonly NetworkVariable<string> Username = new NetworkVariable<string>();
     public readonly NetworkVariable<string> TextureUrl = new NetworkVariable<string>();
 
-    private Camera _sceneCamera;
     private PlayerInventory _inventory;
     private bool _loadWasSuccessful;
 
@@ -53,33 +49,20 @@ public class PlayerSetup : NetworkBehaviour
 
         if (!IsLocalPlayer)
         {
-            foreach (var comp in _objectsToDisable)
+            foreach (var comp in _behavioursToDisable)
             {
                 comp.enabled = false;
             }
 
-            SetNameTag();
-            SetTexture();
+            //todo: these should not be necessary calls for the client, right?
+            //SetNameTag();
+            //SetTexture();
+
             return;
         }
 
-        _sceneCamera = Camera.main;
-        if (_sceneCamera != null)
-        {
-            _sceneCamera.gameObject.SetActive(false);
-        }
-
-        _playerCamera.gameObject.SetActive(true);
-        _inFrontOfPlayerCamera.gameObject.SetActive(true);
-
-        var pm = gameObject.GetComponent<PlayerMovement>();
-        pm.PlayerCamera = _playerCamera;
-
-        if (IsLocalPlayer)
-        {
-            CustomMessagingManager.RegisterNamedMessageHandler(nameof(Assets.Core.Networking.MessageType.LoadPlayerData), OnLoadPlayerData);
-            RequestPlayerDataServerRpc();
-        }
+        CustomMessagingManager.RegisterNamedMessageHandler(nameof(Assets.Core.Networking.MessageType.LoadPlayerData), OnLoadPlayerData);
+        RequestPlayerDataServerRpc();
 
         GameManager.Instance.MainCanvasObjects.Hud.SetActive(true);
     }
@@ -92,16 +75,6 @@ public class PlayerSetup : NetworkBehaviour
         if (IsServer)
         {
             Save();
-        }
-
-        if (GameManager.Instance?.MainCanvasObjects?.Hud != null)
-        {
-            GameManager.Instance.MainCanvasObjects.Hud.SetActive(false);
-        }
-
-        if (_sceneCamera != null)
-        {
-            _sceneCamera.gameObject.SetActive(true);
         }
     }
 
@@ -139,6 +112,13 @@ public class PlayerSetup : NetworkBehaviour
     public void UpdatePlayerSettingsServerRpc(string textureUrl)
     {
         TextureUrl.Value = textureUrl;
+    }
+
+    public void LoadFromPlayerData(PlayerData playerData)
+    {
+        Username.Value = playerData.Username;
+        TextureUrl.Value = playerData.Options.TextureUrl;
+        _loadWasSuccessful = _inventory.ApplyInventory(playerData.Inventory, true);
     }
 
     private void SetNameTag()
@@ -192,13 +172,6 @@ public class PlayerSetup : NetworkBehaviour
 
         var playerData = JsonUtility.FromJson<PlayerData>(message);
         LoadFromPlayerData(playerData);
-    }
-
-    public void LoadFromPlayerData(PlayerData playerData)
-    {
-        Username.Value = playerData.Username;
-        TextureUrl.Value = playerData.Options.TextureUrl;
-        _loadWasSuccessful = _inventory.ApplyInventory(playerData.Inventory, true);
     }
 
     private void Save()

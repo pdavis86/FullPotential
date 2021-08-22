@@ -16,19 +16,22 @@ using UnityEngine;
 // ReSharper disable UnassignedField.Global
 // ReSharper disable RedundantDiscardDesignation
 
-//todo: re-think this class. It should just be for the player to control their interation with the game
-
-public class PlayerController : NetworkBehaviour
+public class PlayerClientSide : NetworkBehaviour
 {
-    public Camera PlayerCamera;
-    public bool HasMenuOpen;
+#pragma warning disable 0649
+    [SerializeField] private Camera _playerCamera;
+    [SerializeField] private Camera _inFrontOfPlayerCamera;
+#pragma warning restore 0649
 
+    private bool _hasMenuOpen;
     private MainCanvasObjects _mainCanvasObjects;
     private bool _toggleGameMenu;
     private bool _toggleCharacterMenu;
     private PlayerInventory _inventory;
+    private PlayerMovement _playerMovement;
     private Interactable _focusedInteractable;
     private Hud _hud;
+    private Camera _sceneCamera;
 
     #region Unity event handlers
 
@@ -45,11 +48,20 @@ public class PlayerController : NetworkBehaviour
         }
 
         _inventory = GetComponent<PlayerInventory>();
+        _playerMovement = GetComponent<PlayerMovement>();
+
+        _inFrontOfPlayerCamera.gameObject.SetActive(true);
+
+        _sceneCamera = Camera.main;
+        if (_sceneCamera != null)
+        {
+            _sceneCamera.gameObject.SetActive(false);
+        }
     }
 
     void OnInteract()
     {
-        if (HasMenuOpen)
+        if (_hasMenuOpen)
         {
             return;
         }
@@ -116,7 +128,7 @@ public class PlayerController : NetworkBehaviour
         {
             if (_toggleGameMenu || _toggleCharacterMenu)
             {
-                if (HasMenuOpen)
+                if (_hasMenuOpen)
                 {
                     _mainCanvasObjects.HideAllMenus();
                 }
@@ -135,10 +147,11 @@ public class PlayerController : NetworkBehaviour
                 _toggleCharacterMenu = false;
             }
 
-            HasMenuOpen = _mainCanvasObjects.IsAnyMenuOpen();
-            _mainCanvasObjects.Hud.SetActive(!HasMenuOpen);
+            _hasMenuOpen = _mainCanvasObjects.IsAnyMenuOpen();
+            _mainCanvasObjects.Hud.SetActive(!_hasMenuOpen);
+            _playerMovement.enabled = !_hasMenuOpen;
 
-            if (HasMenuOpen)
+            if (_hasMenuOpen)
             {
                 if (Cursor.lockState != CursorLockMode.None)
                 {
@@ -165,19 +178,29 @@ public class PlayerController : NetworkBehaviour
             _mainCanvasObjects.Hud.SetActive(false);
             _mainCanvasObjects.CraftingUi.SetActive(false);
         }
+
+        if (_sceneCamera != null)
+        {
+            _sceneCamera.gameObject.SetActive(true);
+        }
+
+        if (GameManager.Instance?.MainCanvasObjects?.Hud != null)
+        {
+            GameManager.Instance.MainCanvasObjects.Hud.SetActive(false);
+        }
     }
 
     #endregion
 
     private void CheckForInteractable()
     {
-        var ray = PlayerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
+        var ray = _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
         if (Physics.Raycast(ray, out var hit, maxDistance: 1000))
         {
             var interactable = hit.collider.GetComponent<Interactable>();
             if (interactable != null)
             {
-                var distance = Vector3.Distance(PlayerCamera.transform.position, interactable.transform.position);
+                var distance = Vector3.Distance(_playerCamera.transform.position, interactable.transform.position);
                 if (distance <= interactable.Radius)
                 {
                     if (interactable != _focusedInteractable)
@@ -247,7 +270,7 @@ public class PlayerController : NetworkBehaviour
 
         Debug.Log($"Trying to interact with {interactable.name}");
 
-        var distance = Vector3.Distance(PlayerCamera.transform.position, interactable.transform.position);
+        var distance = Vector3.Distance(_playerCamera.transform.position, interactable.transform.position);
         if (distance <= interactable.Radius)
         {
             interactable.OnInteract(serverRpcParams.Receive.SenderClientId);
@@ -256,12 +279,12 @@ public class PlayerController : NetworkBehaviour
 
     void TryToAttack(bool leftHand)
     {
-        if (HasMenuOpen)
+        if (_hasMenuOpen)
         {
             return;
         }
 
-        CastSpellServerRpc(leftHand, PlayerCamera.transform.forward);
+        CastSpellServerRpc(leftHand, _playerCamera.transform.forward);
     }
 
     [ServerRpc]
@@ -301,7 +324,7 @@ public class PlayerController : NetworkBehaviour
 
         //todo: style projectile based on activeSpell
 
-        var startPos = PlayerCamera.transform.position + PlayerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
+        var startPos = _playerCamera.transform.position + _playerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
         var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.Spell, startPos, Quaternion.identity, GameManager.Instance.MainCanvasObjects.RuntimeObjectsContainer.transform);
 
         var spellScript = spellObject.GetComponent<SpellBehaviour>();
@@ -312,7 +335,6 @@ public class PlayerController : NetworkBehaviour
         spellObject.GetComponent<NetworkObject>().Spawn(null, true);
     }
 
-    //todo: move this method
     // ReSharper disable once UnusedParameter.Global
     [ClientRpc]
     public void ShowDamageClientRpc(Vector3 position, string damage, ClientRpcParams clientRpcParams = default)

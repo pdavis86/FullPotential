@@ -75,7 +75,7 @@ public class SettingsMenuUi : MonoBehaviour
         _skinUrlInput.text = playerData.Options.TextureUrl;
     }
 
-    public void SetLanguage(int index) //string value)
+    public void SetLanguage(int index)
     {
         var match = _cultures.ElementAt(index);
 
@@ -86,7 +86,7 @@ public class SettingsMenuUi : MonoBehaviour
 
     public void SaveAndClose()
     {
-        GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerSetup>().UpdatePlayerSettingsServerRpc(_skinUrlInput.text);
+        GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>().UpdatePlayerSettingsServerRpc(_skinUrlInput.text);
         GameManager.Instance.MainCanvasObjects.HideAllMenus();
     }
 

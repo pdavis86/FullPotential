@@ -810,21 +810,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 848d0c980b57f4f4dac3298eaf9f7d11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _objectsToDisable:
+  _behavioursToDisable:
   - {fileID: 1201570389013236167}
   - {fileID: 8498825506124217745}
   - {fileID: 7556515380981010776}
   - {fileID: 7867810801410850028}
-  _playerCamera: {fileID: 7392779647204144589}
-  _inFrontOfPlayerCamera: {fileID: 8117841901429913958}
   _nameTag: {fileID: 6250991307057261387}
   _mainMesh: {fileID: 7392779648629048398}
   _leftMesh: {fileID: 7392779647843419196}
   _rightMesh: {fileID: 7392779647605690758}
-  Username:
-    m_InternalValue: 
-  TextureUrl:
-    m_InternalValue: 
 --- !u!114 &1201570389013236167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -837,8 +831,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 539a34b53138d9549b95a671dcbf5f06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerCamera: {fileID: 7392779647204144589}
   HasMenuOpen: 0
+  _playerCamera: {fileID: 7392779647204144589}
+  _inFrontOfPlayerCamera: {fileID: 8117841901429913958}
 --- !u!114 &8498825506124217745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -866,7 +861,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5046254fc5ea4349a715ea4e6aa53f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerCamera: {fileID: 0}
+  PlayerCamera: {fileID: 7392779647204144589}
   _speed: 5
   _lookSensitivity: 0.7
   _cameraRotationLimit: 85

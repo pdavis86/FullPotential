@@ -11,7 +11,6 @@ using UnityEngine.InputSystem;
 // ReSharper disable UnassignedField.Global
 
 [RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(PlayerController))]
 public class PlayerMovement : MonoBehaviour
 {
     public Camera PlayerCamera;
@@ -22,7 +21,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float _jumpForceMultipler = 10500f;
 
     private Rigidbody _rb;
-    private PlayerController _playerController;
 
     private Vector2 _moveVal;
     private Vector2 _lookVal;
@@ -33,7 +31,8 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
-        _playerController = GetComponent<PlayerController>();
+
+        PlayerCamera.gameObject.SetActive(true);
     }
 
     void OnMove(InputValue value)
@@ -53,18 +52,8 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        try
-        {
-            if (!_playerController.HasMenuOpen)
-            {
-                PerformMovement();
-                PerformRotation();
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError(ex);
-        }
+        PerformMovement();
+        PerformRotation();
     }
 
     void PerformMovement()
