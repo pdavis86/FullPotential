@@ -29,8 +29,10 @@ public class PlayerState : NetworkBehaviour
     public readonly NetworkVariable<string> Username = new NetworkVariable<string>();
     public readonly NetworkVariable<string> TextureUrl = new NetworkVariable<string>();
 
-    private PlayerInventory _inventory;
+    private PlayerInventory _inventory = new PlayerInventory();
     private bool _loadWasSuccessful;
+
+    //todo: public event Action NetworkReadied;
 
     #region Event handlers
 
@@ -39,9 +41,10 @@ public class PlayerState : NetworkBehaviour
         Username.OnValueChanged += OnUsernameChanged;
         TextureUrl.OnValueChanged += OnTextureChanged;
 
-        _inventory = GetComponent<PlayerInventory>();
-
-        GameManager.Instance.DataStore.LocalPlayer = gameObject;
+        if (IsLocalPlayer)
+        {
+            GameManager.Instance.DataStore.LocalPlayer = gameObject;
+        }
     }
 
     private void Start()
