@@ -17,7 +17,7 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
 {
     protected GameObject _sourcePlayer;
 
-    private PlayerClientSide _playerClientSide;
+    private PlayerState _playerState;
     private ClientRpcParams _clientRpcParams;
 
     // ReSharper disable once InconsistentNaming
@@ -31,17 +31,15 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
             return;
         }
 
-        if (_playerClientSide == null)
+        if (_playerState == null)
         {
-            _playerClientSide = _sourcePlayer.GetComponent<PlayerClientSide>();
-
-            var playerState = _sourcePlayer.GetComponent<PlayerState>();
+            _playerState = _sourcePlayer.GetComponent<PlayerState>();
 
             _clientRpcParams = new ClientRpcParams
             {
                 Send = new ClientRpcSendParams
                 {
-                    TargetClientIds = new[] { playerState.ClientId.Value }
+                    TargetClientIds = new[] { _playerState.ClientId.Value }
                 }
             };
         }
@@ -72,7 +70,7 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
 
         //todo: check Luck then apply lingering
 
-        _playerClientSide.ShowDamageClientRpc(position, damageDealt.ToString(CultureInfo.InvariantCulture), _clientRpcParams);
+        _playerState.ShowDamageClientRpc(position, damageDealt.ToString(CultureInfo.InvariantCulture), _clientRpcParams);
 
         //todo: give source experience
     }

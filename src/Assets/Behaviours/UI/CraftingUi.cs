@@ -3,6 +3,7 @@ using Assets.Core.Extensions;
 using Assets.Core.Localization;
 using Assets.Core.Registry.Base;
 using Assets.Core.Registry.Types;
+using Assets.Core.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,7 @@ public class CraftingUi : MonoBehaviour
     [SerializeField] private Text _craftErrors;
 #pragma warning restore 0649
 
-    private PlayerInventory _inventory;
+    private PlayerState _playerState;
     private List<ItemBase> _components;
     private Dictionary<Type, string> _craftingCategories;
     private Dictionary<IGearArmor, string> _armorTypes;
@@ -46,7 +47,7 @@ public class CraftingUi : MonoBehaviour
     {
         _components = new List<ItemBase>();
 
-        _inventory = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerInventory>();
+        _playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
 
         _typeDropdown.onValueChanged.AddListener(TypeOnValueChanged);
 
@@ -99,7 +100,7 @@ public class CraftingUi : MonoBehaviour
         var selectedSubType = GetCraftableTypeName(selectedType);
         var isTwoHanded = IsTwoHandedSelected();
 
-        _inventory.CraftItemServerRpc(componentIds, selectedType, selectedSubType, isTwoHanded, _craftName.text);
+        _playerState.CraftItemServerRpc(componentIds, selectedType, selectedSubType, isTwoHanded, _craftName.text);
     }
 
     void SubTypeOnValueChanged(int index)
@@ -177,7 +178,7 @@ public class CraftingUi : MonoBehaviour
 
     public void AddComponent(string itemId)
     {
-        var item = _inventory.Items.FirstOrDefault(x => x.Id == itemId);
+        var item = _playerState.Inventory.GetItemWithId<ItemBase>(itemId);
 
         if (item == null)
         {
@@ -227,7 +228,7 @@ public class CraftingUi : MonoBehaviour
             null,
             _componentsContainer,
             _rowPrefab,
-            _inventory,
+            _playerState.Inventory,
             HandleRowToggle,
             null,
             false
@@ -295,7 +296,7 @@ public class CraftingUi : MonoBehaviour
             _components
         );
 
-        var errors = _inventory.ValidateIsCraftable(_components.Select(x => x.Id).ToArray(), craftedItem);
+        var errors = _playerState.Inventory.ValidateIsCraftable(_components.Select(x => x.Id).ToArray(), craftedItem);
         if (errors.Any())
         {
             _craftErrors.text = string.Join(Environment.NewLine, errors);

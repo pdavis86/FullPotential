@@ -30,7 +30,9 @@ public class SettingsMenuUi : MonoBehaviour
 
     void Awake()
     {
+        //todo: this is really slow!
         LoadCultures();
+
         _languageDropDown.options.Clear();
         _languageDropDown.AddOptions(_cultures.Select(x => x.Value).ToList());
 

@@ -738,7 +738,6 @@ GameObject:
   - component: {fileID: 7392779647718654624}
   - component: {fileID: -7000673966011584055}
   - component: {fileID: 1201570389013236167}
-  - component: {fileID: 8498825506124217745}
   - component: {fileID: 7556515380981010776}
   - component: {fileID: 7867810801410850028}
   - component: {fileID: 4700276935100274849}
@@ -812,7 +811,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _behavioursToDisable:
   - {fileID: 1201570389013236167}
-  - {fileID: 8498825506124217745}
+  - {fileID: 0}
   - {fileID: 7556515380981010776}
   - {fileID: 7867810801410850028}
   _nameTag: {fileID: 6250991307057261387}
@@ -833,21 +832,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerCamera: {fileID: 7392779647204144589}
   _inFrontOfPlayerCamera: {fileID: 8117841901429913958}
---- !u!114 &8498825506124217745
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7392779647718654627}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d78daeeb1ec05df4b90fa44c9fb0148e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MaxItems: 30
-  EquipSlots: []
-  EquippedObjects: []
 --- !u!114 &7556515380981010776
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,6 +1,7 @@
 ﻿using Assets.ApiScripts.Registry;
 using Assets.Core.Extensions;
 using Assets.Core.Registry.Base;
+using Assets.Core.Storage;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,12 +24,12 @@ public class CharacterMenuUi : MonoBehaviour
     [SerializeField] private GameObject _slotsContainer;
 #pragma warning restore 0649
 
-    private PlayerInventory _inventory;
+    private PlayerState _playerState;
     private GameObject _lastClickedSlot;
 
     private void Awake()
     {
-        _inventory = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerInventory>();
+        _playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
     }
 
     private void OnEnable()
@@ -82,23 +83,10 @@ public class CharacterMenuUi : MonoBehaviour
 
         if (reloadSlots)
         {
-            for (var i = 0; i < _inventory.EquipSlots.Length; i++)
+            for (var i = 0; i < _playerState.Inventory.GetSlotCount(); i++)
             {
                 var slotName = System.Enum.GetName(typeof(PlayerInventory.SlotIndexToGameObjectName), i);
-
-                var itemId = _inventory.EquipSlots[i];
-                if (!string.IsNullOrWhiteSpace(itemId))
-                {
-                    var item = _inventory.Items.FirstOrDefault(x => x.Id == itemId);
-
-                    //Debug.Log($"Displaying '{itemId}' in UI slot '{slotName}'");
-
-                    SetSlot(GetSlot(slotName), item);
-                }
-                else
-                {
-                    SetSlot(GetSlot(slotName), null);
-                }
+                SetSlot(GetSlot(slotName), _playerState.Inventory.GetItemInSlot(i));
             }
         }
     }
@@ -144,7 +132,7 @@ public class CharacterMenuUi : MonoBehaviour
             slot,
             _componentsContainer,
             _rowPrefab,
-            _inventory,
+            _playerState.Inventory,
             HandleRowToggle,
             inventorySlot
         );
@@ -161,7 +149,7 @@ public class CharacterMenuUi : MonoBehaviour
 
                 //Debug.Log($"Setting item for slot '{slot.name}' to be '{item.Name}'");
 
-                _inventory.SetItemToSlotOnBoth(slot.name, item.Id);
+                _playerState.Inventory.SetItemToSlot(slot.name, item.Id);
 
                 SetSlot(slot, item);
 

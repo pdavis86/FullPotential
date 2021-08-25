@@ -31,6 +31,7 @@ public class SpellBehaviour : AttackBehaviourBase
     {
         if (!IsServer)
         {
+            //No need to Debug.LogError(). We only want this behaviour on the server
             return;
         }
 
@@ -38,7 +39,7 @@ public class SpellBehaviour : AttackBehaviourBase
 
         Physics.IgnoreCollision(GetComponent<Collider>(), _sourcePlayer.GetComponent<Collider>());
 
-        _spell = _sourcePlayer.GetComponent<PlayerInventory>().Items.FirstOrDefault(x => x.Id == SpellId.Value) as Spell;
+        _spell = _sourcePlayer.GetComponent<PlayerState>().Inventory.GetItemWithId<Spell>(SpellId.Value);
 
         if (_spell == null)
         {

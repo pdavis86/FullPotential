@@ -2,6 +2,7 @@
 using Assets.Core.Extensions;
 using Assets.Core.Registry.Base;
 using Assets.Core.Registry.Types;
+using Assets.Core.Storage;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -29,12 +30,7 @@ public class InventoryItemsList : MonoBehaviour
         var rowRectTransform = rowPrefab.GetComponent<RectTransform>();
         var rowCounter = 0;
 
-        var itemsForSlot = inventory.Items.Where(x =>
-            inventorySlot == null
-            || (x is Accessory acc && (int)((IGearAccessory)acc.RegistryType).InventorySlot == (int)inventorySlot)
-            || (x is Armor armor && (int)((IGearArmor)armor.RegistryType).InventorySlot == (int)inventorySlot)
-            || ((x is Weapon || x is Spell) && inventorySlot == IGear.GearSlot.Hand)
-        );
+        var itemsForSlot = inventory.GetItemsForSlotId(inventorySlot);;
 
         if (!itemsForSlot.Any())
         {
@@ -44,7 +40,7 @@ public class InventoryItemsList : MonoBehaviour
 
         foreach (var item in itemsForSlot)
         {
-            var isEquipped = inventory.EquipSlots.Contains(item.Id);
+            var isEquipped = inventory.IsEquipped(item.Id);
 
             if (isEquipped && !showEquippedItems)
             {

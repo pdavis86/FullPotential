@@ -1,7 +1,9 @@
-﻿using Assets.Core.Registry.Types;
+﻿using Assets.Core.Data;
+using Assets.Core.Registry.Types;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
+using MLAPI.Serialization.Pooled;
 using System;
 using TMPro;
 using UnityEngine;
@@ -27,7 +29,7 @@ public class PlayerClientSide : NetworkBehaviour
     private MainCanvasObjects _mainCanvasObjects;
     private bool _toggleGameMenu;
     private bool _toggleCharacterMenu;
-    private PlayerInventory _inventory;
+    private PlayerState _playerState;
     private PlayerMovement _playerMovement;
     private Interactable _focusedInteractable;
     private Hud _hud;
@@ -52,7 +54,8 @@ public class PlayerClientSide : NetworkBehaviour
             _mainCanvasObjects.DebuggingOverlay.SetActive(true);
         }
 
-        _inventory = GetComponent<PlayerInventory>();
+        _playerState = GetComponent<PlayerState>();
+
         _playerMovement = GetComponent<PlayerMovement>();
 
         _sceneCamera = Camera.main;
@@ -63,6 +66,8 @@ public class PlayerClientSide : NetworkBehaviour
 
         _inFrontOfPlayerCamera.gameObject.SetActive(true);
         _playerCamera.gameObject.SetActive(true);
+
+        CustomMessagingManager.RegisterNamedMessageHandler(nameof(Assets.Core.Networking.MessageType.InventoryChange), OnInventoryChange);
     }
 
     void OnInteract()
@@ -78,7 +83,7 @@ public class PlayerClientSide : NetworkBehaviour
             return;
         }
 
-        InteractServerRpc(_focusedInteractable.gameObject.name);
+        _playerState.InteractServerRpc(_focusedInteractable.gameObject.name);
     }
 
     void OnOpenCharacterMenu()
@@ -196,6 +201,20 @@ public class PlayerClientSide : NetworkBehaviour
         }
     }
 
+    private void OnInventoryChange(ulong clientId, System.IO.Stream stream)
+    {
+        //Debug.LogError("Recieved OnInventoryChange network message");
+
+        string message;
+        using (PooledNetworkReader reader = PooledNetworkReader.Get(stream))
+        {
+            message = reader.ReadString().ToString();
+        }
+
+        var changes = JsonUtility.FromJson<InventoryAndRemovals>(message);
+        _playerState.Inventory.ApplyInventoryAndRemovals(changes);
+    }
+
     #endregion
 
     private void CheckForInteractable()
@@ -231,119 +250,22 @@ public class PlayerClientSide : NetworkBehaviour
         }
     }
 
-    public void ShowAlert(string alertText)
-    {
-        //todo: cache this
-        var pars = new ClientRpcParams { Send = new ClientRpcSendParams() { TargetClientIds = new[] { OwnerClientId } } };
-
-        ShowAlertClientRpc(alertText, pars);
-    }
-
-    // ReSharper disable once UnusedParameter.Global
-    [ClientRpc]
-    public void ShowAlertClientRpc(string alertText, ClientRpcParams clientRpcParams = default)
-    {
-        _hud.ShowAlert(alertText);
-    }
-
-    // ReSharper disable once UnusedParameter.Global
-    [ServerRpc]
-    public void InteractServerRpc(string gameObjectName, ServerRpcParams serverRpcParams = default)
-    {
-        var player = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject;
-
-        Interactable interactable = null;
-        //todo: replace hard-coded radius
-        var collidersInRange = Physics.OverlapSphere(player.gameObject.transform.position, 5f);
-        foreach (var colliderNearby in collidersInRange)
-        {
-            if (colliderNearby.gameObject.name == gameObjectName)
-            {
-                var colliderInteractable = colliderNearby.gameObject.GetComponent<Interactable>();
-                if (colliderInteractable != null)
-                {
-                    interactable = colliderInteractable;
-                    break;
-                }
-            }
-        }
-
-        if (interactable == null)
-        {
-            Debug.LogError("Failed to find the interactable with gameObjectName " + gameObjectName);
-            return;
-        }
-
-        Debug.Log($"Trying to interact with {interactable.name}");
-
-        var distance = Vector3.Distance(_playerCamera.transform.position, interactable.transform.position);
-        if (distance <= interactable.Radius)
-        {
-            interactable.OnInteract(serverRpcParams.Receive.SenderClientId);
-        }
-    }
-
-    void TryToAttack(bool leftHand)
+    private void TryToAttack(bool leftHand)
     {
         if (_hasMenuOpen)
         {
             return;
         }
 
-        CastSpellServerRpc(leftHand, _playerCamera.transform.forward);
+        _playerState.CastSpellServerRpc(leftHand, _playerCamera.transform.position, _playerCamera.transform.forward);
     }
 
-    [ServerRpc]
-    private void CastSpellServerRpc(bool leftHand, Vector3 direction, ServerRpcParams serverRpcParams = default)
+    public void ShowAlert(string alertText)
     {
-        var activeSpell = _inventory.GetSpellInHand(leftHand);
-
-        if (activeSpell == null)
-        {
-            return;
-        }
-
-        switch (activeSpell.Targeting)
-        {
-            case Assets.Core.Spells.Targeting.Projectile _:
-                SpawnSpellProjectile(activeSpell, leftHand, direction, serverRpcParams.Receive.SenderClientId);
-                break;
-
-            case Assets.Core.Spells.Targeting.Self _:
-            case Assets.Core.Spells.Targeting.Touch _:
-            case Assets.Core.Spells.Targeting.Beam _:
-            case Assets.Core.Spells.Targeting.Cone _:
-                //todo: other spell targeting options
-                throw new NotImplementedException();
-
-            default:
-                throw new Exception($"Unexpected spell targeting with TypeName: '{activeSpell.Targeting.TypeName}'");
-        }
+        _hud.ShowAlert(alertText);
     }
 
-    private void SpawnSpellProjectile(Spell activeSpell, bool leftHand, Vector3 direction, ulong clientId)
-    {
-        if (!IsServer)
-        {
-            Debug.LogWarning("Tried to spawn a projectile when not on the server");
-        }
-
-        //todo: style projectile based on activeSpell
-
-        var startPos = _playerCamera.transform.position + _playerCamera.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
-        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.Spell, startPos, Quaternion.identity, GameManager.Instance.MainCanvasObjects.RuntimeObjectsContainer.transform);
-
-        var spellScript = spellObject.GetComponent<SpellBehaviour>();
-        spellScript.PlayerClientId = new NetworkVariable<ulong>(clientId);
-        spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
-        spellScript.SpellDirection = new NetworkVariable<Vector3>(direction);
-
-        spellObject.GetComponent<NetworkObject>().Spawn(null, true);
-    }
-
-    // ReSharper disable once UnusedParameter.Global
-    [ClientRpc]
-    public void ShowDamageClientRpc(Vector3 position, string damage, ClientRpcParams clientRpcParams = default)
+    public void ShowDamage(Vector3 position, string damage)
     {
         var hit = Instantiate(GameManager.Instance.Prefabs.Combat.HitText);
         hit.transform.SetParent(GameManager.Instance.MainCanvasObjects.HitNumberContainer.transform, false);
@@ -363,6 +285,16 @@ public class PlayerClientSide : NetworkBehaviour
         sticky.WorldPosition = position;
 
         Destroy(hit, 1f);
+    }
+
+    public void RefreshCraftingWindow()
+    {
+        var _craftingUi = GameManager.Instance.MainCanvasObjects.CraftingUi.GetComponent<CraftingUi>();
+        if (_craftingUi.gameObject.activeSelf)
+        {
+            _craftingUi.ResetUi();
+            _craftingUi.LoadInventory();
+        }
     }
 
 }
