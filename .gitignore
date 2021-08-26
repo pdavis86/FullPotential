@@ -1,2 +1,4 @@
 ﻿/src/.vsconfig
 /src/Assets/TextMesh Pro
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+/src/Assets/AddressableAssetsData/Windows
