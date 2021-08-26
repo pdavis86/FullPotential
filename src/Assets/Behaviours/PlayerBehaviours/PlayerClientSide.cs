@@ -34,7 +34,13 @@ public class PlayerClientSide : NetworkBehaviour
 
     #region Unity event handlers
 
-    void Start()
+    private void Awake()
+    {
+        _playerState = GetComponent<PlayerState>();
+        _playerMovement = GetComponent<PlayerMovement>();
+    }
+
+    private void Start()
     {
         //var localClientIdMatches = _playerState.ClientId.Value == NetworkManager.Singleton.LocalClientId;
         //Debug.LogError($"PlayerClientSide - IsOwner: {IsOwner}, localClientIdMatches: {localClientIdMatches}, IsLocalPlayer: {IsLocalPlayer}");
@@ -49,20 +55,22 @@ public class PlayerClientSide : NetworkBehaviour
 
         _hud = _mainCanvasObjects.Hud.GetComponent<Hud>();
 
+        _mainCanvasObjects.Hud.SetActive(true);
+
         if (Debug.isDebugBuild)
         {
             _mainCanvasObjects.DebuggingOverlay.SetActive(true);
         }
-
-        _playerState = GetComponent<PlayerState>();
-
-        _playerMovement = GetComponent<PlayerMovement>();
 
         _sceneCamera = Camera.main;
         if (_sceneCamera != null)
         {
             _sceneCamera.gameObject.SetActive(false);
         }
+
+        //Avoids weapons clipping with other objects
+        _playerState.InFrontOfPlayer.transform.parent = _inFrontOfPlayerCamera.transform;
+        Assets.Helpers.GameObjectHelper.SetGameLayerRecursive(_playerState.InFrontOfPlayer, Assets.Constants.Layers.InFrontOfPlayer);
 
         _inFrontOfPlayerCamera.gameObject.SetActive(true);
         _playerCamera.gameObject.SetActive(true);
@@ -159,7 +167,7 @@ public class PlayerClientSide : NetworkBehaviour
             }
 
             _hasMenuOpen = _mainCanvasObjects.IsAnyMenuOpen();
-            _mainCanvasObjects.Hud.SetActive(!_hasMenuOpen);
+            //Can't see alerts if we diable the hud - _mainCanvasObjects.Hud.SetActive(!_hasMenuOpen);
             _playerMovement.enabled = !_hasMenuOpen;
 
             if (_hasMenuOpen)
@@ -213,6 +221,11 @@ public class PlayerClientSide : NetworkBehaviour
 
         var changes = JsonUtility.FromJson<InventoryAndRemovals>(message);
         _playerState.Inventory.ApplyInventoryAndRemovals(changes);
+
+        if (changes.IdsToRemove.Length > 0)
+        {
+            RefreshCraftingWindow();
+        }
     }
 
     #endregion

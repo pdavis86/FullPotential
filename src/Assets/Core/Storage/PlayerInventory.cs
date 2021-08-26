@@ -358,9 +358,12 @@ namespace Assets.Core.Storage
                     weapon.IsTwoHanded ? registryType.PrefabAddressTwoHanded : registryType.PrefabAddress,
                     prefab =>
                     {
-                        var weaponGo = UnityEngine.Object.Instantiate(prefab, _playerState.gameObject.transform);
+                        var weaponGo = UnityEngine.Object.Instantiate(prefab, _playerState.InFrontOfPlayer.transform);
                         weaponGo.transform.localEulerAngles = new Vector3(0, 90);
-                        weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, 0.3f, 0.75f);
+                        weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, -0.25f, 1.9f);
+
+                        Assets.Helpers.GameObjectHelper.SetGameLayerRecursive(weaponGo, _playerState.InFrontOfPlayer.layer);
+
                         _equippedObjects[index] = weaponGo;
                     }
                 );

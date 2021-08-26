@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9138282246304245507}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Staff
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -43,7 +43,7 @@ GameObject:
   - component: {fileID: 605406259023927951}
   - component: {fileID: 4885591097748977626}
   - component: {fileID: 1519600149698614175}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Shaft
   m_TagString: Untagged
   m_Icon: {fileID: 0}

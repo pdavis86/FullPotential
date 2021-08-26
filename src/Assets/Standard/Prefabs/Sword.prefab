@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8708848086076420660}
   - component: {fileID: 3708650307851706209}
   - component: {fileID: 7326348003808983844}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Grip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108,7 +108,7 @@ GameObject:
   - component: {fileID: 6817599142224340997}
   - component: {fileID: 1225827222819303820}
   - component: {fileID: 5460499960261732083}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Blade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -204,7 +204,7 @@ GameObject:
   - component: {fileID: 3231728207413562612}
   - component: {fileID: 2729434756687724636}
   - component: {fileID: 7848734339916416015}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Guard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -297,7 +297,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1039044745558396856}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Sword
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7917056403960094535}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Dagger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 5723233742848629771}
   - component: {fileID: 5067819627074113699}
   - component: {fileID: 1105681153938658544}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Guard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -141,7 +141,7 @@ GameObject:
   - component: {fileID: 4406947224986155258}
   - component: {fileID: 8266188030832714099}
   - component: {fileID: 2914940165448545804}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Blade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -237,7 +237,7 @@ GameObject:
   - component: {fileID: 1974949777365246667}
   - component: {fileID: 5819671773081210782}
   - component: {fileID: 439118400692055003}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Grip
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7518167889734098980}
   - component: {fileID: 8141100859397610884}
   - component: {fileID: 102426922177380037}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: RightLimb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108,7 +108,7 @@ GameObject:
   - component: {fileID: 5535228371776446192}
   - component: {fileID: 538982934463263653}
   - component: {fileID: 5882111645998110688}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: String
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -204,7 +204,7 @@ GameObject:
   - component: {fileID: 1068202221916275236}
   - component: {fileID: 2910018996207253637}
   - component: {fileID: 8716013396892149337}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -300,7 +300,7 @@ GameObject:
   - component: {fileID: 7624827605855283098}
   - component: {fileID: 360741025594056015}
   - component: {fileID: 2467485658169725113}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: LeftLimb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -393,7 +393,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4208176663494943612}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Crossbow
   m_TagString: Untagged
   m_Icon: {fileID: 0}

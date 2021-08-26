@@ -15,5 +15,19 @@ namespace Assets.Helpers
             return gameObject == null && !ReferenceEquals(gameObject, null);
         }
 
+        public static void SetGameLayerRecursive(GameObject gameObject, int layer)
+        {
+            gameObject.layer = layer;
+            foreach (Transform child in gameObject.transform)
+            {
+                child.gameObject.layer = layer;
+
+                Transform _HasChildren = child.GetComponentInChildren<Transform>();
+                if (_HasChildren != null)
+                    SetGameLayerRecursive(child.gameObject, layer);
+
+            }
+        }
+
     }
 }
