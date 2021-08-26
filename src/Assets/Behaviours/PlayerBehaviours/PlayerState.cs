@@ -18,6 +18,7 @@ using UnityEngine;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
 // ReSharper disable ConvertToUsingDeclaration
+// ReSharper disable RedundantDiscardDesignation
 
 public class PlayerState : NetworkBehaviour
 {
@@ -29,13 +30,12 @@ public class PlayerState : NetworkBehaviour
     [SerializeField] private MeshRenderer _rightMesh;
 #pragma warning restore 0649
 
-    public readonly NetworkVariable<ulong> ClientId = new NetworkVariable<ulong>();
+    public readonly NetworkVariable<ulong> ClientId = new NetworkVariable<ulong>(9999);
     public readonly NetworkVariable<string> Username = new NetworkVariable<string>();
     public readonly NetworkVariable<string> TextureUrl = new NetworkVariable<string>();
 
-    public PlayerInventory Inventory;
+    public readonly PlayerInventory Inventory;
 
-    private bool _localClientIdMatches;
     private bool _loadWasSuccessful;
     private PlayerClientSide _playerClientSide;
     private ClientRpcParams _clientRpcParams;
@@ -51,21 +51,18 @@ public class PlayerState : NetworkBehaviour
     {
         Username.OnValueChanged += OnUsernameChanged;
         TextureUrl.OnValueChanged += OnTextureChanged;
-
-        //todo: why does IsLocalPlayer not work here?
-        _localClientIdMatches = NetworkBehaviourId == NetworkManager.Singleton.LocalClientId;
-
-        if (_localClientIdMatches)
-        {
-            GameManager.Instance.DataStore.LocalPlayer = gameObject;
-        }
     }
 
     private void Start()
     {
-        gameObject.name = "Player ID " + NetworkObjectId;
+        //_localClientIdMatches = ClientId.Value == NetworkManager.Singleton.LocalClientId;
+        //Debug.LogError($"PlayerState - IsOwner: {IsOwner}, localClientIdMatches: {_localClientIdMatches}, IsLocalPlayer: {IsLocalPlayer}");
 
-        if (!_localClientIdMatches)
+        if (IsOwner)
+        {
+            GameManager.Instance.DataStore.LocalPlayer = gameObject;
+        }
+        else
         {
             foreach (var comp in _behavioursToDisable)
             {
@@ -75,27 +72,26 @@ public class PlayerState : NetworkBehaviour
             //todo: these should not be necessary calls for the client, right?
             //SetNameTag();
             //SetTexture();
-
-            return;
         }
 
-        _clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams() { TargetClientIds = new[] { OwnerClientId } } };
+        gameObject.name = "Player ID " + NetworkObjectId;
 
         _playerClientSide = GetComponent<PlayerClientSide>();
 
-        CustomMessagingManager.RegisterNamedMessageHandler(nameof(Assets.Core.Networking.MessageType.LoadPlayerData), OnLoadPlayerData);
-        RequestPlayerDataServerRpc();
+        _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
+        //_clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams() { TargetClientIds = new[] { OwnerClientId } } };
+
+        if (!IsServer)
+        {
+            CustomMessagingManager.RegisterNamedMessageHandler(nameof(Assets.Core.Networking.MessageType.LoadPlayerData), OnLoadPlayerData);
+            RequestPlayerDataServerRpc();
+        }
     }
 
     private void OnDisable()
     {
         Username.OnValueChanged -= OnUsernameChanged;
         TextureUrl.OnValueChanged -= OnTextureChanged;
-
-        if (IsServer)
-        {
-            Save();
-        }
     }
 
     private void OnTextureChanged(string previousValue, string newValue)
@@ -267,11 +263,11 @@ public class PlayerState : NetworkBehaviour
         }
     }
 
-    [ServerRpc]
-    private void SetItemToSlotServerRpc(string slotName, string itemId)
-    {
-        Inventory.SetItemToSlot(slotName, itemId);
-    }
+    //[ServerRpc]
+    //private void SetItemToSlotServerRpc(string slotName, string itemId)
+    //{
+    //    Inventory.SetItemToSlot(slotName, itemId);
+    //}
 
     #endregion
 
@@ -324,7 +320,7 @@ public class PlayerState : NetworkBehaviour
 
     private void SetNameTag()
     {
-        if (_localClientIdMatches)
+        if (IsOwner)
         {
             _nameTag.text = null;
             return;
@@ -354,14 +350,14 @@ public class PlayerState : NetworkBehaviour
 
         _mainMesh.material = newMat;
 
-        if (_localClientIdMatches)
+        if (IsOwner)
         {
             _leftMesh.material = newMat;
             _rightMesh.material = newMat;
         }
     }
 
-    private void Save()
+    public void Save()
     {
         if (!IsServer)
         {

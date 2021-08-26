@@ -1,8 +1,6 @@
 ﻿using Assets.Core.Data;
-using Assets.Core.Registry.Types;
 using MLAPI;
 using MLAPI.Messaging;
-using MLAPI.NetworkVariable;
 using MLAPI.Serialization.Pooled;
 using System;
 using TMPro;
@@ -16,7 +14,6 @@ using UnityEngine;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
 // ReSharper disable UnassignedField.Global
-// ReSharper disable RedundantDiscardDesignation
 
 public class PlayerClientSide : NetworkBehaviour
 {
@@ -39,7 +36,10 @@ public class PlayerClientSide : NetworkBehaviour
 
     void Start()
     {
-        if (!IsLocalPlayer)
+        //var localClientIdMatches = _playerState.ClientId.Value == NetworkManager.Singleton.LocalClientId;
+        //Debug.LogError($"PlayerClientSide - IsOwner: {IsOwner}, localClientIdMatches: {localClientIdMatches}, IsLocalPlayer: {IsLocalPlayer}");
+
+        if (!IsOwner)
         {
             return;
         }
@@ -289,11 +289,11 @@ public class PlayerClientSide : NetworkBehaviour
 
     public void RefreshCraftingWindow()
     {
-        var _craftingUi = GameManager.Instance.MainCanvasObjects.CraftingUi.GetComponent<CraftingUi>();
-        if (_craftingUi.gameObject.activeSelf)
+        var craftingUi = GameManager.Instance.MainCanvasObjects.CraftingUi.GetComponent<CraftingMenuUi>();
+        if (craftingUi.gameObject.activeSelf)
         {
-            _craftingUi.ResetUi();
-            _craftingUi.LoadInventory();
+            craftingUi.ResetUi();
+            craftingUi.LoadInventory();
         }
     }
 

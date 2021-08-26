@@ -45,7 +45,8 @@ public class NetworkStats : NetworkBehaviour
             return;
         }
 
-        _pongClientParams = new ClientRpcParams { Send = new ClientRpcSendParams() { TargetClientIds = new[] { OwnerClientId } } };
+        _pongClientParams.Send.TargetClientIds = new[] { OwnerClientId };
+        //_pongClientParams = new ClientRpcParams { Send = new ClientRpcSendParams() { TargetClientIds = new[] { OwnerClientId } } };
     }
 
     void FixedUpdate()

@@ -35,13 +35,14 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
         {
             _playerState = _sourcePlayer.GetComponent<PlayerState>();
 
-            _clientRpcParams = new ClientRpcParams
-            {
-                Send = new ClientRpcSendParams
-                {
-                    TargetClientIds = new[] { _playerState.ClientId.Value }
-                }
-            };
+            _clientRpcParams.Send.TargetClientIds = new[] { _playerState.ClientId.Value };
+            //_clientRpcParams = new ClientRpcParams
+            //{
+            //    Send = new ClientRpcSendParams
+            //    {
+            //        TargetClientIds = new[] { _playerState.ClientId.Value }
+            //    }
+            //};
         }
 
         var targetIsPlayer = target.CompareTag(Tags.Player);

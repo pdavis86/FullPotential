@@ -34,6 +34,7 @@ public class JoinOrHostGame : MonoBehaviour
         _networkManager = NetworkManager.Singleton;
         _networkTransport = _networkManager.GetComponent<UNetTransport>();
         _scene2Name = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(2));
+
     }
 
     #region Button Event Handlers

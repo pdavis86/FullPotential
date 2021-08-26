@@ -74,7 +74,22 @@ public class GameManager : MonoBehaviour
         Prefabs = GetComponent<Prefabs>();
         MainCanvasObjects = _mainCanvas.GetComponent<MainCanvasObjects>();
 
+        MLAPI.NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
+
         SceneManager.LoadSceneAsync(1);
+    }
+
+    private void ApprovalCheck(byte[] connectionData, ulong clientId, MLAPI.NetworkManager.ConnectionApprovedDelegate callback)
+    {
+        //Work-around for v0.1.0 of MLAPI not sending initial positions for GameObjects with Network Transform components
+        //See https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/650
+        GameObject.Find("TempEnemyShape").transform.position += new Vector3(1f, -1f, 1f);
+
+        //todo: validate login credentials
+        //todo: test to see if game is full
+        //todo: test for a duplicate login
+
+        callback(false, null, true, null, null);
     }
 
     private static string GetAppLoadOptions()

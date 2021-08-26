@@ -4,7 +4,6 @@ using Assets.Helpers;
 using MLAPI;
 using MLAPI.NetworkVariable;
 using System;
-using System.Linq;
 using UnityEngine;
 
 // ReSharper disable CheckNamespace

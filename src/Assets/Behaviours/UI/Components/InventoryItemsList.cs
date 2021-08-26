@@ -1,7 +1,6 @@
 ﻿using Assets.ApiScripts.Registry;
 using Assets.Core.Extensions;
 using Assets.Core.Registry.Base;
-using Assets.Core.Registry.Types;
 using Assets.Core.Storage;
 using System;
 using System.Linq;
@@ -30,7 +29,7 @@ public class InventoryItemsList : MonoBehaviour
         var rowRectTransform = rowPrefab.GetComponent<RectTransform>();
         var rowCounter = 0;
 
-        var itemsForSlot = inventory.GetItemsForSlotId(inventorySlot);;
+        var itemsForSlot = inventory.GetItemsForSlotId(inventorySlot);
 
         if (!itemsForSlot.Any())
         {

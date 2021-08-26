@@ -11,16 +11,20 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+// ReSharper disable PossibleMultipleEnumeration
+// ReSharper disable ConvertToUsingDeclaration
+
 namespace Assets.Core.Storage
 {
     public class PlayerInventory
     {
-        private PlayerState _playerState;
+        private readonly PlayerState _playerState;
+        private readonly List<ItemBase> _items;
+        private readonly int _slotCount;
+        private readonly GameObject[] _equippedObjects;
+
         private int _maxItems;
-        private List<ItemBase> _items;
-        private int _slotCount;
         private string[] _equipSlots;
-        private GameObject[] _equippedObjects;
 
         //todo: Cache effective stats based on armour
 
@@ -251,23 +255,23 @@ namespace Assets.Core.Storage
             using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
             {
                 writer.WriteString(json);
-                CustomMessagingManager.SendNamedMessage(nameof(Assets.Core.Networking.MessageType.InventoryChange), _playerState.OwnerClientId, stream);
+                CustomMessagingManager.SendNamedMessage(nameof(Networking.MessageType.InventoryChange), _playerState.OwnerClientId, stream);
             }
         }
 
-        public void RemoveIds(IEnumerable<string> idEnumerable)
-        {
-            foreach (var id in idEnumerable)
-            {
-                var matchingItem = _items.FirstOrDefault(x => x.Id.ToString().Equals(id, StringComparison.OrdinalIgnoreCase));
-                if (matchingItem == null)
-                {
-                    Debug.LogError("No item found with ID: " + id);
-                    continue;
-                }
-                _items.Remove(matchingItem);
-            }
-        }
+        //public void RemoveIds(IEnumerable<string> idEnumerable)
+        //{
+        //    foreach (var id in idEnumerable)
+        //    {
+        //        var matchingItem = _items.FirstOrDefault(x => x.Id.ToString().Equals(id, StringComparison.OrdinalIgnoreCase));
+        //        if (matchingItem == null)
+        //        {
+        //            Debug.LogError("No item found with ID: " + id);
+        //            continue;
+        //        }
+        //        _items.Remove(matchingItem);
+        //    }
+        //}
 
         public List<ItemBase> GetComponentsFromIds(string[] componentIds)
         {
@@ -338,7 +342,7 @@ namespace Assets.Core.Storage
             return item as Spell;
         }
 
-        public void SpawnItemInHand(int index, ItemBase item, bool leftHand = true)
+        private void SpawnItemInHand(int index, ItemBase item, bool leftHand = true)
         {
             if (item is Weapon weapon)
             {
@@ -368,7 +372,7 @@ namespace Assets.Core.Storage
             }
         }
 
-        public void EquipItem(int slotIndex, string itemId)
+        private void EquipItem(int slotIndex, string itemId)
         {
             var currentlyInGame = _equippedObjects[slotIndex];
             if (currentlyInGame != null)

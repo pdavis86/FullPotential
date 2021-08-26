@@ -7874,7 +7874,7 @@ MonoBehaviour:
     MaxReceiveEventsPerTickRate: 500
     EventTickrate: 64
     ClientConnectionBufferTimeout: 10
-    ConnectionApproval: 0
+    ConnectionApproval: 1
     ConnectionData: 
     EnableTimeResync: 0
     TimeResyncInterval: 30
@@ -8017,6 +8017,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 136698720258913445}
+  - component: {fileID: 4559024457428667747}
   m_Layer: 5
   m_Name: EscMenu
   m_TagString: Untagged
@@ -8024,6 +8025,18 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
+--- !u!114 &4559024457428667747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4559024457428667746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11a1ba4ceec3d374dbd1299b179f6e18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4582210529955083856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9069,8 +9082,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1354889467}
-        m_TargetAssemblyTypeName: 
+      - m_Target: {fileID: 4559024457428667747}
+        m_TargetAssemblyTypeName: EscMenuUi, Assembly-CSharp
         m_MethodName: BackToMainMenu
         m_Mode: 1
         m_Arguments:
@@ -9396,8 +9409,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 149.19666, y: -25}
-  m_SizeDelta: {x: 298.3933, y: 30}
+  m_AnchoredPosition: {x: 144.69666, y: -25}
+  m_SizeDelta: {x: 289.3933, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &7011060653684729664
 GameObject:
@@ -10679,8 +10692,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 149.19666, y: -85}
-  m_SizeDelta: {x: 298.3933, y: 30}
+  m_AnchoredPosition: {x: 144.69666, y: -85}
+  m_SizeDelta: {x: 289.3933, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7011060654028942922
 MonoBehaviour:
@@ -11644,7 +11657,7 @@ GameObject:
   - component: {fileID: 7011060654617723810}
   - component: {fileID: 7011060654617723812}
   m_Layer: 5
-  m_Name: Crafting
+  m_Name: CraftingMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11721,7 +11734,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7011060654617723808}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9fcbfa8d69ce904f9967b701604f61e, type: 3}
+  m_Script: {fileID: 11500000, guid: 12c4d94add6378241ae6a40dc020a9e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _componentsContainer: {fileID: 575204706}
@@ -12353,8 +12366,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 149.19666, y: -55}
-  m_SizeDelta: {x: 298.3933, y: 30}
+  m_AnchoredPosition: {x: 144.69666, y: -55}
+  m_SizeDelta: {x: 289.3933, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7011060654927345265
 MonoBehaviour:
@@ -12612,8 +12625,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1354889467}
-        m_TargetAssemblyTypeName: 
+      - m_Target: {fileID: 4559024457428667747}
+        m_TargetAssemblyTypeName: EscMenuUi, Assembly-CSharp
         m_MethodName: QuitGame
         m_Mode: 1
         m_Arguments:

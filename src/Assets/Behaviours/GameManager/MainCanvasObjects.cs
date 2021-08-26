@@ -77,16 +77,4 @@ public class MainCanvasObjects : MonoBehaviour
         ui.SetActive(true);
     }
 
-    public void BackToMainMenu()
-    {
-        HideAllMenus();
-        JoinOrHostGame.Disconnect();
-        UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(1);
-    }
-
-    public void QuitGame()
-    {
-        GameManager.Quit();
-    }
-
 }

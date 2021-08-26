@@ -1,9 +1,8 @@
-﻿using Assets.ApiScripts.Registry;
+using Assets.ApiScripts.Registry;
 using Assets.Core.Extensions;
 using Assets.Core.Localization;
 using Assets.Core.Registry.Base;
 using Assets.Core.Registry.Types;
-using Assets.Core.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +19,7 @@ using UnityEngine.UI;
 // ReSharper disable PossibleMultipleEnumeration
 // ReSharper disable InconsistentNaming
 
-public class CraftingUi : MonoBehaviour
+public class CraftingMenuUi : MonoBehaviour
 {
 #pragma warning disable 0649
     [SerializeField] private GameObject _componentsContainer;
