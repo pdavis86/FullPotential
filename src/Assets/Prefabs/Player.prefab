@@ -811,7 +811,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _behavioursToDisable:
   - {fileID: 1201570389013236167}
-  - {fileID: 0}
   - {fileID: 7556515380981010776}
   - {fileID: 7867810801410850028}
   _nameTag: {fileID: 6250991307057261387}
