@@ -3,7 +3,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnassignedField.Global
 
-namespace Assets.Core.Data
+namespace FullPotential.Assets.Core.Data
 {
     [Serializable]
     public class Localization

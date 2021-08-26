@@ -2,7 +2,7 @@
 
 // ReSharper disable ConditionIsAlwaysTrueOrFalse
 
-namespace Assets.Helpers
+namespace FullPotential.Assets.Helpers
 {
     public static class GameObjectHelper
     {
@@ -22,10 +22,11 @@ namespace Assets.Helpers
             {
                 child.gameObject.layer = layer;
 
-                Transform _HasChildren = child.GetComponentInChildren<Transform>();
-                if (_HasChildren != null)
+                Transform hasChildren = child.GetComponentInChildren<Transform>();
+                if (hasChildren != null)
+                {
                     SetGameLayerRecursive(child.gameObject, layer);
-
+                }
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using Assets.Core.Storage;
+﻿using FullPotential.Assets.Core.Storage;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -23,9 +23,9 @@ public class GameManager : MonoBehaviour
 #pragma warning restore 0649
 
     //Core components
-    public Assets.Core.Registry.TypeRegistry TypeRegistry { get; private set; }
-    public Assets.Core.Localization.Localizer Localizer { get; private set; }
-    public Assets.Core.Crafting.ResultFactory ResultFactory { get; private set; }
+    public FullPotential.Assets.Core.Registry.TypeRegistry TypeRegistry { get; private set; }
+    public FullPotential.Assets.Core.Localization.Localizer Localizer { get; private set; }
+    public FullPotential.Assets.Core.Crafting.ResultFactory ResultFactory { get; private set; }
 
 
     //Behaviours
@@ -55,10 +55,10 @@ public class GameManager : MonoBehaviour
 
         await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
 
-        TypeRegistry = new Assets.Core.Registry.TypeRegistry();
+        TypeRegistry = new FullPotential.Assets.Core.Registry.TypeRegistry();
         TypeRegistry.FindAndRegisterAll();
 
-        Localizer = new Assets.Core.Localization.Localizer(TypeRegistry.GetRegisteredModPaths());
+        Localizer = new FullPotential.Assets.Core.Localization.Localizer(TypeRegistry.GetRegisteredModPaths());
 
         var culture = GetLastUsedCulture();
         if (string.IsNullOrWhiteSpace(culture))
@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviour
 
         await Localizer.LoadLocalizationFiles(culture);
 
-        ResultFactory = new Assets.Core.Crafting.ResultFactory(TypeRegistry, Localizer);
+        ResultFactory = new FullPotential.Assets.Core.Crafting.ResultFactory(TypeRegistry, Localizer);
 
         Prefabs = GetComponent<Prefabs>();
         MainCanvasObjects = _mainCanvas.GetComponent<MainCanvasObjects>();

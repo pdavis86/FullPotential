@@ -1,7 +1,7 @@
-﻿using Assets.ApiScripts.Registry;
+﻿using FullPotential.Assets.Api.Registry;
 using System;
 
-namespace Assets.Standard.Effects.Elements
+namespace FullPotential.Assets.Standard.Effects.Elements
 {
     public class Ice : IElement
     {

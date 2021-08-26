@@ -1,6 +1,6 @@
-﻿using Assets.Core.Registry.Base;
+﻿using FullPotential.Assets.Core.Registry.Base;
 
-namespace Assets.Core.Registry.Types
+namespace FullPotential.Assets.Core.Registry.Types
 {
     [System.Serializable]
     public class Armor : GearBase

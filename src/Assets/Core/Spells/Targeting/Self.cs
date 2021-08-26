@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Assets.Core.Spells.Targeting
+namespace FullPotential.Assets.Core.Spells.Targeting
 {
     public class Self : ISpellTargeting
     {

@@ -7,4 +7,4 @@ dotnet_analyzer_diagnostic.category-Style.severity = none
 resharper_arrange_object_creation_when_type_evident_highlighting = none
 
 # CS0618: Type or member is obsolete
-dotnet_diagnostic.CS0618.severity = none
+#dotnet_diagnostic.CS0618.severity = none

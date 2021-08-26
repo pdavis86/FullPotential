@@ -1,7 +1,7 @@
-﻿using Assets.ApiScripts.Registry;
-using Assets.Core.Extensions;
-using Assets.Core.Registry.Base;
-using Assets.Core.Storage;
+﻿using FullPotential.Assets.Api.Registry;
+using FullPotential.Assets.Core.Extensions;
+using FullPotential.Assets.Core.Registry.Base;
+using FullPotential.Assets.Core.Storage;
 using System;
 using System.Linq;
 using UnityEngine;

@@ -1,7 +1,7 @@
-﻿using Assets.ApiScripts.Registry;
+﻿using FullPotential.Assets.Api.Registry;
 using System;
 
-namespace Assets.Standard.Effects.Debuffs
+namespace FullPotential.Assets.Standard.Effects.Debuffs
 {
     public class Slow : IEffectDebuff
     {

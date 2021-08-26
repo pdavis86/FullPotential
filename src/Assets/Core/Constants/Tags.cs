@@ -1,4 +1,4 @@
-﻿namespace Assets.Core.Constants
+﻿namespace FullPotential.Assets.Core.Constants
 {
     public static class Tags
     {

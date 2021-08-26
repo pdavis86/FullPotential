@@ -3,7 +3,7 @@ using System.Linq;
 
 // ReSharper disable ConvertIfStatementToNullCoalescingAssignment
 
-namespace Assets.Core.Extensions
+namespace FullPotential.Assets.Core.Extensions
 {
     public static class EnumerableExtensions
     {

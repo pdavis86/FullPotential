@@ -1,8 +1,8 @@
-﻿using Assets.ApiScripts;
+﻿using FullPotential.Assets.Api;
 using System;
 using System.Collections.Generic;
 
-namespace Assets.Standard
+namespace FullPotential.Assets.Standard
 {
     public class Registration : IRegistrationSteps
     {

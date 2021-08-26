@@ -1,5 +1,5 @@
-using Assets.Core.Data;
-using Assets.Extensions;
+using FullPotential.Assets.Core.Data;
+using FullPotential.Assets.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;

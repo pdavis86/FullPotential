@@ -1,9 +1,9 @@
-﻿using Assets.Core.Registry.Types;
+﻿using FullPotential.Assets.Core.Registry.Types;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnassignedField.Global
 
-namespace Assets.Core.Data
+namespace FullPotential.Assets.Core.Data
 {
     [System.Serializable]
     public class Inventory

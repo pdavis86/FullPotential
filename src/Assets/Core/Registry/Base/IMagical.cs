@@ -1,7 +1,7 @@
-﻿using Assets.Core.Spells.Shapes;
-using Assets.Core.Spells.Targeting;
+﻿using FullPotential.Assets.Core.Spells.Shapes;
+using FullPotential.Assets.Core.Spells.Targeting;
 
-namespace Assets.Core.Registry.Base
+namespace FullPotential.Assets.Core.Registry.Base
 {
     public interface IMagical
     {

@@ -1,8 +1,8 @@
-using Assets.ApiScripts.Registry;
-using Assets.Core.Extensions;
-using Assets.Core.Localization;
-using Assets.Core.Registry.Base;
-using Assets.Core.Registry.Types;
+using FullPotential.Assets.Api.Registry;
+using FullPotential.Assets.Core.Extensions;
+using FullPotential.Assets.Core.Localization;
+using FullPotential.Assets.Core.Registry.Base;
+using FullPotential.Assets.Core.Registry.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;

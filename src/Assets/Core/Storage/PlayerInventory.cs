@@ -1,8 +1,8 @@
-﻿using Assets.ApiScripts.Registry;
-using Assets.Core.Data;
-using Assets.Core.Extensions;
-using Assets.Core.Registry.Base;
-using Assets.Core.Registry.Types;
+﻿using FullPotential.Assets.Api.Registry;
+using FullPotential.Assets.Core.Data;
+using FullPotential.Assets.Core.Extensions;
+using FullPotential.Assets.Core.Registry.Base;
+using FullPotential.Assets.Core.Registry.Types;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.Serialization.Pooled;
@@ -14,7 +14,7 @@ using UnityEngine;
 // ReSharper disable PossibleMultipleEnumeration
 // ReSharper disable ConvertToUsingDeclaration
 
-namespace Assets.Core.Storage
+namespace FullPotential.Assets.Core.Storage
 {
     public class PlayerInventory
     {

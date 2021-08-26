@@ -1,8 +1,8 @@
-﻿using Assets.ApiScripts.Registry;
-using Assets.Core.Registry.Base;
-using Assets.Core.Registry.Types;
-using Assets.Core.Spells.Shapes;
-using Assets.Core.Spells.Targeting;
+﻿using FullPotential.Assets.Api.Registry;
+using FullPotential.Assets.Core.Registry.Base;
+using FullPotential.Assets.Core.Registry.Types;
+using FullPotential.Assets.Core.Spells.Shapes;
+using FullPotential.Assets.Core.Spells.Targeting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ using UnityEngine.AddressableAssets;
 // ReSharper disable ConvertToNullCoalescingCompoundAssignment
 // ReSharper disable PossibleMultipleEnumeration
 
-namespace Assets.Core.Registry
+namespace FullPotential.Assets.Core.Registry
 {
     public class TypeRegistry
     {

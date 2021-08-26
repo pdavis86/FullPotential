@@ -1,5 +1,5 @@
-﻿using Assets.Core.Constants;
-using Assets.Core.Registry.Base;
+﻿using FullPotential.Assets.Core.Constants;
+using FullPotential.Assets.Core.Registry.Base;
 using MLAPI;
 using MLAPI.Messaging;
 using System;

@@ -2,7 +2,7 @@
 
 // ReSharper disable AccessToStaticMemberViaDerivedType
 
-namespace Assets.Core.Extensions
+namespace FullPotential.Assets.Core.Extensions
 {
     public static class UnityEngineExtensions
     {

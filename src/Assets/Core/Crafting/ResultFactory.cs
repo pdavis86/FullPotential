@@ -1,10 +1,10 @@
-﻿using Assets.ApiScripts.Registry;
-using Assets.Core.Localization;
-using Assets.Core.Registry;
-using Assets.Core.Registry.Base;
-using Assets.Core.Registry.Types;
-using Assets.Core.Spells.Shapes;
-using Assets.Core.Spells.Targeting;
+﻿using FullPotential.Assets.Api.Registry;
+using FullPotential.Assets.Core.Localization;
+using FullPotential.Assets.Core.Registry;
+using FullPotential.Assets.Core.Registry.Base;
+using FullPotential.Assets.Core.Registry.Types;
+using FullPotential.Assets.Core.Spells.Shapes;
+using FullPotential.Assets.Core.Spells.Targeting;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,7 +14,7 @@ using System.Text;
 // ReSharper disable PossibleMultipleEnumeration
 // ReSharper disable InconsistentNaming
 
-namespace Assets.Core.Crafting
+namespace FullPotential.Assets.Core.Crafting
 {
     public class ResultFactory
     {

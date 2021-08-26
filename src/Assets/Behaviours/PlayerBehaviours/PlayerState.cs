@@ -1,6 +1,6 @@
-﻿using Assets.Core.Data;
-using Assets.Core.Registry.Types;
-using Assets.Core.Storage;
+﻿using FullPotential.Assets.Core.Data;
+using FullPotential.Assets.Core.Registry.Types;
+using FullPotential.Assets.Core.Storage;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
@@ -19,6 +19,7 @@ using UnityEngine;
 // ReSharper disable UnassignedField.Compiler
 // ReSharper disable ConvertToUsingDeclaration
 // ReSharper disable RedundantDiscardDesignation
+// ReSharper disable UnassignedField.Global
 
 public class PlayerState : NetworkBehaviour
 {
@@ -86,7 +87,7 @@ public class PlayerState : NetworkBehaviour
 
         if (!IsServer)
         {
-            CustomMessagingManager.RegisterNamedMessageHandler(nameof(Assets.Core.Networking.MessageType.LoadPlayerData), OnLoadPlayerData);
+            CustomMessagingManager.RegisterNamedMessageHandler(nameof(FullPotential.Assets.Core.Networking.MessageType.LoadPlayerData), OnLoadPlayerData);
             RequestPlayerDataServerRpc();
         }
     }
@@ -128,7 +129,7 @@ public class PlayerState : NetworkBehaviour
     [ServerRpc]
     public void RequestPlayerDataServerRpc()
     {
-        var playerData = Assets.Core.Registry.UserRegistry.LoadFromUsername(Username.Value);
+        var playerData = FullPotential.Assets.Core.Registry.UserRegistry.LoadFromUsername(Username.Value);
 
         //Debug.LogError("Sending playerData to clientId " + ClientId);
 
@@ -139,7 +140,7 @@ public class PlayerState : NetworkBehaviour
         using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
         {
             writer.WriteString(json);
-            CustomMessagingManager.SendNamedMessage(nameof(Assets.Core.Networking.MessageType.LoadPlayerData), OwnerClientId, stream);
+            CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.LoadPlayerData), OwnerClientId, stream);
         }
     }
 
@@ -161,14 +162,14 @@ public class PlayerState : NetworkBehaviour
 
         switch (activeSpell.Targeting)
         {
-            case Assets.Core.Spells.Targeting.Projectile _:
+            case FullPotential.Assets.Core.Spells.Targeting.Projectile _:
                 SpawnSpellProjectile(activeSpell, leftHand, position, direction, serverRpcParams.Receive.SenderClientId);
                 break;
 
-            case Assets.Core.Spells.Targeting.Self _:
-            case Assets.Core.Spells.Targeting.Touch _:
-            case Assets.Core.Spells.Targeting.Beam _:
-            case Assets.Core.Spells.Targeting.Cone _:
+            case FullPotential.Assets.Core.Spells.Targeting.Self _:
+            case FullPotential.Assets.Core.Spells.Targeting.Touch _:
+            case FullPotential.Assets.Core.Spells.Targeting.Beam _:
+            case FullPotential.Assets.Core.Spells.Targeting.Cone _:
                 //todo: other spell targeting options
                 throw new NotImplementedException();
 
@@ -262,7 +263,7 @@ public class PlayerState : NetworkBehaviour
         using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
         {
             writer.WriteString(json);
-            CustomMessagingManager.SendNamedMessage(nameof(Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId, stream);
+            CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId, stream);
         }
     }
 
@@ -380,7 +381,7 @@ public class PlayerState : NetworkBehaviour
         //    return;
         //}
 
-        Assets.Core.Registry.UserRegistry.Save(saveData);
+        FullPotential.Assets.Core.Registry.UserRegistry.Save(saveData);
     }
 
     private void SpawnSpellProjectile(Spell activeSpell, bool leftHand, Vector3 position, Vector3 direction, ulong clientId)

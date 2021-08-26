@@ -1,6 +1,6 @@
-﻿using Assets.ApiScripts.Registry;
+﻿using FullPotential.Assets.Api.Registry;
 
-namespace Assets.Core.Spells.Targeting
+namespace FullPotential.Assets.Core.Spells.Targeting
 {
     public interface ISpellTargeting : IRegisterable
     {

@@ -1,4 +1,4 @@
-﻿namespace Assets.Core.Networking
+﻿namespace FullPotential.Assets.Core.Networking
 {
     public enum MessageType
     {

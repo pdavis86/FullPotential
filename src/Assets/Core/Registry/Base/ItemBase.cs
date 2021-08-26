@@ -1,4 +1,4 @@
-﻿using Assets.ApiScripts.Registry;
+﻿using FullPotential.Assets.Api.Registry;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,7 +6,7 @@ using System.Linq;
 // ReSharper disable UseFormatSpecifierInInterpolation
 // ReSharper disable ArrangeAccessorOwnerBody
 
-namespace Assets.Core.Registry.Base
+namespace FullPotential.Assets.Core.Registry.Base
 {
     [System.Serializable]
     public abstract class ItemBase

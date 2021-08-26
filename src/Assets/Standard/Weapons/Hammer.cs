@@ -1,7 +1,7 @@
-﻿using Assets.ApiScripts.Registry;
+﻿using FullPotential.Assets.Api.Registry;
 using System;
 
-namespace Assets.Standard.Weapons
+namespace FullPotential.Assets.Standard.Weapons
 {
     public class Hammer : IGearWeapon
     {

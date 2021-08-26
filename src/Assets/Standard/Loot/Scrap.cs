@@ -1,7 +1,7 @@
-﻿using Assets.ApiScripts.Registry;
+﻿using FullPotential.Assets.Api.Registry;
 using System;
 
-namespace Assets.Standard.Loot
+namespace FullPotential.Assets.Standard.Loot
 {
     public class Scrap : ILoot
     {

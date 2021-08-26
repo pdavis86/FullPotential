@@ -1,4 +1,4 @@
-﻿using Assets.Core.Data;
+﻿using FullPotential.Assets.Core.Data;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.Serialization.Pooled;
@@ -70,12 +70,12 @@ public class PlayerClientSide : NetworkBehaviour
 
         //Avoids weapons clipping with other objects
         _playerState.InFrontOfPlayer.transform.parent = _inFrontOfPlayerCamera.transform;
-        Assets.Helpers.GameObjectHelper.SetGameLayerRecursive(_playerState.InFrontOfPlayer, Assets.Constants.Layers.InFrontOfPlayer);
+        FullPotential.Assets.Helpers.GameObjectHelper.SetGameLayerRecursive(_playerState.InFrontOfPlayer, FullPotential.Assets.Constants.Layers.InFrontOfPlayer);
 
         _inFrontOfPlayerCamera.gameObject.SetActive(true);
         _playerCamera.gameObject.SetActive(true);
 
-        CustomMessagingManager.RegisterNamedMessageHandler(nameof(Assets.Core.Networking.MessageType.InventoryChange), OnInventoryChange);
+        CustomMessagingManager.RegisterNamedMessageHandler(nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OnInventoryChange);
     }
 
     void OnInteract()

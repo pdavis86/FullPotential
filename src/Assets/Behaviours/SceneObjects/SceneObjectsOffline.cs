@@ -1,4 +1,4 @@
-﻿using Assets.Core.Helpers;
+﻿using FullPotential.Assets.Core.Helpers;
 using UnityEngine;
 
 // ReSharper disable CheckNamespace

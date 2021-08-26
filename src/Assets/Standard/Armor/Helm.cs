@@ -1,7 +1,7 @@
-﻿using Assets.ApiScripts.Registry;
+﻿using FullPotential.Assets.Api.Registry;
 using System;
 
-namespace Assets.Standard.Armor
+namespace FullPotential.Assets.Standard.Armor
 {
     public class Helm : IGearArmor
     {

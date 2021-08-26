@@ -1,4 +1,4 @@
-﻿namespace Assets.Extensions
+﻿namespace FullPotential.Assets.Extensions
 {
     public static class StringExtensions
     {

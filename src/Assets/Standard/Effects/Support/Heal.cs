@@ -1,7 +1,7 @@
-﻿using Assets.ApiScripts.Registry;
+﻿using FullPotential.Assets.Api.Registry;
 using System;
 
-namespace Assets.Standard.Effects.Support
+namespace FullPotential.Assets.Standard.Effects.Support
 {
     public class Heal : IEffectSupport
     {

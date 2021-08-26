@@ -1,7 +1,7 @@
-﻿using Assets.ApiScripts.Registry;
+﻿using FullPotential.Assets.Api.Registry;
 using System;
 
-namespace Assets.Standard.Effects.Buffs
+namespace FullPotential.Assets.Standard.Effects.Buffs
 {
     public class LifeTap : IEffectBuff
     {

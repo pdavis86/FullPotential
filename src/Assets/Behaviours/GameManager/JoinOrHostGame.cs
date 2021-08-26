@@ -79,7 +79,7 @@ public class JoinOrHostGame : MonoBehaviour
     private void SignIn()
     {
         //todo: make a server-side call to sign in
-        GameManager.Instance.DataStore.PlayerToken = Assets.Core.Registry.UserRegistry.SignIn(_username, _password);
+        GameManager.Instance.DataStore.PlayerToken = FullPotential.Assets.Core.Registry.UserRegistry.SignIn(_username, _password);
 
         _username = _password = null;
     }

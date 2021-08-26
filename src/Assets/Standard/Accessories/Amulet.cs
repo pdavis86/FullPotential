@@ -1,7 +1,7 @@
-﻿using Assets.ApiScripts.Registry;
+﻿using FullPotential.Assets.Api.Registry;
 using System;
 
-namespace Assets.Standard.Accessories
+namespace FullPotential.Assets.Standard.Accessories
 {
     public class Amulet : IGearAccessory
     {

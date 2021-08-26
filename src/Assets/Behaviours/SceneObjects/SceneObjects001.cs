@@ -22,7 +22,7 @@ public class SceneObjects001 : NetworkBehaviour
 
         _playerPrefabNetObj = GameManager.Instance.Prefabs.Player.GetComponent<NetworkObject>();
 
-        var spawnPointsParent = Assets.Core.Helpers.UnityHelper.GetObjectAtRoot(GameManager.NameSpawnPoints).transform;
+        var spawnPointsParent = FullPotential.Assets.Core.Helpers.UnityHelper.GetObjectAtRoot(GameManager.NameSpawnPoints).transform;
         _spawnPoints = new List<Transform>();
         foreach (Transform spawnPoint in spawnPointsParent)
         {
@@ -55,7 +55,7 @@ public class SceneObjects001 : NetworkBehaviour
 
         playerNetObj.SpawnAsPlayerObject(clientId);
 
-        var playerData = Assets.Core.Registry.UserRegistry.Load(playerToken);
+        var playerData = FullPotential.Assets.Core.Registry.UserRegistry.Load(playerToken);
         playerState.LoadFromPlayerData(playerData);
     }
 
