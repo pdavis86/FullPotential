@@ -30,6 +30,8 @@ public class PlayerState : NetworkBehaviour
     [SerializeField] private MeshRenderer _rightMesh;
 #pragma warning restore 0649
 
+    public GameObject InFrontOfPlayer;
+
     public readonly NetworkVariable<ulong> ClientId = new NetworkVariable<ulong>(9999);
     public readonly NetworkVariable<string> Username = new NetworkVariable<string>();
     public readonly NetworkVariable<string> TextureUrl = new NetworkVariable<string>();
@@ -51,6 +53,8 @@ public class PlayerState : NetworkBehaviour
     {
         Username.OnValueChanged += OnUsernameChanged;
         TextureUrl.OnValueChanged += OnTextureChanged;
+
+        _playerClientSide = GetComponent<PlayerClientSide>();
     }
 
     private void Start()
@@ -76,7 +80,6 @@ public class PlayerState : NetworkBehaviour
 
         gameObject.name = "Player ID " + NetworkObjectId;
 
-        _playerClientSide = GetComponent<PlayerClientSide>();
 
         _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
         //_clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams() { TargetClientIds = new[] { OwnerClientId } } };
@@ -285,13 +288,6 @@ public class PlayerState : NetworkBehaviour
     public void ShowDamageClientRpc(Vector3 position, string damage, ClientRpcParams clientRpcParams = default)
     {
         _playerClientSide.ShowDamage(position, damage);
-    }
-
-    // ReSharper disable once UnusedParameter.Global
-    [ClientRpc]
-    public void CloseCraftingWindowClientRpc(ClientRpcParams clientRpcParams = default)
-    {
-        _playerClientSide.RefreshCraftingWindow();
     }
 
     #endregion

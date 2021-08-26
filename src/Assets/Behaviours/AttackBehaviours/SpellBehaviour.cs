@@ -52,8 +52,7 @@ public class SpellBehaviour : AttackBehaviourBase
             castSpeed = 0.5f;
         }
 
-        var spellRb = GetComponent<Rigidbody>();
-        spellRb.AddForce(SpellDirection.Value * 20f * castSpeed, ForceMode.VelocityChange);
+        GetComponent<Rigidbody>().AddForce(SpellDirection.Value * 20f * castSpeed, ForceMode.VelocityChange);
     }
 
     //private void Update()

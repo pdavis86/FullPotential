@@ -13,8 +13,6 @@ public class Hud : MonoBehaviour
 
     public void ShowAlert(string alertText)
     {
-        //Debug.Log($"{addedItems.First().Name} was added");
-
         var alert = Instantiate(_alertPrefab, _alertsContainer.transform);
         alert.transform.Find("Text").GetComponent<Text>().text = alertText;
     }
