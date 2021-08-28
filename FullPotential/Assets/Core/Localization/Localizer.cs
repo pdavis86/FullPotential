@@ -1,11 +1,13 @@
 ﻿using FullPotential.Assets.Api.Registry;
 using FullPotential.Assets.Core.Spells.Shapes;
 using FullPotential.Assets.Core.Spells.Targeting;
+using FullPotential.Assets.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.AddressableAssets.ResourceLocators;
 
 // ReSharper disable ConvertToAutoProperty
 // ReSharper disable ArrangeAccessorOwnerBody
@@ -19,7 +21,9 @@ namespace FullPotential.Assets.Core.Localization
     {
         private readonly IEnumerable<string> _modPathStems;
         private Dictionary<string, string> _translations;
+        private Dictionary<string, string> _availableCultures;
 
+        public const string DefaultCulture = "en-GB";
         public string CurrentCulture { get; private set; }
 
         public Localizer(IEnumerable<string> modPathStems)
@@ -27,32 +31,58 @@ namespace FullPotential.Assets.Core.Localization
             _modPathStems = modPathStems;
         }
 
-        public List<string> GetAvailableCultureCodes()
+        private async Task<Data.Localization> LoadCultureFileAsync(string address)
         {
-            var cultures = new List<string>();
-            foreach (var rl in Addressables.ResourceLocators)
-            {
-                cultures.AddRange(rl.Keys
-                    .OfType<string>()
-                    .Where(x => x.StartsWith("Core/Localization/") && x.EndsWith(".json"))
-                    .Select(System.IO.Path.GetFileNameWithoutExtension)
-                    );
-            }
-            return cultures;
-        }
+            var checkTask = Addressables.LoadResourceLocationsAsync(address).Task;
+            await checkTask;
 
-        public Dictionary<string, string> GetAvailableCultures()
-        {
-            var cultures = new Dictionary<string, string>();
-            foreach (var code in GetAvailableCultureCodes())
+            if (checkTask.Result.Count == 0)
             {
-                cultures.Add(code, Translate("culture." + code));
+                //NOTE: Failure to find the file causes the app to hang
+                throw new System.Exception($"Failed to find translations for '{address}'");
             }
-            return cultures;
+
+            var loadTask = Addressables.LoadAssetAsync<TextAsset>(address).Task;
+            await loadTask;
+            var data = JsonUtility.FromJson<Data.Localization>(loadTask.Result.text);
+            Addressables.Release(loadTask.Result);
+
+            return data;
         }
 
         // ReSharper disable once UnusedMethodReturnValue.Global
-        public async Task<bool> LoadLocalizationFiles(string culture)
+        public async Task<bool> LoadAvailableCulturesAsync()
+        {
+            var localisationAddresses = new Dictionary<string, List<string>>();
+
+            foreach (var rl in Addressables.ResourceLocators)
+            {
+                var addresses = rl.Keys
+                    .OfType<string>()
+                    .Where(x => x.Contains("/Localization/") && x.EndsWith(".json"));
+
+                if (addresses.Any())
+                {
+                    var groups = addresses.GroupBy(x => System.IO.Path.GetFileNameWithoutExtension(x));
+                    foreach (var grouping in groups)
+                    {
+                        localisationAddresses.Add(grouping.Key, grouping.ToList());
+                    }
+                }
+            }
+
+            _availableCultures = new Dictionary<string, string>();
+            foreach (var kvp in localisationAddresses)
+            {
+                var data = await LoadCultureFileAsync(kvp.Value.First());
+                _availableCultures.Add(kvp.Key, data.Name.OrIfNullOrWhitespace(kvp.Key));
+            }
+
+            return true;
+        }
+
+        // ReSharper disable once UnusedMethodReturnValue.Global
+        public async Task<bool> LoadLocalizationFilesAsync(string culture)
         {
             _translations = new Dictionary<string, string>();
 
@@ -60,22 +90,11 @@ namespace FullPotential.Assets.Core.Localization
             {
                 var address = $"{modName}/Localization/{culture}.json";
 
-                var checkTask = Addressables.LoadResourceLocationsAsync(address).Task;
-                await checkTask;
-
-                if (checkTask.Result.Count == 0)
-                {
-                    //NOTE: Failure to find the file causes the app to hang
-                    throw new System.Exception($"Failed to find translations for '{address}'");
-                }
-
-                var loadTask = Addressables.LoadAssetAsync<TextAsset>(address).Task;
-                await loadTask;
-                var data = JsonUtility.FromJson<Assets.Core.Data.Localization>(loadTask.Result.text);
+                var data = await LoadCultureFileAsync(address);
 
                 if (data?.Translations == null)
                 {
-                    throw new System.Exception($"Failed to load any translations from '{address}'");
+                    throw new System.Exception($"Failed to load any translations for address '{address}'");
                 }
 
                 foreach (var item in data.Translations)
@@ -89,13 +108,16 @@ namespace FullPotential.Assets.Core.Localization
                         _translations.Add(item.Key, item.Value);
                     }
                 }
-
-                Addressables.Release(loadTask.Result);
             }
 
             CurrentCulture = culture;
 
             return true;
+        }
+
+        public Dictionary<string, string> GetAvailableCultures()
+        {
+            return _availableCultures;
         }
 
         public string Translate(string id)

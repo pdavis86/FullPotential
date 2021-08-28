@@ -2156,7 +2156,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee3368b83b876d744b7914cd362ab4c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TranslationId: ui.signin.intro
+  TranslationId: ui.connect.intro
   FireOnValidate: 0
 --- !u!1 &1571292321
 GameObject:

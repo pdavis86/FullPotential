@@ -5,7 +5,7 @@ using UnityEngine;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedMember.Global
 
-public class EscMenuUi : MonoBehaviour
+public class MainMenuUi : MonoBehaviour
 {
     private MainCanvasObjects _mainCanvasObjects;
 
@@ -14,7 +14,7 @@ public class EscMenuUi : MonoBehaviour
         _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;
     }
 
-    public void BackToMainMenu()
+    public void Disconnect()
     {
         Save();
         _mainCanvasObjects.HideAllMenus();

@@ -1981,7 +1981,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee3368b83b876d744b7914cd362ab4c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TranslationId: ui.esc.settings
+  TranslationId: ui.main.settings
   FireOnValidate: 0
 --- !u!1 &511616165
 GameObject:
@@ -3028,8 +3028,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 173.68579, y: -15}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: 201.18579, y: -15}
+  m_SizeDelta: {x: 215, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &690369853
 MonoBehaviour:
@@ -3487,7 +3487,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 281.64, y: -312.19415}
+  m_AnchoredPosition: {x: 310.14, y: -318.69415}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &888100409
@@ -4455,8 +4455,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 281.64, y: -245.69759}
-  m_SizeDelta: {x: 244.5309, y: 40.7483}
+  m_AnchoredPosition: {x: 310.14, y: -252.19759}
+  m_SizeDelta: {x: 244.53, y: 40.7483}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1132610694
 MonoBehaviour:
@@ -4818,7 +4818,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 281.64, y: -200.23964}
+  m_AnchoredPosition: {x: 310.14, y: -206.73964}
   m_SizeDelta: {x: 244.5309, y: 30.1676}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1204717051
@@ -5095,7 +5095,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 281.64, y: -281.63293}
+  m_AnchoredPosition: {x: 310.14, y: -288.13293}
   m_SizeDelta: {x: 100, y: 11.1224}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1332766510
@@ -7023,8 +7023,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 173.68579, y: -15}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: 201.18579, y: -15}
+  m_SizeDelta: {x: 215, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2082777631
 MonoBehaviour:
@@ -8019,7 +8019,7 @@ GameObject:
   - component: {fileID: 136698720258913445}
   - component: {fileID: 4559024457428667747}
   m_Layer: 5
-  m_Name: EscMenu
+  m_Name: MainMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9083,8 +9083,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4559024457428667747}
-        m_TargetAssemblyTypeName: EscMenuUi, Assembly-CSharp
-        m_MethodName: BackToMainMenu
+        m_TargetAssemblyTypeName: MainMenuUi, Assembly-CSharp
+        m_MethodName: Disconnect
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -11459,7 +11459,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee3368b83b876d744b7914cd362ab4c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TranslationId: ui.esc.mainmenu
+  TranslationId: ui.main.disconnect
   FireOnValidate: 0
 --- !u!224 &7011060654569762740
 RectTransform:

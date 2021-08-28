@@ -1,5 +1,6 @@
 {
   "Culture": "en-GB",
+  "Name": "English (United Kingdom)",
   "Translations": [
     {
       "Key": "crafting.category.weapon",
@@ -173,10 +174,14 @@
     },
 	    {
       "Key": "ui.signin.intro",
-      "Value": "Welcome!"
+      "Value": "Please sign in"
     },
 	
 	
+	{
+      "Key": "ui.connect.intro",
+      "Value": "Welcome!"
+    },
 	{
       "Key": "ui.connect.address",
       "Value": "Address..."
@@ -202,12 +207,12 @@
 	
 	
 	{
-      "Key": "ui.esc.settings",
+      "Key": "ui.main.settings",
       "Value": "Settings"
     },
 	{
-      "Key": "ui.esc.mainmenu",
-      "Value": "Back to Main Menu"
+      "Key": "ui.main.disconnect",
+      "Value": "Disconnect"
     },
 	
 	{
@@ -255,16 +260,6 @@
 	{
       "Key": "ui.alert.itemsadded",
       "Value": "Added {0} items"
-    },
-	
-	
-	{
-      "Key": "culture.en-gb",
-      "Value": "English (United Kingdom)"
-    },
-	{
-      "Key": "culture.en-pirate",
-      "Value": "English (Pirate)"
     }
 
   ]

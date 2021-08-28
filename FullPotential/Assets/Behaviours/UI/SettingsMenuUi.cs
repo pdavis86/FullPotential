@@ -19,76 +19,49 @@ public class SettingsMenuUi : MonoBehaviour
 #pragma warning restore 0649
 
     private Dictionary<string, string> _cultures;
-
-    private void LoadCultures()
-    {
-        if (_cultures == null)
-        {
-            _cultures = GameManager.Instance.Localizer.GetAvailableCultures();
-        }
-    }
+    private int _newCultureIndex = -1;
 
     void Awake()
     {
-        //todo: this is really slow!
-        LoadCultures();
+        _cultures = GameManager.Instance.Localizer.GetAvailableCultures();
 
         _languageDropDown.options.Clear();
         _languageDropDown.AddOptions(_cultures.Select(x => x.Value).ToList());
-
-        //    if (!string.IsNullOrWhiteSpace(GameManager.Instance.PlayerSkinUrl))
-        //    {
-        //        string filePath;
-        //        if (!GameManager.Instance.PlayerSkinUrl.StartsWith("http"))
-        //        {
-        //            //todo: upload file?
-        //            filePath = GameManager.Instance.PlayerSkinUrl;
-        //        }
-        //        else
-        //        {
-        //            //todo: download file
-        //            filePath = GameManager.Instance.PlayerSkinUrl;
-        //        }
-
-        //        if (System.IO.File.Exists(filePath))
-        //        {
-        //            SetPlayerTexture(filePath);
-        //            TextureUri = filePath;
-        //        }
-        //    }
     }
 
-    //todo: on open,         GameManager.Instance.MainCanvasObjects.SettingsUi.GetComponent<SettingsMenuUi>().LoadFromPlayerData(playerData);
-
-    public void LoadFromPlayerData(PlayerData playerData)
+    private void OnEnable()
     {
-        LoadCultures();
-
+        var culture = GameManager.GetLastUsedCulture().OrIfNullOrWhitespace(GameManager.Instance.Localizer.CurrentCulture);
         int i;
         for (i = 0; i < _cultures.Count; i++)
         {
-            if (_cultures.ElementAt(i).Key == playerData.Options.Culture.OrIfNullOrWhitespace(GameManager.Instance.Localizer.CurrentCulture))
+            if (_cultures.ElementAt(i).Key == culture)
             {
                 break;
             }
         }
         _languageDropDown.value = i;
 
-        _skinUrlInput.text = playerData.Options.TextureUrl;
+        //todo:
+        //var playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
+        //_skinUrlInput.text = playerData.Options.TextureUrl;
     }
 
     public void SetLanguage(int index)
     {
-        var match = _cultures.ElementAt(index);
-
-        Debug.Log("Setting language to " + match.Value);
-
-        GameManager.SetLastUsedCulture(match.Key);
+        _newCultureIndex = index;
     }
 
     public void SaveAndClose()
     {
+        if (_newCultureIndex > -1)
+        {
+            var match = _cultures.ElementAt(_newCultureIndex);
+            GameManager.SetCulture(match.Key);
+        }
+
         GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerClientSide>().UpdatePlayerSettingsServerRpc(_skinUrlInput.text);
+
         GameManager.Instance.MainCanvasObjects.HideAllMenus();
     }
 

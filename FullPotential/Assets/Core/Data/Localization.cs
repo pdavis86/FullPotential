@@ -9,6 +9,7 @@ namespace FullPotential.Assets.Core.Data
     public class Localization
     {
         public string Culture;
+        public string Name;
         public KeyValuePair<string, string>[] Translations;
     }
 }

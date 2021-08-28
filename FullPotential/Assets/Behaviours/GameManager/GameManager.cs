@@ -58,16 +58,16 @@ public class GameManager : MonoBehaviour
         TypeRegistry = new FullPotential.Assets.Core.Registry.TypeRegistry();
         TypeRegistry.FindAndRegisterAll();
 
-        Localizer = new FullPotential.Assets.Core.Localization.Localizer(TypeRegistry.GetRegisteredModPaths());
-
         var culture = GetLastUsedCulture();
         if (string.IsNullOrWhiteSpace(culture))
         {
-            culture = Localizer.GetAvailableCultureCodes().First();
+            culture = FullPotential.Assets.Core.Localization.Localizer.DefaultCulture;
             SetLastUsedCulture(culture);
         }
 
-        await Localizer.LoadLocalizationFiles(culture);
+        Localizer = new FullPotential.Assets.Core.Localization.Localizer(TypeRegistry.GetRegisteredModPaths());
+        await Localizer.LoadAvailableCulturesAsync();
+        await Localizer.LoadLocalizationFilesAsync(culture);
 
         ResultFactory = new FullPotential.Assets.Core.Crafting.ResultFactory(TypeRegistry, Localizer);
 
@@ -97,7 +97,16 @@ public class GameManager : MonoBehaviour
         return System.IO.Path.Combine(Application.persistentDataPath, "LoadOptions.json");
     }
 
-    public static void SetLastUsedCulture(string culture)
+    public static void SetCulture(string culture)
+    {
+        Debug.Log("Setting language to " + culture);
+
+        //todo: force all dialogue to reload content
+
+        SetLastUsedCulture(culture);
+    }
+
+    private static void SetLastUsedCulture(string culture)
     {
         System.IO.File.WriteAllText(GetAppLoadOptions(), culture);
     }
