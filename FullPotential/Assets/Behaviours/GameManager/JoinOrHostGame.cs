@@ -20,6 +20,11 @@ using UnityEngine.SceneManagement;
 
 public class JoinOrHostGame : MonoBehaviour
 {
+#pragma warning disable 0649
+    [SerializeField] private GameObject _signInContainer;
+    [SerializeField] private GameObject _gameDetailsContainer;
+#pragma warning restore 0649
+
     private NetworkManager _networkManager;
     private UNetTransport _networkTransport;
 
@@ -34,7 +39,6 @@ public class JoinOrHostGame : MonoBehaviour
         _networkManager = NetworkManager.Singleton;
         _networkTransport = _networkManager.GetComponent<UNetTransport>();
         _scene2Name = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(2));
-
     }
 
     #region Button Event Handlers
@@ -76,12 +80,19 @@ public class JoinOrHostGame : MonoBehaviour
 
     #endregion
 
-    private void SignIn()
+    public void SignIn()
     {
-        //todo: make a server-side call to sign in
-        GameManager.Instance.DataStore.PlayerToken = FullPotential.Assets.Core.Registry.UserRegistry.SignIn(_username, _password);
+        var token = FullPotential.Assets.Core.Registry.UserRegistry.SignIn(_username, _password);
 
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            //todo: handle login failure
+        }
+
+        GameManager.Instance.DataStore.PlayerToken = token;
         _username = _password = null;
+        _signInContainer.SetActive(false);
+        _gameDetailsContainer.SetActive(true);
     }
 
     private void SetNetworkAddressAndPort()
@@ -97,8 +108,6 @@ public class JoinOrHostGame : MonoBehaviour
 
     private void HostGameInternal()
     {
-        SignIn();
-
         SetNetworkAddressAndPort();
         _networkManager.StartHost();
 
@@ -109,8 +118,6 @@ public class JoinOrHostGame : MonoBehaviour
 
     private void JoinGameInternal()
     {
-        SignIn();
-
         SetNetworkAddressAndPort();
         _networkManager.StartClient();
 
