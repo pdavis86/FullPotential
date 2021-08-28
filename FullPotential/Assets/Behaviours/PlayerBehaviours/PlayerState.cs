@@ -1,14 +1,14 @@
-﻿using FullPotential.Assets.Core.Data;
+﻿using FullPotential.Assets.Api.Registry;
+using FullPotential.Assets.Core.Data;
+using FullPotential.Assets.Core.Registry.Base;
 using FullPotential.Assets.Core.Registry.Types;
 using FullPotential.Assets.Core.Storage;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
-using MLAPI.Serialization.Pooled;
-using System;
-using System.Linq;
 using TMPro;
 using UnityEngine;
+using static FullPotential.Assets.Core.Storage.PlayerInventory;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -84,12 +84,6 @@ public class PlayerState : NetworkBehaviour
 
         _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
         //_clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams() { TargetClientIds = new[] { OwnerClientId } } };
-
-        if (!IsServer)
-        {
-            CustomMessagingManager.RegisterNamedMessageHandler(nameof(FullPotential.Assets.Core.Networking.MessageType.LoadPlayerData), OnLoadPlayerData);
-            RequestPlayerDataServerRpc();
-        }
     }
 
     private void OnDisable()
@@ -98,180 +92,15 @@ public class PlayerState : NetworkBehaviour
         TextureUrl.OnValueChanged -= OnTextureChanged;
     }
 
-    private void OnTextureChanged(string previousValue, string newValue)
-    {
-        SetTexture();
-    }
-
     private void OnUsernameChanged(string previousValue, string newValue)
     {
         SetNameTag();
     }
 
-    private void OnLoadPlayerData(ulong clientId, System.IO.Stream stream)
+    private void OnTextureChanged(string previousValue, string newValue)
     {
-        //Debug.LogError("Recieved playerData from the server at clientId " + NetworkManager.Singleton.LocalClientId);
-
-        string message;
-        using (PooledNetworkReader reader = PooledNetworkReader.Get(stream))
-        {
-            message = reader.ReadString().ToString();
-        }
-
-        var playerData = JsonUtility.FromJson<PlayerData>(message);
-        LoadFromPlayerData(playerData);
+        SetTexture();
     }
-
-    #endregion
-
-    #region ServerRpc calls
-
-    [ServerRpc]
-    public void RequestPlayerDataServerRpc()
-    {
-        var playerData = FullPotential.Assets.Core.Registry.UserRegistry.LoadFromUsername(Username.Value);
-
-        //Debug.LogError("Sending playerData to clientId " + ClientId);
-
-        var json = JsonUtility.ToJson(playerData);
-        //todo: use compression? - var jsonCompressed = Assets.Core.Helpers.CompressionHelper.CompressString(json);
-
-        var stream = PooledNetworkBuffer.Get();
-        using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
-        {
-            writer.WriteString(json);
-            CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.LoadPlayerData), OwnerClientId, stream);
-        }
-    }
-
-    [ServerRpc]
-    public void UpdatePlayerSettingsServerRpc(string textureUrl)
-    {
-        TextureUrl.Value = textureUrl;
-    }
-
-    [ServerRpc]
-    public void CastSpellServerRpc(bool leftHand, Vector3 position, Vector3 direction, ServerRpcParams serverRpcParams = default)
-    {
-        var activeSpell = Inventory.GetSpellInHand(leftHand);
-
-        if (activeSpell == null)
-        {
-            return;
-        }
-
-        switch (activeSpell.Targeting)
-        {
-            case FullPotential.Assets.Core.Spells.Targeting.Projectile _:
-                SpawnSpellProjectile(activeSpell, leftHand, position, direction, serverRpcParams.Receive.SenderClientId);
-                break;
-
-            case FullPotential.Assets.Core.Spells.Targeting.Self _:
-            case FullPotential.Assets.Core.Spells.Targeting.Touch _:
-            case FullPotential.Assets.Core.Spells.Targeting.Beam _:
-            case FullPotential.Assets.Core.Spells.Targeting.Cone _:
-                //todo: other spell targeting options
-                throw new NotImplementedException();
-
-            default:
-                throw new Exception($"Unexpected spell targeting with TypeName: '{activeSpell.Targeting.TypeName}'");
-        }
-    }
-
-    // ReSharper disable once UnusedParameter.Global
-    [ServerRpc]
-    public void InteractServerRpc(string gameObjectName, ServerRpcParams serverRpcParams = default)
-    {
-        var player = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject;
-
-        Interactable interactable = null;
-        //todo: replace hard-coded radius
-        var collidersInRange = Physics.OverlapSphere(player.gameObject.transform.position, 5f);
-        foreach (var colliderNearby in collidersInRange)
-        {
-            if (colliderNearby.gameObject.name == gameObjectName)
-            {
-                var colliderInteractable = colliderNearby.gameObject.GetComponent<Interactable>();
-                if (colliderInteractable != null)
-                {
-                    interactable = colliderInteractable;
-                    break;
-                }
-            }
-        }
-
-        if (interactable == null)
-        {
-            Debug.LogError("Failed to find the interactable with gameObjectName " + gameObjectName);
-            return;
-        }
-
-        Debug.Log($"Trying to interact with {interactable.name}");
-
-        var distance = Vector3.Distance(gameObject.transform.position, interactable.transform.position);
-        if (distance <= interactable.Radius)
-        {
-            interactable.OnInteract(serverRpcParams.Receive.SenderClientId);
-        }
-    }
-
-    [ServerRpc]
-    public void CraftItemServerRpc(string[] componentIds, string categoryName, string craftableTypeName, bool isTwoHanded, string itemName)
-    {
-        var components = Inventory.GetComponentsFromIds(componentIds);
-
-        if (components.Count != componentIds.Length)
-        {
-            Debug.LogError("Someone tried cheating: One or more IDs provided are not in the inventory");
-            return;
-        }
-
-        var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(
-            categoryName,
-            craftableTypeName,
-            isTwoHanded,
-            components
-        );
-
-        if (Inventory.ValidateIsCraftable(componentIds, craftedItem).Any())
-        {
-            Debug.LogError("Someone tried cheating: validation was skipped");
-            return;
-        }
-
-        if (!string.IsNullOrWhiteSpace(itemName))
-        {
-            craftedItem.Name = itemName;
-        }
-
-        var craftedType = craftedItem.GetType();
-
-        var invChange = new InventoryAndRemovals
-        {
-            IdsToRemove = componentIds.ToArray(),
-            Accessories = craftedType == typeof(Accessory) ? new[] { craftedItem as Accessory } : null,
-            Armor = craftedType == typeof(Armor) ? new[] { craftedItem as Armor } : null,
-            Spells = craftedType == typeof(Spell) ? new[] { craftedItem as Spell } : null,
-            Weapons = craftedType == typeof(Weapon) ? new[] { craftedItem as Weapon } : null
-        };
-
-        Inventory.ApplyInventoryAndRemovals(invChange);
-
-        var json = JsonUtility.ToJson(invChange);
-
-        var stream = PooledNetworkBuffer.Get();
-        using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
-        {
-            writer.WriteString(json);
-            CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId, stream);
-        }
-    }
-
-    //[ServerRpc]
-    //private void SetItemToSlotServerRpc(string slotName, string itemId)
-    //{
-    //    Inventory.SetItemToSlot(slotName, itemId);
-    //}
 
     #endregion
 
@@ -289,6 +118,12 @@ public class PlayerState : NetworkBehaviour
     public void ShowDamageClientRpc(Vector3 position, string damage, ClientRpcParams clientRpcParams = default)
     {
         _playerClientSide.ShowDamage(position, damage);
+    }
+
+    [ClientRpc]
+    public void EquipsHaveChangedClientRpc()
+    {
+        //todo: _playerClientSide.ShowDamage(position, damage);
     }
 
     #endregion
@@ -311,8 +146,9 @@ public class PlayerState : NetworkBehaviour
     public void LoadFromPlayerData(PlayerData playerData)
     {
         Username.Value = playerData.Username;
-        TextureUrl.Value = playerData.Options.TextureUrl;
+        TextureUrl.Value = playerData.Options?.TextureUrl;
         _loadWasSuccessful = Inventory.ApplyInventory(playerData.Inventory, true);
+        SpawnEquippedObjects();
     }
 
     private void SetNameTag()
@@ -384,7 +220,7 @@ public class PlayerState : NetworkBehaviour
         FullPotential.Assets.Core.Registry.UserRegistry.Save(saveData);
     }
 
-    private void SpawnSpellProjectile(Spell activeSpell, bool leftHand, Vector3 position, Vector3 direction, ulong clientId)
+    public void SpawnSpellProjectile(Spell activeSpell, bool leftHand, Vector3 position, Vector3 direction, ulong clientId)
     {
         if (!IsServer)
         {
@@ -402,6 +238,79 @@ public class PlayerState : NetworkBehaviour
         spellScript.SpellDirection = new NetworkVariable<Vector3>(direction);
 
         spellObject.GetComponent<NetworkObject>().Spawn(null, true);
+    }
+
+    private void SpawnEquippedObjects()
+    {
+        for (var slotIndex = 0; slotIndex < Inventory.EquippedObjects.Length; slotIndex++)
+        {
+            var itemId = Inventory.EquipSlots[slotIndex];
+
+            if (string.IsNullOrWhiteSpace(itemId))
+            {
+                continue;
+            }
+
+            var item = Inventory.GetItemWithId<ItemBase>(itemId);
+
+            var currentlyInGame = Inventory.EquippedObjects[slotIndex];
+            if (currentlyInGame != null)
+            {
+                UnityEngine.Object.Destroy(currentlyInGame);
+            }
+
+            if (slotIndex == (int)SlotIndexToGameObjectName.LeftHand)
+            {
+                SpawnItemInHand(slotIndex, item);
+            }
+            else if (slotIndex == (int)SlotIndexToGameObjectName.RightHand)
+            {
+                SpawnItemInHand(slotIndex, item, false);
+            }
+            //todo: other slots
+        }
+    }
+
+    public void SpawnItemInHand(int index, ItemBase item, bool leftHand = true)
+    {
+        if (!NetworkManager.Singleton.IsClient)
+        {
+            Debug.LogError("Tried to spawn a gameobject on a server");
+            return;
+        }
+
+        if (item is Weapon weapon)
+        {
+            var registryType = item.RegistryType as IGearWeapon;
+
+            if (registryType == null)
+            {
+                Debug.LogError("Weapon did not have a RegistryType");
+                return;
+            }
+
+            GameManager.Instance.TypeRegistry.LoadAddessable(
+                weapon.IsTwoHanded ? registryType.PrefabAddressTwoHanded : registryType.PrefabAddress,
+                prefab =>
+                {
+                    var weaponGo = UnityEngine.Object.Instantiate(prefab, InFrontOfPlayer.transform);
+                    weaponGo.transform.localEulerAngles = new Vector3(0, 90);
+                    weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, -0.25f, 1.9f);
+
+                    if (NetworkManager.Singleton.LocalClientId == ClientId.Value)
+                    {
+                        FullPotential.Assets.Helpers.GameObjectHelper.SetGameLayerRecursive(weaponGo, InFrontOfPlayer.layer);
+                    }
+
+                    Inventory.EquippedObjects[index] = weaponGo;
+                }
+            );
+        }
+        else
+        {
+            //todo: implement other items
+            Debug.LogWarning($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name} yet");
+        }
     }
 
 }

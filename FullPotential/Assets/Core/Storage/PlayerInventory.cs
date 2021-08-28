@@ -18,16 +18,6 @@ namespace FullPotential.Assets.Core.Storage
 {
     public class PlayerInventory
     {
-        private readonly PlayerState _playerState;
-        private readonly List<ItemBase> _items;
-        private readonly int _slotCount;
-        private readonly GameObject[] _equippedObjects;
-
-        private int _maxItems;
-        private string[] _equipSlots;
-
-        //todo: Cache effective stats based on armour
-
         public enum SlotIndexToGameObjectName
         {
             Helm,
@@ -43,10 +33,16 @@ namespace FullPotential.Assets.Core.Storage
             Amulet
         }
 
-        public int GetSlotCount()
-        {
-            return _slotCount;
-        }
+        public string[] EquipSlots;
+        public readonly GameObject[] EquippedObjects;
+
+        private readonly PlayerState _playerState;
+        private readonly List<ItemBase> _items;
+        private readonly int _slotCount;
+
+        private int _maxItems;
+
+        //todo: Cache effective stats based on armour
 
         public PlayerInventory(PlayerState playerState)
         {
@@ -55,11 +51,11 @@ namespace FullPotential.Assets.Core.Storage
             _items = new List<ItemBase>();
 
             _slotCount = Enum.GetNames(typeof(SlotIndexToGameObjectName)).Length;
-            _equipSlots = new string[_slotCount];
-            _equippedObjects = new GameObject[_slotCount];
+            EquipSlots = new string[_slotCount];
+            EquippedObjects = new GameObject[_slotCount];
         }
 
-        public IEnumerable<ItemBase> GetItemsForSlotId(IGear.GearSlot? inventorySlot)
+        public IEnumerable<ItemBase> GetCompatibleItemsForSlot(IGear.GearSlot? inventorySlot)
         {
             return _items.Where(x =>
                 inventorySlot == null
@@ -67,6 +63,22 @@ namespace FullPotential.Assets.Core.Storage
                 || (x is Armor armor && (int)((IGearArmor)armor.RegistryType).InventorySlot == (int)inventorySlot)
                 || ((x is Weapon || x is Spell) && inventorySlot == IGear.GearSlot.Hand)
             );
+        }
+
+        public int GetSlotCount()
+        {
+            return _slotCount;
+        }
+
+        public void ApplyInventoryAndRemovals(InventoryAndRemovals changes)
+        {
+            if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
+            {
+                var itemsRemoved = _items.RemoveAll(x => changes.IdsToRemove.Contains(x.Id));
+                _playerState.AlertOfInventoryRemovals(itemsRemoved);
+            }
+
+            ApplyInventory(changes);
         }
 
         public bool ApplyInventory(Inventory changes, bool firstSetup = false)
@@ -93,43 +105,27 @@ namespace FullPotential.Assets.Core.Storage
 
                 _items.AddRange(addedItems);
 
-                foreach (var item in _items)
-                {
-                    if (!string.IsNullOrWhiteSpace(item.RegistryTypeId) && item.RegistryType == null)
-                    {
-                        item.RegistryType = GameManager.Instance.TypeRegistry.GetRegisteredForItem(item);
-                    }
-
-                    if (item is MagicalItemBase magicalItem)
-                    {
-                        if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeName))
-                        {
-                            magicalItem.Shape = GameManager.Instance.ResultFactory.GetSpellShape(magicalItem.ShapeTypeName);
-                        }
-                        if (!string.IsNullOrWhiteSpace(magicalItem.TargetingTypeName))
-                        {
-                            magicalItem.Targeting = GameManager.Instance.ResultFactory.GetSpellTargeting(magicalItem.TargetingTypeName);
-                        }
-                    }
-
-                    if (item.EffectIds != null && item.EffectIds.Length > 0 && item.Effects == null)
-                    {
-                        item.Effects = item.EffectIds.Select(x => GameManager.Instance.TypeRegistry.GetEffect(new Guid(x))).ToList();
-                    }
-                }
+                FillTypesFromIds();
 
                 if (changes.EquipSlots != null && changes.EquipSlots.Any())
                 {
-                    if (changes.EquipSlots.Length == _equipSlots.Length)
+                    if (changes.EquipSlots.Length == EquipSlots.Length)
                     {
-                        _equipSlots = changes.EquipSlots;
+                        EquipSlots = changes.EquipSlots;
                     }
                     else
                     {
-                        HandleOldSaveFile(changes);
-                    }
+                        //HandleOldSaveFile
+                        if (changes.EquipSlots.Length != EquipSlots.Length)
+                        {
+                            Debug.LogWarning("Incoming EquipSlots length differed to existing");
 
-                    //DebugLogEquippedItems();
+                            for (var i = 0; i < Math.Min(EquipSlots.Length, changes.EquipSlots.Length); i++)
+                            {
+                                EquipSlots[i] = changes.EquipSlots[i];
+                            }
+                        }
+                    }
                 }
 
                 EquipItems();
@@ -159,9 +155,37 @@ namespace FullPotential.Assets.Core.Storage
             }
         }
 
+        private void FillTypesFromIds()
+        {
+            foreach (var item in _items)
+            {
+                if (!string.IsNullOrWhiteSpace(item.RegistryTypeId) && item.RegistryType == null)
+                {
+                    item.RegistryType = GameManager.Instance.TypeRegistry.GetRegisteredForItem(item);
+                }
+
+                if (item is MagicalItemBase magicalItem)
+                {
+                    if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeName))
+                    {
+                        magicalItem.Shape = GameManager.Instance.ResultFactory.GetSpellShape(magicalItem.ShapeTypeName);
+                    }
+                    if (!string.IsNullOrWhiteSpace(magicalItem.TargetingTypeName))
+                    {
+                        magicalItem.Targeting = GameManager.Instance.ResultFactory.GetSpellTargeting(magicalItem.TargetingTypeName);
+                    }
+                }
+
+                if (item.EffectIds != null && item.EffectIds.Length > 0 && item.Effects == null)
+                {
+                    item.Effects = item.EffectIds.Select(x => GameManager.Instance.TypeRegistry.GetEffect(new Guid(x))).ToList();
+                }
+            }
+        }
+
         public ItemBase GetItemInSlot(int slotIndex)
         {
-            var itemId = _equipSlots[slotIndex];
+            var itemId = EquipSlots[slotIndex];
             return !string.IsNullOrWhiteSpace(itemId)
                 ? GetItemWithId<ItemBase>(itemId)
                 : null;
@@ -169,31 +193,7 @@ namespace FullPotential.Assets.Core.Storage
 
         public bool IsEquipped(string id)
         {
-            return _equipSlots.Contains(id);
-        }
-
-        private void HandleOldSaveFile(Inventory changes)
-        {
-            if (changes.EquipSlots.Length != _equipSlots.Length)
-            {
-                Debug.LogWarning("Incoming EquipSlots length differed to existing");
-
-                for (var i = 0; i < Math.Min(_equipSlots.Length, changes.EquipSlots.Length); i++)
-                {
-                    _equipSlots[i] = changes.EquipSlots[i];
-                }
-            }
-        }
-
-        public void ApplyInventoryAndRemovals(InventoryAndRemovals changes)
-        {
-            if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
-            {
-                var itemsRemoved = _items.RemoveAll(x => changes.IdsToRemove.Contains(x.Id));
-                _playerState.AlertOfInventoryRemovals(itemsRemoved);
-            }
-
-            ApplyInventory(changes);
+            return EquipSlots.Contains(id);
         }
 
         public Inventory GetSaveData()
@@ -209,15 +209,9 @@ namespace FullPotential.Assets.Core.Storage
                 Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
                 Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray(),
                 Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
-                EquipSlots = _equipSlots
+                EquipSlots = EquipSlots
             };
         }
-
-        //private void AddOfType<T>(string stringValue) where T : ItemBase
-        //{
-        //    Add(JsonUtility.FromJson<T>(stringValue));
-        //    //Debug.Log($"Inventory now has {Items.Count} items in it");
-        //}
 
         public T GetItemWithId<T>(string id) where T : ItemBase
         {
@@ -311,101 +305,34 @@ namespace FullPotential.Assets.Core.Storage
             return errors;
         }
 
-        public void SetItemToSlot(string slotName, string itemId)
-        {
-            if (!Enum.TryParse<SlotIndexToGameObjectName>(slotName, out var slotResult))
-            {
-                Debug.LogError($"Failed to find slot for name {slotName}");
-                return;
-            }
-
-            var equippedIndex = Array.IndexOf(_equipSlots, itemId);
-            if (equippedIndex >= 0)
-            {
-                //Debug.Log($"{itemId} is already assigned to slot {equippedIndex}");
-                //EquipSlots[equippedIndex] = null;
-                EquipItem(equippedIndex, null);
-            }
-
-            //EquipSlots[(int)slotResult] = itemId;
-            EquipItem((int)slotResult, itemId);
-        }
-
         public Spell GetSpellInHand(bool leftHand)
         {
             var itemId = leftHand
-                ? _equipSlots[(int)SlotIndexToGameObjectName.LeftHand]
-                : _equipSlots[(int)SlotIndexToGameObjectName.RightHand];
+                ? EquipSlots[(int)SlotIndexToGameObjectName.LeftHand]
+                : EquipSlots[(int)SlotIndexToGameObjectName.RightHand];
 
             var item = _items.FirstOrDefault(x => x.Id == itemId);
 
             return item as Spell;
         }
 
-        private void SpawnItemInHand(int index, ItemBase item, bool leftHand = true)
+        public void EquipItem(int slotIndex, string itemId)
         {
-            if (item is Weapon weapon)
+            //If necessary, un-equip from a different slot
+            var equippedIndex = Array.IndexOf(EquipSlots, itemId);
+            if (equippedIndex >= 0)
             {
-                var registryType = item.RegistryType as IGearWeapon;
-
-                if (registryType == null)
-                {
-                    Debug.LogError("Weapon did not have a RegistryType");
-                    return;
-                }
-
-                GameManager.Instance.TypeRegistry.LoadAddessable(
-                    weapon.IsTwoHanded ? registryType.PrefabAddressTwoHanded : registryType.PrefabAddress,
-                    prefab =>
-                    {
-                        var weaponGo = UnityEngine.Object.Instantiate(prefab, _playerState.InFrontOfPlayer.transform);
-                        weaponGo.transform.localEulerAngles = new Vector3(0, 90);
-                        weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, -0.25f, 1.9f);
-
-                        Assets.Helpers.GameObjectHelper.SetGameLayerRecursive(weaponGo, _playerState.InFrontOfPlayer.layer);
-
-                        _equippedObjects[index] = weaponGo;
-                    }
-                );
-            }
-            else
-            {
-                //todo: implement other items
-                Debug.LogWarning($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name} yet");
-            }
-        }
-
-        private void EquipItem(int slotIndex, string itemId)
-        {
-            var currentlyInGame = _equippedObjects[slotIndex];
-            if (currentlyInGame != null)
-            {
-                UnityEngine.Object.Destroy(currentlyInGame);
+                EquipSlots[equippedIndex] = null;
             }
 
-            if (string.IsNullOrWhiteSpace(itemId))
-            {
-                _equipSlots[slotIndex] = null;
-                return;
-            }
-
-            _equipSlots[slotIndex] = itemId;
-
-            if (slotIndex == (int)SlotIndexToGameObjectName.LeftHand)
-            {
-                SpawnItemInHand(slotIndex, _items.First(x => x.Id == itemId));
-            }
-            else if (slotIndex == (int)SlotIndexToGameObjectName.RightHand)
-            {
-                SpawnItemInHand(slotIndex, _items.First(x => x.Id == itemId), false);
-            }
+            EquipSlots[slotIndex] = itemId;
         }
 
         private void EquipItems()
         {
-            for (var i = 0; i < _equipSlots.Length; i++)
+            for (var i = 0; i < EquipSlots.Length; i++)
             {
-                EquipItem(i, _equipSlots[i]);
+                EquipItem(i, EquipSlots[i]);
             }
         }
 

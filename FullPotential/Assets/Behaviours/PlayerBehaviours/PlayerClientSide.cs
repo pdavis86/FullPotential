@@ -1,8 +1,10 @@
 ﻿using FullPotential.Assets.Core.Data;
+using FullPotential.Assets.Core.Registry.Types;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.Serialization.Pooled;
 using System;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -76,6 +78,9 @@ public class PlayerClientSide : NetworkBehaviour
         _playerCamera.gameObject.SetActive(true);
 
         CustomMessagingManager.RegisterNamedMessageHandler(nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OnInventoryChange);
+        CustomMessagingManager.RegisterNamedMessageHandler(nameof(FullPotential.Assets.Core.Networking.MessageType.LoadPlayerData), OnLoadPlayerData);
+
+        RequestPlayerDataServerRpc();
     }
 
     void OnInteract()
@@ -91,7 +96,7 @@ public class PlayerClientSide : NetworkBehaviour
             return;
         }
 
-        _playerState.InteractServerRpc(_focusedInteractable.gameObject.name);
+        InteractServerRpc(_focusedInteractable.gameObject.name);
     }
 
     void OnOpenCharacterMenu()
@@ -228,6 +233,183 @@ public class PlayerClientSide : NetworkBehaviour
         }
     }
 
+    private void OnLoadPlayerData(ulong clientId, System.IO.Stream stream)
+    {
+        //Debug.LogError("Recieved playerData from the server at clientId " + NetworkManager.Singleton.LocalClientId);
+
+        string message;
+        using (PooledNetworkReader reader = PooledNetworkReader.Get(stream))
+        {
+            message = reader.ReadString().ToString();
+        }
+
+        var playerData = JsonUtility.FromJson<PlayerData>(message);
+        _playerState.LoadFromPlayerData(playerData);
+    }
+
+    #endregion
+
+    #region ServerRpc calls
+
+    [ServerRpc]
+    public void RequestPlayerDataServerRpc()
+    {
+        var playerData = FullPotential.Assets.Core.Registry.UserRegistry.LoadFromUsername(_playerState.Username.Value);
+
+        //Debug.LogError("Sending playerData to clientId " + ClientId);
+
+        var json = JsonUtility.ToJson(playerData);
+        //todo: use compression? - var jsonCompressed = Assets.Core.Helpers.CompressionHelper.CompressString(json);
+
+        var stream = PooledNetworkBuffer.Get();
+        using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
+        {
+            writer.WriteString(json);
+            CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.LoadPlayerData), OwnerClientId, stream);
+        }
+    }
+
+    [ServerRpc]
+    public void UpdatePlayerSettingsServerRpc(string textureUrl)
+    {
+        _playerState.TextureUrl.Value = textureUrl;
+    }
+
+    [ServerRpc]
+    public void CastSpellServerRpc(bool leftHand, Vector3 position, Vector3 direction, ServerRpcParams serverRpcParams = default)
+    {
+        var activeSpell = _playerState.Inventory.GetSpellInHand(leftHand);
+
+        if (activeSpell == null)
+        {
+            return;
+        }
+
+        switch (activeSpell.Targeting)
+        {
+            case FullPotential.Assets.Core.Spells.Targeting.Projectile _:
+                _playerState.SpawnSpellProjectile(activeSpell, leftHand, position, direction, serverRpcParams.Receive.SenderClientId);
+                break;
+
+            case FullPotential.Assets.Core.Spells.Targeting.Self _:
+            case FullPotential.Assets.Core.Spells.Targeting.Touch _:
+            case FullPotential.Assets.Core.Spells.Targeting.Beam _:
+            case FullPotential.Assets.Core.Spells.Targeting.Cone _:
+                //todo: other spell targeting options
+                throw new NotImplementedException();
+
+            default:
+                throw new Exception($"Unexpected spell targeting with TypeName: '{activeSpell.Targeting.TypeName}'");
+        }
+    }
+
+    // ReSharper disable once UnusedParameter.Global
+    [ServerRpc]
+    public void InteractServerRpc(string gameObjectName, ServerRpcParams serverRpcParams = default)
+    {
+        var player = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject;
+
+        Interactable interactable = null;
+        //todo: replace hard-coded radius
+        var collidersInRange = Physics.OverlapSphere(player.gameObject.transform.position, 5f);
+        foreach (var colliderNearby in collidersInRange)
+        {
+            if (colliderNearby.gameObject.name == gameObjectName)
+            {
+                var colliderInteractable = colliderNearby.gameObject.GetComponent<Interactable>();
+                if (colliderInteractable != null)
+                {
+                    interactable = colliderInteractable;
+                    break;
+                }
+            }
+        }
+
+        if (interactable == null)
+        {
+            Debug.LogError("Failed to find the interactable with gameObjectName " + gameObjectName);
+            return;
+        }
+
+        Debug.Log($"Trying to interact with {interactable.name}");
+
+        var distance = Vector3.Distance(gameObject.transform.position, interactable.transform.position);
+        if (distance <= interactable.Radius)
+        {
+            interactable.OnInteract(serverRpcParams.Receive.SenderClientId);
+        }
+    }
+
+    [ServerRpc]
+    public void CraftItemServerRpc(string[] componentIds, string categoryName, string craftableTypeName, bool isTwoHanded, string itemName)
+    {
+        var components = _playerState.Inventory.GetComponentsFromIds(componentIds);
+
+        if (components.Count != componentIds.Length)
+        {
+            Debug.LogError("Someone tried cheating: One or more IDs provided are not in the inventory");
+            return;
+        }
+
+        var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(
+            categoryName,
+            craftableTypeName,
+            isTwoHanded,
+            components
+        );
+
+        if (_playerState.Inventory.ValidateIsCraftable(componentIds, craftedItem).Any())
+        {
+            Debug.LogError("Someone tried cheating: validation was skipped");
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(itemName))
+        {
+            craftedItem.Name = itemName;
+        }
+
+        var craftedType = craftedItem.GetType();
+
+        var invChange = new InventoryAndRemovals
+        {
+            IdsToRemove = componentIds.ToArray(),
+            Accessories = craftedType == typeof(Accessory) ? new[] { craftedItem as Accessory } : null,
+            Armor = craftedType == typeof(Armor) ? new[] { craftedItem as Armor } : null,
+            Spells = craftedType == typeof(Spell) ? new[] { craftedItem as Spell } : null,
+            Weapons = craftedType == typeof(Weapon) ? new[] { craftedItem as Weapon } : null
+        };
+
+        _playerState.Inventory.ApplyInventoryAndRemovals(invChange);
+
+        var json = JsonUtility.ToJson(invChange);
+
+        var stream = PooledNetworkBuffer.Get();
+        using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
+        {
+            writer.WriteString(json);
+            CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId, stream);
+        }
+    }
+
+    [ServerRpc]
+    public void ChangeEquipsServerRpc()
+    {
+        var invChange = new InventoryAndRemovals
+        {
+            EquipSlots = _playerState.Inventory.EquipSlots
+        };
+
+        var json = JsonUtility.ToJson(invChange);
+
+        var stream = PooledNetworkBuffer.Get();
+        using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
+        {
+            writer.WriteString(json);
+            CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId, stream);
+        }
+    }
+
     #endregion
 
     private void CheckForInteractable()
@@ -270,7 +452,7 @@ public class PlayerClientSide : NetworkBehaviour
             return;
         }
 
-        _playerState.CastSpellServerRpc(leftHand, _playerCamera.transform.position, _playerCamera.transform.forward);
+        CastSpellServerRpc(leftHand, _playerCamera.transform.position, _playerCamera.transform.forward);
     }
 
     public void ShowAlert(string alertText)

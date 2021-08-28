@@ -88,7 +88,7 @@ public class SettingsMenuUi : MonoBehaviour
 
     public void SaveAndClose()
     {
-        GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>().UpdatePlayerSettingsServerRpc(_skinUrlInput.text);
+        GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerClientSide>().UpdatePlayerSettingsServerRpc(_skinUrlInput.text);
         GameManager.Instance.MainCanvasObjects.HideAllMenus();
     }
 

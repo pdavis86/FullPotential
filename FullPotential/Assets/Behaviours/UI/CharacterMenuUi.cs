@@ -2,6 +2,7 @@
 using FullPotential.Assets.Core.Extensions;
 using FullPotential.Assets.Core.Registry.Base;
 using FullPotential.Assets.Core.Storage;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,11 +25,13 @@ public class CharacterMenuUi : MonoBehaviour
 #pragma warning restore 0649
 
     private PlayerState _playerState;
+    private PlayerClientSide _playerClientSide;
     private GameObject _lastClickedSlot;
 
     private void Awake()
     {
         _playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
+        _playerClientSide = _playerState.gameObject.GetComponent<PlayerClientSide>();
     }
 
     private void OnEnable()
@@ -41,6 +44,8 @@ public class CharacterMenuUi : MonoBehaviour
         //todo: set to image of the item selected instead
         var slotImage = slot.transform.Find("Image").GetComponent<Image>();
         slotImage.color = item != null ? Color.white : Color.clear;
+
+        _playerClientSide.ChangeEquipsServerRpc();
 
         var tooltip = slot.GetComponent<Tooltip>();
         if (tooltip != null)
@@ -148,7 +153,13 @@ public class CharacterMenuUi : MonoBehaviour
 
                 //Debug.Log($"Setting item for slot '{slot.name}' to be '{item.Name}'");
 
-                _playerState.Inventory.SetItemToSlot(slot.name, item.Id);
+                if (!Enum.TryParse<PlayerInventory.SlotIndexToGameObjectName>(slot.name, out var slotResult))
+                {
+                    Debug.LogError($"Failed to find slot for name {slot.name}");
+                    return;
+                }
+
+                _playerState.Inventory.EquipItem((int)slotResult, item.Id);
 
                 SetSlot(slot, item);
 

@@ -29,7 +29,7 @@ public class InventoryItemsList : MonoBehaviour
         var rowRectTransform = rowPrefab.GetComponent<RectTransform>();
         var rowCounter = 0;
 
-        var itemsForSlot = inventory.GetItemsForSlotId(inventorySlot);
+        var itemsForSlot = inventory.GetCompatibleItemsForSlot(inventorySlot);
 
         if (!itemsForSlot.Any())
         {

@@ -9,7 +9,7 @@ namespace FullPotential.Assets.Core.Registry
     {
         public static string SignIn(string username, string password)
         {
-            //todo: implement UserRegistry.SignIn()
+            //todo: implement UserRegistry.SignIn(), make a unity web request to get the token
 
             //todo: remove once implemented properly
             if (string.IsNullOrWhiteSpace(username))
@@ -45,7 +45,8 @@ namespace FullPotential.Assets.Core.Registry
             {
                 return new PlayerData
                 {
-                    Username = username
+                    Username = username,
+                    Options = new Options()
                 };
             }
 

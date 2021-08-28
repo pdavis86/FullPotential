@@ -34,6 +34,7 @@ public class CraftingMenuUi : MonoBehaviour
 #pragma warning restore 0649
 
     private PlayerState _playerState;
+    private PlayerClientSide _playerClientSide;
     private List<ItemBase> _components;
     private Dictionary<Type, string> _craftingCategories;
     private Dictionary<IGearArmor, string> _armorTypes;
@@ -47,6 +48,7 @@ public class CraftingMenuUi : MonoBehaviour
         _components = new List<ItemBase>();
 
         _playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
+        _playerClientSide = _playerState.gameObject.GetComponent<PlayerClientSide>();
 
         _typeDropdown.onValueChanged.AddListener(TypeOnValueChanged);
 
@@ -99,7 +101,7 @@ public class CraftingMenuUi : MonoBehaviour
         var selectedSubType = GetCraftableTypeName(selectedType);
         var isTwoHanded = IsTwoHandedSelected();
 
-        _playerState.CraftItemServerRpc(componentIds, selectedType, selectedSubType, isTwoHanded, _craftName.text);
+        _playerClientSide.CraftItemServerRpc(componentIds, selectedType, selectedSubType, isTwoHanded, _craftName.text);
     }
 
     void SubTypeOnValueChanged(int index)
