@@ -220,7 +220,7 @@ public class PlayerState : NetworkBehaviour
         FullPotential.Assets.Core.Registry.UserRegistry.Save(saveData);
     }
 
-    public void SpawnSpellProjectile(Spell activeSpell, bool leftHand, Vector3 position, Vector3 direction, ulong clientId)
+    public void SpawnSpellProjectile(Spell activeSpell, Vector3 position, Vector3 direction, ulong clientId)
     {
         if (!IsServer)
         {
@@ -229,8 +229,7 @@ public class PlayerState : NetworkBehaviour
 
         //todo: style projectile based on activeSpell
 
-        var startPos = position + gameObject.transform.forward + new Vector3(leftHand ? -0.15f : 0.15f, -0.1f, 0);
-        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.Spell, startPos, Quaternion.identity, GameManager.Instance.MainCanvasObjects.RuntimeObjectsContainer.transform);
+        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.Spell, position, Quaternion.identity, GameManager.Instance.MainCanvasObjects.RuntimeObjectsContainer.transform);
 
         var spellScript = spellObject.GetComponent<SpellBehaviour>();
         spellScript.PlayerClientId = new NetworkVariable<ulong>(clientId);
@@ -240,10 +239,18 @@ public class PlayerState : NetworkBehaviour
         spellObject.GetComponent<NetworkObject>().Spawn(null, true);
     }
 
-    private void SpawnEquippedObjects()
+    public void SpawnEquippedObjects()
     {
         for (var slotIndex = 0; slotIndex < Inventory.EquippedObjects.Length; slotIndex++)
         {
+            var currentlyInGame = Inventory.EquippedObjects[slotIndex];
+
+            //todo: only destroy if ID is different
+            if (currentlyInGame != null)
+            {
+                Destroy(currentlyInGame);
+            }
+
             var itemId = Inventory.EquipSlots[slotIndex];
 
             if (string.IsNullOrWhiteSpace(itemId))
@@ -252,12 +259,6 @@ public class PlayerState : NetworkBehaviour
             }
 
             var item = Inventory.GetItemWithId<ItemBase>(itemId);
-
-            var currentlyInGame = Inventory.EquippedObjects[slotIndex];
-            if (currentlyInGame != null)
-            {
-                UnityEngine.Object.Destroy(currentlyInGame);
-            }
 
             if (slotIndex == (int)SlotIndexToGameObjectName.LeftHand)
             {
@@ -297,7 +298,7 @@ public class PlayerState : NetworkBehaviour
                     weaponGo.transform.localEulerAngles = new Vector3(0, 90);
                     weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, -0.25f, 1.9f);
 
-                    if (NetworkManager.Singleton.LocalClientId == ClientId.Value)
+                    if (NetworkManager.Singleton.LocalClientId == ClientId.Value) //todo: same as IsOwner?
                     {
                         FullPotential.Assets.Helpers.GameObjectHelper.SetGameLayerRecursive(weaponGo, InFrontOfPlayer.layer);
                     }
@@ -310,6 +311,7 @@ public class PlayerState : NetworkBehaviour
         {
             //todo: implement other items
             Debug.LogWarning($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name} yet");
+            Inventory.EquippedObjects[index] = null;
         }
     }
 

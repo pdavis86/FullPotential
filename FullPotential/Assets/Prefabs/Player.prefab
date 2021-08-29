@@ -526,6 +526,36 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &6040919883324738210
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8420346807647110726}
+  m_Layer: 0
+  m_Name: Spell Start Left
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8420346807647110726
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6040919883324738210}
+  m_LocalRotation: {x: -0.0017452955, y: -0, z: -0, w: 0.9999985}
+  m_LocalPosition: {x: -0.22, y: -0.16, z: 1.6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7392779647204144591}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7392779646582606321
 GameObject:
   m_ObjectHideFlags: 0
@@ -589,7 +619,9 @@ Transform:
   m_LocalRotation: {x: 0.0017452955, y: 0, z: 0, w: 0.9999985}
   m_LocalPosition: {x: 0, y: 0.471, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 8420346807647110726}
+  - {fileID: 2468258610819334847}
   m_Father: {fileID: 7392779647718654652}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0.2, y: 0, z: 0}
@@ -832,6 +864,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerCamera: {fileID: 7392779647204144589}
   _inFrontOfPlayerCamera: {fileID: 8117841901429913958}
+  _spellStartLeft: {fileID: 6040919883324738210}
+  _spellStartRight: {fileID: 8089984387303676830}
 --- !u!114 &7556515380981010776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1120,6 +1154,36 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &8089984387303676830
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2468258610819334847}
+  m_Layer: 0
+  m_Name: Spell Start Right
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2468258610819334847
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8089984387303676830}
+  m_LocalRotation: {x: -0.0017452955, y: -0, z: -0, w: 0.9999985}
+  m_LocalPosition: {x: 0.22, y: -0.16, z: 1.6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7392779647204144591}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8329820012052210567
 GameObject:
   m_ObjectHideFlags: 0

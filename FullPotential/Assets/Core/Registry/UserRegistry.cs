@@ -7,6 +7,8 @@ namespace FullPotential.Assets.Core.Registry
 {
     public static class UserRegistry
     {
+        //todo: save and load to database instead
+
         public static string SignIn(string username, string password)
         {
             //todo: implement UserRegistry.SignIn(), make a unity web request to get the token

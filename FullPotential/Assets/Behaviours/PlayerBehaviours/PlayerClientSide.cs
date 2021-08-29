@@ -19,9 +19,13 @@ using UnityEngine;
 
 public class PlayerClientSide : NetworkBehaviour
 {
+    //todo: use compression for messages? - var jsonCompressed = Assets.Core.Helpers.CompressionHelper.CompressString(json);
+
 #pragma warning disable 0649
     [SerializeField] private Camera _playerCamera;
     [SerializeField] private Camera _inFrontOfPlayerCamera;
+    [SerializeField] private GameObject _spellStartLeft;
+    [SerializeField] private GameObject _spellStartRight;
 #pragma warning restore 0649
 
     private bool _hasMenuOpen;
@@ -225,9 +229,16 @@ public class PlayerClientSide : NetworkBehaviour
         }
 
         var changes = JsonUtility.FromJson<InventoryAndRemovals>(message);
+        HandleInventoryChange(changes);
+    }
+
+    public void HandleInventoryChange(InventoryAndRemovals changes)
+    {
         _playerState.Inventory.ApplyInventoryAndRemovals(changes);
 
-        if (changes.IdsToRemove.Length > 0)
+        _playerState.SpawnEquippedObjects();
+
+        if (changes.IdsToRemove != null && changes.IdsToRemove.Length > 0)
         {
             RefreshCraftingWindow();
         }
@@ -256,16 +267,17 @@ public class PlayerClientSide : NetworkBehaviour
     {
         var playerData = FullPotential.Assets.Core.Registry.UserRegistry.LoadFromUsername(_playerState.Username.Value);
 
-        //Debug.LogError("Sending playerData to clientId " + ClientId);
+        //Debug.LogError("Sending playerData to clientId " + OwnerClientId);
 
-        var json = JsonUtility.ToJson(playerData);
-        //todo: use compression? - var jsonCompressed = Assets.Core.Helpers.CompressionHelper.CompressString(json);
-
-        var stream = PooledNetworkBuffer.Get();
-        using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
+        if (OwnerClientId > 0)
         {
-            writer.WriteString(json);
-            CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.LoadPlayerData), OwnerClientId, stream);
+            var json = JsonUtility.ToJson(playerData);
+            var stream = PooledNetworkBuffer.Get();
+            using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
+            {
+                writer.WriteString(json);
+                CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.LoadPlayerData), OwnerClientId, stream);
+            }
         }
     }
 
@@ -276,7 +288,7 @@ public class PlayerClientSide : NetworkBehaviour
     }
 
     [ServerRpc]
-    public void CastSpellServerRpc(bool leftHand, Vector3 position, Vector3 direction, ServerRpcParams serverRpcParams = default)
+    public void CastSpellServerRpc(bool leftHand, ServerRpcParams serverRpcParams = default)
     {
         var activeSpell = _playerState.Inventory.GetSpellInHand(leftHand);
 
@@ -285,10 +297,15 @@ public class PlayerClientSide : NetworkBehaviour
             return;
         }
 
+        var startPos = leftHand 
+            ? _spellStartLeft.transform.position
+            : _spellStartRight.transform.position;
+        var direction = _playerCamera.transform.forward;
+
         switch (activeSpell.Targeting)
         {
             case FullPotential.Assets.Core.Spells.Targeting.Projectile _:
-                _playerState.SpawnSpellProjectile(activeSpell, leftHand, position, direction, serverRpcParams.Receive.SenderClientId);
+                _playerState.SpawnSpellProjectile(activeSpell, startPos, direction, serverRpcParams.Receive.SenderClientId);
                 break;
 
             case FullPotential.Assets.Core.Spells.Targeting.Self _:
@@ -331,7 +348,7 @@ public class PlayerClientSide : NetworkBehaviour
             return;
         }
 
-        Debug.Log($"Trying to interact with {interactable.name}");
+        //Debug.Log($"Trying to interact with {interactable.name}");
 
         var distance = Vector3.Distance(gameObject.transform.position, interactable.transform.position);
         if (distance <= interactable.Radius)
@@ -382,31 +399,46 @@ public class PlayerClientSide : NetworkBehaviour
 
         _playerState.Inventory.ApplyInventoryAndRemovals(invChange);
 
-        var json = JsonUtility.ToJson(invChange);
-
-        var stream = PooledNetworkBuffer.Get();
-        using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
+        if (OwnerClientId > 0)
         {
-            writer.WriteString(json);
-            CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId, stream);
+            var json = JsonUtility.ToJson(invChange);
+            var stream = PooledNetworkBuffer.Get();
+            using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
+            {
+                writer.WriteString(json);
+                CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId, stream);
+            }
+        }
+        else
+        {
+            HandleInventoryChange(invChange);
         }
     }
 
     [ServerRpc]
     public void ChangeEquipsServerRpc()
     {
+        //Debug.LogError("Changing slots on server: " + IsServer);
+
         var invChange = new InventoryAndRemovals
         {
             EquipSlots = _playerState.Inventory.EquipSlots
         };
 
-        var json = JsonUtility.ToJson(invChange);
-
-        var stream = PooledNetworkBuffer.Get();
-        using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
+        //todo: make this IF(IsHost) a method and use in all SendNamedMessage places
+        if (OwnerClientId > 0)
         {
-            writer.WriteString(json);
-            CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId, stream);
+            var json = JsonUtility.ToJson(invChange);
+            var stream = PooledNetworkBuffer.Get();
+            using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
+            {
+                writer.WriteString(json);
+                CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId, stream);
+            }
+        }
+        else
+        {
+            HandleInventoryChange(invChange);
         }
     }
 
@@ -452,7 +484,7 @@ public class PlayerClientSide : NetworkBehaviour
             return;
         }
 
-        CastSpellServerRpc(leftHand, _playerCamera.transform.position, _playerCamera.transform.forward);
+        CastSpellServerRpc(leftHand);
     }
 
     public void ShowAlert(string alertText)
