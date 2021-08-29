@@ -5,6 +5,7 @@ using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.Serialization.Pooled;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -17,6 +18,7 @@ using UnityEngine;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
 // ReSharper disable UnassignedField.Global
+// ReSharper disable RedundantDiscardDesignation
 
 public class PlayerClientSide : NetworkBehaviour
 {
@@ -82,8 +84,11 @@ public class PlayerClientSide : NetworkBehaviour
 
         CustomMessagingManager.RegisterNamedMessageHandler(nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OnInventoryChange);
         CustomMessagingManager.RegisterNamedMessageHandler(nameof(FullPotential.Assets.Core.Networking.MessageType.LoadPlayerData), OnLoadPlayerData);
+        CustomMessagingManager.RegisterNamedMessageHandler(nameof(FullPotential.Assets.Core.Networking.MessageType.EquipChange), OnEquipChange);
+        CustomMessagingManager.RegisterNamedMessageHandler(nameof(FullPotential.Assets.Core.Networking.MessageType.EquipChanges), OnEquipChanges);
 
         RequestPlayerDataServerRpc();
+        RequestingOtherPlayerDataServerRpc();
     }
 
     void OnInteract()
@@ -217,7 +222,7 @@ public class PlayerClientSide : NetworkBehaviour
         }
     }
 
-    private void OnInventoryChange(ulong clientId, System.IO.Stream stream)
+    private void OnInventoryChange(ulong senderClientId, System.IO.Stream stream)
     {
         //Debug.LogError("Recieved OnInventoryChange network message");
 
@@ -231,19 +236,7 @@ public class PlayerClientSide : NetworkBehaviour
         HandleInventoryChange(changes);
     }
 
-    public void HandleInventoryChange(InventoryAndRemovals changes)
-    {
-        _playerState.Inventory.ApplyInventoryAndRemovals(changes);
-
-        _playerState.SpawnEquippedObjects();
-
-        if (changes.IdsToRemove != null && changes.IdsToRemove.Length > 0)
-        {
-            RefreshCraftingWindow();
-        }
-    }
-
-    private void OnLoadPlayerData(ulong clientId, System.IO.Stream stream)
+    private void OnLoadPlayerData(ulong senderClientId, System.IO.Stream stream)
     {
         //Debug.LogError("Recieved playerData from the server at clientId " + NetworkManager.Singleton.LocalClientId);
 
@@ -255,6 +248,34 @@ public class PlayerClientSide : NetworkBehaviour
 
         var playerData = JsonUtility.FromJson<PlayerData>(message);
         _playerState.LoadFromPlayerData(playerData);
+    }
+
+    private void OnEquipChange(ulong senderClientId, System.IO.Stream stream)
+    {
+        string message;
+        using (PooledNetworkReader reader = PooledNetworkReader.Get(stream))
+        {
+            message = reader.ReadString().ToString();
+        }
+
+        var equipChange = JsonUtility.FromJson<EquipChange>(message);
+        ApplyEquipChange(equipChange);
+    }
+
+    private void OnEquipChanges(ulong senderClientId, System.IO.Stream stream)
+    {
+        string message;
+        using (PooledNetworkReader reader = PooledNetworkReader.Get(stream))
+        {
+            message = reader.ReadString().ToString();
+        }
+
+        var equipChanges = JsonUtility.FromJson<EquipChanges>(message);
+
+        foreach(var equipChange in equipChanges.Changes)
+        {
+            ApplyEquipChange(equipChange);
+        }
     }
 
     #endregion
@@ -402,10 +423,68 @@ public class PlayerClientSide : NetworkBehaviour
 
         HandleInventoryChange(invChange);
 
-        MessageHelper.SendMessageIfNotHost(invChange, nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId);
+        var equipChange = new EquipChange
+        {
+            SourceClientId = OwnerClientId,
+            Inventory = _playerState.Inventory.GetDataForOtherPlayers()
+        };
+
+        //NOTE: No client ID. We want to tell all clients about equip changes
+        MessageHelper.SendMessageIfNotHost(equipChange, nameof(FullPotential.Assets.Core.Networking.MessageType.EquipChange));
+    }
+
+    [ServerRpc]
+    public void RequestingOtherPlayerDataServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        var changes = new List<EquipChange>();
+
+        var playerObjs = GameObject.FindGameObjectsWithTag(FullPotential.Assets.Core.Constants.Tags.Player);
+        var playerStates = playerObjs.Select(x => x.GetComponent<PlayerState>());
+
+        foreach (var otherPlayerState in playerStates)
+        {
+            if(otherPlayerState.OwnerClientId == OwnerClientId)
+            {
+                continue;
+            }
+
+            changes.Add(new EquipChange
+            {
+                SourceClientId = otherPlayerState.OwnerClientId,
+                Inventory = otherPlayerState.Inventory.GetDataForOtherPlayers()
+            });
+        }
+
+        var equipChanges = new EquipChanges
+        {
+            Changes = changes.ToArray()
+        };
+
+        MessageHelper.SendMessageIfNotHost(equipChanges, nameof(FullPotential.Assets.Core.Networking.MessageType.EquipChanges), OwnerClientId);
     }
 
     #endregion
+
+    private void ApplyEquipChange(EquipChange equipChange)
+    {
+        if (OwnerClientId == equipChange.SourceClientId)
+        {
+            return;
+        }
+
+        var otherPlayerState = PlayerState.GetWithClientId(equipChange.SourceClientId);
+        otherPlayerState.Inventory.ApplyInventory(equipChange.Inventory);
+    }
+
+    private void HandleInventoryChange(InventoryAndRemovals changes)
+    {
+        _playerState.Inventory.ApplyInventoryAndRemovals(changes);
+
+        if (changes.IdsToRemove != null && changes.IdsToRemove.Length > 0)
+        {
+            RefreshCraftingWindow();
+        }
+    }
 
     private void CheckForInteractable()
     {

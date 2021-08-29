@@ -9,7 +9,6 @@ using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
 using TMPro;
 using UnityEngine;
-using static FullPotential.Assets.Core.Storage.PlayerInventory;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -19,7 +18,6 @@ using static FullPotential.Assets.Core.Storage.PlayerInventory;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
 // ReSharper disable ConvertToUsingDeclaration
-// ReSharper disable RedundantDiscardDesignation
 // ReSharper disable UnassignedField.Global
 
 public class PlayerState : NetworkBehaviour
@@ -34,7 +32,6 @@ public class PlayerState : NetworkBehaviour
 
     public GameObject InFrontOfPlayer;
 
-    public readonly NetworkVariable<ulong> ClientId = new NetworkVariable<ulong>(9999);
     public readonly NetworkVariable<string> Username = new NetworkVariable<string>();
     public readonly NetworkVariable<string> TextureUrl = new NetworkVariable<string>();
 
@@ -82,9 +79,7 @@ public class PlayerState : NetworkBehaviour
 
         gameObject.name = "Player ID " + NetworkObjectId;
 
-
         _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
-        //_clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams() { TargetClientIds = new[] { OwnerClientId } } };
     }
 
     private void OnDisable()
@@ -121,12 +116,6 @@ public class PlayerState : NetworkBehaviour
         _playerClientSide.ShowDamage(position, damage);
     }
 
-    [ClientRpc]
-    public void EquipsHaveChangedClientRpc()
-    {
-        //todo: _playerClientSide.ShowDamage(position, damage);
-    }
-
     #endregion
 
     public void ShowAlertForItemsAddedToInventory(string alertText)
@@ -153,7 +142,6 @@ public class PlayerState : NetworkBehaviour
         }
 
         _loadWasSuccessful = Inventory.ApplyInventory(playerData.Inventory, true);
-        SpawnEquippedObjects();
     }
 
     private void SetNameTag()
@@ -279,11 +267,11 @@ public class PlayerState : NetworkBehaviour
 
             var item = Inventory.GetItemWithId<ItemBase>(itemId);
 
-            if (slotIndex == (int)SlotIndexToGameObjectName.LeftHand)
+            if (slotIndex == (int)PlayerInventory.SlotIndexToGameObjectName.LeftHand)
             {
                 SpawnItemInHand(slotIndex, item);
             }
-            else if (slotIndex == (int)SlotIndexToGameObjectName.RightHand)
+            else if (slotIndex == (int)PlayerInventory.SlotIndexToGameObjectName.RightHand)
             {
                 SpawnItemInHand(slotIndex, item, false);
             }
@@ -317,9 +305,9 @@ public class PlayerState : NetworkBehaviour
                     weaponGo.transform.localEulerAngles = new Vector3(0, 90);
                     weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, -0.25f, 1.9f);
 
-                    if (NetworkManager.Singleton.LocalClientId == ClientId.Value) //todo: same as IsOwner?
+                    if (IsOwner) 
                     {
-                        FullPotential.Assets.Helpers.GameObjectHelper.SetGameLayerRecursive(weaponGo, InFrontOfPlayer.layer);
+                        GameObjectHelper.SetGameLayerRecursive(weaponGo, InFrontOfPlayer.layer);
                     }
 
                     Inventory.EquippedObjects[index] = weaponGo;
@@ -332,6 +320,22 @@ public class PlayerState : NetworkBehaviour
             Debug.LogWarning($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name} yet");
             Inventory.EquippedObjects[index] = null;
         }
+    }
+
+    public static PlayerState GetWithClientId(ulong clientId)
+    {
+        var playerObjs = GameObject.FindGameObjectsWithTag(FullPotential.Assets.Core.Constants.Tags.Player);
+
+        foreach (var obj in playerObjs)
+        {
+            var otherPlayerState = obj.GetComponent<PlayerState>();
+            if (otherPlayerState.OwnerClientId == clientId)
+            {
+                return otherPlayerState;
+            }
+        }
+
+        return null;
     }
 
 }

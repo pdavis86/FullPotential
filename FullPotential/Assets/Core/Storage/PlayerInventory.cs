@@ -154,6 +154,8 @@ namespace FullPotential.Assets.Core.Storage
                     }
                 }
 
+                _playerState.SpawnEquippedObjects();
+
                 return true;
             }
             catch (Exception ex)
@@ -199,6 +201,23 @@ namespace FullPotential.Assets.Core.Storage
                 : null;
         }
 
+        public Inventory GetDataForOtherPlayers()
+        {
+            var groupedItems = _items
+                .Where(x => EquipSlots.Contains(x.Id))
+                .GroupBy(x => x.GetType());
+
+            return new Inventory
+            {
+                Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(Loot))?.Select(x => x as Loot).ToArray(),
+                Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray(),
+                Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
+                Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray(),
+                Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
+                EquipSlots = EquipSlots
+            };
+        }
+
         public bool IsEquipped(string id)
         {
             return EquipSlots.Contains(id);
@@ -224,6 +243,12 @@ namespace FullPotential.Assets.Core.Storage
         public T GetItemWithId<T>(string id) where T : ItemBase
         {
             var item = _items.FirstOrDefault(x => x.Id == id);
+
+            if (item == null)
+            {
+                Debug.LogError($"Could not find the item with ID '{id}'");
+                return null;
+            }
 
             if (!(item is T))
             {

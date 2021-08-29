@@ -51,7 +51,6 @@ public class SceneObjects001 : NetworkBehaviour
         var playerNetObj = Instantiate(_playerPrefabNetObj, chosenSpawnPoint.position, chosenSpawnPoint.rotation);
 
         var playerState = playerNetObj.GetComponent<PlayerState>();
-        playerState.ClientId.Value = clientId;
 
         playerNetObj.SpawnAsPlayerObject(clientId);
 

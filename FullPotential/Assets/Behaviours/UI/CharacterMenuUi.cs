@@ -160,6 +160,8 @@ public class CharacterMenuUi : MonoBehaviour
                 }
 
                 _playerState.Inventory.EquipItem((int)slotResult, item.Id);
+                _playerState.SpawnEquippedObjects();
+
                 _playerClientSide.ChangeEquipsServerRpc(_playerState.Inventory.EquipSlots);
 
                 ResetUi(true);

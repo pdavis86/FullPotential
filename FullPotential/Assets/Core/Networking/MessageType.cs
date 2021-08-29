@@ -3,6 +3,8 @@
     public enum MessageType
     {
         LoadPlayerData,
-        InventoryChange
+        InventoryChange,
+        EquipChange,
+        EquipChanges
     }
 }
