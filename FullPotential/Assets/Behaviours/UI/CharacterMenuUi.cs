@@ -41,11 +41,11 @@ public class CharacterMenuUi : MonoBehaviour
 
     private void SetSlot(GameObject slot, ItemBase item)
     {
+        //Debug.LogError($"Setting slot '{slot?.name}' to '{item?.Id}'");
+
         //todo: set to image of the item selected instead
         var slotImage = slot.transform.Find("Image").GetComponent<Image>();
         slotImage.color = item != null ? Color.white : Color.clear;
-
-        _playerClientSide.ChangeEquipsServerRpc();
 
         var tooltip = slot.GetComponent<Tooltip>();
         if (tooltip != null)
@@ -160,8 +160,7 @@ public class CharacterMenuUi : MonoBehaviour
                 }
 
                 _playerState.Inventory.EquipItem((int)slotResult, item.Id);
-
-                SetSlot(slot, item);
+                _playerClientSide.ChangeEquipsServerRpc();
 
                 ResetUi(true);
             }

@@ -111,7 +111,10 @@ namespace FullPotential.Assets.Core.Storage
                 {
                     if (changes.EquipSlots.Length == EquipSlots.Length)
                     {
-                        EquipSlots = changes.EquipSlots;
+                        for (var i = 0; i < EquipSlots.Length; i++)
+                        {
+                            EquipItem(i, changes.EquipSlots[i]);
+                        }
                     }
                     else
                     {
@@ -128,8 +131,6 @@ namespace FullPotential.Assets.Core.Storage
                     }
                 }
 
-                EquipItems();
-
                 if (!firstSetup)
                 {
                     var addedItemsCount = addedItems.Count();
@@ -139,7 +140,7 @@ namespace FullPotential.Assets.Core.Storage
                         var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemadded");
                         _playerState.ShowAlertForItemsAddedToInventory(string.Format(alertText, addedItems.First().Name));
                     }
-                    else
+                    else if (addedItemsCount > 1)
                     {
                         var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemsadded");
                         _playerState.ShowAlertForItemsAddedToInventory(string.Format(alertText, addedItemsCount));
@@ -326,14 +327,6 @@ namespace FullPotential.Assets.Core.Storage
             }
 
             EquipSlots[slotIndex] = itemId;
-        }
-
-        private void EquipItems()
-        {
-            for (var i = 0; i < EquipSlots.Length; i++)
-            {
-                EquipItem(i, EquipSlots[i]);
-            }
         }
 
 
