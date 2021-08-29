@@ -20,7 +20,7 @@ public class TempGiveLoot : Interactable
     {
         var loot = GameManager.Instance.ResultFactory.GetLootDrop();
         var playerObj = NetworkManager.Singleton.ConnectedClients[playerNetId].PlayerObject;
-        playerObj.GetComponent<PlayerState>().Inventory.Add(loot);
+        playerObj.GetComponent<PlayerState>().AddToInventory(loot);
     }
 
     public override void OnBlur()

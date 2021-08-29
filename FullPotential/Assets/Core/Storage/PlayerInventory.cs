@@ -3,6 +3,7 @@ using FullPotential.Assets.Core.Data;
 using FullPotential.Assets.Core.Extensions;
 using FullPotential.Assets.Core.Registry.Base;
 using FullPotential.Assets.Core.Registry.Types;
+using FullPotential.Assets.Helpers;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.Serialization.Pooled;
@@ -94,6 +95,12 @@ namespace FullPotential.Assets.Core.Storage
                 if (changes.MaxItems > 0)
                 {
                     _maxItems = changes.MaxItems;
+                }
+
+                if (_items.Count == _maxItems)
+                {
+                    _playerState.AlertInventoryIsFull();
+                    //todo: handle full inventory
                 }
 
                 var addedItems = Enumerable.Empty<ItemBase>()
@@ -224,34 +231,6 @@ namespace FullPotential.Assets.Core.Storage
             }
 
             return item as T;
-        }
-
-        public void Add(ItemBase item)
-        {
-            if (!NetworkManager.Singleton.IsServer)
-            {
-                Debug.LogError("Inventory Add called on the client!");
-                return;
-            }
-
-            if (_items.Count == _maxItems)
-            {
-                _playerState.AlertInventoryIsFull();
-                return;
-            }
-
-            //todo: what type is the item being added?
-            var change = new InventoryAndRemovals { Loot = new[] { item as Loot } };
-
-            ApplyInventoryAndRemovals(change);
-
-            var json = JsonUtility.ToJson(change);
-            var stream = PooledNetworkBuffer.Get();
-            using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
-            {
-                writer.WriteString(json);
-                CustomMessagingManager.SendNamedMessage(nameof(Networking.MessageType.InventoryChange), _playerState.OwnerClientId, stream);
-            }
         }
 
         //public void RemoveIds(IEnumerable<string> idEnumerable)

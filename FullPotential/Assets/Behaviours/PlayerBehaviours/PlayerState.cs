@@ -3,6 +3,7 @@ using FullPotential.Assets.Core.Data;
 using FullPotential.Assets.Core.Registry.Base;
 using FullPotential.Assets.Core.Registry.Types;
 using FullPotential.Assets.Core.Storage;
+using FullPotential.Assets.Helpers;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
@@ -145,8 +146,12 @@ public class PlayerState : NetworkBehaviour
 
     public void LoadFromPlayerData(PlayerData playerData)
     {
-        Username.Value = playerData.Username;
-        TextureUrl.Value = playerData.Options?.TextureUrl;
+        if (IsServer)
+        {
+            Username.Value = playerData.Username;
+            TextureUrl.Value = playerData.Options?.TextureUrl;
+        }
+
         _loadWasSuccessful = Inventory.ApplyInventory(playerData.Inventory, true);
         SpawnEquippedObjects();
     }
@@ -194,7 +199,7 @@ public class PlayerState : NetworkBehaviour
     {
         if (!IsServer)
         {
-            Debug.LogWarning("Tried to save when not on the server");
+            Debug.LogError("Tried to save when not on the server");
         }
 
         //Debug.Log("Saving player data for " + gameObject.name);
@@ -218,6 +223,20 @@ public class PlayerState : NetworkBehaviour
         //}
 
         FullPotential.Assets.Core.Registry.UserRegistry.Save(saveData);
+    }
+
+    public void AddToInventory(ItemBase item)
+    {
+        if (!IsServer)
+        {
+            Debug.LogError("Inventory Add called on the client!");
+            return;
+        }
+
+        var invChange = new InventoryAndRemovals { Loot = new[] { item as Loot } };
+        Inventory.ApplyInventory(invChange);
+
+        MessageHelper.SendMessageIfNotHost(invChange, nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId);
     }
 
     public void SpawnSpellProjectile(Spell activeSpell, Vector3 position, Vector3 direction, ulong clientId)

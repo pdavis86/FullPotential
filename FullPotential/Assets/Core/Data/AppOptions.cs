@@ -4,10 +4,9 @@
 namespace FullPotential.Assets.Core.Data
 {
     [System.Serializable]
-    public class PlayerData
+    public class AppOptions
     {
-        public string Username;
-        public PlayerOptions Options;
-        public Inventory Inventory;
+        public string Culture;
+
     }
 }

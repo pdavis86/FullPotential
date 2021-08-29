@@ -1,5 +1,6 @@
 ﻿using FullPotential.Assets.Core.Data;
 using FullPotential.Assets.Core.Registry.Types;
+using FullPotential.Assets.Helpers;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.Serialization.Pooled;
@@ -19,8 +20,6 @@ using UnityEngine;
 
 public class PlayerClientSide : NetworkBehaviour
 {
-    //todo: use compression for messages? - var jsonCompressed = Assets.Core.Helpers.CompressionHelper.CompressString(json);
-
 #pragma warning disable 0649
     [SerializeField] private Camera _playerCamera;
     [SerializeField] private Camera _inFrontOfPlayerCamera;
@@ -265,20 +264,10 @@ public class PlayerClientSide : NetworkBehaviour
     [ServerRpc]
     public void RequestPlayerDataServerRpc()
     {
-        var playerData = FullPotential.Assets.Core.Registry.UserRegistry.LoadFromUsername(_playerState.Username.Value);
-
         //Debug.LogError("Sending playerData to clientId " + OwnerClientId);
 
-        if (OwnerClientId > 0)
-        {
-            var json = JsonUtility.ToJson(playerData);
-            var stream = PooledNetworkBuffer.Get();
-            using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
-            {
-                writer.WriteString(json);
-                CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.LoadPlayerData), OwnerClientId, stream);
-            }
-        }
+        var playerData = FullPotential.Assets.Core.Registry.UserRegistry.LoadFromUsername(_playerState.Username.Value);
+        MessageHelper.SendMessageIfNotHost(playerData, nameof(FullPotential.Assets.Core.Networking.MessageType.LoadPlayerData), OwnerClientId);
     }
 
     [ServerRpc]
@@ -396,49 +385,24 @@ public class PlayerClientSide : NetworkBehaviour
             Weapons = craftedType == typeof(Weapon) ? new[] { craftedItem as Weapon } : null
         };
 
-        _playerState.Inventory.ApplyInventoryAndRemovals(invChange);
+        HandleInventoryChange(invChange);
 
-        if (OwnerClientId > 0)
-        {
-            var json = JsonUtility.ToJson(invChange);
-            var stream = PooledNetworkBuffer.Get();
-            using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
-            {
-                writer.WriteString(json);
-                CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId, stream);
-            }
-        }
-        else
-        {
-            HandleInventoryChange(invChange);
-        }
+        MessageHelper.SendMessageIfNotHost(invChange, nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId);
     }
 
     [ServerRpc]
-    public void ChangeEquipsServerRpc()
+    public void ChangeEquipsServerRpc(string[] equipSlots)
     {
         //Debug.LogError("Changing slots on server: " + IsServer);
 
         var invChange = new InventoryAndRemovals
         {
-            EquipSlots = _playerState.Inventory.EquipSlots
+            EquipSlots = equipSlots
         };
 
-        //todo: make this IF(IsHost) a method and use in all SendNamedMessage places
-        if (OwnerClientId > 0)
-        {
-            var json = JsonUtility.ToJson(invChange);
-            var stream = PooledNetworkBuffer.Get();
-            using (PooledNetworkWriter writer = PooledNetworkWriter.Get(stream))
-            {
-                writer.WriteString(json);
-                CustomMessagingManager.SendNamedMessage(nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId, stream);
-            }
-        }
-        else
-        {
-            HandleInventoryChange(invChange);
-        }
+        HandleInventoryChange(invChange);
+
+        MessageHelper.SendMessageIfNotHost(invChange, nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId);
     }
 
     #endregion

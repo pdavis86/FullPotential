@@ -48,7 +48,7 @@ namespace FullPotential.Assets.Core.Registry
                 return new PlayerData
                 {
                     Username = username,
-                    Options = new Options()
+                    Options = new PlayerOptions()
                 };
             }
 
@@ -62,7 +62,7 @@ namespace FullPotential.Assets.Core.Registry
 
             if (playerData.Options == null)
             {
-                playerData.Options = new Options();
+                playerData.Options = new PlayerOptions();
             }
 
             return playerData;

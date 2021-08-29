@@ -1,3 +1,4 @@
+using MLAPI;
 using UnityEngine;
 
 // ReSharper disable CheckNamespace
@@ -30,6 +31,10 @@ public class MainMenuUi : MonoBehaviour
 
     private void Save()
     {
+        if (!NetworkManager.Singleton.IsServer)
+        {
+            return;
+        }
         if (GameManager.Instance.DataStore.LocalPlayer != null)
         {
             GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>().Save();

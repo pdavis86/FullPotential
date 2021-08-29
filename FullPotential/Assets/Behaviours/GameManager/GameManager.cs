@@ -1,4 +1,5 @@
-﻿using FullPotential.Assets.Core.Storage;
+﻿using FullPotential.Assets.Core.Data;
+using FullPotential.Assets.Core.Storage;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -92,7 +93,7 @@ public class GameManager : MonoBehaviour
         callback(false, null, true, null, null);
     }
 
-    private static string GetAppLoadOptions()
+    private static string GetAppOptionsPath()
     {
         return System.IO.Path.Combine(Application.persistentDataPath, "LoadOptions.json");
     }
@@ -108,19 +109,26 @@ public class GameManager : MonoBehaviour
 
     private static void SetLastUsedCulture(string culture)
     {
-        System.IO.File.WriteAllText(GetAppLoadOptions(), culture);
+        var options = new AppOptions
+        {
+            Culture = culture
+        };
+
+        System.IO.File.WriteAllText(GetAppOptionsPath(), JsonUtility.ToJson(options));
     }
 
     public static string GetLastUsedCulture()
     {
-        var path = GetAppLoadOptions();
+        var path = GetAppOptionsPath();
 
         if (!System.IO.File.Exists(path))
         {
             return null;
         }
 
-        return System.IO.File.ReadAllText(path);
+        var options = JsonUtility.FromJson<AppOptions>(System.IO.File.ReadAllText(path));
+
+        return options.Culture;
     }
 
     public static void Quit()

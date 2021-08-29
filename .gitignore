@@ -1,4 +1,6 @@
-﻿/FullPotential/.vsconfig
+﻿**.lnk
+**.bak
+/FullPotential/.vsconfig
 /FullPotential/Assets/TextMesh Pro
 /FullPotential/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
 /FullPotential/Assets/AddressableAssetsData/Windows
