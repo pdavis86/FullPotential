@@ -288,7 +288,7 @@ public class PlayerClientSide : NetworkBehaviour
     }
 
     [ServerRpc]
-    public void CastSpellServerRpc(bool leftHand, ServerRpcParams serverRpcParams = default)
+    public void CastSpellServerRpc(bool leftHand, Vector3 direction, ServerRpcParams serverRpcParams = default)
     {
         var activeSpell = _playerState.Inventory.GetSpellInHand(leftHand);
 
@@ -297,10 +297,9 @@ public class PlayerClientSide : NetworkBehaviour
             return;
         }
 
-        var startPos = leftHand 
+        var startPos = leftHand
             ? _spellStartLeft.transform.position
             : _spellStartRight.transform.position;
-        var direction = _playerCamera.transform.forward;
 
         switch (activeSpell.Targeting)
         {
@@ -484,7 +483,7 @@ public class PlayerClientSide : NetworkBehaviour
             return;
         }
 
-        CastSpellServerRpc(leftHand);
+        CastSpellServerRpc(leftHand, _playerCamera.transform.forward);
     }
 
     public void ShowAlert(string alertText)
