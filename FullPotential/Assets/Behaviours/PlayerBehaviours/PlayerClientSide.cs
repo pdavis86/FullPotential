@@ -78,7 +78,7 @@ public class PlayerClientSide : NetworkBehaviour
 
         //Avoids weapons clipping with other objects
         _playerState.InFrontOfPlayer.transform.parent = _inFrontOfPlayerCamera.transform;
-        GameObjectHelper.SetGameLayerRecursive(_playerState.InFrontOfPlayer, FullPotential.Assets.Constants.Layers.InFrontOfPlayer);
+        GameObjectHelper.SetGameLayerRecursive(_playerState.InFrontOfPlayer, FullPotential.Assets.Core.Constants.Layers.InFrontOfPlayer);
 
         _inFrontOfPlayerCamera.gameObject.SetActive(true);
         _playerCamera.gameObject.SetActive(true);

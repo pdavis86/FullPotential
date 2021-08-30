@@ -11,7 +11,7 @@ using UnityEngine;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
 
-public class SceneObjects001 : NetworkBehaviour
+public class SceneObjectsLevel001 : NetworkBehaviour
 {
     private NetworkObject _playerPrefabNetObj;
     private List<Transform> _spawnPoints;

@@ -105,7 +105,7 @@ public class GameManager : MonoBehaviour
 
     private void OnClientDisconnect(ulong clientId)
     {
-        Debug.LogWarning("Disconnected from server");
+        //Debug.LogWarning("Disconnected from server");
 
         GameManager.Instance.DataStore.HasDisconnected = true;
 

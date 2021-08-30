@@ -44,6 +44,8 @@ public class JoinOrHostGame : MonoBehaviour
         _networkManager = NetworkManager.Singleton;
         _networkTransport = _networkManager.GetComponent<UNetTransport>();
         _scene2Name = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(2));
+
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
     }
 
     private void OnEnable()
@@ -59,11 +61,17 @@ public class JoinOrHostGame : MonoBehaviour
             _gameDetailsContainer.SetActive(true);
         }
 
-        if (GameManager.Instance.DataStore.HasDisconnected)
-        {
-            _connectError.text = GameManager.Instance.Localizer.Translate("ui.connect.disconnected");
-            _connectError.gameObject.SetActive(true);
-        }
+        ShowAnyError();
+    }
+
+    private void OnDisable()
+    {
+        NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
+    }
+
+    private void OnClientDisconnect(ulong clientId)
+    {
+        ShowAnyError();
     }
 
     #region Button Event Handlers
@@ -121,6 +129,18 @@ public class JoinOrHostGame : MonoBehaviour
         _signinError.gameObject.SetActive(false);
         _signInContainer.SetActive(false);
         _gameDetailsContainer.SetActive(true);
+    }
+
+    private void ShowAnyError()
+    {
+        if (GameManager.Instance.DataStore.HasDisconnected && _connectError != null)
+        {
+            _gameDetailsContainer.SetActive(true);
+            _joiningMessage.gameObject.SetActive(false);
+
+            _connectError.text = GameManager.Instance.Localizer.Translate("ui.connect.disconnected");
+            _connectError.gameObject.SetActive(true);
+        }
     }
 
     private void SetNetworkAddressAndPort()
