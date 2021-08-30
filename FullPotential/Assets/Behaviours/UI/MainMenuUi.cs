@@ -19,8 +19,7 @@ public class MainMenuUi : MonoBehaviour
     {
         Save();
         _mainCanvasObjects.HideAllMenus();
-        JoinOrHostGame.Disconnect();
-        UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(1);
+        GameManager.Disconnect();
     }
 
     public void QuitGame()

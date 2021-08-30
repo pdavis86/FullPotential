@@ -1,5 +1,6 @@
 ﻿using FullPotential.Assets.Core.Data;
 using FullPotential.Assets.Core.Storage;
+using MLAPI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -42,6 +43,10 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get { return _instance; } }
 
 
+    //Others
+    private static bool _shouldBeConnected;
+
+
     async void Awake()
     {
         if (_instance != null && _instance != this)
@@ -74,12 +79,17 @@ public class GameManager : MonoBehaviour
         Prefabs = GetComponent<Prefabs>();
         MainCanvasObjects = _mainCanvas.GetComponent<MainCanvasObjects>();
 
-        MLAPI.NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
+        NetworkManager.Singleton.ConnectionApprovalCallback += OnApprovalCheck;
 
         SceneManager.LoadSceneAsync(1);
     }
 
-    private void ApprovalCheck(byte[] connectionData, ulong clientId, MLAPI.NetworkManager.ConnectionApprovedDelegate callback)
+    private void FixedUpdate()
+    {
+        CheckForDisconnect();
+    }
+
+    private void OnApprovalCheck(byte[] connectionData, ulong clientId, MLAPI.NetworkManager.ConnectionApprovedDelegate callback)
     {
         //Work-around for v0.1.0 of MLAPI not sending initial positions for GameObjects with Network Transform components
         //See https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/650
@@ -90,6 +100,26 @@ public class GameManager : MonoBehaviour
         //todo: test for a duplicate login
 
         callback(false, null, true, null, null);
+    }
+
+    private static void CheckForDisconnect()
+    {
+        if (NetworkManager.Singleton.IsHost)
+        {
+            return;
+        }
+
+        if (!_shouldBeConnected && NetworkManager.Singleton.IsClient)
+        {
+            //Debug.LogWarning("Just connected");
+            _shouldBeConnected = true;
+        }
+        else if (_shouldBeConnected && !NetworkManager.Singleton.IsClient)
+        {
+            //Debug.LogWarning("Disconnected from server");
+            _shouldBeConnected = false;
+            SceneManager.LoadSceneAsync(1);
+        }
     }
 
     private static string GetAppOptionsPath()
@@ -130,9 +160,22 @@ public class GameManager : MonoBehaviour
         return options.Culture;
     }
 
+    public static void Disconnect()
+    {
+        if (NetworkManager.Singleton.IsHost)
+        {
+            NetworkManager.Singleton.StopHost();
+            SceneManager.LoadSceneAsync(1);
+        }
+        else if (NetworkManager.Singleton.IsClient)
+        {
+            NetworkManager.Singleton.StopClient();
+        }
+    }
+
     public static void Quit()
     {
-        JoinOrHostGame.Disconnect();
+        //todo: necessary? - Disconnect();
 
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;

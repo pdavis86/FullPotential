@@ -111,7 +111,7 @@ public class JoinOrHostGame : MonoBehaviour
         SetNetworkAddressAndPort();
         _networkManager.StartHost();
 
-        //todo: startResult is useless for findint out if we actualyl connected correctly
+        //todo: startResult is useless for finding out if we actually connected correctly
 
         MLAPI.SceneManagement.NetworkSceneManager.SwitchScene(_scene2Name);
     }
@@ -121,21 +121,9 @@ public class JoinOrHostGame : MonoBehaviour
         SetNetworkAddressAndPort();
         _networkManager.StartClient();
 
-        //todo: startResult is useless for findint out if we actualyl connected correctly
+        //todo: startResult is useless for finding out if we actually connected correctly
 
         //NOTE: Do not need to change scene. This is handled by the server
-    }
-
-    public static void Disconnect()
-    {
-        if (NetworkManager.Singleton.IsHost)
-        {
-            NetworkManager.Singleton.StopHost();
-        }
-        else if (NetworkManager.Singleton.IsClient)
-        {
-            NetworkManager.Singleton.StopClient();
-        }
     }
 
 }
