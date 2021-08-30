@@ -7,6 +7,5 @@ namespace FullPotential.Assets.Core.Data
     public class AppOptions
     {
         public string Culture;
-
     }
 }

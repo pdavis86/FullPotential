@@ -46,10 +46,6 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
             return;
         }
 
-        //todo: implement AttackBehaviourBase crit? if so, what is it?
-        //todo: implement AttackBehaviourBase half-damage for duel-weilding
-        //todo: show when elemental effects are in use - GameManager.Instance.Prefabs.Combat.ElementalText
-
         //todo: calc defence
         var defenceStrength = 30;
 
@@ -57,15 +53,9 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
         var denominator = 100 + _random.Next(-10, 10);
         var damageDealt = Math.Round(sourceItem.Attributes.Strength * ((double)numerator / (denominator + defenceStrength)), 0);
 
-        Debug.Log($"Player '{_sourcePlayer.name}' used '{sourceItem.Name}' to attack target '{target.name}' for {damageDealt} damage");
-
-        //todo: For dealing damage, look at https://docs.unity3d.com/2018.1/Documentation/ScriptReference/Networking.SyncEventAttribute.html
-
-        //todo: check Luck then apply lingering
+        //Debug.Log($"Player '{_sourcePlayer.name}' used '{sourceItem.Name}' to attack target '{target.name}' for {damageDealt} damage");
 
         _playerState.ShowDamageClientRpc(position, damageDealt.ToString(CultureInfo.InvariantCulture), _clientRpcParams);
-
-        //todo: give source experience
     }
 
 }

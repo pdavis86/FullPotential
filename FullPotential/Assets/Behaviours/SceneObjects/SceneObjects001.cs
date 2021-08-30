@@ -40,9 +40,9 @@ public class SceneObjects001 : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void HeresMyJoiningDetailsServerRpc(string token, ServerRpcParams serverRpcParams = default)
+    public void HeresMyJoiningDetailsServerRpc(string playerToken, ServerRpcParams serverRpcParams = default)
     {
-        SpawnPlayer(serverRpcParams.Receive.SenderClientId, token);
+        SpawnPlayer(serverRpcParams.Receive.SenderClientId, playerToken);
     }
 
     private void SpawnPlayer(ulong clientId, string playerToken)
@@ -54,7 +54,7 @@ public class SceneObjects001 : NetworkBehaviour
 
         playerNetObj.SpawnAsPlayerObject(clientId);
 
-        var playerData = FullPotential.Assets.Core.Registry.UserRegistry.Load(playerToken);
+        var playerData = FullPotential.Assets.Core.Registry.UserRegistry.Load(playerToken, null);
         playerState.LoadFromPlayerData(playerData);
     }
 

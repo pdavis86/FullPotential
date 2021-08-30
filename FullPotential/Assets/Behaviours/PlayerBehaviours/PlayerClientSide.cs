@@ -273,7 +273,7 @@ public class PlayerClientSide : NetworkBehaviour
 
         var equipChanges = JsonUtility.FromJson<EquipChanges>(message);
 
-        foreach(var equipChange in equipChanges.Changes)
+        foreach (var equipChange in equipChanges.Changes)
         {
             ApplyEquipChange(equipChange);
         }
@@ -288,7 +288,7 @@ public class PlayerClientSide : NetworkBehaviour
     {
         //Debug.LogError("Sending playerData to clientId " + OwnerClientId);
 
-        var playerData = FullPotential.Assets.Core.Registry.UserRegistry.LoadFromUsername(_playerState.Username.Value);
+        var playerData = FullPotential.Assets.Core.Registry.UserRegistry.Load(null, _playerState.Username.Value);
         MessageHelper.SendMessageIfNotHost(playerData, nameof(MessageType.LoadPlayerData), OwnerClientId);
     }
 
@@ -444,7 +444,7 @@ public class PlayerClientSide : NetworkBehaviour
 
         foreach (var otherPlayerState in playerStates)
         {
-            if(otherPlayerState.OwnerClientId == OwnerClientId)
+            if (otherPlayerState.OwnerClientId == OwnerClientId)
             {
                 continue;
             }

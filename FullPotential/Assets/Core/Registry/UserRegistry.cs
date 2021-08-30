@@ -7,41 +7,25 @@ namespace FullPotential.Assets.Core.Registry
 {
     public static class UserRegistry
     {
-        //todo: save and load to database instead
-
         public static string SignIn(string username, string password)
         {
-            //todo: implement UserRegistry.SignIn(), make a unity web request to get the token
+            var token = string.IsNullOrWhiteSpace(username)
+                ? SystemInfo.deviceUniqueIdentifier
+                : username;
 
-            //todo: remove once implemented properly
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                username = SystemInfo.deviceUniqueIdentifier;
-            }
-
-            return username;
+            return token;
         }
 
-        private static string GetPlayerSavePath(string username)
+        public static bool ValidateToken(string token)
         {
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                throw new System.ArgumentException($"No username supplied to {nameof(GetPlayerSavePath)}()");
-            }
-
-            //todo: username must be a filesystem-safe string
-            return System.IO.Path.Combine(Application.persistentDataPath, username + ".json");
+            return true;
         }
 
-        public static PlayerData Load(string token)
+        public static PlayerData Load(string token, string username)
         {
-            //todo: implement this
-            return LoadFromUsername(token);
-        }
-
-        public static PlayerData LoadFromUsername(string username)
-        {
-            var filePath = GetPlayerSavePath(username);
+            var filePath = string.IsNullOrWhiteSpace(token)
+                ? GetPlayerSavePath(username)
+                : GetPlayerSavePath(token);
 
             if (!System.IO.File.Exists(filePath))
             {
@@ -73,6 +57,16 @@ namespace FullPotential.Assets.Core.Registry
             var prettyPrint = Debug.isDebugBuild;
             var saveJson = JsonUtility.ToJson(playerData, prettyPrint);
             System.IO.File.WriteAllText(GetPlayerSavePath(playerData.Username), saveJson);
+        }
+
+        private static string GetPlayerSavePath(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                throw new System.ArgumentException($"No username supplied");
+            }
+
+            return System.IO.Path.Combine(Application.persistentDataPath, username + ".json");
         }
 
     }
