@@ -1,4 +1,5 @@
 ﻿using MLAPI;
+using UnityEngine.InputSystem;
 
 public class TempGiveLoot : Interactable
 {
@@ -7,12 +8,8 @@ public class TempGiveLoot : Interactable
         //Debug.Log($"Interactable '{gameObject.name}' gained focus");
 
         var translation = GameManager.Instance.Localizer.Translate("ui.interact.shop");
-
-        //todo: get it from UnityEngine.InputSystem.;
-
-        var interactionKey = "E"; // GameManager.Instance.InputMappings.Interact.ToString();
-
-        _interactionBubble.text = string.Format(translation, interactionKey);
+        var interactInputName = GameManager.Instance.InputActions.Player.Interact.GetBindingDisplayString();
+        _interactionBubble.text = string.Format(translation, interactInputName);
         _interactionBubble.gameObject.SetActive(true);
     }
 

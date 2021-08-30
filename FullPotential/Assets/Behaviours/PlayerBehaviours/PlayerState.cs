@@ -261,8 +261,6 @@ public class PlayerState : NetworkBehaviour
             Debug.LogWarning("Tried to spawn a projectile when not on the server");
         }
 
-        //todo: style projectile based on activeSpell
-
         var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.Spell, position, Quaternion.identity, GameManager.Instance.MainCanvasObjects.RuntimeObjectsContainer.transform);
 
         var spellScript = spellObject.GetComponent<SpellBehaviour>();
@@ -279,7 +277,6 @@ public class PlayerState : NetworkBehaviour
         {
             var currentlyInGame = Inventory.EquippedObjects[slotIndex];
 
-            //todo: only destroy if ID is different
             if (currentlyInGame != null)
             {
                 Destroy(currentlyInGame);
@@ -302,7 +299,6 @@ public class PlayerState : NetworkBehaviour
             {
                 SpawnItemInHand(slotIndex, item, false);
             }
-            //todo: other slots
         }
     }
 

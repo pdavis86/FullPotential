@@ -43,7 +43,6 @@ public class CharacterMenuUi : MonoBehaviour
     {
         //Debug.LogError($"Setting slot '{slot?.name}' to '{item?.Id}'");
 
-        //todo: set to image of the item selected instead
         var slotImage = slot.transform.Find("Image").GetComponent<Image>();
         slotImage.color = item != null ? Color.white : Color.clear;
 
@@ -51,6 +50,7 @@ public class CharacterMenuUi : MonoBehaviour
         if (tooltip != null)
         {
             tooltip.ClearHandlers();
+
             // ReSharper disable once UnusedParameter.Local
             tooltip.OnPointerEnterForTooltip += pointerEventData =>
             {

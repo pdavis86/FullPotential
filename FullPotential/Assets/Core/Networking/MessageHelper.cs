@@ -22,7 +22,6 @@ namespace FullPotential.Assets.Core.Networking
         public static void SendMessageIfNotHost(object payload, string messageName, List<ulong> clientIds = null)
         {
             //NOTE: payload size limited to 65527
-            //todo: use compression for messages? - var jsonCompressed = Assets.Core.Helpers.CompressionHelper.CompressString(json);
 
             var json = JsonUtility.ToJson(payload);
             var stream = PooledNetworkBuffer.Get();

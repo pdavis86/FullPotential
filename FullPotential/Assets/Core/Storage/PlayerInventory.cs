@@ -39,8 +39,6 @@ namespace FullPotential.Assets.Core.Storage
 
         private int _maxItems;
 
-        //todo: Cache effective stats based on armour
-
         public PlayerInventory(PlayerState playerState)
         {
             _playerState = playerState;
@@ -96,7 +94,6 @@ namespace FullPotential.Assets.Core.Storage
                 if (_items.Count == _maxItems)
                 {
                     _playerState.AlertInventoryIsFull();
-                    //todo: handle full inventory
                 }
 
                 var addedItems = Enumerable.Empty<ItemBase>()

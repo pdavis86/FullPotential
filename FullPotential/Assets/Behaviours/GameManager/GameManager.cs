@@ -36,6 +36,10 @@ public class GameManager : MonoBehaviour
     //Behaviours
     public Prefabs Prefabs { get; private set; }
     public MainCanvasObjects MainCanvasObjects { get; private set; }
+    
+    
+    //Input
+    public DefaultInputActions InputActions;
 
 
     //Properties
@@ -78,6 +82,8 @@ public class GameManager : MonoBehaviour
 
         Prefabs = GetComponent<Prefabs>();
         MainCanvasObjects = _mainCanvas.GetComponent<MainCanvasObjects>();
+
+        InputActions = new DefaultInputActions();
 
         NetworkManager.Singleton.ConnectionApprovalCallback += OnApprovalCheck;
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
