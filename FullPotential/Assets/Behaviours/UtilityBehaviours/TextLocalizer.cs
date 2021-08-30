@@ -11,37 +11,17 @@ using UnityEngine.UI;
 public class TextLocalizer : MonoBehaviour
 {
     private Text _textComponent;
-    private bool _hasStarted;
 
     public string TranslationId;
-    public bool FireOnValidate = false;
 
     void Awake()
     {
         _textComponent = GetComponent<Text>();
     }
 
-    void Start()
+    private void OnEnable()
     {
-        if (GameManager.Instance == null)
-        {
-            return;
-        }
-        ResolveStringValue(TranslationId);
-        _hasStarted = true;
-    }
-
-    void OnValidate()
-    {
-        if (_hasStarted && FireOnValidate)
-        {
-            ResolveStringValue(TranslationId);
-        }
-    }
-
-    void ResolveStringValue(string id)
-    {
-        _textComponent.text = GameManager.Instance.Localizer.Translate(id);
+        _textComponent.text = GameManager.Instance.Localizer.Translate(TranslationId);
     }
 
 }

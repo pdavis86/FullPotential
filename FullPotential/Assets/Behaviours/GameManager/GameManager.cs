@@ -4,6 +4,7 @@ using FullPotential.Assets.Core.Localization;
 using FullPotential.Assets.Core.Registry;
 using FullPotential.Assets.Core.Storage;
 using MLAPI;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -114,18 +115,25 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private static string GetAppOptionsPath()
-    {
-        return System.IO.Path.Combine(Application.persistentDataPath, "LoadOptions.json");
-    }
-
-    public static void SetCulture(string culture)
+    // ReSharper disable once UnusedMethodReturnValue.Global
+    public async Task<bool> SetCultureAsync(string culture)
     {
         Debug.Log("Setting language to " + culture);
 
-        //todo: force all dialogue to reload content
+        await Localizer.LoadLocalizationFilesAsync(culture);
+
+        //Re-activate anything already active
+        MainCanvasObjects.DebuggingOverlay.SetActive(false);
+        MainCanvasObjects.DebuggingOverlay.SetActive(true);
 
         SetLastUsedCulture(culture);
+
+        return true;
+    }
+
+    private static string GetAppOptionsPath()
+    {
+        return System.IO.Path.Combine(Application.persistentDataPath, "LoadOptions.json");
     }
 
     private static void SetLastUsedCulture(string culture)

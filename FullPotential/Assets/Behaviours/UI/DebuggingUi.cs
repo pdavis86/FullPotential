@@ -27,8 +27,10 @@ public class DebuggingUi : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+    }
 
-        //todo: update this when client changes settings
+    private void OnEnable()
+    {
         _hostString = GameManager.Instance.Localizer.Translate("ui.debugging.host");
     }
 

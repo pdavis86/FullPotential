@@ -1061,7 +1061,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.character.tabs.quests
-  FireOnValidate: 0
 --- !u!1 &253050300
 GameObject:
   m_ObjectHideFlags: 0
@@ -1554,7 +1553,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.save
-  FireOnValidate: 0
 --- !u!114 &336904402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1982,7 +1980,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.main.settings
-  FireOnValidate: 0
 --- !u!1 &511616165
 GameObject:
   m_ObjectHideFlags: 0
@@ -3408,7 +3405,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.settings.skinplaceholder
-  FireOnValidate: 0
 --- !u!114 &828488898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4419,7 +4415,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.character.tabs.equipment
-  FireOnValidate: 0
 --- !u!1 &1132610692
 GameObject:
   m_ObjectHideFlags: 0
@@ -4577,7 +4572,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.character.tabs.inventory
-  FireOnValidate: 0
 --- !u!1 &1148570380
 GameObject:
   m_ObjectHideFlags: 0
@@ -5191,7 +5185,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.character.tabs.map
-  FireOnValidate: 0
 --- !u!114 &1354889467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6491,7 +6484,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.settings.language
-  FireOnValidate: 0
 --- !u!114 &1918674805
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7265,7 +7257,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.settings.skin
-  FireOnValidate: 0
 --- !u!114 &2100922203
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7463,7 +7454,6 @@ MonoBehaviour:
       type: 3}
     HitText: {fileID: 4232121126068313654, guid: e4d26bf7e17ee2b4ea2339e95a75588a,
       type: 3}
-    ElementalText: {fileID: 0}
 --- !u!1 &1549162085111107810
 GameObject:
   m_ObjectHideFlags: 0
@@ -7930,7 +7920,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.quit
-  FireOnValidate: 0
 --- !u!1 &4016244866755828143
 GameObject:
   m_ObjectHideFlags: 0
@@ -11462,7 +11451,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.main.disconnect
-  FireOnValidate: 0
 --- !u!224 &7011060654569762740
 RectTransform:
   m_ObjectHideFlags: 0

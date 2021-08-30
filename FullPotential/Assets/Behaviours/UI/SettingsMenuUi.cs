@@ -50,12 +50,12 @@ public class SettingsMenuUi : MonoBehaviour
         _newCultureIndex = index;
     }
 
-    public void SaveAndClose()
+    public async void SaveAndClose()
     {
         if (_newCultureIndex > -1)
         {
             var match = _cultures.ElementAt(_newCultureIndex);
-            GameManager.SetCulture(match.Key);
+            await GameManager.Instance.SetCultureAsync(match.Key);
         }
 
         GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerClientSide>().UpdatePlayerSettingsServerRpc(_skinUrlInput.text);
