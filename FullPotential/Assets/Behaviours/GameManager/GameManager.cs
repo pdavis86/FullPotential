@@ -133,7 +133,7 @@ public class GameManager : MonoBehaviour
 
     private static string GetAppOptionsPath()
     {
-        return System.IO.Path.Combine(Application.persistentDataPath, "LoadOptions.json");
+        return Application.persistentDataPath + "/LoadOptions.json";
     }
 
     private static void SetLastUsedCulture(string culture)
@@ -175,8 +175,6 @@ public class GameManager : MonoBehaviour
 
     public static void Quit()
     {
-        //todo: necessary? - Disconnect();
-
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else

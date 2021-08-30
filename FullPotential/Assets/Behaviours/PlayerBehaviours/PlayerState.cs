@@ -8,8 +8,10 @@ using FullPotential.Assets.Core.Storage;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -59,9 +61,6 @@ public class PlayerState : NetworkBehaviour
 
     private void Start()
     {
-        //_localClientIdMatches = ClientId.Value == NetworkManager.Singleton.LocalClientId;
-        //Debug.LogError($"PlayerState - IsOwner: {IsOwner}, localClientIdMatches: {_localClientIdMatches}, IsLocalPlayer: {IsLocalPlayer}");
-
         if (IsOwner)
         {
             GameManager.Instance.DataStore.LocalPlayer = gameObject;
@@ -72,10 +71,6 @@ public class PlayerState : NetworkBehaviour
             {
                 comp.enabled = false;
             }
-
-            //todo: these should not be necessary calls for the client, right?
-            //SetNameTag();
-            //SetTexture();
         }
 
         gameObject.name = "Player ID " + NetworkObjectId;
@@ -96,7 +91,10 @@ public class PlayerState : NetworkBehaviour
 
     private void OnTextureChanged(string previousValue, string newValue)
     {
-        SetTexture();
+        if (!string.IsNullOrWhiteSpace(TextureUrl.Value))
+        {
+            StartCoroutine(SetTexture());
+        }
     }
 
     #endregion
@@ -158,15 +156,43 @@ public class PlayerState : NetworkBehaviour
             : Username.Value;
     }
 
-    private void SetTexture()
+    private IEnumerator SetTexture()
     {
-        if (string.IsNullOrWhiteSpace(TextureUrl.Value))
+        string filePath;
+        if (TextureUrl.Value.ToLower().StartsWith("http"))
         {
-            return;
+            filePath = Application.persistentDataPath + "/" + Username.Value + ".png";
+
+            var doDownload = true;
+            var validatePath = Application.persistentDataPath + "/" + Username.Value + ".skinvalidate";
+            if (System.IO.File.Exists(validatePath))
+            {
+                var checkUrl = System.IO.File.ReadAllText(validatePath);
+                if (checkUrl.Equals(TextureUrl.Value, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    doDownload = false;
+                }
+            }
+
+            if (doDownload)
+            {
+                using (var webRequest = UnityWebRequest.Get(TextureUrl.Value))
+                {
+                    yield return webRequest.SendWebRequest();
+                    System.IO.File.WriteAllBytes(filePath, webRequest.downloadHandler.data);
+                }
+                System.IO.File.WriteAllText(validatePath, TextureUrl.Value.ToLower());
+            }
+        }
+        else
+        {
+            filePath = TextureUrl.Value;
         }
 
-        //todo: download player texture
-        var filePath = TextureUrl.Value;
+        if (!System.IO.File.Exists(filePath))
+        {
+            Debug.LogWarning("Not applying player texture because the file does not exist");
+        }
 
         var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
         tex.LoadImage(System.IO.File.ReadAllBytes(filePath));

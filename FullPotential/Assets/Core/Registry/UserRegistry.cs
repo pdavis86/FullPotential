@@ -66,7 +66,7 @@ namespace FullPotential.Assets.Core.Registry
                 throw new System.ArgumentException("No username supplied");
             }
 
-            return System.IO.Path.Combine(Application.persistentDataPath, username + ".json");
+            return Application.persistentDataPath + "/" + username + ".json";
         }
 
     }

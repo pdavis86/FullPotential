@@ -101,7 +101,6 @@ public class PlayerClientSide : NetworkBehaviour
 
         if (_focusedInteractable == null)
         {
-            //todo: play a sound to indicate a failed interaction
             return;
         }
 
@@ -322,7 +321,6 @@ public class PlayerClientSide : NetworkBehaviour
             case FullPotential.Assets.Core.Spells.Targeting.Touch _:
             case FullPotential.Assets.Core.Spells.Targeting.Beam _:
             case FullPotential.Assets.Core.Spells.Targeting.Cone _:
-                //todo: other spell targeting options
                 throw new NotImplementedException();
 
             default:
@@ -334,11 +332,12 @@ public class PlayerClientSide : NetworkBehaviour
     [ServerRpc]
     public void InteractServerRpc(string gameObjectName, ServerRpcParams serverRpcParams = default)
     {
+        const float searchRadius = 5f;
+
         var player = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject;
 
         Interactable interactable = null;
-        //todo: replace hard-coded radius
-        var collidersInRange = Physics.OverlapSphere(player.gameObject.transform.position, 5f);
+        var collidersInRange = Physics.OverlapSphere(player.gameObject.transform.position, searchRadius);
         foreach (var colliderNearby in collidersInRange)
         {
             if (colliderNearby.gameObject.name == gameObjectName)
