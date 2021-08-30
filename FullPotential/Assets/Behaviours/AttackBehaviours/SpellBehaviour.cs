@@ -18,14 +18,6 @@ public class SpellBehaviour : AttackBehaviourBase
     public NetworkVariable<string> SpellId;
     public NetworkVariable<Vector3> SpellDirection;
 
-    private void Awake()
-    {
-        if (NetworkManager.Singleton.IsServer)
-        {
-            Destroy(gameObject, 3f);
-        }
-    }
-
     private void Start()
     {
         if (!IsServer)
@@ -33,6 +25,8 @@ public class SpellBehaviour : AttackBehaviourBase
             //No need to Debug.LogError(). We only want this behaviour on the server
             return;
         }
+
+        Destroy(gameObject, 3f);
 
         _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId.Value].PlayerObject.gameObject;
 

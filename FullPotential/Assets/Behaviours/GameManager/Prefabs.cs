@@ -19,6 +19,7 @@ public class Prefabs : MonoBehaviour
     public class CombatClass
     {
         public GameObject Spell;
+        public GameObject SpellInHand;
         public GameObject HitText;
         public GameObject ElementalText;
     }

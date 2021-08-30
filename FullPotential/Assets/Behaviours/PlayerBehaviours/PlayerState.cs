@@ -302,25 +302,37 @@ public class PlayerState : NetworkBehaviour
                 weapon.IsTwoHanded ? registryType.PrefabAddressTwoHanded : registryType.PrefabAddress,
                 prefab =>
                 {
-                    var weaponGo = UnityEngine.Object.Instantiate(prefab, InFrontOfPlayer.transform);
-                    weaponGo.transform.localEulerAngles = new Vector3(0, 90);
-                    weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, -0.25f, 1.9f);
-
-                    if (IsOwner)
-                    {
-                        GameObjectHelper.SetGameLayerRecursive(weaponGo, InFrontOfPlayer.layer);
-                    }
-
-                    Inventory.EquippedObjects[index] = weaponGo;
+                    InstantiateInPlayerHand(prefab, new Vector3(leftHand ? -0.38f : 0.38f, -0.25f, 1.9f), new Vector3(0, 90), leftHand, index);
                 }
             );
         }
+        else if (item is Spell spell)
+        {
+            InstantiateInPlayerHand(GameManager.Instance.Prefabs.Combat.SpellInHand, new Vector3(leftHand ? -0.32f : 0.32f, -0.21f, 1.9f), null, leftHand, index);
+        }
         else
         {
-            //todo: implement other items
-            Debug.LogWarning($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name} yet");
+            Debug.LogError($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name}");
             Inventory.EquippedObjects[index] = null;
         }
+    }
+
+    private void InstantiateInPlayerHand(GameObject prefab, Vector3 localPosition, Vector3? rotation, bool leftHand, int slotIndex)
+    {
+        var newObj = UnityEngine.Object.Instantiate(prefab, InFrontOfPlayer.transform);
+        newObj.transform.localPosition = localPosition;
+
+        if (rotation.HasValue)
+        {
+            newObj.transform.localEulerAngles = rotation.Value;
+        }
+
+        if (IsOwner)
+        {
+            GameObjectHelper.SetGameLayerRecursive(newObj, InFrontOfPlayer.layer);
+        }
+
+        Inventory.EquippedObjects[slotIndex] = newObj;
     }
 
     public static PlayerState GetWithClientId(ulong clientId)
