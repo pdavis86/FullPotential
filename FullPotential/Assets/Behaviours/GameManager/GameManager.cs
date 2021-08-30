@@ -1,4 +1,7 @@
-﻿using FullPotential.Assets.Core.Data;
+﻿using FullPotential.Assets.Core.Crafting;
+using FullPotential.Assets.Core.Data;
+using FullPotential.Assets.Core.Localization;
+using FullPotential.Assets.Core.Registry;
 using FullPotential.Assets.Core.Storage;
 using MLAPI;
 using UnityEngine;
@@ -24,9 +27,9 @@ public class GameManager : MonoBehaviour
 #pragma warning restore 0649
 
     //Core components
-    public FullPotential.Assets.Core.Registry.TypeRegistry TypeRegistry { get; private set; }
-    public FullPotential.Assets.Core.Localization.Localizer Localizer { get; private set; }
-    public FullPotential.Assets.Core.Crafting.ResultFactory ResultFactory { get; private set; }
+    public TypeRegistry TypeRegistry { get; private set; }
+    public Localizer Localizer { get; private set; }
+    public ResultFactory ResultFactory { get; private set; }
 
 
     //Behaviours
@@ -43,10 +46,6 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get { return _instance; } }
 
 
-    //Others
-    private static bool _shouldBeConnected;
-
-
     async void Awake()
     {
         if (_instance != null && _instance != this)
@@ -60,64 +59,57 @@ public class GameManager : MonoBehaviour
 
         await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
 
-        TypeRegistry = new FullPotential.Assets.Core.Registry.TypeRegistry();
+        TypeRegistry = new TypeRegistry();
         TypeRegistry.FindAndRegisterAll();
 
         var culture = GetLastUsedCulture();
         if (string.IsNullOrWhiteSpace(culture))
         {
-            culture = FullPotential.Assets.Core.Localization.Localizer.DefaultCulture;
+            culture = Localizer.DefaultCulture;
             SetLastUsedCulture(culture);
         }
 
-        Localizer = new FullPotential.Assets.Core.Localization.Localizer(TypeRegistry.GetRegisteredModPaths());
+        Localizer = new Localizer(TypeRegistry.GetRegisteredModPaths());
         await Localizer.LoadAvailableCulturesAsync();
         await Localizer.LoadLocalizationFilesAsync(culture);
 
-        ResultFactory = new FullPotential.Assets.Core.Crafting.ResultFactory(TypeRegistry, Localizer);
+        ResultFactory = new ResultFactory(TypeRegistry, Localizer);
 
         Prefabs = GetComponent<Prefabs>();
         MainCanvasObjects = _mainCanvas.GetComponent<MainCanvasObjects>();
 
         NetworkManager.Singleton.ConnectionApprovalCallback += OnApprovalCheck;
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
 
         SceneManager.LoadSceneAsync(1);
     }
 
-    private void FixedUpdate()
-    {
-        CheckForDisconnect();
-    }
-
-    private void OnApprovalCheck(byte[] connectionData, ulong clientId, MLAPI.NetworkManager.ConnectionApprovedDelegate callback)
+    private void OnApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
     {
         //Work-around for v0.1.0 of MLAPI not sending initial positions for GameObjects with Network Transform components
         //See https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/650
-        GameObject.Find("TempEnemyShape").transform.position += new Vector3(1f, -1f, 1f);
+        GameObject.Find("TempEnemyShape").transform.position += new Vector3(0f, -1f, 0f);
 
-        //todo: validate login credentials
-        //todo: test to see if game is full
-        //todo: test for a duplicate login
+        var payload = System.Text.Encoding.UTF8.GetString(connectionData);
+        var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
+        if (!UserRegistry.ValidateToken(connectionPayload.PlayerToken))
+        {
+            Debug.LogWarning("Someone tried to connect with an invalid Player token");
+            callback(false, null, false, null, null);
+            return;
+        }
 
         callback(false, null, true, null, null);
     }
 
-    private static void CheckForDisconnect()
+    private void OnClientDisconnect(ulong clientId)
     {
-        if (NetworkManager.Singleton.IsHost)
-        {
-            return;
-        }
+        Debug.LogWarning("Disconnected from server");
 
-        if (!_shouldBeConnected && NetworkManager.Singleton.IsClient)
+        GameManager.Instance.DataStore.HasDisconnected = true;
+
+        if (SceneManager.GetActiveScene().buildIndex != 1)
         {
-            //Debug.LogWarning("Just connected");
-            _shouldBeConnected = true;
-        }
-        else if (_shouldBeConnected && !NetworkManager.Singleton.IsClient)
-        {
-            //Debug.LogWarning("Disconnected from server");
-            _shouldBeConnected = false;
             SceneManager.LoadSceneAsync(1);
         }
     }

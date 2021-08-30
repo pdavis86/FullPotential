@@ -1,7 +1,9 @@
-﻿using MLAPI;
+﻿using FullPotential.Assets.Core.Data;
+using MLAPI;
 using MLAPI.Transports.UNET;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -23,6 +25,9 @@ public class JoinOrHostGame : MonoBehaviour
 #pragma warning disable 0649
     [SerializeField] private GameObject _signInContainer;
     [SerializeField] private GameObject _gameDetailsContainer;
+    [SerializeField] private GameObject _signinError;
+    [SerializeField] private GameObject _joiningMessage;
+    [SerializeField] private Text _connectError;
 #pragma warning restore 0649
 
     private NetworkManager _networkManager;
@@ -39,6 +44,26 @@ public class JoinOrHostGame : MonoBehaviour
         _networkManager = NetworkManager.Singleton;
         _networkTransport = _networkManager.GetComponent<UNetTransport>();
         _scene2Name = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(2));
+    }
+
+    private void OnEnable()
+    {
+        if (string.IsNullOrWhiteSpace(GameManager.Instance.DataStore.PlayerToken))
+        {
+            _signInContainer.SetActive(true);
+            _gameDetailsContainer.SetActive(false);
+        }
+        else
+        {
+            _signInContainer.SetActive(false);
+            _gameDetailsContainer.SetActive(true);
+        }
+
+        if (GameManager.Instance.DataStore.HasDisconnected)
+        {
+            _connectError.text = GameManager.Instance.Localizer.Translate("ui.connect.disconnected");
+            _connectError.gameObject.SetActive(true);
+        }
     }
 
     #region Button Event Handlers
@@ -86,11 +111,14 @@ public class JoinOrHostGame : MonoBehaviour
 
         if (string.IsNullOrWhiteSpace(token))
         {
-            //todo: handle login failure
+            _signinError.gameObject.SetActive(true);
+            return;
         }
 
         GameManager.Instance.DataStore.PlayerToken = token;
         _username = _password = null;
+
+        _signinError.gameObject.SetActive(false);
         _signInContainer.SetActive(false);
         _gameDetailsContainer.SetActive(true);
     }
@@ -108,20 +136,58 @@ public class JoinOrHostGame : MonoBehaviour
 
     private void HostGameInternal()
     {
+        _signinError.gameObject.SetActive(false);
+
         SetNetworkAddressAndPort();
+
+        if (!IsPortFree())
+        {
+            _connectError.text = GameManager.Instance.Localizer.Translate("ui.connect.portnotfree");
+            _connectError.gameObject.SetActive(true);
+            return;
+        }
+
+        GameManager.Instance.DataStore.HasDisconnected = false;
+
         _networkManager.StartHost();
 
-        //todo: startResult is useless for finding out if we actually connected correctly
+        _gameDetailsContainer.SetActive(false);
+        _joiningMessage.gameObject.SetActive(true);
 
         MLAPI.SceneManagement.NetworkSceneManager.SwitchScene(_scene2Name);
     }
 
+    private bool IsPortFree()
+    {
+        var ipEndpoints = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().GetActiveUdpListeners();
+
+        foreach (var ipEndpoint in ipEndpoints)
+        {
+            if (ipEndpoint.Port == _networkTransport.ConnectPort)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private void JoinGameInternal()
     {
+        var payload = JsonUtility.ToJson(new ConnectionPayload()
+        {
+            PlayerToken = GameManager.Instance.DataStore.PlayerToken
+        });
+        NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.UTF8.GetBytes(payload);
+
         SetNetworkAddressAndPort();
+
+        GameManager.Instance.DataStore.HasDisconnected = false;
+
         _networkManager.StartClient();
 
-        //todo: startResult is useless for finding out if we actually connected correctly
+        _gameDetailsContainer.SetActive(false);
+        _joiningMessage.gameObject.SetActive(true);
 
         //NOTE: Do not need to change scene. This is handled by the server
     }

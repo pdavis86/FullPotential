@@ -9,5 +9,6 @@ namespace FullPotential.Assets.Core.Storage
         public bool IsDebugging { get { return true; } }
         public string PlayerToken { get; set; }
         public GameObject LocalPlayer { get; set; }
+        public bool HasDisconnected { get; set; }
     }
 }

@@ -168,13 +168,17 @@
       "Key": "ui.signin.password",
       "Value": "Password..."
     },
-		{
+	{
       "Key": "ui.signin.button",
       "Value": "Sign In"
     },
-	    {
+	{
       "Key": "ui.signin.intro",
       "Value": "Please sign in"
+    },
+	{
+      "Key": "ui.signin.error",
+      "Value": "Invalid username or password"
     },
 	
 	
@@ -197,6 +201,14 @@
 	{
       "Key": "ui.connect.join",
       "Value": "Join"
+    },
+	{
+      "Key": "ui.connect.joining",
+      "Value": "Joining..."
+    },
+	{
+      "Key": "ui.connect.disconnected",
+      "Value": "Disconnected"
     },
 	
 	

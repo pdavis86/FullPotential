@@ -302,13 +302,13 @@ public class PlayerState : NetworkBehaviour
                 weapon.IsTwoHanded ? registryType.PrefabAddressTwoHanded : registryType.PrefabAddress,
                 prefab =>
                 {
-                    InstantiateInPlayerHand(prefab, new Vector3(leftHand ? -0.38f : 0.38f, -0.25f, 1.9f), new Vector3(0, 90), leftHand, index);
+                    InstantiateInPlayerHand(prefab, new Vector3(leftHand ? -0.38f : 0.38f, -0.25f, 1.9f), new Vector3(0, 90), index);
                 }
             );
         }
-        else if (item is Spell spell)
+        else if (item is Spell)
         {
-            InstantiateInPlayerHand(GameManager.Instance.Prefabs.Combat.SpellInHand, new Vector3(leftHand ? -0.32f : 0.32f, -0.21f, 1.9f), null, leftHand, index);
+            InstantiateInPlayerHand(GameManager.Instance.Prefabs.Combat.SpellInHand, new Vector3(leftHand ? -0.32f : 0.32f, -0.21f, 1.9f), null, index);
         }
         else
         {
@@ -317,7 +317,7 @@ public class PlayerState : NetworkBehaviour
         }
     }
 
-    private void InstantiateInPlayerHand(GameObject prefab, Vector3 localPosition, Vector3? rotation, bool leftHand, int slotIndex)
+    private void InstantiateInPlayerHand(GameObject prefab, Vector3 localPosition, Vector3? rotation, int slotIndex)
     {
         var newObj = UnityEngine.Object.Instantiate(prefab, InFrontOfPlayer.transform);
         newObj.transform.localPosition = localPosition;
