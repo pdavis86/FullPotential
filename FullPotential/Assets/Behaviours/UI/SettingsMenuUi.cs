@@ -41,9 +41,8 @@ public class SettingsMenuUi : MonoBehaviour
         }
         _languageDropDown.value = i;
 
-        //todo:
-        //var playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
-        //_skinUrlInput.text = playerData.Options.TextureUrl;
+        var playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
+        _skinUrlInput.text = playerState.TextureUrl.Value;
     }
 
     public void SetLanguage(int index)

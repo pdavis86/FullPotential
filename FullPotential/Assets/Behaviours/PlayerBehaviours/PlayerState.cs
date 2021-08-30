@@ -176,12 +176,8 @@ public class PlayerState : NetworkBehaviour
         };
 
         _mainMesh.material = newMat;
-
-        if (IsOwner)
-        {
-            _leftMesh.material = newMat;
-            _rightMesh.material = newMat;
-        }
+        _leftMesh.material = newMat;
+        _rightMesh.material = newMat;
     }
 
     public void Save()
@@ -202,6 +198,10 @@ public class PlayerState : NetworkBehaviour
         var saveData = new PlayerData
         {
             Username = Username.Value,
+            Options = new PlayerOptions
+            {
+                TextureUrl = TextureUrl.Value
+            },
             Inventory = Inventory.GetSaveData()
         };
 
@@ -306,7 +306,7 @@ public class PlayerState : NetworkBehaviour
                     weaponGo.transform.localEulerAngles = new Vector3(0, 90);
                     weaponGo.transform.localPosition = new Vector3(leftHand ? -0.38f : 0.38f, -0.25f, 1.9f);
 
-                    if (IsOwner) 
+                    if (IsOwner)
                     {
                         GameObjectHelper.SetGameLayerRecursive(weaponGo, InFrontOfPlayer.layer);
                     }
