@@ -70,7 +70,7 @@ public class GameManager : MonoBehaviour
             SetLastUsedCulture(culture);
         }
 
-        Localizer = new Localizer(TypeRegistry.GetRegisteredModPaths());
+        Localizer = new Localizer();
         await Localizer.LoadAvailableCulturesAsync();
         await Localizer.LoadLocalizationFilesAsync(culture);
 

@@ -18,17 +18,11 @@ namespace FullPotential.Assets.Core.Localization
 {
     public class Localizer
     {
-        private readonly IEnumerable<string> _modPathStems;
         private Dictionary<string, string> _translations;
-        private Dictionary<string, string> _availableCultures;
+        private List<CultureAddressables> _availableCultures;
 
         public const string DefaultCulture = "en-GB";
         public string CurrentCulture { get; private set; }
-
-        public Localizer(IEnumerable<string> modPathStems)
-        {
-            _modPathStems = modPathStems;
-        }
 
         private async Task<Data.Localization> LoadCultureFileAsync(string address)
         {
@@ -70,11 +64,16 @@ namespace FullPotential.Assets.Core.Localization
                 }
             }
 
-            _availableCultures = new Dictionary<string, string>();
+            _availableCultures = new List<CultureAddressables>();
             foreach (var kvp in localisationAddresses)
             {
                 var data = await LoadCultureFileAsync(kvp.Value.First());
-                _availableCultures.Add(kvp.Key, data.Name.OrIfNullOrWhitespace(kvp.Key));
+                _availableCultures.Add(new CultureAddressables
+                {
+                    Code = kvp.Key,
+                    Name = data.Name.OrIfNullOrWhitespace(kvp.Key),
+                    Addresses = kvp.Value
+                });
             }
 
             return true;
@@ -85,10 +84,9 @@ namespace FullPotential.Assets.Core.Localization
         {
             _translations = new Dictionary<string, string>();
 
-            foreach (var modName in _modPathStems)
+            var cultureMatch = _availableCultures.First(x => x.Code == culture);
+            foreach (var address in cultureMatch.Addresses)
             {
-                var address = $"{modName}/Localization/{culture}.json";
-
                 var data = await LoadCultureFileAsync(address);
 
                 if (data?.Translations == null)
@@ -116,7 +114,7 @@ namespace FullPotential.Assets.Core.Localization
 
         public Dictionary<string, string> GetAvailableCultures()
         {
-            return _availableCultures;
+            return _availableCultures.ToDictionary(x => x.Code, x => x.Name);
         }
 
         public string Translate(string id)

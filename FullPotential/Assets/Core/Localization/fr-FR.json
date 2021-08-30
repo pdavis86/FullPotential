@@ -1,0 +1,278 @@
+{
+  "Culture": "fr-FR",
+  "Name": "French (France)",
+  "Translations": [
+    {
+      "Key": "crafting.category.weapon",
+      "Value": "Arme"
+    },
+    {
+      "Key": "crafting.category.armor",
+      "Value": "Armure"
+    },
+    {
+      "Key": "crafting.category.accessory",
+      "Value": "Accessoire"
+    },
+    {
+      "Key": "crafting.category.spell",
+      "Value": "Épeler"
+    },
+
+
+    {
+      "Key": "crafting.loot.type",
+      "Value": "Genre"
+    },
+
+
+    {
+      "Key": "crafting.handedness.one",
+      "Value": "à une main"
+    },
+    {
+      "Key": "crafting.handedness.two",
+      "Value": "à deux mains"
+    },
+
+
+    {
+      "Key": "crafting.name.prefix.attack",
+      "Value": "attaque"
+    },
+    {
+      "Key": "crafting.name.prefix.defence",
+      "Value": "défense"
+    },
+	
+	
+	{
+      "Key": "crafting.error.spellmissingeffect",
+      "Value": "Un sort a besoin d'au moins un effet"
+    },
+	{
+      "Key": "crafting.error.toomanycomponents",
+      "Value": "Too many components"
+    },
+	{
+      "Key": "crafting.error.toomanyforonehanded",
+      "Value": "Trop de composants pour une arme à une main"
+    },
+
+
+    {
+      "Key": "attribute.name",
+      "Value": "Nom"
+    },
+    {
+      "Key": "attribute.isautomatic",
+      "Value": "Automatique"
+    },
+    {
+      "Key": "attribute.issoulbound",
+      "Value": "Âme lié"
+    },
+    {
+      "Key": "attribute.extraammopershot",
+      "Value": "Munitions supplémentaires par tir"
+    },
+    {
+      "Key": "attribute.strength",
+      "Value": "Force"
+    },
+    {
+      "Key": "attribute.efficiency",
+      "Value": "Efficacité"
+    },
+    {
+      "Key": "attribute.range",
+      "Value": "Varier"
+    },
+    {
+      "Key": "attribute.accuracy",
+      "Value": "Précision"
+    },
+    {
+      "Key": "attribute.speed",
+      "Value": "vitesse"
+    },
+    {
+      "Key": "attribute.recovery",
+      "Value": "Récupération"
+    },
+    {
+      "Key": "attribute.duration",
+      "Value": "Durée"
+    },
+    {
+      "Key": "attribute.effects",
+      "Value": "Effets"
+    },
+    {
+      "Key": "attribute.targeting",
+      "Value": "Ciblage"
+    },
+    {
+      "Key": "attribute.shape",
+      "Value": "Forme"
+    },
+
+
+    {
+      "Key": "spell.shape.wall",
+      "Value": "mur"
+    },
+    {
+      "Key": "spell.shape.zone",
+      "Value": "Zone"
+    },
+
+
+    {
+      "Key": "spell.targeting.beam",
+      "Value": "Rayonner"
+    },
+    {
+      "Key": "spell.targeting.cone",
+      "Value": "Cône"
+    },
+    {
+      "Key": "spell.targeting.projectile",
+      "Value": "Projectile"
+    },
+    {
+      "Key": "spell.targeting.self",
+      "Value": "Soi"
+    },
+    {
+      "Key": "spell.targeting.touch",
+      "Value": "Toucher"
+    },
+	
+	
+	{
+      "Key": "ui.quit",
+      "Value": "Quitter"
+    },
+	{
+      "Key": "ui.save",
+      "Value": "sauvegarder"
+    },
+
+
+	{
+      "Key": "ui.signin.username",
+      "Value": "Nom d'utilisateur..."
+    },
+	{
+      "Key": "ui.signin.password",
+      "Value": "Mot de passe..."
+    },
+	{
+      "Key": "ui.signin.button",
+      "Value": "S'identifier"
+    },
+	{
+      "Key": "ui.signin.intro",
+      "Value": "Veuillez vous connecter"
+    },
+	{
+      "Key": "ui.signin.error",
+      "Value": "Nom d'utilisateur ou mot de passe invalide"
+    },
+	
+	
+	{
+      "Key": "ui.connect.intro",
+      "Value": "Bienvenue!"
+    },
+	{
+      "Key": "ui.connect.address",
+      "Value": "Adresse..."
+    },
+	{
+      "Key": "ui.connect.port",
+      "Value": "Port..."
+    },
+	{
+      "Key": "ui.connect.create",
+      "Value": "Créer"
+    },
+	{
+      "Key": "ui.connect.join",
+      "Value": "Rejoindre"
+    },
+	{
+      "Key": "ui.connect.joining",
+      "Value": "Joindre..."
+    },
+	{
+      "Key": "ui.connect.disconnected",
+      "Value": "Débranché"
+    },
+	
+	
+	{
+      "Key": "ui.debugging.host",
+      "Value": "Hôtesse"
+    },
+	
+	
+	{
+      "Key": "ui.main.settings",
+      "Value": "Paramètres"
+    },
+	{
+      "Key": "ui.main.disconnect",
+      "Value": "Déconnecter"
+    },
+	
+	{
+      "Key": "ui.character.tabs.equipment",
+      "Value": "Équipement"
+    },
+	{
+      "Key": "ui.character.tabs.inventory",
+      "Value": "TODO - Inventory"
+    },
+	{
+      "Key": "ui.character.tabs.quests",
+      "Value": "TODO - Quests"
+    },
+	{
+      "Key": "ui.character.tabs.map",
+      "Value": "TODO - Map"
+    },
+	
+	
+	{
+      "Key": "ui.interact.shop",
+      "Value": "Appuyez sur '{0}' pour magasiner"
+    },
+	
+	
+	{
+      "Key": "ui.settings.language",
+      "Value": "Langue"
+    },
+	{
+		"Key": "ui.settings.skin",
+		"Value": "URL de l'apparence"
+	},
+	{
+		"Key": "ui.settings.skinplaceholder",
+		"Value": "Entrer l'URL..."
+	},
+	
+	
+	{
+      "Key": "ui.alert.itemadded",
+      "Value": "{0} a été ajouté"
+    },
+	{
+      "Key": "ui.alert.itemsadded",
+      "Value": "{0} éléments ajoutés"
+    }
+
+  ]
+}

@@ -16,7 +16,6 @@ namespace FullPotential.Assets.Core.Registry
 {
     public class TypeRegistry
     {
-        private readonly List<string> _modPaths = new List<string>();
         private readonly List<IGearAccessory> _accessories = new List<IGearAccessory>();
         private readonly List<IGearArmor> _armor = new List<IGearArmor>();
         private readonly List<IGearWeapon> _weapons = new List<IGearWeapon>();
@@ -40,19 +39,12 @@ namespace FullPotential.Assets.Core.Registry
 
         public void FindAndRegisterAll()
         {
-            _modPaths.Add("Core");
             RegisterCoreTypes();
 
-            _modPaths.Add("Standard");
             foreach (var t in new Standard.Registration().GetRegisterables())
             {
                 ValidateAndRegister(t);
             }
-        }
-
-        public IEnumerable<string> GetRegisteredModPaths()
-        {
-            return _modPaths;
         }
 
         private void ValidateAndRegister(Type type)

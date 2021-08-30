@@ -25,7 +25,6 @@ public class DebuggingUi : MonoBehaviour
         if (!GameManager.Instance.DataStore.IsDebugging)
         {
             Destroy(gameObject);
-            return;
         }
     }
 

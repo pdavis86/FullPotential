@@ -63,7 +63,7 @@ namespace FullPotential.Assets.Core.Registry
         {
             if (string.IsNullOrWhiteSpace(username))
             {
-                throw new System.ArgumentException($"No username supplied");
+                throw new System.ArgumentException("No username supplied");
             }
 
             return System.IO.Path.Combine(Application.persistentDataPath, username + ".json");
