@@ -2,7 +2,7 @@
 
 // ReSharper disable ConditionIsAlwaysTrueOrFalse
 
-namespace FullPotential.Assets.Helpers
+namespace FullPotential.Assets.Core.Helpers
 {
     public static class GameObjectHelper
     {

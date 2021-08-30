@@ -89,7 +89,7 @@ public class CharacterMenuUi : MonoBehaviour
         {
             for (var i = 0; i < _playerState.Inventory.GetSlotCount(); i++)
             {
-                var slotName = System.Enum.GetName(typeof(PlayerInventory.SlotIndexToGameObjectName), i);
+                var slotName = Enum.GetName(typeof(PlayerInventory.SlotIndexToGameObjectName), i);
                 SetSlot(GetSlot(slotName), _playerState.Inventory.GetItemInSlot(i));
             }
         }

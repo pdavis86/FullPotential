@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.AddressableAssets.ResourceLocators;
 
 // ReSharper disable ConvertToAutoProperty
 // ReSharper disable ArrangeAccessorOwnerBody
@@ -63,7 +62,7 @@ namespace FullPotential.Assets.Core.Localization
 
                 if (addresses.Any())
                 {
-                    var groups = addresses.GroupBy(x => System.IO.Path.GetFileNameWithoutExtension(x));
+                    var groups = addresses.GroupBy(System.IO.Path.GetFileNameWithoutExtension);
                     foreach (var grouping in groups)
                     {
                         localisationAddresses.Add(grouping.Key, grouping.ToList());

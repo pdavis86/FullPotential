@@ -1,9 +1,10 @@
 ﻿using FullPotential.Assets.Api.Registry;
 using FullPotential.Assets.Core.Data;
+using FullPotential.Assets.Core.Helpers;
+using FullPotential.Assets.Core.Networking;
 using FullPotential.Assets.Core.Registry.Base;
 using FullPotential.Assets.Core.Registry.Types;
 using FullPotential.Assets.Core.Storage;
-using FullPotential.Assets.Helpers;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
@@ -224,7 +225,7 @@ public class PlayerState : NetworkBehaviour
         var invChange = new InventoryAndRemovals { Loot = new[] { item as Loot } };
         Inventory.ApplyInventory(invChange);
 
-        MessageHelper.SendMessageIfNotHost(invChange, nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId);
+        MessageHelper.SendMessageIfNotHost(invChange, nameof(MessageType.InventoryChange), OwnerClientId);
     }
 
     public void SpawnSpellProjectile(Spell activeSpell, Vector3 position, Vector3 direction, ulong clientId)

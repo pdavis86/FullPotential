@@ -3,10 +3,6 @@ using FullPotential.Assets.Core.Data;
 using FullPotential.Assets.Core.Extensions;
 using FullPotential.Assets.Core.Registry.Base;
 using FullPotential.Assets.Core.Registry.Types;
-using FullPotential.Assets.Helpers;
-using MLAPI;
-using MLAPI.Messaging;
-using MLAPI.Serialization.Pooled;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +30,7 @@ namespace FullPotential.Assets.Core.Storage
             Amulet
         }
 
-        public string[] EquipSlots;
+        public readonly string[] EquipSlots;
         public readonly GameObject[] EquippedObjects;
 
         private readonly PlayerState _playerState;

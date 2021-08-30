@@ -1,6 +1,6 @@
 ﻿using FullPotential.Assets.Core.Data;
 using FullPotential.Assets.Core.Registry.Types;
-using FullPotential.Assets.Helpers;
+using FullPotential.Assets.Core.Helpers;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.Serialization.Pooled;
@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using FullPotential.Assets.Core.Networking;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -77,15 +78,15 @@ public class PlayerClientSide : NetworkBehaviour
 
         //Avoids weapons clipping with other objects
         _playerState.InFrontOfPlayer.transform.parent = _inFrontOfPlayerCamera.transform;
-        FullPotential.Assets.Helpers.GameObjectHelper.SetGameLayerRecursive(_playerState.InFrontOfPlayer, FullPotential.Assets.Constants.Layers.InFrontOfPlayer);
+        GameObjectHelper.SetGameLayerRecursive(_playerState.InFrontOfPlayer, FullPotential.Assets.Constants.Layers.InFrontOfPlayer);
 
         _inFrontOfPlayerCamera.gameObject.SetActive(true);
         _playerCamera.gameObject.SetActive(true);
 
-        CustomMessagingManager.RegisterNamedMessageHandler(nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OnInventoryChange);
-        CustomMessagingManager.RegisterNamedMessageHandler(nameof(FullPotential.Assets.Core.Networking.MessageType.LoadPlayerData), OnLoadPlayerData);
-        CustomMessagingManager.RegisterNamedMessageHandler(nameof(FullPotential.Assets.Core.Networking.MessageType.EquipChange), OnEquipChange);
-        CustomMessagingManager.RegisterNamedMessageHandler(nameof(FullPotential.Assets.Core.Networking.MessageType.EquipChanges), OnEquipChanges);
+        CustomMessagingManager.RegisterNamedMessageHandler(nameof(MessageType.InventoryChange), OnInventoryChange);
+        CustomMessagingManager.RegisterNamedMessageHandler(nameof(MessageType.LoadPlayerData), OnLoadPlayerData);
+        CustomMessagingManager.RegisterNamedMessageHandler(nameof(MessageType.EquipChange), OnEquipChange);
+        CustomMessagingManager.RegisterNamedMessageHandler(nameof(MessageType.EquipChanges), OnEquipChanges);
 
         RequestPlayerDataServerRpc();
         RequestingOtherPlayerDataServerRpc();
@@ -288,7 +289,7 @@ public class PlayerClientSide : NetworkBehaviour
         //Debug.LogError("Sending playerData to clientId " + OwnerClientId);
 
         var playerData = FullPotential.Assets.Core.Registry.UserRegistry.LoadFromUsername(_playerState.Username.Value);
-        MessageHelper.SendMessageIfNotHost(playerData, nameof(FullPotential.Assets.Core.Networking.MessageType.LoadPlayerData), OwnerClientId);
+        MessageHelper.SendMessageIfNotHost(playerData, nameof(MessageType.LoadPlayerData), OwnerClientId);
     }
 
     [ServerRpc]
@@ -408,7 +409,7 @@ public class PlayerClientSide : NetworkBehaviour
 
         HandleInventoryChange(invChange);
 
-        MessageHelper.SendMessageIfNotHost(invChange, nameof(FullPotential.Assets.Core.Networking.MessageType.InventoryChange), OwnerClientId);
+        MessageHelper.SendMessageIfNotHost(invChange, nameof(MessageType.InventoryChange), OwnerClientId);
     }
 
     [ServerRpc]
@@ -430,11 +431,11 @@ public class PlayerClientSide : NetworkBehaviour
         };
 
         //NOTE: No client ID. We want to tell all clients about equip changes
-        MessageHelper.SendMessageIfNotHost(equipChange, nameof(FullPotential.Assets.Core.Networking.MessageType.EquipChange));
+        MessageHelper.SendMessageIfNotHost(equipChange, nameof(MessageType.EquipChange));
     }
 
     [ServerRpc]
-    public void RequestingOtherPlayerDataServerRpc(ServerRpcParams serverRpcParams = default)
+    public void RequestingOtherPlayerDataServerRpc()
     {
         var changes = new List<EquipChange>();
 
@@ -460,7 +461,7 @@ public class PlayerClientSide : NetworkBehaviour
             Changes = changes.ToArray()
         };
 
-        MessageHelper.SendMessageIfNotHost(equipChanges, nameof(FullPotential.Assets.Core.Networking.MessageType.EquipChanges), OwnerClientId);
+        MessageHelper.SendMessageIfNotHost(equipChanges, nameof(MessageType.EquipChanges), OwnerClientId);
     }
 
     #endregion

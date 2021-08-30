@@ -3,7 +3,9 @@ using MLAPI.Serialization.Pooled;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FullPotential.Assets.Helpers
+// ReSharper disable ConvertToUsingDeclaration
+
+namespace FullPotential.Assets.Core.Networking
 {
     public static class MessageHelper
     {

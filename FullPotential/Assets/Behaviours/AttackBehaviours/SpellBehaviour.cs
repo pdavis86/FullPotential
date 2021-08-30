@@ -1,6 +1,6 @@
 ﻿using FullPotential.Assets.Core.Constants;
+using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Registry.Types;
-using FullPotential.Assets.Helpers;
 using MLAPI;
 using MLAPI.NetworkVariable;
 using System;
