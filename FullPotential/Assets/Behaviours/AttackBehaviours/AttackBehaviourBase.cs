@@ -46,12 +46,24 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
             return;
         }
 
-        //todo: calc defence
-        var defenceStrength = 30;
+        var attackStrength = sourceItem.Attributes.Strength;
 
-        var numerator = 100 + _random.Next(0, 10);
-        var denominator = 100 + _random.Next(-10, 10);
-        var damageDealt = Math.Round(sourceItem.Attributes.Strength * ((double)numerator / (denominator + defenceStrength)), 0);
+        int defenceStrength;
+        if (targetIsPlayer)
+        {
+            var otherPlayerState = target.GetComponent<PlayerState>();
+            defenceStrength = otherPlayerState.Inventory.GetDefenseValue();
+        }
+        else
+        {
+            //todo: calc defence
+            defenceStrength = 1;
+        }
+
+        const int swingValue = 20;
+        var numerator = 100 + _random.Next(0, swingValue);
+        var denominator = 100 + _random.Next(swingValue * -1, swingValue);
+        var damageDealt = Math.Round(attackStrength * ((double)numerator / (denominator + defenceStrength)), 0);
 
         //Debug.Log($"Player '{_sourcePlayer.name}' used '{sourceItem.Name}' to attack target '{target.name}' for {damageDealt} damage");
 

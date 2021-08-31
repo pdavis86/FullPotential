@@ -8,6 +8,7 @@ using FullPotential.Assets.Core.Storage;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -140,7 +141,16 @@ public class PlayerState : NetworkBehaviour
             TextureUrl.Value = playerData.Options?.TextureUrl;
         }
 
-        _loadWasSuccessful = Inventory.ApplyInventory(playerData.Inventory, true);
+        try
+        {
+            Inventory.ApplyInventory(playerData.Inventory, true);
+            _loadWasSuccessful = true;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(ex.ToString());
+            _loadWasSuccessful = false;
+        }
     }
 
     private void SetNameTag()

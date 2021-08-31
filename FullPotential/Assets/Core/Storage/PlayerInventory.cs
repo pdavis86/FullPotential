@@ -36,7 +36,8 @@ namespace FullPotential.Assets.Core.Storage
         private readonly PlayerState _playerState;
         private readonly List<ItemBase> _items;
         private readonly int _slotCount;
-
+        private readonly int _armorSlotCount;
+        
         private int _maxItems;
 
         public PlayerInventory(PlayerState playerState)
@@ -46,6 +47,8 @@ namespace FullPotential.Assets.Core.Storage
             _items = new List<ItemBase>();
 
             _slotCount = Enum.GetNames(typeof(SlotIndexToGameObjectName)).Length;
+            _armorSlotCount = Enum.GetNames(typeof(IGearArmor.ArmorSlot)).Length;
+
             EquipSlots = new string[_slotCount];
             EquippedObjects = new GameObject[_slotCount];
         }
@@ -56,8 +59,15 @@ namespace FullPotential.Assets.Core.Storage
                 inventorySlot == null
                 || (x is Accessory acc && (int)((IGearAccessory)acc.RegistryType).InventorySlot == (int)inventorySlot)
                 || (x is Armor armor && (int)((IGearArmor)armor.RegistryType).InventorySlot == (int)inventorySlot)
-                || ((x is Weapon || x is Spell) && inventorySlot == IGear.GearSlot.Hand)
+                || ((x is Weapon || x is Spell) && IGear.GearSlot.Hand == inventorySlot)
             );
+        }
+
+        public int GetDefenseValue()
+        {
+            var equippedArmor = _items.Where(x => x is Armor && EquipSlots.Contains(x.Id));
+            var strengthSum = (float)equippedArmor.Sum(x => x.Attributes.Strength);
+            return (int)Math.Floor(strengthSum / _armorSlotCount);
         }
 
         public int GetSlotCount()
@@ -76,86 +86,70 @@ namespace FullPotential.Assets.Core.Storage
             ApplyInventory(changes);
         }
 
-        public bool ApplyInventory(Inventory changes, bool firstSetup = false)
+        public void ApplyInventory(Inventory changes, bool firstSetup = false)
         {
-            try
+            if (changes.MaxItems > 0)
             {
-                if (changes == null)
+                _maxItems = changes.MaxItems;
+            }
+
+            if (_items.Count == _maxItems)
+            {
+                _playerState.AlertInventoryIsFull();
+            }
+
+            var addedItems = Enumerable.Empty<ItemBase>()
+                .UnionIfNotNull(changes.Loot)
+                .UnionIfNotNull(changes.Accessories)
+                .UnionIfNotNull(changes.Armor)
+                .UnionIfNotNull(changes.Spells)
+                .UnionIfNotNull(changes.Weapons);
+
+            _items.AddRange(addedItems);
+
+            FillTypesFromIds();
+
+            if (changes.EquipSlots != null && changes.EquipSlots.Any())
+            {
+                if (changes.EquipSlots.Length == EquipSlots.Length)
                 {
-                    //Debug.Log("No inventory changes supplied");
-                    return true;
-                }
-
-                if (changes.MaxItems > 0)
-                {
-                    _maxItems = changes.MaxItems;
-                }
-
-                if (_items.Count == _maxItems)
-                {
-                    _playerState.AlertInventoryIsFull();
-                }
-
-                var addedItems = Enumerable.Empty<ItemBase>()
-                    .UnionIfNotNull(changes.Loot)
-                    .UnionIfNotNull(changes.Accessories)
-                    .UnionIfNotNull(changes.Armor)
-                    .UnionIfNotNull(changes.Spells)
-                    .UnionIfNotNull(changes.Weapons);
-
-                _items.AddRange(addedItems);
-
-                FillTypesFromIds();
-
-                if (changes.EquipSlots != null && changes.EquipSlots.Any())
-                {
-                    if (changes.EquipSlots.Length == EquipSlots.Length)
+                    for (var i = 0; i < EquipSlots.Length; i++)
                     {
-                        for (var i = 0; i < EquipSlots.Length; i++)
-                        {
-                            EquipItem(i, changes.EquipSlots[i]);
-                        }
+                        EquipItem(i, changes.EquipSlots[i]);
                     }
-                    else
+                }
+                else
+                {
+                    //HandleOldSaveFile
+                    if (changes.EquipSlots.Length != EquipSlots.Length)
                     {
-                        //HandleOldSaveFile
-                        if (changes.EquipSlots.Length != EquipSlots.Length)
-                        {
-                            Debug.LogWarning("Incoming EquipSlots length differed to existing");
+                        Debug.LogWarning("Incoming EquipSlots length differed to existing");
 
-                            for (var i = 0; i < Math.Min(EquipSlots.Length, changes.EquipSlots.Length); i++)
-                            {
-                                EquipSlots[i] = changes.EquipSlots[i];
-                            }
+                        for (var i = 0; i < Math.Min(EquipSlots.Length, changes.EquipSlots.Length); i++)
+                        {
+                            EquipSlots[i] = changes.EquipSlots[i];
                         }
                     }
                 }
-
-                if (!firstSetup)
-                {
-                    var addedItemsCount = addedItems.Count();
-
-                    if (addedItemsCount == 1)
-                    {
-                        var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemadded");
-                        _playerState.ShowAlertForItemsAddedToInventory(string.Format(alertText, addedItems.First().Name));
-                    }
-                    else if (addedItemsCount > 1)
-                    {
-                        var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemsadded");
-                        _playerState.ShowAlertForItemsAddedToInventory(string.Format(alertText, addedItemsCount));
-                    }
-                }
-
-                _playerState.SpawnEquippedObjects();
-
-                return true;
             }
-            catch (Exception ex)
+
+            if (!firstSetup)
             {
-                Debug.LogError(ex);
-                return false;
+                var addedItemsCount = addedItems.Count();
+
+                if (addedItemsCount == 1)
+                {
+                    var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemadded");
+                    _playerState.ShowAlertForItemsAddedToInventory(string.Format(alertText, addedItems.First().Name));
+                }
+                else if (addedItemsCount > 1)
+                {
+                    var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemsadded");
+                    _playerState.ShowAlertForItemsAddedToInventory(string.Format(alertText, addedItemsCount));
+                }
             }
+
+            _playerState.SpawnEquippedObjects();
         }
 
         private void FillTypesFromIds()
@@ -200,15 +194,7 @@ namespace FullPotential.Assets.Core.Storage
                 .Where(x => EquipSlots.Contains(x.Id))
                 .GroupBy(x => x.GetType());
 
-            return new Inventory
-            {
-                Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(Loot))?.Select(x => x as Loot).ToArray(),
-                Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray(),
-                Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
-                Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray(),
-                Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
-                EquipSlots = EquipSlots
-            };
+            return GetDataFromGroups(groupedItems);
         }
 
         public bool IsEquipped(string id)
@@ -218,9 +204,14 @@ namespace FullPotential.Assets.Core.Storage
 
         public Inventory GetSaveData()
         {
-            //todo: feasible to use separate lists for different types of item?
-            var groupedItems = _items.GroupBy(x => x.GetType());
+            var groupedItems = _items
+                .GroupBy(x => x.GetType());
 
+            return GetDataFromGroups(groupedItems);
+        }
+
+        private Inventory GetDataFromGroups(IEnumerable<IGrouping<Type, ItemBase>> groupedItems)
+        {
             return new Inventory
             {
                 MaxItems = _maxItems,
@@ -250,20 +241,6 @@ namespace FullPotential.Assets.Core.Storage
 
             return item as T;
         }
-
-        //public void RemoveIds(IEnumerable<string> idEnumerable)
-        //{
-        //    foreach (var id in idEnumerable)
-        //    {
-        //        var matchingItem = _items.FirstOrDefault(x => x.Id.ToString().Equals(id, StringComparison.OrdinalIgnoreCase));
-        //        if (matchingItem == null)
-        //        {
-        //            Debug.LogError("No item found with ID: " + id);
-        //            continue;
-        //        }
-        //        _items.Remove(matchingItem);
-        //    }
-        //}
 
         public List<ItemBase> GetComponentsFromIds(string[] componentIds)
         {
@@ -325,26 +302,6 @@ namespace FullPotential.Assets.Core.Storage
 
             EquipSlots[slotIndex] = itemId;
         }
-
-
-
-
-
-        //private void DebugLogEquippedItems()
-        //{
-        //    for (var i = 0; i < EquipSlots.Length; i++)
-        //    {
-        //        if (EquipSlots[i] == string.Empty)
-        //        {
-        //            continue;
-        //        }
-
-        //        var item = Items.FirstOrDefault(x => x.Id == EquipSlots[i]);
-        //        var slotName = Enum.GetName(typeof(SlotIndexToGameObjectName), i);
-
-        //        Debug.Log($"Equiped '{item?.Name}' to slot '{slotName}'");
-        //    }
-        //}
 
     }
 }

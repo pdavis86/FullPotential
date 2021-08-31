@@ -51,6 +51,9 @@ public class InventoryItemsList : MonoBehaviour
 
             if (isEquipped)
             {
+                var rowToggle = row.GetComponent<Toggle>();
+                rowToggle.isOn = true;
+
                 var rowImage = row.GetComponent<Image>();
                 rowImage.color = Color.green;
             }

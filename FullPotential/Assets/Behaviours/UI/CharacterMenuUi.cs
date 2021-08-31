@@ -147,25 +147,30 @@ public class CharacterMenuUi : MonoBehaviour
         var toggle = row.GetComponent<Toggle>();
         toggle.onValueChanged.AddListener(isOn =>
         {
+            Tooltips.HideTooltip();
+
+            if (!Enum.TryParse<PlayerInventory.SlotIndexToGameObjectName>(slot.name, out var slotResult))
+            {
+                Debug.LogError($"Failed to find slot for name {slot.name}");
+                return;
+            }
+
             if (isOn)
             {
-                Tooltips.HideTooltip();
-
                 //Debug.Log($"Setting item for slot '{slot.name}' to be '{item.Name}'");
-
-                if (!Enum.TryParse<PlayerInventory.SlotIndexToGameObjectName>(slot.name, out var slotResult))
-                {
-                    Debug.LogError($"Failed to find slot for name {slot.name}");
-                    return;
-                }
-
                 _playerState.Inventory.EquipItem((int)slotResult, item.Id);
-                _playerState.SpawnEquippedObjects();
-
-                _playerClientSide.ChangeEquipsServerRpc(_playerState.Inventory.EquipSlots);
-
-                ResetUi(true);
             }
+            else
+            {
+                //Debug.Log($"Removing item '{item.Name}' from slot '{slot.name}'");
+                _playerState.Inventory.EquipItem((int)slotResult, null);
+            }
+
+            _playerState.SpawnEquippedObjects();
+
+            _playerClientSide.ChangeEquipsServerRpc(_playerState.Inventory.EquipSlots);
+
+            ResetUi(true);
         });
     }
 

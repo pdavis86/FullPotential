@@ -45,7 +45,7 @@ public class JoinOrHostGame : MonoBehaviour
         _networkTransport = _networkManager.GetComponent<UNetTransport>();
         _scene2Name = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(2));
 
-        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
+        _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
     }
 
     private void OnEnable()
@@ -66,7 +66,10 @@ public class JoinOrHostGame : MonoBehaviour
 
     private void OnDisable()
     {
-        NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
+        if (_networkManager != null)
+        {
+            _networkManager.OnClientDisconnectCallback -= OnClientDisconnect;
+        }
     }
 
     private void OnClientDisconnect(ulong clientId)
