@@ -203,6 +203,11 @@ public class PlayerClientSide : NetworkBehaviour
 
     private void OnDisable()
     {
+        if (!IsOwner)
+        {
+            return;
+        }
+
         Cursor.lockState = CursorLockMode.None;
 
         if (_mainCanvasObjects?.Hud != null)
@@ -214,11 +219,6 @@ public class PlayerClientSide : NetworkBehaviour
         if (_sceneCamera != null)
         {
             _sceneCamera.gameObject.SetActive(true);
-        }
-
-        if (GameManager.Instance?.MainCanvasObjects?.Hud != null)
-        {
-            GameManager.Instance.MainCanvasObjects.Hud.SetActive(false);
         }
     }
 
