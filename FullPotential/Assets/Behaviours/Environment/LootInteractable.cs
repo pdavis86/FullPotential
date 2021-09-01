@@ -1,13 +1,13 @@
 ﻿using MLAPI;
 using UnityEngine.InputSystem;
 
-public class TempGiveLoot : Interactable
+public class LootInteractable : Interactable
 {
     public override void OnFocus()
     {
         //Debug.Log($"Interactable '{gameObject.name}' gained focus");
 
-        var translation = GameManager.Instance.Localizer.Translate("ui.interact.shop");
+        var translation = GameManager.Instance.Localizer.Translate("ui.interact.loot");
         var interactInputName = GameManager.Instance.InputActions.Player.Interact.GetBindingDisplayString();
         _interactionBubble.text = string.Format(translation, interactInputName);
         _interactionBubble.gameObject.SetActive(true);

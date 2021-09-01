@@ -249,6 +249,10 @@
       "Key": "ui.interact.shop",
       "Value": "Appuyez sur '{0}' pour magasiner"
     },
+	{
+      "Key": "ui.interact.loot",
+      "Value": "Appuyez sur '{0}' pour piller"
+    },
 	
 	
 	{

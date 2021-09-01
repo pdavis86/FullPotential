@@ -15,12 +15,20 @@ public class Prefabs : MonoBehaviour
 
     public CombatClass Combat;
 
+    public EnvironmentClass Environment;
+
     [System.Serializable]
     public class CombatClass
     {
         public GameObject Spell;
         public GameObject SpellInHand;
         public GameObject HitText;
+    }
+
+    [System.Serializable]
+    public class EnvironmentClass
+    {
+        public GameObject LootChest;
     }
 
 }

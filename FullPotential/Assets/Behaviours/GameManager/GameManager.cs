@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour
     {
         //Work-around for v0.1.0 of MLAPI not sending initial positions for GameObjects with Network Transform components
         //See https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/650
-        GameObject.Find("TempEnemyShape").transform.position += new Vector3(0f, -1f, 0f);
+        //GameObject.Find("TempEnemyShape").transform.position += new Vector3(0f, -1f, 0f);
 
         var payload = System.Text.Encoding.UTF8.GetString(connectionData);
         var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);

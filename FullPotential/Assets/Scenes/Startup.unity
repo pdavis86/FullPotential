@@ -7454,6 +7454,9 @@ MonoBehaviour:
       type: 3}
     HitText: {fileID: 4232121126068313654, guid: e4d26bf7e17ee2b4ea2339e95a75588a,
       type: 3}
+  Environment:
+    LootChest: {fileID: 6779003295890321588, guid: 0da494cf737d72c44b603f7a79174481,
+      type: 3}
 --- !u!1 &1549162085111107810
 GameObject:
   m_ObjectHideFlags: 0

@@ -27,7 +27,7 @@ public static class DefaultSceneLoader
             if (activeScene.buildIndex != 0)
             {
                 EditorSceneManager.LoadScene(0);
-                Debug.Log("Scene 0 force loaded");
+                Debug.LogWarning("Force loaded scene 0 as it was not the active scene in the editor");
             }
         }
     }
