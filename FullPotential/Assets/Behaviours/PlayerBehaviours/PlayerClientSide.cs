@@ -297,7 +297,7 @@ public class PlayerClientSide : NetworkBehaviour
     }
 
     [ServerRpc]
-    public void CastSpellServerRpc(bool leftHand, Vector3 direction, ServerRpcParams serverRpcParams = default)
+    public void CastSpellServerRpc(bool leftHand, Vector3 startPosition, Vector3 direction, ServerRpcParams serverRpcParams = default)
     {
         var activeSpell = _playerState.Inventory.GetSpellInHand(leftHand);
 
@@ -306,21 +306,26 @@ public class PlayerClientSide : NetworkBehaviour
             return;
         }
 
-        var startPos = leftHand
-            ? _spellStartLeft.transform.position
-            : _spellStartRight.transform.position;
-
         switch (activeSpell.Targeting)
         {
             case FullPotential.Assets.Core.Spells.Targeting.Projectile _:
-                _playerState.SpawnSpellProjectile(activeSpell, startPos, direction, serverRpcParams.Receive.SenderClientId);
+                _playerState.SpawnSpellProjectile(activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
                 break;
 
             case FullPotential.Assets.Core.Spells.Targeting.Self _:
+                _playerState.SpawnSpellSelf(activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
+                break;
+
             case FullPotential.Assets.Core.Spells.Targeting.Touch _:
+                _playerState.SpawnSpellTouch(activeSpell, direction, serverRpcParams.Receive.SenderClientId);
+                break;
+
             case FullPotential.Assets.Core.Spells.Targeting.Beam _:
+                _playerState.StartSpellBeam(activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
+                break;
+
             case FullPotential.Assets.Core.Spells.Targeting.Cone _:
-                Debug.LogWarning("Not yet implemented that spell targeting");
+                _playerState.SpawnSpellCone(activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
                 break;
 
             default:
@@ -526,7 +531,11 @@ public class PlayerClientSide : NetworkBehaviour
             return;
         }
 
-        CastSpellServerRpc(leftHand, _playerCamera.transform.forward);
+        var startPos = leftHand
+            ? _spellStartLeft.transform.position
+            : _spellStartRight.transform.position;
+
+        CastSpellServerRpc(leftHand, startPos, _playerCamera.transform.forward);
     }
 
     public void ShowAlert(string alertText)

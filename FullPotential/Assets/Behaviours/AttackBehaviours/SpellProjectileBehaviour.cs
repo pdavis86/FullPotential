@@ -10,7 +10,7 @@ using UnityEngine;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 
-public class SpellBehaviour : AttackBehaviourBase
+public class SpellProjectileBehaviour : AttackBehaviourBase
 {
     private Spell _spell;
 
@@ -49,11 +49,6 @@ public class SpellBehaviour : AttackBehaviourBase
         GetComponent<Rigidbody>().AddForce(SpellDirection.Value * 20f * castSpeed, ForceMode.VelocityChange);
     }
 
-    //private void Update()
-    //{
-    //    Debug.Log($"Active '{gameObject.activeInHierarchy}', position '{gameObject.transform.position}'");
-    //}
-
     private void OnTriggerEnter(Collider other)
     {
         if (!IsServer)
@@ -73,10 +68,7 @@ public class SpellBehaviour : AttackBehaviourBase
 
             DealDamage(_spell, gameObject, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
 
-            if (!GameObjectHelper.IsDestroyed(gameObject))
-            {
-                Destroy(gameObject);
-            }
+            Destroy(gameObject);
         }
         catch (Exception ex)
         {

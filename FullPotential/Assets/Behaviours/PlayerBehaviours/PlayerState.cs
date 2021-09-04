@@ -268,17 +268,37 @@ public class PlayerState : NetworkBehaviour
     {
         if (!IsServer)
         {
-            Debug.LogWarning("Tried to spawn a projectile when not on the server");
+            Debug.LogWarning("Tried to spawn a projectile spell when not on the server");
         }
 
         var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.Spell, position, Quaternion.identity, GameManager.Instance.MainCanvasObjects.RuntimeObjectsContainer.transform);
 
-        var spellScript = spellObject.GetComponent<SpellBehaviour>();
+        var spellScript = spellObject.GetComponent<SpellProjectileBehaviour>();
         spellScript.PlayerClientId = new NetworkVariable<ulong>(clientId);
         spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
         spellScript.SpellDirection = new NetworkVariable<Vector3>(direction);
 
         spellObject.GetComponent<NetworkObject>().Spawn(null, true);
+    }
+
+    public void SpawnSpellSelf(Spell activeSpell, Vector3 position, Vector3 direction, ulong clientId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void SpawnSpellTouch(Spell activeSpell, Vector3 direction, ulong senderClientId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void StartSpellBeam(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void SpawnSpellCone(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
+    {
+        throw new NotImplementedException();
     }
 
     public void SpawnEquippedObjects()
