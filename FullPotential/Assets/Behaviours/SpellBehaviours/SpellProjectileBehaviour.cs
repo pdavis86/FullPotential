@@ -1,4 +1,5 @@
-﻿using FullPotential.Assets.Core.Constants;
+﻿using FullPotential.Assets.Behaviours.SpellBehaviours;
+using FullPotential.Assets.Core.Constants;
 using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Registry.Types;
 using MLAPI;
@@ -10,7 +11,7 @@ using UnityEngine;
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 
-public class SpellProjectileBehaviour : AttackBehaviourBase
+public class SpellProjectileBehaviour : AttackBehaviourBase, ISpellBehaviour
 {
     private Spell _spell;
 
@@ -56,24 +57,21 @@ public class SpellProjectileBehaviour : AttackBehaviourBase
             return;
         }
 
-        try
+        //Debug.Log("Collided with " + other.gameObject.name);
+
+        if (other.gameObject.CompareTag(Tags.Projectile))
         {
-            //Debug.Log("Collided with " + other.gameObject.name);
-
-            if (other.gameObject.CompareTag(Tags.Projectile))
-            {
-                //Debug.Log("You hit a Projectile");
-                return;
-            }
-
-            DealDamage(_spell, gameObject, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
-
-            Destroy(gameObject);
+            //Debug.Log("You hit a Projectile");
+            return;
         }
-        catch (Exception ex)
-        {
-            Debug.LogError(ex);
-        }
+
+        ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
+    }
+
+    public void ApplySpellEffects(GameObject target, Vector3? position)
+    {
+        DealDamage(_spell, gameObject, target, position);
+        Destroy(gameObject);
     }
 
 }

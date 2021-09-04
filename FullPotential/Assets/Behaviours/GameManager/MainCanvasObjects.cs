@@ -27,9 +27,6 @@ public class MainCanvasObjects : MonoBehaviour
     public GameObject SettingsUi;
     private List<GameObject> _menus;
 
-    //Other
-    public GameObject RuntimeObjectsContainer;
-
     // ReSharper disable once ArrangeAccessorOwnerBody
     private static MainCanvasObjects _instance;
     public static MainCanvasObjects Instance { get { return _instance; } }

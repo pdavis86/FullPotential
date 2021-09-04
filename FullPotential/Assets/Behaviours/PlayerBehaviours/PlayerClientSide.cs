@@ -321,7 +321,7 @@ public class PlayerClientSide : NetworkBehaviour
                 break;
 
             case FullPotential.Assets.Core.Spells.Targeting.Beam _:
-                _playerState.StartSpellBeam(activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
+                _playerState.ToggleSpellBeam(activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
                 break;
 
             case FullPotential.Assets.Core.Spells.Targeting.Cone _:
@@ -342,7 +342,7 @@ public class PlayerClientSide : NetworkBehaviour
         var player = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject;
 
         Interactable interactable = null;
-        var collidersInRange = Physics.OverlapSphere(player.gameObject.transform.position, searchRadius);
+        var collidersInRange = Physics.OverlapSphere(player.transform.position, searchRadius);
         foreach (var colliderNearby in collidersInRange)
         {
             if (colliderNearby.gameObject.name == gameObjectName)
@@ -364,7 +364,7 @@ public class PlayerClientSide : NetworkBehaviour
 
         //Debug.Log($"Trying to interact with {interactable.name}");
 
-        var distance = Vector3.Distance(gameObject.transform.position, interactable.transform.position);
+        var distance = Vector3.Distance(transform.position, interactable.transform.position);
         if (distance <= interactable.Radius)
         {
             interactable.OnInteract(serverRpcParams.Receive.SenderClientId);

@@ -18,8 +18,9 @@ public class Prefabs : MonoBehaviour
     [System.Serializable]
     public class CombatObjects
     {
-        public GameObject Spell;
         public GameObject SpellInHand;
+        public GameObject SpellProjectile;
+        public GameObject SpellSelf;
     }
 
     [System.Serializable]

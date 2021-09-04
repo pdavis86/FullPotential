@@ -23,7 +23,7 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
     // ReSharper disable once InconsistentNaming
     private static readonly System.Random _random = new System.Random();
 
-    protected void DealDamage(ItemBase sourceItem, GameObject source, GameObject target, Vector3 position)
+    protected void DealDamage(ItemBase sourceItem, GameObject source, GameObject target, Vector3? position)
     {
         if (!IsServer)
         {
@@ -65,9 +65,12 @@ public abstract class AttackBehaviourBase : NetworkBehaviour
         var denominator = 100 + _random.Next(swingValue * -1, swingValue);
         var damageDealt = Math.Round(attackStrength * ((double)numerator / (denominator + defenceStrength)), 0);
 
-        //Debug.Log($"Player '{_sourcePlayer.name}' used '{sourceItem.Name}' to attack target '{target.name}' for {damageDealt} damage");
+        Debug.Log($"Player '{_sourcePlayer.name}' used '{sourceItem.Name}' to attack target '{target.name}' for {damageDealt} damage");
 
-        _playerState.ShowDamageClientRpc(position, damageDealt.ToString(CultureInfo.InvariantCulture), _clientRpcParams);
+        if (position.HasValue)
+        {
+            _playerState.ShowDamageClientRpc(position.Value, damageDealt.ToString(CultureInfo.InvariantCulture), _clientRpcParams);
+        }
     }
 
 }

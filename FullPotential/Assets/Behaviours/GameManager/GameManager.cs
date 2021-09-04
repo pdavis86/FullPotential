@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour
 
     //Properties
     public readonly GameManagerData DataStore = new GameManagerData();
+    public GameObject RuntimeObjectsContainer;
 
 
     //Singleton
