@@ -17,6 +17,7 @@ public class CharacterMenuUiEquipmentTab : MonoBehaviour
     [SerializeField] private GameObject _componentsContainer;
     [SerializeField] private GameObject _lhs;
     [SerializeField] private GameObject _rhs;
+    [SerializeField] private GameObject _inventoryRowPrefab;
 #pragma warning restore 0649
 
     private GameObject _lastClickedSlot;
@@ -128,7 +129,7 @@ public class CharacterMenuUiEquipmentTab : MonoBehaviour
         InventoryItemsList.LoadInventoryItems(
             slot,
             _componentsContainer,
-            GameManager.Instance.Prefabs.Ui.InventoryRowPrefab,
+            _inventoryRowPrefab,
             _playerState.Inventory,
             HandleRowToggle,
             inventorySlot
@@ -150,9 +151,15 @@ public class CharacterMenuUiEquipmentTab : MonoBehaviour
 
             _playerState.Inventory.EquipItem((int)slotResult, isOn ? item.Id : null);
 
-            _playerState.SpawnEquippedObjects();
+            if (!MLAPI.NetworkManager.Singleton.IsServer)
+            {
+                _playerState.SpawnEquippedObjects();
+            }
+            else
+            {
+                _playerClientSide.ChangeEquipsServerRpc(_playerState.Inventory.EquipSlots);
 
-            _playerClientSide.ChangeEquipsServerRpc(_playerState.Inventory.EquipSlots);
+            }
 
             ResetEquipmentUi(true);
         });

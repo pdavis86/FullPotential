@@ -30,6 +30,7 @@ public class CharacterMenuUiCraftingTab : MonoBehaviour
     [SerializeField] private InputField _craftName;
     [SerializeField] private Button _craftButton;
     [SerializeField] private Text _craftErrors;
+    [SerializeField] private GameObject _inventoryRowPrefab;
 #pragma warning restore 0649
 
     private PlayerState _playerState;
@@ -227,7 +228,7 @@ public class CharacterMenuUiCraftingTab : MonoBehaviour
         InventoryItemsList.LoadInventoryItems(
             null,
             _componentsContainer,
-            GameManager.Instance.Prefabs.Ui.InventoryRowPrefab,
+            _inventoryRowPrefab,
             _playerState.Inventory,
             HandleRowToggle,
             null,

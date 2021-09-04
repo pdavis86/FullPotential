@@ -1,4 +1,4 @@
-﻿using System;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 // ReSharper disable CheckNamespace
@@ -18,7 +18,7 @@ public class ShopInteractable : Interactable
 
     public override void OnInteract(ulong playerNetId)
     {
-        throw new NotImplementedException();
+        Debug.LogWarning("Not yet implemented the shop interaction");
     }
 
     public override void OnBlur()

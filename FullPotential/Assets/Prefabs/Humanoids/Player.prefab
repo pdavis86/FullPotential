@@ -915,6 +915,8 @@ MonoBehaviour:
   _inFrontOfPlayerCamera: {fileID: 8117841901429913958}
   _spellStartLeft: {fileID: 6040919883324738210}
   _spellStartRight: {fileID: 8089984387303676830}
+  _hitTextPrefab: {fileID: 4232121126068313654, guid: e4d26bf7e17ee2b4ea2339e95a75588a,
+    type: 3}
 --- !u!114 &7556515380981010776
 MonoBehaviour:
   m_ObjectHideFlags: 0

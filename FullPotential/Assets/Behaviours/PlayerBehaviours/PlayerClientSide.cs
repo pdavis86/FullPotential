@@ -28,6 +28,7 @@ public class PlayerClientSide : NetworkBehaviour
     [SerializeField] private Camera _inFrontOfPlayerCamera;
     [SerializeField] private GameObject _spellStartLeft;
     [SerializeField] private GameObject _spellStartRight;
+    [SerializeField] private GameObject _hitTextPrefab;
 #pragma warning restore 0649
 
     private bool _hasMenuOpen;
@@ -319,7 +320,8 @@ public class PlayerClientSide : NetworkBehaviour
             case FullPotential.Assets.Core.Spells.Targeting.Touch _:
             case FullPotential.Assets.Core.Spells.Targeting.Beam _:
             case FullPotential.Assets.Core.Spells.Targeting.Cone _:
-                throw new NotImplementedException();
+                Debug.LogWarning("Not yet implemented that spell targeting");
+                break;
 
             default:
                 throw new Exception($"Unexpected spell targeting with TypeName: '{activeSpell.Targeting.TypeName}'");
@@ -534,7 +536,7 @@ public class PlayerClientSide : NetworkBehaviour
 
     public void ShowDamage(Vector3 position, string damage)
     {
-        var hit = Instantiate(GameManager.Instance.Prefabs.Combat.HitText);
+        var hit = Instantiate(_hitTextPrefab);
         hit.transform.SetParent(GameManager.Instance.MainCanvasObjects.HitNumberContainer.transform, false);
         hit.gameObject.SetActive(true);
 

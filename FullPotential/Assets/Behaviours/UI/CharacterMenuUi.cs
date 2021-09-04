@@ -11,6 +11,12 @@ public class CharacterMenuUi : MonoBehaviour
     public GameObject Equipment;
     public GameObject Crafting;
 
+    private void Awake()
+    {
+        Equipment.SetActive(false);
+        Crafting.SetActive(false);
+    }
+
     private void OnEnable()
     {
         OnTabClick(0);
