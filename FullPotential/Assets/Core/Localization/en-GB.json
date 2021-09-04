@@ -208,7 +208,7 @@
     },
     {
       "Key": "ui.connect.disconnected",
-      "Value": "Disconnected"
+      "Value": "The server disconnected you"
     },
 
 

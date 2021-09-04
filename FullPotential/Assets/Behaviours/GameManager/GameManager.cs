@@ -36,8 +36,8 @@ public class GameManager : MonoBehaviour
     //Behaviours
     public Prefabs Prefabs { get; private set; }
     public MainCanvasObjects MainCanvasObjects { get; private set; }
-    
-    
+
+
     //Input
     public DefaultInputActions InputActions;
 
@@ -86,7 +86,7 @@ public class GameManager : MonoBehaviour
         InputActions = new DefaultInputActions();
 
         NetworkManager.Singleton.ConnectionApprovalCallback += OnApprovalCheck;
-        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnServerDisconnectedClient;
 
         SceneManager.LoadSceneAsync(1);
     }
@@ -109,15 +109,18 @@ public class GameManager : MonoBehaviour
         callback(false, null, true, null, null);
     }
 
-    private void OnClientDisconnect(ulong clientId)
+    private void OnServerDisconnectedClient(ulong clientId)
     {
         //Debug.LogWarning("Disconnected from server");
 
-        GameManager.Instance.DataStore.HasDisconnected = true;
-
-        if (SceneManager.GetActiveScene().buildIndex != 1)
+        if (clientId == NetworkManager.Singleton.LocalClientId)
         {
-            SceneManager.LoadSceneAsync(1);
+            GameManager.Instance.DataStore.HasDisconnected = true;
+
+            if (SceneManager.GetActiveScene().buildIndex != 1)
+            {
+                SceneManager.LoadSceneAsync(1);
+            }
         }
     }
 
@@ -171,12 +174,13 @@ public class GameManager : MonoBehaviour
         if (NetworkManager.Singleton.IsHost)
         {
             NetworkManager.Singleton.StopHost();
-            SceneManager.LoadSceneAsync(1);
         }
         else if (NetworkManager.Singleton.IsClient)
         {
             NetworkManager.Singleton.StopClient();
         }
+        
+        SceneManager.LoadSceneAsync(1);
     }
 
     public static void Quit()
