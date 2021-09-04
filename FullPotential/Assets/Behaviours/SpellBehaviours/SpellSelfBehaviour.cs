@@ -1,4 +1,5 @@
 using FullPotential.Assets.Behaviours.SpellBehaviours;
+using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Registry.Types;
 using MLAPI;
 using MLAPI.NetworkVariable;
@@ -7,8 +8,9 @@ using UnityEngine;
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable InconsistentNaming
 
-public class SpellSelfBehaviour : AttackBehaviourBase, ISpellBehaviour
+public class SpellSelfBehaviour : NetworkBehaviour, ISpellBehaviour
 {
     const float _distanceBeforeReturning = 8f;
 
@@ -16,6 +18,7 @@ public class SpellSelfBehaviour : AttackBehaviourBase, ISpellBehaviour
     public NetworkVariable<string> SpellId;
     public NetworkVariable<Vector3> SpellDirection;
 
+    private GameObject _sourcePlayer;
     private Spell _spell;
     private float _castSpeed;
     private Rigidbody _rigidbody;
@@ -89,7 +92,6 @@ public class SpellSelfBehaviour : AttackBehaviourBase, ISpellBehaviour
         if (other.gameObject != _sourcePlayer.gameObject)
         {
             ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
-            return;
         }
     }
 
@@ -101,7 +103,7 @@ public class SpellSelfBehaviour : AttackBehaviourBase, ISpellBehaviour
 
     public void ApplySpellEffects(GameObject target, Vector3? position)
     {
-        DealDamage(_spell, gameObject, target, position);
+        AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
         Destroy(gameObject);
     }
 

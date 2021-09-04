@@ -4,20 +4,20 @@ using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Registry.Types;
 using MLAPI;
 using MLAPI.NetworkVariable;
-using System;
 using UnityEngine;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 
-public class SpellProjectileBehaviour : AttackBehaviourBase, ISpellBehaviour
+public class SpellProjectileBehaviour : NetworkBehaviour, ISpellBehaviour
 {
-    private Spell _spell;
-
     public NetworkVariable<ulong> PlayerClientId;
     public NetworkVariable<string> SpellId;
     public NetworkVariable<Vector3> SpellDirection;
+
+    private Spell _spell;
+    private GameObject _sourcePlayer;
 
     private void Start()
     {
@@ -47,7 +47,14 @@ public class SpellProjectileBehaviour : AttackBehaviourBase, ISpellBehaviour
             castSpeed = 0.5f;
         }
 
-        GetComponent<Rigidbody>().AddForce(SpellDirection.Value * 20f * castSpeed, ForceMode.VelocityChange);
+        var rigidBody = GetComponent<Rigidbody>();
+
+        rigidBody.AddForce(SpellDirection.Value * 20f * castSpeed, ForceMode.VelocityChange);
+
+        if (_spell.Shape != null)
+        {
+            rigidBody.useGravity = true;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -65,12 +72,14 @@ public class SpellProjectileBehaviour : AttackBehaviourBase, ISpellBehaviour
             return;
         }
 
+        //todo: if there is a shape, apply the wall or zone
+
         ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
     }
 
     public void ApplySpellEffects(GameObject target, Vector3? position)
     {
-        DealDamage(_spell, gameObject, target, position);
+        AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
         Destroy(gameObject);
     }
 

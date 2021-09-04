@@ -264,7 +264,7 @@ public class PlayerState : NetworkBehaviour
         MessageHelper.SendMessageIfNotHost(invChange, nameof(MessageType.InventoryChange), OwnerClientId);
     }
 
-    public void SpawnSpellProjectile(Spell activeSpell, Vector3 position, Vector3 direction, ulong clientId)
+    public void SpawnSpellProjectile(Spell activeSpell, Vector3 position, Vector3 direction, ulong senderClientId)
     {
         if (!IsServer)
         {
@@ -274,14 +274,14 @@ public class PlayerState : NetworkBehaviour
         var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, position, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer.transform);
 
         var spellScript = spellObject.GetComponent<SpellProjectileBehaviour>();
-        spellScript.PlayerClientId = new NetworkVariable<ulong>(clientId);
+        spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
         spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
         spellScript.SpellDirection = new NetworkVariable<Vector3>(direction);
 
         spellObject.GetComponent<NetworkObject>().Spawn(null, true);
     }
 
-    public void SpawnSpellSelf(Spell activeSpell, Vector3 position, Vector3 direction, ulong clientId)
+    public void SpawnSpellSelf(Spell activeSpell, Vector3 position, Vector3 direction, ulong senderClientId)
     {
         if (!IsServer)
         {
@@ -291,16 +291,22 @@ public class PlayerState : NetworkBehaviour
         var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, position, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer.transform);
 
         var spellScript = spellObject.GetComponent<SpellSelfBehaviour>();
-        spellScript.PlayerClientId = new NetworkVariable<ulong>(clientId);
+        spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
         spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
         spellScript.SpellDirection = new NetworkVariable<Vector3>(direction);
 
         spellObject.GetComponent<NetworkObject>().Spawn(null, true);
     }
 
-    public void SpawnSpellTouch(Spell activeSpell, Vector3 direction, ulong senderClientId)
+    public void CastSpellTouch(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
     {
-        throw new NotImplementedException();
+        if (!IsServer)
+        {
+            Debug.LogWarning("Tried to cast a touch spell when not on the server");
+        }
+
+        // ReSharper disable once ObjectCreationAsStatement
+        new SpellTouchBehaviour(activeSpell, startPosition, direction, senderClientId);
     }
 
     public void ToggleSpellBeam(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)

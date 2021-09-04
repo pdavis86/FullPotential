@@ -317,7 +317,7 @@ public class PlayerClientSide : NetworkBehaviour
                 break;
 
             case FullPotential.Assets.Core.Spells.Targeting.Touch _:
-                _playerState.SpawnSpellTouch(activeSpell, direction, serverRpcParams.Receive.SenderClientId);
+                _playerState.CastSpellTouch(activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
                 break;
 
             case FullPotential.Assets.Core.Spells.Targeting.Beam _:
