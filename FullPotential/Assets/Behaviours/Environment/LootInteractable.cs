@@ -1,6 +1,9 @@
 ﻿using MLAPI;
 using UnityEngine.InputSystem;
 
+// ReSharper disable CheckNamespace
+// ReSharper disable UnusedType.Global
+
 public class LootInteractable : Interactable
 {
     public override void OnFocus()

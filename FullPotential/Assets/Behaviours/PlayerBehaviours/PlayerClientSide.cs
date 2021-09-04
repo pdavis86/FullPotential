@@ -59,7 +59,6 @@ public class PlayerClientSide : NetworkBehaviour
         }
 
         _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;
-        _mainCanvasObjects.CraftingUi.SetActive(false);
 
         _hud = _mainCanvasObjects.Hud.GetComponent<Hud>();
 
@@ -213,7 +212,6 @@ public class PlayerClientSide : NetworkBehaviour
         if (_mainCanvasObjects?.Hud != null)
         {
             _mainCanvasObjects.Hud.SetActive(false);
-            _mainCanvasObjects.CraftingUi.SetActive(false);
         }
 
         if (_sceneCamera != null)
@@ -558,7 +556,9 @@ public class PlayerClientSide : NetworkBehaviour
 
     public void RefreshCraftingWindow()
     {
-        var craftingUi = GameManager.Instance.MainCanvasObjects.CraftingUi.GetComponent<CraftingMenuUi>();
+        var charaterMenuUi = GameManager.Instance.MainCanvasObjects.CharacterMenu.GetComponent<CharacterMenuUi>();
+        var craftingUi = charaterMenuUi.Crafting.GetComponent<CharacterMenuUiCraftingTab>();
+
         if (craftingUi.gameObject.activeSelf)
         {
             craftingUi.ResetUi();

@@ -44,17 +44,17 @@
       "Key": "crafting.name.prefix.defence",
       "Value": "Defence"
     },
-	
-	
-	{
+
+
+    {
       "Key": "crafting.error.spellmissingeffect",
       "Value": "A spell needs at least one effect"
     },
-	{
+    {
       "Key": "crafting.error.toomanycomponents",
       "Value": "Too many components"
     },
-	{
+    {
       "Key": "crafting.error.toomanyforonehanded",
       "Value": "Too many components for a one-handed weapon"
     },
@@ -148,132 +148,139 @@
       "Key": "spell.targeting.touch",
       "Value": "Touch"
     },
-	
-	
-	{
+
+
+    {
       "Key": "ui.quit",
       "Value": "Quit"
     },
-	{
+    {
       "Key": "ui.save",
       "Value": "Save"
     },
 
 
-	{
+    {
       "Key": "ui.signin.username",
       "Value": "Username..."
     },
-	{
+    {
       "Key": "ui.signin.password",
       "Value": "Password..."
     },
-	{
+    {
       "Key": "ui.signin.button",
       "Value": "Sign In"
     },
-	{
+    {
       "Key": "ui.signin.intro",
       "Value": "Please sign in"
     },
-	{
+    {
       "Key": "ui.signin.error",
       "Value": "Invalid username or password"
     },
-	
-	
-	{
+
+
+    {
       "Key": "ui.connect.intro",
       "Value": "Welcome!"
     },
-	{
+    {
       "Key": "ui.connect.address",
       "Value": "Address..."
     },
-	{
+    {
       "Key": "ui.connect.port",
       "Value": "Port..."
     },
-	{
+    {
       "Key": "ui.connect.create",
       "Value": "Create"
     },
-	{
+    {
       "Key": "ui.connect.join",
       "Value": "Join"
     },
-	{
+    {
       "Key": "ui.connect.joining",
       "Value": "Joining..."
     },
-	{
+    {
       "Key": "ui.connect.disconnected",
       "Value": "Disconnected"
     },
-	
-	
-	{
+
+
+    {
       "Key": "ui.debugging.host",
       "Value": "Host"
     },
-	
-	
-	{
+
+
+    {
       "Key": "ui.main.settings",
       "Value": "Settings"
     },
-	{
+    {
       "Key": "ui.main.disconnect",
       "Value": "Disconnect"
     },
-	
-	{
+
+
+    {
       "Key": "ui.character.tabs.equipment",
       "Value": "Equipment"
     },
-	{
+    {
       "Key": "ui.character.tabs.inventory",
       "Value": "TODO - Inventory"
     },
-	{
-      "Key": "ui.character.tabs.quests",
-      "Value": "TODO - Quests"
+    {
+      "Key": "ui.character.tabs.crafting",
+      "Value": "Crafting"
     },
-	{
+    {
       "Key": "ui.character.tabs.map",
       "Value": "TODO - Map"
     },
-	
-	
-	{
+
+
+    {
+      "Key": "ui.character.tabs.crafting.craft",
+      "Value": "Craft"
+    },
+
+
+    {
       "Key": "ui.interact.shop",
       "Value": "Press '{0}' to shop"
     },
-	{
+    {
       "Key": "ui.interact.loot",
       "Value": "Press '{0}' to loot"
     },
-	
-	
-	{
+
+
+    {
       "Key": "ui.settings.language",
       "Value": "Language"
     },
-	{
-		"Key": "ui.settings.skin",
-		"Value": "Skin URL"
-	},
-	{
-		"Key": "ui.settings.skinplaceholder",
-		"Value": "Enter URL..."
-	},
-	
-	
-	{
+    {
+      "Key": "ui.settings.skin",
+      "Value": "Skin URL"
+    },
+    {
+      "Key": "ui.settings.skinplaceholder",
+      "Value": "Enter URL..."
+    },
+
+
+    {
       "Key": "ui.alert.itemadded",
       "Value": "{0} was added"
     },
-	{
+    {
       "Key": "ui.alert.itemsadded",
       "Value": "Added {0} items"
     }

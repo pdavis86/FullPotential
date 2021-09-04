@@ -1,6 +1,9 @@
 ﻿using System;
 using UnityEngine.InputSystem;
 
+// ReSharper disable CheckNamespace
+// ReSharper disable UnusedType.Global
+
 public class ShopInteractable : Interactable
 {
     public override void OnFocus()

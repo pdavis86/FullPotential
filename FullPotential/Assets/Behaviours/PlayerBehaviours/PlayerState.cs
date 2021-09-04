@@ -178,7 +178,7 @@ public class PlayerState : NetworkBehaviour
             if (System.IO.File.Exists(validatePath))
             {
                 var checkUrl = System.IO.File.ReadAllText(validatePath);
-                if (checkUrl.Equals(TextureUrl.Value, System.StringComparison.OrdinalIgnoreCase))
+                if (checkUrl.Equals(TextureUrl.Value, StringComparison.OrdinalIgnoreCase))
                 {
                     doDownload = false;
                 }

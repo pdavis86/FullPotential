@@ -19,11 +19,10 @@ using UnityEngine.UI;
 // ReSharper disable PossibleMultipleEnumeration
 // ReSharper disable InconsistentNaming
 
-public class CraftingMenuUi : MonoBehaviour
+public class CharacterMenuUiCraftingTab : MonoBehaviour
 {
 #pragma warning disable 0649
     [SerializeField] private GameObject _componentsContainer;
-    [SerializeField] private GameObject _rowPrefab;
     [SerializeField] private Text _outputText;
     [SerializeField] private Dropdown _typeDropdown;
     [SerializeField] private Dropdown _subTypeDropdown;
@@ -228,7 +227,7 @@ public class CraftingMenuUi : MonoBehaviour
         InventoryItemsList.LoadInventoryItems(
             null,
             _componentsContainer,
-            _rowPrefab,
+            GameManager.Instance.Prefabs.Ui.InventoryRowPrefab,
             _playerState.Inventory,
             HandleRowToggle,
             null,

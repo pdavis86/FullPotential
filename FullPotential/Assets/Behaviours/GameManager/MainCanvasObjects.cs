@@ -22,7 +22,6 @@ public class MainCanvasObjects : MonoBehaviour
     public GameObject Hud;
 
     //Menus
-    public GameObject CraftingUi;
     public GameObject EscMenu;
     public GameObject CharacterMenu;
     public GameObject SettingsUi;
@@ -51,7 +50,6 @@ public class MainCanvasObjects : MonoBehaviour
         //NOTE: Be sure to add any new menus!
         _menus = new List<GameObject>();
         _menus.AddRange(new[] {
-            CraftingUi,
             EscMenu,
             CharacterMenu,
             SettingsUi
