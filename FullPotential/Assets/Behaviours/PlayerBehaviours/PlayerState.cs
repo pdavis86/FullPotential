@@ -271,7 +271,7 @@ public class PlayerState : NetworkBehaviour
             Debug.LogWarning("Tried to spawn a projectile spell when not on the server");
         }
 
-        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.Spell, position, Quaternion.identity, GameManager.Instance.MainCanvasObjects.RuntimeObjectsContainer.transform);
+        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, position, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer.transform);
 
         var spellScript = spellObject.GetComponent<SpellProjectileBehaviour>();
         spellScript.PlayerClientId = new NetworkVariable<ulong>(clientId);
@@ -283,7 +283,19 @@ public class PlayerState : NetworkBehaviour
 
     public void SpawnSpellSelf(Spell activeSpell, Vector3 position, Vector3 direction, ulong clientId)
     {
-        throw new NotImplementedException();
+        if (!IsServer)
+        {
+            Debug.LogWarning("Tried to spawn a self spell when not on the server");
+        }
+
+        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, position, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer.transform);
+
+        var spellScript = spellObject.GetComponent<SpellSelfBehaviour>();
+        spellScript.PlayerClientId = new NetworkVariable<ulong>(clientId);
+        spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
+        spellScript.SpellDirection = new NetworkVariable<Vector3>(direction);
+
+        spellObject.GetComponent<NetworkObject>().Spawn(null, true);
     }
 
     public void SpawnSpellTouch(Spell activeSpell, Vector3 direction, ulong senderClientId)
@@ -291,7 +303,7 @@ public class PlayerState : NetworkBehaviour
         throw new NotImplementedException();
     }
 
-    public void StartSpellBeam(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
+    public void ToggleSpellBeam(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
     {
         throw new NotImplementedException();
     }

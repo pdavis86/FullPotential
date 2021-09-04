@@ -66,7 +66,7 @@ public class SpellProjectileBehaviour : AttackBehaviourBase
                 return;
             }
 
-            DealDamage(_spell, gameObject, other.gameObject, other.ClosestPointOnBounds(gameObject.transform.position));
+            DealDamage(_spell, gameObject, other.gameObject, other.ClosestPointOnBounds(transform.position));
 
             Destroy(gameObject);
         }
