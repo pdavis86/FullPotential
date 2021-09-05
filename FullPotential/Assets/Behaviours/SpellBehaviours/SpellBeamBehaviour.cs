@@ -19,8 +19,10 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
     private float _timeSinceLastEffective;
     private float _timeBetweenEffects;
 
-    private void Start()
+    public override void NetworkStart()
     {
+        base.NetworkStart();
+
         if (!IsServer)
         {
             //No need to Debug.LogError(). We only want this behaviour on the server
@@ -29,11 +31,19 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
 
         _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId.Value].PlayerObject.gameObject;
 
+        if (_sourcePlayer == null)
+        {
+            Debug.LogError($"No player found in with client ID {PlayerClientId.Value}");
+            Destroy(gameObject);
+            return;
+        }
+
         _spell = _sourcePlayer.GetComponent<PlayerState>().Inventory.GetItemWithId<Spell>(SpellId.Value);
 
         if (_spell == null)
         {
             Debug.LogError($"No spell found in player inventory with ID {SpellId.Value}");
+            Destroy(gameObject);
             return;
         }
 
@@ -45,6 +55,11 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
 
     private void FixedUpdate()
     {
+        if (!IsServer)
+        {
+            return;
+        }
+
         const int maxBeamLength = 10;
 
         var startPosition = transform.position - (transform.up * (transform.localScale.y));

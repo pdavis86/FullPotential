@@ -54,6 +54,11 @@ public class SpellSelfBehaviour : NetworkBehaviour, ISpellBehaviour
 
     private void FixedUpdate()
     {
+        if (!IsServer)
+        {
+            return;
+        }
+
         var distanceFromPlayer = Vector3.Distance(transform.position, _sourcePlayer.transform.position);
 
         if (!_returningToPlayer)

@@ -210,6 +210,10 @@
       "Key": "ui.connect.disconnected",
       "Value": "The server disconnected you"
     },
+    {
+      "Key": "ui.connect.portnotfree",
+      "Value": "Port is in use"
+    },
 
 
     {
