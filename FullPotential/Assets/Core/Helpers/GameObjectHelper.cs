@@ -32,5 +32,14 @@ namespace FullPotential.Assets.Core.Helpers
             return gameObject == null && !ReferenceEquals(gameObject, null);
         }
 
+        public static Vector3 GetHalfWayPoint(Vector3 source, Vector3 destination)
+        {
+            return new Vector3(
+                source.x + (destination.x - source.x) / 2,
+                source.y + (destination.y - source.y) / 2,
+                source.z + (destination.z - source.z) / 2
+            );
+        }
+
     }
 }

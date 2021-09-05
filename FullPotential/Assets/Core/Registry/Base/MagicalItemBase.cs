@@ -38,5 +38,6 @@ namespace FullPotential.Assets.Core.Registry.Base
                 ShapeTypeName = _shape?.TypeName;
             }
         }
+
     }
 }

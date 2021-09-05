@@ -35,6 +35,7 @@ public class PlayerState : NetworkBehaviour
 #pragma warning restore 0649
 
     public GameObject InFrontOfPlayer;
+    public GameObject PlayerCamera;
 
     public readonly NetworkVariable<string> Username = new NetworkVariable<string>();
     public readonly NetworkVariable<string> TextureUrl = new NetworkVariable<string>();
@@ -44,6 +45,8 @@ public class PlayerState : NetworkBehaviour
     private bool _loadWasSuccessful;
     private PlayerClientSide _playerClientSide;
     private ClientRpcParams _clientRpcParams;
+    private GameObject _spellBeingCastLeft;
+    private GameObject _spellBeingCastRight;
 
     public PlayerState()
     {
@@ -241,12 +244,6 @@ public class PlayerState : NetworkBehaviour
             Inventory = Inventory.GetSaveData()
         };
 
-        //if (saveData.Inventory.Weapons == null || saveData.Inventory.Weapons.Length == 0)
-        //{
-        //    Debug.LogError("Save data got corrupted. Aborting save!");
-        //    return;
-        //}
-
         FullPotential.Assets.Core.Registry.UserRegistry.Save(saveData);
     }
 
@@ -264,14 +261,14 @@ public class PlayerState : NetworkBehaviour
         MessageHelper.SendMessageIfNotHost(invChange, nameof(MessageType.InventoryChange), OwnerClientId);
     }
 
-    public void SpawnSpellProjectile(Spell activeSpell, Vector3 position, Vector3 direction, ulong senderClientId)
+    public void SpawnSpellProjectile(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
     {
         if (!IsServer)
         {
             Debug.LogWarning("Tried to spawn a projectile spell when not on the server");
         }
 
-        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, position, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer.transform);
+        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPosition, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer.transform);
 
         var spellScript = spellObject.GetComponent<SpellProjectileBehaviour>();
         spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
@@ -281,14 +278,14 @@ public class PlayerState : NetworkBehaviour
         spellObject.GetComponent<NetworkObject>().Spawn(null, true);
     }
 
-    public void SpawnSpellSelf(Spell activeSpell, Vector3 position, Vector3 direction, ulong senderClientId)
+    public void SpawnSpellSelf(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
     {
         if (!IsServer)
         {
             Debug.LogWarning("Tried to spawn a self spell when not on the server");
         }
 
-        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, position, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer.transform);
+        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPosition, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer.transform);
 
         var spellScript = spellObject.GetComponent<SpellSelfBehaviour>();
         spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
@@ -309,9 +306,38 @@ public class PlayerState : NetworkBehaviour
         new SpellTouchBehaviour(activeSpell, startPosition, direction, senderClientId);
     }
 
-    public void ToggleSpellBeam(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
+    public void ToggleSpellBeam(bool leftHand, Spell activeSpell, Vector3 startPosition, ulong senderClientId)
     {
-        throw new NotImplementedException();
+        if (leftHand && _spellBeingCastLeft != null)
+        {
+            Destroy(_spellBeingCastLeft);
+            _spellBeingCastLeft = null;
+            return;
+        }
+        else if (!leftHand && _spellBeingCastRight != null)
+        {
+            Destroy(_spellBeingCastRight);
+            _spellBeingCastRight = null;
+            return;
+        }
+
+        var prefab = GameManager.Instance.Prefabs.Combat.SpellBeam;
+        var spellObject = Instantiate(prefab, startPosition, transform.rotation * prefab.transform.rotation, PlayerCamera.transform);
+
+        var spellScript = spellObject.GetComponent<SpellBeamBehaviour>();
+        spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
+        spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
+
+        spellObject.GetComponent<NetworkObject>().Spawn(null, true);
+
+        if (leftHand)
+        {
+            _spellBeingCastLeft = spellObject;
+        }
+        else
+        {
+            _spellBeingCastRight = spellObject;
+        }
     }
 
     public void SpawnSpellCone(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)

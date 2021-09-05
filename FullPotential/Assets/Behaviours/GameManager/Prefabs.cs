@@ -21,6 +21,7 @@ public class Prefabs : MonoBehaviour
         public GameObject SpellInHand;
         public GameObject SpellProjectile;
         public GameObject SpellSelf;
+        public GameObject SpellBeam;
     }
 
     [System.Serializable]

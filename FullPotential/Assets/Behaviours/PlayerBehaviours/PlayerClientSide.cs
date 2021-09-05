@@ -321,7 +321,7 @@ public class PlayerClientSide : NetworkBehaviour
                 break;
 
             case FullPotential.Assets.Core.Spells.Targeting.Beam _:
-                _playerState.ToggleSpellBeam(activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
+                _playerState.ToggleSpellBeam(leftHand, activeSpell, startPosition, serverRpcParams.Receive.SenderClientId);
                 break;
 
             case FullPotential.Assets.Core.Spells.Targeting.Cone _:

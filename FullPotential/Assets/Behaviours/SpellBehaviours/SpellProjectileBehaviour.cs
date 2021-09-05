@@ -16,8 +16,8 @@ public class SpellProjectileBehaviour : NetworkBehaviour, ISpellBehaviour
     public NetworkVariable<string> SpellId;
     public NetworkVariable<Vector3> SpellDirection;
 
-    private Spell _spell;
     private GameObject _sourcePlayer;
+    private Spell _spell;
 
     private void Start()
     {

@@ -26,7 +26,10 @@ public class SceneObjectsLevel001 : NetworkBehaviour
         _spawnPoints = new List<Transform>();
         foreach (Transform spawnPoint in spawnPointsParent)
         {
-            _spawnPoints.Add(spawnPoint);
+            if (spawnPoint.gameObject.activeInHierarchy)
+            {
+                _spawnPoints.Add(spawnPoint);
+            }
         }
 
         if (NetworkManager.Singleton.IsHost)

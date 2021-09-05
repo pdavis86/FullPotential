@@ -7471,6 +7471,8 @@ MonoBehaviour:
       type: 3}
     SpellSelf: {fileID: 2058307768172192450, guid: bd7b43d17a423b84a96eceaa0a28419f,
       type: 3}
+    SpellBeam: {fileID: 7811701630397551526, guid: cd7343b2907f0bb43b33607835902cda,
+      type: 3}
   Environment:
     LootChest: {fileID: 6779003295890321588, guid: 0da494cf737d72c44b603f7a79174481,
       type: 3}
