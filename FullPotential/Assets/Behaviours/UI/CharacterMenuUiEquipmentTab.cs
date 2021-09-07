@@ -150,16 +150,9 @@ public class CharacterMenuUiEquipmentTab : MonoBehaviour
             }
 
             _playerState.Inventory.EquipItem((int)slotResult, isOn ? item.Id : null);
+            _playerState.SpawnEquippedObjects();
 
-            if (!MLAPI.NetworkManager.Singleton.IsServer)
-            {
-                _playerState.SpawnEquippedObjects();
-            }
-            else
-            {
-                _playerClientSide.ChangeEquipsServerRpc(_playerState.Inventory.EquipSlots);
-
-            }
+            _playerClientSide.ChangeEquipsServerRpc(_playerState.Inventory.EquipSlots);
 
             ResetEquipmentUi(true);
         });
