@@ -18,6 +18,7 @@ public class DebuggingUi : MonoBehaviour
 #pragma warning restore 0649
 
     private string _hostString;
+    private GameObject _playerObj;
     private NetworkStats _networkStats;
 
     private void Start()
@@ -26,11 +27,9 @@ public class DebuggingUi : MonoBehaviour
         {
             Destroy(gameObject);
         }
-    }
 
-    private void OnEnable()
-    {
         _hostString = GameManager.Instance.Localizer.Translate("ui.debugging.host");
+        GetNetworkStats();
     }
 
     void OnGUI()
@@ -51,7 +50,13 @@ public class DebuggingUi : MonoBehaviour
             return null;
         }
 
-        return _networkStats ?? (_networkStats = GameManager.Instance.DataStore.LocalPlayer.GetComponent<NetworkStats>());
+        if (_playerObj != GameManager.Instance.DataStore.LocalPlayer)
+        {
+            _playerObj = GameManager.Instance.DataStore.LocalPlayer;
+            _networkStats = GameManager.Instance.DataStore.LocalPlayer.GetComponent<NetworkStats>();
+        }
+
+        return _networkStats;
     }
 
 }
