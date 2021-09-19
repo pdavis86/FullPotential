@@ -287,7 +287,9 @@ public class PlayerState : NetworkBehaviour
             Debug.LogWarning("Tried to spawn a self spell when not on the server");
         }
 
-        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPosition, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer.transform);
+        var startPositionAdjusted = startPosition + (PlayerCamera.transform.forward * 1f);
+
+        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPositionAdjusted, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer.transform);
 
         var spellScript = spellObject.GetComponent<SpellSelfBehaviour>();
         spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
