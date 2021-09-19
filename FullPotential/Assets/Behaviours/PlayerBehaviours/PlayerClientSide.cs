@@ -26,8 +26,6 @@ public class PlayerClientSide : NetworkBehaviour
 #pragma warning disable 0649
     [SerializeField] private Camera _playerCamera;
     [SerializeField] private Camera _inFrontOfPlayerCamera;
-    [SerializeField] private GameObject _spellStartLeft;
-    [SerializeField] private GameObject _spellStartRight;
     [SerializeField] private GameObject _hitTextPrefab;
 #pragma warning restore 0649
 
@@ -40,6 +38,8 @@ public class PlayerClientSide : NetworkBehaviour
     private Interactable _focusedInteractable;
     private Hud _hud;
     private Camera _sceneCamera;
+
+    public PositionTransforms Positions;
 
     #region Unity event handlers
 
@@ -180,7 +180,6 @@ public class PlayerClientSide : NetworkBehaviour
             }
 
             _hasMenuOpen = _mainCanvasObjects.IsAnyMenuOpen();
-            //Can't see alerts if we diable the hud - _mainCanvasObjects.Hud.SetActive(!_hasMenuOpen);
             _playerMovement.enabled = !_hasMenuOpen;
 
             if (_hasMenuOpen)
@@ -297,9 +296,9 @@ public class PlayerClientSide : NetworkBehaviour
     }
 
     [ServerRpc]
-    public void CastSpellServerRpc(bool leftHand, Vector3 startPosition, Vector3 direction, ServerRpcParams serverRpcParams = default)
+    public void CastSpellServerRpc(bool isLeftHand, Vector3 startPosition, Vector3 direction, ServerRpcParams serverRpcParams = default)
     {
-        var activeSpell = _playerState.Inventory.GetSpellInHand(leftHand);
+        var activeSpell = _playerState.Inventory.GetSpellInHand(isLeftHand);
 
         if (activeSpell == null)
         {
@@ -321,7 +320,7 @@ public class PlayerClientSide : NetworkBehaviour
                 break;
 
             case FullPotential.Assets.Core.Spells.Targeting.Beam _:
-                _playerState.ToggleSpellBeam(leftHand, activeSpell, startPosition, serverRpcParams.Receive.SenderClientId);
+                _playerState.ToggleSpellBeam(isLeftHand, activeSpell, startPosition, serverRpcParams.Receive.SenderClientId);
                 break;
 
             case FullPotential.Assets.Core.Spells.Targeting.Cone _:
@@ -524,18 +523,18 @@ public class PlayerClientSide : NetworkBehaviour
         }
     }
 
-    private void TryToAttack(bool leftHand)
+    private void TryToAttack(bool isLeftHand)
     {
         if (_hasMenuOpen)
         {
             return;
         }
 
-        var startPos = leftHand
-            ? _spellStartLeft.transform.position
-            : _spellStartRight.transform.position;
+        var startPos = isLeftHand
+            ? Positions.SpellStartLeft.position
+            : Positions.SpellStartRight.position;
 
-        CastSpellServerRpc(leftHand, startPos, _playerCamera.transform.forward);
+        CastSpellServerRpc(isLeftHand, startPos, _playerCamera.transform.forward);
     }
 
     public void ShowAlert(string alertText)
@@ -575,6 +574,15 @@ public class PlayerClientSide : NetworkBehaviour
             craftingUi.ResetUi();
             craftingUi.LoadInventory();
         }
+    }
+
+    [System.Serializable]
+    public class PositionTransforms
+    {
+        public Transform SpellStartLeft;
+        public Transform SpellStartRight;
+        public Transform LeftHand;
+        public Transform RightHand;
     }
 
 }

@@ -268,7 +268,9 @@ public class PlayerState : NetworkBehaviour
             Debug.LogWarning("Tried to spawn a projectile spell when not on the server");
         }
 
-        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPosition, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer.transform);
+        var startPositionAdjusted = startPosition + (PlayerCamera.transform.forward * 1f);
+
+        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPositionAdjusted, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer.transform);
 
         var spellScript = spellObject.GetComponent<SpellProjectileBehaviour>();
         spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
@@ -306,15 +308,15 @@ public class PlayerState : NetworkBehaviour
         new SpellTouchBehaviour(activeSpell, startPosition, direction, senderClientId);
     }
 
-    public void ToggleSpellBeam(bool leftHand, Spell activeSpell, Vector3 startPosition, ulong senderClientId)
+    public void ToggleSpellBeam(bool isLeftHand, Spell activeSpell, Vector3 startPosition, ulong senderClientId)
     {
-        if (leftHand && _spellBeingCastLeft != null)
+        if (isLeftHand && _spellBeingCastLeft != null)
         {
             Destroy(_spellBeingCastLeft);
             _spellBeingCastLeft = null;
             return;
         }
-        else if (!leftHand && _spellBeingCastRight != null)
+        else if (!isLeftHand && _spellBeingCastRight != null)
         {
             Destroy(_spellBeingCastRight);
             _spellBeingCastRight = null;
@@ -322,7 +324,14 @@ public class PlayerState : NetworkBehaviour
         }
 
         var prefab = GameManager.Instance.Prefabs.Combat.SpellBeam;
-        var spellObject = Instantiate(prefab, startPosition, transform.rotation * prefab.transform.rotation, PlayerCamera.transform);
+
+        //NOTE: Can't parent to PlayerCamera otherwise it doesn't parent at all!
+        var spellObject = Instantiate(
+            prefab,
+            startPosition,
+            transform.rotation, 
+            transform
+        );
 
         var spellScript = spellObject.GetComponent<SpellBeamBehaviour>();
         spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
@@ -330,7 +339,7 @@ public class PlayerState : NetworkBehaviour
 
         spellObject.GetComponent<NetworkObject>().Spawn(null, true);
 
-        if (leftHand)
+        if (isLeftHand)
         {
             _spellBeingCastLeft = spellObject;
         }
@@ -376,7 +385,7 @@ public class PlayerState : NetworkBehaviour
         }
     }
 
-    public void SpawnItemInHand(int index, ItemBase item, bool leftHand = true)
+    public void SpawnItemInHand(int index, ItemBase item, bool isLeftHand = true)
     {
         if (!NetworkManager.Singleton.IsClient)
         {
@@ -398,13 +407,13 @@ public class PlayerState : NetworkBehaviour
                 weapon.IsTwoHanded ? registryType.PrefabAddressTwoHanded : registryType.PrefabAddress,
                 prefab =>
                 {
-                    InstantiateInPlayerHand(prefab, new Vector3(leftHand ? -0.38f : 0.38f, -0.25f, 1.9f), new Vector3(0, 90), index);
+                    InstantiateInPlayerHand(prefab, isLeftHand, false, new Vector3(0, 90), index);
                 }
             );
         }
         else if (item is Spell)
         {
-            InstantiateInPlayerHand(GameManager.Instance.Prefabs.Combat.SpellInHand, new Vector3(leftHand ? -0.32f : 0.32f, -0.21f, 1.9f), null, index);
+            InstantiateInPlayerHand(GameManager.Instance.Prefabs.Combat.SpellInHand, isLeftHand, true, null, index);
         }
         else
         {
@@ -413,10 +422,18 @@ public class PlayerState : NetworkBehaviour
         }
     }
 
-    private void InstantiateInPlayerHand(GameObject prefab, Vector3 localPosition, Vector3? rotation, int slotIndex)
+    private void InstantiateInPlayerHand(GameObject prefab, bool isLeftHand, bool isSpell, Vector3? rotation, int slotIndex)
     {
         var newObj = UnityEngine.Object.Instantiate(prefab, InFrontOfPlayer.transform);
-        newObj.transform.localPosition = localPosition;
+
+        if (isSpell)
+        {
+            newObj.transform.localPosition = new Vector3(isLeftHand ? -0.32f : 0.32f, -0.21f, 1.9f);
+        }
+        else
+        {
+            newObj.transform.localPosition = new Vector3(isLeftHand ? -0.38f : 0.38f, -0.25f, 1.9f);
+        }
 
         if (rotation.HasValue)
         {

@@ -18,62 +18,59 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
     private Spell _spell;
     private float _timeSinceLastEffective;
     private float _timeBetweenEffects;
+    private Transform _cylinderTransform;
 
-    public override void NetworkStart()
+    private void Awake()
     {
-        base.NetworkStart();
-
-        if (!IsServer)
-        {
-            //No need to Debug.LogError(). We only want this behaviour on the server
-            return;
-        }
-
-        _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId.Value].PlayerObject.gameObject;
-
-        if (_sourcePlayer == null)
-        {
-            Debug.LogError($"No player found in with client ID {PlayerClientId.Value}");
-            Destroy(gameObject);
-            return;
-        }
-
-        _spell = _sourcePlayer.GetComponent<PlayerState>().Inventory.GetItemWithId<Spell>(SpellId.Value);
-
-        if (_spell == null)
-        {
-            Debug.LogError($"No spell found in player inventory with ID {SpellId.Value}");
-            Destroy(gameObject);
-            return;
-        }
+        _cylinderTransform = transform.GetChild(0);
 
         _timeBetweenEffects = 0.5f;
 
         //Move the tip to the starting position
-        transform.position += (transform.up * transform.localScale.y / 2);
+        _cylinderTransform.position += (_cylinderTransform.up * _cylinderTransform.localScale.y);
+    }
+
+    private void Start()
+    {
+        _sourcePlayer = GameObjectHelper.ClosestParentWithTag(gameObject, FullPotential.Assets.Core.Constants.Tags.Player);
+
+        if (_sourcePlayer == null)
+        {
+            Debug.LogError($"No player found in parents");
+            //Destroy(gameObject);
+            return;
+        }
+
+        var playerState = _sourcePlayer.GetComponent<PlayerState>();
+
+        transform.parent = playerState.PlayerCamera.transform;
+
+        _spell = playerState.Inventory.GetItemWithId<Spell>(SpellId.Value);
+
+        if (_spell == null)
+        {
+            Debug.LogError($"No spell found in player inventory with ID {SpellId.Value}");
+            //Destroy(gameObject);
+            return;
+        }
+
+        if (PlayerClientId.Value == NetworkManager.Singleton.LocalClientId)
+        {
+            transform.position += transform.forward + (transform.right * -0.1f);
+        }
     }
 
     private void FixedUpdate()
     {
-        if (!IsServer)
-        {
-            return;
-        }
-
         const int maxBeamLength = 10;
 
-        var startPosition = transform.position - (transform.up * (transform.localScale.y));
-
-        //Standing still sometimes makes the Raycast go in the wrong direction!
-        var rayStart = startPosition + (transform.up * 0.1f);
-
-        //Vector3 endPosition;
+        Vector3 endPosition;
         float beamLength;
-        if (Physics.Raycast(rayStart, transform.up, out var hit, maxDistance: maxBeamLength))
+        if (Physics.Raycast(transform.position, transform.forward, out var hit, maxDistance: maxBeamLength))
         {
             if (hit.transform.gameObject == _sourcePlayer.gameObject)
             {
-                //Debug.LogWarning("Beam is hitting the source player!");
+                Debug.LogWarning("Beam is hitting the source player!");
                 return;
             }
 
@@ -89,23 +86,29 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
 
                 Debug.Log($"Player {_sourcePlayer.name} is hitting {hit.transform.gameObject.name} with beam spell {_spell.Name} at distance {hit.distance}");
 
-                ApplySpellEffects(hit.transform.gameObject, hit.point);
+                if (NetworkManager.Singleton.IsServer)
+                {
+                    ApplySpellEffects(hit.transform.gameObject, hit.point);
+                }
             }
 
-            //endPosition = hit.point;
+            endPosition = hit.point;
             beamLength = hit.distance;
         }
         else
         {
-            //endPosition = transform.position + (transform.up * maxBeamLength / 2);
+            endPosition = transform.position + (transform.forward * maxBeamLength / 2);
             beamLength = maxBeamLength;
         }
 
-        //Debug.DrawLine(rayStart, endPosition, Color.cyan, 1f);
-        //Debug.DrawRay(rayStart, transform.up, Color.cyan, 1f);
+        //Debug.DrawLine(transform.position, endPosition, Color.cyan);
+        //Debug.DrawRay(transform.position, transform.forward, Color.cyan);
 
-        transform.localScale = new Vector3(transform.localScale.x, beamLength / 2, transform.localScale.z);
-        transform.position = startPosition + (transform.up * transform.localScale.y);
+        if (_cylinderTransform.localScale.y * 2 != beamLength)
+        {
+            _cylinderTransform.localScale = new Vector3(_cylinderTransform.localScale.x, beamLength / 2, _cylinderTransform.localScale.z);
+            _cylinderTransform.position = transform.position + (_cylinderTransform.up * _cylinderTransform.localScale.y);
+        }
     }
 
     public void ApplySpellEffects(GameObject target, Vector3? position)

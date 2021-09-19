@@ -280,9 +280,9 @@ namespace FullPotential.Assets.Core.Storage
             return errors;
         }
 
-        public Spell GetSpellInHand(bool leftHand)
+        public Spell GetSpellInHand(bool isLeftHand)
         {
-            var itemId = leftHand
+            var itemId = isLeftHand
                 ? EquipSlots[(int)SlotIndexToGameObjectName.LeftHand]
                 : EquipSlots[(int)SlotIndexToGameObjectName.RightHand];
 

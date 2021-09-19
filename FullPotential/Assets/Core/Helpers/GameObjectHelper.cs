@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
 
@@ -39,6 +40,16 @@ namespace FullPotential.Assets.Core.Helpers
                 source.y + (destination.y - source.y) / 2,
                 source.z + (destination.z - source.z) / 2
             );
+        }
+
+        public static GameObject ClosestParentWithTag(GameObject gameObject, string tag)
+        {
+            var current = gameObject.transform;
+            do
+            {
+                current = current.parent;
+            } while (current != null && !current.CompareTag(tag));
+            return current?.gameObject;
         }
 
     }
