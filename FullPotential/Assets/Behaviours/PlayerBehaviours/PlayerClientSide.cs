@@ -572,7 +572,7 @@ public class PlayerClientSide : NetworkBehaviour
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class PositionTransforms
     {
         public Transform SpellStartLeft;

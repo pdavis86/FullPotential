@@ -139,6 +139,8 @@ public class CharacterMenuUiEquipmentTab : MonoBehaviour
     private void HandleRowToggle(GameObject row, GameObject slot, ItemBase item)
     {
         var toggle = row.GetComponent<Toggle>();
+
+        // ReSharper disable once UnusedParameter.Local
         toggle.onValueChanged.AddListener(isOn =>
         {
             Tooltips.HideTooltip();
@@ -149,8 +151,7 @@ public class CharacterMenuUiEquipmentTab : MonoBehaviour
                 return;
             }
 
-            _playerState.Inventory.EquipItem((int)slotResult, isOn ? item.Id : null);
-            _playerState.SpawnEquippedObjects();
+            _playerState.Inventory.EquipItem(item.Id, (int)slotResult, true);
 
             _playerClientSide.ChangeEquipsServerRpc(_playerState.Inventory.EquipSlots);
 

@@ -13,6 +13,7 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
 {
     public NetworkVariable<ulong> PlayerClientId;
     public NetworkVariable<string> SpellId;
+    public NetworkVariable<bool> IsLeftHand;
 
     private GameObject _sourcePlayer;
     private Spell _spell;
@@ -36,7 +37,7 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
 
         if (_sourcePlayer == null)
         {
-            Debug.LogError($"No player found in parents");
+            Debug.LogError("No player found in parents");
             Destroy(gameObject);
             return;
         }
@@ -56,8 +57,7 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
 
         if (PlayerClientId.Value == NetworkManager.Singleton.LocalClientId)
         {
-            //todo: does this only work for the right hand?
-            transform.position += transform.forward + (transform.right * -0.1f);
+            transform.position += transform.forward + (transform.right * 0.1f * (IsLeftHand.Value ? 1 : -1));
         }
     }
 
@@ -65,7 +65,7 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
     {
         const int maxBeamLength = 10;
 
-        Vector3 endPosition;
+        //Vector3 endPosition;
         float beamLength;
         if (Physics.Raycast(transform.position, transform.forward, out var hit, maxDistance: maxBeamLength))
         {
@@ -93,23 +93,31 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
                 }
             }
 
-            endPosition = hit.point;
+            //endPosition = hit.point;
             beamLength = hit.distance;
         }
         else
         {
-            endPosition = transform.position + (transform.forward * maxBeamLength / 2);
+            //endPosition = transform.position + (transform.forward * maxBeamLength / 2);
             beamLength = maxBeamLength;
         }
 
         //Debug.DrawLine(transform.position, endPosition, Color.cyan);
         //Debug.DrawRay(transform.position, transform.forward, Color.cyan);
 
-        if (_cylinderTransform.localScale.y * 2 != beamLength)
+        if (!AreRoughlyEqual(_cylinderTransform.localScale.y * 2, beamLength))
         {
             _cylinderTransform.localScale = new Vector3(_cylinderTransform.localScale.x, beamLength / 2, _cylinderTransform.localScale.z);
             _cylinderTransform.position = transform.position + (_cylinderTransform.up * _cylinderTransform.localScale.y);
         }
+    }
+
+    private bool AreRoughlyEqual(float value1, float value2)
+    {
+        var rounded1 = Mathf.RoundToInt(value1 * 100);
+        var rounded2 = Mathf.RoundToInt(value2 * 100);
+
+        return rounded1 == rounded2;
     }
 
     public void ApplySpellEffects(GameObject target, Vector3? position)

@@ -1,4 +1,4 @@
-﻿using FullPotential.Assets.Core.Helpers;
+using FullPotential.Assets.Core.Helpers;
 using UnityEngine;
 
 // ReSharper disable CheckNamespace
@@ -7,11 +7,11 @@ using UnityEngine;
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 
-public class SceneObjectsOffline : MonoBehaviour
+public class SceneObjectsStartup : MonoBehaviour
 {
     void Start()
     {
         UnityHelper.GetObjectAtRoot(GameManager.NameCanvasScene).SetActive(true);
     }
-    
+
 }

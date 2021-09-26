@@ -37,7 +37,7 @@ namespace FullPotential.Assets.Core.Storage
         private readonly List<ItemBase> _items;
         private readonly int _slotCount;
         private readonly int _armorSlotCount;
-        
+
         private int _maxItems;
 
         public PlayerInventory(PlayerState playerState)
@@ -115,7 +115,7 @@ namespace FullPotential.Assets.Core.Storage
                 {
                     for (var i = 0; i < EquipSlots.Length; i++)
                     {
-                        EquipItem(i, changes.EquipSlots[i]);
+                        EquipItem(changes.EquipSlots[i], i, !firstSetup);
                     }
                 }
                 else
@@ -291,16 +291,18 @@ namespace FullPotential.Assets.Core.Storage
             return item as Spell;
         }
 
-        public void EquipItem(int slotIndex, string itemId)
+        public void EquipItem(string itemId, int slotIndex, bool allowUnEquip)
         {
-            //If necessary, un-equip from a different slot
-            var equippedIndex = Array.IndexOf(EquipSlots, itemId);
-            if (equippedIndex >= 0)
+            if (!string.IsNullOrWhiteSpace(itemId) && allowUnEquip)
             {
-                EquipSlots[equippedIndex] = null;
+                var equippedIndex = Array.IndexOf(EquipSlots, itemId);
+                if (equippedIndex >= 0)
+                {
+                    EquipSlots[equippedIndex] = null;
+                }
             }
 
-            EquipSlots[slotIndex] = itemId;
+            EquipSlots[slotIndex] = itemId == string.Empty ? null : itemId;
         }
 
     }

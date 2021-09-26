@@ -336,6 +336,7 @@ public class PlayerState : NetworkBehaviour
         var spellScript = spellObject.GetComponent<SpellBeamBehaviour>();
         spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
         spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
+        spellScript.IsLeftHand = new NetworkVariable<bool>(isLeftHand);
 
         spellObject.GetComponent<NetworkObject>().Spawn(null, true);
 
@@ -351,14 +352,13 @@ public class PlayerState : NetworkBehaviour
 
     public void SpawnEquippedObjects()
     {
-        //todo: fix client bug where first-loaded GO is not destroyed
-
         for (var slotIndex = 0; slotIndex < Inventory.EquippedObjects.Length; slotIndex++)
         {
             var currentlyInGame = Inventory.EquippedObjects[slotIndex];
 
             if (currentlyInGame != null)
             {
+                currentlyInGame.name = "DESTROY" + currentlyInGame.name;
                 Destroy(currentlyInGame);
             }
 
@@ -423,14 +423,9 @@ public class PlayerState : NetworkBehaviour
     {
         var newObj = UnityEngine.Object.Instantiate(prefab, InFrontOfPlayer.transform);
 
-        if (isSpell)
-        {
-            newObj.transform.localPosition = new Vector3(isLeftHand ? -0.32f : 0.32f, -0.21f, 1.9f);
-        }
-        else
-        {
-            newObj.transform.localPosition = new Vector3(isLeftHand ? -0.38f : 0.38f, -0.25f, 1.9f);
-        }
+        newObj.transform.localPosition = isSpell
+            ? new Vector3(isLeftHand ? -0.32f : 0.32f, -0.21f, 1.9f)
+            : new Vector3(isLeftHand ? -0.38f : 0.38f, -0.25f, 1.9f);
 
         if (rotation.HasValue)
         {
