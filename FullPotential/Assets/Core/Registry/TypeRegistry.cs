@@ -31,7 +31,6 @@ namespace FullPotential.Assets.Core.Registry
             ValidateAndRegister(typeof(Zone));
 
             ValidateAndRegister(typeof(Beam));
-            ValidateAndRegister(typeof(Cone));
             ValidateAndRegister(typeof(Projectile));
             ValidateAndRegister(typeof(Self));
             ValidateAndRegister(typeof(Touch));

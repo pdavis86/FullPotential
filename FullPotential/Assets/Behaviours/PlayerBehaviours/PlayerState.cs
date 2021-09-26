@@ -325,11 +325,9 @@ public class PlayerState : NetworkBehaviour
             return;
         }
 
-        var prefab = GameManager.Instance.Prefabs.Combat.SpellBeam;
-
         //NOTE: Can't parent to PlayerCamera otherwise it doesn't parent at all!
         var spellObject = Instantiate(
-            prefab,
+            GameManager.Instance.Prefabs.Combat.SpellBeam,
             startPosition,
             transform.rotation, 
             transform
@@ -351,13 +349,10 @@ public class PlayerState : NetworkBehaviour
         }
     }
 
-    public void SpawnSpellCone(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
-    {
-        throw new NotImplementedException();
-    }
-
     public void SpawnEquippedObjects()
     {
+        //todo: fix client bug where first-loaded GO is not destroyed
+
         for (var slotIndex = 0; slotIndex < Inventory.EquippedObjects.Length; slotIndex++)
         {
             var currentlyInGame = Inventory.EquippedObjects[slotIndex];

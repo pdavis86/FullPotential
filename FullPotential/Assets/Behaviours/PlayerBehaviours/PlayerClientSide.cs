@@ -323,10 +323,6 @@ public class PlayerClientSide : NetworkBehaviour
                 _playerState.ToggleSpellBeam(isLeftHand, activeSpell, startPosition, serverRpcParams.Receive.SenderClientId);
                 break;
 
-            case FullPotential.Assets.Core.Spells.Targeting.Cone _:
-                _playerState.SpawnSpellCone(activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
-                break;
-
             default:
                 throw new Exception($"Unexpected spell targeting with TypeName: '{activeSpell.Targeting.TypeName}'");
         }

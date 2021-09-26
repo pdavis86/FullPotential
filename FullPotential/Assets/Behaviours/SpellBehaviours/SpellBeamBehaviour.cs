@@ -37,7 +37,7 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
         if (_sourcePlayer == null)
         {
             Debug.LogError($"No player found in parents");
-            //Destroy(gameObject);
+            Destroy(gameObject);
             return;
         }
 
@@ -50,12 +50,13 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
         if (_spell == null)
         {
             Debug.LogError($"No spell found in player inventory with ID {SpellId.Value}");
-            //Destroy(gameObject);
+            Destroy(gameObject);
             return;
         }
 
         if (PlayerClientId.Value == NetworkManager.Singleton.LocalClientId)
         {
+            //todo: does this only work for the right hand?
             transform.position += transform.forward + (transform.right * -0.1f);
         }
     }
@@ -84,7 +85,7 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
             {
                 _timeSinceLastEffective = 0;
 
-                Debug.Log($"Player {_sourcePlayer.name} is hitting {hit.transform.gameObject.name} with beam spell {_spell.Name} at distance {hit.distance}");
+                //Debug.Log($"Player {_sourcePlayer.name} is hitting {hit.transform.gameObject.name} with beam spell {_spell.Name} at distance {hit.distance}");
 
                 if (NetworkManager.Singleton.IsServer)
                 {

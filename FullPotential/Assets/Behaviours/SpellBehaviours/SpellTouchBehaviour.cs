@@ -18,6 +18,11 @@ public class SpellTouchBehaviour : ISpellBehaviour
 
     public SpellTouchBehaviour(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
     {
+        if (!NetworkManager.Singleton.IsServer)
+        {
+            return;
+        }
+
         _spell = activeSpell;
         _sourcePlayer = NetworkManager.Singleton.ConnectedClients[senderClientId].PlayerObject.gameObject;
 
