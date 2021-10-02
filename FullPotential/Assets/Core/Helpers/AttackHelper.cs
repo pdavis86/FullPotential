@@ -58,9 +58,14 @@ namespace FullPotential.Assets.Core.Helpers
 
             if (source.CompareTag(Tags.Player) && position.HasValue)
             {
+                var offsetX = (float)_random.Next(-9, 10) / 100;
+                var offsetY = (float)_random.Next(-9, 10) / 100;
+                var offsetZ = (float)_random.Next(-9, 10) / 100;
+                var adjustedPosition = position.Value + new Vector3(offsetX, offsetY, offsetZ);
+
                 var playerState = source.GetComponent<PlayerState>();
                 var clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { playerState.OwnerClientId } } };
-                playerState.ShowDamageClientRpc(position.Value, damageDealt.ToString(CultureInfo.InvariantCulture), clientRpcParams);
+                playerState.ShowDamageClientRpc(adjustedPosition, damageDealt.ToString(CultureInfo.InvariantCulture), clientRpcParams);
             }
         }
 
