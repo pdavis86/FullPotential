@@ -308,8 +308,8 @@ public class PlayerClientSide : NetworkBehaviour
         }
 
         var startPosition = isLeftHand
-            ? _playerState.Positions.LeftHand.position
-            : _playerState.Positions.RightHand.position;
+            ? _playerState.Positions.LeftHandInFront.position
+            : _playerState.Positions.RightHandInFront.position;
 
         switch (activeSpell.Targeting)
         {
@@ -326,7 +326,7 @@ public class PlayerClientSide : NetworkBehaviour
                 break;
 
             case FullPotential.Assets.Core.Spells.Targeting.Beam _:
-                _playerState.ToggleSpellBeam(isLeftHand, activeSpell, startPosition, serverRpcParams.Receive.SenderClientId);
+                _playerState.ToggleSpellBeam(isLeftHand, activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
                 break;
 
             default:

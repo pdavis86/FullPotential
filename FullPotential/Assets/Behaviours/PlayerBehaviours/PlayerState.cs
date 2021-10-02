@@ -343,7 +343,7 @@ public class PlayerState : NetworkBehaviour
         new SpellTouchBehaviour(activeSpell, startPosition, direction, senderClientId);
     }
 
-    public void ToggleSpellBeam(bool isLeftHand, Spell activeSpell, Vector3 startPosition, ulong senderClientId)
+    public void ToggleSpellBeam(bool isLeftHand, Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
     {
         if (isLeftHand && _spellBeingCastLeft != null)
         {
@@ -362,7 +362,7 @@ public class PlayerState : NetworkBehaviour
         var spellObject = Instantiate(
             GameManager.Instance.Prefabs.Combat.SpellBeam,
             startPosition,
-            transform.rotation, 
+            Quaternion.LookRotation(direction), 
             transform
         );
 
@@ -494,8 +494,8 @@ public class PlayerState : NetworkBehaviour
     [Serializable]
     public class PositionTransforms
     {
-        public Transform LeftHand;
-        public Transform RightHand;
+        public Transform LeftHandInFront;
+        public Transform RightHandInFront;
     }
 
 }
