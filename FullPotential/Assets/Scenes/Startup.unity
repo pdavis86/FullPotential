@@ -7771,6 +7771,10 @@ MonoBehaviour:
       type: 3}
     SpellBeam: {fileID: 9101233024267604900, guid: cd7343b2907f0bb43b33607835902cda,
       type: 3}
+    SpellWall: {fileID: 605297549439960408, guid: da2c19386588bc24cb34810a8530adc5,
+      type: 3}
+    SpellZone: {fileID: 585545506049340028, guid: b7d2fcaa5eb669840928413506c5b9ea,
+      type: 3}
   Environment:
     LootChest: {fileID: 6779003295890321588, guid: 0da494cf737d72c44b603f7a79174481,
       type: 3}
@@ -8183,6 +8187,12 @@ MonoBehaviour:
         type: 3}
       PlayerPrefab: 0
     - Prefab: {fileID: 9101233024267604900, guid: cd7343b2907f0bb43b33607835902cda,
+        type: 3}
+      PlayerPrefab: 0
+    - Prefab: {fileID: 605297549439960408, guid: da2c19386588bc24cb34810a8530adc5,
+        type: 3}
+      PlayerPrefab: 0
+    - Prefab: {fileID: 585545506049340028, guid: b7d2fcaa5eb669840928413506c5b9ea,
         type: 3}
       PlayerPrefab: 0
     PlayerPrefabHash:
@@ -12729,7 +12739,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mainCanvas: {fileID: 7011060654693451861}
-  RuntimeObjectsContainer: {fileID: 511616165}
+  RuntimeObjectsContainer: {fileID: 511616166}
 --- !u!4 &8533790816139666109
 Transform:
   m_ObjectHideFlags: 0

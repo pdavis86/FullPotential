@@ -22,6 +22,8 @@ public class Prefabs : MonoBehaviour
         public GameObject SpellProjectile;
         public GameObject SpellSelf;
         public GameObject SpellBeam;
+        public GameObject SpellWall;
+        public GameObject SpellZone;
     }
 
     [System.Serializable]

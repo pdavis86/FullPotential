@@ -270,7 +270,7 @@ public class PlayerState : NetworkBehaviour
 
         var startPositionAdjusted = startPosition + (PlayerCamera.transform.forward * 1f);
 
-        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPositionAdjusted, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer.transform);
+        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPositionAdjusted, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer);
 
         var spellScript = spellObject.GetComponent<SpellProjectileBehaviour>();
         spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
@@ -289,12 +289,48 @@ public class PlayerState : NetworkBehaviour
 
         var startPositionAdjusted = startPosition + (PlayerCamera.transform.forward * 1f);
 
-        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPositionAdjusted, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer.transform);
+        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPositionAdjusted, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer);
 
         var spellScript = spellObject.GetComponent<SpellSelfBehaviour>();
         spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
         spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
         spellScript.SpellDirection = new NetworkVariable<Vector3>(direction);
+
+        spellObject.GetComponent<NetworkObject>().Spawn(null, true);
+    }
+
+    public void SpawnSpellWall(Spell activeSpell, Vector3 startPosition, Quaternion rotation, ulong senderClientId)
+    {
+        if (!IsServer)
+        {
+            Debug.LogWarning("Tried to spawn a wall spell when not on the server");
+        }
+
+        var prefab = GameManager.Instance.Prefabs.Combat.SpellWall;
+        var startPositionAdjusted = startPosition + new Vector3(0, prefab.transform.localScale.y / 2);
+        var spellObject = Instantiate(prefab, startPositionAdjusted, rotation, GameManager.Instance.RuntimeObjectsContainer);
+
+        var spellScript = spellObject.GetComponent<SpellWallBehaviour>();
+        spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
+        spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
+
+        spellObject.GetComponent<NetworkObject>().Spawn(null, true);
+    }
+
+    public void SpawnSpellZone(Spell activeSpell, Vector3 startPosition, ulong senderClientId)
+    {
+        if (!IsServer)
+        {
+            Debug.LogWarning("Tried to spawn a zone spell when not on the server");
+        }
+
+        var prefab = GameManager.Instance.Prefabs.Combat.SpellZone;
+        var startPositionAdjusted = startPosition + new Vector3(0, prefab.transform.localScale.y / 2);
+        var spellObject = Instantiate(prefab, startPositionAdjusted, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer);
+
+        var spellScript = spellObject.GetComponent<SpellZoneBehaviour>();
+        spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
+        spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
 
         spellObject.GetComponent<NetworkObject>().Spawn(null, true);
     }

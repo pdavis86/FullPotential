@@ -177,10 +177,6 @@
       "Value": "Absorb"
     },
     {
-      "Key": "effect.blink",
-      "Value": "Blink"
-    },
-    {
       "Key": "effect.deflect",
       "Value": "Deflect"
     },
@@ -189,13 +185,36 @@
       "Value": "Heal"
     },
     {
-      "Key": "effect.leap",
-      "Value": "Leap"
+      "Key": "effect.reflect",
+      "Value": "Reflect"
     },
     {
       "Key": "effect.soften",
       "Value": "Soften"
     },
+    {
+      "Key": "effect.summon",
+      "Value": "Summon"
+    },
+	
+	
+	{
+      "Key": "effect.attract",
+      "Value": "Attract"
+    },
+    {
+      "Key": "effect.blink",
+      "Value": "Blink"
+    },
+    {
+      "Key": "effect.launch",
+      "Value": "Launch"
+    },	
+	{
+      "Key": "effect.repel",
+      "Value": "Repel"
+    },
+	
 	
 	{
       "Key": "effect.courage.description",
@@ -288,24 +307,43 @@
       "Value": "Reduces damage taken from magic attacks"
     },
     {
-      "Key": "effect.blink.description",
-      "Value": "Instantly move from one place to another"
-    },
-    {
       "Key": "effect.deflect.description",
       "Value": "Reduces damage taken from physical attacks"
     },
     {
       "Key": "effect.heal.description",
-      "Value": "Increases HP"
+      "Value": "Restores some HP"
     },
     {
-      "Key": "effect.leap.description",
-      "Value": "Jump to an increased height"
+      "Key": "effect.reflect.description",
+      "Value": "Reflect damage back at the attacker"
     },
     {
       "Key": "effect.soften.description",
       "Value": "Reduces fall damage"
+    },
+    {
+      "Key": "effect.summon.description",
+      "Value": "Summon entities to act as shields or weapons"
+    },
+	
+	
+    {
+      "Key": "effect.attract.description",
+      "Value": "Pulls a target towards the source"
+    },
+    {
+      "Key": "effect.blink.description",
+      "Value": "Instantly move from one place to another"
+    },
+    {
+      "Key": "effect.launch.description",
+      "Value": "Launch target into the air"
+    },	
+	{
+      "Key": "effect.repel.description",
+      "Value": "Repels a target away from the source"
     }
+	
   ]
 }

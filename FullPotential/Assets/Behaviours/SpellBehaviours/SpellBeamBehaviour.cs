@@ -17,16 +17,14 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
 
     private GameObject _sourcePlayer;
     private Spell _spell;
-    private float _timeSinceLastEffective;
     private float _timeBetweenEffects;
+    private float _timeSinceLastEffective;
     private Transform _cylinderTransform;
 
     private void Awake()
     {
         _cylinderTransform = transform.GetChild(0);
-
-        _timeBetweenEffects = 0.5f;
-
+        
         //Move the tip to the starting position
         _cylinderTransform.position += (_cylinderTransform.up * _cylinderTransform.localScale.y);
     }
@@ -54,6 +52,9 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
             Destroy(gameObject);
             return;
         }
+
+        _timeBetweenEffects = 0.5f;
+        _timeSinceLastEffective = _timeBetweenEffects;
 
         if (PlayerClientId.Value == NetworkManager.Singleton.LocalClientId)
         {

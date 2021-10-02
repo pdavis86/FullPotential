@@ -43,12 +43,17 @@ namespace FullPotential.Assets.Standard
                 typeof(Effects.Elements.Lightning),
                 typeof(Effects.Elements.Water),
 
+                typeof(Effects.Movement.Attract),
+                typeof(Effects.Movement.Blink),
+                typeof(Effects.Movement.Launch),
+                typeof(Effects.Movement.Repel),
+
                 typeof(Effects.Support.Absorb),
-                typeof(Effects.Support.Blink),
                 typeof(Effects.Support.Deflect),
                 typeof(Effects.Support.Heal),
-                typeof(Effects.Support.Leap),
+                typeof(Effects.Support.Reflect),
                 typeof(Effects.Support.Soften),
+                typeof(Effects.Support.Summon),
 
                 typeof(Loot.Scrap),
                 typeof(Loot.Shard),

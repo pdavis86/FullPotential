@@ -2,8 +2,11 @@
 using FullPotential.Assets.Core.Constants;
 using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Registry.Types;
+using FullPotential.Assets.Core.Spells.Shapes;
+using FullPotential.Assets.Extensions;
 using MLAPI;
 using MLAPI.NetworkVariable;
+using System;
 using UnityEngine;
 
 // ReSharper disable CheckNamespace
@@ -17,7 +20,9 @@ public class SpellProjectileBehaviour : NetworkBehaviour, ISpellBehaviour
     public NetworkVariable<Vector3> SpellDirection;
 
     private GameObject _sourcePlayer;
+    private PlayerState _platerState;
     private Spell _spell;
+    private Type _shapeType;
 
     private void Start()
     {
@@ -33,7 +38,9 @@ public class SpellProjectileBehaviour : NetworkBehaviour, ISpellBehaviour
 
         Physics.IgnoreCollision(GetComponent<Collider>(), _sourcePlayer.GetComponent<Collider>());
 
-        _spell = _sourcePlayer.GetComponent<PlayerState>().Inventory.GetItemWithId<Spell>(SpellId.Value);
+        _platerState = _sourcePlayer.GetComponent<PlayerState>();
+
+        _spell = _platerState.Inventory.GetItemWithId<Spell>(SpellId.Value);
 
         if (_spell == null)
         {
@@ -47,11 +54,15 @@ public class SpellProjectileBehaviour : NetworkBehaviour, ISpellBehaviour
             castSpeed = 0.5f;
         }
 
+        var affectedByGravity = _spell.Shape != null;
+
+        _shapeType = _spell.Shape?.GetType();
+
         var rigidBody = GetComponent<Rigidbody>();
 
         rigidBody.AddForce(SpellDirection.Value * 20f * castSpeed, ForceMode.VelocityChange);
 
-        if (_spell.Shape != null)
+        if (affectedByGravity)
         {
             rigidBody.useGravity = true;
         }
@@ -66,20 +77,58 @@ public class SpellProjectileBehaviour : NetworkBehaviour, ISpellBehaviour
 
         //Debug.Log("Collided with " + other.gameObject.name);
 
-        if (other.gameObject.CompareTag(Tags.Projectile))
+        if (!other.gameObject.CompareTagAny(Tags.Player, Tags.Enemy, Tags.Ground))
         {
-            //Debug.Log("You hit a Projectile");
             return;
         }
-
-        //todo: if there is a shape, apply the wall or zone
 
         ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
     }
 
     public void ApplySpellEffects(GameObject target, Vector3? position)
     {
-        AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
+        if (_shapeType == null)
+        {
+            AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
+        }
+        else
+        {
+            Vector3 spawnPosition;
+            if (!target.CompareTagAny(Tags.Player, Tags.Enemy))
+            {
+                spawnPosition = position.Value;
+            }
+            else
+            {
+                var pointUnderTarget = new Vector3(target.transform.position.x, -100, target.transform.position.z);
+                var targetsFeet = target.GetComponent<Collider>().ClosestPointOnBounds(pointUnderTarget);
+                if (Physics.Raycast(targetsFeet, transform.up * -1, out var hit))
+                {
+                    spawnPosition = hit.point;
+                }
+                else
+                {
+                    spawnPosition = position.Value;
+                }
+            }
+
+            if (_shapeType == typeof(Wall))
+            {
+                var rotation = Quaternion.LookRotation(SpellDirection.Value);
+                rotation.x = 0;
+                rotation.z = 0;
+                _platerState.SpawnSpellWall(_spell, spawnPosition, rotation, PlayerClientId.Value);
+            }
+            else if (_shapeType == typeof(Zone))
+            {
+                _platerState.SpawnSpellZone(_spell, spawnPosition, PlayerClientId.Value);
+            }
+            else
+            {
+                Debug.LogError($"Unexpected secondary effect for spell {_spell.Id} '{_spell.Name}'");
+            }
+        }
+
         Destroy(gameObject);
     }
 
