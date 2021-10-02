@@ -964,6 +964,9 @@ MonoBehaviour:
   _rightMesh: {fileID: 7392779647605690758}
   InFrontOfPlayer: {fileID: 3124563880166737475}
   PlayerCamera: {fileID: 7392779647204144590}
+  Positions:
+    LeftHand: {fileID: 3462865541722136237}
+    RightHand: {fileID: 4535721041638513647}
 --- !u!114 &1201570389013236167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -980,11 +983,6 @@ MonoBehaviour:
   _inFrontOfPlayerCamera: {fileID: 8117841901429913958}
   _hitTextPrefab: {fileID: 4232121126068313654, guid: e4d26bf7e17ee2b4ea2339e95a75588a,
     type: 3}
-  Positions:
-    SpellStartLeft: {fileID: 8420346807647110726}
-    SpellStartRight: {fileID: 2468258610819334847}
-    LeftHand: {fileID: 3462865541722136237}
-    RightHand: {fileID: 4535721041638513647}
 --- !u!114 &7556515380981010776
 MonoBehaviour:
   m_ObjectHideFlags: 0

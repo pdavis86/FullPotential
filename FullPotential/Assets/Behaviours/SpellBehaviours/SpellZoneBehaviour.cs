@@ -76,6 +76,7 @@ public class SpellZoneBehaviour : NetworkBehaviour, ISpellBehaviour
         //throw new System.NotImplementedException();
         Debug.Log("Applying spell effects to " + target.name);
 
-        AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
+        var adjustedPosition = position + new Vector3(0, 1);
+        AttackHelper.DealDamage(_sourcePlayer, _spell, target, adjustedPosition);
     }
 }

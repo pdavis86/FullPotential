@@ -280,7 +280,7 @@ namespace FullPotential.Assets.Core.Storage
             return errors;
         }
 
-        public Spell GetSpellInHand(bool isLeftHand)
+        public ItemBase GetItemInHand(bool isLeftHand)
         {
             var itemId = isLeftHand
                 ? EquipSlots[(int)SlotIndexToGameObjectName.LeftHand]
@@ -288,7 +288,7 @@ namespace FullPotential.Assets.Core.Storage
 
             var item = _items.FirstOrDefault(x => x.Id == itemId);
 
-            return item as Spell;
+            return item;
         }
 
         public void EquipItem(string itemId, int slotIndex, bool allowUnEquip)

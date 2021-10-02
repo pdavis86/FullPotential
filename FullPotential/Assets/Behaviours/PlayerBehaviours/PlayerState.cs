@@ -36,6 +36,7 @@ public class PlayerState : NetworkBehaviour
 
     public GameObject InFrontOfPlayer;
     public GameObject PlayerCamera;
+    public PositionTransforms Positions;
 
     public readonly NetworkVariable<string> Username = new NetworkVariable<string>();
     public readonly NetworkVariable<string> TextureUrl = new NetworkVariable<string>();
@@ -268,9 +269,7 @@ public class PlayerState : NetworkBehaviour
             Debug.LogWarning("Tried to spawn a projectile spell when not on the server");
         }
 
-        var startPositionAdjusted = startPosition + (PlayerCamera.transform.forward * 1f);
-
-        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPositionAdjusted, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer);
+        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPosition, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer);
 
         var spellScript = spellObject.GetComponent<SpellProjectileBehaviour>();
         spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
@@ -287,9 +286,7 @@ public class PlayerState : NetworkBehaviour
             Debug.LogWarning("Tried to spawn a self spell when not on the server");
         }
 
-        var startPositionAdjusted = startPosition + (PlayerCamera.transform.forward * 1f);
-
-        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPositionAdjusted, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer);
+        var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPosition, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer);
 
         var spellScript = spellObject.GetComponent<SpellSelfBehaviour>();
         spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
@@ -490,6 +487,15 @@ public class PlayerState : NetworkBehaviour
         }
 
         return null;
+    }
+
+
+
+    [Serializable]
+    public class PositionTransforms
+    {
+        public Transform LeftHand;
+        public Transform RightHand;
     }
 
 }

@@ -39,8 +39,6 @@ public class PlayerClientSide : NetworkBehaviour
     private Hud _hud;
     private Camera _sceneCamera;
 
-    public PositionTransforms Positions;
-
     #region Unity event handlers
 
     private void Awake()
@@ -104,7 +102,7 @@ public class PlayerClientSide : NetworkBehaviour
             return;
         }
 
-        InteractServerRpc(_focusedInteractable.gameObject.name);
+        TryToInteractServerRpc(_focusedInteractable.gameObject.name);
     }
 
     void OnOpenCharacterMenu()
@@ -129,29 +127,7 @@ public class PlayerClientSide : NetworkBehaviour
 
     void Update()
     {
-        try
-        {
-            CheckForInteractable();
-
-            //if (Input.GetKeyDown(mappings.GameMenu)) { _toggleGameMenu = true; }
-            //else if (Input.GetKeyDown(mappings.CharacterMenu)) { _toggleCharacterMenu = true; }
-            //else if (!HasMenuOpen)
-            //{
-            //    if (Input.GetKeyDown(mappings.Interact)) { TryToInteract(); }
-            //    else if (Input.GetMouseButtonDown(0)) { TryToAttack(true); }
-            //    else if (Input.GetMouseButtonDown(1)) { TryToAttack(false); }
-            //    else
-            //    {
-            //        var mouseScrollWheel = Input.GetAxis("Mouse ScrollWheel");
-            //        if (mouseScrollWheel > 0) { /*todo: scrolled up*/ Debug.Log("Positive mouse scroll"); }
-            //        else if (mouseScrollWheel < 0) { /*todo: scrolled down*/ Debug.Log("Negative mouse scroll"); }
-            //    }
-            //}
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError(ex);
-        }
+        CheckForInteractable();
     }
 
     private void FixedUpdate()
@@ -296,14 +272,44 @@ public class PlayerClientSide : NetworkBehaviour
     }
 
     [ServerRpc]
-    public void CastSpellServerRpc(bool isLeftHand, Vector3 startPosition, Vector3 direction, ServerRpcParams serverRpcParams = default)
+    public void TryToAttackServerRpc(string itemId, Vector3 direction, ServerRpcParams serverRpcParams = default)
     {
-        var activeSpell = _playerState.Inventory.GetSpellInHand(isLeftHand);
+        const int leftHandIndex = (int)FullPotential.Assets.Core.Storage.PlayerInventory.SlotIndexToGameObjectName.LeftHand;
+        const int rightHandIndex = (int)FullPotential.Assets.Core.Storage.PlayerInventory.SlotIndexToGameObjectName.RightHand;
 
-        if (activeSpell == null)
+        var isLeftHand = false;
+        if (_playerState.Inventory.EquipSlots[leftHandIndex] == itemId)
+        {
+            isLeftHand = true;
+        }
+        else if (_playerState.Inventory.EquipSlots[rightHandIndex] != itemId)
+        {
+            Debug.LogError("Player tried to cheat by sending an un-equipped item ID");
+            return;
+        }
+
+        var itemInHand = _playerState.Inventory.GetItemInHand(isLeftHand);
+
+        if (itemInHand is Spell)
+        {
+            CastSpell(itemInHand as Spell, isLeftHand, direction, serverRpcParams);
+        }
+        else
+        {
+            Debug.LogWarning("Not implemented attack for " + itemInHand.Name + " yet");
+        }
+    }
+
+    private void CastSpell(Spell activeSpell, bool isLeftHand, Vector3 direction, ServerRpcParams serverRpcParams)
+    {
+        if (!IsServer)
         {
             return;
         }
+
+        var startPosition = isLeftHand
+            ? _playerState.Positions.LeftHand.position
+            : _playerState.Positions.RightHand.position;
 
         switch (activeSpell.Targeting)
         {
@@ -330,7 +336,7 @@ public class PlayerClientSide : NetworkBehaviour
 
     // ReSharper disable once UnusedParameter.Global
     [ServerRpc]
-    public void InteractServerRpc(string gameObjectName, ServerRpcParams serverRpcParams = default)
+    public void TryToInteractServerRpc(string gameObjectName, ServerRpcParams serverRpcParams = default)
     {
         const float searchRadius = 5f;
 
@@ -526,11 +532,8 @@ public class PlayerClientSide : NetworkBehaviour
             return;
         }
 
-        var startPos = isLeftHand
-            ? Positions.SpellStartLeft.position
-            : Positions.SpellStartRight.position;
-
-        CastSpellServerRpc(isLeftHand, startPos, _playerCamera.transform.forward);
+        var itemInHand = _playerState.Inventory.GetItemInHand(isLeftHand);
+        TryToAttackServerRpc(itemInHand.Id, _playerCamera.transform.forward);
     }
 
     public void ShowAlert(string alertText)
@@ -570,15 +573,6 @@ public class PlayerClientSide : NetworkBehaviour
             craftingUi.ResetUi();
             craftingUi.LoadInventory();
         }
-    }
-
-    [Serializable]
-    public class PositionTransforms
-    {
-        public Transform SpellStartLeft;
-        public Transform SpellStartRight;
-        public Transform LeftHand;
-        public Transform RightHand;
     }
 
 }
