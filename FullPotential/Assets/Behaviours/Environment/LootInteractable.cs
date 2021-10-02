@@ -11,7 +11,7 @@ public class LootInteractable : Interactable
         //Debug.Log($"Interactable '{gameObject.name}' gained focus");
 
         var translation = GameManager.Instance.Localizer.Translate("ui.interact.loot");
-        var interactInputName = GameManager.Instance.InputActions.Player.Interact.GetBindingDisplayString();
+        var interactInputName = GameManager.Instance.InputActions.Player.Interact.GetBindingDisplayString().ToUpper();
         _interactionBubble.text = string.Format(translation, interactInputName);
         _interactionBubble.gameObject.SetActive(true);
     }
