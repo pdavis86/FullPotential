@@ -1,4 +1,5 @@
-﻿using FullPotential.Assets.Core.Constants;
+﻿using FullPotential.Assets.Api.Behaviours;
+using FullPotential.Assets.Core.Constants;
 using FullPotential.Assets.Core.Registry.Base;
 using MLAPI;
 using MLAPI.Messaging;
@@ -15,7 +16,7 @@ namespace FullPotential.Assets.Core.Helpers
 
         public static void DealDamage(
             GameObject source,
-            ItemBase sourceItem,
+            ItemBase itemUsed,
             GameObject target,
             Vector3? position
         )
@@ -35,26 +36,34 @@ namespace FullPotential.Assets.Core.Helpers
                 return;
             }
 
-            var attackStrength = sourceItem.Attributes.Strength;
+            var attackStrength = itemUsed.Attributes.Strength;
 
+            IDamageable damageable;
             int defenceStrength;
             if (targetIsPlayer)
             {
                 var otherPlayerState = target.GetComponent<PlayerState>();
+                damageable = otherPlayerState;
                 defenceStrength = otherPlayerState.Inventory.GetDefenseValue();
             }
             else
             {
-                //todo: calc defence
-                defenceStrength = 1;
+                var enemyState = target.GetComponent<EnemyState>();
+                damageable = enemyState;
+                defenceStrength = enemyState.GetDefenseValue();
             }
 
-            const int swingValue = 20;
-            var numerator = 100 + _random.Next(0, swingValue);
-            var denominator = 100 + _random.Next(swingValue * -1, swingValue);
-            var damageDealt = Math.Round(attackStrength * ((double)numerator / (denominator + defenceStrength)), 0);
+            //Even a small attack can still do damage
+            var damageDealtBasic = attackStrength * 100f / (100 + defenceStrength);
 
-            Debug.Log($"Source '{source.name}' used '{sourceItem.Name}' to attack target '{target.name}' for {damageDealt} damage");
+            //Throw in some variation
+            var multiplier = (float)_random.Next(90, 111) / 100;
+            var adder = _random.Next(0, 6);
+            var damageDealt = (int)Math.Ceiling(damageDealtBasic / multiplier) + adder;
+
+            damageable.TakeDamage(damageDealt);
+
+            Debug.Log($"Source '{source.name}' used '{itemUsed.Name}' to attack target '{target.name}' for {damageDealt} damage");
 
             if (source.CompareTag(Tags.Player) && position.HasValue)
             {
@@ -63,9 +72,9 @@ namespace FullPotential.Assets.Core.Helpers
                 var offsetZ = (float)_random.Next(-9, 10) / 100;
                 var adjustedPosition = position.Value + new Vector3(offsetX, offsetY, offsetZ);
 
-                var playerState = source.GetComponent<PlayerState>();
-                var clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { playerState.OwnerClientId } } };
-                playerState.ShowDamageClientRpc(adjustedPosition, damageDealt.ToString(CultureInfo.InvariantCulture), clientRpcParams);
+                var sourcePlayerState = source.GetComponent<PlayerState>();
+                var clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { sourcePlayerState.OwnerClientId } } };
+                sourcePlayerState.ShowDamageClientRpc(adjustedPosition, damageDealt.ToString(CultureInfo.InvariantCulture), clientRpcParams);
             }
         }
 

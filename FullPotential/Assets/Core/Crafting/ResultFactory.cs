@@ -1,4 +1,5 @@
 ﻿using FullPotential.Assets.Api.Registry;
+using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Localization;
 using FullPotential.Assets.Core.Registry;
 using FullPotential.Assets.Core.Registry.Base;
@@ -181,11 +182,6 @@ namespace FullPotential.Assets.Core.Crafting
             return null;
         }
 
-        private int GetMinBiasedNumber(int min, int max)
-        {
-            return min + (int)Math.Round((max - min) * Math.Pow(_random.NextDouble(), 3), 0);
-        }
-
         public ItemBase GetLootDrop()
         {
             var lootDrop = new Loot
@@ -215,11 +211,11 @@ namespace FullPotential.Assets.Core.Crafting
             {
                 // ReSharper disable once UnusedParameter.Local
                 lootDrop.RegistryType = magicalLootTypes
-                    .OrderBy(x =>_random.Next())
+                    .OrderBy(x => _random.Next())
                     .First();
 
                 var effects = new List<IEffect>();
-                var numberOfEffects = GetMinBiasedNumber(1, Math.Min(4, _effectsForLoot.Count));
+                var numberOfEffects = MathsHelper.GetMinBiasedNumber(1, Math.Min(4, _effectsForLoot.Count), _random);
                 for (var i = 1; i <= numberOfEffects; i++)
                 {
                     IEffect effect;

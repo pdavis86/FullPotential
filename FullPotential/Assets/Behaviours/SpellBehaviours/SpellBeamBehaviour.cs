@@ -24,7 +24,7 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
     private void Awake()
     {
         _cylinderTransform = transform.GetChild(0);
-        
+
         //Move the tip to the starting position
         _cylinderTransform.position += (_cylinderTransform.up * _cylinderTransform.localScale.y);
     }
@@ -68,7 +68,7 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
 
         //Vector3 endPosition;
         float beamLength;
-        if (Physics.Raycast(transform.position, transform.forward, out var hit, maxDistance: maxBeamLength))
+        if (Physics.Raycast(transform.position, transform.forward, out var hit, maxBeamLength, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
         {
             if (hit.transform.gameObject == _sourcePlayer.gameObject)
             {
@@ -88,10 +88,7 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
 
                 //Debug.Log($"Player {_sourcePlayer.name} is hitting {hit.transform.gameObject.name} with beam spell {_spell.Name} at distance {hit.distance}");
 
-                if (NetworkManager.Singleton.IsServer)
-                {
-                    ApplySpellEffects(hit.transform.gameObject, hit.point);
-                }
+                ApplySpellEffects(hit.transform.gameObject, hit.point);
             }
 
             //endPosition = hit.point;
@@ -106,23 +103,20 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
         //Debug.DrawLine(transform.position, endPosition, Color.cyan);
         //Debug.DrawRay(transform.position, transform.forward, Color.cyan);
 
-        if (!AreRoughlyEqual(_cylinderTransform.localScale.y * 2, beamLength))
+        if (!MathsHelper.AreRoughlyEqual(_cylinderTransform.localScale.y * 2, beamLength))
         {
             _cylinderTransform.localScale = new Vector3(_cylinderTransform.localScale.x, beamLength / 2, _cylinderTransform.localScale.z);
             _cylinderTransform.position = transform.position + (_cylinderTransform.up * _cylinderTransform.localScale.y);
         }
     }
 
-    private bool AreRoughlyEqual(float value1, float value2)
-    {
-        var rounded1 = Mathf.RoundToInt(value1 * 100);
-        var rounded2 = Mathf.RoundToInt(value2 * 100);
-
-        return rounded1 == rounded2;
-    }
-
     public void ApplySpellEffects(GameObject target, Vector3? position)
     {
+        if (!NetworkManager.Singleton.IsServer)
+        {
+            return;
+        }
+
         AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
     }
 

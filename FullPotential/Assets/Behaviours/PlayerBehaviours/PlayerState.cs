@@ -1,4 +1,5 @@
-﻿using FullPotential.Assets.Api.Registry;
+﻿using FullPotential.Assets.Api.Behaviours;
+using FullPotential.Assets.Api.Registry;
 using FullPotential.Assets.Core.Data;
 using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Networking;
@@ -24,7 +25,7 @@ using UnityEngine.Networking;
 // ReSharper disable ConvertToUsingDeclaration
 // ReSharper disable UnassignedField.Global
 
-public class PlayerState : NetworkBehaviour
+public class PlayerState : NetworkBehaviour, IDamageable
 {
 #pragma warning disable 0649
     [SerializeField] private Behaviour[] _behavioursToDisable;
@@ -40,6 +41,7 @@ public class PlayerState : NetworkBehaviour
 
     public readonly NetworkVariable<string> Username = new NetworkVariable<string>();
     public readonly NetworkVariable<string> TextureUrl = new NetworkVariable<string>();
+    public readonly NetworkVariable<int> Health = new NetworkVariable<int>();
 
     public readonly PlayerInventory Inventory;
 
@@ -121,6 +123,22 @@ public class PlayerState : NetworkBehaviour
     }
 
     #endregion
+
+    public static PlayerState GetWithClientId(ulong clientId)
+    {
+        var playerObjs = GameObject.FindGameObjectsWithTag(FullPotential.Assets.Core.Constants.Tags.Player);
+
+        foreach (var obj in playerObjs)
+        {
+            var otherPlayerState = obj.GetComponent<PlayerState>();
+            if (otherPlayerState.OwnerClientId == clientId)
+            {
+                return otherPlayerState;
+            }
+        }
+
+        return null;
+    }
 
     public void ShowAlertForItemsAddedToInventory(string alertText)
     {
@@ -473,20 +491,9 @@ public class PlayerState : NetworkBehaviour
         Inventory.EquippedObjects[slotIndex] = newObj;
     }
 
-    public static PlayerState GetWithClientId(ulong clientId)
+    public void TakeDamage(int amount)
     {
-        var playerObjs = GameObject.FindGameObjectsWithTag(FullPotential.Assets.Core.Constants.Tags.Player);
-
-        foreach (var obj in playerObjs)
-        {
-            var otherPlayerState = obj.GetComponent<PlayerState>();
-            if (otherPlayerState.OwnerClientId == clientId)
-            {
-                return otherPlayerState;
-            }
-        }
-
-        return null;
+        //todo: implement player TakeDamage()
     }
 
 

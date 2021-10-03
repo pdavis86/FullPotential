@@ -1,4 +1,5 @@
-﻿using FullPotential.Assets.Api.Registry;
+﻿using FullPotential.Assets.Api.Behaviours;
+using FullPotential.Assets.Api.Registry;
 using FullPotential.Assets.Core.Data;
 using FullPotential.Assets.Core.Extensions;
 using FullPotential.Assets.Core.Registry.Base;
@@ -13,7 +14,7 @@ using UnityEngine;
 
 namespace FullPotential.Assets.Core.Storage
 {
-    public class PlayerInventory
+    public class PlayerInventory : IDefensible
     {
         public enum SlotIndexToGameObjectName
         {
