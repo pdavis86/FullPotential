@@ -1,17 +1,12 @@
 ﻿using FullPotential.Assets.Api.Behaviours;
-using FullPotential.Assets.Api.Registry;
 using FullPotential.Assets.Core.Data;
-using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Networking;
-using FullPotential.Assets.Core.Registry.Base;
 using FullPotential.Assets.Core.Registry.Types;
-using FullPotential.Assets.Core.Storage;
-using MLAPI;
-using MLAPI.Messaging;
-using MLAPI.NetworkVariable;
 using System;
 using System.Collections;
 using TMPro;
+using Unity.Collections;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -38,23 +33,20 @@ public class PlayerState : NetworkBehaviour, IDamageable
     public GameObject InFrontOfPlayer;
     public GameObject PlayerCamera;
     public PositionTransforms Positions;
+    public string PlayerToken;
 
-    public readonly NetworkVariable<string> Username = new NetworkVariable<string>();
-    public readonly NetworkVariable<string> TextureUrl = new NetworkVariable<string>();
+    public readonly NetworkVariable<FixedString64Bytes> Username = new NetworkVariable<FixedString64Bytes>();
+    public readonly NetworkVariable<FixedString512Bytes> TextureUrl = new NetworkVariable<FixedString512Bytes>();
     public readonly NetworkVariable<int> Health = new NetworkVariable<int>();
 
-    public readonly PlayerInventory Inventory;
+    public PlayerInventory Inventory;
 
     private bool _loadWasSuccessful;
-    private PlayerClientSide _playerClientSide;
+    private PlayerActions _playerActions;
     private ClientRpcParams _clientRpcParams;
     private GameObject _spellBeingCastLeft;
     private GameObject _spellBeingCastRight;
-
-    public PlayerState()
-    {
-        Inventory = new PlayerInventory(this);
-    }
+    private FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
 
     #region Event handlers
 
@@ -63,7 +55,8 @@ public class PlayerState : NetworkBehaviour, IDamageable
         Username.OnValueChanged += OnUsernameChanged;
         TextureUrl.OnValueChanged += OnTextureChanged;
 
-        _playerClientSide = GetComponent<PlayerClientSide>();
+        _playerActions = GetComponent<PlayerActions>();
+        Inventory = GetComponent<PlayerInventory>();
     }
 
     private void Start()
@@ -83,6 +76,8 @@ public class PlayerState : NetworkBehaviour, IDamageable
         gameObject.name = "Player ID " + NetworkObjectId;
 
         _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
+
+        RequestPlayerDataServerRpc();
     }
 
     private void OnDisable()
@@ -91,16 +86,36 @@ public class PlayerState : NetworkBehaviour, IDamageable
         TextureUrl.OnValueChanged -= OnTextureChanged;
     }
 
-    private void OnUsernameChanged(string previousValue, string newValue)
+    private void OnUsernameChanged(FixedString64Bytes previousValue, FixedString64Bytes newValue)
     {
         SetNameTag();
     }
 
-    private void OnTextureChanged(string previousValue, string newValue)
+    private void OnTextureChanged(FixedString512Bytes previousValue, FixedString512Bytes newValue)
     {
-        if (!string.IsNullOrWhiteSpace(TextureUrl.Value))
+        if (!string.IsNullOrWhiteSpace(TextureUrl.Value.ToString()))
         {
             StartCoroutine(SetTexture());
+        }
+    }
+
+    #endregion
+
+    #region ServerRpc calls
+
+    [ServerRpc]
+    public void RequestPlayerDataServerRpc()
+    {
+        var playerData = FullPotential.Assets.Core.Registry.UserRegistry.Load(PlayerToken, null);
+
+        if (OwnerClientId != 0)
+        {
+            LoadFromPlayerData(playerData);
+        }
+
+        foreach (var message in MessageHelper.GetFragmentedMessages(JsonUtility.ToJson(playerData)))
+        {
+            LoadPlayerDataClientRpc(JsonUtility.ToJson(message), _clientRpcParams);
         }
     }
 
@@ -112,14 +127,32 @@ public class PlayerState : NetworkBehaviour, IDamageable
     [ClientRpc]
     public void ShowAlertClientRpc(string alertText, ClientRpcParams clientRpcParams = default)
     {
-        _playerClientSide.ShowAlert(alertText);
+        _playerActions.ShowAlert(alertText);
     }
 
     // ReSharper disable once UnusedParameter.Global
     [ClientRpc]
     public void ShowDamageClientRpc(Vector3 position, string damage, ClientRpcParams clientRpcParams = default)
     {
-        _playerClientSide.ShowDamage(position, damage);
+        _playerActions.ShowDamage(position, damage);
+    }
+
+    // ReSharper disable once UnusedParameter.Global
+    [ClientRpc]
+    public void LoadPlayerDataClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams = default)
+    {
+        var fragmentedMessage = JsonUtility.FromJson<FragmentedMessage>(fragmentedMessageJson);
+
+        _loadPlayerDataReconstructor.AddMessage(fragmentedMessage);
+        if (!_loadPlayerDataReconstructor.HaveAllMessages(fragmentedMessage.GroupId))
+        {
+            return;
+        }
+
+        var playerData = JsonUtility.FromJson<PlayerData>(_loadPlayerDataReconstructor.Reconstruct(fragmentedMessage.GroupId));
+        LoadFromPlayerData(playerData);
+
+        _loadPlayerDataReconstructor = null;
     }
 
     #endregion
@@ -155,17 +188,14 @@ public class PlayerState : NetworkBehaviour, IDamageable
         ShowAlertClientRpc("Your inventory is at max", _clientRpcParams);
     }
 
-    public void LoadFromPlayerData(PlayerData playerData)
+    private void LoadFromPlayerData(PlayerData playerData)
     {
-        if (IsServer)
-        {
-            Username.Value = playerData.Username;
-            TextureUrl.Value = playerData.Options?.TextureUrl;
-        }
+        Username.Value = playerData.Username;
+        TextureUrl.Value = playerData.Options?.TextureUrl;
 
         try
         {
-            Inventory.ApplyInventory(playerData.Inventory, true);
+            Inventory.LoadInventory(playerData.Inventory);
             _loadWasSuccessful = true;
         }
         catch (Exception ex)
@@ -183,15 +213,18 @@ public class PlayerState : NetworkBehaviour, IDamageable
             return;
         }
 
-        _nameTag.text = string.IsNullOrWhiteSpace(Username.Value)
+        var username = Username.Value.ToString();
+        _nameTag.text = string.IsNullOrWhiteSpace(username)
             ? "Player " + NetworkObjectId
-            : Username.Value;
+            : username;
     }
 
     private IEnumerator SetTexture()
     {
+        var textureUrl = TextureUrl.Value.ToString().ToLower();
+
         string filePath;
-        if (TextureUrl.Value.ToLower().StartsWith("http"))
+        if (textureUrl.StartsWith("http"))
         {
             filePath = Application.persistentDataPath + "/" + Username.Value + ".png";
 
@@ -200,7 +233,7 @@ public class PlayerState : NetworkBehaviour, IDamageable
             if (System.IO.File.Exists(validatePath))
             {
                 var checkUrl = System.IO.File.ReadAllText(validatePath);
-                if (checkUrl.Equals(TextureUrl.Value, StringComparison.OrdinalIgnoreCase))
+                if (checkUrl.Equals(textureUrl, StringComparison.OrdinalIgnoreCase))
                 {
                     doDownload = false;
                 }
@@ -208,17 +241,17 @@ public class PlayerState : NetworkBehaviour, IDamageable
 
             if (doDownload)
             {
-                using (var webRequest = UnityWebRequest.Get(TextureUrl.Value))
+                using (var webRequest = UnityWebRequest.Get(textureUrl))
                 {
                     yield return webRequest.SendWebRequest();
                     System.IO.File.WriteAllBytes(filePath, webRequest.downloadHandler.data);
                 }
-                System.IO.File.WriteAllText(validatePath, TextureUrl.Value.ToLower());
+                System.IO.File.WriteAllText(validatePath, textureUrl);
             }
         }
         else
         {
-            filePath = TextureUrl.Value;
+            filePath = textureUrl;
         }
 
         if (!System.IO.File.Exists(filePath))
@@ -255,29 +288,15 @@ public class PlayerState : NetworkBehaviour, IDamageable
 
         var saveData = new PlayerData
         {
-            Username = Username.Value,
+            Username = Username.Value.ToString(),
             Options = new PlayerOptions
             {
-                TextureUrl = TextureUrl.Value
+                TextureUrl = TextureUrl.Value.ToString()
             },
             Inventory = Inventory.GetSaveData()
         };
 
         FullPotential.Assets.Core.Registry.UserRegistry.Save(saveData);
-    }
-
-    public void AddToInventory(ItemBase item)
-    {
-        if (!IsServer)
-        {
-            Debug.LogError("Inventory Add called on the client!");
-            return;
-        }
-
-        var invChange = new InventoryAndRemovals { Loot = new[] { item as Loot } };
-        Inventory.ApplyInventory(invChange);
-
-        MessageHelper.SendMessageIfNotHost(invChange, nameof(MessageType.InventoryChange), OwnerClientId);
     }
 
     public void SpawnSpellProjectile(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
@@ -290,11 +309,11 @@ public class PlayerState : NetworkBehaviour, IDamageable
         var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPosition, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer);
 
         var spellScript = spellObject.GetComponent<SpellProjectileBehaviour>();
-        spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
-        spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
-        spellScript.SpellDirection = new NetworkVariable<Vector3>(direction);
+        spellScript.PlayerClientId.Value = senderClientId;
+        spellScript.SpellId.Value = activeSpell.Id;
+        spellScript.SpellDirection.Value = direction;
 
-        spellObject.GetComponent<NetworkObject>().Spawn(null, true);
+        spellObject.GetComponent<NetworkObject>().Spawn(true);
     }
 
     public void SpawnSpellSelf(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
@@ -307,11 +326,11 @@ public class PlayerState : NetworkBehaviour, IDamageable
         var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPosition, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer);
 
         var spellScript = spellObject.GetComponent<SpellSelfBehaviour>();
-        spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
-        spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
-        spellScript.SpellDirection = new NetworkVariable<Vector3>(direction);
+        spellScript.PlayerClientId.Value = senderClientId;
+        spellScript.SpellId.Value = activeSpell.Id;
+        spellScript.SpellDirection.Value = direction;
 
-        spellObject.GetComponent<NetworkObject>().Spawn(null, true);
+        spellObject.GetComponent<NetworkObject>().Spawn(true);
     }
 
     public void SpawnSpellWall(Spell activeSpell, Vector3 startPosition, Quaternion rotation, ulong senderClientId)
@@ -326,10 +345,10 @@ public class PlayerState : NetworkBehaviour, IDamageable
         var spellObject = Instantiate(prefab, startPositionAdjusted, rotation, GameManager.Instance.RuntimeObjectsContainer);
 
         var spellScript = spellObject.GetComponent<SpellWallBehaviour>();
-        spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
-        spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
+        spellScript.PlayerClientId.Value = senderClientId;
+        spellScript.SpellId.Value = activeSpell.Id;
 
-        spellObject.GetComponent<NetworkObject>().Spawn(null, true);
+        spellObject.GetComponent<NetworkObject>().Spawn(true);
     }
 
     public void SpawnSpellZone(Spell activeSpell, Vector3 startPosition, ulong senderClientId)
@@ -344,10 +363,10 @@ public class PlayerState : NetworkBehaviour, IDamageable
         var spellObject = Instantiate(prefab, startPositionAdjusted, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer);
 
         var spellScript = spellObject.GetComponent<SpellZoneBehaviour>();
-        spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
-        spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
+        spellScript.PlayerClientId.Value = senderClientId;
+        spellScript.SpellId.Value = activeSpell.Id;
 
-        spellObject.GetComponent<NetworkObject>().Spawn(null, true);
+        spellObject.GetComponent<NetworkObject>().Spawn(true);
     }
 
     public void CastSpellTouch(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
@@ -380,16 +399,16 @@ public class PlayerState : NetworkBehaviour, IDamageable
         var spellObject = Instantiate(
             GameManager.Instance.Prefabs.Combat.SpellBeam,
             startPosition,
-            Quaternion.LookRotation(direction), 
+            Quaternion.LookRotation(direction),
             transform
         );
 
         var spellScript = spellObject.GetComponent<SpellBeamBehaviour>();
-        spellScript.PlayerClientId = new NetworkVariable<ulong>(senderClientId);
-        spellScript.SpellId = new NetworkVariable<string>(activeSpell.Id);
-        spellScript.IsLeftHand = new NetworkVariable<bool>(isLeftHand);
+        spellScript.PlayerClientId.Value = senderClientId;
+        spellScript.SpellId.Value = activeSpell.Id;
+        spellScript.IsLeftHand.Value = isLeftHand;
 
-        spellObject.GetComponent<NetworkObject>().Spawn(null, true);
+        spellObject.GetComponent<NetworkObject>().Spawn(true);
 
         if (isLeftHand)
         {
@@ -401,102 +420,13 @@ public class PlayerState : NetworkBehaviour, IDamageable
         }
     }
 
-    public void SpawnEquippedObjects()
-    {
-        for (var slotIndex = 0; slotIndex < Inventory.EquippedObjects.Length; slotIndex++)
-        {
-            var currentlyInGame = Inventory.EquippedObjects[slotIndex];
-
-            if (currentlyInGame != null)
-            {
-                currentlyInGame.name = "DESTROY" + currentlyInGame.name;
-                Destroy(currentlyInGame);
-            }
-
-            var itemId = Inventory.EquipSlots[slotIndex];
-
-            if (string.IsNullOrWhiteSpace(itemId))
-            {
-                continue;
-            }
-
-            var item = Inventory.GetItemWithId<ItemBase>(itemId);
-
-            if (slotIndex == (int)PlayerInventory.SlotIndexToGameObjectName.LeftHand)
-            {
-                SpawnItemInHand(slotIndex, item);
-            }
-            else if (slotIndex == (int)PlayerInventory.SlotIndexToGameObjectName.RightHand)
-            {
-                SpawnItemInHand(slotIndex, item, false);
-            }
-        }
-    }
-
-    public void SpawnItemInHand(int index, ItemBase item, bool isLeftHand = true)
-    {
-        if (!NetworkManager.Singleton.IsClient)
-        {
-            Debug.LogError("Tried to spawn a gameobject on a server");
-            return;
-        }
-
-        if (item is Weapon weapon)
-        {
-            var registryType = item.RegistryType as IGearWeapon;
-
-            if (registryType == null)
-            {
-                Debug.LogError("Weapon did not have a RegistryType");
-                return;
-            }
-
-            GameManager.Instance.TypeRegistry.LoadAddessable(
-                weapon.IsTwoHanded ? registryType.PrefabAddressTwoHanded : registryType.PrefabAddress,
-                prefab =>
-                {
-                    InstantiateInPlayerHand(prefab, isLeftHand, false, new Vector3(0, 90), index);
-                }
-            );
-        }
-        else if (item is Spell)
-        {
-            InstantiateInPlayerHand(GameManager.Instance.Prefabs.Combat.SpellInHand, isLeftHand, true, null, index);
-        }
-        else
-        {
-            Debug.LogError($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name}");
-            Inventory.EquippedObjects[index] = null;
-        }
-    }
-
-    private void InstantiateInPlayerHand(GameObject prefab, bool isLeftHand, bool isSpell, Vector3? rotation, int slotIndex)
-    {
-        var newObj = UnityEngine.Object.Instantiate(prefab, InFrontOfPlayer.transform);
-
-        newObj.transform.localPosition = isSpell
-            ? new Vector3(isLeftHand ? -0.32f : 0.32f, -0.21f, 1.9f)
-            : new Vector3(isLeftHand ? -0.38f : 0.38f, -0.25f, 1.9f);
-
-        if (rotation.HasValue)
-        {
-            newObj.transform.localEulerAngles = rotation.Value;
-        }
-
-        if (IsOwner)
-        {
-            GameObjectHelper.SetGameLayerRecursive(newObj, InFrontOfPlayer.layer);
-        }
-
-        Inventory.EquippedObjects[slotIndex] = newObj;
-    }
-
     public void TakeDamage(int amount)
     {
         //todo: implement player TakeDamage()
     }
 
 
+    #region Nested Classes
 
     [Serializable]
     public class PositionTransforms
@@ -505,4 +435,5 @@ public class PlayerState : NetworkBehaviour, IDamageable
         public Transform RightHandInFront;
     }
 
+    #endregion
 }

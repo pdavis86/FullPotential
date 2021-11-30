@@ -1,6 +1,8 @@
 using FullPotential.Assets.Api.Registry;
 using FullPotential.Assets.Core.Extensions;
+using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Localization;
+using FullPotential.Assets.Core.Networking;
 using FullPotential.Assets.Core.Registry.Base;
 using FullPotential.Assets.Core.Registry.Types;
 using System;
@@ -34,7 +36,7 @@ public class CharacterMenuUiCraftingTab : MonoBehaviour
 #pragma warning restore 0649
 
     private PlayerState _playerState;
-    private PlayerClientSide _playerClientSide;
+    private PlayerActions _playerClientSide;
     private List<ItemBase> _components;
     private Dictionary<Type, string> _craftingCategories;
     private Dictionary<IGearArmor, string> _armorTypes;
@@ -48,7 +50,7 @@ public class CharacterMenuUiCraftingTab : MonoBehaviour
         _components = new List<ItemBase>();
 
         _playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
-        _playerClientSide = _playerState.gameObject.GetComponent<PlayerClientSide>();
+        _playerClientSide = _playerState.gameObject.GetComponent<PlayerActions>();
 
         _typeDropdown.onValueChanged.AddListener(TypeOnValueChanged);
 
@@ -96,7 +98,7 @@ public class CharacterMenuUiCraftingTab : MonoBehaviour
     {
         _craftButton.interactable = false;
 
-        var componentIds = _components.Select(x => x.Id).ToArray();
+        var componentIds = string.Join(',', _components.Select(x => x.Id));
         var selectedType = GetCraftingCategory();
         var selectedSubType = GetCraftableTypeName(selectedType);
         var isTwoHanded = IsTwoHandedSelected();
@@ -169,7 +171,6 @@ public class CharacterMenuUiCraftingTab : MonoBehaviour
     private void OnEnable()
     {
         ResetUi();
-        LoadInventory();
     }
 
     private void OnDisable()
@@ -207,7 +208,9 @@ public class CharacterMenuUiCraftingTab : MonoBehaviour
         _handednessDropdown.ClearOptions();
         _handednessDropdown.AddOptions(_handednessOptions);
 
-        TypeOnValueChanged(0);
+        LoadInventory();
+
+        //todo: ? TypeOnValueChanged(0);
 
         ResetUiText();
 
@@ -221,7 +224,7 @@ public class CharacterMenuUiCraftingTab : MonoBehaviour
         _craftErrors.text = null;
     }
 
-    public void LoadInventory()
+    private void LoadInventory()
     {
         _components.Clear();
 

@@ -9,7 +9,7 @@ namespace FullPotential.Assets.Standard.Armor
 
         public string TypeName => nameof(Legs);
 
-        public IGearArmor.ArmorSlot InventorySlot => IGearArmor.ArmorSlot.Legs;
+        public IGearArmor.ArmorCategory Category => IGearArmor.ArmorCategory.Legs;
 
         //todo: missing prefab
         public string PrefabAddress => throw new NotImplementedException();

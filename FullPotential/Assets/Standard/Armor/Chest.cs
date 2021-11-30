@@ -8,7 +8,7 @@ namespace FullPotential.Assets.Standard.Armor
         public Guid TypeId => new Guid("2419fcac-217e-48d8-9770-76c5ff27c9f8");
         public string TypeName => nameof(Chest);
 
-        public IGearArmor.ArmorSlot InventorySlot => IGearArmor.ArmorSlot.Chest;
+        public IGearArmor.ArmorCategory Category => IGearArmor.ArmorCategory.Chest;
 
         //todo: missing prefab
         public string PrefabAddress => throw new NotImplementedException();

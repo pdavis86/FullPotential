@@ -1,4 +1,6 @@
-﻿namespace FullPotential.Assets.Core.Data
+﻿// ReSharper disable UnusedMember.Global
+
+namespace FullPotential.Assets.Core.Data
 {
     [System.Serializable]
     public class EquipChanges

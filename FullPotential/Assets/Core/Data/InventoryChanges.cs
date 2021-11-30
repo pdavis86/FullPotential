@@ -4,7 +4,7 @@
 namespace FullPotential.Assets.Core.Data
 {
     [System.Serializable]
-    public class InventoryAndRemovals : Inventory
+    public class InventoryChanges : Inventory
     {
         public string[] IdsToRemove;
     }

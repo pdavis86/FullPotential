@@ -9,7 +9,7 @@ namespace FullPotential.Assets.Standard.Armor
 
         public string TypeName => nameof(Barrier);
 
-        public IGearArmor.ArmorSlot InventorySlot => IGearArmor.ArmorSlot.Barrier;
+        public IGearArmor.ArmorCategory Category => IGearArmor.ArmorCategory.Barrier;
 
         //todo: missing prefab
         public string PrefabAddress => throw new NotImplementedException();

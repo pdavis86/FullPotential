@@ -1,15 +1,13 @@
 ﻿using FullPotential.Assets.Core.Data;
-using FullPotential.Assets.Core.Registry.Types;
 using FullPotential.Assets.Core.Helpers;
-using MLAPI;
-using MLAPI.Messaging;
-using MLAPI.Serialization.Pooled;
+using FullPotential.Assets.Core.Networking;
+using FullPotential.Assets.Core.Registry.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
-using FullPotential.Assets.Core.Networking;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
@@ -21,7 +19,7 @@ using FullPotential.Assets.Core.Networking;
 // ReSharper disable UnassignedField.Global
 // ReSharper disable RedundantDiscardDesignation
 
-public class PlayerClientSide : NetworkBehaviour
+public class PlayerActions : NetworkBehaviour
 {
 #pragma warning disable 0649
     [SerializeField] private Camera _playerCamera;
@@ -38,8 +36,10 @@ public class PlayerClientSide : NetworkBehaviour
     private Interactable _focusedInteractable;
     private Hud _hud;
     private Camera _sceneCamera;
+    private ClientRpcParams _clientRpcParams;
+    private FragmentedMessageReconstructor _inventoryChangesReconstructor = new FragmentedMessageReconstructor();
 
-    #region Unity event handlers
+    #region Event handlers
 
     private void Awake()
     {
@@ -49,9 +49,6 @@ public class PlayerClientSide : NetworkBehaviour
 
     private void Start()
     {
-        //var localClientIdMatches = _playerState.ClientId.Value == NetworkManager.Singleton.LocalClientId;
-        //Debug.LogError($"PlayerClientSide - IsOwner: {IsOwner}, localClientIdMatches: {localClientIdMatches}, IsLocalPlayer: {IsLocalPlayer}");
-
         if (!IsOwner)
         {
             return;
@@ -81,13 +78,7 @@ public class PlayerClientSide : NetworkBehaviour
         _inFrontOfPlayerCamera.gameObject.SetActive(true);
         _playerCamera.gameObject.SetActive(true);
 
-        CustomMessagingManager.RegisterNamedMessageHandler(nameof(MessageType.InventoryChange), OnInventoryChange);
-        CustomMessagingManager.RegisterNamedMessageHandler(nameof(MessageType.LoadPlayerData), OnLoadPlayerData);
-        CustomMessagingManager.RegisterNamedMessageHandler(nameof(MessageType.EquipChange), OnEquipChange);
-        CustomMessagingManager.RegisterNamedMessageHandler(nameof(MessageType.EquipChanges), OnEquipChanges);
-
-        RequestPlayerDataServerRpc();
-        RequestingOtherPlayerDataServerRpc();
+        _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
     }
 
     void OnInteract()
@@ -132,48 +123,7 @@ public class PlayerClientSide : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        try
-        {
-            if (_toggleGameMenu || _toggleCharacterMenu)
-            {
-                if (_hasMenuOpen)
-                {
-                    _mainCanvasObjects.HideAllMenus();
-                }
-                else if (_toggleGameMenu)
-                {
-                    _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.EscMenu);
-                }
-                else if (_toggleCharacterMenu)
-                {
-                    _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.CharacterMenu);
-                }
-
-                Tooltips.HideTooltip();
-
-                _toggleGameMenu = false;
-                _toggleCharacterMenu = false;
-            }
-
-            _hasMenuOpen = _mainCanvasObjects.IsAnyMenuOpen();
-            _playerMovement.enabled = !_hasMenuOpen;
-
-            if (_hasMenuOpen)
-            {
-                if (Cursor.lockState != CursorLockMode.None)
-                {
-                    Cursor.lockState = CursorLockMode.None;
-                }
-            }
-            else if (Cursor.lockState != CursorLockMode.Locked)
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError(ex);
-        }
+        UpdateMenuStates();
     }
 
     private void OnDisable()
@@ -185,7 +135,7 @@ public class PlayerClientSide : NetworkBehaviour
 
         Cursor.lockState = CursorLockMode.None;
 
-        if (_mainCanvasObjects?.Hud != null)
+        if (_mainCanvasObjects.Hud != null)
         {
             _mainCanvasObjects.Hud.SetActive(false);
         }
@@ -196,74 +146,9 @@ public class PlayerClientSide : NetworkBehaviour
         }
     }
 
-    private void OnInventoryChange(ulong senderClientId, System.IO.Stream stream)
-    {
-        //Debug.LogError("Recieved OnInventoryChange network message");
-
-        string message;
-        using (PooledNetworkReader reader = PooledNetworkReader.Get(stream))
-        {
-            message = reader.ReadString().ToString();
-        }
-
-        var changes = JsonUtility.FromJson<InventoryAndRemovals>(message);
-        HandleInventoryChange(changes);
-    }
-
-    private void OnLoadPlayerData(ulong senderClientId, System.IO.Stream stream)
-    {
-        //Debug.LogError("Recieved playerData from the server at clientId " + NetworkManager.Singleton.LocalClientId);
-
-        string message;
-        using (PooledNetworkReader reader = PooledNetworkReader.Get(stream))
-        {
-            message = reader.ReadString().ToString();
-        }
-
-        var playerData = JsonUtility.FromJson<PlayerData>(message);
-        _playerState.LoadFromPlayerData(playerData);
-    }
-
-    private void OnEquipChange(ulong senderClientId, System.IO.Stream stream)
-    {
-        string message;
-        using (PooledNetworkReader reader = PooledNetworkReader.Get(stream))
-        {
-            message = reader.ReadString().ToString();
-        }
-
-        var equipChange = JsonUtility.FromJson<EquipChange>(message);
-        ApplyEquipChange(equipChange);
-    }
-
-    private void OnEquipChanges(ulong senderClientId, System.IO.Stream stream)
-    {
-        string message;
-        using (PooledNetworkReader reader = PooledNetworkReader.Get(stream))
-        {
-            message = reader.ReadString().ToString();
-        }
-
-        var equipChanges = JsonUtility.FromJson<EquipChanges>(message);
-
-        foreach (var equipChange in equipChanges.Changes)
-        {
-            ApplyEquipChange(equipChange);
-        }
-    }
-
     #endregion
 
     #region ServerRpc calls
-
-    [ServerRpc]
-    public void RequestPlayerDataServerRpc()
-    {
-        //Debug.LogError("Sending playerData to clientId " + OwnerClientId);
-
-        var playerData = FullPotential.Assets.Core.Registry.UserRegistry.Load(null, _playerState.Username.Value);
-        MessageHelper.SendMessageIfNotHost(playerData, nameof(MessageType.LoadPlayerData), OwnerClientId);
-    }
 
     [ServerRpc]
     public void UpdatePlayerSettingsServerRpc(string textureUrl)
@@ -274,15 +159,12 @@ public class PlayerClientSide : NetworkBehaviour
     [ServerRpc]
     public void TryToAttackServerRpc(string itemId, Vector3 direction, ServerRpcParams serverRpcParams = default)
     {
-        const int leftHandIndex = (int)FullPotential.Assets.Core.Storage.PlayerInventory.SlotIndexToGameObjectName.LeftHand;
-        const int rightHandIndex = (int)FullPotential.Assets.Core.Storage.PlayerInventory.SlotIndexToGameObjectName.RightHand;
-
         var isLeftHand = false;
-        if (_playerState.Inventory.EquipSlots[leftHandIndex] == itemId)
+        if (_playerState.Inventory.EquippedLeftHand.Value == itemId)
         {
             isLeftHand = true;
         }
-        else if (_playerState.Inventory.EquipSlots[rightHandIndex] != itemId)
+        else if (_playerState.Inventory.EquippedRightHand.Value != itemId)
         {
             Debug.LogError("Player tried to cheat by sending an un-equipped item ID");
             return;
@@ -290,9 +172,9 @@ public class PlayerClientSide : NetworkBehaviour
 
         var itemInHand = _playerState.Inventory.GetItemInHand(isLeftHand);
 
-        if (itemInHand is Spell)
+        if (itemInHand is Spell spellInHand)
         {
-            CastSpell(itemInHand as Spell, isLeftHand, direction, serverRpcParams);
+            CastSpell(spellInHand, isLeftHand, direction, serverRpcParams);
         }
         else
         {
@@ -373,11 +255,13 @@ public class PlayerClientSide : NetworkBehaviour
     }
 
     [ServerRpc]
-    public void CraftItemServerRpc(string[] componentIds, string categoryName, string craftableTypeName, bool isTwoHanded, string itemName)
+    public void CraftItemServerRpc(string componentIdsCsv, string categoryName, string craftableTypeName, bool isTwoHanded, string itemName)
     {
-        var components = _playerState.Inventory.GetComponentsFromIds(componentIds);
+        var componentIdArray = componentIdsCsv.Split(',');
 
-        if (components.Count != componentIds.Length)
+        var components = _playerState.Inventory.GetComponentsFromIds(componentIdArray);
+
+        if (components.Count != componentIdArray.Length)
         {
             Debug.LogError("Someone tried cheating: One or more IDs provided are not in the inventory");
             return;
@@ -390,7 +274,7 @@ public class PlayerClientSide : NetworkBehaviour
             components
         );
 
-        if (_playerState.Inventory.ValidateIsCraftable(componentIds, craftedItem).Any())
+        if (_playerState.Inventory.ValidateIsCraftable(componentIdArray, craftedItem).Any())
         {
             Debug.LogError("Someone tried cheating: validation was skipped");
             return;
@@ -403,88 +287,90 @@ public class PlayerClientSide : NetworkBehaviour
 
         var craftedType = craftedItem.GetType();
 
-        var invChange = new InventoryAndRemovals
+        var invChange = new InventoryChanges
         {
-            IdsToRemove = componentIds.ToArray(),
+            IdsToRemove = componentIdArray,
             Accessories = craftedType == typeof(Accessory) ? new[] { craftedItem as Accessory } : null,
             Armor = craftedType == typeof(Armor) ? new[] { craftedItem as Armor } : null,
             Spells = craftedType == typeof(Spell) ? new[] { craftedItem as Spell } : null,
             Weapons = craftedType == typeof(Weapon) ? new[] { craftedItem as Weapon } : null
         };
 
-        HandleInventoryChange(invChange);
-
-        MessageHelper.SendMessageIfNotHost(invChange, nameof(MessageType.InventoryChange), OwnerClientId);
-    }
-
-    [ServerRpc]
-    public void ChangeEquipsServerRpc(string[] equipSlots)
-    {
-        //Debug.LogError("Changing slots on server: " + IsServer);
-
-        var invChange = new InventoryAndRemovals
+        if (OwnerClientId != 0)
         {
-            EquipSlots = equipSlots
-        };
-
-        HandleInventoryChange(invChange);
-
-        var equipChange = new EquipChange
-        {
-            SourceClientId = OwnerClientId,
-            Inventory = _playerState.Inventory.GetDataForOtherPlayers()
-        };
-
-        //NOTE: No client ID. We want to tell all clients about equip changes
-        MessageHelper.SendMessageIfNotHost(equipChange, nameof(MessageType.EquipChange));
-    }
-
-    [ServerRpc]
-    public void RequestingOtherPlayerDataServerRpc()
-    {
-        var changes = new List<EquipChange>();
-
-        var playerObjs = GameObject.FindGameObjectsWithTag(FullPotential.Assets.Core.Constants.Tags.Player);
-        var playerStates = playerObjs.Select(x => x.GetComponent<PlayerState>());
-
-        foreach (var otherPlayerState in playerStates)
-        {
-            if (otherPlayerState.OwnerClientId == OwnerClientId)
-            {
-                continue;
-            }
-
-            changes.Add(new EquipChange
-            {
-                SourceClientId = otherPlayerState.OwnerClientId,
-                Inventory = otherPlayerState.Inventory.GetDataForOtherPlayers()
-            });
+            ApplyInventoryChanges(invChange);
         }
 
-        var equipChanges = new EquipChanges
+        foreach (var message in MessageHelper.GetFragmentedMessages(JsonUtility.ToJson(invChange)))
         {
-            Changes = changes.ToArray()
-        };
-
-        MessageHelper.SendMessageIfNotHost(equipChanges, nameof(MessageType.EquipChanges), OwnerClientId);
+            ApplyInventoryChangesClientRpc(JsonUtility.ToJson(message), _clientRpcParams);
+        }
     }
 
     #endregion
 
-    private void ApplyEquipChange(EquipChange equipChange)
+    #region ClientRpc calls
+
+    // ReSharper disable once UnusedParameter.Global
+    [ClientRpc]
+    public void ApplyInventoryChangesClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams = default)
     {
-        if (OwnerClientId == equipChange.SourceClientId)
+        var fragmentedMessage = JsonUtility.FromJson<FragmentedMessage>(fragmentedMessageJson);
+
+        _inventoryChangesReconstructor.AddMessage(fragmentedMessage);
+        if (!_inventoryChangesReconstructor.HaveAllMessages(fragmentedMessage.GroupId))
         {
             return;
         }
 
-        var otherPlayerState = PlayerState.GetWithClientId(equipChange.SourceClientId);
-        otherPlayerState.Inventory.ApplyInventory(equipChange.Inventory);
+        var changes = JsonUtility.FromJson<InventoryChanges>(_inventoryChangesReconstructor.Reconstruct(fragmentedMessage.GroupId));
+        ApplyInventoryChanges(changes);
     }
 
-    private void HandleInventoryChange(InventoryAndRemovals changes)
+    #endregion
+
+    private void UpdateMenuStates()
     {
-        _playerState.Inventory.ApplyInventoryAndRemovals(changes);
+        if (_toggleGameMenu || _toggleCharacterMenu)
+        {
+            if (_hasMenuOpen)
+            {
+                _mainCanvasObjects.HideAllMenus();
+            }
+            else if (_toggleGameMenu)
+            {
+                _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.EscMenu);
+            }
+            else if (_toggleCharacterMenu)
+            {
+                _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.CharacterMenu);
+            }
+
+            Tooltips.HideTooltip();
+
+            _toggleGameMenu = false;
+            _toggleCharacterMenu = false;
+        }
+
+        _hasMenuOpen = _mainCanvasObjects.IsAnyMenuOpen();
+        _playerMovement.enabled = !_hasMenuOpen;
+
+        if (_hasMenuOpen)
+        {
+            if (Cursor.lockState != CursorLockMode.None)
+            {
+                Cursor.lockState = CursorLockMode.None;
+            }
+        }
+        else if (Cursor.lockState != CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+    }
+
+    private void ApplyInventoryChanges(InventoryChanges changes)
+    {
+        _playerState.Inventory.ApplyInventoryChanges(changes);
 
         if (changes.IdsToRemove != null && changes.IdsToRemove.Length > 0)
         {
@@ -545,7 +431,7 @@ public class PlayerClientSide : NetworkBehaviour
     {
         var hit = Instantiate(_hitTextPrefab);
         hit.transform.SetParent(GameManager.Instance.MainCanvasObjects.HitNumberContainer.transform, false);
-        hit.gameObject.SetActive(true);
+        hit.SetActive(true);
 
         var hitText = hit.GetComponent<TextMeshProUGUI>();
         hitText.text = damage;
@@ -571,7 +457,6 @@ public class PlayerClientSide : NetworkBehaviour
         if (craftingUi.gameObject.activeSelf)
         {
             craftingUi.ResetUi();
-            craftingUi.LoadInventory();
         }
     }
 

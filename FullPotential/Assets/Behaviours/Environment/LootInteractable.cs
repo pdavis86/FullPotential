@@ -1,4 +1,6 @@
-﻿using MLAPI;
+﻿using FullPotential.Assets.Core.Data;
+using FullPotential.Assets.Core.Registry.Types;
+using Unity.Netcode;
 using UnityEngine.InputSystem;
 
 // ReSharper disable CheckNamespace
@@ -19,8 +21,10 @@ public class LootInteractable : Interactable
     public override void OnInteract(ulong playerNetId)
     {
         var loot = GameManager.Instance.ResultFactory.GetLootDrop();
+        var invChange = new InventoryChanges { Loot = new[] { loot as Loot } };
+
         var playerObj = NetworkManager.Singleton.ConnectedClients[playerNetId].PlayerObject;
-        playerObj.GetComponent<PlayerState>().AddToInventory(loot);
+        playerObj.GetComponent<PlayerState>().Inventory.ApplyInventoryChanges(invChange);
     }
 
     public override void OnBlur()

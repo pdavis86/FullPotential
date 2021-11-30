@@ -20,7 +20,7 @@ public class SettingsMenuUi : MonoBehaviour
     private Dictionary<string, string> _cultures;
     private int _newCultureIndex = -1;
 
-    void Awake()
+    private void Awake()
     {
         _cultures = GameManager.Instance.Localizer.GetAvailableCultures();
 
@@ -42,7 +42,7 @@ public class SettingsMenuUi : MonoBehaviour
         _languageDropDown.value = i;
 
         var playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
-        _skinUrlInput.text = playerState.TextureUrl.Value;
+        _skinUrlInput.text = playerState.TextureUrl.Value.ToString();
     }
 
     public void SetLanguage(int index)
@@ -58,7 +58,7 @@ public class SettingsMenuUi : MonoBehaviour
             await GameManager.Instance.SetCultureAsync(match.Key);
         }
 
-        GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerClientSide>().UpdatePlayerSettingsServerRpc(_skinUrlInput.text);
+        GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerActions>().UpdatePlayerSettingsServerRpc(_skinUrlInput.text);
 
         GameManager.Instance.MainCanvasObjects.HideAllMenus();
     }

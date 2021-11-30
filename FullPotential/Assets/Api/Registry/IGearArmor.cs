@@ -2,18 +2,15 @@
 {
     public interface IGearArmor : IGear
     {
-        public enum ArmorSlot
+        public enum ArmorCategory
         {
-            Helm = GearSlot.Helm,
-            Chest = GearSlot.Chest,
-            Legs = GearSlot.Legs,
-            Feet = GearSlot.Feet,
-            Barrier = GearSlot.Barrier
+            Helm = GearCategory.Helm,
+            Chest = GearCategory.Chest,
+            Legs = GearCategory.Legs,
+            Feet = GearCategory.Feet,
+            Barrier = GearCategory.Barrier
         }
 
-        /// <summary>
-        /// Which armor slot this item can occupy
-        /// </summary>
-        ArmorSlot InventorySlot { get; }
+        ArmorCategory Category { get; }
     }
 }

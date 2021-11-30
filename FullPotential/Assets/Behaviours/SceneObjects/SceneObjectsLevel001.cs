@@ -1,5 +1,4 @@
-﻿using MLAPI;
-using MLAPI.Messaging;
+﻿using Unity.Netcode;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,14 +10,16 @@ using UnityEngine;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
 
+//todo: move everything inside Core, Standard, or Api
+//todo: separate scene-specific classes into their own namespace
 public class SceneObjectsLevel001 : NetworkBehaviour
 {
     private NetworkObject _playerPrefabNetObj;
     private List<Transform> _spawnPoints;
 
-    public override void NetworkStart()
+    public override void OnNetworkSpawn()
     {
-        base.NetworkStart();
+        base.OnNetworkSpawn();
 
         _playerPrefabNetObj = GameManager.Instance.Prefabs.Player.GetComponent<NetworkObject>();
 
@@ -32,14 +33,7 @@ public class SceneObjectsLevel001 : NetworkBehaviour
             }
         }
 
-        if (NetworkManager.Singleton.IsHost)
-        {
-            SpawnPlayer(NetworkManager.Singleton.LocalClientId, GameManager.Instance.DataStore.PlayerToken);
-        }
-        else
-        {
-            HeresMyJoiningDetailsServerRpc(GameManager.Instance.DataStore.PlayerToken);
-        }
+        HeresMyJoiningDetailsServerRpc(GameManager.Instance.DataStore.PlayerToken);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -54,11 +48,9 @@ public class SceneObjectsLevel001 : NetworkBehaviour
         var playerNetObj = Instantiate(_playerPrefabNetObj, chosenSpawnPoint.position, chosenSpawnPoint.rotation);
 
         var playerState = playerNetObj.GetComponent<PlayerState>();
+        playerState.PlayerToken = playerToken;
 
         playerNetObj.SpawnAsPlayerObject(clientId);
-
-        var playerData = FullPotential.Assets.Core.Registry.UserRegistry.Load(playerToken, null);
-        playerState.LoadFromPlayerData(playerData);
     }
 
 }

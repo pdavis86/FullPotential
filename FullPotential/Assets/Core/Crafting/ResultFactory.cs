@@ -1,4 +1,5 @@
 ﻿using FullPotential.Assets.Api.Registry;
+using FullPotential.Assets.Core.Extensions;
 using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Localization;
 using FullPotential.Assets.Core.Registry;
@@ -186,7 +187,7 @@ namespace FullPotential.Assets.Core.Crafting
         {
             var lootDrop = new Loot
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid().ToMinimisedString(),
                 Attributes = new Attributes
                 {
                     IsAutomatic = IsSuccess(50),
@@ -264,7 +265,7 @@ namespace FullPotential.Assets.Core.Crafting
 
             var spell = new Spell
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid().ToMinimisedString(),
                 Targeting = targeting,
                 Shape = GetSpellShape(targeting, spellComponents),
                 Attributes = new Attributes
@@ -314,7 +315,7 @@ namespace FullPotential.Assets.Core.Crafting
             var weapon = new Weapon()
             {
                 RegistryType = craftableType,
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid().ToMinimisedString(),
                 IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
                 Attributes = new Attributes
                 {
@@ -334,7 +335,7 @@ namespace FullPotential.Assets.Core.Crafting
             var weapon = new Weapon()
             {
                 RegistryType = craftableType,
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid().ToMinimisedString(),
                 IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
                 Attributes = new Attributes
                 {
@@ -359,7 +360,7 @@ namespace FullPotential.Assets.Core.Crafting
             var weapon = new Weapon()
             {
                 RegistryType = craftableType,
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid().ToMinimisedString(),
                 IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
                 Attributes = new Attributes
                 {
@@ -379,7 +380,7 @@ namespace FullPotential.Assets.Core.Crafting
             var armor = new Armor()
             {
                 RegistryType = craftableType,
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid().ToMinimisedString(),
                 Attributes = new Attributes
                 {
                     IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
@@ -396,7 +397,7 @@ namespace FullPotential.Assets.Core.Crafting
             var armor = new Armor()
             {
                 RegistryType = craftableType,
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid().ToMinimisedString(),
                 Attributes = new Attributes
                 {
                     IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
@@ -416,7 +417,7 @@ namespace FullPotential.Assets.Core.Crafting
             var accessory = new Accessory()
             {
                 RegistryType = craftableType,
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid().ToMinimisedString(),
                 Attributes = new Attributes
                 {
                     IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
@@ -449,7 +450,7 @@ namespace FullPotential.Assets.Core.Crafting
 
                 case nameof(Armor):
                     var craftableArmor = _typeRegistry.GetRegisteredByTypeName<IGearArmor>(typeName);
-                    if (craftableArmor.InventorySlot == IGearArmor.ArmorSlot.Barrier)
+                    if (craftableArmor.Category == IGearArmor.ArmorCategory.Barrier)
                     {
                         return GetBarrier(craftableArmor, components);
                     }

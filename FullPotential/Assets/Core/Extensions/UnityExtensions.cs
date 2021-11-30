@@ -4,7 +4,7 @@
 
 namespace FullPotential.Assets.Core.Extensions
 {
-    public static class UnityEngineExtensions
+    public static class UnityExtensions
     {
         public static void Clear(this Transform transform)
         {

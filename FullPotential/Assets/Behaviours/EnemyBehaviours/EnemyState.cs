@@ -1,8 +1,11 @@
 using FullPotential.Assets.Api.Behaviours;
-using MLAPI;
-using MLAPI.NetworkVariable;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+
+// ReSharper disable CheckNamespace
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Local
 
 public class EnemyState : NetworkBehaviour, IDefensible, IDamageable
 {

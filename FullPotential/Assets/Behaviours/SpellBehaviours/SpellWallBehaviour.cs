@@ -3,8 +3,8 @@ using FullPotential.Assets.Core.Constants;
 using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Registry.Types;
 using FullPotential.Assets.Extensions;
-using MLAPI;
-using MLAPI.NetworkVariable;
+using Unity.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable CheckNamespace
@@ -14,8 +14,8 @@ using UnityEngine;
 
 public class SpellWallBehaviour : NetworkBehaviour, ISpellBehaviour
 {
-    public NetworkVariable<ulong> PlayerClientId;
-    public NetworkVariable<string> SpellId;
+    public readonly NetworkVariable<ulong> PlayerClientId = new NetworkVariable<ulong>();
+    public readonly NetworkVariable<FixedString32Bytes> SpellId = new NetworkVariable<FixedString32Bytes>();
 
     private GameObject _sourcePlayer;
     private Spell _spell;
@@ -35,11 +35,13 @@ public class SpellWallBehaviour : NetworkBehaviour, ISpellBehaviour
 
         _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId.Value].PlayerObject.gameObject;
 
-        _spell = _sourcePlayer.GetComponent<PlayerState>().Inventory.GetItemWithId<Spell>(SpellId.Value);
+        var spellId = SpellId.Value.ToString();
+
+        _spell = _sourcePlayer.GetComponent<PlayerState>().Inventory.GetItemWithId<Spell>(spellId);
 
         if (_spell == null)
         {
-            Debug.LogError($"No spell found in player inventory with ID {SpellId.Value}");
+            Debug.LogError($"No spell found in player inventory with ID {spellId}");
             return;
         }
 

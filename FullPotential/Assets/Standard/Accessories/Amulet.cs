@@ -9,7 +9,7 @@ namespace FullPotential.Assets.Standard.Accessories
 
         public string TypeName => nameof(Amulet);
 
-        public IGearAccessory.AccessorySlot InventorySlot => IGearAccessory.AccessorySlot.Amulet;
+        public IGearAccessory.AccessoryCategory Category => IGearAccessory.AccessoryCategory.Amulet;
 
         //todo: missing prefab
         public string PrefabAddress => throw new NotImplementedException();

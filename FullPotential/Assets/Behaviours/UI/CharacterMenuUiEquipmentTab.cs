@@ -1,7 +1,6 @@
 ﻿using FullPotential.Assets.Api.Registry;
 using FullPotential.Assets.Core.Extensions;
 using FullPotential.Assets.Core.Registry.Base;
-using FullPotential.Assets.Core.Storage;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,12 +21,12 @@ public class CharacterMenuUiEquipmentTab : MonoBehaviour
 
     private GameObject _lastClickedSlot;
     private PlayerState _playerState;
-    private PlayerClientSide _playerClientSide;
+    private PlayerActions _playerClientSide;
 
     private void Awake()
     {
         _playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
-        _playerClientSide = _playerState.gameObject.GetComponent<PlayerClientSide>();
+        _playerClientSide = _playerState.gameObject.GetComponent<PlayerActions>();
     }
 
     private void OnEnable()
@@ -45,20 +44,20 @@ public class CharacterMenuUiEquipmentTab : MonoBehaviour
 
         switch (clickedObject.name)
         {
-            case nameof(PlayerInventory.SlotIndexToGameObjectName.Helm): LoadInventoryItems(clickedObject, IGear.GearSlot.Helm); break;
-            case nameof(PlayerInventory.SlotIndexToGameObjectName.Chest): LoadInventoryItems(clickedObject, IGear.GearSlot.Chest); break;
-            case nameof(PlayerInventory.SlotIndexToGameObjectName.Legs): LoadInventoryItems(clickedObject, IGear.GearSlot.Legs); break;
-            case nameof(PlayerInventory.SlotIndexToGameObjectName.Feet): LoadInventoryItems(clickedObject, IGear.GearSlot.Feet); break;
-            case nameof(PlayerInventory.SlotIndexToGameObjectName.Barrier): LoadInventoryItems(clickedObject, IGear.GearSlot.Barrier); break;
+            case nameof(PlayerInventory.SlotGameObjectName.Helm): LoadInventoryItems(clickedObject, IGear.GearCategory.Helm); break;
+            case nameof(PlayerInventory.SlotGameObjectName.Chest): LoadInventoryItems(clickedObject, IGear.GearCategory.Chest); break;
+            case nameof(PlayerInventory.SlotGameObjectName.Legs): LoadInventoryItems(clickedObject, IGear.GearCategory.Legs); break;
+            case nameof(PlayerInventory.SlotGameObjectName.Feet): LoadInventoryItems(clickedObject, IGear.GearCategory.Feet); break;
+            case nameof(PlayerInventory.SlotGameObjectName.Barrier): LoadInventoryItems(clickedObject, IGear.GearCategory.Barrier); break;
 
-            case nameof(PlayerInventory.SlotIndexToGameObjectName.LeftHand):
-            case nameof(PlayerInventory.SlotIndexToGameObjectName.RightHand): LoadInventoryItems(clickedObject, IGear.GearSlot.Hand); break;
+            case nameof(PlayerInventory.SlotGameObjectName.LeftHand):
+            case nameof(PlayerInventory.SlotGameObjectName.RightHand): LoadInventoryItems(clickedObject, IGear.GearCategory.Hand); break;
 
-            case nameof(PlayerInventory.SlotIndexToGameObjectName.LeftRing):
-            case nameof(PlayerInventory.SlotIndexToGameObjectName.RightRing): LoadInventoryItems(clickedObject, IGear.GearSlot.Ring); break;
+            case nameof(PlayerInventory.SlotGameObjectName.LeftRing):
+            case nameof(PlayerInventory.SlotGameObjectName.RightRing): LoadInventoryItems(clickedObject, IGear.GearCategory.Ring); break;
 
-            case nameof(PlayerInventory.SlotIndexToGameObjectName.Amulet): LoadInventoryItems(clickedObject, IGear.GearSlot.Amulet); break;
-            case nameof(PlayerInventory.SlotIndexToGameObjectName.Belt): LoadInventoryItems(clickedObject, IGear.GearSlot.Belt); break;
+            case nameof(PlayerInventory.SlotGameObjectName.Amulet): LoadInventoryItems(clickedObject, IGear.GearCategory.Amulet); break;
+            case nameof(PlayerInventory.SlotGameObjectName.Belt): LoadInventoryItems(clickedObject, IGear.GearCategory.Belt); break;
 
             default:
                 Debug.LogError($"Cannot handle click for slot {clickedObject.name}");
@@ -116,13 +115,13 @@ public class CharacterMenuUiEquipmentTab : MonoBehaviour
         {
             for (var i = 0; i < _playerState.Inventory.GetSlotCount(); i++)
             {
-                var slotName = Enum.GetName(typeof(PlayerInventory.SlotIndexToGameObjectName), i);
-                SetSlot(GetSlot(slotName), _playerState.Inventory.GetItemInSlot(i));
+                var slotName = Enum.GetName(typeof(PlayerInventory.SlotGameObjectName), i);
+                SetSlot(GetSlot(slotName), _playerState.Inventory.GetItemInSlot((PlayerInventory.SlotGameObjectName)i));
             }
         }
     }
 
-    private void LoadInventoryItems(GameObject slot, IGear.GearSlot? inventorySlot = null)
+    private void LoadInventoryItems(GameObject slot, IGear.GearCategory? gearCategory = null)
     {
         _componentsContainer.SetActive(true);
 
@@ -132,7 +131,7 @@ public class CharacterMenuUiEquipmentTab : MonoBehaviour
             _inventoryRowPrefab,
             _playerState.Inventory,
             HandleRowToggle,
-            inventorySlot
+            gearCategory
         );
     }
 
@@ -145,15 +144,14 @@ public class CharacterMenuUiEquipmentTab : MonoBehaviour
         {
             Tooltips.HideTooltip();
 
-            if (!Enum.TryParse<PlayerInventory.SlotIndexToGameObjectName>(slot.name, out var slotResult))
+            if (!Enum.TryParse<PlayerInventory.SlotGameObjectName>(slot.name, out var slotResult))
             {
                 Debug.LogError($"Failed to find slot for name {slot.name}");
                 return;
             }
 
-            _playerState.Inventory.EquipItem(item.Id, (int)slotResult, true);
-
-            _playerClientSide.ChangeEquipsServerRpc(_playerState.Inventory.EquipSlots);
+            _playerState.Inventory.EquipItem(item.Id, slotResult, true);
+            _playerState.Inventory.SpawnEquippedObject(slotResult);
 
             ResetEquipmentUi(true);
         });

@@ -3,7 +3,7 @@ using FullPotential.Assets.Core.Data;
 using FullPotential.Assets.Core.Localization;
 using FullPotential.Assets.Core.Registry;
 using FullPotential.Assets.Core.Storage;
-using MLAPI;
+using Unity.Netcode;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -52,7 +52,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get { return _instance; } }
 
 
-    async void Awake()
+    private async void Awake()
     {
         if (_instance != null && _instance != this)
         {
@@ -94,9 +94,11 @@ public class GameManager : MonoBehaviour
 
     private void OnApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
     {
-        //Work-around for v0.1.0 of MLAPI not sending initial positions for GameObjects with Network Transform components
-        //See https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/650
-        //GameObject.Find("TempEnemyShape").transform.position += new Vector3(0f, -1f, 0f);
+        if (clientId == NetworkManager.Singleton.LocalClientId)
+        {
+            callback(false, null, true, null, null);
+            return;
+        }
 
         var payload = System.Text.Encoding.UTF8.GetString(connectionData);
         var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
@@ -174,13 +176,13 @@ public class GameManager : MonoBehaviour
     {
         if (NetworkManager.Singleton.IsHost)
         {
-            NetworkManager.Singleton.StopHost();
+            NetworkManager.Singleton.Shutdown();
         }
         else if (NetworkManager.Singleton.IsClient)
         {
-            NetworkManager.Singleton.StopClient();
+            NetworkManager.Singleton.DisconnectClient(NetworkManager.Singleton.LocalClientId);
         }
-        
+
         SceneManager.LoadSceneAsync(1);
     }
 

@@ -9,7 +9,7 @@ namespace FullPotential.Assets.Standard.Accessories
 
         public string TypeName => nameof(Belt);
 
-        public IGearAccessory.AccessorySlot InventorySlot => IGearAccessory.AccessorySlot.Belt;
+        public IGearAccessory.AccessoryCategory Category => IGearAccessory.AccessoryCategory.Belt;
 
         //todo: missing prefab
         public string PrefabAddress => throw new NotImplementedException();

@@ -4,10 +4,10 @@ using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Registry.Types;
 using FullPotential.Assets.Core.Spells.Shapes;
 using FullPotential.Assets.Extensions;
-using MLAPI;
-using MLAPI.NetworkVariable;
+using Unity.Netcode;
 using System;
 using UnityEngine;
+using Unity.Collections;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Local
@@ -15,9 +15,9 @@ using UnityEngine;
 
 public class SpellProjectileBehaviour : NetworkBehaviour, ISpellBehaviour
 {
-    public NetworkVariable<ulong> PlayerClientId;
-    public NetworkVariable<string> SpellId;
-    public NetworkVariable<Vector3> SpellDirection;
+    public readonly NetworkVariable<ulong> PlayerClientId = new NetworkVariable<ulong>();
+    public readonly NetworkVariable<FixedString64Bytes> SpellId = new NetworkVariable<FixedString64Bytes>();
+    public readonly NetworkVariable<Vector3> SpellDirection = new NetworkVariable<Vector3>();
 
     private GameObject _sourcePlayer;
     private PlayerState _platerState;
@@ -40,7 +40,7 @@ public class SpellProjectileBehaviour : NetworkBehaviour, ISpellBehaviour
 
         _platerState = _sourcePlayer.GetComponent<PlayerState>();
 
-        _spell = _platerState.Inventory.GetItemWithId<Spell>(SpellId.Value);
+        _spell = _platerState.Inventory.GetItemWithId<Spell>(SpellId.Value.ToString());
 
         if (_spell == null)
         {
@@ -60,7 +60,7 @@ public class SpellProjectileBehaviour : NetworkBehaviour, ISpellBehaviour
 
         var rigidBody = GetComponent<Rigidbody>();
 
-        rigidBody.AddForce(SpellDirection.Value * 20f * castSpeed, ForceMode.VelocityChange);
+        rigidBody.AddForce(20f * castSpeed * SpellDirection.Value, ForceMode.VelocityChange);
 
         if (affectedByGravity)
         {
@@ -87,6 +87,11 @@ public class SpellProjectileBehaviour : NetworkBehaviour, ISpellBehaviour
 
     public void ApplySpellEffects(GameObject target, Vector3? position)
     {
+        if (!position.HasValue)
+        {
+            throw new ArgumentException("Position Vector3 cannot be null for projectiles");
+        }
+
         if (_shapeType == null)
         {
             AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
@@ -102,14 +107,10 @@ public class SpellProjectileBehaviour : NetworkBehaviour, ISpellBehaviour
             {
                 var pointUnderTarget = new Vector3(target.transform.position.x, -100, target.transform.position.z);
                 var targetsFeet = target.GetComponent<Collider>().ClosestPointOnBounds(pointUnderTarget);
-                if (Physics.Raycast(targetsFeet, transform.up * -1, out var hit))
-                {
-                    spawnPosition = hit.point;
-                }
-                else
-                {
-                    spawnPosition = position.Value;
-                }
+                 
+                spawnPosition = Physics.Raycast(targetsFeet, transform.up * -1, out var hit)
+                    ? hit.point
+                    : position.Value;
             }
 
             if (_shapeType == typeof(Wall))

@@ -2,7 +2,7 @@
 {
     public interface IGear : ICraftable
     {
-        public enum GearSlot
+        public enum GearCategory
         {
             Helm,
             Chest,

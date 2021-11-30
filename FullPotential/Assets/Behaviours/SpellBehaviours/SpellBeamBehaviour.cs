@@ -1,8 +1,8 @@
 ﻿using FullPotential.Assets.Behaviours.SpellBehaviours;
 using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Registry.Types;
-using MLAPI;
-using MLAPI.NetworkVariable;
+using Unity.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable CheckNamespace
@@ -11,22 +11,21 @@ using UnityEngine;
 
 public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
 {
-    public NetworkVariable<ulong> PlayerClientId;
-    public NetworkVariable<string> SpellId;
-    public NetworkVariable<bool> IsLeftHand;
+    public readonly NetworkVariable<ulong> PlayerClientId = new NetworkVariable<ulong>();
+    public readonly NetworkVariable<FixedString32Bytes> SpellId = new NetworkVariable<FixedString32Bytes>();
+    public readonly NetworkVariable<bool> IsLeftHand = new NetworkVariable<bool>();
 
     private GameObject _sourcePlayer;
     private Spell _spell;
     private float _timeBetweenEffects;
     private float _timeSinceLastEffective;
+    private Transform _cylinderParentTransform;
     private Transform _cylinderTransform;
 
     private void Awake()
     {
-        _cylinderTransform = transform.GetChild(0);
-
-        //Move the tip to the starting position
-        _cylinderTransform.position += (_cylinderTransform.up * _cylinderTransform.localScale.y);
+        _cylinderParentTransform = transform.GetChild(0);
+        _cylinderTransform = _cylinderParentTransform.GetChild(0);
     }
 
     private void Start()
@@ -42,9 +41,7 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
 
         var playerState = _sourcePlayer.GetComponent<PlayerState>();
 
-        transform.parent = playerState.PlayerCamera.transform;
-
-        _spell = playerState.Inventory.GetItemWithId<Spell>(SpellId.Value);
+        _spell = playerState.Inventory.GetItemWithId<Spell>(SpellId.Value.ToString());
 
         if (_spell == null)
         {
@@ -56,10 +53,19 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
         _timeBetweenEffects = 0.5f;
         _timeSinceLastEffective = _timeBetweenEffects;
 
+        _cylinderParentTransform.parent = playerState.PlayerCamera.transform;
+
         if (PlayerClientId.Value == NetworkManager.Singleton.LocalClientId)
         {
-            transform.position += transform.forward + (transform.right * 0.1f * (IsLeftHand.Value ? 1 : -1));
+            //Move it a little forwards
+            _cylinderParentTransform.position += transform.forward;
+
+            //Move it a little sideways
+            _cylinderParentTransform.position += (IsLeftHand.Value ? 0.1f : -0.1f) * _cylinderParentTransform.right;
         }
+
+        //Move the tip to the middle
+        _cylinderTransform.position += (_cylinderTransform.up * _cylinderTransform.localScale.y);
     }
 
     private void FixedUpdate()
@@ -70,7 +76,7 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
         float beamLength;
         if (Physics.Raycast(transform.position, transform.forward, out var hit, maxBeamLength, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
         {
-            if (hit.transform.gameObject == _sourcePlayer.gameObject)
+            if (hit.transform.gameObject == _sourcePlayer)
             {
                 Debug.LogWarning("Beam is hitting the source player!");
                 return;
@@ -106,8 +112,15 @@ public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
         if (!MathsHelper.AreRoughlyEqual(_cylinderTransform.localScale.y * 2, beamLength))
         {
             _cylinderTransform.localScale = new Vector3(_cylinderTransform.localScale.x, beamLength / 2, _cylinderTransform.localScale.z);
-            _cylinderTransform.position = transform.position + (_cylinderTransform.up * _cylinderTransform.localScale.y);
+            _cylinderTransform.position = _cylinderParentTransform.position + (_cylinderTransform.up * _cylinderTransform.localScale.y);
         }
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        Destroy(_cylinderTransform.gameObject);
     }
 
     public void ApplySpellEffects(GameObject target, Vector3? position)

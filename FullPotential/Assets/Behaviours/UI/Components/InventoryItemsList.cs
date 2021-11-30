@@ -1,7 +1,6 @@
 ﻿using FullPotential.Assets.Api.Registry;
 using FullPotential.Assets.Core.Extensions;
 using FullPotential.Assets.Core.Registry.Base;
-using FullPotential.Assets.Core.Storage;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -19,7 +18,7 @@ public class InventoryItemsList : MonoBehaviour
         GameObject rowPrefab,
         PlayerInventory inventory,
         Action<GameObject, GameObject, ItemBase> toggleAction,
-        IGear.GearSlot? inventorySlot = null,
+        IGear.GearCategory? gearCategory = null,
         bool showEquippedItems = true
     )
     {
@@ -29,7 +28,7 @@ public class InventoryItemsList : MonoBehaviour
         var rowRectTransform = rowPrefab.GetComponent<RectTransform>();
         var rowCounter = 0;
 
-        var itemsForSlot = inventory.GetCompatibleItemsForSlot(inventorySlot);
+        var itemsForSlot = inventory.GetCompatibleItemsForSlot(gearCategory);
 
         if (!itemsForSlot.Any())
         {
@@ -39,7 +38,7 @@ public class InventoryItemsList : MonoBehaviour
 
         foreach (var item in itemsForSlot)
         {
-            var isEquipped = inventory.IsEquipped(item.Id);
+            var isEquipped = !string.IsNullOrWhiteSpace(inventory.GetVariableSetToItemId(item.Id)?.Value.ToString());
 
             if (isEquipped && !showEquippedItems)
             {

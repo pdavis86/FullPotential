@@ -16,6 +16,6 @@ namespace FullPotential.Assets.Core.Data
         public Spell[] Spells;
         public Weapon[] Weapons;
 
-        public string[] EquipSlots;
+        public KeyValuePair<string, string>[] EquippedItems;
     }
 }

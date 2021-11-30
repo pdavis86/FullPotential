@@ -14,7 +14,7 @@ public class TextLocalizer : MonoBehaviour
 
     public string TranslationId;
 
-    void Awake()
+    private void Awake()
     {
         _textComponent = GetComponent<Text>();
     }

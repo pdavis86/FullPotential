@@ -1,6 +1,6 @@
 ﻿using FullPotential.Assets.Core.Data;
-using MLAPI;
-using MLAPI.Transports.UNET;
+using Unity.Netcode;
+using Unity.Netcode.Transports.UNET;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -122,14 +122,14 @@ public class JoinOrHostGame : MonoBehaviour
 
         if (string.IsNullOrWhiteSpace(token))
         {
-            _signinError.gameObject.SetActive(true);
+            _signinError.SetActive(true);
             return;
         }
 
         GameManager.Instance.DataStore.PlayerToken = token;
         _username = _password = null;
 
-        _signinError.gameObject.SetActive(false);
+        _signinError.SetActive(false);
         _signInContainer.SetActive(false);
         _gameDetailsContainer.SetActive(true);
     }
@@ -139,7 +139,7 @@ public class JoinOrHostGame : MonoBehaviour
         if (GameManager.Instance.DataStore.HasDisconnected && _connectError != null)
         {
             _gameDetailsContainer.SetActive(true);
-            _joiningMessage.gameObject.SetActive(false);
+            _joiningMessage.SetActive(false);
 
             _connectError.text = GameManager.Instance.Localizer.Translate("ui.connect.disconnected");
             _connectError.gameObject.SetActive(true);
@@ -159,7 +159,7 @@ public class JoinOrHostGame : MonoBehaviour
 
     private void HostGameInternal()
     {
-        _signinError.gameObject.SetActive(false);
+        _signinError.SetActive(false);
 
         SetNetworkAddressAndPort();
 
@@ -175,9 +175,9 @@ public class JoinOrHostGame : MonoBehaviour
         _networkManager.StartHost();
 
         _gameDetailsContainer.SetActive(false);
-        _joiningMessage.gameObject.SetActive(true);
+        _joiningMessage.SetActive(true);
 
-        MLAPI.SceneManagement.NetworkSceneManager.SwitchScene(_scene2Name);
+        NetworkManager.Singleton.SceneManager.LoadScene(_scene2Name, LoadSceneMode.Single);
     }
 
     private bool IsPortFree()
@@ -210,7 +210,7 @@ public class JoinOrHostGame : MonoBehaviour
         _networkManager.StartClient();
 
         _gameDetailsContainer.SetActive(false);
-        _joiningMessage.gameObject.SetActive(true);
+        _joiningMessage.SetActive(true);
 
         //NOTE: Do not need to change scene. This is handled by the server
     }

@@ -1,5 +1,4 @@
-﻿using MLAPI;
-using MLAPI.Messaging;
+﻿using Unity.Netcode;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -36,7 +35,7 @@ public class NetworkStats : NetworkBehaviour
     int _currentPingId;
     ClientRpcParams _pongClientParams;
 
-    public override void NetworkStart()
+    public override void OnNetworkSpawn()
     {
         bool isClientOnly = IsClient && !IsServer;
         if (!IsOwner && isClientOnly)

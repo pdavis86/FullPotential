@@ -1,7 +1,7 @@
 ﻿using FullPotential.Assets.Behaviours.SpellBehaviours;
 using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Registry.Types;
-using MLAPI;
+using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable CheckNamespace

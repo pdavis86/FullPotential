@@ -1,8 +1,8 @@
 using FullPotential.Assets.Behaviours.SpellBehaviours;
 using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Registry.Types;
-using MLAPI;
-using MLAPI.NetworkVariable;
+using Unity.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable CheckNamespace
@@ -14,9 +14,9 @@ public class SpellSelfBehaviour : NetworkBehaviour, ISpellBehaviour
 {
     const float _distanceBeforeReturning = 8f;
 
-    public NetworkVariable<ulong> PlayerClientId;
-    public NetworkVariable<string> SpellId;
-    public NetworkVariable<Vector3> SpellDirection;
+    public readonly NetworkVariable<ulong> PlayerClientId = new NetworkVariable<ulong>();
+    public readonly NetworkVariable<FixedString32Bytes> SpellId = new NetworkVariable<FixedString32Bytes>();
+    public readonly NetworkVariable<Vector3> SpellDirection = new NetworkVariable<Vector3>();
 
     private GameObject _sourcePlayer;
     private Spell _spell;
@@ -34,7 +34,7 @@ public class SpellSelfBehaviour : NetworkBehaviour, ISpellBehaviour
 
         _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId.Value].PlayerObject.gameObject;
 
-        _spell = _sourcePlayer.GetComponent<PlayerState>().Inventory.GetItemWithId<Spell>(SpellId.Value);
+        _spell = _sourcePlayer.GetComponent<PlayerState>().Inventory.GetItemWithId<Spell>(SpellId.Value.ToString());
 
         if (_spell == null)
         {
@@ -49,7 +49,7 @@ public class SpellSelfBehaviour : NetworkBehaviour, ISpellBehaviour
         }
 
         _rigidbody = GetComponent<Rigidbody>();
-        _rigidbody.AddForce(SpellDirection.Value * 20f * _castSpeed, ForceMode.VelocityChange);
+        _rigidbody.AddForce(_castSpeed * 20f * SpellDirection.Value, ForceMode.VelocityChange);
     }
 
     private void FixedUpdate()
@@ -77,12 +77,12 @@ public class SpellSelfBehaviour : NetworkBehaviour, ISpellBehaviour
         {
             ClearForce();
             var playerDirection = (_sourcePlayer.transform.position - transform.position).normalized;
-            _rigidbody.AddForce(playerDirection * 20f * _castSpeed, ForceMode.VelocityChange);
+            _rigidbody.AddForce(_castSpeed * 20f * playerDirection, ForceMode.VelocityChange);
             return;
         }
 
         //Debug.LogError("Finally got back to the player!");
-        ApplySpellEffects(_sourcePlayer.gameObject, transform.position);
+        ApplySpellEffects(_sourcePlayer, transform.position);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -94,7 +94,7 @@ public class SpellSelfBehaviour : NetworkBehaviour, ISpellBehaviour
 
         //Debug.Log("Collided with " + other.gameObject.name);
 
-        if (other.gameObject != _sourcePlayer.gameObject)
+        if (other.gameObject != _sourcePlayer)
         {
             ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
         }
