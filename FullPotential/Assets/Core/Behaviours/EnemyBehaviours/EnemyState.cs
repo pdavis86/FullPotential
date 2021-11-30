@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Local
 

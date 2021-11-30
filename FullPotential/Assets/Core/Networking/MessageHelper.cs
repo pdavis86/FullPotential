@@ -2,11 +2,6 @@
 using FullPotential.Assets.Core.Extensions;
 using System;
 using System.Collections.Generic;
-using Unity.Collections;
-using Unity.Netcode;
-using UnityEngine;
-
-// fsdfsd disable ConvertToUsingDeclaration
 
 namespace FullPotential.Assets.Core.Networking
 {
@@ -18,6 +13,7 @@ namespace FullPotential.Assets.Core.Networking
 
             var groupId = Guid.NewGuid().ToMinimisedString();
             var groupStartDateTime = DateTime.UtcNow.ToString("u");
+            var fragmentCount = (int)Math.Ceiling((float)json.Length / 1000);
 
             for (var i = 0; i < json.Length; i += chunkSize)
             {
@@ -25,8 +21,8 @@ namespace FullPotential.Assets.Core.Networking
                 {
                     GroupId = groupId,
                     GroupStartDateTime = groupStartDateTime,
+                    FragmentCount = fragmentCount,
                     SequenceId = i,
-                    IsLastMessage = i > json.Length - chunkSize,
                     Payload = json.Substring(i, Math.Min(chunkSize, json.Length - i))
                 };
             }
@@ -56,9 +52,6 @@ namespace FullPotential.Assets.Core.Networking
         //public static void SendFragmentedMessage(string json, string messageName, List<ulong> clientIds)
         //{
         //    const int chunkSize = 1000;
-
-        //    //todo: remove
-        //    json = json.Substring(0, 400);
 
         //    for (var i = 0; i < json.Length; i += chunkSize)
         //    {

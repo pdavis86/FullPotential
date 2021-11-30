@@ -21,12 +21,10 @@ public class CharacterMenuUiEquipmentTab : MonoBehaviour
 
     private GameObject _lastClickedSlot;
     private PlayerState _playerState;
-    private PlayerActions _playerClientSide;
 
     private void Awake()
     {
         _playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
-        _playerClientSide = _playerState.gameObject.GetComponent<PlayerActions>();
     }
 
     private void OnEnable()

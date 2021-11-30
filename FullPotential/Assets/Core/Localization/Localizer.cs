@@ -1,7 +1,7 @@
 ﻿using FullPotential.Assets.Api.Registry;
+using FullPotential.Assets.Core.Extensions;
 using FullPotential.Assets.Core.Spells.Shapes;
 using FullPotential.Assets.Core.Spells.Targeting;
-using FullPotential.Assets.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

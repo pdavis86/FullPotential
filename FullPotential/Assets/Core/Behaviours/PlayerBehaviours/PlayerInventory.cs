@@ -35,6 +35,7 @@ public class PlayerInventory : NetworkBehaviour, IDefensible
         Amulet
     }
 
+    //todo: use NetworkList instead?
     public readonly NetworkVariable<FixedString32Bytes> EquippedHelm = new NetworkVariable<FixedString32Bytes>();
     public readonly NetworkVariable<FixedString32Bytes> EquippedChest = new NetworkVariable<FixedString32Bytes>();
     public readonly NetworkVariable<FixedString32Bytes> EquippedLegs = new NetworkVariable<FixedString32Bytes>();
@@ -89,22 +90,25 @@ public class PlayerInventory : NetworkBehaviour, IDefensible
 
     public int GetDefenseValue()
     {
-        //todo: all equipped items that implement IDefensible
-        //foreach (var i in Enum.GetValues(typeof(SlotGameObjectName)))
-        //{
-        //    var equippedItemId = GetVariableFromSlotName((SlotGameObjectName)i).Value.ToString();
-        //    //todo: finish
-        //}
+        var defenseSum = 0;
 
-        var equippedArmor = new[] {
-                GetItemInSlot(SlotGameObjectName.Helm),
-                GetItemInSlot(SlotGameObjectName.Chest),
-                GetItemInSlot(SlotGameObjectName.Legs),
-                GetItemInSlot(SlotGameObjectName.Feet),
-                GetItemInSlot(SlotGameObjectName.Barrier)
-            };
-        var strengthSum = (float)equippedArmor.Sum(x => x.Attributes.Strength);
-        return (int)Math.Floor(strengthSum / _armorSlotCount);
+        foreach (SlotGameObjectName slotGameObjectName in Enum.GetValues(typeof(SlotGameObjectName)))
+        {
+            var equippedItemId = GetVariableFromSlotName(slotGameObjectName).Value.ToString();
+
+            if (equippedItemId.IsNullOrWhiteSpace())
+            {
+                continue;
+            }
+
+            var item = GetItemWithId<ItemBase>(equippedItemId);
+            if (item is IDefensible defensibleItem)
+            {
+                defenseSum += defensibleItem.GetDefenseValue();
+            }
+        }
+
+        return (int)Math.Floor((float)defenseSum / _armorSlotCount);
     }
 
     public int GetSlotCount()

@@ -3,7 +3,6 @@ using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Networking;
 using FullPotential.Assets.Core.Registry.Types;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using Unity.Netcode;
@@ -18,6 +17,8 @@ using UnityEngine;
 // ReSharper disable UnassignedField.Compiler
 // ReSharper disable UnassignedField.Global
 // ReSharper disable RedundantDiscardDesignation
+
+//todo: see if the problem is that I have too many network behaviours
 
 public class PlayerActions : NetworkBehaviour
 {
@@ -37,7 +38,8 @@ public class PlayerActions : NetworkBehaviour
     private Hud _hud;
     private Camera _sceneCamera;
     private ClientRpcParams _clientRpcParams;
-    private FragmentedMessageReconstructor _inventoryChangesReconstructor = new FragmentedMessageReconstructor();
+    
+    private readonly FragmentedMessageReconstructor _inventoryChangesReconstructor = new FragmentedMessageReconstructor();
 
     #region Event handlers
 

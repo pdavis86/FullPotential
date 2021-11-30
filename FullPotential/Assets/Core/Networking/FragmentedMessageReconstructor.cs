@@ -8,7 +8,7 @@ namespace FullPotential.Assets.Core.Networking
 {
     public class FragmentedMessageReconstructor
     {
-        private Dictionary<string, List<FragmentedMessage>> _messageGroups = new Dictionary<string, List<FragmentedMessage>>();
+        private readonly Dictionary<string, List<FragmentedMessage>> _messageGroups = new Dictionary<string, List<FragmentedMessage>>();
 
         private void ClearOldMessageGroups()
         {
@@ -38,7 +38,8 @@ namespace FullPotential.Assets.Core.Networking
 
         public bool HaveAllMessages(string groupId)
         {
-            return _messageGroups[groupId].Any(x => x.IsLastMessage);
+            return _messageGroups[groupId].Count > 0
+                && _messageGroups[groupId].Count == _messageGroups[groupId].First().FragmentCount;
         }
 
         public string Reconstruct(string groupId)

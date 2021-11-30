@@ -10,8 +10,6 @@ using UnityEngine;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
 
-//todo: move everything inside Core, Standard, or Api
-//todo: separate scene-specific classes into their own namespace
 public class SceneObjectsLevel001 : NetworkBehaviour
 {
     private NetworkObject _playerPrefabNetObj;

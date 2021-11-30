@@ -1,8 +1,8 @@
-﻿using FullPotential.Assets.Behaviours.SpellBehaviours;
-using FullPotential.Assets.Core.Constants;
+﻿using FullPotential.Assets.Core.Constants;
+using FullPotential.Assets.Core.Extensions;
 using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Registry.Types;
-using FullPotential.Assets.Extensions;
+using FullPotential.Core.Behaviours.SpellBehaviours;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;

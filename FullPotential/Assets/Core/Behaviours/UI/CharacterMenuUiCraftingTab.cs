@@ -1,8 +1,6 @@
 using FullPotential.Assets.Api.Registry;
 using FullPotential.Assets.Core.Extensions;
-using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Localization;
-using FullPotential.Assets.Core.Networking;
 using FullPotential.Assets.Core.Registry.Base;
 using FullPotential.Assets.Core.Registry.Types;
 using System;
@@ -36,7 +34,7 @@ public class CharacterMenuUiCraftingTab : MonoBehaviour
 #pragma warning restore 0649
 
     private PlayerState _playerState;
-    private PlayerActions _playerClientSide;
+    private PlayerActions _playerActions;
     private List<ItemBase> _components;
     private Dictionary<Type, string> _craftingCategories;
     private Dictionary<IGearArmor, string> _armorTypes;
@@ -50,7 +48,7 @@ public class CharacterMenuUiCraftingTab : MonoBehaviour
         _components = new List<ItemBase>();
 
         _playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
-        _playerClientSide = _playerState.gameObject.GetComponent<PlayerActions>();
+        _playerActions = _playerState.gameObject.GetComponent<PlayerActions>();
 
         _typeDropdown.onValueChanged.AddListener(TypeOnValueChanged);
 
@@ -103,7 +101,7 @@ public class CharacterMenuUiCraftingTab : MonoBehaviour
         var selectedSubType = GetCraftableTypeName(selectedType);
         var isTwoHanded = IsTwoHandedSelected();
 
-        _playerClientSide.CraftItemServerRpc(componentIds, selectedType, selectedSubType, isTwoHanded, _craftName.text);
+        _playerActions.CraftItemServerRpc(componentIds, selectedType, selectedSubType, isTwoHanded, _craftName.text);
     }
 
     void SubTypeOnValueChanged(int index)
@@ -209,8 +207,6 @@ public class CharacterMenuUiCraftingTab : MonoBehaviour
         _handednessDropdown.AddOptions(_handednessOptions);
 
         LoadInventory();
-
-        //todo: ? TypeOnValueChanged(0);
 
         ResetUiText();
 

@@ -2,7 +2,7 @@
 
 // ReSharper disable UnusedMemberInSuper.Global
 
-namespace FullPotential.Assets.Behaviours.SpellBehaviours
+namespace FullPotential.Core.Behaviours.SpellBehaviours
 {
     public interface ISpellBehaviour
     {

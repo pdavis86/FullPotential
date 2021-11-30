@@ -1,13 +1,13 @@
-﻿using FullPotential.Assets.Behaviours.SpellBehaviours;
-using FullPotential.Assets.Core.Constants;
+﻿using FullPotential.Assets.Core.Constants;
+using FullPotential.Assets.Core.Extensions;
 using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Registry.Types;
 using FullPotential.Assets.Core.Spells.Shapes;
-using FullPotential.Assets.Extensions;
-using Unity.Netcode;
+using FullPotential.Core.Behaviours.SpellBehaviours;
 using System;
-using UnityEngine;
 using Unity.Collections;
+using Unity.Netcode;
+using UnityEngine;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Local

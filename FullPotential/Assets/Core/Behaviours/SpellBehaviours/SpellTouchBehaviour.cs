@@ -1,6 +1,6 @@
-﻿using FullPotential.Assets.Behaviours.SpellBehaviours;
-using FullPotential.Assets.Core.Helpers;
+﻿using FullPotential.Assets.Core.Helpers;
 using FullPotential.Assets.Core.Registry.Types;
+using FullPotential.Core.Behaviours.SpellBehaviours;
 using Unity.Netcode;
 using UnityEngine;
 

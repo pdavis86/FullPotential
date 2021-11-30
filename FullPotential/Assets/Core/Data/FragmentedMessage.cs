@@ -5,13 +5,13 @@ using System;
 
 namespace FullPotential.Assets.Core.Data
 {
-    [System.Serializable]
+    [Serializable]
     public class FragmentedMessage
     {
         public string GroupId;
         public string GroupStartDateTime;
+        public int FragmentCount;
         public int SequenceId;
-        public bool IsLastMessage;
         public string Payload;
     }
 }
