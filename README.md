@@ -1,4 +1,4 @@
-# Magikum Opus (to be renamed)
+# Full Potential
 Inspired by the Minecraft mod Ars Magica 2, Skyrim, the Borderlands series, Final Fantasy 12 and the Oasis from the book Ready Player One, this game allows the player to explore their abilities in a new way.
 
 
