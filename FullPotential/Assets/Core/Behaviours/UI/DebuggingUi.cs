@@ -32,7 +32,7 @@ public class DebuggingUi : MonoBehaviour
         GetNetworkStats();
     }
 
-    void OnGUI()
+    private void OnGUI()
     {
         var networkStats = GetNetworkStats();
         if (networkStats != null)

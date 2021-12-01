@@ -39,7 +39,7 @@ public class JoinOrHostGame : MonoBehaviour
     private string _networkAddress;
     private string _networkPort;
 
-    void Start()
+    private void Start()
     {
         _networkManager = NetworkManager.Singleton;
         _networkTransport = _networkManager.GetComponent<UNetTransport>();

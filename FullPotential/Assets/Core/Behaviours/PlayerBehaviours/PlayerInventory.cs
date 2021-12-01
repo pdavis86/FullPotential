@@ -35,7 +35,6 @@ public class PlayerInventory : NetworkBehaviour, IDefensible
         Amulet
     }
 
-    //todo: use NetworkList instead?
     public readonly NetworkVariable<FixedString32Bytes> EquippedHelm = new NetworkVariable<FixedString32Bytes>();
     public readonly NetworkVariable<FixedString32Bytes> EquippedChest = new NetworkVariable<FixedString32Bytes>();
     public readonly NetworkVariable<FixedString32Bytes> EquippedLegs = new NetworkVariable<FixedString32Bytes>();

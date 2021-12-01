@@ -18,8 +18,6 @@ using UnityEngine;
 // ReSharper disable UnassignedField.Global
 // ReSharper disable RedundantDiscardDesignation
 
-//todo: see if the problem is that I have too many network behaviours
-
 public class PlayerActions : NetworkBehaviour
 {
 #pragma warning disable 0649
@@ -38,7 +36,7 @@ public class PlayerActions : NetworkBehaviour
     private Hud _hud;
     private Camera _sceneCamera;
     private ClientRpcParams _clientRpcParams;
-    
+
     private readonly FragmentedMessageReconstructor _inventoryChangesReconstructor = new FragmentedMessageReconstructor();
 
     #region Event handlers
@@ -83,7 +81,7 @@ public class PlayerActions : NetworkBehaviour
         _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
     }
 
-    void OnInteract()
+    private void OnInteract()
     {
         if (_hasMenuOpen)
         {
@@ -98,27 +96,27 @@ public class PlayerActions : NetworkBehaviour
         TryToInteractServerRpc(_focusedInteractable.gameObject.name);
     }
 
-    void OnOpenCharacterMenu()
+    private void OnOpenCharacterMenu()
     {
         _toggleCharacterMenu = true;
     }
 
-    void OnCancel()
+    private void OnCancel()
     {
         _toggleGameMenu = true;
     }
 
-    void OnLeftAttack()
+    private void OnLeftAttack()
     {
         TryToAttack(true);
     }
 
-    void OnRightAttack()
+    private void OnRightAttack()
     {
         TryToAttack(false);
     }
 
-    void Update()
+    private void Update()
     {
         CheckForInteractable();
     }
@@ -421,6 +419,12 @@ public class PlayerActions : NetworkBehaviour
         }
 
         var itemInHand = _playerState.Inventory.GetItemInHand(isLeftHand);
+
+        if (itemInHand == null)
+        {
+            return;
+        }
+
         TryToAttackServerRpc(itemInHand.Id, _playerCamera.transform.forward);
     }
 

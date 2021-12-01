@@ -76,8 +76,16 @@ public class PlayerState : NetworkBehaviour, IDamageable
         gameObject.name = "Player ID " + NetworkObjectId;
 
         _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
+    }
 
-        RequestPlayerDataServerRpc();
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        if (IsOwner)
+        {
+            RequestPlayerDataServerRpc();
+        }
     }
 
     private void OnDisable()

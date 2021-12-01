@@ -104,7 +104,7 @@ public class CharacterMenuUiCraftingTab : MonoBehaviour
         _playerActions.CraftItemServerRpc(componentIds, selectedType, selectedSubType, isTwoHanded, _craftName.text);
     }
 
-    void SubTypeOnValueChanged(int index)
+    private void SubTypeOnValueChanged(int index)
     {
         try
         {
@@ -117,7 +117,7 @@ public class CharacterMenuUiCraftingTab : MonoBehaviour
         }
     }
 
-    void HandednessOnValueChanged(int index)
+    private void HandednessOnValueChanged(int index)
     {
         UpdateResults();
     }
@@ -127,7 +127,7 @@ public class CharacterMenuUiCraftingTab : MonoBehaviour
         _handednessDropdown.gameObject.SetActive(GetCraftingCategory() == nameof(Weapon) && _optionalTwoHandedWeaponIndexes.Contains(_subTypeDropdown.value));
     }
 
-    void TypeOnValueChanged(int index)
+    private void TypeOnValueChanged(int index)
     {
         try
         {

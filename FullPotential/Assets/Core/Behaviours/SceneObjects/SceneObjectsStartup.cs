@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class SceneObjectsStartup : MonoBehaviour
 {
-    void Start()
+    private void Start()
     {
         UnityHelper.GetObjectAtRoot(GameManager.NameCanvasScene).SetActive(true);
     }

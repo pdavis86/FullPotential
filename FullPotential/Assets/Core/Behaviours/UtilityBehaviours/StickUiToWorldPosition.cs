@@ -9,7 +9,7 @@ public class StickUiToWorldPosition : MonoBehaviour
 {
     public Vector3 WorldPosition;
 
-    void Update()
+    private void Update()
     {
         transform.position = Camera.main.WorldToScreenPoint(WorldPosition);
     }

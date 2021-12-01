@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class SlideOutAlert : MonoBehaviour
 {
-    void Start()
+    private void Start()
     {
         Destroy(gameObject, 3f);
     }

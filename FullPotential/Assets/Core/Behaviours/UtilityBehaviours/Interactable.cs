@@ -15,12 +15,12 @@ public abstract class Interactable : MonoBehaviour
 
     protected TMPro.TextMeshProUGUI _interactionBubble;
 
-    void Start()
+    private void Start()
     {
         _interactionBubble = GameManager.Instance.MainCanvasObjects.InteractionBubble.GetComponent<TMPro.TextMeshProUGUI>();
     }
 
-    void OnDrawGizmosSelected()
+    private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, Radius);

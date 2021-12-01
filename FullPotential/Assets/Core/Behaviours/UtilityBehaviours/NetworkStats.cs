@@ -47,7 +47,7 @@ public class NetworkStats : NetworkBehaviour
         _pongClientParams.Send.TargetClientIds = new[] { OwnerClientId };
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         if (IsServer)
         {
@@ -82,7 +82,7 @@ public class NetworkStats : NetworkBehaviour
         UpdateRTTSlidingWindowAverage();
     }
 
-    void UpdateRTTSlidingWindowAverage()
+    private void UpdateRTTSlidingWindowAverage()
     {
         if (_movingWindow.Count > _maxWindowSize)
         {

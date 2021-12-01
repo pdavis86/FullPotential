@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 // ReSharper disable CheckNamespace
@@ -10,8 +11,13 @@ using UnityEngine.InputSystem;
 // ReSharper disable UnassignedField.Global
 
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
+    private readonly NetworkVariable<Vector3> _rigidBodyVelocity = new NetworkVariable<Vector3>();
+    private readonly NetworkVariable<Vector3> _rigidBodyRotationDirection = new NetworkVariable<Vector3>();
+    private readonly NetworkVariable<Vector3> _cameraRotationDirection = new NetworkVariable<Vector3>();
+    //private readonly NetworkVariable<bool> _isJumping = new NetworkVariable<bool>();
+
 #pragma warning disable 0649
     [SerializeField] private Camera _playerCamera;
     [SerializeField] private float _speed = 5f;
@@ -26,66 +32,101 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 _lookVal;
     private Vector3 _jumpForce;
     private float _currentCameraRotationX;
-    private bool _isJumping;
+
+    private Vector3 _oldVelocity;
+    private Vector3 _oldRotation;
+    private Vector3 _oldCameraRotation;
+
+    #region Event Handlers 
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
     }
 
-    void OnMove(InputValue value)
+    private void OnMove(InputValue value)
     {
         _moveVal = value.Get<Vector2>();
     }
 
-    void OnLook(InputValue value)
+    private void OnLook(InputValue value)
     {
         _lookVal = value.Get<Vector2>();
     }
 
-    void OnJump()
+    private void OnJump()
     {
         _jumpForce = Vector3.up * _jumpForceMultipler;
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        PerformMovement();
-        PerformRotation();
+        //todo: I don't like this. Let's give the client some flexibility but periodically set their position and rotation
+
+        if (_rigidBodyVelocity.Value != Vector3.zero)
+        {
+            _rb.MovePosition(_rb.position + _rigidBodyVelocity.Value * Time.fixedDeltaTime);
+        }
+
+        if (_rigidBodyRotationDirection.Value != Vector3.zero)
+        {
+            _rb.MoveRotation(_rb.rotation * Quaternion.Euler(_rigidBodyRotationDirection.Value));
+        }
+
+        if (_cameraRotationDirection.Value != Vector3.zero)
+        {
+            _playerCamera.transform.localEulerAngles = _cameraRotationDirection.Value;
+        }
+
+        CheckForInput();
     }
 
-    void PerformMovement()
+    #endregion
+
+    #region Server RPC methods
+
+    [ServerRpc]
+    public void UpdatePositionAndRotationServerRpc(Vector3 rigidBodyVelocity, Vector3 rigidBodyRotation, Vector3 cameraRotation)
+    {
+        _rigidBodyVelocity.Value = rigidBodyVelocity;
+        _rigidBodyRotationDirection.Value = rigidBodyRotation;
+        _cameraRotationDirection.Value = cameraRotation;
+    }
+
+    #endregion
+
+    private void CheckForInput()
     {
         var moveX = transform.right * _moveVal.x;
         var moveZ = transform.forward * _moveVal.y;
         var velocity = (moveX + moveZ) * _speed;
 
-        if (velocity != Vector3.zero)
-        {
-            _rb.MovePosition(_rb.position + velocity * Time.fixedDeltaTime);
-        }
+        //todo: fix jumping
+        //if (!_isJumping.Value && _jumpForce != Vector3.zero)
+        //{
+        //    _isJumping.Value = true;
+        //    _rb.AddForce(_jumpForce * Time.fixedDeltaTime, ForceMode.Acceleration);
+        //    _jumpForce = Vector3.zero;
+        //}
+        //else if (_isJumping.Value && _jumpForce == Vector3.zero)
+        //{
+        //    _isJumping.Value = false;
+        //}
 
-        if (!_isJumping && _jumpForce != Vector3.zero)
-        {
-            _isJumping = true;
-            _rb.AddForce(_jumpForce * Time.fixedDeltaTime, ForceMode.Acceleration);
-            _jumpForce = Vector3.zero;
-        }
-        else if (_isJumping && _jumpForce == Vector3.zero)
-        {
-            _isJumping = false;
-        }
-    }
-
-    void PerformRotation()
-    {
         var rotation = new Vector3(0f, _lookVal.x, 0f) * _lookSensitivity;
-        _rb.MoveRotation(_rb.rotation * Quaternion.Euler(rotation));
 
         var cameraRotationX = _lookVal.y * _lookSensitivity;
         _currentCameraRotationX -= cameraRotationX;
         _currentCameraRotationX = Mathf.Clamp(_currentCameraRotationX, -_cameraRotationLimit, _cameraRotationLimit);
-        _playerCamera.transform.localEulerAngles = new Vector3(_currentCameraRotationX, 0f, 0f);
+        var cameraRotation = new Vector3(_currentCameraRotationX, 0f, 0f);
+
+        if (velocity != _oldVelocity || rotation != _oldRotation || cameraRotation != _oldCameraRotation)
+        {
+            UpdatePositionAndRotationServerRpc(velocity, rotation, cameraRotation);
+            _oldVelocity = velocity;
+            _oldRotation = rotation;
+            _oldCameraRotation = cameraRotation;
+        }
     }
 
 }
