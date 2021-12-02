@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FullPotential.Assets.Core.Localization
+namespace FullPotential.Core.Localization
 {
     public class CultureAddressables
     {

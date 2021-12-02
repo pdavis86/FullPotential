@@ -1,9 +1,9 @@
-﻿using FullPotential.Assets.Core.Spells.Shapes;
-using FullPotential.Assets.Core.Spells.Targeting;
+﻿using FullPotential.Core.Spells.Shapes;
+using FullPotential.Core.Spells.Targeting;
 
 // ReSharper disable ArrangeAccessorOwnerBody
 
-namespace FullPotential.Assets.Core.Registry.Base
+namespace FullPotential.Core.Registry.Base
 {
     [System.Serializable]
     public class MagicalItemBase : ItemBase, IMagical

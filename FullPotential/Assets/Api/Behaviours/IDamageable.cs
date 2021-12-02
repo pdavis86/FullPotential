@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Assets.Api.Behaviours
+﻿namespace FullPotential.Api.Behaviours
 {
     public interface IDamageable
     {

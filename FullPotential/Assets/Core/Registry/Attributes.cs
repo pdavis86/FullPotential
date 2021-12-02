@@ -1,7 +1,7 @@
 ﻿
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
-namespace FullPotential.Assets.Core.Registry
+namespace FullPotential.Core.Registry
 {
     [System.Serializable]
     public struct Attributes

@@ -1,13 +1,15 @@
 using UnityEngine;
 
-// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedType.Global
 
-public class SlideOutAlert : MonoBehaviour
+namespace FullPotential.Core.Behaviours.Ui.Components
 {
-    private void Start()
+    public class SlideOutAlert : MonoBehaviour
     {
-        Destroy(gameObject, 3f);
+        private void Start()
+        {
+            Destroy(gameObject, 3f);
+        }
     }
 }

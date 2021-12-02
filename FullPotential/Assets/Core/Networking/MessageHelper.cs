@@ -1,9 +1,9 @@
-﻿using FullPotential.Assets.Core.Data;
-using FullPotential.Assets.Core.Extensions;
+﻿using FullPotential.Core.Data;
+using FullPotential.Core.Extensions;
 using System;
 using System.Collections.Generic;
 
-namespace FullPotential.Assets.Core.Networking
+namespace FullPotential.Core.Networking
 {
     public static class MessageHelper
     {

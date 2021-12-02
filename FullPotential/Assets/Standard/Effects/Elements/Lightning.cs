@@ -1,7 +1,7 @@
-﻿using FullPotential.Assets.Api.Registry;
+﻿using FullPotential.Api.Registry;
 using System;
 
-namespace FullPotential.Assets.Standard.Effects.Elements
+namespace FullPotential.Standard.Effects.Elements
 {
     public class Lightning : IElement
     {

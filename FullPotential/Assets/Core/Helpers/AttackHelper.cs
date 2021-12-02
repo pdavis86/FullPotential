@@ -1,12 +1,14 @@
-﻿using FullPotential.Assets.Api.Behaviours;
-using FullPotential.Assets.Core.Constants;
-using FullPotential.Assets.Core.Registry.Base;
+﻿using FullPotential.Api.Behaviours;
+using FullPotential.Core.Constants;
+using FullPotential.Core.Registry.Base;
 using Unity.Netcode;
 using System;
 using System.Globalization;
 using UnityEngine;
+using FullPotential.Core.Behaviours.PlayerBehaviours;
+using FullPotential.Core.Behaviours.EnemyBehaviours;
 
-namespace FullPotential.Assets.Core.Helpers
+namespace FullPotential.Core.Helpers
 {
     public static class AttackHelper
     {

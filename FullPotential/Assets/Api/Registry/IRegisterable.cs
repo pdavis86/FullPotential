@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FullPotential.Assets.Api.Registry
+namespace FullPotential.Api.Registry
 {
     public interface IRegisterable
     {

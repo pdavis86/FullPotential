@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FullPotential.Assets.Core.Spells.Targeting
+namespace FullPotential.Core.Spells.Targeting
 {
     public class Touch : ISpellTargeting
     {

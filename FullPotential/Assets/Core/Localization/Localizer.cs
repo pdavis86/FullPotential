@@ -1,7 +1,7 @@
-﻿using FullPotential.Assets.Api.Registry;
-using FullPotential.Assets.Core.Extensions;
-using FullPotential.Assets.Core.Spells.Shapes;
-using FullPotential.Assets.Core.Spells.Targeting;
+﻿using FullPotential.Api.Registry;
+using FullPotential.Core.Extensions;
+using FullPotential.Core.Spells.Shapes;
+using FullPotential.Core.Spells.Targeting;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,7 +14,7 @@ using UnityEngine.AddressableAssets;
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-namespace FullPotential.Assets.Core.Localization
+namespace FullPotential.Core.Localization
 {
     public class Localizer
     {

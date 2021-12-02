@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
@@ -8,11 +7,14 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
 
-public class LookAtMainCamera : MonoBehaviour
+namespace FullPotential.Core.Behaviours.UtilityBehaviours
 {
-    private void LateUpdate()
+    public class LookAtMainCamera : MonoBehaviour
     {
-        //transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
-        transform.LookAt(transform.position + Camera.main.transform.forward);
+        private void LateUpdate()
+        {
+            //transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
+            transform.LookAt(transform.position + Camera.main.transform.forward);
+        }
     }
 }

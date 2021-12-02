@@ -1,7 +1,7 @@
-﻿using FullPotential.Assets.Api.Registry;
+﻿using FullPotential.Api.Registry;
 using System;
 
-namespace FullPotential.Assets.Standard.Loot
+namespace FullPotential.Standard.Loot
 {
     public class Shard : ILoot
     {

@@ -2,7 +2,7 @@
 
 using System;
 
-namespace FullPotential.Assets.Core.Extensions
+namespace FullPotential.Core.Extensions
 {
     public static class StringExtensions
     {

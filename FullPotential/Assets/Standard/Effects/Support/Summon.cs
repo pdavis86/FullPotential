@@ -1,7 +1,7 @@
-﻿using FullPotential.Assets.Api.Registry;
+﻿using FullPotential.Api.Registry;
 using System;
 
-namespace FullPotential.Assets.Standard.Effects.Support
+namespace FullPotential.Standard.Effects.Support
 {
     public class Summon : IEffectSupport
     {

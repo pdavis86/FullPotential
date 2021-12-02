@@ -1,7 +1,7 @@
-﻿using FullPotential.Assets.Api.Behaviours;
-using FullPotential.Assets.Core.Registry.Base;
+﻿using FullPotential.Api.Behaviours;
+using FullPotential.Core.Registry.Base;
 
-namespace FullPotential.Assets.Core.Registry.Types
+namespace FullPotential.Core.Registry.Types
 {
     [System.Serializable]
     public class Armor : GearBase, IDefensible

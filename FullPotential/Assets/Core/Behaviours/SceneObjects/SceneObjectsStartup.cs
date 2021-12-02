@@ -1,17 +1,20 @@
-using FullPotential.Assets.Core.Helpers;
+using FullPotential.Core.Behaviours.GameManagement;
+using FullPotential.Core.Helpers;
 using UnityEngine;
 
-// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 
-public class SceneObjectsStartup : MonoBehaviour
+namespace FullPotential.Core.Behaviours.SceneObjects
 {
-    private void Start()
+    public class SceneObjectsStartup : MonoBehaviour
     {
-        UnityHelper.GetObjectAtRoot(GameManager.NameCanvasScene).SetActive(true);
-    }
+        private void Start()
+        {
+            UnityHelper.GetObjectAtRoot(GameManager.NameCanvasScene).SetActive(true);
+        }
 
+    }
 }

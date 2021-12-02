@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FullPotential.Assets.Core.Spells.Shapes
+namespace FullPotential.Core.Spells.Shapes
 {
     public class Wall : ISpellShape
     {

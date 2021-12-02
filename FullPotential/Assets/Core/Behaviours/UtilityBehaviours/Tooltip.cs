@@ -1,8 +1,8 @@
-﻿using System;
+﻿using FullPotential.Core.Behaviours.GameManagement;
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
@@ -10,31 +10,34 @@ using UnityEngine.EventSystems;
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Compiler
 
-public class Tooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+namespace FullPotential.Core.Behaviours.UtilityBehaviours
 {
-    public delegate void PointerEnterEventDelegate(PointerEventData eventData);
-    public event PointerEnterEventDelegate OnPointerEnterForTooltip;
-
-    public void OnPointerEnter(PointerEventData eventData)
+    public class Tooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        OnPointerEnterForTooltip?.Invoke(eventData);
-    }
+        public delegate void PointerEnterEventDelegate(PointerEventData eventData);
+        public event PointerEnterEventDelegate OnPointerEnterForTooltip;
 
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        Tooltips.HideTooltip();
-    }
-
-    public void ClearHandlers()
-    {
-        if (OnPointerEnterForTooltip == null)
+        public void OnPointerEnter(PointerEventData eventData)
         {
-            return;
+            OnPointerEnterForTooltip?.Invoke(eventData);
         }
-        foreach (Delegate d in OnPointerEnterForTooltip.GetInvocationList())
-        {
-            OnPointerEnterForTooltip -= (PointerEnterEventDelegate)d;
-        }
-    }
 
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            Tooltips.HideTooltip();
+        }
+
+        public void ClearHandlers()
+        {
+            if (OnPointerEnterForTooltip == null)
+            {
+                return;
+            }
+            foreach (Delegate d in OnPointerEnterForTooltip.GetInvocationList())
+            {
+                OnPointerEnterForTooltip -= (PointerEnterEventDelegate)d;
+            }
+        }
+
+    }
 }

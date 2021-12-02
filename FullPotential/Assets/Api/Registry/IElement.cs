@@ -1,7 +1,7 @@
 ﻿
 // ReSharper disable UnusedMember.Global
 
-namespace FullPotential.Assets.Api.Registry
+namespace FullPotential.Api.Registry
 {
     public interface IElement : IEffect
     {

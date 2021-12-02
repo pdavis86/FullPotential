@@ -1,14 +1,16 @@
 ﻿using UnityEngine;
 
-// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedType.Global
 
-public class DontDestroy : MonoBehaviour
+namespace FullPotential.Core.Behaviours.UtilityBehaviours
 {
-    private void Awake()
+    public class DontDestroy : MonoBehaviour
     {
-        DontDestroyOnLoad(gameObject);
+        private void Awake()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
     }
 }

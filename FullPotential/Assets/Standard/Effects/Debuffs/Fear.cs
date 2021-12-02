@@ -1,7 +1,7 @@
-﻿using FullPotential.Assets.Api.Registry;
+﻿using FullPotential.Api.Registry;
 using System;
 
-namespace FullPotential.Assets.Standard.Effects.Debuffs
+namespace FullPotential.Standard.Effects.Debuffs
 {
     public class Fear : IEffectDebuff
     {

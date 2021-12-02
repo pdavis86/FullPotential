@@ -1,7 +1,7 @@
-﻿using FullPotential.Assets.Api.Registry;
+﻿using FullPotential.Api.Registry;
 using System;
 
-namespace FullPotential.Assets.Standard.Effects.Movement
+namespace FullPotential.Standard.Effects.Movement
 {
     public class Blink : IEffectMovement
     {

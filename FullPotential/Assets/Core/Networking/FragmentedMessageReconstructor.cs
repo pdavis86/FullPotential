@@ -1,10 +1,10 @@
-﻿using FullPotential.Assets.Core.Data;
+﻿using FullPotential.Core.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FullPotential.Assets.Core.Networking
+namespace FullPotential.Core.Networking
 {
     public class FragmentedMessageReconstructor
     {

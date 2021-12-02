@@ -3,7 +3,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable ArrangeAccessorOwnerBody
 
-namespace FullPotential.Assets.Core.Networking
+namespace FullPotential.Core.Networking
 {
     //
     // http://forum.unity3d.com/threads/lzf-compression-and-decompression-for-unity.152579/

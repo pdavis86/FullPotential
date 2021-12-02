@@ -2,7 +2,7 @@
 
 // ReSharper disable UnusedMember.Global
 
-namespace FullPotential.Assets.Core.Helpers
+namespace FullPotential.Core.Helpers
 {
     public static class GameObjectHelper
     {

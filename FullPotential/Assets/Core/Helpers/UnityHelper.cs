@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using UnityEngine;
 
-namespace FullPotential.Assets.Core.Helpers
+namespace FullPotential.Core.Helpers
 {
     public static class UnityHelper
     {

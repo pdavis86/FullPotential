@@ -1,16 +1,18 @@
 ﻿using UnityEngine;
 
-// ReSharper disable CheckNamespace
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 
-public class StickUiToWorldPosition : MonoBehaviour
+namespace FullPotential.Core.Behaviours.UtilityBehaviours
 {
-    public Vector3 WorldPosition;
-
-    private void Update()
+    public class StickUiToWorldPosition : MonoBehaviour
     {
-        transform.position = Camera.main.WorldToScreenPoint(WorldPosition);
+        public Vector3 WorldPosition;
+
+        private void Update()
+        {
+            transform.position = Camera.main.WorldToScreenPoint(WorldPosition);
+        }
     }
 }

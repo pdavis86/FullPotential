@@ -1,7 +1,7 @@
-﻿using FullPotential.Assets.Api.Registry;
+﻿using FullPotential.Api.Registry;
 using System;
 
-namespace FullPotential.Assets.Standard.Accessories
+namespace FullPotential.Standard.Accessories
 {
     public class Ring : IGearAccessory
     {

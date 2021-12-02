@@ -1,6 +1,6 @@
-﻿using FullPotential.Assets.Core.Registry.Base;
+﻿using FullPotential.Core.Registry.Base;
 
-namespace FullPotential.Assets.Core.Registry.Types
+namespace FullPotential.Core.Registry.Types
 {
     [System.Serializable]
     public class Accessory : GearBase

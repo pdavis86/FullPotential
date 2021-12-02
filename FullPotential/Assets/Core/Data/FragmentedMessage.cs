@@ -3,7 +3,7 @@
 
 using System;
 
-namespace FullPotential.Assets.Core.Data
+namespace FullPotential.Core.Data
 {
     [Serializable]
     public class FragmentedMessage

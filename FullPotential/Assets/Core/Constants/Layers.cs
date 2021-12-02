@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Assets.Core.Constants
+﻿namespace FullPotential.Core.Constants
 {
     public static class Layers
     {

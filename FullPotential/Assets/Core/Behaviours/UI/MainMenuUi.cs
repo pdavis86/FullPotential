@@ -1,43 +1,47 @@
+using FullPotential.Core.Behaviours.GameManagement;
+using FullPotential.Core.Behaviours.PlayerBehaviours;
 using Unity.Netcode;
 using UnityEngine;
 
-// ReSharper disable CheckNamespace
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedMember.Global
 
-public class MainMenuUi : MonoBehaviour
+namespace FullPotential.Core.Behaviours.Ui
 {
-    private MainCanvasObjects _mainCanvasObjects;
-
-    private void Awake()
+    public class MainMenuUi : MonoBehaviour
     {
-        _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;
-    }
+        private MainCanvasObjects _mainCanvasObjects;
 
-    public void Disconnect()
-    {
-        Save();
-        _mainCanvasObjects.HideAllMenus();
-        GameManager.Disconnect();
-    }
-
-    public void QuitGame()
-    {
-        Save();
-        GameManager.Quit();
-    }
-
-    private void Save()
-    {
-        if (!NetworkManager.Singleton.IsServer)
+        private void Awake()
         {
-            return;
+            _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;
         }
-        if (GameManager.Instance.DataStore.LocalPlayer != null)
-        {
-            GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>().Save();
-        }
-    }
 
+        public void Disconnect()
+        {
+            Save();
+            _mainCanvasObjects.HideAllMenus();
+            GameManager.Disconnect();
+        }
+
+        public void QuitGame()
+        {
+            Save();
+            GameManager.Quit();
+        }
+
+        private void Save()
+        {
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                return;
+            }
+            if (GameManager.Instance.DataStore.LocalPlayer != null)
+            {
+                GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>().Save();
+            }
+        }
+
+    }
 }

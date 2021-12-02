@@ -1,7 +1,7 @@
-﻿using FullPotential.Assets.Api.Registry;
+﻿using FullPotential.Api.Registry;
 using System;
 
-namespace FullPotential.Assets.Standard.Weapons
+namespace FullPotential.Standard.Weapons
 {
     public class Crossbow : IGearWeapon
     {

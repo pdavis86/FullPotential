@@ -1,6 +1,6 @@
 ﻿// ReSharper disable UnusedMemberInSuper.Global
 
-namespace FullPotential.Assets.Api.Behaviours
+namespace FullPotential.Api.Behaviours
 {
     public interface IDefensible
     {

@@ -2,7 +2,7 @@
 
 // ReSharper disable ArrangeAccessorOwnerBody
 
-namespace FullPotential.Assets.Core.Storage
+namespace FullPotential.Core.Storage
 {
     public class GameManagerData
     {

@@ -1,6 +1,6 @@
-﻿using FullPotential.Assets.Api.Registry;
+﻿using FullPotential.Api.Registry;
 
-namespace FullPotential.Assets.Core.Spells.Shapes
+namespace FullPotential.Core.Spells.Shapes
 {
     public interface ISpellShape : IRegisterable
     {

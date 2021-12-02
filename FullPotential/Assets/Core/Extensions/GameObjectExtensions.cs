@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 
-//todo: find a way to exclude "Assets" from namespaces
-//todo: add namespace to every class (loads missing)
-namespace FullPotential.Assets.Core.Extensions
+namespace FullPotential.Core.Extensions
 {
     public static class GameObjectExtensions
     {

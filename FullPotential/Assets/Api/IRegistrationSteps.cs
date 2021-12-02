@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 // ReSharper disable UnusedMemberInSuper.Global
 
-namespace FullPotential.Assets.Api
+namespace FullPotential.Api
 {
     public interface IRegistrationSteps
     {

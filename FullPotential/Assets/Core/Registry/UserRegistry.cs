@@ -1,9 +1,9 @@
-﻿using FullPotential.Assets.Core.Data;
+﻿using FullPotential.Core.Data;
 using UnityEngine;
 
 // ReSharper disable ConvertIfStatementToNullCoalescingAssignment
 
-namespace FullPotential.Assets.Core.Registry
+namespace FullPotential.Core.Registry
 {
     public static class UserRegistry
     {

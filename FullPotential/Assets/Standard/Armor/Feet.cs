@@ -1,7 +1,7 @@
-﻿using FullPotential.Assets.Api.Registry;
+﻿using FullPotential.Api.Registry;
 using System;
 
-namespace FullPotential.Assets.Standard.Armor
+namespace FullPotential.Standard.Armor
 {
     public class Feet : IGearArmor
     {

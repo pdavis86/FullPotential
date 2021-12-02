@@ -1,7 +1,7 @@
-﻿using FullPotential.Assets.Api.Registry;
+﻿using FullPotential.Api.Registry;
 using System;
 
-namespace FullPotential.Assets.Standard.Effects.Buffs
+namespace FullPotential.Standard.Effects.Buffs
 {
     public class Focus : IEffectBuff
     {

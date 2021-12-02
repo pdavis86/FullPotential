@@ -1,79 +1,84 @@
-﻿using FullPotential.Assets.Api.Registry;
-using FullPotential.Assets.Core.Extensions;
-using FullPotential.Assets.Core.Registry.Base;
+﻿using FullPotential.Api.Registry;
+using FullPotential.Core.Behaviours.GameManagement;
+using FullPotential.Core.Behaviours.PlayerBehaviours;
+using FullPotential.Core.Behaviours.UtilityBehaviours;
+using FullPotential.Core.Extensions;
+using FullPotential.Core.Registry.Base;
 using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PossibleMultipleEnumeration
 
-public class InventoryItemsList : MonoBehaviour
+namespace FullPotential.Core.Behaviours.Ui.Components
 {
-    public static void LoadInventoryItems(
-        GameObject slot,
-        GameObject componentsContainer,
-        GameObject rowPrefab,
-        PlayerInventory inventory,
-        Action<GameObject, GameObject, ItemBase> toggleAction,
-        IGear.GearCategory? gearCategory = null,
-        bool showEquippedItems = true
-    )
+    public class InventoryItemsList : MonoBehaviour
     {
-        componentsContainer.SetActive(true);
-        componentsContainer.transform.Clear();
-
-        var rowRectTransform = rowPrefab.GetComponent<RectTransform>();
-        var rowCounter = 0;
-
-        var itemsForSlot = inventory.GetCompatibleItemsForSlot(gearCategory);
-
-        if (!itemsForSlot.Any())
+        public static void LoadInventoryItems(
+            GameObject slot,
+            GameObject componentsContainer,
+            GameObject rowPrefab,
+            PlayerInventory inventory,
+            Action<GameObject, GameObject, ItemBase> toggleAction,
+            IGear.GearCategory? gearCategory = null,
+            bool showEquippedItems = true
+        )
         {
-            Debug.LogWarning("There are no items of the correct type");
-            return;
-        }
+            componentsContainer.SetActive(true);
+            componentsContainer.transform.Clear();
 
-        foreach (var item in itemsForSlot)
-        {
-            var isEquipped = !string.IsNullOrWhiteSpace(inventory.GetVariableSetToItemId(item.Id)?.Value.ToString());
+            var rowRectTransform = rowPrefab.GetComponent<RectTransform>();
+            var rowCounter = 0;
 
-            if (isEquipped && !showEquippedItems)
+            var itemsForSlot = inventory.GetCompatibleItemsForSlot(gearCategory);
+
+            if (!itemsForSlot.Any())
             {
-                continue;
+                Debug.LogWarning("There are no items of the correct type");
+                return;
             }
 
-            var row = Instantiate(rowPrefab, componentsContainer.transform);
-            row.transform.Find("ItemName").GetComponent<Text>().text = item.Name;
-
-            if (isEquipped)
+            foreach (var item in itemsForSlot)
             {
-                var rowToggle = row.GetComponent<Toggle>();
-                rowToggle.isOn = true;
+                var isEquipped = !string.IsNullOrWhiteSpace(inventory.GetVariableSetToItemId(item.Id)?.Value.ToString());
 
-                var rowImage = row.GetComponent<Image>();
-                rowImage.color = Color.green;
+                if (isEquipped && !showEquippedItems)
+                {
+                    continue;
+                }
+
+                var row = Instantiate(rowPrefab, componentsContainer.transform);
+                row.transform.Find("ItemName").GetComponent<Text>().text = item.Name;
+
+                if (isEquipped)
+                {
+                    var rowToggle = row.GetComponent<Toggle>();
+                    rowToggle.isOn = true;
+
+                    var rowImage = row.GetComponent<Image>();
+                    rowImage.color = Color.green;
+                }
+
+                toggleAction(row, slot, item);
+
+                var tooltip = row.GetComponent<Tooltip>();
+                tooltip.ClearHandlers();
+
+                // ReSharper disable once UnusedParameter.Local
+                tooltip.OnPointerEnterForTooltip += pointerEventData =>
+                {
+                    Tooltips.ShowTooltip(GameManager.Instance.ResultFactory.GetItemDescription(item, false));
+                };
+
+                rowCounter++;
             }
 
-            toggleAction(row, slot, item);
-
-            var tooltip = row.GetComponent<Tooltip>();
-            tooltip.ClearHandlers();
-
-            // ReSharper disable once UnusedParameter.Local
-            tooltip.OnPointerEnterForTooltip += pointerEventData =>
-            {
-                Tooltips.ShowTooltip(GameManager.Instance.ResultFactory.GetItemDescription(item, false));
-            };
-
-            rowCounter++;
+            const int spacer = 5;
+            var containerRectTrans = componentsContainer.GetComponent<RectTransform>();
+            containerRectTrans.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rowCounter * (rowRectTransform.rect.height + spacer));
         }
 
-        const int spacer = 5;
-        var containerRectTrans = componentsContainer.GetComponent<RectTransform>();
-        containerRectTrans.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rowCounter * (rowRectTransform.rect.height + spacer));
     }
-
 }

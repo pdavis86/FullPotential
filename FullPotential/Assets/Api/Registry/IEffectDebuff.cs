@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Assets.Api.Registry
+﻿namespace FullPotential.Api.Registry
 {
     public interface IEffectDebuff : IEffect
     {
