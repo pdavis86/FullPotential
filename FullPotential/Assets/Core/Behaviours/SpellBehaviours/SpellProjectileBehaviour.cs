@@ -16,12 +16,13 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 {
     public class SpellProjectileBehaviour : NetworkBehaviour, ISpellBehaviour
     {
+        //todo: do these have to be network variables? Can we just use normal public variables as the values will not change
         public readonly NetworkVariable<ulong> PlayerClientId = new NetworkVariable<ulong>();
         public readonly NetworkVariable<FixedString64Bytes> SpellId = new NetworkVariable<FixedString64Bytes>();
         public readonly NetworkVariable<Vector3> SpellDirection = new NetworkVariable<Vector3>();
 
         private GameObject _sourcePlayer;
-        private PlayerState _platerState;
+        private PlayerState _playerState;
         private Spell _spell;
         private Type _shapeType;
 
@@ -39,9 +40,9 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
             Physics.IgnoreCollision(GetComponent<Collider>(), _sourcePlayer.GetComponent<Collider>());
 
-            _platerState = _sourcePlayer.GetComponent<PlayerState>();
+            _playerState = _sourcePlayer.GetComponent<PlayerState>();
 
-            _spell = _platerState.Inventory.GetItemWithId<Spell>(SpellId.Value.ToString());
+            _spell = _playerState.Inventory.GetItemWithId<Spell>(SpellId.Value.ToString());
 
             if (_spell == null)
             {
@@ -119,11 +120,11 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
                     var rotation = Quaternion.LookRotation(SpellDirection.Value);
                     rotation.x = 0;
                     rotation.z = 0;
-                    _platerState.SpawnSpellWall(_spell, spawnPosition, rotation, PlayerClientId.Value);
+                    _playerState.SpawnSpellWall(_spell, spawnPosition, rotation, PlayerClientId.Value);
                 }
                 else if (_shapeType == typeof(Zone))
                 {
-                    _platerState.SpawnSpellZone(_spell, spawnPosition, PlayerClientId.Value);
+                    _playerState.SpawnSpellZone(_spell, spawnPosition, PlayerClientId.Value);
                 }
                 else
                 {

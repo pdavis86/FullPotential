@@ -120,7 +120,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         public void SignIn()
         {
-            var token = Registry.UserRegistry.SignIn(_username, _password);
+            var token = GameManager.Instance.UserRegistry.SignIn(_username, _password);
 
             if (string.IsNullOrWhiteSpace(token))
             {

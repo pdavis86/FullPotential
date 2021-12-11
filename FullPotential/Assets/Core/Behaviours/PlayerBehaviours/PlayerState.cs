@@ -86,15 +86,20 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             base.OnNetworkSpawn();
 
-            if (IsOwner)
+            if (IsServer)
+            {
+                //Debug.Log("I am the Server. Loading player data with client ID " + OwnerClientId);
+                GetAndLoadPlayerData(false, null);
+            }
+            else if (IsOwner)
             {
                 //Debug.Log("Requesting my player data with client ID " + OwnerClientId);
                 RequestPlayerDataServerRpc();
             }
             else
             {
-                //todo: get reduced player data for non-owner players
-                Debug.Log("Need to load the player data for client ID " + OwnerClientId);
+                //Debug.Log("Requesting other player data for client ID " + OwnerClientId);
+                RequestReducedPlayerDataServerRpc();
             }
         }
 
@@ -122,29 +127,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         #region ServerRpc calls
 
         [ServerRpc]
-        public void RequestPlayerDataServerRpc()
+        public void RequestPlayerDataServerRpc(ServerRpcParams serverRpcParams = default)
         {
-            var playerData = Registry.UserRegistry.Load(PlayerToken, null);
-
-            _username.Value = playerData.Username;
-            TextureUrl.Value = playerData.Options?.TextureUrl;
-
-            LoadFromPlayerData(playerData);
-
-            if (OwnerClientId != 0)
-            {
-                StartCoroutine(LoadFromPlayerDataCoroutine(playerData));
-            }
+            GetAndLoadPlayerData(false, serverRpcParams.Receive.SenderClientId);
         }
 
-        //Need this to get over the key not found exception caused by too many RPC calls with large payloads
-        private IEnumerator LoadFromPlayerDataCoroutine(PlayerData playerData)
+        [ServerRpc(RequireOwnership = false)]
+        public void RequestReducedPlayerDataServerRpc(ServerRpcParams serverRpcParams = default)
         {
-            foreach (var message in MessageHelper.GetFragmentedMessages(playerData))
-            {
-                LoadPlayerDataClientRpc(message, _clientRpcParams);
-                yield return null;
-            }
+            GetAndLoadPlayerData(true, serverRpcParams.Receive.SenderClientId);
         }
 
         [ServerRpc]
@@ -179,6 +170,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             var fragmentedMessage = JsonUtility.FromJson<FragmentedMessage>(fragmentedMessageJson);
 
+            //Debug.LogError($"Received part message with SequenceId {fragmentedMessage.SequenceId}");
+
             _loadPlayerDataReconstructor.AddMessage(fragmentedMessage);
             if (!_loadPlayerDataReconstructor.HaveAllMessages(fragmentedMessage.GroupId))
             {
@@ -189,6 +182,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             LoadFromPlayerData(playerData);
 
             _loadPlayerDataReconstructor = null;
+
+            SetNameTag();
+
+            if (!string.IsNullOrWhiteSpace(TextureUrl.Value.ToString()))
+            {
+                StartCoroutine(SetTexture());
+            }
         }
 
         // ReSharper disable once UnusedParameter.Global
@@ -203,6 +203,42 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         #endregion
+
+        private void GetAndLoadPlayerData(bool reduced, ulong? clientId)
+        {
+            Debug.Log($"Loading player data for {OwnerClientId}, reduced: {reduced}");
+
+            var playerData = GameManager.Instance.UserRegistry.Load(PlayerToken, null, reduced);
+
+            if (clientId.HasValue)
+            {
+                //Don#'t send data to the server. It already has it loaded
+                if (clientId.Value == 0) { return; }
+
+                StartCoroutine(LoadFromPlayerDataCoroutine(playerData, clientId.Value));
+            }
+            else
+            {
+                _username.Value = playerData.Username;
+                TextureUrl.Value = playerData.Options?.TextureUrl;
+                LoadFromPlayerData(playerData);
+            }
+        }
+
+        //Need this to get over the key not found exception caused by too many RPC calls with large payloads
+        private IEnumerator LoadFromPlayerDataCoroutine(PlayerData playerData, ulong clientId)
+        {
+            var clientRpcParams = new ClientRpcParams();
+            clientRpcParams.Send.TargetClientIds = new[] { clientId };
+
+            //Debug.LogError($"Sending LoadFromPlayerData messages to client {clientId}");
+
+            foreach (var message in MessageHelper.GetFragmentedMessages(playerData))
+            {
+                LoadPlayerDataClientRpc(message, clientRpcParams);
+                yield return null;
+            }
+        }
 
         private void UpdatePositionsAndRotations(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation)
         {
@@ -350,7 +386,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 Inventory = Inventory.GetSaveData()
             };
 
-            Registry.UserRegistry.Save(saveData);
+            GameManager.Instance.UserRegistry.Save(saveData);
         }
 
         public void SpawnSpellProjectile(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)

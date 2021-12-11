@@ -30,6 +30,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         //Core components
         public TypeRegistry TypeRegistry { get; private set; }
+        public UserRegistry UserRegistry { get; private set; }
         public Localizer Localizer { get; private set; }
         public ResultFactory ResultFactory { get; private set; }
 
@@ -67,6 +68,8 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
             TypeRegistry = new TypeRegistry();
             TypeRegistry.FindAndRegisterAll();
+
+            UserRegistry = new UserRegistry();
 
             var culture = GetLastUsedCulture();
             if (string.IsNullOrWhiteSpace(culture))
