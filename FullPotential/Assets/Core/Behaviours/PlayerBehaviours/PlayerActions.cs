@@ -235,11 +235,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 if (colliderNearby.gameObject.name == gameObjectName)
                 {
                     var colliderInteractable = colliderNearby.gameObject.GetComponent<Interactable>();
-                    if (colliderInteractable != null)
+
+                    if (colliderInteractable == null)
                     {
-                        interactable = colliderInteractable;
-                        break;
+                        continue;
                     }
+
+                    interactable = colliderInteractable;
+                    break;
                 }
             }
 
@@ -300,14 +303,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 Weapons = craftedType == typeof(Weapon) ? new[] { craftedItem as Weapon } : null
             };
 
+            ApplyInventoryChanges(invChange);
+
             if (OwnerClientId != 0)
             {
-                ApplyInventoryChanges(invChange);
-            }
-
-            foreach (var message in MessageHelper.GetFragmentedMessages(JsonUtility.ToJson(invChange)))
-            {
-                ApplyInventoryChangesClientRpc(JsonUtility.ToJson(message), _clientRpcParams);
+                foreach (var message in MessageHelper.GetFragmentedMessages(invChange))
+                {
+                    ApplyInventoryChangesClientRpc(message, _clientRpcParams);
+                }
             }
         }
 
@@ -459,10 +462,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             Destroy(hit, 1f);
         }
 
-        public void RefreshCraftingWindow()
+        public static void RefreshCraftingWindow()
         {
-            var charaterMenuUi = GameManager.Instance.MainCanvasObjects.CharacterMenu.GetComponent<CharacterMenuUi>();
-            var craftingUi = charaterMenuUi.Crafting.GetComponent<CharacterMenuUiCraftingTab>();
+            var characterMenuUi = GameManager.Instance.MainCanvasObjects.CharacterMenu.GetComponent<CharacterMenuUi>();
+            var craftingUi = characterMenuUi.Crafting.GetComponent<CharacterMenuUiCraftingTab>();
 
             if (craftingUi.gameObject.activeSelf)
             {

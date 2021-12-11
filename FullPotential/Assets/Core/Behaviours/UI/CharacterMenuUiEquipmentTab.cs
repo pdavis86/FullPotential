@@ -153,8 +153,7 @@ namespace FullPotential.Core.Behaviours.Ui
                     return;
                 }
 
-                _playerState.Inventory.EquipItem(item.Id, slotResult, true);
-                _playerState.Inventory.SpawnEquippedObject(slotResult);
+                _playerState.Inventory.EquipItemServerRpc(item.Id, slotResult, true);
 
                 ResetEquipmentUi(true);
             });

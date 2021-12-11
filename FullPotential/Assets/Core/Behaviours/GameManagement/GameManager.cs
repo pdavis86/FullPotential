@@ -49,19 +49,18 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
 
         //Singleton
-        private static GameManager _instance;
-        public static GameManager Instance { get { return _instance; } }
+        public static GameManager Instance { get; private set; }
 
 
         private async void Awake()
         {
-            if (_instance != null && _instance != this)
+            if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
                 return;
             }
 
-            _instance = this;
+            Instance = this;
             DontDestroyOnLoad(gameObject);
 
             await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
@@ -128,8 +127,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             }
         }
 
-        // ReSharper disable once UnusedMethodReturnValue.Global
-        public async Task<bool> SetCultureAsync(string culture)
+        public async Task SetCultureAsync(string culture)
         {
             Debug.Log("Setting language to " + culture);
 
@@ -140,8 +138,6 @@ namespace FullPotential.Core.Behaviours.GameManagement
             MainCanvasObjects.DebuggingOverlay.SetActive(true);
 
             SetLastUsedCulture(culture);
-
-            return true;
         }
 
         private static string GetAppOptionsPath()
@@ -175,15 +171,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         public static void Disconnect()
         {
-            if (NetworkManager.Singleton.IsHost)
-            {
-                NetworkManager.Singleton.Shutdown();
-            }
-            else if (NetworkManager.Singleton.IsClient)
-            {
-                NetworkManager.Singleton.DisconnectClient(NetworkManager.Singleton.LocalClientId);
-            }
-
+            NetworkManager.Singleton.Shutdown();
             SceneManager.LoadSceneAsync(1);
         }
 

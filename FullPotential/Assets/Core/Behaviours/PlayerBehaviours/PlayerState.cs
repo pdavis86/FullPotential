@@ -88,7 +88,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (IsOwner)
             {
+                //Debug.Log("Requesting my player data with client ID " + OwnerClientId);
                 RequestPlayerDataServerRpc();
+            }
+            else
+            {
+                //todo: get reduced player data for non-owner players
+                Debug.Log("Need to load the player data for client ID " + OwnerClientId);
             }
         }
 
@@ -120,23 +126,33 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             var playerData = Registry.UserRegistry.Load(PlayerToken, null);
 
+            _username.Value = playerData.Username;
+            TextureUrl.Value = playerData.Options?.TextureUrl;
+
+            LoadFromPlayerData(playerData);
+
             if (OwnerClientId != 0)
             {
-                LoadFromPlayerData(playerData);
+                StartCoroutine(LoadFromPlayerDataCoroutine(playerData));
             }
+        }
 
-            foreach (var message in MessageHelper.GetFragmentedMessages(JsonUtility.ToJson(playerData)))
+        //Need this to get over the key not found exception caused by too many RPC calls with large payloads
+        private IEnumerator LoadFromPlayerDataCoroutine(PlayerData playerData)
+        {
+            foreach (var message in MessageHelper.GetFragmentedMessages(playerData))
             {
-                LoadPlayerDataClientRpc(JsonUtility.ToJson(message), _clientRpcParams);
+                LoadPlayerDataClientRpc(message, _clientRpcParams);
+                yield return null;
             }
         }
 
         [ServerRpc]
-        public void UpdatePositionsAndRotationsServerRpc(Vector3 rbPosition, Quaternion rbRotation, Quaternion cameraRotation)
+        public void UpdatePositionsAndRotationsServerRpc(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation)
         {
             //NOTE: This does not stop players cheating their position. That's a problem for another day
-            UpdatePositionsAndRotations(rbPosition, rbRotation, cameraRotation);
-            UpdatePositionsAndRotationsClientRpc(rbPosition, rbRotation, cameraRotation);
+            UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation);
+            UpdatePositionsAndRotationsClientRpc(rbPosition, rbRotation, rbVelocity, cameraRotation);
         }
 
         #endregion
@@ -177,20 +193,22 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void UpdatePositionsAndRotationsClientRpc(Vector3 rbPosition, Quaternion rbRotation, Quaternion cameraRotation, ClientRpcParams clientRpcParams = default)
+        public void UpdatePositionsAndRotationsClientRpc(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation, ClientRpcParams clientRpcParams = default)
         {
+            //todo: Only send position data of nearby players to client - Might be worth looking into the implementation of networktransform to steal its code
             if (!IsOwner)
             {
-                UpdatePositionsAndRotations(rbPosition, rbRotation, cameraRotation);
+                UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation);
             }
         }
 
         #endregion
 
-        private void UpdatePositionsAndRotations(Vector3 rbPosition, Quaternion rbRotation, Quaternion cameraRotation)
+        private void UpdatePositionsAndRotations(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation)
         {
             _rb.position = rbPosition;
             _rb.rotation = rbRotation;
+            _rb.velocity = rbVelocity;
             PlayerCamera.transform.rotation = cameraRotation;
         }
 
@@ -227,9 +245,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void LoadFromPlayerData(PlayerData playerData)
         {
-            _username.Value = playerData.Username;
-            TextureUrl.Value = playerData.Options?.TextureUrl;
-
             try
             {
                 Inventory.LoadInventory(playerData.Inventory);
@@ -265,8 +280,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 filePath = Application.persistentDataPath + "/" + _username.Value + ".png";
 
-                var doDownload = true;
+                // ReSharper disable once StringLiteralTypo
                 var validatePath = Application.persistentDataPath + "/" + _username.Value + ".skinvalidate";
+
+                var doDownload = true;
                 if (System.IO.File.Exists(validatePath))
                 {
                     var checkUrl = System.IO.File.ReadAllText(validatePath);
@@ -425,7 +442,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 _spellBeingCastLeft = null;
                 return;
             }
-            else if (!isLeftHand && _spellBeingCastRight != null)
+
+            if (!isLeftHand && _spellBeingCastRight != null)
             {
                 Destroy(_spellBeingCastRight);
                 _spellBeingCastRight = null;

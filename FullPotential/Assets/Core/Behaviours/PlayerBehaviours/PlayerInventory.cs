@@ -37,25 +37,29 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             Amulet
         }
 
-        public readonly NetworkVariable<FixedString32Bytes> EquippedHelm = new NetworkVariable<FixedString32Bytes>();
-        public readonly NetworkVariable<FixedString32Bytes> EquippedChest = new NetworkVariable<FixedString32Bytes>();
-        public readonly NetworkVariable<FixedString32Bytes> EquippedLegs = new NetworkVariable<FixedString32Bytes>();
-        public readonly NetworkVariable<FixedString32Bytes> EquippedFeet = new NetworkVariable<FixedString32Bytes>();
-        public readonly NetworkVariable<FixedString32Bytes> EquippedBarrier = new NetworkVariable<FixedString32Bytes>();
+        private readonly NetworkVariable<FixedString32Bytes> EquippedHelm = new NetworkVariable<FixedString32Bytes>();
+        private readonly NetworkVariable<FixedString32Bytes> EquippedChest = new NetworkVariable<FixedString32Bytes>();
+        private readonly NetworkVariable<FixedString32Bytes> EquippedLegs = new NetworkVariable<FixedString32Bytes>();
+        private readonly NetworkVariable<FixedString32Bytes> EquippedFeet = new NetworkVariable<FixedString32Bytes>();
+        private readonly NetworkVariable<FixedString32Bytes> EquippedBarrier = new NetworkVariable<FixedString32Bytes>();
         public readonly NetworkVariable<FixedString32Bytes> EquippedLeftHand = new NetworkVariable<FixedString32Bytes>();
         public readonly NetworkVariable<FixedString32Bytes> EquippedRightHand = new NetworkVariable<FixedString32Bytes>();
-        public readonly NetworkVariable<FixedString32Bytes> EquippedLeftRing = new NetworkVariable<FixedString32Bytes>();
-        public readonly NetworkVariable<FixedString32Bytes> EquippedRightRing = new NetworkVariable<FixedString32Bytes>();
-        public readonly NetworkVariable<FixedString32Bytes> EquippedBelt = new NetworkVariable<FixedString32Bytes>();
-        public readonly NetworkVariable<FixedString32Bytes> EquippedAmulet = new NetworkVariable<FixedString32Bytes>();
+        private readonly NetworkVariable<FixedString32Bytes> EquippedLeftRing = new NetworkVariable<FixedString32Bytes>();
+        private readonly NetworkVariable<FixedString32Bytes> EquippedRightRing = new NetworkVariable<FixedString32Bytes>();
+        private readonly NetworkVariable<FixedString32Bytes> EquippedBelt = new NetworkVariable<FixedString32Bytes>();
+        private readonly NetworkVariable<FixedString32Bytes> EquippedAmulet = new NetworkVariable<FixedString32Bytes>();
 
         private PlayerState _playerState;
         private Dictionary<string, ItemBase> _items;
         private Dictionary<SlotGameObjectName, GameObject> _equippedObjects;
+        private Dictionary<NetworkVariable<FixedString32Bytes>, SlotGameObjectName> _variableToSlotNameMapping;
+        private Dictionary<SlotGameObjectName, NetworkVariable<FixedString32Bytes>> _slotNameToVariableMapping;
         private int _slotCount;
         private int _armorSlotCount;
-
         private int _maxItems;
+        private bool _inventoryLoaded;
+
+        #region Event Handlers
 
         private void Awake()
         {
@@ -64,9 +68,50 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _items = new Dictionary<string, ItemBase>();
             _equippedObjects = new Dictionary<SlotGameObjectName, GameObject>();
 
+            SetupMappings();
+
             _slotCount = Enum.GetNames(typeof(SlotGameObjectName)).Length;
             _armorSlotCount = Enum.GetNames(typeof(IGearArmor.ArmorCategory)).Length;
+
+            EquippedHelm.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedHelm, x, y);
+            EquippedChest.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedChest, x, y);
+            EquippedLegs.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedLegs, x, y);
+            EquippedFeet.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedFeet, x, y);
+            EquippedBarrier.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedBarrier, x, y);
+            EquippedLeftHand.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedLeftHand, x, y);
+            EquippedRightHand.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedRightHand, x, y);
+            EquippedLeftRing.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedLeftRing, x, y);
+            EquippedRightRing.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedRightRing, x, y);
+            EquippedBelt.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedBelt, x, y);
+            EquippedAmulet.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedAmulet, x, y);
         }
+
+        // ReSharper disable once UnusedParameter.Local
+        private void OnEquippedValueChanged(
+            NetworkVariable<FixedString32Bytes> variable,
+            FixedString32Bytes previousValue,
+            FixedString32Bytes newValue)
+        {
+            if (!_inventoryLoaded)
+            {
+                return;
+            }
+
+            var slot = GetSlotNameFromVariable(variable);
+            SpawnEquippedObject(newValue.Value, slot);
+        }
+
+        #endregion
+
+        #region ServerRpc calls
+
+        [ServerRpc]
+        public void EquipItemServerRpc(string itemId, SlotGameObjectName slot, bool allowUnEquip)
+        {
+            EquipItem(itemId, slot, allowUnEquip);
+        }
+
+        #endregion
 
         public IEnumerable<ItemBase> GetCompatibleItemsForSlot(IGear.GearCategory? gearCategory)
         {
@@ -78,7 +123,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (gearCategory == IGear.GearCategory.Hand)
             {
                 return _items
-                    .Where(x => x.Value is Weapon || x.Value is Spell)
+                    .Where(x => x.Value is Weapon or Spell)
                     .Select(x => x.Value);
             }
 
@@ -155,18 +200,21 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             var itemToAddCount = itemsToAdd.Count();
 
-            if (itemToAddCount == 1)
+            switch (itemToAddCount)
             {
-                var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemadded");
-                _playerState.ShowAlertForItemsAddedToInventory(string.Format(alertText, itemsToAdd.First().Name));
+                case 1:
+                    {
+                        var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemadded");
+                        _playerState.ShowAlertForItemsAddedToInventory(string.Format(alertText, itemsToAdd.First().Name));
+                        break;
+                    }
+                case > 1:
+                    {
+                        var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemsadded");
+                        _playerState.ShowAlertForItemsAddedToInventory(string.Format(alertText, itemToAddCount));
+                        break;
+                    }
             }
-            else if (itemToAddCount > 1)
-            {
-                var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemsadded");
-                _playerState.ShowAlertForItemsAddedToInventory(string.Format(alertText, itemToAddCount));
-            }
-
-            SpawnEquippedObjects();
         }
 
         public void LoadInventory(Inventory inventoryData)
@@ -188,25 +236,18 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 _items.Add(item.Id, item);
             }
 
-            if (inventoryData.EquippedItems != null)
+            if (IsServer)
             {
-                foreach (var equippedItem in inventoryData.EquippedItems)
-                {
-                    if (equippedItem.Key.IsNullOrWhiteSpace())
-                    {
-                        continue;
-                    }
-
-                    if (!Enum.TryParse<SlotGameObjectName>(equippedItem.Key, out var slotResult))
-                    {
-                        Debug.LogError($"Failed to load slot data for {equippedItem.Key}");
-                    }
-
-                    GetVariableFromSlotName(slotResult).Value = equippedItem.Value;
-                }
+                SetEquippedVariables(inventoryData.EquippedItems);
             }
 
-            SpawnEquippedObjects();
+            foreach (SlotGameObjectName slotGameObjectName in Enum.GetValues(typeof(SlotGameObjectName)))
+            {
+                var variable = GetVariableFromSlotName(slotGameObjectName);
+                SpawnEquippedObject(variable.Value.Value, slotGameObjectName);
+            }
+
+            _inventoryLoaded = true;
         }
 
         private void FillTypesFromIds(ItemBase item)
@@ -236,16 +277,18 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public NetworkVariable<FixedString32Bytes> GetVariableSetToItemId(string itemId)
         {
-            foreach (SlotGameObjectName slotGameObjectName in Enum.GetValues(typeof(SlotGameObjectName)))
-            {
-                var variable = GetVariableFromSlotName(slotGameObjectName);
-                if (variable.Value.ToString() == itemId)
-                {
-                    return variable;
-                }
-            }
+            return Enum.GetValues(typeof(SlotGameObjectName))
+                .Cast<SlotGameObjectName>()
+                .Select(GetVariableFromSlotName)
+                .FirstOrDefault(variable => variable.Value.ToString() == itemId);
+        }
 
-            return null;
+        private IEnumerable<NetworkVariable<FixedString32Bytes>> GetVariablesSetToItemId(string itemId)
+        {
+            return Enum.GetValues(typeof(SlotGameObjectName))
+                .Cast<SlotGameObjectName>()
+                .Select(GetVariableFromSlotName)
+                .Where(variable => variable.Value.ToString() == itemId);
         }
 
         public Inventory GetSaveData()
@@ -290,31 +333,55 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return null;
             }
 
-            if (!(item is T))
+            if (item is not T castAsType)
             {
                 throw new Exception($"Item '{id}' was not of the correct type: {typeof(T).Name}");
             }
 
-            return item as T;
+            return castAsType;
+        }
+
+        private void SetupMappings()
+        {
+            _slotNameToVariableMapping = new Dictionary<SlotGameObjectName, NetworkVariable<FixedString32Bytes>>
+            {
+                { SlotGameObjectName.Helm, EquippedHelm },
+                { SlotGameObjectName.Chest, EquippedChest },
+                { SlotGameObjectName.Legs, EquippedLegs },
+                { SlotGameObjectName.Feet, EquippedFeet },
+                { SlotGameObjectName.Barrier, EquippedBarrier },
+                { SlotGameObjectName.LeftHand, EquippedLeftHand },
+                { SlotGameObjectName.RightHand, EquippedRightHand },
+                { SlotGameObjectName.LeftRing, EquippedLeftRing },
+                { SlotGameObjectName.RightRing, EquippedRightRing },
+                { SlotGameObjectName.Belt, EquippedBelt },
+                { SlotGameObjectName.Amulet, EquippedAmulet }
+            };
+
+            _variableToSlotNameMapping = _slotNameToVariableMapping.ToDictionary(
+                kvp => kvp.Value,
+                kvp => kvp.Key
+                );
         }
 
         private NetworkVariable<FixedString32Bytes> GetVariableFromSlotName(SlotGameObjectName slotName)
         {
-            switch (slotName)
+            if (!_slotNameToVariableMapping.ContainsKey(slotName))
             {
-                case SlotGameObjectName.Helm: return EquippedHelm;
-                case SlotGameObjectName.Chest: return EquippedChest;
-                case SlotGameObjectName.Legs: return EquippedLegs;
-                case SlotGameObjectName.Feet: return EquippedFeet;
-                case SlotGameObjectName.Barrier: return EquippedBarrier;
-                case SlotGameObjectName.LeftHand: return EquippedLeftHand;
-                case SlotGameObjectName.RightHand: return EquippedRightHand;
-                case SlotGameObjectName.LeftRing: return EquippedLeftRing;
-                case SlotGameObjectName.RightRing: return EquippedRightRing;
-                case SlotGameObjectName.Belt: return EquippedBelt;
-                case SlotGameObjectName.Amulet: return EquippedAmulet;
-                default: throw new ArgumentException($"Unexpected slot name {slotName}");
+                throw new ArgumentException($"Unexpected slot name {slotName}");
             }
+
+            return _slotNameToVariableMapping[slotName];
+        }
+
+        private SlotGameObjectName GetSlotNameFromVariable(NetworkVariable<FixedString32Bytes> variable)
+        {
+            if (!_variableToSlotNameMapping.ContainsKey(variable))
+            {
+                throw new ArgumentException($"Unexpected variable {variable}");
+            }
+
+            return _variableToSlotNameMapping[variable];
         }
 
         public ItemBase GetItemInSlot(SlotGameObjectName slotName)
@@ -373,8 +440,44 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             return errors;
         }
 
-        public void EquipItem(string itemId, SlotGameObjectName slot, bool allowUnEquip)
+        private void SetEquippedVariables(Data.KeyValuePair<string, string>[] equippedItems)
         {
+            if (!IsServer)
+            {
+                Debug.LogError("Cannot set equipped items on the client");
+                return;
+            }
+
+            if (equippedItems == null)
+            {
+                Debug.LogWarning("No equipped items provided");
+                return;
+            }
+
+            foreach (var equippedItem in equippedItems)
+            {
+                if (equippedItem.Key.IsNullOrWhiteSpace())
+                {
+                    continue;
+                }
+
+                if (!Enum.TryParse<SlotGameObjectName>(equippedItem.Key, out var slotResult))
+                {
+                    Debug.LogError($"Failed to load slot data for {equippedItem.Key}");
+                }
+
+                GetVariableFromSlotName(slotResult).Value = equippedItem.Value;
+            }
+        }
+
+        private void EquipItem(string itemId, SlotGameObjectName slot, bool allowUnEquip)
+        {
+            if (!IsServer)
+            {
+                Debug.LogError("Cannot equip items on the client");
+                return;
+            }
+
             if (!string.IsNullOrWhiteSpace(itemId) && allowUnEquip)
             {
                 var oldVariable = GetVariableSetToItemId(itemId);
@@ -390,42 +493,49 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 : itemId;
         }
 
-        private void SpawnEquippedObjects()
+        private void DespawnEquippedObject(SlotGameObjectName slotGameObjectName)
         {
-            foreach (SlotGameObjectName slotGameObjectName in Enum.GetValues(typeof(SlotGameObjectName)))
-            {
-                SpawnEquippedObject(slotGameObjectName);
-            }
-        }
-
-        public void SpawnEquippedObject(SlotGameObjectName slotGameObjectName)
-        {
-            var currentlyInGame = _equippedObjects.ContainsKey(slotGameObjectName)
-                    ? _equippedObjects[slotGameObjectName]
-                    : null;
-
-            if (currentlyInGame != null)
-            {
-                currentlyInGame.name = "DESTROY" + currentlyInGame.name;
-                Destroy(currentlyInGame);
-            }
-
-            var variable = GetVariableFromSlotName(slotGameObjectName);
-
-            if (variable.Value.ToString().IsNullOrWhiteSpace())
+            if (!_equippedObjects.ContainsKey(slotGameObjectName))
             {
                 return;
             }
 
-            var item = GetItemWithId<ItemBase>(variable.Value.ToString());
+            var currentlyInGame = _equippedObjects[slotGameObjectName];
 
-            if (variable == EquippedLeftHand)
+            if (currentlyInGame == null)
             {
-                SpawnItemInHand(slotGameObjectName, item);
+                return;
             }
-            else if (variable == EquippedRightHand)
+
+            currentlyInGame.name = "DESTROY" + currentlyInGame.name;
+            Destroy(currentlyInGame);
+            _equippedObjects[slotGameObjectName] = null;
+        }
+
+        private void SpawnEquippedObject(string itemId, SlotGameObjectName slotGameObjectName)
+        {
+            DespawnEquippedObject(slotGameObjectName);
+
+            if (itemId.IsNullOrWhiteSpace())
             {
-                SpawnItemInHand(slotGameObjectName, item, false);
+                return;
+            }
+
+            var item = GetItemWithId<ItemBase>(itemId);
+
+            switch (slotGameObjectName)
+            {
+                case SlotGameObjectName.LeftHand:
+                    SpawnItemInHand(slotGameObjectName, item);
+                    break;
+
+                case SlotGameObjectName.RightHand:
+                    SpawnItemInHand(slotGameObjectName, item, false);
+                    break;
+
+                default:
+                    Debug.LogWarning("Not yet implemented equipping for slot " + slotGameObjectName);
+                    break;
             }
         }
 
@@ -433,36 +543,36 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (!NetworkManager.Singleton.IsClient)
             {
-                Debug.LogError("Tried to spawn a gameobject on a server");
+                Debug.LogError("Tried to spawn a GameObject on a server");
                 return;
             }
 
-            if (item is Weapon weapon)
+            switch (item)
             {
-                var registryType = item.RegistryType as IGearWeapon;
-
-                if (registryType == null)
-                {
-                    Debug.LogError("Weapon did not have a RegistryType");
-                    return;
-                }
-
-                GameManager.Instance.TypeRegistry.LoadAddessable(
-                    weapon.IsTwoHanded ? registryType.PrefabAddressTwoHanded : registryType.PrefabAddress,
-                    prefab =>
+                case Weapon weapon:
+                    if (item.RegistryType is not IGearWeapon registryType)
                     {
-                        InstantiateInPlayerHand(prefab, isLeftHand, false, new Vector3(0, 90), slotGameObjectName);
+                        Debug.LogError("Weapon did not have a RegistryType");
+                        return;
                     }
-                );
-            }
-            else if (item is Spell)
-            {
-                InstantiateInPlayerHand(GameManager.Instance.Prefabs.Combat.SpellInHand, isLeftHand, true, null, slotGameObjectName);
-            }
-            else
-            {
-                Debug.LogError($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name}");
-                _equippedObjects[slotGameObjectName] = null;
+
+                    GameManager.Instance.TypeRegistry.LoadAddessable(
+                        weapon.IsTwoHanded ? registryType.PrefabAddressTwoHanded : registryType.PrefabAddress,
+                        prefab =>
+                        {
+                            InstantiateInPlayerHand(prefab, isLeftHand, false, new Vector3(0, 90), slotGameObjectName);
+                        }
+                    );
+                    break;
+
+                case Spell:
+                    InstantiateInPlayerHand(GameManager.Instance.Prefabs.Combat.SpellInHand, isLeftHand, true, null, slotGameObjectName);
+                    break;
+
+                default:
+                    Debug.LogError($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name}");
+                    _equippedObjects[slotGameObjectName] = null;
+                    break;
             }
         }
 

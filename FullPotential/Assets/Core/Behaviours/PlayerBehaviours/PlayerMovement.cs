@@ -100,9 +100,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     break;
             }
 
-            if (_moveVal != Vector2.zero || _lookVal != Vector2.zero || _isJumping)
+            if (_moveVal != Vector2.zero || _lookVal != Vector2.zero || _rb.velocity != Vector3.zero)
             {
-                _playerState.UpdatePositionsAndRotationsServerRpc(_rb.position, _rb.rotation, _playerCamera.transform.rotation);
+                _playerState.UpdatePositionsAndRotationsServerRpc(_rb.position, _rb.rotation, _rb.velocity, _playerCamera.transform.rotation);
             }
         }
 
