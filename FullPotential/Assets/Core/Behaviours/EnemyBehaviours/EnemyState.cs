@@ -31,6 +31,16 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
             return 50;
         }
 
+        public int GetHealthMax()
+        {
+            return _defaultHealth;
+        }
+
+        public int GetHealth()
+        {
+            return Health.Value;
+        }
+
         public void TakeDamage(int amount)
         {
             Health.Value -= amount;

@@ -74,8 +74,21 @@ namespace FullPotential.Core.Helpers
                 var adjustedPosition = position.Value + new Vector3(offsetX, offsetY, offsetZ);
 
                 var sourcePlayerState = source.GetComponent<PlayerState>();
-                var clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { sourcePlayerState.OwnerClientId } } };
-                sourcePlayerState.ShowDamageClientRpc(adjustedPosition, damageDealt.ToString(CultureInfo.InvariantCulture), clientRpcParams);
+
+                if (damageable.GetHealth() <= 0)
+                {
+                    //todo: get ground height properly
+                    var groundYValue = target.transform.position.y - target.transform.localScale.y;
+                    var groundPosition = new Vector3(target.transform.position.x, groundYValue, target.transform.position.z);
+                    sourcePlayerState.SpawnLootChest(sourcePlayerState.OwnerClientId, groundPosition, target.transform.rotation);
+
+                    GameObject.Destroy(target);
+                }
+                else
+                {
+                    var clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { sourcePlayerState.OwnerClientId } } };
+                    sourcePlayerState.ShowDamageClientRpc(adjustedPosition, damageDealt.ToString(CultureInfo.InvariantCulture), clientRpcParams);
+                }
             }
         }
 

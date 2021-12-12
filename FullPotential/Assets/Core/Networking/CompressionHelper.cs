@@ -1,7 +1,4 @@
-﻿// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable ArrangeAccessorOwnerBody
+﻿// ReSharper disable All
 
 namespace FullPotential.Core.Networking
 {

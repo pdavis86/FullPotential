@@ -64,6 +64,8 @@ namespace FullPotential.Core.Behaviours.GameManagement
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
+            Instance.DataStore.IsDebugging = true;
+
             await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
 
             TypeRegistry = new TypeRegistry();

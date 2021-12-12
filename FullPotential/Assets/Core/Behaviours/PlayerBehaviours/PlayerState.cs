@@ -6,6 +6,10 @@ using FullPotential.Core.Networking;
 using FullPotential.Core.Registry.Types;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using FullPotential.Core.Behaviours.Environment;
+using FullPotential.Core.Behaviours.Ui;
+using FullPotential.Core.Extensions;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -39,7 +43,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public GameObject PlayerCamera;
 
         [HideInInspector] public string PlayerToken;
-        private readonly NetworkVariable<FixedString64Bytes> _username = new NetworkVariable<FixedString64Bytes>();
+        [HideInInspector] private readonly NetworkVariable<FixedString64Bytes> _username = new NetworkVariable<FixedString64Bytes>();
         [HideInInspector] public readonly NetworkVariable<FixedString512Bytes> TextureUrl = new NetworkVariable<FixedString512Bytes>();
         public readonly NetworkVariable<int> Health = new NetworkVariable<int>();
 
@@ -48,8 +52,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private ClientRpcParams _clientRpcParams;
         private GameObject _spellBeingCastLeft;
         private GameObject _spellBeingCastRight;
-        private FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
         private bool _loadWasSuccessful;
+
+        private FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
+        private readonly Dictionary<string, DateTime> _unclaimedLoot = new Dictionary<string, DateTime>();
 
         #region Event handlers
 
@@ -57,6 +63,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             _username.OnValueChanged += OnUsernameChanged;
             TextureUrl.OnValueChanged += OnTextureChanged;
+            Health.OnValueChanged += OnHealthChanged;
 
             Inventory = GetComponent<PlayerInventory>();
             _rb = GetComponent<Rigidbody>();
@@ -122,6 +129,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
+        private void OnHealthChanged(int previousValue, int newValue)
+        {
+            if (NetworkManager.LocalClientId != OwnerClientId)
+            {
+                return;
+            }
+
+            GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateHealthPercentage((float)newValue / GetHealthMax());
+        }
+
         #endregion
 
         #region ServerRpc calls
@@ -144,6 +161,21 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             //NOTE: This does not stop players cheating their position. That's a problem for another day
             UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation);
             UpdatePositionsAndRotationsClientRpc(rbPosition, rbRotation, rbVelocity, cameraRotation);
+        }
+
+        [ServerRpc]
+        public void ClaimLootServerRpc(string id)
+        {
+            if (!_unclaimedLoot.ContainsKey(id))
+            {
+                Debug.LogError($"Could not find loot with ID {id}");
+            }
+
+            _unclaimedLoot.Remove(id);
+
+            var loot = GameManager.Instance.ResultFactory.GetLootDrop();
+            var invChange = new InventoryChanges { Loot = new[] { loot as Loot } };
+            Inventory.ApplyInventoryChanges(invChange);
         }
 
         #endregion
@@ -195,11 +227,21 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [ClientRpc]
         public void UpdatePositionsAndRotationsClientRpc(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation, ClientRpcParams clientRpcParams = default)
         {
-            //todo: Only send position data of nearby players to client - Might be worth looking into the implementation of networktransform to steal its code
+            //todo: Only send position data of nearby players to client - Might be worth looking into the implementation of NetworkTransform to steal its code
             if (!IsOwner)
             {
                 UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation);
             }
+        }
+
+        // ReSharper disable once UnusedParameter.Global
+        [ClientRpc]
+        public void SpawnLootChestClientRpc(string id, Vector3 groundPosition, Quaternion rotation, ClientRpcParams clientRpcParams = default)
+        {
+            var prefab = GameManager.Instance.Prefabs.Environment.LootChest;
+            var go = Instantiate(prefab, groundPosition, transform.rotation * Quaternion.Euler(0, 90, 0));
+            var lootScript = go.GetComponent<LootInteractable>();
+            lootScript.UnclaimedLootId = id;
         }
 
         #endregion
@@ -511,9 +553,33 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
+        public int GetHealthMax()
+        {
+            //todo: do this properly
+            return 100;
+        }
+
+        public int GetHealth()
+        {
+            return Health.Value;
+        }
+
         public void TakeDamage(int amount)
         {
             //todo: implement player TakeDamage()
+        }
+
+        public void SpawnLootChest(ulong clientId, Vector3 position, Quaternion rotation)
+        {
+            //todo: clean out expired loot
+
+            var id = Guid.NewGuid().ToMinimisedString();
+
+            _unclaimedLoot.Add(id, DateTime.UtcNow.AddHours(1));
+
+            var clientRpcParams = new ClientRpcParams();
+            clientRpcParams.Send.TargetClientIds = new[] { clientId };
+            SpawnLootChestClientRpc(id, position, rotation, clientRpcParams);
         }
 
         #region Nested Classes

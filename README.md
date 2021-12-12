@@ -21,6 +21,12 @@ Inspired by the Minecraft mod Ars Magica 2, Skyrim, the Borderlands series, Fina
 - Requires the TextMeshPro package to be reinstalled
 
 
+## Code Structure
+- API is the code required for any third-party development to be compliant with the game 
+- Core is the code fundamental to the game working 
+- Standard is my implementation using the API to add Accessories, Armor, Effects, Loot, and Weapons to the game 
+
+
 ## Product Roadmap
 
 See the [Project Trello Board](https://trello.com/b/biH6NdE0/oasis "Go to Trello") for a better depiction of where the game currently stands.

@@ -1,17 +1,18 @@
 ﻿using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
-using FullPotential.Core.Data;
-using FullPotential.Core.Registry.Types;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 
 // ReSharper disable UnusedType.Global
+// ReSharper disable once ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Behaviours.Environment
 {
     public class LootInteractable : Interactable
     {
+        public string UnclaimedLootId;
+
         public override void OnFocus()
         {
             //Debug.Log($"Interactable '{gameObject.name}' gained focus");
@@ -24,11 +25,10 @@ namespace FullPotential.Core.Behaviours.Environment
 
         public override void OnInteract(ulong playerNetId)
         {
-            var loot = GameManager.Instance.ResultFactory.GetLootDrop();
-            var invChange = new InventoryChanges { Loot = new[] { loot as Loot } };
-
             var playerObj = NetworkManager.Singleton.ConnectedClients[playerNetId].PlayerObject;
-            playerObj.GetComponent<PlayerState>().Inventory.ApplyInventoryChanges(invChange);
+            playerObj.GetComponent<PlayerState>().ClaimLootServerRpc(UnclaimedLootId);
+
+            Destroy(gameObject);
         }
 
         public override void OnBlur()

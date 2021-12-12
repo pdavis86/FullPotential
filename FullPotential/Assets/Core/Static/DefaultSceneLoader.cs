@@ -6,7 +6,7 @@ using UnityEngine;
 // ReSharper disable UnusedType.Global
 // ReSharper disable AccessToStaticMemberViaDerivedType
 
-namespace FullPotential.Static
+namespace FullPotential.Core.Static
 {
     [InitializeOnLoadAttribute]
     public static class DefaultSceneLoader

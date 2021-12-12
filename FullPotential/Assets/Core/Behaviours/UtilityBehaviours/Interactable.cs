@@ -28,6 +28,11 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
             Gizmos.DrawWireSphere(transform.position, Radius);
         }
 
+        private void OnDisable()
+        {
+            OnBlur();
+        }
+
         public abstract void OnFocus();
 
         public abstract void OnInteract(ulong playerNetId);
