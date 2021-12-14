@@ -2,6 +2,8 @@
 {
     public static class Layers
     {
-        public const int InFrontOfPlayer = 8;
+        public const string Default = "Default";
+        public const string Ground = "Ground";
+        public const string InFrontOfPlayer = "InFrontOfPlayer";
     }
 }

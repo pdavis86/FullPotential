@@ -1,8 +1,10 @@
 ﻿using Unity.Netcode;
 using System.Collections.Generic;
+using FullPotential.Api.Behaviours;
 using UnityEngine;
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
+using FullPotential.Core.Helpers;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
@@ -13,18 +15,24 @@ using FullPotential.Core.Behaviours.PlayerBehaviours;
 
 namespace FullPotential.Core.Behaviours.SceneObjects
 {
-    public class SceneObjectsLevel001 : NetworkBehaviour
+    public class SceneObjectsLevel001 : NetworkBehaviour, ISceneEvents
     {
-        private NetworkObject _playerPrefabNetObj;
+        public GameObject EnemyPrefab;
+
+        [SerializeField] private readonly Vector2 _spawnVariation = new Vector2(-4f, 4f);
+
         private List<Transform> _spawnPoints;
+        private NetworkObject _playerPrefabNetObj;
+        private NetworkObject _enemyPrefabNetObj;
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
 
             _playerPrefabNetObj = GameManager.Instance.Prefabs.Player.GetComponent<NetworkObject>();
+            _enemyPrefabNetObj = EnemyPrefab.GetComponent<NetworkObject>();
 
-            var spawnPointsParent = Helpers.UnityHelper.GetObjectAtRoot(GameManager.NameSpawnPoints).transform;
+            var spawnPointsParent = UnityHelper.GetObjectAtRoot(GameManager.NameSpawnPoints).transform;
             _spawnPoints = new List<Transform>();
             foreach (Transform spawnPoint in spawnPointsParent)
             {
@@ -34,16 +42,11 @@ namespace FullPotential.Core.Behaviours.SceneObjects
                 }
             }
 
-            HeresMyJoiningDetailsServerRpc(GameManager.Instance.DataStore.PlayerToken);
+            HereAreMyJoiningDetailsServerRpc(GameManager.Instance.DataStore.PlayerToken);
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void HeresMyJoiningDetailsServerRpc(string playerToken, ServerRpcParams serverRpcParams = default)
-        {
-            SpawnPlayer(serverRpcParams.Receive.SenderClientId, playerToken);
-        }
-
-        private void SpawnPlayer(ulong clientId, string playerToken)
+        public void HereAreMyJoiningDetailsServerRpc(string playerToken, ServerRpcParams serverRpcParams = default)
         {
             var chosenSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Count)];
             var playerNetObj = Instantiate(_playerPrefabNetObj, chosenSpawnPoint.position, chosenSpawnPoint.rotation);
@@ -51,7 +54,24 @@ namespace FullPotential.Core.Behaviours.SceneObjects
             var playerState = playerNetObj.GetComponent<PlayerState>();
             playerState.PlayerToken = playerToken;
 
-            playerNetObj.SpawnAsPlayerObject(clientId);
+            playerNetObj.SpawnAsPlayerObject(serverRpcParams.Receive.SenderClientId);
+        }
+
+        public void SpawnEnemy()
+        {
+            var chosenSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Count)];
+            var spawnPosition = SpawnHelper.GetAboveGroundPosition(chosenSpawnPoint.position, _enemyPrefabNetObj.gameObject) + new Vector3(
+                Random.Range(_spawnVariation.x, _spawnVariation.y),
+                0,
+                Random.Range(_spawnVariation.x, _spawnVariation.y));
+
+            var enemyNetObj = Instantiate(_enemyPrefabNetObj, spawnPosition, chosenSpawnPoint.rotation, transform);
+            enemyNetObj.Spawn(true);
+        }
+
+        public void OnEnemyDeath()
+        {
+            SpawnEnemy();
         }
 
     }

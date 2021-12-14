@@ -13,12 +13,10 @@ using UnityEngine.UI;
 // ReSharper disable UnassignedField.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-//https://docs-multiplayer.unity3d.com/docs/getting-started/about-mlapi
+//https://docs-multiplayer.unity3d.com/docs
 
-//todo: check if these are still bugs
-//Known bugs with v0.1.0
+//Known bugs
 //NetworkTransform doesn't sync data with new connected client https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/650
-//Destroying an object via despawn leads to a warning message https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/677
 
 namespace FullPotential.Core.Behaviours.GameManagement
 {

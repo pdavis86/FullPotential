@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 using FullPotential.Api.Behaviours;
+using FullPotential.Core.Behaviours.GameManagement;
+using FullPotential.Core.Behaviours.PlayerBehaviours;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,10 +14,10 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
 {
     public class EnemyState : NetworkBehaviour, IDefensible, IDamageable
     {
-        const int _defaultHealth = 100;
+        private const int _maxHealth = 100;
 
-        public readonly NetworkVariable<int> MaxHealth = new NetworkVariable<int>(_defaultHealth);
-        public readonly NetworkVariable<int> Health = new NetworkVariable<int>(_defaultHealth);
+        private readonly NetworkVariable<int> _health = new NetworkVariable<int>(_maxHealth);
+        private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
 
 #pragma warning disable 0649
         [SerializeField] private Slider _healthSlider;
@@ -22,7 +25,7 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
 
         private void Awake()
         {
-            Health.OnValueChanged += OnHealthChanged;
+            _health.OnValueChanged += OnHealthChanged;
         }
 
         public int GetDefenseValue()
@@ -33,22 +36,49 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
 
         public int GetHealthMax()
         {
-            return _defaultHealth;
+            return _maxHealth;
         }
 
         public int GetHealth()
         {
-            return Health.Value;
+            return _health.Value;
         }
 
-        public void TakeDamage(int amount)
+        public void TakeDamage(ulong? clientId, int amount)
         {
-            Health.Value -= amount;
+            if (clientId != null)
+            {
+                if (_damageTaken.ContainsKey(clientId.Value))
+                {
+                    _damageTaken[clientId.Value] += amount;
+                }
+                else
+                {
+                    _damageTaken.Add(clientId.Value, amount);
+                }
+            }
+
+            _health.Value -= amount;
         }
 
         private void OnHealthChanged(int previousValue, int newValue)
         {
-            _healthSlider.value = (float)newValue / MaxHealth.Value;
+            _healthSlider.value = (float)newValue / _maxHealth;
+        }
+
+        public void HandleDeath()
+        {
+            GetComponent<Collider>().enabled = false;
+
+            foreach (var item in _damageTaken)
+            {
+                var playerState = NetworkManager.Singleton.ConnectedClients[item.Key].PlayerObject.gameObject.GetComponent<PlayerState>();
+                playerState.SpawnLootChest(transform.position, transform.rotation);
+            }
+
+            Destroy(gameObject);
+
+            GameManager.Instance.SceneObjects.GetComponent<ISceneEvents>().OnEnemyDeath();
         }
 
     }

@@ -5,6 +5,8 @@ using FullPotential.Core.Registry;
 using FullPotential.Core.Storage;
 using Unity.Netcode;
 using System.Threading.Tasks;
+using FullPotential.Api.Behaviours;
+using FullPotential.Core.Helpers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -23,6 +25,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
     {
         public const string NameCanvasScene = "SceneCanvas";
         public const string NameSpawnPoints = "SpawnPoints";
+        public const string NameSceneObjects = "SceneObjects";
 
 #pragma warning disable 0649
         [SerializeField] private GameObject _mainCanvas;
@@ -39,6 +42,19 @@ namespace FullPotential.Core.Behaviours.GameManagement
         public Prefabs Prefabs { get; private set; }
         public MainCanvasObjects MainCanvasObjects { get; private set; }
 
+        private GameObject _sceneObjects;
+        public GameObject SceneObjects
+        {
+            get
+            {
+                if (_sceneObjects == null)
+                {
+                    _sceneObjects = UnityHelper.GetObjectAtRoot(GameManager.NameSceneObjects);
+                }
+                return _sceneObjects;
+            }
+        }
+
 
         //Input
         public DefaultInputActions InputActions;
@@ -46,7 +62,6 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         //Properties
         public readonly GameManagerData DataStore = new GameManagerData();
-        public Transform RuntimeObjectsContainer;
 
 
         //Singleton

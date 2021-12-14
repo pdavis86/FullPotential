@@ -15,8 +15,6 @@ namespace FullPotential.Core.Behaviours.Environment
 
         public override void OnFocus()
         {
-            //Debug.Log($"Interactable '{gameObject.name}' gained focus");
-
             var translation = GameManager.Instance.Localizer.Translate("ui.interact.loot");
             var interactInputName = GameManager.Instance.InputActions.Player.Interact.GetBindingDisplayString().ToUpper();
             _interactionBubble.text = string.Format(translation, interactInputName);
@@ -27,14 +25,15 @@ namespace FullPotential.Core.Behaviours.Environment
         {
             var playerObj = NetworkManager.Singleton.ConnectedClients[playerNetId].PlayerObject;
             playerObj.GetComponent<PlayerState>().ClaimLootServerRpc(UnclaimedLootId);
-
             Destroy(gameObject);
         }
 
         public override void OnBlur()
         {
-            //Debug.Log($"Interactable '{gameObject.name}' lost focus");
-            _interactionBubble.gameObject.SetActive(false);
+            if (_interactionBubble != null)
+            {
+                _interactionBubble.gameObject.SetActive(false);
+            }
         }
 
     }

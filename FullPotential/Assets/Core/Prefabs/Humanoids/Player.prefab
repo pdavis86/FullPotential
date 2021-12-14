@@ -731,7 +731,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 119
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -926,17 +926,17 @@ MonoBehaviour:
   - {fileID: 2266218230932236417}
   - {fileID: 7392779647204144589}
   - {fileID: 7392779647204144588}
+  Positions:
+    LeftHandInFront: {fileID: 8103993405689920857}
+    RightHandInFront: {fileID: 1380344505649988731}
   _nameTag: {fileID: 6250991307057261387}
   _mainMesh: {fileID: 7392779648629048398}
   _leftMesh: {fileID: 7392779647843419196}
   _rightMesh: {fileID: 7392779647605690758}
+  Inventory: {fileID: 0}
   InFrontOfPlayer: {fileID: 3124563880166737475}
   PlayerCamera: {fileID: 7392779647204144590}
-  Positions:
-    LeftHandInFront: {fileID: 8103993405689920857}
-    RightHandInFront: {fileID: 1380344505649988731}
   PlayerToken: 
-  Inventory: {fileID: 0}
 --- !u!114 &3593277776525206365
 MonoBehaviour:
   m_ObjectHideFlags: 0

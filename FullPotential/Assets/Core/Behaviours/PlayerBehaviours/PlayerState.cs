@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using FullPotential.Core.Behaviours.Environment;
 using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Extensions;
+using FullPotential.Core.Helpers;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -236,10 +237,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void SpawnLootChestClientRpc(string id, Vector3 groundPosition, Quaternion rotation, ClientRpcParams clientRpcParams = default)
+        public void SpawnLootChestClientRpc(string id, Vector3 position, Quaternion rotation, ClientRpcParams clientRpcParams = default)
         {
             var prefab = GameManager.Instance.Prefabs.Environment.LootChest;
-            var go = Instantiate(prefab, groundPosition, transform.rotation * Quaternion.Euler(0, 90, 0));
+
+            var spawnPosition = SpawnHelper.GetAboveGroundPosition(position, prefab.gameObject);
+
+            var go = Instantiate(prefab, spawnPosition, transform.rotation * Quaternion.Euler(0, 90, 0));
+            go.transform.parent = GameManager.Instance.SceneObjects.transform;
+            go.name = id;
+
             var lootScript = go.GetComponent<LootInteractable>();
             lootScript.UnclaimedLootId = id;
         }
@@ -248,7 +255,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void GetAndLoadPlayerData(bool reduced, ulong? clientId)
         {
-            Debug.Log($"Loading player data for {OwnerClientId}, reduced: {reduced}");
+            //Debug.Log($"Loading player data for {OwnerClientId}, reduced: {reduced}");
 
             var playerData = GameManager.Instance.UserRegistry.Load(PlayerToken, null, reduced);
 
@@ -438,7 +445,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 Debug.LogWarning("Tried to spawn a projectile spell when not on the server");
             }
 
-            var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPosition, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer);
+            var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPosition, Quaternion.identity, GameManager.Instance.SceneObjects.transform);
 
             var spellScript = spellObject.GetComponent<SpellProjectileBehaviour>();
             spellScript.PlayerClientId.Value = senderClientId;
@@ -455,7 +462,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 Debug.LogWarning("Tried to spawn a self spell when not on the server");
             }
 
-            var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPosition, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer);
+            var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPosition, Quaternion.identity, GameManager.Instance.SceneObjects.transform);
 
             var spellScript = spellObject.GetComponent<SpellSelfBehaviour>();
             spellScript.PlayerClientId.Value = senderClientId;
@@ -474,7 +481,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             var prefab = GameManager.Instance.Prefabs.Combat.SpellWall;
             var startPositionAdjusted = startPosition + new Vector3(0, prefab.transform.localScale.y / 2);
-            var spellObject = Instantiate(prefab, startPositionAdjusted, rotation, GameManager.Instance.RuntimeObjectsContainer);
+            var spellObject = Instantiate(prefab, startPositionAdjusted, rotation, GameManager.Instance.SceneObjects.transform);
 
             var spellScript = spellObject.GetComponent<SpellWallBehaviour>();
             spellScript.PlayerClientId.Value = senderClientId;
@@ -492,7 +499,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             var prefab = GameManager.Instance.Prefabs.Combat.SpellZone;
             var startPositionAdjusted = startPosition + new Vector3(0, prefab.transform.localScale.y / 2);
-            var spellObject = Instantiate(prefab, startPositionAdjusted, Quaternion.identity, GameManager.Instance.RuntimeObjectsContainer);
+            var spellObject = Instantiate(prefab, startPositionAdjusted, Quaternion.identity, GameManager.Instance.SceneObjects.transform);
 
             var spellScript = spellObject.GetComponent<SpellZoneBehaviour>();
             spellScript.PlayerClientId.Value = senderClientId;
@@ -564,12 +571,17 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             return Health.Value;
         }
 
-        public void TakeDamage(int amount)
+        public void TakeDamage(ulong? clientId, int amount)
         {
             //todo: implement player TakeDamage()
         }
 
-        public void SpawnLootChest(ulong clientId, Vector3 position, Quaternion rotation)
+        public void HandleDeath()
+        {
+            //todo: implement player HandleDeath()
+        }
+
+        public void SpawnLootChest(Vector3 position, Quaternion rotation)
         {
             //todo: clean out expired loot
 
@@ -578,7 +590,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _unclaimedLoot.Add(id, DateTime.UtcNow.AddHours(1));
 
             var clientRpcParams = new ClientRpcParams();
-            clientRpcParams.Send.TargetClientIds = new[] { clientId };
+            clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
             SpawnLootChestClientRpc(id, position, rotation, clientRpcParams);
         }
 

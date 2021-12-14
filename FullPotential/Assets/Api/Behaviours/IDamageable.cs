@@ -6,6 +6,8 @@
 
         int GetHealth();
 
-        void TakeDamage(int amount);
+        void TakeDamage(ulong? clientId, int amount);
+
+        void HandleDeath();
     }
 }

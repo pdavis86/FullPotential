@@ -77,7 +77,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             //Avoids weapons clipping with other objects
             _playerState.InFrontOfPlayer.transform.parent = _inFrontOfPlayerCamera.transform;
-            GameObjectHelper.SetGameLayerRecursive(_playerState.InFrontOfPlayer, Constants.Layers.InFrontOfPlayer);
+            GameObjectHelper.SetGameLayerRecursive(_playerState.InFrontOfPlayer, LayerMask.NameToLayer(Constants.Layers.InFrontOfPlayer));
 
             _inFrontOfPlayerCamera.gameObject.SetActive(true);
             _playerCamera.gameObject.SetActive(true);

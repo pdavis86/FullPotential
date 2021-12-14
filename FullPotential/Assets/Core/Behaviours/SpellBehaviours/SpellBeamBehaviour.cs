@@ -75,7 +75,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
             //Vector3 endPosition;
             float beamLength;
-            if (Physics.Raycast(transform.position, transform.forward, out var hit, maxBeamLength, LayerMask.GetMask("Default"), QueryTriggerInteraction.Ignore))
+            if (Physics.Raycast(transform.position, transform.forward, out var hit, maxBeamLength, LayerMask.NameToLayer(Constants.Layers.Default), QueryTriggerInteraction.Ignore))
             {
                 if (hit.transform.gameObject == _sourcePlayer)
                 {

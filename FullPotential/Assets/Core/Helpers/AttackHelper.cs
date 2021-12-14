@@ -7,6 +7,7 @@ using System.Globalization;
 using UnityEngine;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Behaviours.EnemyBehaviours;
+using Object = UnityEngine.Object;
 
 namespace FullPotential.Core.Helpers
 {
@@ -53,6 +54,8 @@ namespace FullPotential.Core.Helpers
                 damageable = enemyState;
                 defenceStrength = enemyState.GetDefenseValue();
             }
+            
+            var sourceNetObj = source.GetComponent<NetworkObject>();
 
             //Even a small attack can still do damage
             var damageDealtBasic = attackStrength * 100f / (100 + defenceStrength);
@@ -62,9 +65,9 @@ namespace FullPotential.Core.Helpers
             var adder = _random.Next(0, 6);
             var damageDealt = (int)Math.Ceiling(damageDealtBasic / multiplier) + adder;
 
-            damageable.TakeDamage(damageDealt);
+            damageable.TakeDamage(sourceNetObj?.OwnerClientId, damageDealt);
 
-            Debug.Log($"Source '{source.name}' used '{itemUsed.Name}' to attack target '{target.name}' for {damageDealt} damage");
+            //Debug.Log($"Source '{source.name}' used '{itemUsed.Name}' to attack target '{target.name}' for {damageDealt} damage");
 
             if (source.CompareTag(Tags.Player) && position.HasValue)
             {
@@ -77,12 +80,7 @@ namespace FullPotential.Core.Helpers
 
                 if (damageable.GetHealth() <= 0)
                 {
-                    //todo: get ground height properly
-                    var groundYValue = target.transform.position.y - target.transform.localScale.y;
-                    var groundPosition = new Vector3(target.transform.position.x, groundYValue, target.transform.position.z);
-                    sourcePlayerState.SpawnLootChest(sourcePlayerState.OwnerClientId, groundPosition, target.transform.rotation);
-
-                    GameObject.Destroy(target);
+                    damageable.HandleDeath();
                 }
                 else
                 {
