@@ -917,6 +917,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c38032a77936014e9cb0fe64d22a255, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  EnemyPrefab: {fileID: 145446360085616433, guid: 6d41a310c4a9c2340b060fd324410cc1,
+    type: 3}
 --- !u!4 &1249230892
 Transform:
   m_ObjectHideFlags: 0
@@ -962,7 +964,7 @@ GameObject:
   - component: {fileID: 1353315335}
   - component: {fileID: 1353315334}
   - component: {fileID: 1353315333}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Ground
   m_TagString: Ground
   m_Icon: {fileID: 0}
