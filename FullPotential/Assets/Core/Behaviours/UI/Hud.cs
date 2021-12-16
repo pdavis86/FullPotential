@@ -12,6 +12,7 @@ namespace FullPotential.Core.Behaviours.Ui
         [SerializeField] private GameObject _alertPrefab;
         [SerializeField] private Slider _healthSlider;
         //[SerializeField] private Slider _manaSlider;
+        //[SerializeField] private Slider _barrierSlider;
 #pragma warning restore 0649
 
         public void ShowAlert(string alertText)
@@ -25,10 +26,14 @@ namespace FullPotential.Core.Behaviours.Ui
             _healthSlider.value = value;
         }
 
-        //todo: this and barrier too
         //public void UpdateManaPercentage(float value)
         //{
         //    _manaSlider.value = value;
+        //}
+
+        //public void UpdateBarrierPercentage(float value)
+        //{
+        //    _barrierSlider.value = value;
         //}
 
     }

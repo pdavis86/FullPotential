@@ -6,7 +6,7 @@ namespace FullPotential.Core.Data
     //todo: should these all be structs rather than classes?
 
     [System.Serializable]
-    public class AppOptions
+    public struct AppOptions
     {
         public string Culture;
     }

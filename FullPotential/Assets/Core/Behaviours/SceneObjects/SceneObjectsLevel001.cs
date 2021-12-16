@@ -62,6 +62,8 @@ namespace FullPotential.Core.Behaviours.SceneObjects
             playerState.PlayerToken = playerToken;
 
             playerNetObj.SpawnAsPlayerObject(serverRpcParams.Receive.SenderClientId);
+
+            _spawnService.AdjustPositionToBeAboveGround(chosenSpawnPoint.position, playerNetObj.gameObject);
         }
 
         public void SpawnEnemy()

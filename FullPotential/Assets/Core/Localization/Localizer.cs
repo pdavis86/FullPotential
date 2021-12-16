@@ -89,7 +89,7 @@ namespace FullPotential.Core.Localization
             {
                 var data = await LoadCultureFileAsync(address);
 
-                if (data?.Translations == null)
+                if (data.Translations == null)
                 {
                     throw new System.Exception($"Failed to load any translations for address '{address}'");
                 }

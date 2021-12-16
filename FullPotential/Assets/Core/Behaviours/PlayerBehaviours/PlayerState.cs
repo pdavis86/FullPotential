@@ -260,7 +260,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
             else
             {
-                TextureUrl.Value = playerData.Options?.TextureUrl;
+                TextureUrl.Value = playerData.Options.TextureUrl;
                 LoadFromPlayerData(playerData);
             }
         }

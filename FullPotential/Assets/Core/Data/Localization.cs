@@ -6,7 +6,7 @@
 namespace FullPotential.Core.Data
 {
     [Serializable]
-    public class Localization
+    public struct Localization
     {
         public string Culture;
         public string Name;

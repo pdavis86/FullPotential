@@ -43,11 +43,6 @@ namespace FullPotential.Core.Registry
                 playerData.Username = username;
             }
 
-            if (playerData.Options == null)
-            {
-                playerData.Options = new PlayerOptions();
-            }
-
             if (reduced)
             {
                 StripExtraData(playerData);

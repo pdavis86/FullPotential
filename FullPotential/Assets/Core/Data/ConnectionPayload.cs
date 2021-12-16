@@ -1,7 +1,7 @@
 ﻿namespace FullPotential.Core.Data
 {
     [System.Serializable]
-    public class ConnectionPayload
+    public struct ConnectionPayload
     {
         public string PlayerToken;
     }

@@ -4,7 +4,7 @@
 namespace FullPotential.Core.Data
 {
     [System.Serializable]
-    public class PlayerData
+    public struct PlayerData
     {
         public string Username;
         public PlayerOptions Options;

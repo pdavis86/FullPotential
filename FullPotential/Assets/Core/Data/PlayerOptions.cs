@@ -4,7 +4,7 @@
 namespace FullPotential.Core.Data
 {
     [System.Serializable]
-    public class PlayerOptions
+    public struct PlayerOptions
     {
         public string TextureUrl;
     }

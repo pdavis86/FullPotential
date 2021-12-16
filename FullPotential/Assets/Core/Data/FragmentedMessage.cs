@@ -6,7 +6,7 @@ using System;
 namespace FullPotential.Core.Data
 {
     [Serializable]
-    public class FragmentedMessage
+    public struct FragmentedMessage
     {
         public string GroupId;
         public string GroupStartDateTime;
