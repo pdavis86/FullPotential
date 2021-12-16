@@ -1,4 +1,5 @@
 ﻿using FullPotential.Core.Behaviours.GameManagement;
+using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -19,7 +20,7 @@ namespace FullPotential.Core.Behaviours.Environment
             _interactionBubble.gameObject.SetActive(true);
         }
 
-        public override void OnInteract(ulong playerNetId)
+        public override void OnInteract(PlayerState playerState)
         {
             Debug.LogWarning("Not yet implemented the shop interaction");
         }

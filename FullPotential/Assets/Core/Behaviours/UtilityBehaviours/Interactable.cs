@@ -1,4 +1,5 @@
 ﻿using FullPotential.Core.Behaviours.GameManagement;
+using FullPotential.Core.Behaviours.PlayerBehaviours;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
@@ -14,6 +15,7 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
     public abstract class Interactable : MonoBehaviour
     {
         public float Radius = 3f;
+        public bool RequiresServerCheck = true;
 
         protected TMPro.TextMeshProUGUI _interactionBubble;
 
@@ -35,7 +37,7 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
 
         public abstract void OnFocus();
 
-        public abstract void OnInteract(ulong playerNetId);
+        public abstract void OnInteract(PlayerState playerState);
 
         public abstract void OnBlur();
     }

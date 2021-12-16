@@ -13,6 +13,11 @@ namespace FullPotential.Core.Behaviours.Environment
     {
         public string UnclaimedLootId;
 
+        private void Awake()
+        {
+            RequiresServerCheck = false;
+        }
+
         public override void OnFocus()
         {
             var translation = GameManager.Instance.Localizer.Translate("ui.interact.loot");
@@ -21,10 +26,9 @@ namespace FullPotential.Core.Behaviours.Environment
             _interactionBubble.gameObject.SetActive(true);
         }
 
-        public override void OnInteract(ulong playerNetId)
+        public override void OnInteract(PlayerState playerState)
         {
-            var playerObj = NetworkManager.Singleton.ConnectedClients[playerNetId].PlayerObject;
-            playerObj.GetComponent<PlayerState>().ClaimLootServerRpc(UnclaimedLootId);
+            playerState.ClaimLootServerRpc(UnclaimedLootId);
             Destroy(gameObject);
         }
 

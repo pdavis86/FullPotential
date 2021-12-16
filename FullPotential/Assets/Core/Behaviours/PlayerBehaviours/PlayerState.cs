@@ -43,8 +43,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public GameObject PlayerCamera;
 
         [HideInInspector] public string PlayerToken;
+
+        //todo: do these need to be network variables?
         [HideInInspector] private readonly NetworkVariable<FixedString64Bytes> _username = new NetworkVariable<FixedString64Bytes>();
         [HideInInspector] public readonly NetworkVariable<FixedString512Bytes> TextureUrl = new NetworkVariable<FixedString512Bytes>();
+
         public readonly NetworkVariable<int> Health = new NetworkVariable<int>();
 
         private Rigidbody _rb;
@@ -59,7 +62,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         #region Event handlers
 
-#pragma warning disable IDE0051
         private void Awake()
         {
             _username.OnValueChanged += OnUsernameChanged;
@@ -95,7 +97,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _username.OnValueChanged -= OnUsernameChanged;
             TextureUrl.OnValueChanged -= OnTextureChanged;
         }
-#pragma warning restore IDE0051
 
         public override void OnNetworkSpawn()
         {
@@ -446,14 +447,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 Debug.LogWarning("Tried to spawn a projectile spell when not on the server");
             }
 
-            var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPosition, Quaternion.identity, GameManager.Instance.SceneBehaviour.GetTransform());
+            var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPosition, Quaternion.identity);
 
             var spellScript = spellObject.GetComponent<SpellProjectileBehaviour>();
-            spellScript.PlayerClientId.Value = senderClientId;
-            spellScript.SpellId.Value = activeSpell.Id;
-            spellScript.SpellDirection.Value = direction;
+            spellScript.PlayerClientId = senderClientId;
+            spellScript.SpellId = activeSpell.Id;
+            spellScript.SpellDirection = direction;
 
             spellObject.GetComponent<NetworkObject>().Spawn(true);
+            
+            spellObject.transform.parent = GameManager.Instance.SceneBehaviour.GetTransform();
         }
 
         public void SpawnSpellSelf(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
@@ -463,7 +466,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 Debug.LogWarning("Tried to spawn a self spell when not on the server");
             }
 
-            var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPosition, Quaternion.identity, GameManager.Instance.SceneBehaviour.GetTransform());
+            var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPosition, Quaternion.identity);
 
             var spellScript = spellObject.GetComponent<SpellSelfBehaviour>();
             spellScript.PlayerClientId.Value = senderClientId;
@@ -471,6 +474,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             spellScript.SpellDirection.Value = direction;
 
             spellObject.GetComponent<NetworkObject>().Spawn(true);
+
+            spellObject.transform.parent = GameManager.Instance.SceneBehaviour.GetTransform();
         }
 
         public void SpawnSpellWall(Spell activeSpell, Vector3 startPosition, Quaternion rotation, ulong senderClientId)
@@ -482,13 +487,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             var prefab = GameManager.Instance.Prefabs.Combat.SpellWall;
             var startPositionAdjusted = startPosition + new Vector3(0, prefab.transform.localScale.y / 2);
-            var spellObject = Instantiate(prefab, startPositionAdjusted, rotation, GameManager.Instance.SceneBehaviour.GetTransform());
+            var spellObject = Instantiate(prefab, startPositionAdjusted, rotation);
 
             var spellScript = spellObject.GetComponent<SpellWallBehaviour>();
             spellScript.PlayerClientId.Value = senderClientId;
             spellScript.SpellId.Value = activeSpell.Id;
 
             spellObject.GetComponent<NetworkObject>().Spawn(true);
+
+            spellObject.transform.parent = GameManager.Instance.SceneBehaviour.GetTransform();
         }
 
         public void SpawnSpellZone(Spell activeSpell, Vector3 startPosition, ulong senderClientId)
@@ -500,13 +507,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             var prefab = GameManager.Instance.Prefabs.Combat.SpellZone;
             var startPositionAdjusted = startPosition + new Vector3(0, prefab.transform.localScale.y / 2);
-            var spellObject = Instantiate(prefab, startPositionAdjusted, Quaternion.identity, GameManager.Instance.SceneBehaviour.GetTransform());
+            var spellObject = Instantiate(prefab, startPositionAdjusted, Quaternion.identity);
 
             var spellScript = spellObject.GetComponent<SpellZoneBehaviour>();
             spellScript.PlayerClientId.Value = senderClientId;
             spellScript.SpellId.Value = activeSpell.Id;
 
             spellObject.GetComponent<NetworkObject>().Spawn(true);
+
+            spellObject.transform.parent = GameManager.Instance.SceneBehaviour.GetTransform();
         }
 
         public void CastSpellTouch(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
@@ -540,16 +549,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             var spellObject = Instantiate(
                 GameManager.Instance.Prefabs.Combat.SpellBeam,
                 startPosition,
-                Quaternion.LookRotation(direction),
-                transform
+                Quaternion.LookRotation(direction)
             );
 
             var spellScript = spellObject.GetComponent<SpellBeamBehaviour>();
-            spellScript.PlayerClientId.Value = senderClientId;
-            spellScript.SpellId.Value = activeSpell.Id;
-            spellScript.IsLeftHand.Value = isLeftHand;
+            spellScript.SpellId = activeSpell.Id;
+            spellScript.IsLeftHand = isLeftHand;
 
             spellObject.GetComponent<NetworkObject>().Spawn(true);
+
+            spellObject.transform.parent = transform;
 
             if (isLeftHand)
             {

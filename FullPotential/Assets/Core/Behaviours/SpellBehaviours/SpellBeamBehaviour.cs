@@ -1,7 +1,6 @@
 ﻿using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Helpers;
 using FullPotential.Core.Registry.Types;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -12,9 +11,8 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 {
     public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
     {
-        public readonly NetworkVariable<ulong> PlayerClientId = new NetworkVariable<ulong>();
-        public readonly NetworkVariable<FixedString32Bytes> SpellId = new NetworkVariable<FixedString32Bytes>();
-        public readonly NetworkVariable<bool> IsLeftHand = new NetworkVariable<bool>();
+        public string SpellId;
+        public bool IsLeftHand;
 
         private GameObject _sourcePlayer;
         private Spell _spell;
@@ -42,31 +40,24 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
             var playerState = _sourcePlayer.GetComponent<PlayerState>();
 
-            _spell = playerState.Inventory.GetItemWithId<Spell>(SpellId.Value.ToString());
+            PerformGraphicsAdjustments(playerState);
+
+            if (!IsServer)
+            {
+                return;
+            }
+
+            _spell = playerState.Inventory.GetItemWithId<Spell>(SpellId);
 
             if (_spell == null)
             {
-                Debug.LogError($"No spell found in player inventory with ID {SpellId.Value}");
+                Debug.LogError($"No spell found in player inventory with ID {SpellId}");
                 Destroy(gameObject);
                 return;
             }
 
             _timeBetweenEffects = 0.5f;
             _timeSinceLastEffective = _timeBetweenEffects;
-
-            _cylinderParentTransform.parent = playerState.PlayerCamera.transform;
-
-            if (PlayerClientId.Value == NetworkManager.Singleton.LocalClientId)
-            {
-                //Move it a little forwards
-                _cylinderParentTransform.position += transform.forward;
-
-                //Move it a little sideways
-                _cylinderParentTransform.position += (IsLeftHand.Value ? 0.1f : -0.1f) * _cylinderParentTransform.right;
-            }
-
-            //Move the tip to the middle
-            _cylinderTransform.position += (_cylinderTransform.up * _cylinderTransform.localScale.y);
         }
 
         private void FixedUpdate()
@@ -75,7 +66,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
             //Vector3 endPosition;
             float beamLength;
-            if (Physics.Raycast(transform.position, transform.forward, out var hit, maxBeamLength, LayerMask.NameToLayer(Constants.Layers.Default), QueryTriggerInteraction.Ignore))
+            if (Physics.Raycast(transform.position, transform.forward, out var hit, maxBeamLength))
             {
                 if (hit.transform.gameObject == _sourcePlayer)
                 {
@@ -122,6 +113,23 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
             base.OnDestroy();
 
             Destroy(_cylinderTransform.gameObject);
+        }
+
+        private void PerformGraphicsAdjustments(PlayerState playerState)
+        {
+            _cylinderParentTransform.parent = playerState.PlayerCamera.transform;
+
+            if (playerState.OwnerClientId == NetworkManager.Singleton.LocalClientId)
+            {
+                //Move it a little forwards
+                _cylinderParentTransform.position += transform.forward;
+
+                //Move it a little sideways
+                _cylinderParentTransform.position += (IsLeftHand ? 0.1f : -0.1f) * _cylinderParentTransform.right;
+            }
+
+            //Move the tip to the middle
+            _cylinderTransform.position += (_cylinderTransform.up * _cylinderTransform.localScale.y);
         }
 
         public void ApplySpellEffects(GameObject target, Vector3? position)

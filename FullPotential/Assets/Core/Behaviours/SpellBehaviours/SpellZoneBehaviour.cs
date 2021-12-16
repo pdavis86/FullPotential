@@ -15,6 +15,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 {
     public class SpellZoneBehaviour : NetworkBehaviour, ISpellBehaviour
     {
+        //todo: do these have to be network variables? Can we just use normal public variables as the values will not change
         public readonly NetworkVariable<ulong> PlayerClientId = new NetworkVariable<ulong>();
         public readonly NetworkVariable<FixedString32Bytes> SpellId = new NetworkVariable<FixedString32Bytes>();
 

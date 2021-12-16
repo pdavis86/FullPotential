@@ -23,12 +23,10 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
         [SerializeField] private Slider _healthSlider;
 #pragma warning restore 0649
 
-#pragma warning disable IDE0051
         private void Awake()
         {
             _health.OnValueChanged += OnHealthChanged;
         }
-#pragma warning restore IDE0051
 
         public int GetDefenseValue()
         {

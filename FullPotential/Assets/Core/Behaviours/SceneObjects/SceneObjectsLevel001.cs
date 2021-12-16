@@ -27,12 +27,10 @@ namespace FullPotential.Core.Behaviours.SceneObjects
         private NetworkObject _enemyPrefabNetObj;
         private SpawnService _spawnService;
 
-#pragma warning disable IDE0051
         private void Awake()
         {
             _spawnService = new SpawnService();
         }
-#pragma warning restore IDE0051
 
         public override void OnNetworkSpawn()
         {
@@ -74,11 +72,13 @@ namespace FullPotential.Core.Behaviours.SceneObjects
                 0,
                 Random.Range(_spawnVariation.x, _spawnVariation.y));
 
-            var enemyNetObj = Instantiate(_enemyPrefabNetObj, spawnPosition, chosenSpawnPoint.rotation, transform);
+            var enemyNetObj = Instantiate(_enemyPrefabNetObj, spawnPosition, chosenSpawnPoint.rotation);
 
             _spawnService.AdjustPositionToBeAboveGround(spawnPosition, enemyNetObj.gameObject);
 
             enemyNetObj.Spawn(true);
+
+            enemyNetObj.transform.parent = transform;
         }
 
         public void OnEnemyDeath()

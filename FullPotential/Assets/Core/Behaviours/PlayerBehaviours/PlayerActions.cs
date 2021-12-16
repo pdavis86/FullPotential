@@ -45,7 +45,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         #region Event handlers
 
-#pragma warning disable IDE0051
         private void Awake()
         {
             _playerState = GetComponent<PlayerState>();
@@ -98,7 +97,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return;
             }
 
-            TryToInteractServerRpc(_focusedInteractable.gameObject.name);
+            if (_focusedInteractable.RequiresServerCheck)
+            {
+                TryToInteractServerRpc(_focusedInteractable.gameObject.name);
+            }
+            else
+            {
+                _focusedInteractable.OnInteract(_playerState);
+            }
         }
 
         private void OnOpenCharacterMenu()
@@ -150,7 +156,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 _sceneCamera.gameObject.SetActive(true);
             }
         }
-#pragma warning restore IDE0051
+
         #endregion
 
         #region ServerRpc calls
@@ -258,7 +264,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             var distance = Vector3.Distance(transform.position, interactable.transform.position);
             if (distance <= interactable.Radius)
             {
-                interactable.OnInteract(serverRpcParams.Receive.SenderClientId);
+                interactable.OnInteract(player.GetComponent<PlayerState>());
             }
         }
 

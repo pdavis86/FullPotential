@@ -66,7 +66,6 @@ namespace FullPotential.Core.Behaviours.GameManagement
         public static GameManager Instance { get; private set; }
 
 
-#pragma warning disable IDE0051
         private async void Awake()
         {
             if (Instance != null && Instance != this)
@@ -110,7 +109,6 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
             SceneManager.LoadSceneAsync(1);
         }
-#pragma warning restore IDE0051
 
         private void OnApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
         {

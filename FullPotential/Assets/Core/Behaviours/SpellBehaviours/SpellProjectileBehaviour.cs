@@ -5,7 +5,6 @@ using FullPotential.Core.Helpers;
 using FullPotential.Core.Registry.Types;
 using FullPotential.Core.Spells.Shapes;
 using System;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -16,10 +15,9 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 {
     public class SpellProjectileBehaviour : NetworkBehaviour, ISpellBehaviour
     {
-        //todo: do these have to be network variables? Can we just use normal public variables as the values will not change
-        public readonly NetworkVariable<ulong> PlayerClientId = new NetworkVariable<ulong>();
-        public readonly NetworkVariable<FixedString64Bytes> SpellId = new NetworkVariable<FixedString64Bytes>();
-        public readonly NetworkVariable<Vector3> SpellDirection = new NetworkVariable<Vector3>();
+        public ulong PlayerClientId;
+        public string SpellId;
+        public Vector3 SpellDirection;
 
         private GameObject _sourcePlayer;
         private PlayerState _playerState;
@@ -37,17 +35,17 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
             Destroy(gameObject, 3f);
 
-            _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId.Value].PlayerObject.gameObject;
+            _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId].PlayerObject.gameObject;
 
             Physics.IgnoreCollision(GetComponent<Collider>(), _sourcePlayer.GetComponent<Collider>());
 
             _playerState = _sourcePlayer.GetComponent<PlayerState>();
 
-            _spell = _playerState.Inventory.GetItemWithId<Spell>(SpellId.Value.ToString());
+            _spell = _playerState.Inventory.GetItemWithId<Spell>(SpellId);
 
             if (_spell == null)
             {
-                Debug.LogError($"No spell found in player inventory with ID {SpellId.Value}");
+                Debug.LogError($"No spell found in player inventory with ID {SpellId}");
                 return;
             }
 
@@ -63,7 +61,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
             var rigidBody = GetComponent<Rigidbody>();
 
-            rigidBody.AddForce(20f * castSpeed * SpellDirection.Value, ForceMode.VelocityChange);
+            rigidBody.AddForce(20f * castSpeed * SpellDirection, ForceMode.VelocityChange);
 
             if (affectedByGravity)
             {
@@ -119,14 +117,14 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
                 if (_shapeType == typeof(Wall))
                 {
-                    var rotation = Quaternion.LookRotation(SpellDirection.Value);
+                    var rotation = Quaternion.LookRotation(SpellDirection);
                     rotation.x = 0;
                     rotation.z = 0;
-                    _playerState.SpawnSpellWall(_spell, spawnPosition, rotation, PlayerClientId.Value);
+                    _playerState.SpawnSpellWall(_spell, spawnPosition, rotation, PlayerClientId);
                 }
                 else if (_shapeType == typeof(Zone))
                 {
-                    _playerState.SpawnSpellZone(_spell, spawnPosition, PlayerClientId.Value);
+                    _playerState.SpawnSpellZone(_spell, spawnPosition, PlayerClientId);
                 }
                 else
                 {
