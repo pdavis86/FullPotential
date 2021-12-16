@@ -7,6 +7,7 @@ using FullPotential.Core.Registry.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using FullPotential.Core.Behaviours.Environment;
 using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Extensions;
@@ -44,15 +45,17 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         [HideInInspector] public string PlayerToken;
         [HideInInspector] public readonly NetworkVariable<FixedString512Bytes> TextureUrl = new NetworkVariable<FixedString512Bytes>();
-        public readonly NetworkVariable<int> Health = new NetworkVariable<int>(100);
+        public readonly NetworkVariable<int> Health = new NetworkVariable<int>();
 
-        private string _username;
         private Rigidbody _rb;
         private PlayerActions _playerActions;
         private ClientRpcParams _clientRpcParams;
         private GameObject _spellBeingCastLeft;
         private GameObject _spellBeingCastRight;
         private bool _loadWasSuccessful;
+
+        //todo: another struct for this player data?
+        private string _username;
 
         private FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
         private readonly Dictionary<string, DateTime> _unclaimedLoot = new Dictionary<string, DateTime>();
@@ -322,6 +325,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             _username = playerData.Username;
 
+            if (IsServer)
+            {
+                Health.Value = GetHealthMax();
+            }
+
             try
             {
                 Inventory.LoadInventory(playerData.Inventory);
@@ -458,9 +466,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPosition, Quaternion.identity);
 
             var spellScript = spellObject.GetComponent<SpellSelfBehaviour>();
-            spellScript.PlayerClientId.Value = senderClientId;
-            spellScript.SpellId.Value = activeSpell.Id;
-            spellScript.SpellDirection.Value = direction;
+            spellScript.PlayerClientId = senderClientId;
+            spellScript.SpellId = activeSpell.Id;
+            spellScript.SpellDirection = direction;
 
             spellObject.GetComponent<NetworkObject>().Spawn(true);
 
@@ -496,7 +504,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
 
             var prefab = GameManager.Instance.Prefabs.Combat.SpellZone;
-            
+
             var spellObject = Instantiate(prefab, startPosition, Quaternion.identity);
             GameManager.Instance.SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(startPosition, spellObject, false);
 
@@ -563,7 +571,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public int GetHealthMax()
         {
-            //todo: do this properly
             return 100;
         }
 
@@ -584,7 +591,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public void SpawnLootChest(Vector3 position)
         {
-            //todo: clean out expired loot
+            ClearExpiredLoot();
 
             var id = Guid.NewGuid().ToMinimisedString();
 
@@ -593,6 +600,21 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             var clientRpcParams = new ClientRpcParams();
             clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
             SpawnLootChestClientRpc(id, position, clientRpcParams);
+        }
+
+        private void ClearExpiredLoot()
+        {
+            var expiredLoot = _unclaimedLoot.Where(x => x.Value < DateTime.UtcNow);
+
+            if (!expiredLoot.Any())
+            {
+                return;
+            }
+
+            foreach (var loot in expiredLoot)
+            {
+                _unclaimedLoot.Remove(loot.Key);
+            }
         }
 
         #region Nested Classes

@@ -74,7 +74,7 @@ namespace FullPotential.Core.Helpers
                 return;
             }
 
-            //Debug.Log($"Source '{source.name}' used '{itemUsed.Name}' to attack target '{target.name}' for {damageDealt} damage");
+            Debug.Log($"Source '{source.name}' used '{itemUsed.Name}' to attack target '{target.name}' for {damageDealt} damage");
 
             if (source.CompareTag(Tags.Player) && position.HasValue)
             {

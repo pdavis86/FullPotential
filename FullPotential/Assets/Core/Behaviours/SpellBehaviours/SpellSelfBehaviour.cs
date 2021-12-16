@@ -1,7 +1,6 @@
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Helpers;
 using FullPotential.Core.Registry.Types;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -13,17 +12,16 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 {
     public class SpellSelfBehaviour : NetworkBehaviour, ISpellBehaviour
     {
-        const float _distanceBeforeReturning = 8f;
+        private const float _distanceBeforeReturning = 8f;
 
-        //todo: do these have to be network variables? Can we just use normal public variables as the values will not change
-        public readonly NetworkVariable<ulong> PlayerClientId = new NetworkVariable<ulong>();
-        public readonly NetworkVariable<FixedString32Bytes> SpellId = new NetworkVariable<FixedString32Bytes>();
-        public readonly NetworkVariable<Vector3> SpellDirection = new NetworkVariable<Vector3>();
+        public ulong PlayerClientId;
+        public string SpellId;
+        public Vector3 SpellDirection;
 
         private GameObject _sourcePlayer;
         private Spell _spell;
         private float _castSpeed;
-        private Rigidbody _rigidbody;
+        private Rigidbody _rigidBody;
         private bool _returningToPlayer;
 
         private void Start()
@@ -34,13 +32,13 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
                 return;
             }
 
-            _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId.Value].PlayerObject.gameObject;
+            _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId].PlayerObject.gameObject;
 
-            _spell = _sourcePlayer.GetComponent<PlayerState>().Inventory.GetItemWithId<Spell>(SpellId.Value.ToString());
+            _spell = _sourcePlayer.GetComponent<PlayerState>().Inventory.GetItemWithId<Spell>(SpellId);
 
             if (_spell == null)
             {
-                Debug.LogError($"No spell found in player inventory with ID {SpellId.Value}");
+                Debug.LogError($"No spell found in player inventory with ID {SpellId}");
                 return;
             }
 
@@ -50,8 +48,8 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
                 _castSpeed = 0.5f;
             }
 
-            _rigidbody = GetComponent<Rigidbody>();
-            _rigidbody.AddForce(_castSpeed * 20f * SpellDirection.Value, ForceMode.VelocityChange);
+            _rigidBody = GetComponent<Rigidbody>();
+            _rigidBody.AddForce(_castSpeed * 20f * SpellDirection, ForceMode.VelocityChange);
         }
 
         private void FixedUpdate()
@@ -79,7 +77,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
             {
                 ClearForce();
                 var playerDirection = (_sourcePlayer.transform.position - transform.position).normalized;
-                _rigidbody.AddForce(_castSpeed * 20f * playerDirection, ForceMode.VelocityChange);
+                _rigidBody.AddForce(_castSpeed * 20f * playerDirection, ForceMode.VelocityChange);
                 return;
             }
 
@@ -104,8 +102,8 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
         private void ClearForce()
         {
-            _rigidbody.velocity = Vector3.zero;
-            _rigidbody.angularVelocity = Vector3.zero;
+            _rigidBody.velocity = Vector3.zero;
+            _rigidBody.angularVelocity = Vector3.zero;
         }
 
         public void ApplySpellEffects(GameObject target, Vector3? position)
