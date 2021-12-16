@@ -219,7 +219,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     break;
 
                 case Spells.Targeting.Beam _:
-                    _playerState.ToggleSpellBeam(isLeftHand, activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
+                    _playerState.ToggleSpellBeam(isLeftHand, activeSpell, startPosition, direction);
                     break;
 
                 default:
@@ -314,6 +314,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (OwnerClientId != 0)
             {
+                //todo: can't apply inventory changes on the client. What was I thinking here?
                 foreach (var message in MessageHelper.GetFragmentedMessages(invChange))
                 {
                     ApplyInventoryChangesClientRpc(message, _clientRpcParams);

@@ -53,8 +53,6 @@ namespace FullPotential.Core.Helpers
                 damageable = enemyState;
                 defenceStrength = enemyState.GetDefenseValue();
             }
-            
-            var sourceNetObj = source.GetComponent<NetworkObject>();
 
             //Even a small attack can still do damage
             var damageDealtBasic = attackStrength * 100f / (100 + defenceStrength);
@@ -64,7 +62,17 @@ namespace FullPotential.Core.Helpers
             var adder = _random.Next(0, 6);
             var damageDealt = (int)Math.Ceiling(damageDealtBasic / multiplier) + adder;
 
-            damageable.TakeDamage(sourceNetObj?.OwnerClientId, damageDealt);
+            var sourceClientId = source == null
+                ? null
+                : source.GetComponent<NetworkObject>()?.OwnerClientId;
+
+            damageable.TakeDamage(sourceClientId, damageDealt);
+
+            if (source == null)
+            {
+                Debug.LogWarning("Attack source not found. Did they sign out?");
+                return;
+            }
 
             //Debug.Log($"Source '{source.name}' used '{itemUsed.Name}' to attack target '{target.name}' for {damageDealt} damage");
 

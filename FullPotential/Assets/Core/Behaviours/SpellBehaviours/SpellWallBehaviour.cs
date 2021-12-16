@@ -3,7 +3,6 @@ using FullPotential.Core.Constants;
 using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
 using FullPotential.Core.Registry.Types;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -15,16 +14,14 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 {
     public class SpellWallBehaviour : NetworkBehaviour, ISpellBehaviour
     {
-        //todo: do these have to be network variables? Can we just use normal public variables as the values will not change
-        public readonly NetworkVariable<ulong> PlayerClientId = new NetworkVariable<ulong>();
-        public readonly NetworkVariable<FixedString32Bytes> SpellId = new NetworkVariable<FixedString32Bytes>();
+        public ulong PlayerClientId;
+        public string SpellId;
 
         private GameObject _sourcePlayer;
         private Spell _spell;
         private float _timeSinceLastEffective;
         private float _timeBetweenEffects;
 
-#pragma warning disable IDE0051
         private void Start()
         {
             if (!IsServer)
@@ -33,18 +30,16 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
                 return;
             }
 
-            //todo: for how long does this live?
+            //todo: change lifetime based on attributes
             Destroy(gameObject, 10f);
 
-            _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId.Value].PlayerObject.gameObject;
+            _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId].PlayerObject.gameObject;
 
-            var spellId = SpellId.Value.ToString();
-
-            _spell = _sourcePlayer.GetComponent<PlayerState>().Inventory.GetItemWithId<Spell>(spellId);
+            _spell = _sourcePlayer.GetComponent<PlayerState>().Inventory.GetItemWithId<Spell>(SpellId);
 
             if (_spell == null)
             {
-                Debug.LogError($"No spell found in player inventory with ID {spellId}");
+                Debug.LogError($"No spell found in player inventory with ID {SpellId}");
                 return;
             }
 
@@ -75,7 +70,6 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
             ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
         }
-#pragma warning restore IDE0051
 
         public void ApplySpellEffects(GameObject target, Vector3? position)
         {

@@ -10,12 +10,14 @@ namespace FullPotential.Core.Spawning
 
         public SpawnService()
         {
-            var ground = UnityHelper.GetObjectAtRoot("Environment").FindChildWithTag(Constants.Tags.Ground);
+            var ground = UnityHelper.GetObjectAtRoot(Constants.GameObjectNames.Environment).FindChildWithTag(Constants.Tags.Ground);
             _groundCollider = ground.GetComponent<Collider>();
         }
 
         public void AdjustPositionToBeAboveGround(Vector3 startingPoint, GameObject gameObject, bool removeHalfHeight = true)
         {
+            startingPoint.y += 10;
+
             var groundClosestPoint = _groundCollider.ClosestPointOnBounds(startingPoint);
 
             var adjustment = 0f;

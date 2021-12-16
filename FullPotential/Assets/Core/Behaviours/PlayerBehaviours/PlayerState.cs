@@ -43,13 +43,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public GameObject PlayerCamera;
 
         [HideInInspector] public string PlayerToken;
-
-        //todo: do these need to be network variables?
-        [HideInInspector] private readonly NetworkVariable<FixedString64Bytes> _username = new NetworkVariable<FixedString64Bytes>();
         [HideInInspector] public readonly NetworkVariable<FixedString512Bytes> TextureUrl = new NetworkVariable<FixedString512Bytes>();
+        public readonly NetworkVariable<int> Health = new NetworkVariable<int>(100);
 
-        public readonly NetworkVariable<int> Health = new NetworkVariable<int>();
-
+        private string _username;
         private Rigidbody _rb;
         private PlayerActions _playerActions;
         private ClientRpcParams _clientRpcParams;
@@ -64,7 +61,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void Awake()
         {
-            _username.OnValueChanged += OnUsernameChanged;
             TextureUrl.OnValueChanged += OnTextureChanged;
             Health.OnValueChanged += OnHealthChanged;
 
@@ -90,39 +86,30 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             gameObject.name = "Player ID " + NetworkObjectId;
 
             _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
-        }
-
-        private void OnDisable()
-        {
-            _username.OnValueChanged -= OnUsernameChanged;
-            TextureUrl.OnValueChanged -= OnTextureChanged;
-        }
-
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
 
             if (IsServer)
             {
-                //Debug.Log("I am the Server. Loading player data with client ID " + OwnerClientId);
+                //Debug.LogError("I am the Server. Loading player data with client ID " + OwnerClientId);
                 GetAndLoadPlayerData(false, null);
             }
             else if (IsOwner)
             {
-                //Debug.Log("Requesting my player data with client ID " + OwnerClientId);
+                //Debug.LogError("Requesting my player data with client ID " + OwnerClientId);
                 RequestPlayerDataServerRpc();
             }
             else
             {
-                //Debug.Log("Requesting other player data for client ID " + OwnerClientId);
+                //Debug.LogError("Requesting other player data for client ID " + OwnerClientId);
                 RequestReducedPlayerDataServerRpc();
             }
         }
 
+        // ReSharper disable UnusedParameter.Local
         private void OnUsernameChanged(FixedString64Bytes previousValue, FixedString64Bytes newValue)
         {
             SetNameTag();
         }
+        // ReSharper restore UnusedParameter.Local
 
         private void OnTextureChanged(FixedString512Bytes previousValue, FixedString512Bytes newValue)
         {
@@ -270,7 +257,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
             else
             {
-                _username.Value = playerData.Username;
                 TextureUrl.Value = playerData.Options?.TextureUrl;
                 LoadFromPlayerData(playerData);
             }
@@ -332,6 +318,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void LoadFromPlayerData(PlayerData playerData)
         {
+            //Debug.LogError($"Loading player data into PlayerState with OwnerClientId: {OwnerClientId}");
+
+            _username = playerData.Username;
+
             try
             {
                 Inventory.LoadInventory(playerData.Inventory);
@@ -352,10 +342,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return;
             }
 
-            var username = _username.Value.ToString();
-            _nameTag.text = string.IsNullOrWhiteSpace(username)
+            _nameTag.text = string.IsNullOrWhiteSpace(_username)
                 ? "Player " + NetworkObjectId
-                : username;
+                : _username;
         }
 
         private IEnumerator SetTexture()
@@ -365,10 +354,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             string filePath;
             if (textureUrl.StartsWith("http"))
             {
-                filePath = Application.persistentDataPath + "/" + _username.Value + ".png";
+                filePath = Application.persistentDataPath + "/" + _username + ".png";
 
                 // ReSharper disable once StringLiteralTypo
-                var validatePath = Application.persistentDataPath + "/" + _username.Value + ".skinvalidate";
+                var validatePath = Application.persistentDataPath + "/" + _username + ".skinvalidate";
 
                 var doDownload = true;
                 if (System.IO.File.Exists(validatePath))
@@ -429,7 +418,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             var saveData = new PlayerData
             {
-                Username = _username.Value.ToString(),
+                Username = _username,
                 Options = new PlayerOptions
                 {
                     TextureUrl = TextureUrl.Value.ToString()
@@ -455,7 +444,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             spellScript.SpellDirection = direction;
 
             spellObject.GetComponent<NetworkObject>().Spawn(true);
-            
+
             spellObject.transform.parent = GameManager.Instance.SceneBehaviour.GetTransform();
         }
 
@@ -486,12 +475,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
 
             var prefab = GameManager.Instance.Prefabs.Combat.SpellWall;
-            var startPositionAdjusted = startPosition + new Vector3(0, prefab.transform.localScale.y / 2);
-            var spellObject = Instantiate(prefab, startPositionAdjusted, rotation);
+
+            var spellObject = Instantiate(prefab, startPosition, rotation);
+            GameManager.Instance.SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(startPosition, spellObject);
 
             var spellScript = spellObject.GetComponent<SpellWallBehaviour>();
-            spellScript.PlayerClientId.Value = senderClientId;
-            spellScript.SpellId.Value = activeSpell.Id;
+            spellScript.PlayerClientId = senderClientId;
+            spellScript.SpellId = activeSpell.Id;
 
             spellObject.GetComponent<NetworkObject>().Spawn(true);
 
@@ -506,12 +496,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
 
             var prefab = GameManager.Instance.Prefabs.Combat.SpellZone;
-            var startPositionAdjusted = startPosition + new Vector3(0, prefab.transform.localScale.y / 2);
-            var spellObject = Instantiate(prefab, startPositionAdjusted, Quaternion.identity);
+            
+            var spellObject = Instantiate(prefab, startPosition, Quaternion.identity);
+            GameManager.Instance.SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(startPosition, spellObject, false);
 
             var spellScript = spellObject.GetComponent<SpellZoneBehaviour>();
-            spellScript.PlayerClientId.Value = senderClientId;
-            spellScript.SpellId.Value = activeSpell.Id;
+            spellScript.PlayerClientId = senderClientId;
+            spellScript.SpellId = activeSpell.Id;
 
             spellObject.GetComponent<NetworkObject>().Spawn(true);
 
@@ -529,7 +520,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             new SpellTouchBehaviour(activeSpell, startPosition, direction, senderClientId);
         }
 
-        public void ToggleSpellBeam(bool isLeftHand, Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
+        public void ToggleSpellBeam(bool isLeftHand, Spell activeSpell, Vector3 startPosition, Vector3 direction)
         {
             if (isLeftHand && _spellBeingCastLeft != null)
             {
