@@ -5,6 +5,7 @@ using UnityEngine;
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Helpers;
+using FullPotential.Core.Spawning;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
@@ -15,7 +16,7 @@ using FullPotential.Core.Helpers;
 
 namespace FullPotential.Core.Behaviours.SceneObjects
 {
-    public class SceneObjectsLevel001 : NetworkBehaviour, ISceneEvents
+    public class SceneObjectsLevel001 : NetworkBehaviour, ISceneBehaviour
     {
         public GameObject EnemyPrefab;
 
@@ -24,6 +25,12 @@ namespace FullPotential.Core.Behaviours.SceneObjects
         private List<Transform> _spawnPoints;
         private NetworkObject _playerPrefabNetObj;
         private NetworkObject _enemyPrefabNetObj;
+        private SpawnService _spawnService;
+
+        private void Awake()
+        {
+            _spawnService = new SpawnService();
+        }
 
         public override void OnNetworkSpawn()
         {
@@ -32,7 +39,7 @@ namespace FullPotential.Core.Behaviours.SceneObjects
             _playerPrefabNetObj = GameManager.Instance.Prefabs.Player.GetComponent<NetworkObject>();
             _enemyPrefabNetObj = EnemyPrefab.GetComponent<NetworkObject>();
 
-            var spawnPointsParent = UnityHelper.GetObjectAtRoot(GameManager.NameSpawnPoints).transform;
+            var spawnPointsParent = UnityHelper.GetObjectAtRoot(Constants.GameObjectNames.SpawnPoints).transform;
             _spawnPoints = new List<Transform>();
             foreach (Transform spawnPoint in spawnPointsParent)
             {
@@ -60,12 +67,15 @@ namespace FullPotential.Core.Behaviours.SceneObjects
         public void SpawnEnemy()
         {
             var chosenSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Count)];
-            var spawnPosition = SpawnHelper.GetAboveGroundPosition(chosenSpawnPoint.position, _enemyPrefabNetObj.gameObject) + new Vector3(
+            var spawnPosition = chosenSpawnPoint.position + new Vector3(
                 Random.Range(_spawnVariation.x, _spawnVariation.y),
                 0,
                 Random.Range(_spawnVariation.x, _spawnVariation.y));
 
             var enemyNetObj = Instantiate(_enemyPrefabNetObj, spawnPosition, chosenSpawnPoint.rotation, transform);
+
+            _spawnService.AdjustPositionToBeAboveGround(spawnPosition, enemyNetObj.gameObject);
+
             enemyNetObj.Spawn(true);
         }
 
@@ -74,5 +84,14 @@ namespace FullPotential.Core.Behaviours.SceneObjects
             SpawnEnemy();
         }
 
+        public SpawnService GetSpawnService()
+        {
+            return _spawnService;
+        }
+
+        public Transform GetTransform()
+        {
+            return transform;
+        }
     }
 }

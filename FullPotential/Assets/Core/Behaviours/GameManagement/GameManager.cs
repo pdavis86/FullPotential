@@ -23,10 +23,6 @@ namespace FullPotential.Core.Behaviours.GameManagement
 {
     public class GameManager : MonoBehaviour
     {
-        public const string NameCanvasScene = "SceneCanvas";
-        public const string NameSpawnPoints = "SpawnPoints";
-        public const string NameSceneObjects = "SceneObjects";
-
 #pragma warning disable 0649
         [SerializeField] private GameObject _mainCanvas;
 #pragma warning restore 0649
@@ -43,15 +39,17 @@ namespace FullPotential.Core.Behaviours.GameManagement
         public MainCanvasObjects MainCanvasObjects { get; private set; }
 
         private GameObject _sceneObjects;
-        public GameObject SceneObjects
+        private ISceneBehaviour _sceneBehaviour;
+        public ISceneBehaviour SceneBehaviour
         {
             get
             {
-                if (_sceneObjects == null)
+                if (_sceneObjects == null || _sceneBehaviour == null)
                 {
-                    _sceneObjects = UnityHelper.GetObjectAtRoot(GameManager.NameSceneObjects);
+                    _sceneObjects = UnityHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneObjects);
+                    _sceneBehaviour = _sceneObjects.GetComponent<ISceneBehaviour>();
                 }
-                return _sceneObjects;
+                return _sceneBehaviour;
             }
         }
 

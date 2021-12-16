@@ -16,5 +16,17 @@ namespace FullPotential.Core.Extensions
             return false;
         }
 
+        public static GameObject FindChildWithTag(this GameObject gameObject, string tag)
+        {
+            foreach (Transform tr in gameObject.transform)
+            {
+                if (tr.CompareTag(tag))
+                {
+                    return tr.gameObject;
+                }
+            }
+            return null;
+        }
+
     }
 }

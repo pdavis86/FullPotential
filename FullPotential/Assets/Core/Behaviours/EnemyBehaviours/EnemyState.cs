@@ -30,7 +30,6 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
 
         public int GetDefenseValue()
         {
-            //todo: implement enemy GetDefenseValue()
             return 50;
         }
 
@@ -73,12 +72,12 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
             foreach (var item in _damageTaken)
             {
                 var playerState = NetworkManager.Singleton.ConnectedClients[item.Key].PlayerObject.gameObject.GetComponent<PlayerState>();
-                playerState.SpawnLootChest(transform.position, transform.rotation);
+                playerState.SpawnLootChest(transform.position);
             }
 
             Destroy(gameObject);
 
-            GameManager.Instance.SceneObjects.GetComponent<ISceneEvents>().OnEnemyDeath();
+            GameManager.Instance.SceneBehaviour.OnEnemyDeath();
         }
 
     }

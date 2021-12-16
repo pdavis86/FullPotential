@@ -14,19 +14,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
     [RequireComponent(typeof(Rigidbody))]
     public class PlayerMovement : NetworkBehaviour
     {
-        //private readonly NetworkVariable<Vector3> _rigidBodyVelocity = new NetworkVariable<Vector3>();
-        //private readonly NetworkVariable<Vector3> _rigidBodyRotationDirection = new NetworkVariable<Vector3>();
-        //private readonly NetworkVariable<Vector3> _cameraRotationDirection = new NetworkVariable<Vector3>();
-        //private readonly NetworkVariable<bool> _isJumping = new NetworkVariable<bool>();
-
 #pragma warning disable 0649
+        [SerializeField] private readonly Vector2 _lookSensitivity = new Vector2(0.2f, 0.2f);
+        [SerializeField] private readonly Vector2 _lookSmoothness = new Vector2(3f, 3f);
         [SerializeField] private Camera _playerCamera;
         [SerializeField] private float _speed = 5f;
-        [SerializeField] private float _lookSensitivity = 0.7f;
         [SerializeField] private float _cameraRotationLimit = 85f;
         [SerializeField] private float _jumpForceMultiplier = 10500f;
 #pragma warning restore 0649
 
+        private Vector2 _smoothLook;
         private Rigidbody _rb;
         private PlayerState _playerState;
         private Vector2 _moveVal;
@@ -60,12 +57,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void FixedUpdate()
         {
-            CheckForInput();
+            MoveAndLook();
         }
 
         #endregion
 
-        private void CheckForInput()
+        private void MoveAndLook()
         {
             if (_moveVal != Vector2.zero)
             {
@@ -77,10 +74,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (_lookVal != Vector2.zero)
             {
-                var rotation = new Vector3(0f, _lookVal.x, 0f) * _lookSensitivity;
+                var lookInput = new Vector2(_lookVal.x, _lookVal.y);
+                lookInput = Vector2.Scale(lookInput, new Vector2(_lookSensitivity.x * _lookSmoothness.x, _lookSensitivity.y * _lookSmoothness.y));
+
+                _smoothLook.x = Mathf.Lerp(_smoothLook.x, lookInput.x, 1f / _lookSmoothness.x);
+                _smoothLook.y = Mathf.Lerp(_smoothLook.y, lookInput.y, 1f / _lookSmoothness.y);
+
+                var rotation = new Vector3(0f, _smoothLook.x, 0f);
                 _rb.MoveRotation(_rb.rotation * Quaternion.Euler(rotation));
 
-                var cameraRotationX = _lookVal.y * _lookSensitivity;
+                var cameraRotationX = _smoothLook.y;
                 _currentCameraRotationX -= cameraRotationX;
                 _currentCameraRotationX = Mathf.Clamp(_currentCameraRotationX, -_cameraRotationLimit, _cameraRotationLimit);
                 var cameraRotation = new Vector3(_currentCameraRotationX, 0f, 0f);

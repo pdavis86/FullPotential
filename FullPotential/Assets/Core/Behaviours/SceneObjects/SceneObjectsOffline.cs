@@ -1,5 +1,4 @@
-﻿using FullPotential.Core.Behaviours.GameManagement;
-using FullPotential.Core.Helpers;
+﻿using FullPotential.Core.Helpers;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
@@ -13,7 +12,7 @@ namespace FullPotential.Core.Behaviours.SceneObjects
     {
         private void Start()
         {
-            UnityHelper.GetObjectAtRoot(GameManager.NameCanvasScene).SetActive(true);
+            UnityHelper.GetObjectAtRoot(Constants.GameObjectNames.CanvasScene).SetActive(true);
         }
 
     }

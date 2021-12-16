@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using FullPotential.Core.Behaviours.Environment;
 using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Extensions;
-using FullPotential.Core.Helpers;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -228,7 +227,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [ClientRpc]
         public void UpdatePositionsAndRotationsClientRpc(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation, ClientRpcParams clientRpcParams = default)
         {
-            //todo: Only send position data of nearby players to client - Might be worth looking into the implementation of NetworkTransform to steal its code
             if (!IsOwner)
             {
                 UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation);
@@ -237,14 +235,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void SpawnLootChestClientRpc(string id, Vector3 position, Quaternion rotation, ClientRpcParams clientRpcParams = default)
+        public void SpawnLootChestClientRpc(string id, Vector3 position, ClientRpcParams clientRpcParams = default)
         {
             var prefab = GameManager.Instance.Prefabs.Environment.LootChest;
 
-            var spawnPosition = SpawnHelper.GetAboveGroundPosition(position, prefab.gameObject);
+            var go = Instantiate(prefab, position, transform.rotation * Quaternion.Euler(0, 90, 0));
 
-            var go = Instantiate(prefab, spawnPosition, transform.rotation * Quaternion.Euler(0, 90, 0));
-            go.transform.parent = GameManager.Instance.SceneObjects.transform;
+            GameManager.Instance.SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(position, go, false);
+
+            go.transform.parent = GameManager.Instance.SceneBehaviour.GetTransform();
             go.name = id;
 
             var lootScript = go.GetComponent<LootInteractable>();
@@ -445,7 +444,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 Debug.LogWarning("Tried to spawn a projectile spell when not on the server");
             }
 
-            var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPosition, Quaternion.identity, GameManager.Instance.SceneObjects.transform);
+            var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPosition, Quaternion.identity, GameManager.Instance.SceneBehaviour.GetTransform());
 
             var spellScript = spellObject.GetComponent<SpellProjectileBehaviour>();
             spellScript.PlayerClientId.Value = senderClientId;
@@ -462,7 +461,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 Debug.LogWarning("Tried to spawn a self spell when not on the server");
             }
 
-            var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPosition, Quaternion.identity, GameManager.Instance.SceneObjects.transform);
+            var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPosition, Quaternion.identity, GameManager.Instance.SceneBehaviour.GetTransform());
 
             var spellScript = spellObject.GetComponent<SpellSelfBehaviour>();
             spellScript.PlayerClientId.Value = senderClientId;
@@ -481,7 +480,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             var prefab = GameManager.Instance.Prefabs.Combat.SpellWall;
             var startPositionAdjusted = startPosition + new Vector3(0, prefab.transform.localScale.y / 2);
-            var spellObject = Instantiate(prefab, startPositionAdjusted, rotation, GameManager.Instance.SceneObjects.transform);
+            var spellObject = Instantiate(prefab, startPositionAdjusted, rotation, GameManager.Instance.SceneBehaviour.GetTransform());
 
             var spellScript = spellObject.GetComponent<SpellWallBehaviour>();
             spellScript.PlayerClientId.Value = senderClientId;
@@ -499,7 +498,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             var prefab = GameManager.Instance.Prefabs.Combat.SpellZone;
             var startPositionAdjusted = startPosition + new Vector3(0, prefab.transform.localScale.y / 2);
-            var spellObject = Instantiate(prefab, startPositionAdjusted, Quaternion.identity, GameManager.Instance.SceneObjects.transform);
+            var spellObject = Instantiate(prefab, startPositionAdjusted, Quaternion.identity, GameManager.Instance.SceneBehaviour.GetTransform());
 
             var spellScript = spellObject.GetComponent<SpellZoneBehaviour>();
             spellScript.PlayerClientId.Value = senderClientId;
@@ -581,7 +580,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             //todo: implement player HandleDeath()
         }
 
-        public void SpawnLootChest(Vector3 position, Quaternion rotation)
+        public void SpawnLootChest(Vector3 position)
         {
             //todo: clean out expired loot
 
@@ -591,7 +590,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             var clientRpcParams = new ClientRpcParams();
             clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
-            SpawnLootChestClientRpc(id, position, rotation, clientRpcParams);
+            SpawnLootChestClientRpc(id, position, clientRpcParams);
         }
 
         #region Nested Classes

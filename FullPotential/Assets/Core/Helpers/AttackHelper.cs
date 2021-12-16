@@ -7,7 +7,6 @@ using System.Globalization;
 using UnityEngine;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Behaviours.EnemyBehaviours;
-using Object = UnityEngine.Object;
 
 namespace FullPotential.Core.Helpers
 {
