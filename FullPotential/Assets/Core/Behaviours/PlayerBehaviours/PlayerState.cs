@@ -59,6 +59,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         #region Event handlers
 
+#pragma warning disable IDE0051
         private void Awake()
         {
             _username.OnValueChanged += OnUsernameChanged;
@@ -89,6 +90,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
         }
 
+        private void OnDisable()
+        {
+            _username.OnValueChanged -= OnUsernameChanged;
+            TextureUrl.OnValueChanged -= OnTextureChanged;
+        }
+#pragma warning restore IDE0051
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -108,12 +116,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 //Debug.Log("Requesting other player data for client ID " + OwnerClientId);
                 RequestReducedPlayerDataServerRpc();
             }
-        }
-
-        private void OnDisable()
-        {
-            _username.OnValueChanged -= OnUsernameChanged;
-            TextureUrl.OnValueChanged -= OnTextureChanged;
         }
 
         private void OnUsernameChanged(FixedString64Bytes previousValue, FixedString64Bytes newValue)

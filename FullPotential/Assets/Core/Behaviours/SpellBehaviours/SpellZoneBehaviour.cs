@@ -23,6 +23,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
         private float _timeSinceLastEffective;
         private float _timeBetweenEffects;
 
+#pragma warning disable IDE0051
         private void Start()
         {
             if (!IsServer)
@@ -71,6 +72,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
             ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
         }
+#pragma warning restore IDE0051
 
         public void ApplySpellEffects(GameObject target, Vector3? position)
         {

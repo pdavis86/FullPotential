@@ -27,10 +27,12 @@ namespace FullPotential.Core.Behaviours.SceneObjects
         private NetworkObject _enemyPrefabNetObj;
         private SpawnService _spawnService;
 
+#pragma warning disable IDE0051
         private void Awake()
         {
             _spawnService = new SpawnService();
         }
+#pragma warning restore IDE0051
 
         public override void OnNetworkSpawn()
         {

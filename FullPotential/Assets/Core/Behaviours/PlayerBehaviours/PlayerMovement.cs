@@ -34,6 +34,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         #region Event Handlers 
 
+#pragma warning disable IDE0051
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
@@ -59,6 +60,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             MoveAndLook();
         }
+#pragma warning restore IDE0051
 
         #endregion
 

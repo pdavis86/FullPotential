@@ -45,6 +45,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         #region Event handlers
 
+#pragma warning disable IDE0051
         private void Awake()
         {
             _playerState = GetComponent<PlayerState>();
@@ -149,7 +150,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 _sceneCamera.gameObject.SetActive(true);
             }
         }
-
+#pragma warning restore IDE0051
         #endregion
 
         #region ServerRpc calls
