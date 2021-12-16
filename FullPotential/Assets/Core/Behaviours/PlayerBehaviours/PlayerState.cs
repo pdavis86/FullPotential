@@ -54,7 +54,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private GameObject _spellBeingCastRight;
         private bool _loadWasSuccessful;
 
-        //todo: another struct for this player data?
         private string _username;
 
         private FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
@@ -106,13 +105,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 RequestReducedPlayerDataServerRpc();
             }
         }
-
-        // ReSharper disable UnusedParameter.Local
-        private void OnUsernameChanged(FixedString64Bytes previousValue, FixedString64Bytes newValue)
-        {
-            SetNameTag();
-        }
-        // ReSharper restore UnusedParameter.Local
 
         private void OnTextureChanged(FixedString512Bytes previousValue, FixedString512Bytes newValue)
         {
@@ -324,6 +316,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             //Debug.LogError($"Loading player data into PlayerState with OwnerClientId: {OwnerClientId}");
 
             _username = playerData.Username;
+            SetNameTag();
 
             if (IsServer)
             {
