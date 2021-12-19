@@ -166,12 +166,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public void ApplyInventoryChanges(InventoryChanges changes)
         {
-            if (!IsServer)
-            {
-                Debug.LogError($"{nameof(ApplyInventoryChanges)} called on the client!");
-                return;
-            }
-
             if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
             {
                 foreach (var id in changes.IdsToRemove)
@@ -395,9 +389,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public ItemBase GetItemInHand(bool isLeftHand)
         {
-            return isLeftHand
-                ? GetItemWithId<ItemBase>(EquippedLeftHand.Value.ToString())
-                : GetItemWithId<ItemBase>(EquippedRightHand.Value.ToString());
+            var idInHand = isLeftHand
+                ? EquippedLeftHand.Value.ToString()
+                : EquippedRightHand.Value.ToString();
+
+            if (idInHand.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+
+            return GetItemWithId<ItemBase>(idInHand, false);
         }
 
         public List<ItemBase> GetComponentsFromIds(string[] componentIds)

@@ -20,6 +20,10 @@ namespace FullPotential.Core.Behaviours.Environment
 
         public override void OnFocus()
         {
+            if (_interactionBubble == null)
+            {
+                return;
+            }
             var translation = GameManager.Instance.Localizer.Translate("ui.interact.loot");
             var interactInputName = GameManager.Instance.InputActions.Player.Interact.GetBindingDisplayString().ToUpper();
             _interactionBubble.text = string.Format(translation, interactInputName);

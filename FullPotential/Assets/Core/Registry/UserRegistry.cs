@@ -22,26 +22,25 @@ namespace FullPotential.Core.Registry
 
         public PlayerData Load(string token, string username, bool reduced)
         {
-            var filePath = string.IsNullOrWhiteSpace(token)
-                ? GetPlayerSavePath(username)
-                : GetPlayerSavePath(token);
+            if (string.IsNullOrWhiteSpace(username))
+            {
+               username = token;
+            }
+
+            var filePath = GetPlayerSavePath(username);
 
             if (!System.IO.File.Exists(filePath))
             {
                 return new PlayerData
                 {
                     Username = username,
-                    Options = new PlayerOptions()
+                    Options = new PlayerOptions(),
+                    Inventory = new Inventory()
                 };
             }
 
             var loadJson = System.IO.File.ReadAllText(filePath);
             var playerData = JsonUtility.FromJson<PlayerData>(loadJson);
-
-            if (string.IsNullOrWhiteSpace(playerData.Username))
-            {
-                playerData.Username = username;
-            }
 
             if (reduced)
             {

@@ -435,12 +435,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             var itemInHand = _playerState.Inventory.GetItemInHand(isLeftHand);
 
-            if (itemInHand == null)
-            {
-                return;
-            }
-
-            TryToAttackServerRpc(itemInHand.Id, _playerCamera.transform.forward);
+            TryToAttackServerRpc(itemInHand?.Id, _playerCamera.transform.forward);
         }
 
         public void ShowAlert(string alertText)
