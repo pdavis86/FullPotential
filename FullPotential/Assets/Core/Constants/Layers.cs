@@ -1,5 +1,7 @@
 ﻿namespace FullPotential.Core.Constants
 {
+    // ReSharper disable UnusedMember.Global
+
     public static class Layers
     {
         public const string Default = "Default";

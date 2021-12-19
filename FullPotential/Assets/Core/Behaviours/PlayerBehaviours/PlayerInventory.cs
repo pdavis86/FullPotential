@@ -37,6 +37,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             Amulet
         }
 
+        // ReSharper disable InconsistentNaming
         private readonly NetworkVariable<FixedString32Bytes> EquippedHelm = new NetworkVariable<FixedString32Bytes>();
         private readonly NetworkVariable<FixedString32Bytes> EquippedChest = new NetworkVariable<FixedString32Bytes>();
         private readonly NetworkVariable<FixedString32Bytes> EquippedLegs = new NetworkVariable<FixedString32Bytes>();
@@ -48,6 +49,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private readonly NetworkVariable<FixedString32Bytes> EquippedRightRing = new NetworkVariable<FixedString32Bytes>();
         private readonly NetworkVariable<FixedString32Bytes> EquippedBelt = new NetworkVariable<FixedString32Bytes>();
         private readonly NetworkVariable<FixedString32Bytes> EquippedAmulet = new NetworkVariable<FixedString32Bytes>();
+        // ReSharper restore InconsistentNaming
 
         private PlayerState _playerState;
         private Dictionary<string, ItemBase> _items;

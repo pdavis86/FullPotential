@@ -1,4 +1,6 @@
-﻿namespace FullPotential.Api.Behaviours
+﻿// ReSharper disable UnusedMemberInSuper.Global
+
+namespace FullPotential.Api.Behaviours
 {
     public interface IDamageable
     {

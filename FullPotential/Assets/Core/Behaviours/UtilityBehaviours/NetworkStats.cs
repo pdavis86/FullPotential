@@ -23,18 +23,18 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
         [Tooltip("The interval to send ping RPCs to calculate the RTT. The bigger the number, the less reactive the stat will be to RTT changes")]
         float _pingIntervalSeconds = 0.1f;
 
-        const int _maxWindowSizeSeconds = 3;
+        private const int _maxWindowSizeSeconds = 3;
 
         public float LastRtt { get; private set; }
 
-        float _maxWindowSize => _maxWindowSizeSeconds / _pingIntervalSeconds;
+        private float _maxWindowSize => _maxWindowSizeSeconds / _pingIntervalSeconds;
 
-        readonly Queue<float> _movingWindow = new Queue<float>();
-        readonly Dictionary<int, float> _pingHistoryStartTimes = new Dictionary<int, float>();
+        private readonly Queue<float> _movingWindow = new Queue<float>();
+        private readonly Dictionary<int, float> _pingHistoryStartTimes = new Dictionary<int, float>();
 
-        float _lastPingTime;
-        int _currentPingId;
-        ClientRpcParams _pongClientParams;
+        private float _lastPingTime;
+        private int _currentPingId;
+        private ClientRpcParams _pongClientParams;
 
         public override void OnNetworkSpawn()
         {

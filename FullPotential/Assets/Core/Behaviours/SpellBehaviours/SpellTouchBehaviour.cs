@@ -11,7 +11,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 {
     public class SpellTouchBehaviour : ISpellBehaviour
     {
-        const int _maxDistance = 3;
+        private const int _maxDistance = 3;
 
         private readonly Spell _spell;
         private readonly GameObject _sourcePlayer;

@@ -260,8 +260,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         //Need this to get over the key not found exception caused by too many RPC calls with large payloads
         private IEnumerator LoadFromPlayerDataCoroutine(PlayerData playerData, ulong clientId)
         {
-            var clientRpcParams = new ClientRpcParams();
-            clientRpcParams.Send.TargetClientIds = new[] { clientId };
+            var clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams { TargetClientIds = new[] { clientId } }
+            };
 
             //Debug.LogError($"Sending LoadFromPlayerData messages to client {clientId}");
 
@@ -590,8 +592,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             _unclaimedLoot.Add(id, DateTime.UtcNow.AddHours(1));
 
-            var clientRpcParams = new ClientRpcParams();
-            clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
+            var clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams { TargetClientIds = new[] { OwnerClientId } }
+            };
             SpawnLootChestClientRpc(id, position, clientRpcParams);
         }
 

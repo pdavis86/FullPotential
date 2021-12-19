@@ -1,11 +1,11 @@
 ﻿using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
-using Unity.Netcode;
 using UnityEngine.InputSystem;
 
 // ReSharper disable UnusedType.Global
-// ReSharper disable once ClassNeverInstantiated.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable UnusedMember.Local
 
 namespace FullPotential.Core.Behaviours.Environment
 {

@@ -16,19 +16,24 @@ namespace FullPotential.Core.Static
             EditorApplication.playModeStateChanged += LoadDefaultScene;
         }
 
-        static void LoadDefaultScene(PlayModeStateChange state)
+        private static void LoadDefaultScene(PlayModeStateChange state)
         {
-            if (state == PlayModeStateChange.ExitingEditMode)
+            switch (state)
             {
-                EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
-            }
-            else if (state == PlayModeStateChange.EnteredPlayMode)
-            {
-                var activeScene = EditorSceneManager.GetActiveScene();
-                if (activeScene.buildIndex != 0)
+                case PlayModeStateChange.ExitingEditMode:
+                    EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
+                    break;
+
+                case PlayModeStateChange.EnteredPlayMode:
                 {
-                    EditorSceneManager.LoadScene(0);
-                    Debug.LogWarning("Force loaded scene 0 as it was not the active scene in the editor");
+                    var activeScene = EditorSceneManager.GetActiveScene();
+                    if (activeScene.buildIndex != 0)
+                    {
+                        EditorSceneManager.LoadScene(0);
+                        Debug.LogWarning("Force loaded scene 0 as it was not the active scene in the editor");
+                    }
+
+                    break;
                 }
             }
         }
