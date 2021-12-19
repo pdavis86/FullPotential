@@ -8,7 +8,6 @@ using System.Linq;
 using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
 using FullPotential.Core.Extensions;
-using FullPotential.Core.Registry.Base;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;

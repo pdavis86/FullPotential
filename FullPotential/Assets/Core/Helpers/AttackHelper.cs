@@ -37,10 +37,6 @@ namespace FullPotential.Core.Helpers
                 return;
             }
 
-            var attackStrength = itemUsed != null 
-                ? itemUsed.Attributes.Strength
-                : 1;
-
             IDamageable damageable;
             int defenceStrength;
             if (targetIsPlayer)
@@ -57,6 +53,7 @@ namespace FullPotential.Core.Helpers
             }
 
             //Even a small attack can still do damage
+            var attackStrength = itemUsed?.Attributes.Strength ?? 1;
             var damageDealtBasic = attackStrength * 100f / (100 + defenceStrength);
 
             //Throw in some variation
