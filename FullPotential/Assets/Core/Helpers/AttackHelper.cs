@@ -37,7 +37,9 @@ namespace FullPotential.Core.Helpers
                 return;
             }
 
-            var attackStrength = itemUsed.Attributes.Strength;
+            var attackStrength = itemUsed != null 
+                ? itemUsed.Attributes.Strength
+                : 1;
 
             IDamageable damageable;
             int defenceStrength;
@@ -74,7 +76,7 @@ namespace FullPotential.Core.Helpers
                 return;
             }
 
-            Debug.Log($"Source '{source.name}' used '{itemUsed.Name}' to attack target '{target.name}' for {damageDealt} damage");
+            Debug.Log($"Source '{source.name}' used '{itemUsed?.Name ?? "their fist"}' to attack target '{target.name}' for {damageDealt} damage");
 
             if (source.CompareTag(Tags.Player) && position.HasValue)
             {

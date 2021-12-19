@@ -7,6 +7,8 @@ using System;
 using System.Linq;
 using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
+using FullPotential.Core.Extensions;
+using FullPotential.Core.Registry.Base;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -170,6 +172,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [ServerRpc]
         public void TryToAttackServerRpc(string itemId, Vector3 direction, ServerRpcParams serverRpcParams = default)
         {
+            if (itemId.IsNullOrWhiteSpace())
+            {
+                Punch();
+                return;
+            }
+
             var isLeftHand = false;
             if (_playerState.Inventory.EquippedLeftHand.Value == itemId)
             {
@@ -187,10 +195,38 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 CastSpell(spellInHand, isLeftHand, direction, serverRpcParams);
             }
+            else if (itemInHand is Weapon weaponInHand)
+            {
+                UseWeapon(weaponInHand);
+            }
             else
             {
                 Debug.LogWarning("Not implemented attack for " + itemInHand.Name + " yet");
             }
+        }
+
+        private void Punch()
+        {
+            var ray = _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
+            if (!Physics.Raycast(ray, out var hit, maxDistance: 4))
+            {
+                //Debug.Log("Swing and a miss!");
+                return;
+            }
+
+            AttackHelper.DealDamage(gameObject, null, hit.transform.gameObject, hit.point);
+        }
+
+        private void UseWeapon(Weapon itemInHand)
+        {
+            var ray = _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
+            if (!Physics.Raycast(ray, out var hit, maxDistance: 4))
+            {
+                //Debug.Log("Weapon can't reach target!");
+                return;
+            }
+
+            AttackHelper.DealDamage(gameObject, itemInHand, hit.transform.gameObject, hit.point);
         }
 
         private void CastSpell(Spell activeSpell, bool isLeftHand, Vector3 direction, ServerRpcParams serverRpcParams)
@@ -314,7 +350,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (OwnerClientId != 0)
             {
-                //todo: can't apply inventory changes on the client. What was I thinking here?
                 foreach (var message in MessageHelper.GetFragmentedMessages(invChange))
                 {
                     ApplyInventoryChangesClientRpc(message, _clientRpcParams);
