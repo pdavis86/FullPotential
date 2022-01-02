@@ -1,4 +1,6 @@
-﻿using FullPotential.Core.Crafting;
+﻿using System;
+using System.Reflection;
+using FullPotential.Core.Crafting;
 using FullPotential.Core.Data;
 using FullPotential.Core.Localization;
 using FullPotential.Core.Registry;
@@ -118,6 +120,9 @@ namespace FullPotential.Core.Behaviours.GameManagement
                 return;
             }
 
+            //todo: don't let connect if too different
+            GetGameVersion();
+
             var payload = System.Text.Encoding.UTF8.GetString(connectionData);
             var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
             if (!UserRegistry.ValidateToken(connectionPayload.PlayerToken))
@@ -200,6 +205,13 @@ namespace FullPotential.Core.Behaviours.GameManagement
 #else
         Application.Quit ();
 #endif
+        }
+
+        public static Version GetGameVersion()
+        {
+            var appVersion = Application.version;
+            var lastWrite = System.IO.File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location);
+            return new Version(appVersion + "." + lastWrite.ToString("yyyyMMdd"));
         }
 
     }
