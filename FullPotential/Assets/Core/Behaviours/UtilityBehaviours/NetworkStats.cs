@@ -68,14 +68,14 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
 
         // ReSharper disable once UnusedParameter.Local
         [ServerRpc(RequireOwnership = false)]
-        private void PingServerRpc(int pingId, ServerRpcParams serverParams = default)
+        private void PingServerRpc(int pingId, ServerRpcParams serverRpcParams = default)
         {
             PongClientRpc(pingId, _pongClientParams);
         }
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        private void PongClientRpc(int pingId, ClientRpcParams clientParams = default)
+        private void PongClientRpc(int pingId, ClientRpcParams clientRpcParams)
         {
             var startTime = _pingHistoryStartTimes[pingId];
             _pingHistoryStartTimes.Remove(pingId);

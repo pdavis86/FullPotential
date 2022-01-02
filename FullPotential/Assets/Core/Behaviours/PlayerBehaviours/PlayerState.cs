@@ -143,9 +143,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [ServerRpc]
         public void UpdatePositionsAndRotationsServerRpc(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation)
         {
-            //NOTE: This does not stop players cheating their position. That's a problem for another day
+            //NOTE: This does not stop players cheating their position. That's a problem for another day. Also sends data to ALL clients
             UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation);
-            UpdatePositionsAndRotationsClientRpc(rbPosition, rbRotation, rbVelocity, cameraRotation);
+            UpdatePositionsAndRotationsClientRpc(rbPosition, rbRotation, rbVelocity, cameraRotation, new ClientRpcParams());
         }
 
         [ServerRpc]
@@ -169,21 +169,21 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void ShowAlertClientRpc(string alertText, ClientRpcParams clientRpcParams = default)
+        public void ShowAlertClientRpc(string alertText, ClientRpcParams clientRpcParams)
         {
             _playerActions.ShowAlert(alertText);
         }
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void ShowDamageClientRpc(Vector3 position, string damage, ClientRpcParams clientRpcParams = default)
+        public void ShowDamageClientRpc(Vector3 position, string damage, ClientRpcParams clientRpcParams)
         {
             _playerActions.ShowDamage(position, damage);
         }
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void LoadPlayerDataClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams = default)
+        public void LoadPlayerDataClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams)
         {
             var fragmentedMessage = JsonUtility.FromJson<FragmentedMessage>(fragmentedMessageJson);
 
@@ -210,7 +210,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void UpdatePositionsAndRotationsClientRpc(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation, ClientRpcParams clientRpcParams = default)
+        public void UpdatePositionsAndRotationsClientRpc(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation, ClientRpcParams clientRpcParams)
         {
             if (!IsOwner)
             {
@@ -220,7 +220,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void SpawnLootChestClientRpc(string id, Vector3 position, ClientRpcParams clientRpcParams = default)
+        public void SpawnLootChestClientRpc(string id, Vector3 position, ClientRpcParams clientRpcParams)
         {
             var prefab = GameManager.Instance.Prefabs.Environment.LootChest;
 
