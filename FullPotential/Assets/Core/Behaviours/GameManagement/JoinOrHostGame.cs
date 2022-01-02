@@ -1,4 +1,7 @@
-﻿using FullPotential.Core.Data;
+﻿using System;
+using System.Collections;
+using System.Linq;
+using FullPotential.Core.Data;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UNET;
 using UnityEngine;
@@ -38,6 +41,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
         private string _password;
         private string _networkAddress;
         private string _networkPort;
+        private DateTime _joinAttempt;
 
         private void Start()
         {
@@ -183,21 +187,12 @@ namespace FullPotential.Core.Behaviours.GameManagement
         private bool IsPortFree()
         {
             var ipEndpoints = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().GetActiveUdpListeners();
-
-            foreach (var ipEndpoint in ipEndpoints)
-            {
-                if (ipEndpoint.Port == _networkTransport.ConnectPort)
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return ipEndpoints.All(ipEndpoint => ipEndpoint.Port != _networkTransport.ConnectPort);
         }
 
         private void JoinGameInternal()
         {
-            var payload = JsonUtility.ToJson(new ConnectionPayload()
+            var payload = JsonUtility.ToJson(new ConnectionPayload
             {
                 PlayerToken = GameManager.Instance.DataStore.PlayerToken
             });
@@ -207,12 +202,39 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
             GameManager.Instance.DataStore.HasDisconnected = false;
 
+            _joinAttempt = DateTime.UtcNow;
             _networkManager.StartClient();
 
             _gameDetailsContainer.SetActive(false);
             _joiningMessage.SetActive(true);
 
             //NOTE: Do not need to change scene. This is handled by the server
+
+            StartCoroutine(LogTimeout());
+        }
+
+        private IEnumerator LogTimeout()
+        {
+            const int timeoutSeconds = 10;
+
+            do
+            {
+                var timeTaken = (DateTime.UtcNow - _joinAttempt).TotalSeconds;
+                if (timeTaken > timeoutSeconds)
+                {
+                    NetworkManager.Singleton.Shutdown();
+
+                    Debug.LogWarning($"Failed to join game after {timeoutSeconds} seconds");
+                    _connectError.text = GameManager.Instance.Localizer.Translate("ui.connect.jointimeout");
+                    _connectError.gameObject.SetActive(true);
+                    _joiningMessage.SetActive(false);
+                    _gameDetailsContainer.SetActive(true);
+                    break;
+                }
+
+                yield return new WaitForSeconds(1);
+
+            } while (true);
         }
 
     }

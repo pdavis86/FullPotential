@@ -207,6 +207,10 @@
       "Value": "Joining..."
     },
     {
+      "Key": "ui.connect.jointimeout",
+      "Value": "Failed to join game"
+    },
+    {
       "Key": "ui.connect.disconnected",
       "Value": "The server disconnected you"
     },
