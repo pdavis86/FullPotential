@@ -84,6 +84,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (IsOwner)
             {
+                GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCanvas).SetActive(false);
                 GameManager.Instance.DataStore.LocalPlayer = gameObject;
                 _nameTag.gameObject.SetActive(false);
                 _healthSlider.gameObject.SetActive(false);
@@ -174,8 +175,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public void RespawnServerRpc()
         {
             Health.Value = GetHealthMax();
-            var spawnPoint = GameManager.Instance.SceneBehaviour.GetSpawnPoint();
-            RespawnClientRpc(spawnPoint.Position, spawnPoint.Rotation, _clientRpcParams);
+            var spawnPoint = GameManager.Instance.SceneBehaviour.GetSpawnPoint(gameObject);
+            RespawnClientRpc(_clientRpcParams);
+
+            //NOTE: Sent to all players
+            PlayerRespawnClientRpc(spawnPoint.Position, spawnPoint.Rotation, false, new ClientRpcParams());
+
             IsDead = false;
         }
 
@@ -274,18 +279,23 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void PlayerDiedClientRpc(ClientRpcParams clientRpcParams)
+        public void PlayerRespawnClientRpc(Vector3 position, Quaternion rotation, bool isDead, ClientRpcParams clientRpcParams)
         {
-            _graphicsGameObject.gameObject.SetActive(false);
-            _rb.useGravity = false;
+            if (!isDead)
+            {
+                UpdatePositionsAndRotations(position, rotation, Vector3.zero, null);
+            }
+
+            _graphicsGameObject.gameObject.SetActive(!isDead);
+            _rb.useGravity = !isDead;
+            _rb.isKinematic = isDead;
+            GetComponent<Collider>().enabled = !isDead;
         }
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void RespawnClientRpc(Vector3 position, Quaternion rotation, ClientRpcParams clientRpcParams)
+        public void RespawnClientRpc(ClientRpcParams clientRpcParams)
         {
-            UpdatePositionsAndRotations(position, rotation, Vector3.zero, Quaternion.identity);
-
             MainCanvasObjects.Instance.Respawn.SetActive(false);
             MainCanvasObjects.Instance.Hud.SetActive(true);
 
@@ -341,12 +351,20 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
-        private void UpdatePositionsAndRotations(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation)
+        private void UpdatePositionsAndRotations(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion? cameraRotation)
         {
             _rb.position = rbPosition;
             _rb.rotation = rbRotation;
             _rb.velocity = rbVelocity;
-            PlayerCamera.transform.rotation = cameraRotation;
+
+            if (cameraRotation.HasValue)
+            {
+                PlayerCamera.transform.rotation = cameraRotation.Value;
+            }
+            else
+            {
+                PlayerCamera.transform.localEulerAngles = Vector3.zero;
+            }
         }
 
         public static PlayerState GetWithClientId(ulong clientId)

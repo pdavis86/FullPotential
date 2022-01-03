@@ -14,6 +14,6 @@ namespace FullPotential.Api.Behaviours
 
         Transform GetTransform();
 
-        SpawnPoint GetSpawnPoint();
+        SpawnPoint GetSpawnPoint(GameObject gameObjectToSpawn);
     }
 }

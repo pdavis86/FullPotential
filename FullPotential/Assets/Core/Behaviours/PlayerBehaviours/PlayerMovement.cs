@@ -53,7 +53,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _smoothLook = Vector2.zero;
             _currentCameraRotationX = 0;
             _isJumping = false;
-            _playerCamera.transform.localEulerAngles = Vector3.zero;
+            _isSprinting = false;
         }
 
         private void OnMove(InputValue value)

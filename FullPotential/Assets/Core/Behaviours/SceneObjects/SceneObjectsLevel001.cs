@@ -40,8 +40,6 @@ namespace FullPotential.Core.Behaviours.SceneObjects
         private void Awake()
         {
             _spawnService = new SpawnService();
-
-            GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCamera).SetActive(false);
         }
 
         private void Start()
@@ -116,13 +114,23 @@ namespace FullPotential.Core.Behaviours.SceneObjects
             return transform;
         }
 
-        public SpawnPoint GetSpawnPoint()
+        public SpawnPoint GetSpawnPoint(GameObject gameObjectToSpawn = null)
         {
             var chosenSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Count)];
             var spawnPosition = chosenSpawnPoint.position + new Vector3(
                 Random.Range(_spawnVariation.x, _spawnVariation.y),
                 0,
                 Random.Range(_spawnVariation.x, _spawnVariation.y));
+
+            if (gameObjectToSpawn != null)
+            {
+                _spawnService.AdjustPositionToBeAboveGround(spawnPosition, gameObjectToSpawn);
+                return new SpawnPoint
+                {
+                    Position = gameObjectToSpawn.transform.position,
+                    Rotation = chosenSpawnPoint.rotation
+                };
+            }
 
             return new SpawnPoint
             {

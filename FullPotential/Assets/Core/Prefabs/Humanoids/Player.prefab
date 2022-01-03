@@ -177,7 +177,6 @@ GameObject:
   - component: {fileID: 2488293154466857106}
   - component: {fileID: 5154970250438547979}
   - component: {fileID: 1042624448985905188}
-  - component: {fileID: 2124740598746153271}
   m_Layer: 0
   m_Name: LeftEye
   m_TagString: Untagged
@@ -250,19 +249,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &2124740598746153271
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2951509415099797715}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3124563880166737475
 GameObject:
   m_ObjectHideFlags: 0
@@ -513,7 +499,6 @@ GameObject:
   - component: {fileID: 7294534043646461934}
   - component: {fileID: 1881478102800302093}
   - component: {fileID: 879162605512112676}
-  - component: {fileID: 3021155450797012792}
   m_Layer: 0
   m_Name: RightEye
   m_TagString: Untagged
@@ -586,19 +571,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &3021155450797012792
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5407435344410651640}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6771438989672716362
 GameObject:
   m_ObjectHideFlags: 0
@@ -942,10 +914,10 @@ MonoBehaviour:
   _leftMesh: {fileID: 7392779647843419196}
   _rightMesh: {fileID: 7392779647605690758}
   _healthSlider: {fileID: 5998598060662337222}
-  Inventory: {fileID: 0}
   InFrontOfPlayer: {fileID: 3124563880166737475}
   PlayerCamera: {fileID: 7392779647204144590}
   IsDead: 0
+  Inventory: {fileID: 0}
   PlayerToken: 
 --- !u!114 &3593277776525206365
 MonoBehaviour:
