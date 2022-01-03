@@ -21,6 +21,7 @@ namespace FullPotential.Core.Behaviours.Ui
 #pragma warning restore 0649
 
         private string _hostString;
+        private string _framePerSecond;
         private GameObject _playerObj;
         private NetworkStats _networkStats;
 
@@ -33,6 +34,9 @@ namespace FullPotential.Core.Behaviours.Ui
 
             _hostString = GameManager.Instance.Localizer.Translate("ui.debugging.host");
             GetNetworkStats();
+
+            GetFps();
+            InvokeRepeating(nameof(GetFps), 1, 1);
         }
 
         private void OnGUI()
@@ -40,9 +44,13 @@ namespace FullPotential.Core.Behaviours.Ui
             var networkStats = GetNetworkStats();
             if (networkStats != null)
             {
-                _pingText.text = NetworkManager.Singleton.IsServer
+                var pingTime = NetworkManager.Singleton.IsServer
                     ? _hostString
-                    : networkStats.LastRtt + " ms";
+                    : (int)(networkStats.LastRtt * 1000) + " ms";
+
+
+
+                _pingText.text = pingTime + "\n" + _framePerSecond;
             }
         }
 
@@ -60,6 +68,11 @@ namespace FullPotential.Core.Behaviours.Ui
             }
 
             return _networkStats;
+        }
+
+        private void GetFps()
+        {
+            _framePerSecond = (int)(1f / Time.smoothDeltaTime) + " FPS";
         }
 
     }
