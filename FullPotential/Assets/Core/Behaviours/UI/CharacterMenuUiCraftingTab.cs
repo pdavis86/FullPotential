@@ -94,6 +94,8 @@ namespace FullPotential.Core.Behaviours.Ui
                 .Select((x, i) => !x.Key.EnforceTwoHanded && x.Key.AllowTwoHanded ? (int?)i : null)
                 .Where(x => x != null)
                 .ToList();
+
+            UpdateSecondaryDropDowns();
         }
 
         private void CraftButtonOnClick()
@@ -131,43 +133,40 @@ namespace FullPotential.Core.Behaviours.Ui
             _handednessDropdown.gameObject.SetActive(GetCraftingCategory() == nameof(Weapon) && _optionalTwoHandedWeaponIndexes.Contains(_subTypeDropdown.value));
         }
 
+        private void UpdateSecondaryDropDowns()
+        {
+            _subTypeDropdown.ClearOptions();
+
+            var isSpell = false;
+
+            switch (GetCraftingCategory())
+            {
+                case nameof(Weapon): _subTypeDropdown.AddOptions(_weaponTypes.Select(x => x.Value).ToList()); break;
+                case nameof(Armor): _subTypeDropdown.AddOptions(_armorTypes.Select(x => x.Value).ToList()); break;
+                case nameof(Accessory): _subTypeDropdown.AddOptions(_accessoryTypes.Select(x => x.Value).ToList()); break;
+                case nameof(Spell): isSpell = true; break;
+
+                default:
+                    throw new InvalidOperationException("Unknown crafting type");
+            }
+
+            if (isSpell)
+            {
+                _subTypeDropdown.gameObject.SetActive(false);
+            }
+            else
+            {
+                _subTypeDropdown.RefreshShownValue();
+                _subTypeDropdown.gameObject.SetActive(true);
+            }
+
+            SetHandednessDropDownVisibility();
+        }
+
         private void TypeOnValueChanged(int index)
         {
-            try
-            {
-                _subTypeDropdown.ClearOptions();
-
-                var isSpell = false;
-
-                switch (GetCraftingCategory())
-                {
-                    case nameof(Weapon): _subTypeDropdown.AddOptions(_weaponTypes.Select(x => x.Value).ToList()); break;
-                    case nameof(Armor): _subTypeDropdown.AddOptions(_armorTypes.Select(x => x.Value).ToList()); break;
-                    case nameof(Accessory): _subTypeDropdown.AddOptions(_accessoryTypes.Select(x => x.Value).ToList()); break;
-                    case nameof(Spell): isSpell = true; break;
-
-                    default:
-                        throw new InvalidOperationException("Unknown crafting type");
-                }
-
-                if (isSpell)
-                {
-                    _subTypeDropdown.gameObject.SetActive(false);
-                }
-                else
-                {
-                    _subTypeDropdown.RefreshShownValue();
-                    _subTypeDropdown.gameObject.SetActive(true);
-                }
-
-                SetHandednessDropDownVisibility();
-
-                UpdateResults();
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError(ex);
-            }
+            UpdateSecondaryDropDowns();
+            UpdateResults();
         }
 
         private void OnEnable()
@@ -209,6 +208,8 @@ namespace FullPotential.Core.Behaviours.Ui
 
             _handednessDropdown.ClearOptions();
             _handednessDropdown.AddOptions(_handednessOptions);
+
+            UpdateSecondaryDropDowns();
 
             LoadInventory();
 
@@ -269,9 +270,9 @@ namespace FullPotential.Core.Behaviours.Ui
         {
             switch (craftingCategory)
             {
-                case nameof(Weapon): return (_weaponTypes.ElementAt(_subTypeDropdown.value).Key).TypeName;
-                case nameof(Armor): return (_armorTypes.ElementAt(_subTypeDropdown.value).Key).TypeName;
-                case nameof(Accessory): return (_accessoryTypes.ElementAt(_subTypeDropdown.value).Key).TypeName;
+                case nameof(Weapon): return _weaponTypes.ElementAt(_subTypeDropdown.value).Key.TypeName;
+                case nameof(Armor): return _armorTypes.ElementAt(_subTypeDropdown.value).Key.TypeName;
+                case nameof(Accessory): return _accessoryTypes.ElementAt(_subTypeDropdown.value).Key.TypeName;
                 case nameof(Spell): return null;
                 default: throw new InvalidOperationException("Unknown crafting type");
             }
