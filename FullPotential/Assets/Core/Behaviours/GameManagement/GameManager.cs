@@ -48,7 +48,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             {
                 if (_sceneObjects == null || _sceneBehaviour == null)
                 {
-                    _sceneObjects = UnityHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneObjects);
+                    _sceneObjects = GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneObjects);
                     _sceneBehaviour = _sceneObjects.GetComponent<ISceneBehaviour>();
                 }
                 return _sceneBehaviour;

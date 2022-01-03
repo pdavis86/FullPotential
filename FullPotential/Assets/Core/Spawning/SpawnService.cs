@@ -10,7 +10,7 @@ namespace FullPotential.Core.Spawning
 
         public SpawnService()
         {
-            var ground = UnityHelper.GetObjectAtRoot(Constants.GameObjectNames.Environment).FindChildWithTag(Constants.Tags.Ground);
+            var ground = GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.Environment).FindChildWithTag(Constants.Tags.Ground);
             _groundCollider = ground.GetComponent<Collider>();
         }
 

@@ -30,6 +30,8 @@ namespace FullPotential.Core.Behaviours.SceneObjects
         private void Awake()
         {
             _spawnService = new SpawnService();
+
+            GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCamera).SetActive(false);
         }
 
         private void Start()
@@ -49,7 +51,7 @@ namespace FullPotential.Core.Behaviours.SceneObjects
             _playerPrefabNetObj = GameManager.Instance.Prefabs.Player.GetComponent<NetworkObject>();
             _enemyPrefabNetObj = EnemyPrefab.GetComponent<NetworkObject>();
 
-            var spawnPointsParent = UnityHelper.GetObjectAtRoot(Constants.GameObjectNames.SpawnPoints).transform;
+            var spawnPointsParent = GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SpawnPoints).transform;
             _spawnPoints = new List<Transform>();
             foreach (Transform spawnPoint in spawnPointsParent)
             {

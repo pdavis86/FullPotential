@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
 
@@ -6,6 +7,11 @@ namespace FullPotential.Core.Helpers
 {
     public static class GameObjectHelper
     {
+        public static GameObject GetObjectAtRoot(string name)
+        {
+            return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects().FirstOrDefault(x => x.name == name);
+        }
+
         public static void SetGameLayerRecursive(GameObject gameObject, int layer)
         {
             gameObject.layer = layer;

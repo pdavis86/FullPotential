@@ -18,9 +18,6 @@ using UnityEngine.UI;
 
 //https://docs-multiplayer.unity3d.com/docs
 
-//Known bugs
-//NetworkTransform doesn't sync data with new connected client https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/650
-
 namespace FullPotential.Core.Behaviours.GameManagement
 {
     public class JoinOrHostGame : MonoBehaviour

@@ -5,11 +5,6 @@ namespace FullPotential.Core.Helpers
 {
     public static class UnityHelper
     {
-        public static GameObject GetObjectAtRoot(string name)
-        {
-            return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects().FirstOrDefault(x => x.name == name);
-        }
-
         //public static bool IsPointerOverUIElement(List<RaycastResult> eventSystemRaysastResults)
         //{
         //    var uiLayer = LayerMask.NameToLayer("UI");

@@ -12,7 +12,7 @@ namespace FullPotential.Core.Behaviours.SceneObjects
     {
         private void Start()
         {
-            UnityHelper.GetObjectAtRoot(Constants.GameObjectNames.CanvasScene).SetActive(true);
+            GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCanvas).SetActive(true);
         }
 
     }
