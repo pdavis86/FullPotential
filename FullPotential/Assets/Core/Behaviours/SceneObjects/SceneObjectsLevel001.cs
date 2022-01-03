@@ -32,6 +32,16 @@ namespace FullPotential.Core.Behaviours.SceneObjects
             _spawnService = new SpawnService();
         }
 
+        private void Start()
+        {
+            if (!IsServer)
+            {
+                return;
+            }
+
+            SpawnEnemy();
+        }
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
