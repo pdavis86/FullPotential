@@ -24,7 +24,9 @@ namespace FullPotential.Core.Behaviours.GameManagement
     {
 #pragma warning disable 0649
         [SerializeField] private GameObject _signInContainer;
+        [SerializeField] private InputField _signinFirstInput;
         [SerializeField] private GameObject _gameDetailsContainer;
+        [SerializeField] private InputField _gameDetailsFirstInput;
         [SerializeField] private GameObject _signinError;
         [SerializeField] private GameObject _joiningMessage;
         [SerializeField] private Text _connectError;
@@ -53,13 +55,21 @@ namespace FullPotential.Core.Behaviours.GameManagement
         {
             if (string.IsNullOrWhiteSpace(GameManager.Instance.DataStore.PlayerToken))
             {
-                _signInContainer.SetActive(true);
                 _gameDetailsContainer.SetActive(false);
+                _signInContainer.SetActive(true);
+                if (_signinFirstInput != null)
+                {
+                    _signinFirstInput.Select();
+                }
             }
             else
             {
                 _signInContainer.SetActive(false);
                 _gameDetailsContainer.SetActive(true);
+                if (_gameDetailsFirstInput != null)
+                {
+                    _gameDetailsFirstInput.Select();
+                }
             }
 
             ShowAnyError();
@@ -133,6 +143,10 @@ namespace FullPotential.Core.Behaviours.GameManagement
             _signinError.SetActive(false);
             _signInContainer.SetActive(false);
             _gameDetailsContainer.SetActive(true);
+            if (_gameDetailsFirstInput != null)
+            {
+                _gameDetailsFirstInput.Select();
+            }
         }
 
         private void ShowAnyError()

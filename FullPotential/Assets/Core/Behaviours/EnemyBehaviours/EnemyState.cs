@@ -73,6 +73,7 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
                 playerState.SpawnLootChest(transform.position);
             }
 
+            //todo: Use object pooling
             Destroy(gameObject);
 
             GameManager.Instance.SceneBehaviour.OnEnemyDeath();
