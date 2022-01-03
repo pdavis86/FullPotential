@@ -13,6 +13,11 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
     {
         private void LateUpdate()
         {
+            if (Camera.main == null)
+            {
+                return;
+            }
+
             //transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
             transform.LookAt(transform.position + Camera.main.transform.forward);
         }
