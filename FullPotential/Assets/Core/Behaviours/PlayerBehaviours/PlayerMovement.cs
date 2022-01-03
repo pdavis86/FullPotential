@@ -42,7 +42,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void OnMove(InputValue value)
         {
-            _moveVal = value.Get<Vector2>();
+            _moveVal = value.Get<Vector2>().normalized;
         }
 
         private void OnLook(InputValue value)
