@@ -108,7 +108,7 @@ namespace FullPotential.Core.Behaviours.Ui
             return null;
         }
 
-        private void ResetEquipmentUi(bool reloadSlots = false)
+        public void ResetEquipmentUi(bool reloadSlots = false)
         {
             _componentsContainer.SetActive(false);
             _componentsContainer.transform.Clear();
@@ -154,8 +154,6 @@ namespace FullPotential.Core.Behaviours.Ui
                 }
 
                 _playerState.Inventory.EquipItemServerRpc(item.Id, slotResult, true);
-
-                ResetEquipmentUi(true);
             });
         }
 

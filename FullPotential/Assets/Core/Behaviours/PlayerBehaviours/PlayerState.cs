@@ -458,9 +458,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     using (var webRequest = UnityWebRequest.Get(textureUrl))
                     {
                         yield return webRequest.SendWebRequest();
-                        System.IO.File.WriteAllBytes(filePath, webRequest.downloadHandler.data);
+
+                        if (webRequest.downloadHandler.data != null)
+                        {
+                            System.IO.File.WriteAllBytes(filePath, webRequest.downloadHandler.data);
+                            System.IO.File.WriteAllText(validatePath, textureUrl);
+                        }
                     }
-                    System.IO.File.WriteAllText(validatePath, textureUrl);
                 }
             }
             else
@@ -472,17 +476,19 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 Debug.LogWarning("Not applying player texture because the file does not exist");
             }
-
-            var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
-            tex.LoadImage(System.IO.File.ReadAllBytes(filePath));
-            var newMat = new Material(_mainMesh.material.shader)
+            else
             {
-                mainTexture = tex
-            };
+                var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
+                tex.LoadImage(System.IO.File.ReadAllBytes(filePath));
+                var newMat = new Material(_mainMesh.material.shader)
+                {
+                    mainTexture = tex
+                };
 
-            _mainMesh.material = newMat;
-            _leftMesh.material = newMat;
-            _rightMesh.material = newMat;
+                _mainMesh.material = newMat;
+                _leftMesh.material = newMat;
+                _rightMesh.material = newMat;
+            }
         }
 
         public void Save()
@@ -675,9 +681,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public void HandleDeath()
         {
             IsDead = true;
-            
+
+            foreach (var item in _damageTaken)
+            {
+                var playerState = NetworkManager.Singleton.ConnectedClients[item.Key].PlayerObject.gameObject.GetComponent<PlayerState>();
+                playerState.SpawnLootChest(transform.position);
+            }
+
             //NOTE: Sent to all players
-            PlayerDiedClientRpc(new ClientRpcParams());
+            PlayerRespawnClientRpc(Vector3.zero, Quaternion.identity, true, new ClientRpcParams());
 
             YouDiedClientRpc(_clientRpcParams);
         }

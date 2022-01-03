@@ -7,11 +7,13 @@ using FullPotential.Core.Registry.Base;
 using FullPotential.Core.Registry.Types;
 using System.Collections.Generic;
 using System;
+using System.Collections;
 using System.Linq;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using FullPotential.Core.Behaviours.GameManagement;
+using FullPotential.Core.Behaviours.Ui;
 
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PossibleMultipleEnumeration
@@ -60,6 +62,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private int _armorSlotCount;
         private int _maxItems;
         private bool _inventoryLoaded;
+        private ClientRpcParams _clientRpcParams;
 
         #region Event Handlers
 
@@ -103,6 +106,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             SpawnEquippedObject(newValue.Value, slot);
         }
 
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+
+            _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
+        }
+
         #endregion
 
         #region ServerRpc calls
@@ -111,9 +121,35 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public void EquipItemServerRpc(string itemId, SlotGameObjectName slot, bool allowUnEquip)
         {
             EquipItem(itemId, slot, allowUnEquip);
+
+            ResetEquipmentUiClientRpc(_clientRpcParams);
         }
 
         #endregion
+
+        #region ClientRpc calls
+
+        [ClientRpc]
+        // ReSharper disable once UnusedParameter.Local
+        private void ResetEquipmentUiClientRpc(ClientRpcParams clientRpcParams)
+        {
+            StartCoroutine(ResetEquipmentUi());
+        }
+
+        #endregion
+
+        private IEnumerator ResetEquipmentUi()
+        {
+            yield return new WaitForSeconds(0.1f);
+
+            var characterMenuUi = GameManager.Instance.MainCanvasObjects.CharacterMenu.GetComponent<CharacterMenuUi>();
+            var equipmentUi = characterMenuUi.Equipment.GetComponent<CharacterMenuUiEquipmentTab>();
+
+            if (equipmentUi.gameObject.activeSelf)
+            {
+                equipmentUi.ResetEquipmentUi(true);
+            }
+        }
 
         public IEnumerable<ItemBase> GetCompatibleItemsForSlot(IGear.GearCategory? gearCategory)
         {
@@ -481,19 +517,25 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return;
             }
 
+            var oldVariable = GetVariableSetToItemId(itemId);
+
             if (!string.IsNullOrWhiteSpace(itemId) && allowUnEquip)
             {
-                var oldVariable = GetVariableSetToItemId(itemId);
+
                 if (oldVariable != null)
                 {
                     oldVariable.Value = string.Empty;
                 }
             }
 
-            GetVariableFromSlotName(slot).Value =
-                itemId.IsNullOrWhiteSpace()
-                ? string.Empty
-                : itemId;
+            var newVariable = GetVariableFromSlotName(slot);
+
+            if (oldVariable != newVariable)
+            {
+                newVariable.Value = itemId.IsNullOrWhiteSpace()
+                    ? string.Empty
+                    : itemId;
+            }
         }
 
         private void DespawnEquippedObject(SlotGameObjectName slotGameObjectName)
