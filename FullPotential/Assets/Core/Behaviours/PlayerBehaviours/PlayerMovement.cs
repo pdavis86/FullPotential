@@ -36,6 +36,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private Vector2 _smoothLook;
         private float _currentCameraRotationX;
         private bool _isJumping;
+        private bool _isSprinting;
 
         #region Event Handlers 
 
@@ -70,6 +71,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _jumpForce = Vector3.up * _jumpForceMultiplier;
         }
 
+        private void OnSprintStart()
+        {
+            _isSprinting = true;
+        }
+
+        private void OnSprintStop()
+        {
+            _isSprinting = false;
+        }
+
         private void FixedUpdate()
         {
             MoveAndLook();
@@ -83,7 +94,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 var moveX = transform.right * _moveVal.x;
                 var moveZ = transform.forward * _moveVal.y;
-                var velocity = (moveX + moveZ) * _speed;
+                var velocity = (moveX + moveZ) * _speed * (_isSprinting ? 2f : 1);
                 _rb.MovePosition(_rb.position + velocity * Time.fixedDeltaTime);
             }
 
