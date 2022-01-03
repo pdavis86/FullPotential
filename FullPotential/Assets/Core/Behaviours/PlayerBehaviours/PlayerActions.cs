@@ -82,6 +82,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             _inFrontOfPlayerCamera.gameObject.SetActive(true);
             _playerCamera.gameObject.SetActive(true);
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
 
             _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
         }
@@ -104,7 +109,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
             else
             {
-                _focusedInteractable.OnInteract(_playerState);
+                _focusedInteractable.OnInteract(GetComponent<NetworkObject>());
             }
         }
 
@@ -268,10 +273,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             const float searchRadius = 5f;
 
-            var player = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject;
+            var playerNetworkObject = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject;
 
             Interactable interactable = null;
-            var collidersInRange = Physics.OverlapSphere(player.transform.position, searchRadius);
+            var collidersInRange = Physics.OverlapSphere(playerNetworkObject.transform.position, searchRadius);
             foreach (var colliderNearby in collidersInRange)
             {
                 if (colliderNearby.gameObject.name == gameObjectName)
@@ -299,7 +304,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             var distance = Vector3.Distance(transform.position, interactable.transform.position);
             if (distance <= interactable.Radius)
             {
-                interactable.OnInteract(player.GetComponent<PlayerState>());
+                interactable.OnInteract(playerNetworkObject);
             }
         }
 
@@ -344,6 +349,28 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 Spells = craftedType == typeof(Spell) ? new[] { craftedItem as Spell } : null,
                 Weapons = craftedType == typeof(Weapon) ? new[] { craftedItem as Weapon } : null
             };
+
+            ApplyInventoryChanges(invChange);
+
+            if (OwnerClientId != 0)
+            {
+                foreach (var message in MessageHelper.GetFragmentedMessages(invChange))
+                {
+                    ApplyInventoryChangesClientRpc(message, _clientRpcParams);
+                }
+            }
+        }
+
+        [ServerRpc]
+        public void ClaimLootServerRpc(string id)
+        {
+            if (!_playerState.ClaimLoot(id))
+            {
+                return;
+            }
+
+            var loot = GameManager.Instance.ResultFactory.GetLootDrop();
+            var invChange = new InventoryChanges { Loot = new[] { loot as Loot } };
 
             ApplyInventoryChanges(invChange);
 

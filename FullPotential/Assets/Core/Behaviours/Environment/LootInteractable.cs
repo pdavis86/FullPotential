@@ -1,6 +1,7 @@
 ﻿using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
+using Unity.Netcode;
 using UnityEngine.InputSystem;
 
 // ReSharper disable UnusedType.Global
@@ -30,9 +31,9 @@ namespace FullPotential.Core.Behaviours.Environment
             _interactionBubble.gameObject.SetActive(true);
         }
 
-        public override void OnInteract(PlayerState playerState)
+        public override void OnInteract(NetworkObject networkObject)
         {
-            playerState.ClaimLootServerRpc(UnclaimedLootId);
+            networkObject.GetComponent<PlayerActions>().ClaimLootServerRpc(UnclaimedLootId);
             Destroy(gameObject);
         }
 

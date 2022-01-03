@@ -1,5 +1,5 @@
 ﻿using FullPotential.Core.Behaviours.GameManagement;
-using FullPotential.Core.Behaviours.PlayerBehaviours;
+using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
@@ -37,7 +37,7 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
 
         public abstract void OnFocus();
 
-        public abstract void OnInteract(PlayerState playerState);
+        public abstract void OnInteract(NetworkObject networkObject);
 
         public abstract void OnBlur();
     }

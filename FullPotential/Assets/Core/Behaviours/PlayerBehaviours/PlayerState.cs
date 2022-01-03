@@ -87,8 +87,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             gameObject.name = "Player ID " + NetworkObjectId;
 
-            _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
-
             if (IsServer)
             {
                 //Debug.LogError("I am the Server. Loading player data with client ID " + OwnerClientId);
@@ -104,6 +102,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 //Debug.LogError("Requesting other player data for client ID " + OwnerClientId);
                 RequestReducedPlayerDataServerRpc();
             }
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+
+            _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
         }
 
         private void OnTextureChanged(FixedString512Bytes previousValue, FixedString512Bytes newValue)
@@ -146,21 +151,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             //NOTE: This does not stop players cheating their position. That's a problem for another day. Also sends data to ALL clients
             UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation);
             UpdatePositionsAndRotationsClientRpc(rbPosition, rbRotation, rbVelocity, cameraRotation, new ClientRpcParams());
-        }
-
-        [ServerRpc]
-        public void ClaimLootServerRpc(string id)
-        {
-            if (!_unclaimedLoot.ContainsKey(id))
-            {
-                Debug.LogError($"Could not find loot with ID {id}");
-            }
-
-            _unclaimedLoot.Remove(id);
-
-            var loot = GameManager.Instance.ResultFactory.GetLootDrop();
-            var invChange = new InventoryChanges { Loot = new[] { loot as Loot } };
-            Inventory.ApplyInventoryChanges(invChange);
         }
 
         #endregion
@@ -597,6 +587,17 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 Send = new ClientRpcSendParams { TargetClientIds = new[] { OwnerClientId } }
             };
             SpawnLootChestClientRpc(id, position, clientRpcParams);
+        }
+
+        public bool ClaimLoot(string id)
+        {
+            if (!_unclaimedLoot.ContainsKey(id))
+            {
+                Debug.LogError($"Could not find loot with ID {id}");
+                return false;
+            }
+
+            return _unclaimedLoot.Remove(id);
         }
 
         private void ClearExpiredLoot()

@@ -107,7 +107,12 @@ namespace FullPotential.Core.Behaviours.GameManagement
             InputActions = new DefaultInputActions();
 
             NetworkManager.Singleton.ConnectionApprovalCallback += OnApprovalCheck;
+            //NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += OnServerDisconnectedClient;
+            //NetworkManager.Singleton.OnServerStarted += OnServerStarted;
+
+            //var networkTransport = NetworkManager.Singleton.GetComponent<UNetTransport>();
+            //networkTransport.OnTransportEvent += OnTransportEvent;
 
             SceneManager.LoadSceneAsync(1);
         }
@@ -135,6 +140,11 @@ namespace FullPotential.Core.Behaviours.GameManagement
             callback(false, null, true, null, null);
         }
 
+        //private void OnClientConnected(ulong obj)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
         private void OnServerDisconnectedClient(ulong clientId)
         {
             //Debug.LogWarning("Disconnected from server");
@@ -149,6 +159,16 @@ namespace FullPotential.Core.Behaviours.GameManagement
                 }
             }
         }
+
+        //private void OnServerStarted()
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //private void OnTransportEvent(NetworkEvent eventType, ulong clientId, ArraySegment<byte> payload, float receiveTime)
+        //{
+        //    var foo = "";
+        //}
 
         public async Task SetCultureAsync(string culture)
         {
