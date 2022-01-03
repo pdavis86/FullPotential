@@ -21,6 +21,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
         public GameObject HitNumberContainer;
         public GameObject InteractionBubble;
         public GameObject Hud;
+        public GameObject Respawn;
 
         //Menus
         public GameObject EscMenu;

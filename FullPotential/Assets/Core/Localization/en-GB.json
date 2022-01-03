@@ -225,7 +225,10 @@
       "Value": "Host"
     },
 
-
+    {
+      "Key": "ui.main.forcerespawn",
+      "Value": "Force Respawn"
+    },
     {
       "Key": "ui.main.settings",
       "Value": "Settings"
@@ -291,6 +294,16 @@
     {
       "Key": "ui.alert.itemsadded",
       "Value": "Added {0} items"
+    },
+
+
+    {
+      "Key": "ui.respawn.youdied",
+      "Value": "You Died!"
+    },
+    {
+      "Key": "ui.respawn.respawn",
+      "Value": "Respawn"
     }
 
   ]

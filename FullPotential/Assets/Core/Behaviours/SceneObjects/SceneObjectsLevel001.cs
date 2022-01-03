@@ -1,11 +1,13 @@
 ﻿using Unity.Netcode;
 using System.Collections.Generic;
 using FullPotential.Api.Behaviours;
+using FullPotential.Api.Data;
 using UnityEngine;
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Helpers;
 using FullPotential.Core.Spawning;
+using Random = UnityEngine.Random;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
@@ -26,6 +28,14 @@ namespace FullPotential.Core.Behaviours.SceneObjects
         private NetworkObject _playerPrefabNetObj;
         private NetworkObject _enemyPrefabNetObj;
         private SpawnService _spawnService;
+
+        [SerializeField] private SceneAttributes _attributes = new SceneAttributes();
+        [SerializeField]
+        public SceneAttributes Attributes
+        {
+            get => _attributes;
+            set => _attributes = value;
+        }
 
         private void Awake()
         {
@@ -67,28 +77,24 @@ namespace FullPotential.Core.Behaviours.SceneObjects
         [ServerRpc(RequireOwnership = false)]
         public void HereAreMyJoiningDetailsServerRpc(string playerToken, ServerRpcParams serverRpcParams = default)
         {
-            var chosenSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Count)];
-            var playerNetObj = Instantiate(_playerPrefabNetObj, chosenSpawnPoint.position, chosenSpawnPoint.rotation);
+            var chosenSpawnPoint = GetSpawnPoint();
+            var playerNetObj = Instantiate(_playerPrefabNetObj, chosenSpawnPoint.Position, chosenSpawnPoint.Rotation);
 
             var playerState = playerNetObj.GetComponent<PlayerState>();
             playerState.PlayerToken = playerToken;
 
             playerNetObj.SpawnAsPlayerObject(serverRpcParams.Receive.SenderClientId);
 
-            _spawnService.AdjustPositionToBeAboveGround(chosenSpawnPoint.position, playerNetObj.gameObject);
+            _spawnService.AdjustPositionToBeAboveGround(chosenSpawnPoint.Position, playerNetObj.gameObject);
         }
 
         public void SpawnEnemy()
         {
-            var chosenSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Count)];
-            var spawnPosition = chosenSpawnPoint.position + new Vector3(
-                Random.Range(_spawnVariation.x, _spawnVariation.y),
-                0,
-                Random.Range(_spawnVariation.x, _spawnVariation.y));
+            var chosenSpawnPoint = GetSpawnPoint();
 
-            var enemyNetObj = Instantiate(_enemyPrefabNetObj, spawnPosition, chosenSpawnPoint.rotation);
+            var enemyNetObj = Instantiate(_enemyPrefabNetObj, chosenSpawnPoint.Position, chosenSpawnPoint.Rotation);
 
-            _spawnService.AdjustPositionToBeAboveGround(spawnPosition, enemyNetObj.gameObject);
+            _spawnService.AdjustPositionToBeAboveGround(chosenSpawnPoint.Position, enemyNetObj.gameObject);
 
             enemyNetObj.Spawn(true);
 
@@ -109,5 +115,21 @@ namespace FullPotential.Core.Behaviours.SceneObjects
         {
             return transform;
         }
+
+        public SpawnPoint GetSpawnPoint()
+        {
+            var chosenSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Count)];
+            var spawnPosition = chosenSpawnPoint.position + new Vector3(
+                Random.Range(_spawnVariation.x, _spawnVariation.y),
+                0,
+                Random.Range(_spawnVariation.x, _spawnVariation.y));
+
+            return new SpawnPoint
+            {
+                Position = spawnPosition,
+                Rotation = chosenSpawnPoint.rotation
+            };
+        }
+
     }
 }

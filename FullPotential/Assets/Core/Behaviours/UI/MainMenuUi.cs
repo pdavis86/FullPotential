@@ -18,6 +18,11 @@ namespace FullPotential.Core.Behaviours.Ui
             _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;
         }
 
+        public void ForceRespawn()
+        {
+            GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>().RespawnServerRpc();
+        }
+
         public void Disconnect()
         {
             Save();
@@ -37,6 +42,7 @@ namespace FullPotential.Core.Behaviours.Ui
             {
                 return;
             }
+
             if (GameManager.Instance.DataStore.LocalPlayer != null)
             {
                 GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>().Save();

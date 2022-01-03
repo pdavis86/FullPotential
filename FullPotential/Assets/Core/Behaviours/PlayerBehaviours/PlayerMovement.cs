@@ -1,4 +1,5 @@
-﻿using Unity.Netcode;
+﻿using FullPotential.Core.Behaviours.GameManagement;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -23,12 +24,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [SerializeField] private float _jumpForceMultiplier = 10500f;
 #pragma warning restore 0649
 
-        private Vector2 _smoothLook;
         private Rigidbody _rb;
         private PlayerState _playerState;
+
+        //Variables for passing values
         private Vector2 _moveVal;
         private Vector2 _lookVal;
         private Vector3 _jumpForce;
+
+        //Variables for maintaining state
+        private Vector2 _smoothLook;
         private float _currentCameraRotationX;
         private bool _isJumping;
 
@@ -38,6 +43,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             _rb = GetComponent<Rigidbody>();
             _playerState = GetComponent<PlayerState>();
+
+            InvokeRepeating(nameof(CheckIfOffTheMap), 1, 1);
+        }
+
+        private void OnEnable()
+        {
+            _smoothLook = Vector2.zero;
+            _currentCameraRotationX = 0;
+            _isJumping = false;
+            _playerCamera.transform.localEulerAngles = Vector3.zero;
         }
 
         private void OnMove(InputValue value)
@@ -106,6 +121,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (_moveVal != Vector2.zero || _lookVal != Vector2.zero || _rb.velocity != Vector3.zero)
             {
                 _playerState.UpdatePositionsAndRotationsServerRpc(_rb.position, _rb.rotation, _rb.velocity, _playerCamera.transform.rotation);
+            }
+        }
+
+        private void CheckIfOffTheMap()
+        {
+            if (!_playerState.IsDead && transform.position.y < GameManager.Instance.SceneBehaviour.Attributes.LowestYValue)
+            {
+                _playerState.HandleDeath();
             }
         }
 

@@ -14,9 +14,7 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
 {
     public class EnemyState : NetworkBehaviour, IDefensible, IDamageable
     {
-        private const int _maxHealth = 100;
-
-        private readonly NetworkVariable<int> _health = new NetworkVariable<int>(_maxHealth);
+        private readonly NetworkVariable<int> _health = new NetworkVariable<int>(100);
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
 
 #pragma warning disable 0649
@@ -35,7 +33,7 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
 
         public int GetHealthMax()
         {
-            return _maxHealth;
+            return 100;
         }
 
         public int GetHealth()
@@ -62,7 +60,7 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
 
         private void OnHealthChanged(int previousValue, int newValue)
         {
-            _healthSlider.value = (float)newValue / _maxHealth;
+            _healthSlider.value = (float)newValue / GetHealthMax();
         }
 
         public void HandleDeath()

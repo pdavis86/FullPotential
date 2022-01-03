@@ -11,11 +11,13 @@ using System.Linq;
 using FullPotential.Core.Behaviours.Environment;
 using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Extensions;
+using FullPotential.Core.Helpers;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
@@ -32,20 +34,24 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
     {
 #pragma warning disable 0649
         [SerializeField] private Behaviour[] _behavioursToDisable;
+        [SerializeField] private Behaviour[] _behavioursForRespawn;
         public PositionTransforms Positions;
         [SerializeField] private TextMeshProUGUI _nameTag;
         [SerializeField] private MeshRenderer _mainMesh;
         [SerializeField] private MeshRenderer _leftMesh;
         [SerializeField] private MeshRenderer _rightMesh;
+        [SerializeField] private Slider _healthSlider;
 #pragma warning restore 0649
 
-        public PlayerInventory Inventory;
         public GameObject InFrontOfPlayer;
         public GameObject PlayerCamera;
 
+        public readonly NetworkVariable<int> Health = new NetworkVariable<int>(100);
+
+        [HideInInspector] public bool IsDead;
+        [HideInInspector] public PlayerInventory Inventory;
         [HideInInspector] public string PlayerToken;
         [HideInInspector] public readonly NetworkVariable<FixedString512Bytes> TextureUrl = new NetworkVariable<FixedString512Bytes>();
-        public readonly NetworkVariable<int> Health = new NetworkVariable<int>();
 
         private Rigidbody _rb;
         private PlayerActions _playerActions;
@@ -53,6 +59,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private GameObject _spellBeingCastLeft;
         private GameObject _spellBeingCastRight;
         private bool _loadWasSuccessful;
+        private GameObject _graphicsGameObject;
+        private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
 
         private string _username;
 
@@ -69,6 +77,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             Inventory = GetComponent<PlayerInventory>();
             _rb = GetComponent<Rigidbody>();
             _playerActions = GetComponent<PlayerActions>();
+            _graphicsGameObject = transform.Find("Graphics").gameObject;
         }
 
         private void Start()
@@ -76,6 +85,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (IsOwner)
             {
                 GameManager.Instance.DataStore.LocalPlayer = gameObject;
+                _nameTag.gameObject.SetActive(false);
+                _healthSlider.gameObject.SetActive(false);
+
             }
             else
             {
@@ -121,6 +133,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void OnHealthChanged(int previousValue, int newValue)
         {
+            if (!IsOwner)
+            {
+                _healthSlider.value = (float)newValue / GetHealthMax();
+            }
+
             if (NetworkManager.LocalClientId != OwnerClientId)
             {
                 return;
@@ -151,6 +168,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             //NOTE: This does not stop players cheating their position. That's a problem for another day. Also sends data to ALL clients
             UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation);
             UpdatePositionsAndRotationsClientRpc(rbPosition, rbRotation, rbVelocity, cameraRotation, new ClientRpcParams());
+        }
+
+        [ServerRpc]
+        public void RespawnServerRpc()
+        {
+            Health.Value = GetHealthMax();
+            var spawnPoint = GameManager.Instance.SceneBehaviour.GetSpawnPoint();
+            RespawnClientRpc(spawnPoint.Position, spawnPoint.Rotation, _clientRpcParams);
+            IsDead = false;
         }
 
         #endregion
@@ -223,6 +249,57 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             var lootScript = go.GetComponent<LootInteractable>();
             lootScript.UnclaimedLootId = id;
+        }
+
+        //todo: make a list of commands to run in reverse order when necessary. Delegates for dead and alive
+
+        // ReSharper disable once UnusedParameter.Global
+        [ClientRpc]
+        public void YouDiedClientRpc(ClientRpcParams clientRpcParams)
+        {
+            GameManager.Instance.MainCanvasObjects.HideAllMenus();
+
+            IsDead = true;
+
+            foreach (var comp in _behavioursForRespawn)
+            {
+                comp.enabled = false;
+            }
+
+            GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCamera).SetActive(true);
+
+            MainCanvasObjects.Instance.Hud.SetActive(false);
+            MainCanvasObjects.Instance.Respawn.SetActive(true);
+        }
+
+        // ReSharper disable once UnusedParameter.Global
+        [ClientRpc]
+        public void PlayerDiedClientRpc(ClientRpcParams clientRpcParams)
+        {
+            _graphicsGameObject.gameObject.SetActive(false);
+            _rb.useGravity = false;
+        }
+
+        // ReSharper disable once UnusedParameter.Global
+        [ClientRpc]
+        public void RespawnClientRpc(Vector3 position, Quaternion rotation, ClientRpcParams clientRpcParams)
+        {
+            UpdatePositionsAndRotations(position, rotation, Vector3.zero, Quaternion.identity);
+
+            MainCanvasObjects.Instance.Respawn.SetActive(false);
+            MainCanvasObjects.Instance.Hud.SetActive(true);
+
+            GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCamera).SetActive(false);
+
+            foreach (var comp in _behavioursForRespawn)
+            {
+                comp.enabled = true;
+            }
+
+            _rb.useGravity = true;
+            _graphicsGameObject.gameObject.SetActive(false);
+
+            IsDead = false;
         }
 
         #endregion
@@ -331,7 +408,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (IsOwner)
             {
-                _nameTag.text = null;
                 return;
             }
 
@@ -566,12 +642,29 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public void TakeDamage(ulong? clientId, int amount)
         {
-            //todo: implement player TakeDamage()
+            if (clientId != null)
+            {
+                if (_damageTaken.ContainsKey(clientId.Value))
+                {
+                    _damageTaken[clientId.Value] += amount;
+                }
+                else
+                {
+                    _damageTaken.Add(clientId.Value, amount);
+                }
+            }
+
+            Health.Value -= amount;
         }
 
         public void HandleDeath()
         {
-            //todo: implement player HandleDeath()
+            IsDead = true;
+            
+            //NOTE: Sent to all players
+            PlayerDiedClientRpc(new ClientRpcParams());
+
+            YouDiedClientRpc(_clientRpcParams);
         }
 
         public void SpawnLootChest(Vector3 position)
@@ -613,6 +706,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 _unclaimedLoot.Remove(loot.Key);
             }
+        }
+
+        public void Respawn()
+        {
+            RespawnServerRpc();
         }
 
         #region Nested Classes
