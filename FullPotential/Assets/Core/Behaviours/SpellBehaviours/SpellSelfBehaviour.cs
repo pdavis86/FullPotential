@@ -73,7 +73,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
                 return;
             }
 
-            if (distanceFromPlayer > 0.1f)
+            if (distanceFromPlayer > 0.2f)
             {
                 ClearForce();
                 var playerDirection = (_sourcePlayer.transform.position - transform.position).normalized;

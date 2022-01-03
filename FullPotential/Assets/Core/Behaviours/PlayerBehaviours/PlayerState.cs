@@ -306,9 +306,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 comp.enabled = true;
             }
 
-            _rb.useGravity = true;
-            _graphicsGameObject.gameObject.SetActive(false);
-
             IsDead = false;
         }
 

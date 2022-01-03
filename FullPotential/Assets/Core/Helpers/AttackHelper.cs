@@ -33,7 +33,7 @@ namespace FullPotential.Core.Helpers
 
             if (!targetIsPlayer && !targetIsEnemy)
             {
-                //Debug.Log("You hit something not damageable");
+                Debug.Log($"You hit {target.name} which is not damageable");
                 return;
             }
 
