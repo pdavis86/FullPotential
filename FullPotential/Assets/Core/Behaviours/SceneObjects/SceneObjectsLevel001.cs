@@ -44,6 +44,11 @@ namespace FullPotential.Core.Behaviours.SceneObjects
 
         private void Start()
         {
+            if (IsClient)
+            {
+                Camera.main.fieldOfView = GameManager.Instance.AppOptions.FieldOfView;
+            }
+
             if (!IsServer)
             {
                 return;

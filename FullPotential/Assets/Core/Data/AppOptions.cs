@@ -7,6 +7,9 @@ namespace FullPotential.Core.Data
     public struct AppOptions
     {
         public string Username;
+
         public string Culture;
+
+        public float FieldOfView;
     }
 }

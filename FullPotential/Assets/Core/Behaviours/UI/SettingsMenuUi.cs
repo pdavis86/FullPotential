@@ -1,6 +1,5 @@
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
-using FullPotential.Core.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -20,6 +19,7 @@ namespace FullPotential.Core.Behaviours.Ui
         [SerializeField] private Toggle _fullscreenToggle;
         [SerializeField] private Dropdown _languageDropDown;
         [SerializeField] private InputField _skinUrlInput;
+        [SerializeField] private Slider _fovSlider;
 #pragma warning restore 0649
 
         private Dictionary<string, string> _cultures;
@@ -59,6 +59,8 @@ namespace FullPotential.Core.Behaviours.Ui
 
             var playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
             _skinUrlInput.text = playerState.TextureUrl.Value.ToString();
+
+            _fovSlider.value = Camera.main.fieldOfView;
         }
 
         public void SetResolution(int index)
@@ -70,6 +72,11 @@ namespace FullPotential.Core.Behaviours.Ui
         public void ToggleFullscreen(bool isOn)
         {
             Screen.SetResolution(Screen.width, Screen.height, isOn);
+        }
+
+        public void SetFieldOfView(float degrees)
+        {
+            Camera.main.fieldOfView = degrees;
         }
 
         public void SetLanguage(int index)
@@ -84,6 +91,8 @@ namespace FullPotential.Core.Behaviours.Ui
                 var match = _cultures.ElementAt(_newCultureIndex);
                 await GameManager.Instance.SetCultureAsync(match.Key);
             }
+
+            GameManager.Instance.AppOptions.FieldOfView = Camera.main.fieldOfView;
 
             GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerActions>().UpdatePlayerSettingsServerRpc(_skinUrlInput.text);
 
