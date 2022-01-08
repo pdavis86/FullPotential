@@ -688,6 +688,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 playerState.SpawnLootChest(transform.position);
             }
 
+            _damageTaken.Clear();
+
             //NOTE: Sent to all players
             PlayerRespawnClientRpc(Vector3.zero, Quaternion.identity, true, new ClientRpcParams());
 
