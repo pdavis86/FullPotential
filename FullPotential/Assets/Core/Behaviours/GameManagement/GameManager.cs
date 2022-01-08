@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Linq;
 using System.Reflection;
 using FullPotential.Core.Crafting;
 using FullPotential.Core.Data;
@@ -8,6 +10,7 @@ using FullPotential.Core.Storage;
 using Unity.Netcode;
 using System.Threading.Tasks;
 using FullPotential.Api.Behaviours;
+using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
 using UnityEngine;
@@ -64,6 +67,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
         //Variables
         public readonly GameManagerData DataStore = new GameManagerData();
         public AppOptions AppOptions;
+        private bool _isSaving;
 
 
         //Singleton
@@ -114,6 +118,14 @@ namespace FullPotential.Core.Behaviours.GameManagement
             SceneManager.LoadSceneAsync(1);
         }
 
+        private void FixedUpdate()
+        {
+            if (!_isSaving && NetworkManager.Singleton.IsServer)
+            {
+                StartCoroutine(PeriodicSave());
+            }
+        }
+
         private void OnApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
         {
             if (clientId == NetworkManager.Singleton.LocalClientId)
@@ -145,6 +157,15 @@ namespace FullPotential.Core.Behaviours.GameManagement
         private void OnServerDisconnectedClient(ulong clientId)
         {
             //Debug.LogWarning("Disconnected from server");
+
+            //if (NetworkManager.Singleton.ConnectedClients.ContainsKey(clientId))
+            //{
+            //    SavePlayerIfDirty(NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.GetComponent<PlayerState>());
+            //}
+            //else
+            //{
+            //    Debug.LogWarning("Went to save but the client had already disconnected");
+            //}
 
             if (clientId == NetworkManager.Singleton.LocalClientId)
             {
@@ -234,6 +255,44 @@ namespace FullPotential.Core.Behaviours.GameManagement
             var appVersion = Application.version;
             var lastWrite = System.IO.File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location);
             return new Version(appVersion + "." + lastWrite.ToString("yyyyMMdd"));
+        }
+
+        private IEnumerator PeriodicSave()
+        {
+            const int waitSeconds = 15;
+
+            _isSaving = true;
+
+            Debug.Log($"Waiting {waitSeconds} seconds before saving...");
+            yield return new WaitForSeconds(waitSeconds);
+
+            Debug.Log("Saving...");
+            var saveTask = SaveAllPlayerDataAsync();
+            yield return new WaitUntil(() => saveTask.IsCompleted);
+
+            Debug.Log("Save completed. Waiting 60 seconds...");
+
+            _isSaving = false;
+        }
+
+        private async Task SaveAllPlayerDataAsync()
+        {
+            var tasks = NetworkManager.Singleton.ConnectedClientsList.Select(networkClient => Task.Run(() =>
+            {
+                var playerState = networkClient?.PlayerObject?.GetComponent<PlayerState>();
+                SavePlayerIfDirty(playerState);
+            }));
+
+            await Task.WhenAll(tasks);
+        }
+
+        private void SavePlayerIfDirty(PlayerState playerState)
+        {
+            if (playerState != null && playerState.IsDirty)
+            {
+                Debug.Log($"Saving data for client {playerState.OwnerClientId}...");
+                playerState.Save();
+            }
         }
 
     }

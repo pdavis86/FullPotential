@@ -67,6 +67,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
         private readonly Dictionary<string, DateTime> _unclaimedLoot = new Dictionary<string, DateTime>();
 
+        public bool IsDirty => Inventory.IsDirty;
+
         #region Event handlers
 
         private void Awake()
@@ -517,6 +519,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             };
 
             GameManager.Instance.UserRegistry.Save(saveData);
+
+            Inventory.IsDirty = false;
         }
 
         public void SpawnSpellProjectile(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)

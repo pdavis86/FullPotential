@@ -53,6 +53,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private readonly NetworkVariable<FixedString32Bytes> EquippedAmulet = new NetworkVariable<FixedString32Bytes>();
         // ReSharper restore InconsistentNaming
 
+        public bool IsDirty { get; set; }
+
         private PlayerState _playerState;
         private Dictionary<string, ItemBase> _items;
         private Dictionary<SlotGameObjectName, GameObject> _equippedObjects;
@@ -121,6 +123,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public void EquipItemServerRpc(string itemId, SlotGameObjectName slot, bool allowUnEquip)
         {
             EquipItem(itemId, slot, allowUnEquip);
+
+            IsDirty = true;
 
             ResetEquipmentUiClientRpc(_clientRpcParams);
         }
@@ -247,6 +251,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                         break;
                     }
             }
+
+            IsDirty = true;
         }
 
         public void LoadInventory(Inventory inventoryData)
