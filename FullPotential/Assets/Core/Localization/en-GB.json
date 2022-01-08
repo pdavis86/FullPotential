@@ -274,6 +274,14 @@
 
 
     {
+      "Key": "ui.settings.resolution",
+      "Value": "Resolution"
+    },
+    {
+      "Key": "ui.settings.fullscreen",
+      "Value": "Fullscreen"
+    },
+    {
       "Key": "ui.settings.language",
       "Value": "Language"
     },

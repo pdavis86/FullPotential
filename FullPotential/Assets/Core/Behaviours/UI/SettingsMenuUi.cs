@@ -16,19 +16,32 @@ namespace FullPotential.Core.Behaviours.Ui
     public class SettingsMenuUi : MonoBehaviour
     {
 #pragma warning disable 0649
+        [SerializeField] private Dropdown _resolutionDropDown;
+        [SerializeField] private Toggle _fullscreenToggle;
         [SerializeField] private Dropdown _languageDropDown;
         [SerializeField] private InputField _skinUrlInput;
 #pragma warning restore 0649
 
         private Dictionary<string, string> _cultures;
         private int _newCultureIndex = -1;
+        private Resolution[] _availableResolutions;
 
         private void Awake()
         {
+            _availableResolutions = Screen.resolutions
+                .Where(x => x.refreshRate == 60)
+                .Distinct()
+                .ToArray();
+
+            _resolutionDropDown.options.Clear();
+            _resolutionDropDown.AddOptions(_availableResolutions.Select(x => $"{x.width} x {x.height} ({GetAspectRatio(x.width, x.height)})").ToList());
+
             _cultures = GameManager.Instance.Localizer.GetAvailableCultures();
 
             _languageDropDown.options.Clear();
             _languageDropDown.AddOptions(_cultures.Select(x => x.Value).ToList());
+
+            LoadFromUnitySettings();
         }
 
         private void OnEnable()
@@ -48,6 +61,17 @@ namespace FullPotential.Core.Behaviours.Ui
             _skinUrlInput.text = playerState.TextureUrl.Value.ToString();
         }
 
+        public void SetResolution(int index)
+        {
+            var selectedResolution = _availableResolutions[index];
+            Screen.SetResolution(selectedResolution.width, selectedResolution.height, _fullscreenToggle.isOn);
+        }
+
+        public void ToggleFullscreen(bool isOn)
+        {
+            Screen.SetResolution(Screen.width, Screen.height, isOn);
+        }
+
         public void SetLanguage(int index)
         {
             _newCultureIndex = index;
@@ -64,6 +88,39 @@ namespace FullPotential.Core.Behaviours.Ui
             GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerActions>().UpdatePlayerSettingsServerRpc(_skinUrlInput.text);
 
             GameManager.Instance.MainCanvasObjects.HideAllMenus();
+        }
+
+        private string GetAspectRatio(int width, int height)
+        {
+            var screenRatio = (float)width / height;
+
+            if (screenRatio >= 1.7)
+            {
+                return "16:9";
+            }
+
+            if (screenRatio >= 1.5)
+            {
+                return "3:2";
+            }
+
+            return "4:3";
+        }
+
+        private void LoadFromUnitySettings()
+        {
+            for (var i = 0; i < _availableResolutions.Length; i++)
+            {
+                if (_availableResolutions[i].width != Screen.width || _availableResolutions[i].height != Screen.height)
+                {
+                    continue;
+                }
+
+                _resolutionDropDown.value = i;
+                break;
+            }
+
+            _fullscreenToggle.isOn = Screen.fullScreen;
         }
 
     }
