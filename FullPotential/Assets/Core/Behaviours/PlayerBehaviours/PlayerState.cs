@@ -694,6 +694,18 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             PlayerRespawnClientRpc(Vector3.zero, Quaternion.identity, true, new ClientRpcParams());
 
             YouDiedClientRpc(_clientRpcParams);
+
+            if (_spellBeingCastLeft != null)
+            {
+                Destroy(_spellBeingCastLeft);
+                _spellBeingCastLeft = null;
+            }
+
+            if (_spellBeingCastRight != null)
+            {
+                Destroy(_spellBeingCastRight);
+                _spellBeingCastRight = null;
+            }
         }
 
         public void SpawnLootChest(Vector3 position)

@@ -101,7 +101,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
             //Debug.DrawLine(transform.position, endPosition, Color.cyan);
             //Debug.DrawRay(transform.position, transform.forward, Color.cyan);
 
-            if (!MathsHelper.AreRoughlyEqual(_cylinderTransform.localScale.y * 2, beamLength))
+            if (!Mathf.Approximately(_cylinderTransform.localScale.y * 2, beamLength))
             {
                 _cylinderTransform.localScale = new Vector3(_cylinderTransform.localScale.x, beamLength / 2, _cylinderTransform.localScale.z);
                 _cylinderTransform.position = _cylinderParentTransform.position + (_cylinderTransform.up * _cylinderTransform.localScale.y);
