@@ -22,7 +22,6 @@ namespace FullPotential.Core.Localization
         private List<CultureAddressables> _availableCultures;
 
         public const string DefaultCulture = "en-GB";
-        public string CurrentCulture { get; private set; }
 
         private async Task<Data.Localization> LoadCultureFileAsync(string address)
         {
@@ -106,8 +105,6 @@ namespace FullPotential.Core.Localization
                     }
                 }
             }
-
-            CurrentCulture = culture;
 
             return true;
         }

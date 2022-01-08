@@ -282,7 +282,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _inventoryLoaded = true;
         }
 
-        private void FillTypesFromIds(ItemBase item)
+        private static void FillTypesFromIds(ItemBase item)
         {
             if (!string.IsNullOrWhiteSpace(item.RegistryTypeId) && item.RegistryType == null)
             {
@@ -489,7 +489,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (equippedItems == null)
             {
-                Debug.LogWarning("No equipped items provided");
+                //Debug.LogWarning("No equipped items provided");
                 return;
             }
 

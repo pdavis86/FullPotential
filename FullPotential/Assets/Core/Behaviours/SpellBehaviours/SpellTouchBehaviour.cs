@@ -28,8 +28,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
             if (Physics.Raycast(startPosition, direction, out var hit, maxDistance: _maxDistance))
             {
-                var distance = Vector3.Distance(startPosition, hit.transform.position);
-
+                //var distance = Vector3.Distance(startPosition, hit.transform.position);
                 //Debug.Log($"Player {_sourcePlayer.name} touched {hit.transform.gameObject.name} with spell {activeSpell.Name} at distance {distance}");
 
                 ApplySpellEffects(hit.transform.gameObject, hit.point);

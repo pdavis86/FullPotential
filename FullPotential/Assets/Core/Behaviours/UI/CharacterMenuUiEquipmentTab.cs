@@ -12,6 +12,7 @@ using UnityEngine.UI;
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Behaviours.Ui
 {
