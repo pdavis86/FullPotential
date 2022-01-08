@@ -46,7 +46,7 @@ namespace FullPotential.Core.Behaviours.Ui
 
         private void OnEnable()
         {
-            var culture = GameManager.GetLastUsedCulture().OrIfNullOrWhitespace(GameManager.Instance.Localizer.CurrentCulture);
+            var culture = GameManager.Instance.AppOptions.Culture;
             int i;
             for (i = 0; i < _cultures.Count; i++)
             {

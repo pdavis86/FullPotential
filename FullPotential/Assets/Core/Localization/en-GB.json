@@ -177,6 +177,10 @@
       "Value": "Please sign in"
     },
     {
+      "Key": "ui.signin.missing",
+      "Value": "Please provide username and password"
+    },
+    {
       "Key": "ui.signin.error",
       "Value": "Invalid username or password"
     },

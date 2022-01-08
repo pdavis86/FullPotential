@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Linq;
 using FullPotential.Core.Data;
+using FullPotential.Core.Extensions;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UNET;
 using UnityEngine;
@@ -27,9 +28,8 @@ namespace FullPotential.Core.Behaviours.GameManagement
         [SerializeField] private InputField _signinFirstInput;
         [SerializeField] private GameObject _gameDetailsContainer;
         [SerializeField] private InputField _gameDetailsFirstInput;
-        [SerializeField] private GameObject _signinError;
+        [SerializeField] private Text _signinError;
         [SerializeField] private GameObject _joiningMessage;
-        [SerializeField] private Text _connectError;
 #pragma warning restore 0649
 
         private NetworkManager _networkManager;
@@ -53,6 +53,9 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         private void OnEnable()
         {
+            _username = GameManager.Instance.AppOptions.Username;
+            _signinFirstInput.text = _username;
+
             if (string.IsNullOrWhiteSpace(GameManager.Instance.DataStore.PlayerToken))
             {
                 _gameDetailsContainer.SetActive(false);
@@ -129,18 +132,28 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         public void SignIn()
         {
+            if (_username.IsNullOrWhiteSpace())
+            {
+                _signinError.text = GameManager.Instance.Localizer.Translate("ui.signin.missing");
+                _signinError.gameObject.SetActive(true);
+                return;
+            }
+
             var token = GameManager.Instance.UserRegistry.SignIn(_username, _password);
 
             if (string.IsNullOrWhiteSpace(token))
             {
-                _signinError.SetActive(true);
+                _signinError.text = GameManager.Instance.Localizer.Translate("ui.signin.error");
+                _signinError.gameObject.SetActive(true);
                 return;
             }
+
+            GameManager.Instance.AppOptions.Username = _username;
 
             GameManager.Instance.DataStore.PlayerToken = token;
             _username = _password = null;
 
-            _signinError.SetActive(false);
+            _signinError.gameObject.SetActive(false);
             _signInContainer.SetActive(false);
             _gameDetailsContainer.SetActive(true);
             if (_gameDetailsFirstInput != null)
@@ -151,13 +164,13 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         private void ShowAnyError()
         {
-            if (GameManager.Instance.DataStore.HasDisconnected && _connectError != null)
+            if (GameManager.Instance.DataStore.HasDisconnected && _signinError != null)
             {
                 _gameDetailsContainer.SetActive(true);
                 _joiningMessage.SetActive(false);
 
-                _connectError.text = GameManager.Instance.Localizer.Translate("ui.connect.disconnected");
-                _connectError.gameObject.SetActive(true);
+                _signinError.text = GameManager.Instance.Localizer.Translate("ui.connect.disconnected");
+                _signinError.gameObject.SetActive(true);
             }
         }
 
@@ -174,14 +187,14 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         private void HostGameInternal()
         {
-            _signinError.SetActive(false);
+            _signinError.gameObject.SetActive(false);
 
             SetNetworkAddressAndPort();
 
             if (!IsPortFree())
             {
-                _connectError.text = GameManager.Instance.Localizer.Translate("ui.connect.portnotfree");
-                _connectError.gameObject.SetActive(true);
+                _signinError.text = GameManager.Instance.Localizer.Translate("ui.connect.portnotfree");
+                _signinError.gameObject.SetActive(true);
                 return;
             }
 
@@ -236,8 +249,8 @@ namespace FullPotential.Core.Behaviours.GameManagement
                     NetworkManager.Singleton.Shutdown();
 
                     Debug.LogWarning($"Failed to join game after {timeoutSeconds} seconds");
-                    _connectError.text = GameManager.Instance.Localizer.Translate("ui.connect.jointimeout");
-                    _connectError.gameObject.SetActive(true);
+                    _signinError.text = GameManager.Instance.Localizer.Translate("ui.connect.jointimeout");
+                    _signinError.gameObject.SetActive(true);
                     _joiningMessage.SetActive(false);
                     _gameDetailsContainer.SetActive(true);
                     break;

@@ -8,6 +8,7 @@ using FullPotential.Core.Storage;
 using Unity.Netcode;
 using System.Threading.Tasks;
 using FullPotential.Api.Behaviours;
+using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -60,8 +61,9 @@ namespace FullPotential.Core.Behaviours.GameManagement
         public DefaultInputActions InputActions;
 
 
-        //Properties
+        //Variables
         public readonly GameManagerData DataStore = new GameManagerData();
+        public AppOptions AppOptions;
 
 
         //Singleton
@@ -81,6 +83,8 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
             Instance.DataStore.IsDebugging = true;
 
+            EnsureAppOptionsLoaded();
+
             await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
 
             TypeRegistry = new TypeRegistry();
@@ -88,16 +92,9 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
             UserRegistry = new UserRegistry();
 
-            var culture = GetLastUsedCulture();
-            if (string.IsNullOrWhiteSpace(culture))
-            {
-                culture = Localizer.DefaultCulture;
-                SetLastUsedCulture(culture);
-            }
-
             Localizer = new Localizer();
             await Localizer.LoadAvailableCulturesAsync();
-            await Localizer.LoadLocalizationFilesAsync(culture);
+            await Localizer.LoadLocalizationFilesAsync(Instance.AppOptions.Culture);
 
             ResultFactory = new ResultFactory(TypeRegistry, Localizer);
 
@@ -180,7 +177,8 @@ namespace FullPotential.Core.Behaviours.GameManagement
             MainCanvasObjects.DebuggingOverlay.SetActive(false);
             MainCanvasObjects.DebuggingOverlay.SetActive(true);
 
-            SetLastUsedCulture(culture);
+            EnsureAppOptionsLoaded();
+            Instance.AppOptions.Culture = culture;
         }
 
         private static string GetAppOptionsPath()
@@ -188,28 +186,30 @@ namespace FullPotential.Core.Behaviours.GameManagement
             return Application.persistentDataPath + "/LoadOptions.json";
         }
 
-        private static void SetLastUsedCulture(string culture)
+        private static void EnsureAppOptionsLoaded()
         {
-            var options = new AppOptions
+            if (!Instance.AppOptions.Culture.IsNullOrWhiteSpace())
             {
-                Culture = culture
-            };
-
-            System.IO.File.WriteAllText(GetAppOptionsPath(), JsonUtility.ToJson(options));
-        }
-
-        public static string GetLastUsedCulture()
-        {
-            var path = GetAppOptionsPath();
-
-            if (!System.IO.File.Exists(path))
-            {
-                return null;
+                return;
             }
 
-            var options = JsonUtility.FromJson<AppOptions>(System.IO.File.ReadAllText(path));
+            var path = GetAppOptionsPath();
 
-            return options.Culture;
+            if (System.IO.File.Exists(path))
+            {
+                Instance.AppOptions = JsonUtility.FromJson<AppOptions>(System.IO.File.ReadAllText(path));
+                return;
+            }
+
+            Instance.AppOptions = new AppOptions
+            {
+                Culture = Localizer.DefaultCulture
+            };
+        }
+
+        public static void SaveAppOptions()
+        {
+            System.IO.File.WriteAllText(GetAppOptionsPath(), JsonUtility.ToJson(Instance.AppOptions));
         }
 
         public static void Disconnect()
@@ -220,6 +220,8 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         public static void Quit()
         {
+            SaveAppOptions();
+
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #else
