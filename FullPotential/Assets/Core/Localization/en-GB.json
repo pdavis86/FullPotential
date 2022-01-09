@@ -286,6 +286,10 @@
       "Value": "Fullscreen"
     },
     {
+      "Key": "ui.settings.fov",
+      "Value": "Field of View"
+    },
+    {
       "Key": "ui.settings.language",
       "Value": "Language"
     },
