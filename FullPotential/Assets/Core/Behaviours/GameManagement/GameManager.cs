@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using FullPotential.Core.Crafting;
@@ -263,23 +264,21 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
             _isSaving = true;
 
-            Debug.Log($"Waiting {waitSeconds} seconds before saving...");
+            //Debug.Log($"Waiting {waitSeconds} seconds before saving...");
             yield return new WaitForSeconds(waitSeconds);
 
             Debug.Log("Saving...");
-            var saveTask = SaveAllPlayerDataAsync();
+            var saveTask = SaveAllPlayerDataAsync(NetworkManager.Singleton.ConnectedClientsList.Select(networkClient => networkClient?.PlayerObject?.GetComponent<PlayerState>()));
             yield return new WaitUntil(() => saveTask.IsCompleted);
-
-            Debug.Log("Save completed. Waiting 60 seconds...");
+            //Debug.Log("Save completed!");
 
             _isSaving = false;
         }
 
-        private async Task SaveAllPlayerDataAsync()
+        private async Task SaveAllPlayerDataAsync(IEnumerable<PlayerState> playerStates)
         {
-            var tasks = NetworkManager.Singleton.ConnectedClientsList.Select(networkClient => Task.Run(() =>
+            var tasks = playerStates.Select(playerState => Task.Run(() =>
             {
-                var playerState = networkClient?.PlayerObject?.GetComponent<PlayerState>();
                 SavePlayerIfDirty(playerState);
             }));
 

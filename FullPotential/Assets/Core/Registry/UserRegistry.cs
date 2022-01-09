@@ -6,6 +6,15 @@ namespace FullPotential.Core.Registry
 {
     public class UserRegistry
     {
+        private readonly bool _isDebugBuild;
+        private readonly string _persistentDataPath;
+
+        public UserRegistry()
+        {
+            _isDebugBuild = Debug.isDebugBuild;
+            _persistentDataPath = Application.persistentDataPath;
+        }
+
         public string SignIn(string username, string password)
         {
             var token = string.IsNullOrWhiteSpace(username)
@@ -33,7 +42,6 @@ namespace FullPotential.Core.Registry
             {
                 return new PlayerData
                 {
-                    Username = username,
                     Options = new PlayerOptions(),
                     Inventory = new Inventory()
                 };
@@ -52,7 +60,7 @@ namespace FullPotential.Core.Registry
 
         public void Save(PlayerData playerData)
         {
-            var prettyPrint = Debug.isDebugBuild;
+            var prettyPrint = _isDebugBuild;
             var saveJson = JsonUtility.ToJson(playerData, prettyPrint);
             System.IO.File.WriteAllText(GetPlayerSavePath(playerData.Username), saveJson);
         }
@@ -64,7 +72,7 @@ namespace FullPotential.Core.Registry
                 throw new System.ArgumentException("No username supplied");
             }
 
-            return Application.persistentDataPath + "/" + username + ".json";
+            return _persistentDataPath + "/" + username + ".json";
         }
 
         private void StripExtraData(PlayerData playerData)
