@@ -7,6 +7,7 @@ using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Helpers;
 using FullPotential.Core.Spawning;
+using TMPro;
 using Random = UnityEngine.Random;
 
 // ReSharper disable UnusedMember.Global
@@ -28,6 +29,7 @@ namespace FullPotential.Core.Behaviours.SceneObjects
         private NetworkObject _playerPrefabNetObj;
         private NetworkObject _enemyPrefabNetObj;
         private SpawnService _spawnService;
+        private int _enemyCounter;
 
         [SerializeField] private SceneAttributes _attributes = new SceneAttributes();
         [SerializeField]
@@ -98,6 +100,11 @@ namespace FullPotential.Core.Behaviours.SceneObjects
             var enemyNetObj = Instantiate(_enemyPrefabNetObj, chosenSpawnPoint.Position, chosenSpawnPoint.Rotation);
 
             _spawnService.AdjustPositionToBeAboveGround(chosenSpawnPoint.Position, enemyNetObj.gameObject);
+
+            _enemyCounter++;
+
+            //todo: do this better
+            enemyNetObj.gameObject.transform.Find("Graphics").Find("Canvas").Find("NameTag").GetComponent<TextMeshProUGUI>().text = "Enemy " + _enemyCounter;
 
             enemyNetObj.Spawn(true);
 
