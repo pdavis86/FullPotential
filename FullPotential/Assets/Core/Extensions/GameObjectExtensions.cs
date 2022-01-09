@@ -28,5 +28,25 @@ namespace FullPotential.Core.Extensions
             return null;
         }
 
+        public static Transform FindInDescendants(this GameObject gameObject, string name)
+        {
+            var child = gameObject.transform.Find(name);
+
+            if (child != null)
+            {
+                return child;
+            }
+
+            foreach (Transform tr in gameObject.transform)
+            {
+                var subChild = tr.Find(name);
+                if (subChild != null)
+                {
+                    return subChild;
+                }
+            }
+            return null;
+        }
+
     }
 }

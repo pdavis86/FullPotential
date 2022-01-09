@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using FullPotential.Api.Behaviours;
 using FullPotential.Api.Data;
+using FullPotential.Core.Behaviours.EnemyBehaviours;
 using UnityEngine;
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Helpers;
 using FullPotential.Core.Spawning;
-using TMPro;
 using Random = UnityEngine.Random;
 
 // ReSharper disable UnusedMember.Global
@@ -76,7 +76,7 @@ namespace FullPotential.Core.Behaviours.SceneObjects
                 }
             }
 
-            HereAreMyJoiningDetailsServerRpc(GameManager.Instance.DataStore.PlayerToken);
+            HereAreMyJoiningDetailsServerRpc(GameManager.Instance.LocalGameDataStore.PlayerToken);
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -103,12 +103,11 @@ namespace FullPotential.Core.Behaviours.SceneObjects
 
             _enemyCounter++;
 
-            //todo: do this better
-            enemyNetObj.gameObject.transform.Find("Graphics").Find("Canvas").Find("NameTag").GetComponent<TextMeshProUGUI>().text = "Enemy " + _enemyCounter;
-
             enemyNetObj.Spawn(true);
 
             enemyNetObj.transform.parent = transform;
+
+            enemyNetObj.GetComponent<EnemyState>().EnemyName.Value = "Enemy " + _enemyCounter;
         }
 
         public void OnEnemyDeath()

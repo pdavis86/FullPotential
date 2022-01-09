@@ -30,7 +30,7 @@ namespace FullPotential.Core.Behaviours.Ui
 
         private void Awake()
         {
-            _playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
+            _playerState = GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>();
         }
 
         private void OnEnable()
@@ -99,7 +99,7 @@ namespace FullPotential.Core.Behaviours.Ui
                 return leftAttempt.gameObject;
             }
 
-            var rightAttempt = _rhs.transform.Find(slotName);
+            var rightAttempt = _rhs.FindInDescendants(slotName);
             if (rightAttempt != null)
             {
                 return rightAttempt.gameObject;

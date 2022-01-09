@@ -51,7 +51,7 @@ namespace FullPotential.Core.Behaviours.Ui
         {
             _components = new List<ItemBase>();
 
-            _playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
+            _playerState = GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>();
             _playerActions = _playerState.gameObject.GetComponent<PlayerActions>();
 
             _typeDropdown.onValueChanged.AddListener(TypeOnValueChanged);

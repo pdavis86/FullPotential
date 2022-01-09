@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using FullPotential.Api.Behaviours;
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
+using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +16,7 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
 {
     public class EnemyState : NetworkBehaviour, IDefensible, IDamageable
     {
+        public readonly NetworkVariable<FixedString32Bytes> EnemyName = new NetworkVariable<FixedString32Bytes>();
         private readonly NetworkVariable<int> _health = new NetworkVariable<int>(100);
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
 
@@ -24,6 +27,13 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
         private void Awake()
         {
             _health.OnValueChanged += OnHealthChanged;
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+
+            transform.Find("Graphics").Find("Canvas").Find("NameTag").GetComponent<TextMeshProUGUI>().text = EnemyName.Value.ToString();
         }
 
         public int GetDefenseValue()
@@ -69,6 +79,11 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
 
             foreach (var item in _damageTaken)
             {
+
+                if (!NetworkManager.Singleton.ConnectedClients.ContainsKey(item.Key))
+                {
+                    continue;
+                }
                 var playerState = NetworkManager.Singleton.ConnectedClients[item.Key].PlayerObject.gameObject.GetComponent<PlayerState>();
                 playerState.SpawnLootChest(transform.position);
             }

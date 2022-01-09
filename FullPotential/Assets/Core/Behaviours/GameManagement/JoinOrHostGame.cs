@@ -56,7 +56,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             _username = GameManager.Instance.AppOptions.Username;
             _signinFirstInput.text = _username;
 
-            if (string.IsNullOrWhiteSpace(GameManager.Instance.DataStore.PlayerToken))
+            if (string.IsNullOrWhiteSpace(GameManager.Instance.LocalGameDataStore.PlayerToken))
             {
                 _gameDetailsContainer.SetActive(false);
                 _signInContainer.SetActive(true);
@@ -150,7 +150,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
             GameManager.Instance.AppOptions.Username = _username;
 
-            GameManager.Instance.DataStore.PlayerToken = token;
+            GameManager.Instance.LocalGameDataStore.PlayerToken = token;
             _username = _password = null;
 
             _signinError.gameObject.SetActive(false);
@@ -164,7 +164,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         private void ShowAnyError()
         {
-            if (GameManager.Instance.DataStore.HasDisconnected && _signinError != null)
+            if (GameManager.Instance.LocalGameDataStore.HasDisconnected && _signinError != null)
             {
                 _gameDetailsContainer.SetActive(true);
                 _joiningMessage.SetActive(false);
@@ -198,7 +198,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
                 return;
             }
 
-            GameManager.Instance.DataStore.HasDisconnected = false;
+            GameManager.Instance.LocalGameDataStore.HasDisconnected = false;
 
             _networkManager.StartHost();
 
@@ -218,13 +218,13 @@ namespace FullPotential.Core.Behaviours.GameManagement
         {
             var payload = JsonUtility.ToJson(new ConnectionPayload
             {
-                PlayerToken = GameManager.Instance.DataStore.PlayerToken
+                PlayerToken = GameManager.Instance.LocalGameDataStore.PlayerToken
             });
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.UTF8.GetBytes(payload);
 
             SetNetworkAddressAndPort();
 
-            GameManager.Instance.DataStore.HasDisconnected = false;
+            GameManager.Instance.LocalGameDataStore.HasDisconnected = false;
 
             _joinAttempt = DateTime.UtcNow;
             _networkManager.StartClient();

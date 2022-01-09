@@ -11,7 +11,7 @@ namespace FullPotential.Core.Behaviours.UI
     {
         public void Respawn()
         {
-            GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>().Respawn();
+            GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>().Respawn();
         }
     }
 }

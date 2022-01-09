@@ -27,7 +27,7 @@ namespace FullPotential.Core.Behaviours.Ui
 
         private void Start()
         {
-            if (!GameManager.Instance.DataStore.IsDebugging)
+            if (!GameManager.Instance.LocalGameDataStore.IsDebugging)
             {
                 Destroy(gameObject);
             }
@@ -56,15 +56,15 @@ namespace FullPotential.Core.Behaviours.Ui
 
         private NetworkStats GetNetworkStats()
         {
-            if (GameManager.Instance.DataStore.LocalPlayer == null)
+            if (GameManager.Instance.LocalGameDataStore.GameObject == null)
             {
                 return null;
             }
 
-            if (_playerObj != GameManager.Instance.DataStore.LocalPlayer)
+            if (_playerObj != GameManager.Instance.LocalGameDataStore.GameObject)
             {
-                _playerObj = GameManager.Instance.DataStore.LocalPlayer;
-                _networkStats = GameManager.Instance.DataStore.LocalPlayer.GetComponent<NetworkStats>();
+                _playerObj = GameManager.Instance.LocalGameDataStore.GameObject;
+                _networkStats = GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<NetworkStats>();
             }
 
             return _networkStats;

@@ -57,7 +57,7 @@ namespace FullPotential.Core.Behaviours.Ui
             }
             _languageDropDown.value = i;
 
-            var playerState = GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>();
+            var playerState = GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>();
             _skinUrlInput.text = playerState.TextureUrl.Value.ToString();
 
             _fovSlider.value = Camera.main.fieldOfView;
@@ -94,7 +94,7 @@ namespace FullPotential.Core.Behaviours.Ui
 
             GameManager.Instance.AppOptions.FieldOfView = Camera.main.fieldOfView;
 
-            GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerActions>().UpdatePlayerSettingsServerRpc(_skinUrlInput.text);
+            GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerActions>().UpdatePlayerSettingsServerRpc(_skinUrlInput.text);
 
             GameManager.Instance.MainCanvasObjects.HideAllMenus();
         }

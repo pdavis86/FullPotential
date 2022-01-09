@@ -1,6 +1,5 @@
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
-using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable UnusedType.Global
@@ -20,7 +19,7 @@ namespace FullPotential.Core.Behaviours.Ui
 
         public void ForceRespawn()
         {
-            GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>().RespawnServerRpc();
+            GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>().RespawnServerRpc();
         }
 
         public void Disconnect()
@@ -38,15 +37,7 @@ namespace FullPotential.Core.Behaviours.Ui
 
         private void Save()
         {
-            if (!NetworkManager.Singleton.IsServer)
-            {
-                return;
-            }
-
-            if (GameManager.Instance.DataStore.LocalPlayer != null)
-            {
-                GameManager.Instance.DataStore.LocalPlayer.GetComponent<PlayerState>().Save();
-            }
+            //todo: make a save request to the server, wait for a response, then quit/disconnect
         }
 
     }

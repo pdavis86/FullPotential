@@ -33,6 +33,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
             //todo: change lifetime based on attributes
             Destroy(gameObject, 10f);
 
+            //todo: handle situations where player disconnects
             _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId].PlayerObject.gameObject;
 
             _spell = _sourcePlayer.GetComponent<PlayerState>().Inventory.GetItemWithId<Spell>(SpellId);

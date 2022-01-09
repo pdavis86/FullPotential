@@ -11,7 +11,6 @@ using FullPotential.Core.Storage;
 using Unity.Netcode;
 using System.Threading.Tasks;
 using FullPotential.Api.Behaviours;
-using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
 using UnityEngine;
@@ -65,8 +64,12 @@ namespace FullPotential.Core.Behaviours.GameManagement
         public DefaultInputActions InputActions;
 
 
+        //Data Stores
+        public readonly GameData GameDataStore = new GameData();
+        public readonly LocalGameData LocalGameDataStore = new LocalGameData();
+
+
         //Variables
-        public readonly GameManagerData DataStore = new GameManagerData();
         public AppOptions AppOptions;
         private bool _isSaving;
 
@@ -86,7 +89,8 @@ namespace FullPotential.Core.Behaviours.GameManagement
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            Instance.DataStore.IsDebugging = true;
+            Instance.LocalGameDataStore.IsDebugging = true;
+            Instance.GameDataStore.PlayerData = new Dictionary<string, PlayerData>();
 
             EnsureAppOptionsLoaded();
 
@@ -157,26 +161,19 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         private void OnServerDisconnectedClient(ulong clientId)
         {
-            //Debug.LogWarning("Disconnected from server");
-
-            //if (NetworkManager.Singleton.ConnectedClients.ContainsKey(clientId))
-            //{
-            //    SavePlayerIfDirty(NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.GetComponent<PlayerState>());
-            //}
-            //else
-            //{
-            //    Debug.LogWarning("Went to save but the client had already disconnected");
-            //}
-
             if (clientId == NetworkManager.Singleton.LocalClientId)
             {
-                Instance.DataStore.HasDisconnected = true;
+                Instance.LocalGameDataStore.HasDisconnected = true;
 
                 if (SceneManager.GetActiveScene().buildIndex != 1)
                 {
                     SceneManager.LoadSceneAsync(1);
                 }
             }
+
+            //todo: maintain a mapping of username and clientid
+            //todo: when a player disconnects, save their data then unload it from memory
+            //Instance.GameDataStore.PlayerData.Remove(dddd);
         }
 
         //private void OnServerStarted()
@@ -267,31 +264,40 @@ namespace FullPotential.Core.Behaviours.GameManagement
             //Debug.Log($"Waiting {waitSeconds} seconds before saving...");
             yield return new WaitForSeconds(waitSeconds);
 
-            Debug.Log("Saving...");
-            var saveTask = SaveAllPlayerDataAsync(NetworkManager.Singleton.ConnectedClientsList.Select(networkClient => networkClient?.PlayerObject?.GetComponent<PlayerState>()));
-            yield return new WaitUntil(() => saveTask.IsCompleted);
+            Debug.Log("Looking for changes to save...");
+            yield return new WaitUntil(() => SaveAllPlayerDataAsync().IsCompleted);
             //Debug.Log("Save completed!");
 
             _isSaving = false;
         }
 
-        private async Task SaveAllPlayerDataAsync(IEnumerable<PlayerState> playerStates)
+        private async Task SaveAllPlayerDataAsync()
         {
-            var tasks = playerStates.Select(playerState => Task.Run(() =>
-            {
-                SavePlayerIfDirty(playerState);
-            }));
+            var tasks = GameDataStore.PlayerData
+                .Where(x => x.Value.InventoryLoadedSuccessfully && x.Value.IsDirty)
+                .Select(x => Task.Run(() => SavePlayerData(x.Value)));
 
             await Task.WhenAll(tasks);
         }
 
-        private void SavePlayerIfDirty(PlayerState playerState)
+        private static void SavePlayerData(PlayerData playerData)
         {
-            if (playerState != null && playerState.IsDirty)
+            if (!NetworkManager.Singleton.IsServer)
             {
-                Debug.Log($"Saving data for client {playerState.OwnerClientId}...");
-                playerState.Save();
+                Debug.LogError("Tried to save when not on the server");
             }
+
+            Debug.Log($"Saving data for '{playerData.Username}'...");
+
+            if (!playerData.InventoryLoadedSuccessfully)
+            {
+                Debug.LogWarning("Not saving because the load failed");
+                return;
+            }
+
+            Instance.UserRegistry.Save(playerData);
+
+            playerData.IsDirty = false;
         }
 
     }

@@ -34,6 +34,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
             Destroy(gameObject, 3f);
 
+            //todo: handle situations where player disconnects
             _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId].PlayerObject.gameObject;
 
             Physics.IgnoreCollision(GetComponent<Collider>(), _sourcePlayer.GetComponent<Collider>());

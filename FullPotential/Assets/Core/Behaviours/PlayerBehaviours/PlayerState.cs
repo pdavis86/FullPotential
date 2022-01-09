@@ -51,6 +51,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [HideInInspector] public bool IsDead;
         [HideInInspector] public PlayerInventory Inventory;
         [HideInInspector] public string PlayerToken;
+        [HideInInspector] public string Username;
         [HideInInspector] public readonly NetworkVariable<FixedString512Bytes> TextureUrl = new NetworkVariable<FixedString512Bytes>();
 
         private Rigidbody _rb;
@@ -58,16 +59,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private ClientRpcParams _clientRpcParams;
         private GameObject _spellBeingCastLeft;
         private GameObject _spellBeingCastRight;
-        private bool _loadWasSuccessful;
         private GameObject _graphicsGameObject;
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
 
-        private string _username;
 
         private FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
         private readonly Dictionary<string, DateTime> _unclaimedLoot = new Dictionary<string, DateTime>();
-
-        public bool IsDirty => Inventory.IsDirty;
 
         #region Event handlers
 
@@ -87,7 +84,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (IsOwner)
             {
                 GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCanvas).SetActive(false);
-                GameManager.Instance.DataStore.LocalPlayer = gameObject;
+                GameManager.Instance.LocalGameDataStore.GameObject = gameObject;
                 _nameTag.gameObject.SetActive(false);
                 _healthSlider.gameObject.SetActive(false);
 
@@ -319,6 +316,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             var playerData = GameManager.Instance.UserRegistry.Load(PlayerToken, null, reduced);
 
+            //todo: If it's still in memory, just pass that instead
+
             if (clientId.HasValue)
             {
                 //Don#'t send data to the server. It already has it loaded
@@ -401,7 +400,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             //Debug.LogError($"Loading player data into PlayerState with OwnerClientId: {OwnerClientId}");
 
-            _username = playerData.Username;
+            Username = playerData.Username;
             SetNameTag();
 
             if (IsServer)
@@ -412,12 +411,22 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             try
             {
                 Inventory.LoadInventory(playerData.Inventory);
-                _loadWasSuccessful = true;
+                playerData.InventoryLoadedSuccessfully = true;
             }
             catch (Exception ex)
             {
                 Debug.LogError(ex.ToString());
-                _loadWasSuccessful = false;
+                playerData.InventoryLoadedSuccessfully = false;
+            }
+
+            if (GameManager.Instance.GameDataStore.PlayerData.ContainsKey(playerData.Username))
+            {
+                Debug.LogWarning($"Overwriting player data for username '{playerData.Username}'");
+                GameManager.Instance.GameDataStore.PlayerData[playerData.Username] = playerData;
+            }
+            else
+            {
+                GameManager.Instance.GameDataStore.PlayerData.Add(playerData.Username, playerData);
             }
         }
 
@@ -428,9 +437,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return;
             }
 
-            _nameTag.text = string.IsNullOrWhiteSpace(_username)
+            _nameTag.text = string.IsNullOrWhiteSpace(Username)
                 ? "Player " + NetworkObjectId
-                : _username;
+                : Username;
         }
 
         private IEnumerator SetTexture()
@@ -440,10 +449,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             string filePath;
             if (textureUrl.StartsWith("http"))
             {
-                filePath = Application.persistentDataPath + "/" + _username + ".png";
+                filePath = Application.persistentDataPath + "/" + Username + ".png";
 
                 // ReSharper disable once StringLiteralTypo
-                var validatePath = Application.persistentDataPath + "/" + _username + ".skinvalidate";
+                var validatePath = Application.persistentDataPath + "/" + Username + ".skinvalidate";
 
                 var doDownload = true;
                 if (System.IO.File.Exists(validatePath))
@@ -491,36 +500,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 _leftMesh.material = newMat;
                 _rightMesh.material = newMat;
             }
-        }
-
-        public void Save()
-        {
-            if (!IsServer)
-            {
-                Debug.LogError("Tried to save when not on the server");
-            }
-
-            //Debug.Log("Saving player data for " + gameObject.name);
-
-            if (!_loadWasSuccessful)
-            {
-                Debug.LogWarning("Not saving because the load failed");
-                return;
-            }
-
-            var saveData = new PlayerData
-            {
-                Username = _username,
-                Options = new PlayerOptions
-                {
-                    TextureUrl = TextureUrl.Value.ToString()
-                },
-                Inventory = Inventory.GetSaveData()
-            };
-
-            GameManager.Instance.UserRegistry.Save(saveData);
-
-            Inventory.IsDirty = false;
         }
 
         public void SpawnSpellProjectile(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
@@ -688,6 +667,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             foreach (var item in _damageTaken)
             {
+                if (!NetworkManager.Singleton.ConnectedClients.ContainsKey(item.Key))
+                {
+                    continue;
+                }
                 var playerState = NetworkManager.Singleton.ConnectedClients[item.Key].PlayerObject.gameObject.GetComponent<PlayerState>();
                 playerState.SpawnLootChest(transform.position);
             }
