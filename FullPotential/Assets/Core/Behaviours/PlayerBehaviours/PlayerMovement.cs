@@ -35,6 +35,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         //Variables for maintaining state
         private Vector2 _smoothLook;
         private float _currentCameraRotationX;
+        private float _maxDistanceToBeStanding;
         private bool _isJumping;
         private bool _isSprinting;
 
@@ -46,6 +47,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _playerState = GetComponent<PlayerState>();
 
             InvokeRepeating(nameof(CheckIfOffTheMap), 1, 1);
+
+            _maxDistanceToBeStanding = gameObject.GetComponent<Collider>().bounds.extents.y + 0.1f;
         }
 
         private void OnEnable()
@@ -66,9 +69,17 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _lookVal = value.Get<Vector2>();
         }
 
+        private bool IsOnSolidObject()
+        {
+            return Physics.Raycast(transform.position, -Vector3.up, out var hitInfo, _maxDistanceToBeStanding);
+        }
+
         private void OnJump()
         {
-            _jumpForce = Vector3.up * _jumpForceMultiplier;
+            if (IsOnSolidObject())
+            {
+                _jumpForce = Vector3.up * _jumpForceMultiplier;
+            }
         }
 
         private void OnSprintStart()
@@ -116,17 +127,23 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 _playerCamera.transform.localEulerAngles = cameraRotation;
             }
 
-            switch (_isJumping)
+            if (_isJumping)
             {
-                case false when _jumpForce != Vector3.zero:
+                if (IsOnSolidObject())
+                {
+                    //Debug.Log("Resetting _isJumping to false");
+                    _isJumping = false;
+                }
+            }
+            else if (_jumpForce != Vector3.zero)
+            {
+                if (IsOnSolidObject())
+                {
+                    //Debug.Log("Jumping!");
                     _isJumping = true;
                     _rb.AddForce(_jumpForce * Time.fixedDeltaTime, ForceMode.Acceleration);
                     _jumpForce = Vector3.zero;
-                    break;
-
-                case true when _jumpForce == Vector3.zero:
-                    _isJumping = false;
-                    break;
+                }
             }
 
             if (_moveVal != Vector2.zero || _lookVal != Vector2.zero || _rb.velocity != Vector3.zero)
