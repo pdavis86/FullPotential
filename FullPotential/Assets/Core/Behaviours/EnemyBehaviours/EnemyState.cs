@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FullPotential.Api.Behaviours;
 using FullPotential.Core.Behaviours.GameManagement;
@@ -27,13 +28,24 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
         private void Awake()
         {
             _health.OnValueChanged += OnHealthChanged;
+            EnemyName.OnValueChanged += OnNameChanged;
+        }
+
+        private void OnHealthChanged(int previousValue, int newValue)
+        {
+            _healthSlider.value = (float)newValue / GetHealthMax();
+        }
+
+        private void OnNameChanged(FixedString32Bytes previousValue, FixedString32Bytes newValue)
+        {
+            SetNameTag();
         }
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
 
-            transform.Find("Graphics").Find("Canvas").Find("NameTag").GetComponent<TextMeshProUGUI>().text = EnemyName.Value.ToString();
+            SetNameTag();
         }
 
         public int GetDefenseValue()
@@ -68,11 +80,6 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
             _health.Value -= amount;
         }
 
-        private void OnHealthChanged(int previousValue, int newValue)
-        {
-            _healthSlider.value = (float)newValue / GetHealthMax();
-        }
-
         public void HandleDeath()
         {
             GetComponent<Collider>().enabled = false;
@@ -94,6 +101,11 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
             Destroy(gameObject);
 
             GameManager.Instance.SceneBehaviour.OnEnemyDeath();
+        }
+
+        private void SetNameTag()
+        {
+            transform.Find("Graphics").Find("Canvas").Find("NameTag").GetComponent<TextMeshProUGUI>().text = EnemyName.Value.ToString();
         }
 
     }

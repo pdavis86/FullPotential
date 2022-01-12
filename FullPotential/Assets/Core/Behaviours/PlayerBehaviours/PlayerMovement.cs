@@ -154,6 +154,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void CheckIfOffTheMap()
         {
+            //todo: do this for enemies too
+
             if (!_playerState.IsDead && transform.position.y < GameManager.Instance.SceneBehaviour.Attributes.LowestYValue)
             {
                 _playerState.HandleDeath();
