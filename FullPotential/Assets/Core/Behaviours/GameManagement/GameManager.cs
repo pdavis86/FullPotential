@@ -264,7 +264,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             //Debug.Log($"Waiting {waitSeconds} seconds before saving...");
             yield return new WaitForSeconds(waitSeconds);
 
-            Debug.Log("Looking for changes to save...");
+            //Debug.Log("Looking for changes to save...");
             yield return new WaitUntil(() => SaveAllPlayerDataAsync().IsCompleted);
             //Debug.Log("Save completed!");
 
