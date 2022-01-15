@@ -276,13 +276,14 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         private void SaveAllPlayerData()
         {
-            Debug.Log("Performing synchronous save");
-            
+            if (_isSaving || !NetworkManager.Singleton.IsServer)
+            {
+                return;
+            }
+
             Task.Run(async () => await SaveAllPlayerDataAsync())
                 .GetAwaiter()
                 .GetResult();
-
-            Debug.Log("Synchronous save complete");
         }
 
         private async Task SaveAllPlayerDataAsync()
