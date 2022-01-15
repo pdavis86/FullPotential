@@ -278,6 +278,10 @@
 
 
     {
+      "Key": "ui.settings.appsettings",
+      "Value": "Application Settings"
+    },
+	{
       "Key": "ui.settings.resolution",
       "Value": "Resolution"
     },
@@ -286,12 +290,20 @@
       "Value": "Fullscreen"
     },
     {
+      "Key": "ui.settings.gamesettings",
+      "Value": "Game Settings"
+    },
+    {
       "Key": "ui.settings.fov",
       "Value": "Field of View"
     },
     {
       "Key": "ui.settings.language",
       "Value": "Language"
+    },
+    {
+      "Key": "ui.settings.playersettings",
+      "Value": "Skin URL"
     },
     {
       "Key": "ui.settings.skin",
@@ -310,6 +322,14 @@
     {
       "Key": "ui.alert.itemsadded",
       "Value": "Added {0} items"
+    },
+    {
+      "Key": "ui.alert.unknownkiller",
+      "Value": "someone"
+    },
+    {
+      "Key": "ui.alert.falldamage",
+      "Value": "someone"
     },
 
 

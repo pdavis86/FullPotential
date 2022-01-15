@@ -171,7 +171,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [ServerRpc]
         public void UpdatePositionsAndRotationsServerRpc(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation)
         {
-            //NOTE: This does not stop players cheating their position. That's a problem for another day. Also sends data to ALL clients
+            //todo: This does not stop players cheating their position. That's a problem for another day. Also sends data to ALL clients
             UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation);
             UpdatePositionsAndRotationsClientRpc(rbPosition, rbRotation, rbVelocity, cameraRotation, new ClientRpcParams());
         }
@@ -693,14 +693,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 {
                     continue;
                 }
+
                 var playerState = NetworkManager.Singleton.ConnectedClients[item.Key].PlayerObject.gameObject.GetComponent<PlayerState>();
                 playerState.SpawnLootChest(transform.position);
             }
 
             _damageTaken.Clear();
 
-            //NOTE: Sent to all players
-            PlayerSpawnStateChangeClientRpc(Vector3.zero, Quaternion.identity, true, new ClientRpcParams());
+            PlayerSpawnStateChangeClientRpc(Vector3.zero, Quaternion.identity, true, killerName, RpcHelper.ForNearbyPlayers());
 
             YouDiedClientRpc(_clientRpcParams);
 

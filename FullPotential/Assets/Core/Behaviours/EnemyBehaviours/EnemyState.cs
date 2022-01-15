@@ -28,6 +28,8 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
         {
             _health.OnValueChanged += OnHealthChanged;
             EnemyName.OnValueChanged += OnNameChanged;
+
+            InvokeRepeating(nameof(CheckIfOffTheMap), 1, 1);
         }
 
         private void OnHealthChanged(int previousValue, int newValue)
@@ -105,6 +107,11 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
         private void SetNameTag()
         {
             transform.Find("Graphics").Find("Canvas").Find("NameTag").GetComponent<TextMeshProUGUI>().text = EnemyName.Value.ToString();
+        }
+
+        private void CheckIfOffTheMap()
+        {
+            AttackHelper.CheckIfOffTheMap(this, transform.position.y);
         }
 
     }

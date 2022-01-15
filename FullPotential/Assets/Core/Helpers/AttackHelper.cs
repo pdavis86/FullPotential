@@ -96,5 +96,13 @@ namespace FullPotential.Core.Helpers
             }
         }
 
+        public static void CheckIfOffTheMap(IDamageable damageable, float yValue)
+        {
+            if (!damageable.IsDead && yValue < GameManager.Instance.SceneBehaviour.Attributes.LowestYValue)
+            {
+                damageable.HandleDeath(GameManager.Instance.Localizer.Translate("ui.alert.falldamage"));
+            }
+        }
+
     }
 }
