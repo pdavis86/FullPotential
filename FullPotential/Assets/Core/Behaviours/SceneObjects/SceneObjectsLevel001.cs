@@ -46,6 +46,8 @@ namespace FullPotential.Core.Behaviours.SceneObjects
 
         private void Start()
         {
+            GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCanvas).SetActive(true);
+
             if (IsClient)
             {
                 Camera.main.fieldOfView = GameManager.Instance.AppOptions.FieldOfView;

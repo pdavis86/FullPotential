@@ -78,7 +78,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
             //Debug.Log("Collided with " + other.gameObject.name);
 
-            if (!other.gameObject.CompareTagAny(Tags.Player, Tags.Enemy, Tags.Ground))
+            if (other.isTrigger)
             {
                 return;
             }
@@ -106,10 +106,11 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
                 }
                 else
                 {
+                    //todo: is this duplicate logic?
                     var pointUnderTarget = new Vector3(target.transform.position.x, -100, target.transform.position.z);
-                    var targetsFeet = target.GetComponent<Collider>().ClosestPointOnBounds(pointUnderTarget);
+                    var feetOfTarget = target.GetComponent<Collider>().ClosestPointOnBounds(pointUnderTarget);
 
-                    spawnPosition = Physics.Raycast(targetsFeet, transform.up * -1, out var hit)
+                    spawnPosition = Physics.Raycast(feetOfTarget, transform.up * -1, out var hit)
                         ? hit.point
                         : position.Value;
                 }
