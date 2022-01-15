@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Core.Behaviours.Environment;
 using FullPotential.Core.Behaviours.Ui;
+using FullPotential.Core.Behaviours.UI.Components;
 using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
 using TMPro;
@@ -17,7 +18,6 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.UI;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
@@ -40,7 +40,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public PositionTransforms Positions;
         public TextureMeshes Meshes;
         [SerializeField] private TextMeshProUGUI _nameTag;
-        [SerializeField] private Slider _healthSlider;
+        [SerializeField] private HealthSlider _healthSlider;
         [SerializeField] private Transform _head;
 #pragma warning restore 0649
 
@@ -136,9 +136,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void OnHealthChanged(int previousValue, int newValue)
         {
+            var maxHealthValue = GetHealthMax();
+            var defenseValue = Inventory.GetDefenseValue();
+
             if (!IsOwner)
             {
-                _healthSlider.value = (float)newValue / GetHealthMax();
+                _healthSlider.SetValue(newValue, maxHealthValue, defenseValue);
             }
 
             if (NetworkManager.LocalClientId != OwnerClientId)
@@ -146,7 +149,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return;
             }
 
-            GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateHealthPercentage((float)newValue / GetHealthMax());
+            GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateHealthPercentage(newValue, maxHealthValue, defenseValue);
         }
 
         #endregion

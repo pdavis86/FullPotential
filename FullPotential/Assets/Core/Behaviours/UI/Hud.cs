@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FullPotential.Core.Behaviours.UI.Components;
+using UnityEngine;
 using UnityEngine.UI;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -10,7 +11,7 @@ namespace FullPotential.Core.Behaviours.Ui
 #pragma warning disable 0649
         [SerializeField] private GameObject _alertsContainer;
         [SerializeField] private GameObject _alertPrefab;
-        [SerializeField] private Slider _healthSlider;
+        [SerializeField] private HealthSlider _healthSlider;
         //[SerializeField] private Slider _manaSlider;
         //[SerializeField] private Slider _barrierSlider;
 #pragma warning restore 0649
@@ -21,9 +22,9 @@ namespace FullPotential.Core.Behaviours.Ui
             alert.transform.Find("Text").GetComponent<Text>().text = alertText;
         }
 
-        public void UpdateHealthPercentage(float value)
+        public void UpdateHealthPercentage(int health, int maxHealth, int defence)
         {
-            _healthSlider.value = value;
+            _healthSlider.SetValue(health, maxHealth, defence);
         }
 
         //public void UpdateManaPercentage(float value)

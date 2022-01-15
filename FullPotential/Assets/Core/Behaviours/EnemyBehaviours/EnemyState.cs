@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using FullPotential.Api.Behaviours;
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
+using FullPotential.Core.Behaviours.UI.Components;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UI;
 
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable InconsistentNaming
@@ -21,7 +21,7 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
 
 #pragma warning disable 0649
-        [SerializeField] private Slider _healthSlider;
+        [SerializeField] private HealthSlider _healthSlider;
 #pragma warning restore 0649
 
         private void Awake()
@@ -32,7 +32,7 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
 
         private void OnHealthChanged(int previousValue, int newValue)
         {
-            _healthSlider.value = (float)newValue / GetHealthMax();
+            _healthSlider.SetValue(newValue, GetHealthMax(), GetDefenseValue());
         }
 
         private void OnNameChanged(FixedString32Bytes previousValue, FixedString32Bytes newValue)
