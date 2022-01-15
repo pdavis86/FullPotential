@@ -161,8 +161,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1367944321400830439}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.435, z: 0}
-  m_LocalScale: {x: 1, y: 0.6, z: 0.5}
+  m_LocalPosition: {x: 0, y: -0.334, z: 0}
+  m_LocalScale: {x: 1, y: 0.7, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7392779646582606286}
@@ -991,10 +991,12 @@ MonoBehaviour:
   Positions:
     LeftHandInFront: {fileID: 8103993405689920857}
     RightHandInFront: {fileID: 1380344505649988731}
+  Meshes:
+    HeadMesh: {fileID: 7392779648629048398}
+    BodyMesh: {fileID: 8717859264228815994}
+    LeftHandMesh: {fileID: 7392779647843419196}
+    RightHandMesh: {fileID: 7392779647605690758}
   _nameTag: {fileID: 6250991307057261387}
-  _mainMesh: {fileID: 7392779648629048398}
-  _leftMesh: {fileID: 7392779647843419196}
-  _rightMesh: {fileID: 7392779647605690758}
   _healthSlider: {fileID: 5998598060662337222}
   _head: {fileID: 7392779648629048435}
   InFrontOfPlayer: {fileID: 3124563880166737475}
@@ -1216,7 +1218,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7392779648629048434}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.456, z: 0}
+  m_LocalPosition: {x: 0, y: 0.667, z: 0}
   m_LocalScale: {x: 1, y: 0.3, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:

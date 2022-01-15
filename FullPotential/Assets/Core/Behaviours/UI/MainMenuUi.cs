@@ -24,20 +24,13 @@ namespace FullPotential.Core.Behaviours.Ui
 
         public void Disconnect()
         {
-            Save();
             _mainCanvasObjects.HideAllMenus();
-            GameManager.Disconnect();
+            GameManager.Instance.Disconnect();
         }
 
         public void QuitGame()
         {
-            Save();
-            GameManager.Quit();
-        }
-
-        private void Save()
-        {
-            //todo: make a save request to the server, wait for a response, then quit/disconnect
+            GameManager.Instance.Quit();
         }
 
     }

@@ -36,10 +36,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [SerializeField] private Behaviour[] _behavioursToDisable;
         [SerializeField] private Behaviour[] _behavioursForRespawn;
         public PositionTransforms Positions;
+        public TextureMeshes Meshes;
         [SerializeField] private TextMeshProUGUI _nameTag;
-        [SerializeField] private MeshRenderer _mainMesh;
-        [SerializeField] private MeshRenderer _leftMesh;
-        [SerializeField] private MeshRenderer _rightMesh;
         [SerializeField] private Slider _healthSlider;
         [SerializeField] private Transform _head;
 #pragma warning restore 0649
@@ -447,10 +445,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private IEnumerator SetTexture()
         {
-            var textureUrl = TextureUrl.Value.ToString().ToLower();
+            var textureUrl = TextureUrl.Value.ToString();
 
             string filePath;
-            if (textureUrl.StartsWith("http"))
+            if (textureUrl.ToLower().StartsWith("http"))
             {
                 filePath = Application.persistentDataPath + "/" + Username + ".png";
 
@@ -473,11 +471,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     {
                         yield return webRequest.SendWebRequest();
 
-                        if (webRequest.downloadHandler.data != null)
+                        if (webRequest.downloadHandler.data == null)
                         {
-                            System.IO.File.WriteAllBytes(filePath, webRequest.downloadHandler.data);
-                            System.IO.File.WriteAllText(validatePath, textureUrl);
+                            Debug.LogError("Failed to download texture");
+                            yield break;
                         }
+
+                        System.IO.File.WriteAllBytes(filePath, webRequest.downloadHandler.data);
+                        System.IO.File.WriteAllText(validatePath, textureUrl);
                     }
                 }
             }
@@ -494,14 +495,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
                 tex.LoadImage(System.IO.File.ReadAllBytes(filePath));
-                var newMat = new Material(_mainMesh.material.shader)
+                var newMat = new Material(Meshes.BodyMesh.material.shader)
                 {
                     mainTexture = tex
                 };
 
-                _mainMesh.material = newMat;
-                _leftMesh.material = newMat;
-                _rightMesh.material = newMat;
+                Meshes.HeadMesh.material = newMat;
+                Meshes.BodyMesh.material = newMat;
+                Meshes.LeftHandMesh.material = newMat;
+                Meshes.RightHandMesh.material = newMat;
             }
         }
 
@@ -751,6 +753,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             public Transform LeftHandInFront;
             public Transform RightHandInFront;
+        }
+
+        [Serializable]
+        public struct TextureMeshes
+        {
+            public MeshRenderer HeadMesh;
+            public MeshRenderer BodyMesh;
+            public MeshRenderer LeftHandMesh;
+            public MeshRenderer RightHandMesh;
         }
 
         #endregion

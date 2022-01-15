@@ -43,7 +43,7 @@ namespace FullPotential.Core.Registry
                 return new PlayerData
                 {
                     Username = username,
-                    Options = new PlayerOptions(),
+                    Options = new PlayerSettings(),
                     Inventory = new Inventory()
                 };
             }

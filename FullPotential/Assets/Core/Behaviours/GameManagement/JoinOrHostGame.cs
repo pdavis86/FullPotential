@@ -125,7 +125,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         public void QuitGame()
         {
-            GameManager.Quit();
+            GameManager.Instance.Quit();
         }
 
         #endregion

@@ -2,6 +2,7 @@ using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Core.Data;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -94,7 +95,12 @@ namespace FullPotential.Core.Behaviours.Ui
 
             GameManager.Instance.AppOptions.FieldOfView = Camera.main.fieldOfView;
 
-            GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerActions>().UpdatePlayerSettingsServerRpc(_skinUrlInput.text);
+            var playerSettings = new PlayerSettings
+            {
+                TextureUrl = _skinUrlInput.text
+            };
+
+            GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerActions>().UpdatePlayerSettingsServerRpc(playerSettings);
 
             GameManager.Instance.MainCanvasObjects.HideAllMenus();
         }

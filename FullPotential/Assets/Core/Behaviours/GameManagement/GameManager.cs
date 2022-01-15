@@ -205,7 +205,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             return Application.persistentDataPath + "/LoadOptions.json";
         }
 
-        private static void EnsureAppOptionsLoaded()
+        private void EnsureAppOptionsLoaded()
         {
             if (!Instance.AppOptions.Culture.IsNullOrWhiteSpace())
             {
@@ -226,26 +226,29 @@ namespace FullPotential.Core.Behaviours.GameManagement
             };
         }
 
-        public static void SaveAppOptions()
+        public void Disconnect()
         {
-            System.IO.File.WriteAllText(GetAppOptionsPath(), JsonUtility.ToJson(Instance.AppOptions));
-        }
+            SaveAllPlayerData();
 
-        public static void Disconnect()
-        {
             NetworkManager.Singleton.Shutdown();
             SceneManager.LoadSceneAsync(1);
         }
 
-        public static void Quit()
+        public void Quit()
         {
             SaveAppOptions();
+            SaveAllPlayerData();
 
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #else
         Application.Quit ();
 #endif
+        }
+
+        public static void SaveAppOptions()
+        {
+            System.IO.File.WriteAllText(GetAppOptionsPath(), JsonUtility.ToJson(Instance.AppOptions));
         }
 
         public static Version GetGameVersion()
@@ -269,6 +272,17 @@ namespace FullPotential.Core.Behaviours.GameManagement
             //Debug.Log("Save completed!");
 
             _isSaving = false;
+        }
+
+        private void SaveAllPlayerData()
+        {
+            Debug.Log("Performing synchronous save");
+            
+            Task.Run(async () => await SaveAllPlayerDataAsync())
+                .GetAwaiter()
+                .GetResult();
+
+            Debug.Log("Synchronous save complete");
         }
 
         private async Task SaveAllPlayerDataAsync()

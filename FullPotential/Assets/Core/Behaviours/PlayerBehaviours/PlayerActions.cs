@@ -168,9 +168,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         #region ServerRpc calls
 
         [ServerRpc]
-        public void UpdatePlayerSettingsServerRpc(string textureUrl)
+        public void UpdatePlayerSettingsServerRpc(PlayerSettings playerSettings)
         {
-            _playerState.TextureUrl.Value = textureUrl;
+            var saveData = GameManager.Instance.GameDataStore.PlayerData[_playerState.Username];
+            saveData.Options = playerSettings;
+            saveData.IsDirty = true;
+
+            _playerState.TextureUrl.Value = playerSettings.TextureUrl;
         }
 
         [ServerRpc]

@@ -71,7 +71,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private bool IsOnSolidObject()
         {
-            return Physics.Raycast(transform.position, -Vector3.up, out var hitInfo, _maxDistanceToBeStanding);
+            return Physics.Raycast(transform.position, -Vector3.up, _maxDistanceToBeStanding);
         }
 
         private void OnJump()
