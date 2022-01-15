@@ -41,6 +41,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [SerializeField] private MeshRenderer _leftMesh;
         [SerializeField] private MeshRenderer _rightMesh;
         [SerializeField] private Slider _healthSlider;
+        [SerializeField] private Transform _head;
 #pragma warning restore 0649
 
         public GameObject InFrontOfPlayer;
@@ -358,10 +359,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (cameraRotation.HasValue)
             {
                 PlayerCamera.transform.rotation = cameraRotation.Value;
+                _head.transform.rotation = cameraRotation.Value;
             }
             else
             {
                 PlayerCamera.transform.localEulerAngles = Vector3.zero;
+                _head.transform.localEulerAngles = Vector3.zero;
             }
         }
 
