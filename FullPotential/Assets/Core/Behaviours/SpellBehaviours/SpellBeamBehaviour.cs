@@ -121,9 +121,6 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
             if (playerState.OwnerClientId == NetworkManager.Singleton.LocalClientId)
             {
-                //Move it a little forwards
-                _cylinderParentTransform.position += transform.forward;
-
                 //Move it a little sideways
                 _cylinderParentTransform.position += (IsLeftHand ? 0.1f : -0.1f) * _cylinderParentTransform.right;
             }

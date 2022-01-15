@@ -35,6 +35,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 #pragma warning disable 0649
         [SerializeField] private Behaviour[] _behavioursToDisable;
         [SerializeField] private Behaviour[] _behavioursForRespawn;
+        [SerializeField] private GameObject[] _gameObjectsForRespawn;
         public PositionTransforms Positions;
         public TextureMeshes Meshes;
         [SerializeField] private TextMeshProUGUI _nameTag;
@@ -177,7 +178,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             RespawnClientRpc(_clientRpcParams);
 
             //NOTE: Sent to all players
-            PlayerRespawnClientRpc(spawnPoint.Position, spawnPoint.Rotation, false, new ClientRpcParams());
+            PlayerSpawnStateChangeClientRpc(spawnPoint.Position, spawnPoint.Rotation, false, new ClientRpcParams());
 
             IsDead = false;
         }
@@ -269,25 +270,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 comp.enabled = false;
             }
 
+            foreach (var obj in _gameObjectsForRespawn)
+            {
+                obj.SetActive(false);
+            }
+
             GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCamera).SetActive(true);
 
             MainCanvasObjects.Instance.Hud.SetActive(false);
             MainCanvasObjects.Instance.Respawn.SetActive(true);
-        }
-
-        // ReSharper disable once UnusedParameter.Global
-        [ClientRpc]
-        public void PlayerRespawnClientRpc(Vector3 position, Quaternion rotation, bool isDead, ClientRpcParams clientRpcParams)
-        {
-            if (!isDead)
-            {
-                UpdatePositionsAndRotations(position, rotation, Vector3.zero, null);
-            }
-
-            _graphicsGameObject.gameObject.SetActive(!isDead);
-            _rb.useGravity = !isDead;
-            _rb.isKinematic = isDead;
-            GetComponent<Collider>().enabled = !isDead;
         }
 
         // ReSharper disable once UnusedParameter.Global
@@ -299,12 +290,32 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCamera).SetActive(false);
 
+            foreach (var obj in _gameObjectsForRespawn)
+            {
+                obj.SetActive(true);
+            }
+
             foreach (var comp in _behavioursForRespawn)
             {
                 comp.enabled = true;
             }
 
             IsDead = false;
+        }
+
+        // ReSharper disable once UnusedParameter.Global
+        [ClientRpc]
+        public void PlayerSpawnStateChangeClientRpc(Vector3 position, Quaternion rotation, bool isDead, ClientRpcParams clientRpcParams)
+        {
+            if (!isDead)
+            {
+                UpdatePositionsAndRotations(position, rotation, Vector3.zero, null);
+            }
+
+            _graphicsGameObject.gameObject.SetActive(!isDead);
+            _rb.useGravity = !isDead;
+            _rb.isKinematic = isDead;
+            GetComponent<Collider>().enabled = !isDead;
         }
 
         #endregion
@@ -683,7 +694,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _damageTaken.Clear();
 
             //NOTE: Sent to all players
-            PlayerRespawnClientRpc(Vector3.zero, Quaternion.identity, true, new ClientRpcParams());
+            PlayerSpawnStateChangeClientRpc(Vector3.zero, Quaternion.identity, true, new ClientRpcParams());
 
             YouDiedClientRpc(_clientRpcParams);
 
