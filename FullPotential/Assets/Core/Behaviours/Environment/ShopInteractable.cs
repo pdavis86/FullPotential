@@ -1,4 +1,5 @@
 ﻿using FullPotential.Core.Behaviours.GameManagement;
+using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
 using Unity.Netcode;
 using UnityEngine;
@@ -22,7 +23,7 @@ namespace FullPotential.Core.Behaviours.Environment
 
         public override void OnInteract(NetworkObject networkObject)
         {
-            Debug.LogWarning("Not yet implemented the shop interaction");
+            networkObject.GetComponent<PlayerActions>().ClaimLootServerRpc("justgimmieloot");
         }
 
         public override void OnBlur()

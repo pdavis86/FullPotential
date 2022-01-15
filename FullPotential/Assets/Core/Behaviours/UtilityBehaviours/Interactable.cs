@@ -19,7 +19,7 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
 
         protected TMPro.TextMeshProUGUI _interactionBubble;
 
-        private void Start()
+        private void Awake()
         {
             _interactionBubble = GameManager.Instance.MainCanvasObjects.InteractionBubble.GetComponent<TMPro.TextMeshProUGUI>();
         }
@@ -32,7 +32,10 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
 
         private void OnDisable()
         {
-            OnBlur();
+            if (_interactionBubble != null)
+            {
+                OnBlur();
+            }
         }
 
         public abstract void OnFocus();

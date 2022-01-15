@@ -365,7 +365,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [ServerRpc]
         public void ClaimLootServerRpc(string id)
         {
-            if (!_playerState.ClaimLoot(id))
+            var skipIdCheck = Debug.isDebugBuild && id == "justgimmieloot";
+
+            if (!skipIdCheck && !_playerState.ClaimLoot(id))
             {
                 return;
             }
