@@ -987,6 +987,10 @@ MonoBehaviour:
   - {fileID: 7392779647204144589}
   - {fileID: 7392779647204144588}
   - {fileID: 8117841901429913958}
+  _gameObjectsForPlayers:
+  - {fileID: 5334387806646515413}
+  - {fileID: 7392779648629048434}
+  - {fileID: 1367944321400830439}
   _gameObjectsForRespawn:
   - {fileID: 3124563880166737475}
   Positions:

@@ -35,6 +35,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 #pragma warning disable 0649
         [SerializeField] private Behaviour[] _behavioursToDisable;
         [SerializeField] private Behaviour[] _behavioursForRespawn;
+        [SerializeField] private GameObject[] _gameObjectsForPlayers;
         [SerializeField] private GameObject[] _gameObjectsForRespawn;
         public PositionTransforms Positions;
         public TextureMeshes Meshes;
@@ -85,9 +86,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCanvas).SetActive(false);
                 GameManager.Instance.LocalGameDataStore.GameObject = gameObject;
-                _nameTag.gameObject.SetActive(false);
-                _healthSlider.gameObject.SetActive(false);
 
+                foreach (var obj in _gameObjectsForPlayers)
+                {
+                    obj.SetActive(false);
+                }
             }
             else
             {
