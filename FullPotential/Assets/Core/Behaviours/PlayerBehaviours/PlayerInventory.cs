@@ -571,6 +571,24 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (itemId.IsNullOrWhiteSpace())
             {
+                switch (slotGameObjectName)
+                {
+                    case SlotGameObjectName.LeftHand:
+                        if (IsClient)
+                        {
+                            GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateLeftHand(null);
+                        }
+                        break;
+
+
+                    case SlotGameObjectName.RightHand:
+                        if (IsClient)
+                        {
+                            GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateRightHand(null);
+                        }
+                        break;
+                }
+
                 return;
             }
 
@@ -580,10 +598,20 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 case SlotGameObjectName.LeftHand:
                     SpawnItemInHand(slotGameObjectName, item);
+                    if (IsClient)
+                    {
+                        var contents = GameManager.Instance.ResultFactory.GetItemDescription(item);
+                        GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateLeftHand(contents);
+                    }
                     break;
 
                 case SlotGameObjectName.RightHand:
                     SpawnItemInHand(slotGameObjectName, item, false);
+                    if (IsClient)
+                    {
+                        var contents = GameManager.Instance.ResultFactory.GetItemDescription(item);
+                        GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateRightHand(contents);
+                    }
                     break;
 
                 default:
