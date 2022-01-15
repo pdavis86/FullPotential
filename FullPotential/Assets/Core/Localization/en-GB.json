@@ -324,12 +324,12 @@
       "Value": "Added {0} items"
     },
     {
-      "Key": "ui.alert.unknownkiller",
+      "Key": "ui.alert.unknownattacker",
       "Value": "someone"
     },
     {
       "Key": "ui.alert.falldamage",
-      "Value": "someone"
+      "Value": "fall damage"
     },
 
 

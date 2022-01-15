@@ -27,7 +27,7 @@ namespace FullPotential.Core.Behaviours.Ui
 
         private void Start()
         {
-            if (!GameManager.Instance.LocalGameDataStore.IsDebugging)
+            if (!Debug.isDebugBuild)
             {
                 Destroy(gameObject);
             }

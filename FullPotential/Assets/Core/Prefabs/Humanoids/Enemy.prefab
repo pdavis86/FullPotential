@@ -162,6 +162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0e57d1b62b20be418143d92c23a408f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _nameTag: {fileID: 3612779855335603929}
   _healthSlider: {fileID: 2211276185775919372}
 --- !u!114 &2712974170162580787
 MonoBehaviour:

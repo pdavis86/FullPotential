@@ -46,7 +46,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _rb = GetComponent<Rigidbody>();
             _playerState = GetComponent<PlayerState>();
 
-            InvokeRepeating(nameof(CheckIfOffTheMap), 1, 1);
+            if (IsServer)
+            {
+                InvokeRepeating(nameof(CheckIfOffTheMap), 1, 1);
+            }
 
             _maxDistanceToBeStanding = gameObject.GetComponent<Collider>().bounds.extents.y + 0.1f;
         }

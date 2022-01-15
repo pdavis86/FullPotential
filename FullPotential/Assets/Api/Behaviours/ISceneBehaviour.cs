@@ -1,5 +1,6 @@
 ﻿using FullPotential.Api.Data;
 using FullPotential.Core.Spawning;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace FullPotential.Api.Behaviours
@@ -8,12 +9,14 @@ namespace FullPotential.Api.Behaviours
     {
         SceneAttributes Attributes { get; }
 
-        void OnEnemyDeath();
-
         SpawnService GetSpawnService();
 
         Transform GetTransform();
 
         SpawnPoint GetSpawnPoint(GameObject gameObjectToSpawn);
+
+        void HandleEnemyDeath();
+
+        void MakeAnnouncementClientRpc(string announcement, ClientRpcParams clientRpcParams);
     }
 }

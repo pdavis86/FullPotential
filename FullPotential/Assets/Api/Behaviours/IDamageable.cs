@@ -4,12 +4,14 @@ namespace FullPotential.Api.Behaviours
 {
     public interface IDamageable
     {
+        bool IsDead { get; }
+
         int GetHealthMax();
 
         int GetHealth();
 
-        void TakeDamage(ulong? clientId, int amount);
+        void TakeDamage(int amount, ulong? clientId, string attackerName);
 
-        void HandleDeath();
+        void HandleDeath(string killerName);
     }
 }

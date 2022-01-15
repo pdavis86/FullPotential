@@ -38,7 +38,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private PlayerState _playerState;
         private PlayerMovement _playerMovement;
         private Interactable _focusedInteractable;
-        private Hud _hud;
         private Camera _sceneCamera;
         private ClientRpcParams _clientRpcParams;
 
@@ -60,8 +59,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
 
             _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;
-
-            _hud = _mainCanvasObjects.Hud.GetComponent<Hud>();
 
             _mainCanvasObjects.Hud.SetActive(true);
 
@@ -501,11 +498,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             var itemInHand = _playerState.Inventory.GetItemInHand(isLeftHand);
 
             TryToAttackServerRpc(itemInHand?.Id, _playerCamera.transform.forward);
-        }
-
-        public void ShowAlert(string alertText)
-        {
-            _hud.ShowAlert(alertText);
         }
 
         public void ShowDamage(Vector3 position, string damage)

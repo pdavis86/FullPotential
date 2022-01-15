@@ -49,7 +49,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public readonly NetworkVariable<int> Health = new NetworkVariable<int>(100);
 
-        [HideInInspector] public bool IsDead;
+        public bool IsDead { get; set; }
+
         [HideInInspector] public PlayerInventory Inventory;
         [HideInInspector] public string PlayerToken;
         [HideInInspector] public string Username;
@@ -183,8 +184,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             var spawnPoint = GameManager.Instance.SceneBehaviour.GetSpawnPoint(gameObject);
             RespawnClientRpc(_clientRpcParams);
 
-            //NOTE: Sent to all players
-            PlayerSpawnStateChangeClientRpc(spawnPoint.Position, spawnPoint.Rotation, false, new ClientRpcParams());
+            PlayerSpawnStateChangeClientRpc(spawnPoint.Position, spawnPoint.Rotation, false, null, RpcHelper.ForNearbyPlayers());
 
             IsDead = false;
         }
@@ -192,13 +192,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         #endregion
 
         #region ClientRpc calls
-
-        // ReSharper disable once UnusedParameter.Global
-        [ClientRpc]
-        public void ShowAlertClientRpc(string alertText, ClientRpcParams clientRpcParams)
-        {
-            _playerActions.ShowAlert(alertText);
-        }
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
@@ -226,7 +219,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             _loadPlayerDataReconstructor = null;
 
-            SetNameTag();
+            SetName();
 
             if (!string.IsNullOrWhiteSpace(TextureUrl.Value.ToString()))
             {
@@ -311,11 +304,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void PlayerSpawnStateChangeClientRpc(Vector3 position, Quaternion rotation, bool isDead, ClientRpcParams clientRpcParams)
+        public void PlayerSpawnStateChangeClientRpc(Vector3 position, Quaternion rotation, bool isDead, string killerName, ClientRpcParams clientRpcParams)
         {
             if (!isDead)
             {
                 UpdatePositionsAndRotations(position, rotation, Vector3.zero, null);
+            }
+
+            if (!killerName.IsNullOrWhiteSpace())
+            {
+                GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ShowAlert($"{Username} was killed by {killerName}");
             }
 
             _graphicsGameObject.gameObject.SetActive(!isDead);
@@ -401,17 +399,17 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public void ShowAlertForItemsAddedToInventory(string alertText)
         {
-            ShowAlertClientRpc(alertText, _clientRpcParams);
+            GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc(alertText, _clientRpcParams);
         }
 
         public void AlertOfInventoryRemovals(int itemsRemoved)
         {
-            ShowAlertClientRpc($"Removed {itemsRemoved} items from the inventory after handling message on " + (IsServer ? "server" : "client") + " for " + gameObject.name, _clientRpcParams);
+            GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc($"Removed {itemsRemoved} items from the inventory after handling message on " + (IsServer ? "server" : "client") + " for " + gameObject.name, _clientRpcParams);
         }
 
         public void AlertInventoryIsFull()
         {
-            ShowAlertClientRpc("Your inventory is at max", _clientRpcParams);
+            GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc("Your inventory is at max", _clientRpcParams);
         }
 
         private void LoadFromPlayerData(PlayerData playerData)
@@ -419,7 +417,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             //Debug.LogError($"Loading player data into PlayerState with OwnerClientId: {OwnerClientId}");
 
             Username = playerData.Username;
-            SetNameTag();
+            SetName();
 
             if (IsServer)
             {
@@ -448,16 +446,20 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
-        private void SetNameTag()
+        private void SetName()
         {
+            var displayName = string.IsNullOrWhiteSpace(Username)
+                ? "Player " + NetworkObjectId
+                : Username;
+
+            gameObject.name = displayName;
+
             if (IsOwner)
             {
                 return;
             }
 
-            _nameTag.text = string.IsNullOrWhiteSpace(Username)
-                ? "Player " + NetworkObjectId
-                : Username;
+            _nameTag.text = displayName;
         }
 
         private IEnumerator SetTexture()
@@ -666,7 +668,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             return Health.Value;
         }
 
-        public void TakeDamage(ulong? clientId, int amount)
+        public void TakeDamage(int amount, ulong? clientId, string attackerName)
         {
             if (clientId != null)
             {
@@ -681,9 +683,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
 
             Health.Value -= amount;
+
+            if (Health.Value <= 0)
+            {
+                HandleDeath(attackerName);
+            }
         }
 
-        public void HandleDeath()
+        public void HandleDeath(string killerName)
         {
             IsDead = true;
 

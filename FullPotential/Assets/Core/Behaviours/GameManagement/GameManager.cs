@@ -89,7 +89,6 @@ namespace FullPotential.Core.Behaviours.GameManagement
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            Instance.LocalGameDataStore.IsDebugging = true;
             Instance.GameDataStore.PlayerData = new Dictionary<string, PlayerData>();
 
             EnsureAppOptionsLoaded();

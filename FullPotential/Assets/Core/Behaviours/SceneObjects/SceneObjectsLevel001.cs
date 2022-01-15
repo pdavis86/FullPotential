@@ -6,6 +6,8 @@ using FullPotential.Core.Behaviours.EnemyBehaviours;
 using UnityEngine;
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
+using FullPotential.Core.Behaviours.Ui;
+using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
 using FullPotential.Core.Spawning;
 using Random = UnityEngine.Random;
@@ -95,6 +97,18 @@ namespace FullPotential.Core.Behaviours.SceneObjects
             _spawnService.AdjustPositionToBeAboveGround(chosenSpawnPoint.Position, playerNetObj.gameObject);
         }
 
+        // ReSharper disable once UnusedParameter.Global
+        [ClientRpc]
+        public void MakeAnnouncementClientRpc(string announcement, ClientRpcParams clientRpcParams)
+        {
+            if (announcement.IsNullOrWhiteSpace())
+            {
+                return;
+            }
+
+            GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ShowAlert(announcement);
+        }
+
         public void SpawnEnemy()
         {
             var chosenSpawnPoint = GetSpawnPoint();
@@ -112,7 +126,7 @@ namespace FullPotential.Core.Behaviours.SceneObjects
             enemyNetObj.GetComponent<EnemyState>().EnemyName.Value = "Enemy " + _enemyCounter;
         }
 
-        public void OnEnemyDeath()
+        public void HandleEnemyDeath()
         {
             SpawnEnemy();
         }

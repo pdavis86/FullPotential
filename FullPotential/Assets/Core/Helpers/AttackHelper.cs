@@ -7,6 +7,8 @@ using System.Globalization;
 using UnityEngine;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Behaviours.EnemyBehaviours;
+using FullPotential.Core.Behaviours.GameManagement;
+using FullPotential.Core.Extensions;
 
 namespace FullPotential.Core.Helpers
 {
@@ -65,7 +67,15 @@ namespace FullPotential.Core.Helpers
                 ? null
                 : source.GetComponent<NetworkObject>()?.OwnerClientId;
 
-            damageable.TakeDamage(sourceClientId, damageDealt);
+            var sourceIsPlayer = source?.CompareTag(Tags.Player) ?? false;
+            var sourcePlayerState = source?.GetComponent<PlayerState>();
+
+            // ReSharper disable once StringLiteralTypo
+            var sourceName = sourceIsPlayer
+                ? sourcePlayerState.Username
+                : source?.name.OrIfNullOrWhitespace(GameManager.Instance.Localizer.Translate("ui.alert.unknownattacker"));
+
+            damageable.TakeDamage(damageDealt, sourceClientId, sourceName);
 
             if (source == null)
             {
@@ -75,6 +85,15 @@ namespace FullPotential.Core.Helpers
 
             //Debug.Log($"Source '{source.name}' used '{itemUsed?.Name ?? "their fist"}' to attack target '{target.name}' for {damageDealt} damage");
 
+            if (itemUsed == null)
+            {
+                var targetRb = target.GetComponent<Rigidbody>();
+                if (targetRb != null && position.HasValue)
+                {
+                    targetRb.AddForceAtPosition(source.transform.forward * 150, position.Value);
+                }
+            }
+
             if (source.CompareTag(Tags.Player) && position.HasValue)
             {
                 var offsetX = (float)_random.Next(-9, 10) / 100;
@@ -82,17 +101,9 @@ namespace FullPotential.Core.Helpers
                 var offsetZ = (float)_random.Next(-9, 10) / 100;
                 var adjustedPosition = position.Value + new Vector3(offsetX, offsetY, offsetZ);
 
-                var sourcePlayerState = source.GetComponent<PlayerState>();
 
-                if (damageable.GetHealth() <= 0)
-                {
-                    damageable.HandleDeath();
-                }
-                else
-                {
-                    var clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { sourcePlayerState.OwnerClientId } } };
-                    sourcePlayerState.ShowDamageClientRpc(adjustedPosition, damageDealt.ToString(CultureInfo.InvariantCulture), clientRpcParams);
-                }
+                var clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { sourcePlayerState.OwnerClientId } } };
+                sourcePlayerState.ShowDamageClientRpc(adjustedPosition, damageDealt.ToString(CultureInfo.InvariantCulture), clientRpcParams);
             }
         }
 
