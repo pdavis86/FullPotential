@@ -77,7 +77,6 @@ namespace FullPotential.Core.Behaviours.Ui
 
             _armorTypes = GameManager.Instance.TypeRegistry.GetRegisteredTypes<IGearArmor>()
                 .ToDictionary(x => x, x => GameManager.Instance.Localizer.GetTranslatedTypeName(x))
-                .OrderBy(x => x.Value)
                 .ToDictionary(x => x.Key, x => x.Value);
 
             _accessoryTypes = GameManager.Instance.TypeRegistry.GetRegisteredTypes<IGearAccessory>()
@@ -94,6 +93,12 @@ namespace FullPotential.Core.Behaviours.Ui
                 .Select((x, i) => !x.Key.EnforceTwoHanded && x.Key.AllowTwoHanded ? (int?)i : null)
                 .Where(x => x != null)
                 .ToList();
+
+            _typeDropdown.ClearOptions();
+            _typeDropdown.AddOptions(_craftingCategories.Select(x => x.Value).ToList());
+
+            _handednessDropdown.ClearOptions();
+            _handednessDropdown.AddOptions(_handednessOptions);
 
             UpdateSecondaryDropDowns();
         }
@@ -171,6 +176,7 @@ namespace FullPotential.Core.Behaviours.Ui
 
         private void OnEnable()
         {
+            _typeDropdown.value = 0;
             ResetUi();
         }
 
@@ -203,14 +209,6 @@ namespace FullPotential.Core.Behaviours.Ui
 
         public void ResetUi()
         {
-            _typeDropdown.ClearOptions();
-            _typeDropdown.AddOptions(_craftingCategories.Select(x => x.Value).ToList());
-
-            _handednessDropdown.ClearOptions();
-            _handednessDropdown.AddOptions(_handednessOptions);
-
-            UpdateSecondaryDropDowns();
-
             LoadInventory();
 
             ResetUiText();
