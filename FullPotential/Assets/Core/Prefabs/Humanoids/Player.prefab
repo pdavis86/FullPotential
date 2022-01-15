@@ -992,7 +992,7 @@ Rigidbody:
   m_GameObject: {fileID: 7392779647718654627}
   serializedVersion: 2
   m_Mass: 1
-  m_Drag: 0
+  m_Drag: 1.5
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
@@ -1043,7 +1043,6 @@ MonoBehaviour:
   _head: {fileID: 7392779648629048435}
   InFrontOfPlayer: {fileID: 3124563880166737475}
   PlayerCamera: {fileID: 7392779647204144590}
-  IsDead: 0
   Inventory: {fileID: 0}
   PlayerToken: 
   Username: 

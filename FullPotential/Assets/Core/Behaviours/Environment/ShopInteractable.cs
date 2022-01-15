@@ -2,7 +2,6 @@
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
 using Unity.Netcode;
-using UnityEngine;
 using UnityEngine.InputSystem;
 
 // ReSharper disable UnusedType.Global
