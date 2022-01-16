@@ -3,7 +3,6 @@ using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -19,17 +18,20 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
 
         protected TMPro.TextMeshProUGUI _interactionBubble;
 
+        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _interactionBubble = GameManager.Instance.MainCanvasObjects.InteractionBubble.GetComponent<TMPro.TextMeshProUGUI>();
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, Radius);
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnDisable()
         {
             if (_interactionBubble != null)

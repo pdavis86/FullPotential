@@ -6,8 +6,6 @@ using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedMember.Local
-
 namespace FullPotential.Core.Behaviours.SpellBehaviours
 {
     public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
@@ -25,12 +23,14 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
         private DelayedAction _takeManaAction;
         private bool _stopCasting;
 
+        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _cylinderParentTransform = transform.GetChild(0);
             _cylinderTransform = _cylinderParentTransform.GetChild(0);
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             _sourcePlayer = GameObjectHelper.ClosestParentWithTag(gameObject, Constants.Tags.Player);
@@ -78,6 +78,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
             });
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             //todo: hard-coded value

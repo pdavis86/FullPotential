@@ -6,7 +6,6 @@ using FullPotential.Core.Registry.Types;
 using Unity.Netcode;
 using UnityEngine;
 
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable InconsistentNaming
 
@@ -22,6 +21,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
         private float _timeSinceLastEffective;
         private float _timeBetweenEffects;
 
+        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             if (!IsServer)
@@ -48,6 +48,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
             _timeSinceLastEffective = _timeBetweenEffects;
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnTriggerStay(Collider other)
         {
             if (!IsServer)

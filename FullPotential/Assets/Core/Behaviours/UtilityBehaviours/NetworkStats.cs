@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -48,6 +47,7 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
             _pongClientParams.Send.TargetClientIds = new[] { OwnerClientId };
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             if (IsServer)

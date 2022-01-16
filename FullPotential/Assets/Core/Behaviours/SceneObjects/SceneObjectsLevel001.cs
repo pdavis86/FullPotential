@@ -13,7 +13,6 @@ using FullPotential.Core.Spawning;
 using Random = UnityEngine.Random;
 
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -41,11 +40,13 @@ namespace FullPotential.Core.Behaviours.SceneObjects
             set => _attributes = value;
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _spawnService = new SpawnService();
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCanvas).SetActive(true);

@@ -21,7 +21,6 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -77,6 +76,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         #region Event handlers
 
+        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             TextureUrl.OnValueChanged += OnTextureChanged;
@@ -90,6 +90,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _graphicsGameObject = transform.Find("Graphics").gameObject;
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             if (IsOwner)

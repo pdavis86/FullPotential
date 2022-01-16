@@ -18,8 +18,6 @@ using FullPotential.Core.Behaviours.Ui;
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PossibleMultipleEnumeration
 // ReSharper disable ConvertToUsingDeclaration
-// ReSharper disable UnusedMember.Local
-
 namespace FullPotential.Core.Behaviours.PlayerBehaviours
 {
     public class PlayerInventory : NetworkBehaviour, IDefensible
@@ -66,6 +64,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         #region Event Handlers
 
+        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _playerState = GetComponent<PlayerState>();
@@ -323,13 +322,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 .FirstOrDefault(variable => variable.Value.ToString() == itemId);
         }
 
-        private IEnumerable<NetworkVariable<FixedString32Bytes>> GetVariablesSetToItemId(string itemId)
-        {
-            return Enum.GetValues(typeof(SlotGameObjectName))
-                .Cast<SlotGameObjectName>()
-                .Select(GetVariableFromSlotName)
-                .Where(variable => variable.Value.ToString() == itemId);
-        }
+        //private IEnumerable<NetworkVariable<FixedString32Bytes>> GetVariablesSetToItemId(string itemId)
+        //{
+        //    return Enum.GetValues(typeof(SlotGameObjectName))
+        //        .Cast<SlotGameObjectName>()
+        //        .Select(GetVariableFromSlotName)
+        //        .Where(variable => variable.Value.ToString() == itemId);
+        //}
 
         private Inventory GetSaveData()
         {

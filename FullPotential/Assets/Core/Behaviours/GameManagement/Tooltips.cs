@@ -3,7 +3,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -20,6 +19,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
         private Vector3 _underOffset;
         private Vector3 _leftOffset;
 
+        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _instance = this;
@@ -28,6 +28,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             gameObject.SetActive(false);
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void Update()
         {
             if (gameObject.activeSelf)

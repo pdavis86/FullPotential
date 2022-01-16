@@ -3,7 +3,6 @@ using System.Linq;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -33,6 +32,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
         private static MainCanvasObjects _instance;
         public static MainCanvasObjects Instance { get { return _instance; } }
 
+        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             if (_instance != null && _instance != this)

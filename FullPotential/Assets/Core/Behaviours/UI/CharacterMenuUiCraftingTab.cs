@@ -13,7 +13,6 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -47,6 +46,7 @@ namespace FullPotential.Core.Behaviours.Ui
         private List<string> _handednessOptions;
         private List<int?> _optionalTwoHandedWeaponIndexes;
 
+        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _components = new List<ItemBase>();
@@ -101,6 +101,25 @@ namespace FullPotential.Core.Behaviours.Ui
             _handednessDropdown.AddOptions(_handednessOptions);
 
             UpdateSecondaryDropDowns();
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnEnable()
+        {
+            _typeDropdown.value = 0;
+            ResetUi();
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnDisable()
+        {
+            _componentsContainer.transform.Clear();
+        }
+
+        private void TypeOnValueChanged(int index)
+        {
+            UpdateSecondaryDropDowns();
+            UpdateResults();
         }
 
         private void CraftButtonOnClick()
@@ -166,23 +185,6 @@ namespace FullPotential.Core.Behaviours.Ui
             }
 
             SetHandednessDropDownVisibility();
-        }
-
-        private void TypeOnValueChanged(int index)
-        {
-            UpdateSecondaryDropDowns();
-            UpdateResults();
-        }
-
-        private void OnEnable()
-        {
-            _typeDropdown.value = 0;
-            ResetUi();
-        }
-
-        private void OnDisable()
-        {
-            _componentsContainer.transform.Clear();
         }
 
         public void AddComponent(string itemId)

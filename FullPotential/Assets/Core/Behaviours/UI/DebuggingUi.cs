@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -25,6 +24,7 @@ namespace FullPotential.Core.Behaviours.Ui
         private GameObject _playerObj;
         private NetworkStats _networkStats;
 
+        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             if (!Debug.isDebugBuild)
@@ -39,6 +39,7 @@ namespace FullPotential.Core.Behaviours.Ui
             InvokeRepeating(nameof(GetFps), 1, 1);
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnGUI()
         {
             var networkStats = GetNetworkStats();

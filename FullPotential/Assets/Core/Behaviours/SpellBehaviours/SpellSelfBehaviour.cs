@@ -4,7 +4,6 @@ using FullPotential.Core.Registry.Types;
 using Unity.Netcode;
 using UnityEngine;
 
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable InconsistentNaming
 
@@ -24,6 +23,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
         private Rigidbody _rigidBody;
         private bool _returningToPlayer;
 
+        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             if (!IsServer)
@@ -53,6 +53,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
             _rigidBody.AddForce(_castSpeed * 20f * SpellDirection, ForceMode.VelocityChange);
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             if (!IsServer)
@@ -86,6 +87,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
             ApplySpellEffects(_sourcePlayer, transform.position);
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnTriggerEnter(Collider other)
         {
             if (!IsServer)

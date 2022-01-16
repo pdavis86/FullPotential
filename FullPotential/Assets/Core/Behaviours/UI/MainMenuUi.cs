@@ -3,7 +3,6 @@ using FullPotential.Core.Behaviours.PlayerBehaviours;
 using UnityEngine;
 
 // ReSharper disable UnusedType.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedMember.Global
 
 namespace FullPotential.Core.Behaviours.Ui
@@ -12,6 +11,7 @@ namespace FullPotential.Core.Behaviours.Ui
     {
         private MainCanvasObjects _mainCanvasObjects;
 
+        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;

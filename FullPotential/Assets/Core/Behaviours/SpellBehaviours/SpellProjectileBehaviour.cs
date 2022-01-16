@@ -8,7 +8,6 @@ using System;
 using Unity.Netcode;
 using UnityEngine;
 
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Behaviours.SpellBehaviours
@@ -24,6 +23,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
         private Spell _spell;
         private Type _shapeType;
 
+        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             if (!IsServer)
@@ -69,6 +69,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
             }
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnTriggerEnter(Collider other)
         {
             if (!IsServer)

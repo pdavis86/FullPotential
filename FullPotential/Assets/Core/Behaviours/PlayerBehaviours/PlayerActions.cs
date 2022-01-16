@@ -13,7 +13,6 @@ using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -45,12 +44,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         #region Event handlers
 
+        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _playerState = GetComponent<PlayerState>();
             _playerMovement = GetComponent<PlayerMovement>();
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             if (!IsOwner)
@@ -88,6 +89,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnInteract()
         {
             if (_hasMenuOpen)
@@ -110,36 +112,43 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnOpenCharacterMenu()
         {
             _toggleCharacterMenu = true;
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnCancel()
         {
             _toggleGameMenu = true;
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnLeftAttack()
         {
             TryToAttack(true);
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnRightAttack()
         {
             TryToAttack(false);
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void Update()
         {
             CheckForInteractable();
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             UpdateMenuStates();
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnDisable()
         {
             if (!IsOwner)

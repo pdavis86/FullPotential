@@ -17,7 +17,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -78,6 +77,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
         public static GameManager Instance { get; private set; }
 
 
+        // ReSharper disable once UnusedMember.Local
         private async void Awake()
         {
             if (Instance != null && Instance != this)
@@ -122,6 +122,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             SceneManager.LoadSceneAsync(1);
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             if (!_isSaving && NetworkManager.Singleton.IsServer)

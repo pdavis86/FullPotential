@@ -10,7 +10,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -42,6 +41,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
         private string _networkPort;
         private DateTime _joinAttempt;
 
+        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             _networkManager = NetworkManager.Singleton;
@@ -51,6 +51,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
             _username = GameManager.Instance.AppOptions.Username;
@@ -78,6 +79,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             ShowAnyError();
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnDisable()
         {
             if (_networkManager != null)

@@ -3,7 +3,6 @@ using FullPotential.Core.Registry.Types;
 using Unity.Netcode;
 using UnityEngine;
 
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable InconsistentNaming
 

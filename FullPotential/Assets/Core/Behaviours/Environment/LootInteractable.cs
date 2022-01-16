@@ -6,7 +6,6 @@ using UnityEngine.InputSystem;
 
 // ReSharper disable UnusedType.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedMember.Local
 
 namespace FullPotential.Core.Behaviours.Environment
 {
@@ -14,6 +13,7 @@ namespace FullPotential.Core.Behaviours.Environment
     {
         public string UnclaimedLootId;
 
+        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             RequiresServerCheck = false;

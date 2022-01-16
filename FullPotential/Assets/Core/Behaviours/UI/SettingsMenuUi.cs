@@ -7,7 +7,6 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedType.Global
 // ReSharper disable ConvertIfStatementToNullCoalescingAssignment
 
@@ -27,6 +26,7 @@ namespace FullPotential.Core.Behaviours.Ui
         private int _newCultureIndex = -1;
         private Resolution[] _availableResolutions;
 
+        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _availableResolutions = Screen.resolutions
@@ -45,6 +45,7 @@ namespace FullPotential.Core.Behaviours.Ui
             LoadFromUnitySettings();
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
             var culture = GameManager.Instance.AppOptions.Culture;

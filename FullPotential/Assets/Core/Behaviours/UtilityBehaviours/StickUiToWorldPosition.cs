@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Behaviours.UtilityBehaviours
@@ -10,6 +9,7 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
     {
         public Vector3 WorldPosition;
 
+        // ReSharper disable once UnusedMember.Local
         private void Update()
         {
             transform.position = Camera.main.WorldToScreenPoint(WorldPosition);

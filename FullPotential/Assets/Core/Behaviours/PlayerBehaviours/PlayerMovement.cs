@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -43,6 +42,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         #region Event Handlers 
 
+        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
@@ -61,6 +61,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             });
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
             _smoothLook = Vector2.zero;
@@ -69,21 +70,19 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _isSprinting = false;
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnMove(InputValue value)
         {
             _moveVal = value.Get<Vector2>().normalized;
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnLook(InputValue value)
         {
             _lookVal = value.Get<Vector2>();
         }
 
-        private bool IsOnSolidObject()
-        {
-            return Physics.Raycast(transform.position, -Vector3.up, _maxDistanceToBeStanding);
-        }
-
+        // ReSharper disable once UnusedMember.Local
         private void OnJump()
         {
             if (IsOnSolidObject())
@@ -92,6 +91,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnSprintStart()
         {
             if (_playerState.Stamina.Value >= _playerState.GetStaminaCost())
@@ -101,18 +101,25 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnSprintStop()
         {
             //Debug.Log("Stopping");
             _isSprinting = false;
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             MoveAndLook();
         }
 
         #endregion
+
+        private bool IsOnSolidObject()
+        {
+            return Physics.Raycast(transform.position, -Vector3.up, _maxDistanceToBeStanding);
+        }
 
         private void MoveAndLook()
         {

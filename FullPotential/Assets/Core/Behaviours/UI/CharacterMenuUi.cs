@@ -2,7 +2,6 @@
 
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnassignedField.Global
-// ReSharper disable UnusedMember.Local
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace FullPotential.Core.Behaviours.Ui
@@ -12,12 +11,14 @@ namespace FullPotential.Core.Behaviours.Ui
         public GameObject Equipment;
         public GameObject Crafting;
 
+        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             Equipment.SetActive(false);
             Crafting.SetActive(false);
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
             OnTabClick(0);

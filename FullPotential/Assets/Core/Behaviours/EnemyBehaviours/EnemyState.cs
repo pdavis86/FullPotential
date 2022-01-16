@@ -12,7 +12,6 @@ using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Local
 
 namespace FullPotential.Core.Behaviours.EnemyBehaviours
 {
@@ -29,6 +28,7 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
         [SerializeField] private BarSlider _healthSlider;
 #pragma warning restore 0649
 
+        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _health.OnValueChanged += OnHealthChanged;
