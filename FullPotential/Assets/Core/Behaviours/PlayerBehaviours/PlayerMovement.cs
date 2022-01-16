@@ -1,4 +1,5 @@
 ﻿using FullPotential.Core.Helpers;
+using FullPotential.Core.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -38,6 +39,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private float _maxDistanceToBeStanding;
         private bool _isJumping;
         private bool _isSprinting;
+        private DelayedAction _sendMovementToServer;
 
         #region Event Handlers 
 
@@ -52,6 +54,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
 
             _maxDistanceToBeStanding = gameObject.GetComponent<Collider>().bounds.extents.y + 0.1f;
+
+            _sendMovementToServer = new DelayedAction(.1f, () =>
+            {
+                _playerState.UpdatePositionsAndRotationsServerRpc(_rb.position, _rb.rotation, _rb.velocity, _playerCamera.transform.rotation, _isSprinting);
+            });
         }
 
         private void OnEnable()
@@ -87,14 +94,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void OnSprintStart()
         {
-            if (_playerState.Stamina.Value > 0)
+            if (_playerState.Stamina.Value >= _playerState.GetStaminaCost())
             {
+                //Debug.Log("Sprinting");
                 _isSprinting = true;
             }
         }
 
         private void OnSprintStop()
         {
+            //Debug.Log("Stopping");
             _isSprinting = false;
         }
 
@@ -109,14 +118,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (!_isJumping && _moveVal != Vector2.zero)
             {
-                if (_isSprinting)
+                if (_isSprinting && _playerState.Stamina.Value < _playerState.GetStaminaCost())
                 {
-                    _playerState.Stamina.Value -= _playerState.GetStaminaCost();
-
-                    if (_playerState.Stamina.Value <= 0)
-                    {
-                        _isSprinting = false;
-                    }
+                    //Debug.Log("Out of stamina");
+                    _isSprinting = false;
                 }
 
                 var moveX = transform.right * _moveVal.x;
@@ -169,7 +174,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (_moveVal != Vector2.zero || _lookVal != Vector2.zero || _rb.velocity != Vector3.zero)
             {
-                _playerState.UpdatePositionsAndRotationsServerRpc(_rb.position, _rb.rotation, _rb.velocity, _playerCamera.transform.rotation);
+                _sendMovementToServer.TryPerformAction();
             }
         }
 

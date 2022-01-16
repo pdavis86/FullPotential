@@ -70,8 +70,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
         private readonly Dictionary<string, DateTime> _unclaimedLoot = new Dictionary<string, DateTime>();
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
+        private DelayedAction _consumeStamina;
         private DelayedAction _replenishStamina;
         private DelayedAction _replenishMana;
+        private bool _isSprinting;
 
         #region Event handlers
 
@@ -127,6 +129,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
 
             //todo: hard-coded value
+            _consumeStamina = new DelayedAction(.05f, () =>
+            {
+                var staminaCost = GetStaminaCost();
+                if (_isSprinting && Stamina.Value > staminaCost)
+                {
+                    Stamina.Value -= staminaCost;
+                }
+            });
+
+            //todo: hard-coded value
             _replenishStamina = new DelayedAction(.01f, () =>
             {
                 if (Stamina.Value < GetStaminaMax())
@@ -147,6 +159,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public void FixedUpdate()
         {
+            Sprint();
             Replenish();
         }
 
@@ -211,10 +224,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         [ServerRpc]
-        public void UpdatePositionsAndRotationsServerRpc(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation)
+        public void UpdatePositionsAndRotationsServerRpc(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation, bool isSprinting)
         {
             //todo: This does not stop players cheating their position. That's a problem for another day. Also sends data to ALL clients
-            UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation);
+            UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation, isSprinting);
             UpdatePositionsAndRotationsClientRpc(rbPosition, rbRotation, rbVelocity, cameraRotation, new ClientRpcParams());
         }
 
@@ -274,7 +287,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (!IsOwner)
             {
-                UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation);
+                UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation, false);
             }
         }
 
@@ -349,7 +362,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (!isDead)
             {
-                UpdatePositionsAndRotations(position, rotation, Vector3.zero, null);
+                UpdatePositionsAndRotations(position, rotation, Vector3.zero, null, false);
             }
 
             if (!killerName.IsNullOrWhiteSpace())
@@ -373,6 +386,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
 
             return _hud;
+        }
+
+        private void Sprint()
+        {
+            if (!IsServer)
+            {
+                return;
+            }
+
+            _consumeStamina.TryPerformAction();
         }
 
         private void Replenish()
@@ -425,11 +448,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
-        private void UpdatePositionsAndRotations(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion? cameraRotation)
+        private void UpdatePositionsAndRotations(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion? cameraRotation, bool isSprinting)
         {
             _rb.position = rbPosition;
             _rb.rotation = rbRotation;
             _rb.velocity = rbVelocity;
+
+            _isSprinting = isSprinting;
 
             if (cameraRotation.HasValue)
             {
@@ -764,7 +789,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public int GetStaminaCost()
         {
-            return 2;
+            return 10;
         }
 
         public float GetSprintSpeed()
