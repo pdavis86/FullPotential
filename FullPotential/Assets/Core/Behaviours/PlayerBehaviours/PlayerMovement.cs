@@ -87,7 +87,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void OnSprintStart()
         {
-            _isSprinting = true;
+            if (_playerState.Stamina.Value > 0)
+            {
+                _isSprinting = true;
+            }
         }
 
         private void OnSprintStop()
@@ -106,13 +109,23 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (!_isJumping && _moveVal != Vector2.zero)
             {
+                if (_isSprinting)
+                {
+                    _playerState.Stamina.Value -= _playerState.GetStaminaCost();
+
+                    if (_playerState.Stamina.Value <= 0)
+                    {
+                        _isSprinting = false;
+                    }
+                }
+
                 var moveX = transform.right * _moveVal.x;
                 var moveZ = transform.forward * _moveVal.y;
-                var velocity = (moveX + moveZ) * _speed * (_isSprinting ? 2.5f : 1);
+                var velocity = (moveX + moveZ) * _speed * (_isSprinting ? _playerState.GetSprintSpeed() : 1);
 
                 //Move
                 _rb.MovePosition(_rb.position + velocity * Time.fixedDeltaTime);
-                
+
                 //Continue after releasing the key
                 _rb.AddForce(100 * velocity * Time.fixedDeltaTime, ForceMode.Acceleration);
             }

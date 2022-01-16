@@ -14,8 +14,9 @@ namespace FullPotential.Core.Behaviours.Ui
         [SerializeField] private GameObject _alertPrefab;
         [SerializeField] private GameObject _equippedLeftHand;
         [SerializeField] private GameObject _equippedRightHand;
-        [SerializeField] private HealthSlider _healthSlider;
-        //[SerializeField] private Slider _manaSlider;
+        [SerializeField] private BarSlider _staminaSlider;
+        [SerializeField] private BarSlider _healthSlider;
+        [SerializeField] private BarSlider _manaSlider;
         //[SerializeField] private Slider _barrierSlider;
 #pragma warning restore 0649
 
@@ -42,15 +43,23 @@ namespace FullPotential.Core.Behaviours.Ui
             _equippedRightHand.GetComponent<EquippedSummary>().SetContents(contents);
         }
 
-        public void UpdateHealthPercentage(int health, int maxHealth, int defence)
+        public void UpdateStaminaPercentage(int stamina, int maxStamina)
         {
-            _healthSlider.SetValue(health, maxHealth, defence);
+            var values = _staminaSlider.GetStaminaValues(stamina, maxStamina);
+            _staminaSlider.SetValues(values);
         }
 
-        //public void UpdateManaPercentage(float value)
-        //{
-        //    _manaSlider.value = value;
-        //}
+        public void UpdateHealthPercentage(int health, int maxHealth, int defence)
+        {
+            var values = _healthSlider.GetHealthValues(health, maxHealth, defence);
+            _healthSlider.SetValues(values);
+        }
+
+        public void UpdateManaPercentage(int mana, int maxMana)
+        {
+            var values = _manaSlider.GetManaValues(mana, maxMana);
+            _manaSlider.SetValues(values);
+        }
 
         //public void UpdateBarrierPercentage(float value)
         //{

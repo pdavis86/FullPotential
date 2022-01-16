@@ -26,7 +26,7 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
 
 #pragma warning disable 0649
         [SerializeField] private TextMeshProUGUI _nameTag;
-        [SerializeField] private HealthSlider _healthSlider;
+        [SerializeField] private BarSlider _healthSlider;
 #pragma warning restore 0649
 
         private void Awake()
@@ -42,7 +42,8 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
 
         private void OnHealthChanged(int previousValue, int newValue)
         {
-            _healthSlider.SetValue(newValue, GetHealthMax(), GetDefenseValue());
+            var values = _healthSlider.GetHealthValues(newValue, GetHealthMax(), GetDefenseValue());
+            _healthSlider.SetValues(values);
         }
 
         private void OnNameChanged(FixedString32Bytes previousValue, FixedString32Bytes newValue)

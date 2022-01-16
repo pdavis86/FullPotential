@@ -1,6 +1,7 @@
 ﻿using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Helpers;
 using FullPotential.Core.Registry.Types;
+using FullPotential.Core.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -15,11 +16,14 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
         public bool IsLeftHand;
 
         private GameObject _sourcePlayer;
+        private PlayerState _sourcePlayerState;
         private Spell _spell;
-        private float _timeBetweenEffects;
-        private float _timeSinceLastEffective;
         private Transform _cylinderParentTransform;
         private Transform _cylinderTransform;
+        private RaycastHit _hit;
+        private DelayedAction _applyEffectsAction;
+        private DelayedAction _takeManaAction;
+        private bool _stopCasting;
 
         private void Awake()
         {
@@ -38,16 +42,16 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
                 return;
             }
 
-            var playerState = _sourcePlayer.GetComponent<PlayerState>();
+            _sourcePlayerState = _sourcePlayer.GetComponent<PlayerState>();
 
-            PerformGraphicsAdjustments(playerState);
+            PerformGraphicsAdjustments(_sourcePlayerState);
 
             if (!IsServer)
             {
                 return;
             }
 
-            _spell = playerState.Inventory.GetItemWithId<Spell>(SpellId);
+            _spell = _sourcePlayerState.Inventory.GetItemWithId<Spell>(SpellId);
 
             if (_spell == null)
             {
@@ -56,13 +60,35 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
                 return;
             }
 
-            _timeBetweenEffects = 0.5f;
-            _timeSinceLastEffective = _timeBetweenEffects;
+            //todo: hard-coded value
+            _applyEffectsAction = new DelayedAction(0.5f, () =>
+            {
+                //Debug.Log($"Player {_sourcePlayer.name} is hitting {hit.transform.gameObject.name} with beam spell {_spell.Name} at distance {hit.distance}");
+                ApplySpellEffects(_hit.transform.gameObject, _hit.point);
+            });
+
+            //todo: hard-coded value
+            _takeManaAction = new DelayedAction(1f, () =>
+            {
+                if (!_sourcePlayerState.SpendMana(_spell))
+                {
+                    _sourcePlayerState.ToggleSpellBeam(IsLeftHand, _spell, Vector3.zero, Vector3.zero);
+                    _stopCasting = true;
+                }
+            });
         }
 
         private void FixedUpdate()
         {
+            //todo: hard-coded value
             const int maxBeamLength = 10;
+
+            _takeManaAction.TryPerformAction();
+
+            if (_stopCasting)
+            {
+                return;
+            }
 
             //Vector3 endPosition;
             float beamLength;
@@ -76,18 +102,9 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
                 //Debug.Log("Beam is hitting the object " + hit.transform.name);
 
-                if (_timeSinceLastEffective < _timeBetweenEffects)
-                {
-                    _timeSinceLastEffective += Time.deltaTime;
-                }
-                else
-                {
-                    _timeSinceLastEffective = 0;
+                _hit = hit;
 
-                    //Debug.Log($"Player {_sourcePlayer.name} is hitting {hit.transform.gameObject.name} with beam spell {_spell.Name} at distance {hit.distance}");
-
-                    ApplySpellEffects(hit.transform.gameObject, hit.point);
-                }
+                _applyEffectsAction.TryPerformAction();
 
                 //endPosition = hit.point;
                 beamLength = hit.distance;
@@ -121,6 +138,7 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
             if (playerState.OwnerClientId == NetworkManager.Singleton.LocalClientId)
             {
+                //todo: hard-coded value
                 //Move it a little sideways
                 _cylinderParentTransform.position += (IsLeftHand ? 0.1f : -0.1f) * _cylinderParentTransform.right;
             }

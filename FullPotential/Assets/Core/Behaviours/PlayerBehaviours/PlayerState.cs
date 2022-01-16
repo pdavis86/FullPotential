@@ -13,6 +13,7 @@ using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Behaviours.UI.Components;
 using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
+using FullPotential.Core.Utilities;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -40,14 +41,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public PositionTransforms Positions;
         public TextureMeshes Meshes;
         [SerializeField] private TextMeshProUGUI _nameTag;
-        [SerializeField] private HealthSlider _healthSlider;
+        [SerializeField] private BarSlider _healthSlider;
         [SerializeField] private Transform _head;
 #pragma warning restore 0649
 
         public GameObject InFrontOfPlayer;
         public GameObject PlayerCamera;
 
+        public readonly NetworkVariable<int> Stamina = new NetworkVariable<int>(100);
         public readonly NetworkVariable<int> Health = new NetworkVariable<int>(100);
+        public readonly NetworkVariable<int> Mana = new NetworkVariable<int>(100);
 
         public bool IsDead { get; set; }
 
@@ -62,18 +65,22 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private GameObject _spellBeingCastLeft;
         private GameObject _spellBeingCastRight;
         private GameObject _graphicsGameObject;
-        private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
-
+        private Hud _hud;
 
         private FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
         private readonly Dictionary<string, DateTime> _unclaimedLoot = new Dictionary<string, DateTime>();
+        private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
+        private DelayedAction _replenishStamina;
+        private DelayedAction _replenishMana;
 
         #region Event handlers
 
         private void Awake()
         {
             TextureUrl.OnValueChanged += OnTextureChanged;
+            Stamina.OnValueChanged += OnStaminaChanged;
             Health.OnValueChanged += OnHealthChanged;
+            Mana.OnValueChanged += OnManaChanged;
 
             Inventory = GetComponent<PlayerInventory>();
             _rb = GetComponent<Rigidbody>();
@@ -118,6 +125,29 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 //Debug.LogError("Requesting other player data for client ID " + OwnerClientId);
                 RequestReducedPlayerDataServerRpc();
             }
+
+            //todo: hard-coded value
+            _replenishStamina = new DelayedAction(.01f, () =>
+            {
+                if (Stamina.Value < GetStaminaMax())
+                {
+                    Stamina.Value += 1;
+                }
+            });
+
+            //todo: hard-coded value
+            _replenishMana = new DelayedAction(.2f, () =>
+            {
+                if (Mana.Value < GetManaMax())
+                {
+                    Mana.Value += 1;
+                }
+            });
+        }
+
+        public void FixedUpdate()
+        {
+            Replenish();
         }
 
         public override void OnNetworkSpawn()
@@ -135,6 +165,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
+        private void OnStaminaChanged(int previousValue, int newValue)
+        {
+            GetHud().UpdateStaminaPercentage(newValue, GetStaminaMax());
+        }
+
         private void OnHealthChanged(int previousValue, int newValue)
         {
             var maxHealthValue = GetHealthMax();
@@ -142,7 +177,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (!IsOwner)
             {
-                _healthSlider.SetValue(newValue, maxHealthValue, defenseValue);
+                var values = _healthSlider.GetHealthValues(newValue, maxHealthValue, defenseValue);
+                _healthSlider.SetValues(values);
             }
 
             if (NetworkManager.LocalClientId != OwnerClientId)
@@ -150,7 +186,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return;
             }
 
-            GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateHealthPercentage(newValue, maxHealthValue, defenseValue);
+            GetHud().UpdateHealthPercentage(newValue, maxHealthValue, defenseValue);
+        }
+
+        private void OnManaChanged(int previousValue, int newValue)
+        {
+            GetHud().UpdateManaPercentage(newValue, GetManaMax());
         }
 
         #endregion
@@ -323,6 +364,27 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         #endregion
+
+        private Hud GetHud()
+        {
+            if (_hud == null)
+            {
+                _hud = GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>();
+            }
+
+            return _hud;
+        }
+
+        private void Replenish()
+        {
+            if (!IsServer)
+            {
+                return;
+            }
+
+            _replenishStamina.TryPerformAction();
+            _replenishMana.TryPerformAction();
+        }
 
         private void GetAndLoadPlayerData(bool reduced, ulong? clientId)
         {
@@ -526,11 +588,30 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
+        public bool SpendMana(Spell activeSpell)
+        {
+            var manaCost = GetManaCost(activeSpell);
+
+            if (Mana.Value < manaCost)
+            {
+                return false;
+            }
+
+            Mana.Value -= manaCost;
+
+            return true;
+        }
+
         public void SpawnSpellProjectile(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
         {
             if (!IsServer)
             {
                 Debug.LogWarning("Tried to spawn a projectile spell when not on the server");
+            }
+
+            if (!SpendMana(activeSpell))
+            {
+                return;
             }
 
             var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPosition, Quaternion.identity);
@@ -550,6 +631,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (!IsServer)
             {
                 Debug.LogWarning("Tried to spawn a self spell when not on the server");
+            }
+
+            if (!SpendMana(activeSpell))
+            {
+                return;
             }
 
             var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPosition, Quaternion.identity);
@@ -613,11 +699,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 Debug.LogWarning("Tried to cast a touch spell when not on the server");
             }
 
+            if (!SpendMana(activeSpell))
+            {
+                return;
+            }
+
             // ReSharper disable once ObjectCreationAsStatement
             new SpellTouchBehaviour(activeSpell, startPosition, direction, senderClientId);
         }
 
-        public void ToggleSpellBeam(bool isLeftHand, Spell activeSpell, Vector3 startPosition, Vector3 direction)
+        public void ToggleSpellBeam(bool isLeftHand, Spell activeSpell, Vector3? startPosition, Vector3? direction)
         {
             if (isLeftHand && _spellBeingCastLeft != null)
             {
@@ -633,11 +724,19 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return;
             }
 
+            //NOTE: Don't call SpendMana() here as it is called in the behaviour
+
+            if (!startPosition.HasValue || !direction.HasValue)
+            {
+                Debug.LogError("Tried to ToggleSpellBeam on without position and direction");
+                return;
+            }
+
             //NOTE: Can't parent to PlayerCamera otherwise it doesn't parent at all!
             var spellObject = Instantiate(
                 GameManager.Instance.Prefabs.Combat.SpellBeam,
-                startPosition,
-                Quaternion.LookRotation(direction)
+                startPosition.Value,
+                Quaternion.LookRotation(direction.Value)
             );
 
             var spellScript = spellObject.GetComponent<SpellBeamBehaviour>();
@@ -658,9 +757,34 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
+        public int GetStaminaMax()
+        {
+            return 100;
+        }
+
+        public int GetStaminaCost()
+        {
+            return 2;
+        }
+
+        public float GetSprintSpeed()
+        {
+            return 2.5f;
+        }
+
         public int GetHealthMax()
         {
             return 100;
+        }
+
+        public int GetManaMax()
+        {
+            return 100;
+        }
+
+        public int GetManaCost(Spell activeSpell)
+        {
+            return 20;
         }
 
         public int GetHealth()
