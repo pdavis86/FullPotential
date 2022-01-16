@@ -19,7 +19,7 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
         protected TMPro.TextMeshProUGUI _interactionBubble;
 
         // ReSharper disable once UnusedMember.Local
-        private void Awake()
+        private void Start()
         {
             _interactionBubble = GameManager.Instance.MainCanvasObjects.InteractionBubble.GetComponent<TMPro.TextMeshProUGUI>();
         }
