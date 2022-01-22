@@ -427,8 +427,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
             else
             {
-                TextureUrl.Value = playerData.Options.TextureUrl ?? string.Empty;
                 LoadFromPlayerData(playerData);
+                TextureUrl.Value = playerData.Options.TextureUrl ?? string.Empty;
             }
         }
 
@@ -552,6 +552,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private IEnumerator SetTexture()
         {
+            if (Username.IsNullOrWhiteSpace())
+            {
+                Debug.LogError("Trying to set texture before player data is loaded");
+                yield break;
+            }
+
             var textureUrl = TextureUrl.Value.ToString();
 
             string filePath;
