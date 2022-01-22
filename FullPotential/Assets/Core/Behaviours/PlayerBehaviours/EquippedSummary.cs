@@ -19,7 +19,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             SetTransparency(0.25f);
         }
 
-        public void SetTransparency(float alpha)
+        private void SetTransparency(float alpha)
         {
             _image.color = new Color(_image.color.r, _image.color.g, _image.color.b,  alpha);
             _text.color = new Color(_text.color.r, _text.color.g, _text.color.b, alpha);

@@ -17,6 +17,7 @@ namespace FullPotential.Api.Behaviours
 
         void HandleEnemyDeath();
 
+        // ReSharper disable once UnusedParameter.Global
         void MakeAnnouncementClientRpc(string announcement, ClientRpcParams clientRpcParams);
     }
 }

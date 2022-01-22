@@ -18,6 +18,7 @@ namespace FullPotential.Core.Utilities
             _actionToDo = actionToDo;
         }
 
+        // ReSharper disable once UnusedMethodReturnValue.Global
         public bool TryPerformAction()
         {
             if (_timeSinceLastEffective < _timeBetweenEffects)
