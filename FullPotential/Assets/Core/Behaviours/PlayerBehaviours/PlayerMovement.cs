@@ -1,5 +1,4 @@
 ﻿using FullPotential.Core.Helpers;
-using FullPotential.Core.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -38,7 +37,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private float _maxDistanceToBeStanding;
         private bool _isJumping;
         private bool _isSprinting;
-        private DelayedAction _sendMovementToServer;
+        //private DelayedAction _sendMovementToServer;
 
         #region Event Handlers 
 
@@ -55,10 +54,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             _maxDistanceToBeStanding = gameObject.GetComponent<Collider>().bounds.extents.y + 0.1f;
 
-            _sendMovementToServer = new DelayedAction(.1f, () =>
-            {
-                _playerState.UpdatePositionsAndRotationsServerRpc(_rb.position, _rb.rotation, _rb.velocity, _playerCamera.transform.rotation, _isSprinting);
-            });
+            //_sendMovementToServer = new DelayedAction(.1f, () =>
+            //{
+            //    _playerState.UpdatePositionsAndRotationsServerRpc(_rb.position, _rb.rotation, _rb.velocity, _playerCamera.transform.rotation, _isSprinting);
+            //});
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -181,7 +180,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (_moveVal != Vector2.zero || _lookVal != Vector2.zero || _rb.velocity != Vector3.zero)
             {
-                _sendMovementToServer.TryPerformAction();
+                //todo: try the FullPotential.Core.Behaviours.Networking behaviours instead
+
+                _playerState.UpdatePositionsAndRotationsServerRpc(_rb.position, _rb.rotation, _rb.velocity, _playerCamera.transform.rotation, _isSprinting);
+                //_sendMovementToServer.TryPerformAction();
             }
         }
 
