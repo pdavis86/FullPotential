@@ -232,7 +232,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             //todo: This does not stop players cheating their position. That's a problem for another day. Also sends data to ALL clients
             UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation, isSprinting);
-            UpdatePositionsAndRotationsClientRpc(rbPosition, rbRotation, rbVelocity, cameraRotation, new ClientRpcParams());
+            UpdatePositionsAndRotationsClientRpc(rbPosition, rbRotation, rbVelocity, cameraRotation, isSprinting, new ClientRpcParams());
         }
 
         [ServerRpc]
@@ -287,13 +287,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void UpdatePositionsAndRotationsClientRpc(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation, ClientRpcParams clientRpcParams)
+        public void UpdatePositionsAndRotationsClientRpc(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation, bool isSprinting, ClientRpcParams clientRpcParams)
         {
-            Debug.Log("UpdatePositionsAndRotationsClientRpc() called");
-
             if (!IsOwner)
             {
-                UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation, false);
+                UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation, isSprinting);
             }
         }
 
