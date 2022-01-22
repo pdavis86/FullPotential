@@ -84,11 +84,14 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
             //todo: hard-coded value
             const int maxBeamLength = 10;
 
-            _takeManaAction.TryPerformAction();
-
-            if (_stopCasting)
+            if (IsServer)
             {
-                return;
+                _takeManaAction.TryPerformAction();
+
+                if (_stopCasting)
+                {
+                    return;
+                }
             }
 
             //Vector3 endPosition;
