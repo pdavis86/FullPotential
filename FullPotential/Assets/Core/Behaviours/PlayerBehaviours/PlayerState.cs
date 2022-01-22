@@ -38,7 +38,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [SerializeField] private GameObject[] _gameObjectsForPlayers;
         [SerializeField] private GameObject[] _gameObjectsForRespawn;
         public PositionTransforms Positions;
-        public TextureMeshes Meshes;
+        [SerializeField] private TextureMeshes _meshes;
         [SerializeField] private TextMeshProUGUI _nameTag;
         [SerializeField] private BarSlider _healthSlider;
         [SerializeField] private Transform _head;
@@ -286,6 +286,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [ClientRpc]
         public void UpdatePositionsAndRotationsClientRpc(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation, ClientRpcParams clientRpcParams)
         {
+            Debug.Log("UpdatePositionsAndRotationsClientRpc() called");
+
             if (!IsOwner)
             {
                 UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation, false);
@@ -365,7 +367,17 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 UpdatePositionsAndRotations(position, rotation, Vector3.zero, null, false);
             }
+            else
+            {
+                Debug.LogError("Applying translucent texture to " + Username);
 
+                var bodyMaterial = _meshes.BodyMesh.material;
+                ShaderHelper.ChangeRenderMode(bodyMaterial, ShaderHelper.BlendMode.Fade);
+                bodyMaterial.color = new Color(1, 1, 1, 0.2f);
+                ApplyNewMaterial(bodyMaterial);
+            }
+
+            //todo: Use GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc instead?
             if (!killerName.IsNullOrWhiteSpace())
             {
                 GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ShowAlert($"{Username} was killed by {killerName}");
@@ -608,15 +620,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
                 tex.LoadImage(System.IO.File.ReadAllBytes(filePath));
-                var newMat = new Material(Meshes.BodyMesh.material.shader)
+                var newMat = new Material(_meshes.BodyMesh.material.shader)
                 {
                     mainTexture = tex
                 };
 
-                Meshes.HeadMesh.material = newMat;
-                Meshes.BodyMesh.material = newMat;
-                Meshes.LeftHandMesh.material = newMat;
-                Meshes.RightHandMesh.material = newMat;
+                ApplyNewMaterial(newMat);
             }
         }
 
@@ -926,6 +935,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             RespawnServerRpc();
         }
 
+        private void ApplyNewMaterial(Material newMat)
+        {
+            _meshes.HeadMesh.material = newMat;
+            _meshes.BodyMesh.material = newMat;
+            _meshes.LeftArmMesh.material = newMat;
+            _meshes.RightArmMesh.material = newMat;
+        }
+
         #region Nested Classes
 
         [Serializable]
@@ -940,8 +957,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             public MeshRenderer HeadMesh;
             public MeshRenderer BodyMesh;
-            public MeshRenderer LeftHandMesh;
-            public MeshRenderer RightHandMesh;
+            public MeshRenderer LeftArmMesh;
+            public MeshRenderer RightArmMesh;
         }
 
         #endregion

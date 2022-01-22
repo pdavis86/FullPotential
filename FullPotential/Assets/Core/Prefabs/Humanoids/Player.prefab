@@ -1033,11 +1033,11 @@ MonoBehaviour:
   Positions:
     LeftHandInFront: {fileID: 8103993405689920857}
     RightHandInFront: {fileID: 1380344505649988731}
-  Meshes:
+  _meshes:
     HeadMesh: {fileID: 7392779648629048398}
     BodyMesh: {fileID: 8717859264228815994}
-    LeftHandMesh: {fileID: 7392779647843419196}
-    RightHandMesh: {fileID: 7392779647605690758}
+    LeftArmMesh: {fileID: 7392779647843419196}
+    RightArmMesh: {fileID: 7392779647605690758}
   _nameTag: {fileID: 6250991307057261387}
   _healthSlider: {fileID: 155634429994666516}
   _head: {fileID: 7392779648629048435}
