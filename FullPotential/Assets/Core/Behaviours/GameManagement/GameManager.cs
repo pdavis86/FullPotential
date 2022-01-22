@@ -161,7 +161,13 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         private void OnServerDisconnectedClient(ulong clientId)
         {
-            if (clientId == NetworkManager.Singleton.LocalClientId)
+            if (NetworkManager.Singleton.IsServer)
+            {
+                //todo: maintain a mapping of username and clientid
+                //todo: when a player disconnects, save their data then unload it from memory
+                //Instance.GameDataStore.PlayerData.Remove(dddd);
+            }
+            else
             {
                 Instance.LocalGameDataStore.HasDisconnected = true;
 
@@ -170,10 +176,6 @@ namespace FullPotential.Core.Behaviours.GameManagement
                     SceneManager.LoadSceneAsync(1);
                 }
             }
-
-            //todo: maintain a mapping of username and clientid
-            //todo: when a player disconnects, save their data then unload it from memory
-            //Instance.GameDataStore.PlayerData.Remove(dddd);
         }
 
         //private void OnServerStarted()

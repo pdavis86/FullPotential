@@ -664,10 +664,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _signInContainer: {fileID: 2100110681}
   _signinFirstInput: {fileID: 970016615}
+  _signinError: {fileID: 1847556013}
   _gameDetailsContainer: {fileID: 2071496204}
   _gameDetailsFirstInput: {fileID: 1449155798}
-  _signinError: {fileID: 1847556013}
-  _joiningMessage: {fileID: 1847556011}
+  _gameDetailsError: {fileID: 360142710}
+  _joiningMessage: {fileID: 736819383}
 --- !u!1 &736819383
 GameObject:
   m_ObjectHideFlags: 0

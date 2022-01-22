@@ -25,9 +25,10 @@ namespace FullPotential.Core.Behaviours.GameManagement
 #pragma warning disable 0649
         [SerializeField] private GameObject _signInContainer;
         [SerializeField] private InputField _signinFirstInput;
+        [SerializeField] private Text _signinError;
         [SerializeField] private GameObject _gameDetailsContainer;
         [SerializeField] private InputField _gameDetailsFirstInput;
-        [SerializeField] private Text _signinError;
+        [SerializeField] private Text _gameDetailsError;
         [SerializeField] private GameObject _joiningMessage;
 #pragma warning restore 0649
 
@@ -166,13 +167,13 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         private void ShowAnyError()
         {
-            if (GameManager.Instance.LocalGameDataStore.HasDisconnected && _signinError != null)
+            if (GameManager.Instance.LocalGameDataStore.HasDisconnected)
             {
                 _gameDetailsContainer.SetActive(true);
                 _joiningMessage.SetActive(false);
 
-                _signinError.text = GameManager.Instance.Localizer.Translate("ui.connect.disconnected");
-                _signinError.gameObject.SetActive(true);
+                _gameDetailsError.text = GameManager.Instance.Localizer.Translate("ui.connect.disconnected");
+                _gameDetailsError.gameObject.SetActive(true);
             }
         }
 
