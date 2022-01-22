@@ -142,7 +142,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             //todo: hard-coded value
             _replenishStamina = new DelayedAction(.01f, () =>
             {
-                if (Stamina.Value < GetStaminaMax())
+                if (!_isSprinting && Stamina.Value < GetStaminaMax())
                 {
                     Stamina.Value += 1;
                 }
@@ -151,7 +151,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             //todo: hard-coded value
             _replenishMana = new DelayedAction(.2f, () =>
             {
-                if (Mana.Value < GetManaMax())
+                var isConsumingMana = _spellBeingCastLeft != null 
+                    || _spellBeingCastRight != null;
+
+                if (!isConsumingMana && Mana.Value < GetManaMax())
                 {
                     Mana.Value += 1;
                 }
@@ -160,7 +163,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public void FixedUpdate()
         {
-            Sprint();
+            HandleSprinting();
             Replenish();
         }
 
@@ -401,7 +404,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             return _hud;
         }
 
-        private void Sprint()
+        private void HandleSprinting()
         {
             if (!IsServer)
             {
