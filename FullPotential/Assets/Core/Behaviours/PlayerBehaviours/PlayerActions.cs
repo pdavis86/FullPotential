@@ -158,7 +158,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             Cursor.lockState = CursorLockMode.None;
 
-            if (_mainCanvasObjects.Hud != null)
+            if (_mainCanvasObjects?.Hud != null)
             {
                 _mainCanvasObjects.Hud.SetActive(false);
             }
