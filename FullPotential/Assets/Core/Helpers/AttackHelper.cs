@@ -126,14 +126,14 @@ namespace FullPotential.Core.Helpers
             if (itemName.IsNullOrWhiteSpace())
             {
                 return isOwner
-                    ? $"You were killed by {killerName}"
-                    : $"{victimName} was killed by {killerName}";
+                    ? $"You were killed by '{killerName}'"
+                    : $"'{victimName}' was killed by '{killerName}'";
             }
             else
             {
                 return isOwner
-                    ? $"You were killed by {killerName} using {itemName}"
-                    : $"{victimName} was killed by {killerName} using {itemName}";
+                    ? $"You were killed by '{killerName}' using '{itemName}'"
+                    : $"{victimName} was killed by '{killerName}' using '{itemName}'";
             }
         }
 
