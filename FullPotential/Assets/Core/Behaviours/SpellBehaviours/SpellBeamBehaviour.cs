@@ -108,7 +108,10 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
                 _hit = hit;
 
-                _applyEffectsAction.TryPerformAction();
+                if (IsServer)
+                {
+                    _applyEffectsAction.TryPerformAction();
+                }
 
                 //endPosition = hit.point;
                 beamLength = hit.distance;
@@ -126,6 +129,11 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
             {
                 _cylinderTransform.localScale = new Vector3(_cylinderTransform.localScale.x, beamLength / 2, _cylinderTransform.localScale.z);
                 _cylinderTransform.position = _cylinderParentTransform.position + (_cylinderTransform.up * _cylinderTransform.localScale.y);
+            }
+
+            if (!_cylinderTransform.gameObject.activeInHierarchy)
+            {
+                _cylinderTransform.gameObject.SetActive(true);
             }
         }
 
@@ -149,6 +157,8 @@ namespace FullPotential.Core.Behaviours.SpellBehaviours
 
             //Move the tip to the middle
             _cylinderTransform.position += (_cylinderTransform.up * _cylinderTransform.localScale.y);
+
+            _cylinderTransform.gameObject.SetActive(false);
         }
 
         public void ApplySpellEffects(GameObject target, Vector3? position)

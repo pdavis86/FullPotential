@@ -767,6 +767,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
 
             //NOTE: Don't call SpendMana() here as it is called in the behaviour
+            if (Mana.Value < GetManaCost(activeSpell))
+            {
+                return;
+            }
 
             if (!startPosition.HasValue || !direction.HasValue)
             {
