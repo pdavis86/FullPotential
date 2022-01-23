@@ -1,4 +1,5 @@
 ﻿using FullPotential.Core.Behaviours.GameManagement;
+using FullPotential.Core.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,6 +25,11 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
         // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
+            if (TranslationId.IsNullOrWhiteSpace())
+            {
+                Debug.LogWarning($"Missing {nameof(TranslationId)} on {gameObject.name} under {transform.parent.gameObject.name}");
+            }
+
             _textComponent.text = GameManager.Instance.Localizer.Translate(TranslationId);
         }
 
