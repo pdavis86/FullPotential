@@ -29,7 +29,7 @@ namespace FullPotential.Core.Helpers
 
         //public static bool IsDestroyed(GameObject gameObject)
         //{
-        //    // UnityEngine overloads the == opeator for the GameObject type
+        //    // UnityEngine overloads the == operator for the GameObject type
         //    // and returns null when the object has been destroyed, but 
         //    // actually the object is still there but has not been cleaned up yet
         //    // if we test both we can determine if the object has been destroyed.

@@ -1,11 +1,12 @@
 ﻿using FullPotential.Api.Registry;
 using FullPotential.Core.Registry.Base;
 using FullPotential.Core.Registry.Types;
-using FullPotential.Core.Spells.Shapes;
-using FullPotential.Core.Spells.Targeting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Spells;
+using FullPotential.Standard.Spells.Shapes;
+using FullPotential.Standard.Spells.Targeting;
 using UnityEngine.AddressableAssets;
 
 // ReSharper disable ArrangeAccessorOwnerBody

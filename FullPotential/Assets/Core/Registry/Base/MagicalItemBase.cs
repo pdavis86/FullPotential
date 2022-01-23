@@ -1,5 +1,4 @@
-﻿using FullPotential.Core.Spells.Shapes;
-using FullPotential.Core.Spells.Targeting;
+﻿using FullPotential.Api.Spells;
 
 // ReSharper disable ArrangeAccessorOwnerBody
 

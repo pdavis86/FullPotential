@@ -1,5 +1,4 @@
-﻿using FullPotential.Core.Behaviours.PlayerBehaviours;
-using FullPotential.Core.Behaviours.UI.Components;
+﻿using FullPotential.Core.Behaviours.UI.Components;
 using UnityEngine;
 using UnityEngine.UI;
 

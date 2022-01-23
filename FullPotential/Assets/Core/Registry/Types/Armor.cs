@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Behaviours;
+﻿using FullPotential.Api.Combat;
 using FullPotential.Core.Registry.Base;
 
 namespace FullPotential.Core.Registry.Types

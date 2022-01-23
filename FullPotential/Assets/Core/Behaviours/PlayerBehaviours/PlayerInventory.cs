@@ -1,5 +1,4 @@
-﻿using FullPotential.Api.Behaviours;
-using FullPotential.Api.Registry;
+﻿using FullPotential.Api.Registry;
 using FullPotential.Core.Data;
 using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
@@ -9,6 +8,7 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 using System.Linq;
+using FullPotential.Api.Combat;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;

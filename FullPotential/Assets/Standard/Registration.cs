@@ -1,6 +1,6 @@
-﻿using FullPotential.Api;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using FullPotential.Api.Registry;
 
 namespace FullPotential.Standard
 {

@@ -1,6 +1,4 @@
-﻿using FullPotential.Api.Behaviours;
-using FullPotential.Core.Behaviours.GameManagement;
-using FullPotential.Core.Behaviours.SpellBehaviours;
+﻿using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Data;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Registry.Types;
@@ -8,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Combat;
 using FullPotential.Api.Enums;
 using FullPotential.Core.Behaviours.Environment;
 using FullPotential.Core.Behaviours.Ui;
@@ -15,6 +14,7 @@ using FullPotential.Core.Behaviours.UI.Components;
 using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
 using FullPotential.Core.Utilities;
+using FullPotential.Standard.Spells.Behaviours;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -253,14 +253,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             RespawnClientRpc(_clientRpcParams);
 
             AliveState = LivingEntityState.Respawning;
-            PlayerSpawnStateChangeClientRpc(spawnPoint.Position, spawnPoint.Rotation, LivingEntityState.Respawning, null, RpcHelper.ForNearbyPlayers());
+            PlayerSpawnStateChangeClientRpc(spawnPoint.Position, spawnPoint.Rotation, LivingEntityState.Respawning, null, null, RpcHelper.ForNearbyPlayers());
         }
 
         [ServerRpc]
         public void ForceRespawnServerRpc()
         {
             //todo: needs a translation
-            HandleDeath("Yourself!");
+            HandleDeath("Yourself!", null);
         }
 
         #endregion
@@ -371,20 +371,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void PlayerSpawnStateChangeClientRpc(Vector3 position, Quaternion rotation, LivingEntityState state, string killerName, ClientRpcParams clientRpcParams)
+        public void PlayerSpawnStateChangeClientRpc(Vector3 position, Quaternion rotation, LivingEntityState state, string killerName, string itemName, ClientRpcParams clientRpcParams)
         {
             if (!killerName.IsNullOrWhiteSpace())
             {
-                if (IsOwner)
-                {
-                    //todo: needs a translation
-                    GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ShowAlert($"You were killed by {killerName}");
-                }
-                else
-                {
-                    //todo: needs a translation
-                    GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ShowAlert($"{Username} was killed by {killerName}");
-                }
+                var deathMessage = AttackHelper.GetDeathMessage(IsOwner, Username, killerName, itemName);
+                GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ShowAlert(deathMessage);
             }
 
             switch (state)
@@ -470,7 +462,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (distanceMoved > 1)
             {
                 AliveState = LivingEntityState.Alive;
-                PlayerSpawnStateChangeClientRpc(Vector3.zero, Quaternion.identity, LivingEntityState.Alive, null, RpcHelper.ForNearbyPlayers());
+                PlayerSpawnStateChangeClientRpc(Vector3.zero, Quaternion.identity, LivingEntityState.Alive, null, null, RpcHelper.ForNearbyPlayers());
                 _startingPosition = Vector3.zero;
             }
         }
@@ -792,7 +784,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 Debug.LogWarning("Tried to cast a touch spell when not on the server");
             }
 
-            if (!SpendMana(activeSpell))
+            //NOTE: Don't call SpendMana() here as it is called in the behaviour
+            if (Mana.Value < GetManaCost(activeSpell))
             {
                 return;
             }
@@ -889,7 +882,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             return Health.Value;
         }
 
-        public void TakeDamage(int amount, ulong? clientId, string attackerName)
+        public void TakeDamage(int amount, ulong? clientId, string attackerName, string itemName)
         {
             if (clientId != null)
             {
@@ -907,11 +900,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (Health.Value <= 0)
             {
-                HandleDeath(attackerName);
+                HandleDeath(attackerName, itemName);
             }
         }
 
-        public void HandleDeath(string killerName)
+        public void HandleDeath(string killerName, string itemName)
         {
             foreach (var item in _damageTaken)
             {
@@ -927,7 +920,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _damageTaken.Clear();
 
             AliveState = LivingEntityState.Dead;
-            PlayerSpawnStateChangeClientRpc(Vector3.zero, Quaternion.identity, LivingEntityState.Dead, killerName, RpcHelper.ForNearbyPlayers());
+            PlayerSpawnStateChangeClientRpc(Vector3.zero, Quaternion.identity, LivingEntityState.Dead, killerName, itemName, RpcHelper.ForNearbyPlayers());
 
             YouDiedClientRpc(_clientRpcParams);
 

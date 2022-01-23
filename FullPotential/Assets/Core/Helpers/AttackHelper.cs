@@ -1,15 +1,15 @@
-﻿using FullPotential.Api.Behaviours;
-using FullPotential.Core.Constants;
+﻿using FullPotential.Core.Constants;
 using FullPotential.Core.Registry.Base;
 using Unity.Netcode;
 using System;
 using System.Globalization;
+using FullPotential.Api.Combat;
 using FullPotential.Api.Enums;
 using UnityEngine;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
-using FullPotential.Core.Behaviours.EnemyBehaviours;
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Extensions;
+using FullPotential.Standard.Enemies.Behaviours;
 
 namespace FullPotential.Core.Helpers
 {
@@ -76,7 +76,10 @@ namespace FullPotential.Core.Helpers
                 ? sourcePlayerState.Username
                 : source?.name.OrIfNullOrWhitespace(GameManager.Instance.Localizer.Translate("ui.alert.unknownattacker"));
 
-            damageable.TakeDamage(damageDealt, sourceClientId, sourceName);
+            //todo: needs a translation
+            var sourceItemName = itemUsed?.Name ?? "their fist";
+
+            damageable.TakeDamage(damageDealt, sourceClientId, sourceName, sourceItemName);
 
             if (source == null)
             {
@@ -84,7 +87,7 @@ namespace FullPotential.Core.Helpers
                 return;
             }
 
-            //Debug.Log($"Source '{source.name}' used '{itemUsed?.Name ?? "their fist"}' to attack target '{target.name}' for {damageDealt} damage");
+            //Debug.Log($"Source '{source.name}' used '{sourceItemName}' to attack target '{target.name}' for {damageDealt} damage");
 
             if (itemUsed == null)
             {
@@ -112,7 +115,25 @@ namespace FullPotential.Core.Helpers
         {
             if (damageable.AliveState != LivingEntityState.Dead && yValue < GameManager.Instance.SceneBehaviour.Attributes.LowestYValue)
             {
-                damageable.HandleDeath(GameManager.Instance.Localizer.Translate("ui.alert.falldamage"));
+                damageable.HandleDeath(GameManager.Instance.Localizer.Translate("ui.alert.falldamage"), null);
+            }
+        }
+
+        public static string GetDeathMessage(bool isOwner, string victimName, string killerName, string itemName)
+        {
+            //todo: needs translations
+
+            if (itemName.IsNullOrWhiteSpace())
+            {
+                return isOwner
+                    ? $"You were killed by {killerName}"
+                    : $"{victimName} was killed by {killerName}";
+            }
+            else
+            {
+                return isOwner
+                    ? $"You were killed by {killerName} using {itemName}"
+                    : $"{victimName} was killed by {killerName} using {itemName}";
             }
         }
 

@@ -1,10 +1,9 @@
 ﻿using FullPotential.Api.Registry;
 using FullPotential.Core.Extensions;
-using FullPotential.Core.Spells.Shapes;
-using FullPotential.Core.Spells.Targeting;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FullPotential.Api.Spells;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 

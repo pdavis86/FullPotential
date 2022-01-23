@@ -9,9 +9,11 @@ using FullPotential.Api.Enums;
 using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
 using FullPotential.Core.Extensions;
+using FullPotential.Standard.Spells.Targeting;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using Touch = FullPotential.Standard.Spells.Targeting.Touch;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
@@ -257,19 +259,19 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             switch (activeSpell.Targeting)
             {
-                case Spells.Targeting.Projectile _:
+                case Projectile _:
                     _playerState.SpawnSpellProjectile(activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
                     break;
 
-                case Spells.Targeting.Self _:
+                case Self _:
                     _playerState.SpawnSpellSelf(activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
                     break;
 
-                case FullPotential.Core.Spells.Targeting.Touch _:
+                case Touch _:
                     _playerState.CastSpellTouch(activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
                     break;
 
-                case Spells.Targeting.Beam _:
+                case Beam _:
                     _playerState.ToggleSpellBeam(isLeftHand, activeSpell, startPosition, direction);
                     break;
 

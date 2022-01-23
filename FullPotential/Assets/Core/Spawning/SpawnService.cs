@@ -1,10 +1,11 @@
-﻿using FullPotential.Core.Extensions;
+﻿using FullPotential.Api.Spawning;
+using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
 using UnityEngine;
 
 namespace FullPotential.Core.Spawning
 {
-    public class SpawnService
+    public class SpawnService : ISpawnService
     {
         private readonly Collider _groundCollider;
 

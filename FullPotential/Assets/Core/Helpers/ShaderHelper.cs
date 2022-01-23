@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Rendering;
+﻿using UnityEngine;
 
 // ReSharper disable StringLiteralTypo
 
@@ -66,17 +64,17 @@ namespace FullPotential.Core.Helpers
             }
         }
 
-        public static Dictionary<string, ShaderPropertyType> GetShaderProperties(Shader shader)
-        {
-            var props = new Dictionary<string, ShaderPropertyType>();
-            for (var i = 0; i < shader.GetPropertyCount(); i++)
-            {
-                props.Add(
-                    shader.GetPropertyName(i),
-                    shader.GetPropertyType(i));
-            }
+        //public static Dictionary<string, ShaderPropertyType> GetShaderProperties(Shader shader)
+        //{
+        //    var props = new Dictionary<string, ShaderPropertyType>();
+        //    for (var i = 0; i < shader.GetPropertyCount(); i++)
+        //    {
+        //        props.Add(
+        //            shader.GetPropertyName(i),
+        //            shader.GetPropertyType(i));
+        //    }
 
-            return props;
-        }
+        //    return props;
+        //}
     }
 }

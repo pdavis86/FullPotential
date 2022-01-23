@@ -10,7 +10,7 @@ using FullPotential.Core.Registry;
 using FullPotential.Core.Storage;
 using Unity.Netcode;
 using System.Threading.Tasks;
-using FullPotential.Api.Behaviours;
+using FullPotential.Api.Scenes;
 using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
 using UnityEngine;
