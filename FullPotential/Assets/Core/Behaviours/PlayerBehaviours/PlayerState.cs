@@ -168,6 +168,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     Mana.Value += 1;
                 }
             });
+
+            MainCanvasObjects.Instance.Respawn.SetActive(false);
+            MainCanvasObjects.Instance.Hud.SetActive(true);
         }
 
         public void FixedUpdate()
