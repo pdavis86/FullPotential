@@ -19,7 +19,7 @@ namespace FullPotential.Core.Behaviours.Ui
 
         public void ForceRespawn()
         {
-            GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>().RespawnServerRpc();
+            GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>().ForceRespawnServerRpc();
         }
 
         public void Disconnect()

@@ -1,10 +1,12 @@
-﻿// ReSharper disable UnusedMemberInSuper.Global
+﻿using FullPotential.Api.Enums;
+
+// ReSharper disable UnusedMemberInSuper.Global
 
 namespace FullPotential.Api.Behaviours
 {
     public interface IDamageable
     {
-        bool IsDead { get; }
+        LivingEntityState AliveState { get; }
 
         int GetHealthMax();
 

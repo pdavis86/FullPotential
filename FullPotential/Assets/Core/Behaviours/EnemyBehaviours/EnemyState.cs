@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FullPotential.Api.Behaviours;
+using FullPotential.Api.Enums;
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Behaviours.UI.Components;
@@ -17,7 +18,7 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
 {
     public class EnemyState : NetworkBehaviour, IDefensible, IDamageable
     {
-        public bool IsDead { get; private set; }
+        public LivingEntityState AliveState { get; private set; }
 
         public readonly NetworkVariable<FixedString32Bytes> EnemyName = new NetworkVariable<FixedString32Bytes>();
         private readonly NetworkVariable<int> _health = new NetworkVariable<int>(100);
@@ -97,7 +98,7 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
 
         public void HandleDeath(string killerName)
         {
-            IsDead = true;
+            AliveState = LivingEntityState.Dead;
 
             GetComponent<Collider>().enabled = false;
 
@@ -114,6 +115,7 @@ namespace FullPotential.Core.Behaviours.EnemyBehaviours
 
             _damageTaken.Clear();
 
+            //todo: needs a translation
             GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc($"{name} was killed by {killerName}", RpcHelper.ForNearbyPlayers());
 
             //todo: Use object pooling

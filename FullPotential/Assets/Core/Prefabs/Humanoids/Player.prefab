@@ -1041,6 +1041,7 @@ MonoBehaviour:
   _nameTag: {fileID: 6250991307057261387}
   _healthSlider: {fileID: 155634429994666516}
   _head: {fileID: 7392779648629048435}
+  _defaultMaterial: {fileID: 2100000, guid: f941e4a9ae20e994198b523fce8b6ab3, type: 2}
   InFrontOfPlayer: {fileID: 3124563880166737475}
   PlayerCamera: {fileID: 7392779647204144590}
   Inventory: {fileID: 0}

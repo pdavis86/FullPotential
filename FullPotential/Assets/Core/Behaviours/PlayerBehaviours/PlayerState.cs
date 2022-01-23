@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Enums;
 using FullPotential.Core.Behaviours.Environment;
 using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Behaviours.UI.Components;
@@ -42,6 +43,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [SerializeField] private TextMeshProUGUI _nameTag;
         [SerializeField] private BarSlider _healthSlider;
         [SerializeField] private Transform _head;
+        [SerializeField] private Material _defaultMaterial;
 #pragma warning restore 0649
 
         public GameObject InFrontOfPlayer;
@@ -51,7 +53,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public readonly NetworkVariable<int> Health = new NetworkVariable<int>(100);
         public readonly NetworkVariable<int> Mana = new NetworkVariable<int>(100);
 
-        public bool IsDead { get; set; }
+        public LivingEntityState AliveState { get; set; }
 
         [HideInInspector] public PlayerInventory Inventory;
         [HideInInspector] public string PlayerToken;
@@ -73,6 +75,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private DelayedAction _replenishStamina;
         private DelayedAction _replenishMana;
         private bool _isSprinting;
+        private Vector3 _startingPosition;
+        private float _myHeight;
 
         #region Event handlers
 
@@ -129,6 +133,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 RequestReducedPlayerDataServerRpc();
             }
 
+            var gameObjectCollider = gameObject.GetComponent<Collider>();
+            _myHeight = gameObjectCollider.bounds.max.y - gameObjectCollider.bounds.min.y;
+
+            AliveState = LivingEntityState.Alive;
+
             //todo: hard-coded value
             _consumeStamina = new DelayedAction(.05f, () =>
             {
@@ -151,7 +160,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             //todo: hard-coded value
             _replenishMana = new DelayedAction(.2f, () =>
             {
-                var isConsumingMana = _spellBeingCastLeft != null 
+                var isConsumingMana = _spellBeingCastLeft != null
                     || _spellBeingCastRight != null;
 
                 if (!isConsumingMana && Mana.Value < GetManaMax())
@@ -165,6 +174,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             HandleSprinting();
             Replenish();
+            BecomeVulnerable();
         }
 
         public override void OnNetworkSpawn()
@@ -176,10 +186,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void OnTextureChanged(FixedString512Bytes previousValue, FixedString512Bytes newValue)
         {
-            if (!string.IsNullOrWhiteSpace(TextureUrl.Value.ToString()))
-            {
-                StartCoroutine(SetTexture());
-            }
+            StartCoroutine(SetTexture());
         }
 
         private void OnStaminaChanged(int previousValue, int newValue)
@@ -242,9 +249,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             var spawnPoint = GameManager.Instance.SceneBehaviour.GetSpawnPoint(gameObject);
             RespawnClientRpc(_clientRpcParams);
 
-            PlayerSpawnStateChangeClientRpc(spawnPoint.Position, spawnPoint.Rotation, false, null, RpcHelper.ForNearbyPlayers());
+            AliveState = LivingEntityState.Respawning;
+            PlayerSpawnStateChangeClientRpc(spawnPoint.Position, spawnPoint.Rotation, LivingEntityState.Respawning, null, RpcHelper.ForNearbyPlayers());
+        }
 
-            IsDead = false;
+        [ServerRpc]
+        public void ForceRespawnServerRpc()
+        {
+            //todo: needs a translation
+            HandleDeath("Yourself!");
         }
 
         #endregion
@@ -279,10 +292,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             SetName();
 
-            if (!string.IsNullOrWhiteSpace(TextureUrl.Value.ToString()))
-            {
-                StartCoroutine(SetTexture());
-            }
+            StartCoroutine(SetTexture());
         }
 
         // ReSharper disable once UnusedParameter.Global
@@ -320,8 +330,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             GameManager.Instance.MainCanvasObjects.HideAllMenus();
 
-            IsDead = true;
-
             foreach (var comp in _behavioursForRespawn)
             {
                 comp.enabled = false;
@@ -356,38 +364,60 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 comp.enabled = true;
             }
-
-            IsDead = false;
         }
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void PlayerSpawnStateChangeClientRpc(Vector3 position, Quaternion rotation, bool isDead, string killerName, ClientRpcParams clientRpcParams)
+        public void PlayerSpawnStateChangeClientRpc(Vector3 position, Quaternion rotation, LivingEntityState state, string killerName, ClientRpcParams clientRpcParams)
         {
-            if (!isDead)
-            {
-                UpdatePositionsAndRotations(position, rotation, Vector3.zero, null, false);
-            }
-            else
-            {
-                Debug.LogError("Applying translucent texture to " + Username);
-
-                var bodyMaterial = _meshes.BodyMesh.material;
-                ShaderHelper.ChangeRenderMode(bodyMaterial, ShaderHelper.BlendMode.Fade);
-                bodyMaterial.color = new Color(1, 1, 1, 0.2f);
-                ApplyNewMaterial(bodyMaterial);
-            }
-
-            //todo: Use GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc instead?
             if (!killerName.IsNullOrWhiteSpace())
             {
-                GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ShowAlert($"{Username} was killed by {killerName}");
+                if (IsOwner)
+                {
+                    //todo: needs a translation
+                    GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ShowAlert($"You were killed by {killerName}");
+                }
+                else
+                {
+                    //todo: needs a translation
+                    GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ShowAlert($"{Username} was killed by {killerName}");
+                }
             }
 
-            _graphicsGameObject.gameObject.SetActive(!isDead);
-            _rb.useGravity = !isDead;
-            _rb.isKinematic = isDead;
-            GetComponent<Collider>().enabled = !isDead;
+            switch (state)
+            {
+                case LivingEntityState.Dead:
+                    _graphicsGameObject.gameObject.SetActive(false);
+                    _rb.isKinematic = true;
+                    _rb.useGravity = false;
+                    GetComponent<Collider>().enabled = false;
+                    break;
+
+                case LivingEntityState.Respawning:
+                    _graphicsGameObject.gameObject.SetActive(true);
+                    _rb.isKinematic = false;
+
+                    position.y += _myHeight / 2;
+                    UpdatePositionsAndRotations(position, rotation, Vector3.zero, null, false);
+
+                    _startingPosition = position;
+
+                    var bodyMaterial1 = _meshes.BodyMesh.material;
+                    ShaderHelper.ChangeRenderMode(bodyMaterial1, ShaderHelper.BlendMode.Fade);
+                    bodyMaterial1.color = new Color(1, 1, 1, 0.2f);
+                    ApplyMaterial(bodyMaterial1);
+                    break;
+
+                case LivingEntityState.Alive:
+                    GetComponent<Collider>().enabled = true;
+                    _rb.useGravity = true;
+
+                    var bodyMaterial2 = _meshes.BodyMesh.material;
+                    ShaderHelper.ChangeRenderMode(bodyMaterial2, ShaderHelper.BlendMode.Opaque);
+                    ApplyMaterial(bodyMaterial2);
+
+                    break;
+            }
         }
 
         #endregion
@@ -421,6 +451,25 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             _replenishStamina.TryPerformAction();
             _replenishMana.TryPerformAction();
+        }
+
+        private void BecomeVulnerable()
+        {
+            if (_startingPosition == Vector3.zero)
+            {
+                return;
+            }
+
+            var distanceMoved = Vector3.Distance(transform.position, _startingPosition);
+
+            //Debug.Log("Distance moved since death: " + distanceMoved + ". _startingPosition: " + _startingPosition + ". Current pos: " + transform.position);
+
+            if (distanceMoved > 1)
+            {
+                AliveState = LivingEntityState.Alive;
+                PlayerSpawnStateChangeClientRpc(Vector3.zero, Quaternion.identity, LivingEntityState.Alive, null, RpcHelper.ForNearbyPlayers());
+                _startingPosition = Vector3.zero;
+            }
         }
 
         private void GetAndLoadPlayerData(bool reduced, ulong? clientId)
@@ -464,7 +513,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void UpdatePositionsAndRotations(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion? cameraRotation, bool isSprinting)
         {
-            _rb.position = rbPosition;
+            transform.position = rbPosition;
             _rb.rotation = rbRotation;
             _rb.velocity = rbVelocity;
 
@@ -505,11 +554,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public void AlertOfInventoryRemovals(int itemsRemoved)
         {
+            //todo: needs a translation
             GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc($"Removed {itemsRemoved} items from the inventory after handling message on " + (IsServer ? "server" : "client") + " for " + gameObject.name, _clientRpcParams);
         }
 
         public void AlertInventoryIsFull()
         {
+            //todo: needs a translation
             GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc("Your inventory is at max", _clientRpcParams);
         }
 
@@ -567,13 +618,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (Username.IsNullOrWhiteSpace())
             {
-                Debug.LogError("Trying to set texture before player data is loaded");
+                //Debug.LogError("Trying to set texture before player data is loaded");
                 yield break;
             }
 
             var textureUrl = TextureUrl.Value.ToString();
 
-            string filePath;
+            string filePath = null;
             if (textureUrl.ToLower().StartsWith("http"))
             {
                 filePath = Application.persistentDataPath + "/" + Username + ".png";
@@ -582,6 +633,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 var validatePath = Application.persistentDataPath + "/" + Username + ".skinvalidate";
 
                 var doDownload = true;
+
                 if (System.IO.File.Exists(validatePath))
                 {
                     var checkUrl = System.IO.File.ReadAllText(validatePath);
@@ -608,26 +660,22 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     }
                 }
             }
-            else
-            {
-                filePath = textureUrl;
-            }
 
-            if (!System.IO.File.Exists(filePath))
+            if (filePath == null || !System.IO.File.Exists(filePath))
             {
                 Debug.LogWarning("Not applying player texture because the file does not exist");
+                yield break;
             }
-            else
-            {
-                var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
-                tex.LoadImage(System.IO.File.ReadAllBytes(filePath));
-                var newMat = new Material(_meshes.BodyMesh.material.shader)
-                {
-                    mainTexture = tex
-                };
 
-                ApplyNewMaterial(newMat);
-            }
+            var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
+            tex.LoadImage(System.IO.File.ReadAllBytes(filePath));
+
+            var newMat = new Material(_meshes.BodyMesh.material.shader)
+            {
+                mainTexture = tex
+            };
+
+            ApplyMaterial(newMat);
         }
 
         public bool SpendMana(Spell activeSpell)
@@ -862,8 +910,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public void HandleDeath(string killerName)
         {
-            IsDead = true;
-
             foreach (var item in _damageTaken)
             {
                 if (!NetworkManager.Singleton.ConnectedClients.ContainsKey(item.Key))
@@ -877,7 +923,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             _damageTaken.Clear();
 
-            PlayerSpawnStateChangeClientRpc(Vector3.zero, Quaternion.identity, true, killerName, RpcHelper.ForNearbyPlayers());
+            AliveState = LivingEntityState.Dead;
+            PlayerSpawnStateChangeClientRpc(Vector3.zero, Quaternion.identity, LivingEntityState.Dead, killerName, RpcHelper.ForNearbyPlayers());
 
             YouDiedClientRpc(_clientRpcParams);
 
@@ -940,12 +987,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             RespawnServerRpc();
         }
 
-        private void ApplyNewMaterial(Material newMat)
+        private void ApplyMaterial(Material material)
         {
-            _meshes.HeadMesh.material = newMat;
-            _meshes.BodyMesh.material = newMat;
-            _meshes.LeftArmMesh.material = newMat;
-            _meshes.RightArmMesh.material = newMat;
+            _meshes.HeadMesh.material = material;
+            _meshes.BodyMesh.material = material;
+            _meshes.LeftArmMesh.material = material;
+            _meshes.RightArmMesh.material = material;
         }
 
         #region Nested Classes

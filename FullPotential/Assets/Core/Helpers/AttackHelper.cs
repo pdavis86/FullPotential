@@ -4,6 +4,7 @@ using FullPotential.Core.Registry.Base;
 using Unity.Netcode;
 using System;
 using System.Globalization;
+using FullPotential.Api.Enums;
 using UnityEngine;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Behaviours.EnemyBehaviours;
@@ -109,7 +110,7 @@ namespace FullPotential.Core.Helpers
 
         public static void CheckIfOffTheMap(IDamageable damageable, float yValue)
         {
-            if (!damageable.IsDead && yValue < GameManager.Instance.SceneBehaviour.Attributes.LowestYValue)
+            if (damageable.AliveState != LivingEntityState.Dead && yValue < GameManager.Instance.SceneBehaviour.Attributes.LowestYValue)
             {
                 damageable.HandleDeath(GameManager.Instance.Localizer.Translate("ui.alert.falldamage"));
             }

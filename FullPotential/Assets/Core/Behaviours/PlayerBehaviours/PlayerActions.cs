@@ -5,6 +5,7 @@ using FullPotential.Core.Networking;
 using FullPotential.Core.Registry.Types;
 using System;
 using System.Linq;
+using FullPotential.Api.Enums;
 using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
 using FullPotential.Core.Extensions;
@@ -501,7 +502,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void TryToAttack(bool isLeftHand)
         {
-            if (_hasMenuOpen)
+            if (_hasMenuOpen || _playerState.AliveState != LivingEntityState.Alive)
             {
                 return;
             }
