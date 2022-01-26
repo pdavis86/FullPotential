@@ -27,7 +27,6 @@ namespace FullPotential.Core.Behaviours.Ui
                 Destroy(_alertsContainer.transform.GetChild(0).gameObject);
             }
 
-            //System.DateTime.UtcNow.ToString("ss.fff") + " " + 
             var alert = Instantiate(_alertPrefab, _alertsContainer.transform);
             alert.transform.Find("Text").GetComponent<Text>().text = alertText;
         }
