@@ -20,6 +20,14 @@ using UnityEngine.UI;
 
 namespace FullPotential.Core.Behaviours.GameManagement
 {
+    public enum ConnectStatus
+    {
+        Success,
+        VersionMismatch,
+        //ServerFull,
+        //LoggedInAgain,
+    }
+
     public class JoinOrHostGame : MonoBehaviour
     {
 #pragma warning disable 0649
@@ -167,7 +175,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         private void ShowAnyError()
         {
-            if (GameManager.Instance.LocalGameDataStore.HasDisconnected)
+            if (GameManager.Instance.LocalGameDataStore.HasDisconnected && !_gameDetailsError.gameObject.activeInHierarchy)
             {
                 _gameDetailsContainer.SetActive(true);
                 _joiningMessage.SetActive(false);
@@ -221,7 +229,8 @@ namespace FullPotential.Core.Behaviours.GameManagement
         {
             var payload = JsonUtility.ToJson(new ConnectionPayload
             {
-                PlayerToken = GameManager.Instance.LocalGameDataStore.PlayerToken
+                PlayerToken = GameManager.Instance.LocalGameDataStore.PlayerToken,
+                GameVersion = GameManager.GetGameVersion().ToString()
             });
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.UTF8.GetBytes(payload);
 
@@ -232,15 +241,18 @@ namespace FullPotential.Core.Behaviours.GameManagement
             _joinAttempt = DateTime.UtcNow;
             _networkManager.StartClient();
 
+            _networkManager.CustomMessagingManager.UnregisterNamedMessageHandler(nameof(SetDisconnectReasonClientCustomMessage));
+            _networkManager.CustomMessagingManager.RegisterNamedMessageHandler(nameof(SetDisconnectReasonClientCustomMessage), SetDisconnectReasonClientCustomMessage);
+
             _gameDetailsContainer.SetActive(false);
             _joiningMessage.SetActive(true);
 
             //NOTE: Do not need to change scene. This is handled by the server
 
-            StartCoroutine(LogTimeout());
+            StartCoroutine(JoinGameTimeout());
         }
 
-        private IEnumerator LogTimeout()
+        private IEnumerator JoinGameTimeout()
         {
             const int timeoutSeconds = 10;
 
@@ -252,16 +264,31 @@ namespace FullPotential.Core.Behaviours.GameManagement
                     NetworkManager.Singleton.Shutdown();
 
                     Debug.LogWarning($"Failed to join game after {timeoutSeconds} seconds");
-                    _signinError.text = GameManager.Instance.Localizer.Translate("ui.connect.jointimeout");
-                    _signinError.gameObject.SetActive(true);
-                    _joiningMessage.SetActive(false);
-                    _gameDetailsContainer.SetActive(true);
+
+                    if (!_gameDetailsError.gameObject.activeInHierarchy)
+                    {
+                        _gameDetailsError.text = GameManager.Instance.Localizer.Translate("ui.connect.jointimeout");
+                        _gameDetailsError.gameObject.SetActive(true);
+                        _joiningMessage.SetActive(false);
+                        _gameDetailsContainer.SetActive(true);
+                    }
+
                     break;
                 }
 
                 yield return new WaitForSeconds(1);
 
             } while (true);
+        }
+
+        public void SetDisconnectReasonClientCustomMessage(ulong clientId, FastBufferReader reader)
+        {
+            reader.ReadValueSafe(out ConnectStatus status);
+            Debug.LogWarning($"Server refused connection with status {status}");
+            _gameDetailsError.text = GameManager.Instance.Localizer.Translate("ui.connect.joinrejected");
+            _gameDetailsError.gameObject.SetActive(true);
+            _joiningMessage.SetActive(false);
+            _gameDetailsContainer.SetActive(true);
         }
 
     }

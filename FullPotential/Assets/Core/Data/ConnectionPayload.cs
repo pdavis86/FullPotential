@@ -4,5 +4,7 @@
     public struct ConnectionPayload
     {
         public string PlayerToken;
+
+        public string GameVersion;
     }
 }

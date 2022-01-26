@@ -222,6 +222,10 @@
       "Key": "ui.connect.portnotfree",
       "Value": "Port is in use"
     },
+    {
+      "Key": "ui.connect.joinrejected",
+      "Value": "Version incompatible"
+    },
 
 
     {
