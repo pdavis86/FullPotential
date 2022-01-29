@@ -19,6 +19,6 @@ namespace FullPotential.Standard.Weapons
 
         public string PrefabAddress => null;
 
-        public string PrefabAddressTwoHanded => "Standard/Prefabs/Staff.prefab";
+        public string PrefabAddressTwoHanded => "Standard/Prefabs/Weapons/Staff.prefab";
     }
 }

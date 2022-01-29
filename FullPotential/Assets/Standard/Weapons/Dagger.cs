@@ -17,7 +17,7 @@ namespace FullPotential.Standard.Weapons
 
         public bool EnforceTwoHanded => false;
 
-        public string PrefabAddress => "Standard/Prefabs/Dagger.prefab";
+        public string PrefabAddress => "Standard/Prefabs/Weapons/Dagger.prefab";
 
         public string PrefabAddressTwoHanded => null;
     }

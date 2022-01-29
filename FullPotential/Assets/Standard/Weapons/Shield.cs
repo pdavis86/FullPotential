@@ -13,13 +13,12 @@ namespace FullPotential.Standard.Weapons
 
         public bool AllowAutomatic => false;
 
-        public bool AllowTwoHanded => true;
+        public bool AllowTwoHanded => false;
 
         public bool EnforceTwoHanded => false;
 
-        public string PrefabAddress => "Standard/Prefabs/Shield.prefab";
+        public string PrefabAddress => "Standard/Prefabs/Weapons/Shield.prefab";
 
-        //todo: different prefab for two-handed
-        public string PrefabAddressTwoHanded => "Standard/Prefabs/Shield.prefab";
+        public string PrefabAddressTwoHanded => null;
     }
 }
