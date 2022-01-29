@@ -596,7 +596,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     break;
 
                 case SlotGameObjectName.Amulet:
-                    InstantiateAroundPlayerNeck(item);
+                    InstantiateAccessory(item, _amuletForwardMultiplier);
+                    break;
+
+                case SlotGameObjectName.Belt:
+                    InstantiateAccessory(item);
                     break;
 
                 default:
@@ -669,10 +673,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _equippedObjects[slotGameObjectName] = newObj;
         }
 
-        private void InstantiateAroundPlayerNeck(ItemBase item)
+        private void InstantiateAccessory(ItemBase item, float forwardMultiplier = 0)
         {
-            //Debug.Log($"Spawning Amulet for {OwnerClientId}");
-
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
                 return;
@@ -684,18 +686,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return;
             }
 
-            if (registryType.Category != IGearAccessory.AccessoryCategory.Amulet)
-            {
-                Debug.LogError("Item is not an Amulet");
-                return;
-            }
-
             GameManager.Instance.TypeRegistry.LoadAddessable(
                 registryType.PrefabAddress,
                 prefab =>
                 {
                     var newObj = Instantiate(prefab, _playerState.GraphicsTransform);
-                    newObj.transform.position += newObj.transform.forward * _amuletForwardMultiplier;
+                    newObj.transform.position += newObj.transform.forward * forwardMultiplier;
                     _equippedObjects[SlotGameObjectName.Amulet] = newObj;
                 });
         }
