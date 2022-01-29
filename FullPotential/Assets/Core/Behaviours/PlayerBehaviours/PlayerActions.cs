@@ -189,7 +189,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         [ServerRpc]
-        public void TryToAttackServerRpc(string itemId, Vector3 direction, ServerRpcParams serverRpcParams = default)
+        public void TryToAttackServerRpc(string itemId, Vector3 lookDirection, ServerRpcParams serverRpcParams = default)
         {
             if (itemId.IsNullOrWhiteSpace())
             {
@@ -212,7 +212,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (itemInHand is Spell spellInHand)
             {
-                CastSpell(spellInHand, isLeftHand, direction, serverRpcParams);
+                CastSpell(spellInHand, isLeftHand, lookDirection, serverRpcParams);
             }
             else if (itemInHand is Weapon weaponInHand)
             {
@@ -248,7 +248,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             AttackHelper.DealDamage(gameObject, itemInHand, hit.transform.gameObject, hit.point);
         }
 
-        private void CastSpell(Spell activeSpell, bool isLeftHand, Vector3 direction, ServerRpcParams serverRpcParams)
+        private void CastSpell(Spell activeSpell, bool isLeftHand, Vector3 lookDirection, ServerRpcParams serverRpcParams)
         {
             if (!IsServer)
             {
@@ -259,22 +259,27 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 ? _playerState.Positions.LeftHandInFront.position
                 : _playerState.Positions.RightHandInFront.position;
 
+            const float maxDistance = 50f;
+            var targetDirection = Physics.Raycast(_playerCamera.transform.position, lookDirection, out var hit, maxDistance: maxDistance)
+                ? (hit.point - startPosition).normalized
+                : lookDirection;
+
             switch (activeSpell.Targeting)
             {
                 case Projectile _:
-                    _playerState.SpawnSpellProjectile(activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
+                    _playerState.SpawnSpellProjectile(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId);
                     break;
 
                 case Self _:
-                    _playerState.SpawnSpellSelf(activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
+                    _playerState.SpawnSpellSelf(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId);
                     break;
 
                 case Touch _:
-                    _playerState.CastSpellTouch(activeSpell, startPosition, direction, serverRpcParams.Receive.SenderClientId);
+                    _playerState.CastSpellTouch(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId);
                     break;
 
                 case Beam _:
-                    _playerState.ToggleSpellBeam(isLeftHand, activeSpell, startPosition, direction);
+                    _playerState.ToggleSpellBeam(isLeftHand, activeSpell, startPosition, targetDirection);
                     break;
 
                 default:
