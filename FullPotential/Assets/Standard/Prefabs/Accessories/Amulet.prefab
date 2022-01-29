@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 5025906033403902287}
   - component: {fileID: 1503477681645476750}
   - component: {fileID: 5195911858783263721}
-  - component: {fileID: 3152474440441796405}
   m_Layer: 0
   m_Name: LeftStrap
   m_TagString: Untagged
@@ -84,20 +83,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &3152474440441796405
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 432562630452055852}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!1 &7091022561941134620
 GameObject:
   m_ObjectHideFlags: 0
@@ -143,7 +128,6 @@ GameObject:
   - component: {fileID: 7295055341172404694}
   - component: {fileID: 5896994879527615552}
   - component: {fileID: 5166761843759149838}
-  - component: {fileID: 8406381259757054516}
   m_Layer: 0
   m_Name: Medalion
   m_TagString: Untagged
@@ -216,19 +200,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &8406381259757054516
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7742192693850731498}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7799667810893662910
 GameObject:
   m_ObjectHideFlags: 0
@@ -240,7 +211,6 @@ GameObject:
   - component: {fileID: 6939977459885431505}
   - component: {fileID: 5302134532188474143}
   - component: {fileID: 7478156042654810141}
-  - component: {fileID: 639419515971824884}
   m_Layer: 0
   m_Name: RightStrap
   m_TagString: Untagged
@@ -313,17 +283,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &639419515971824884
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7799667810893662910}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
