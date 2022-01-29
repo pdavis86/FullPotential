@@ -11,7 +11,6 @@ namespace FullPotential.Standard.Accessories
 
         public IGearAccessory.AccessoryCategory Category => IGearAccessory.AccessoryCategory.Amulet;
 
-        //todo: missing prefab
-        public string PrefabAddress => throw new NotImplementedException();
+        public string PrefabAddress => "Standard/Prefabs/Accessories/Amulet.prefab";
     }
 }

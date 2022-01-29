@@ -570,23 +570,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (itemId.IsNullOrWhiteSpace())
             {
-                if (IsOwner)
+                if (IsOwner && IsClient)
                 {
                     switch (slotGameObjectName)
                     {
                         case SlotGameObjectName.LeftHand:
-                            if (IsClient)
-                            {
-                                GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateLeftHand(null);
-                            }
-                            break;
-
-
                         case SlotGameObjectName.RightHand:
-                            if (IsClient)
-                            {
-                                GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateRightHand(null);
-                            }
+                            GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateHand(null, slotGameObjectName == SlotGameObjectName.LeftHand);
                             break;
                     }
                 }
@@ -599,21 +589,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             switch (slotGameObjectName)
             {
                 case SlotGameObjectName.LeftHand:
-                    SpawnItemInHand(slotGameObjectName, item);
-                    if (IsOwner)
-                    {
-                        var contents = GameManager.Instance.ResultFactory.GetItemDescription(item);
-                        GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateLeftHand(contents);
-                    }
+                case SlotGameObjectName.RightHand:
+                    SpawnItemInHand(slotGameObjectName, item, slotGameObjectName == SlotGameObjectName.LeftHand);
                     break;
 
-                case SlotGameObjectName.RightHand:
-                    SpawnItemInHand(slotGameObjectName, item, false);
-                    if (IsOwner)
-                    {
-                        var contents = GameManager.Instance.ResultFactory.GetItemDescription(item);
-                        GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateRightHand(contents);
-                    }
+                case SlotGameObjectName.Amulet:
+                    InstantiateAroundPlayerNeck(item);
                     break;
 
                 default:
@@ -624,6 +605,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void SpawnItemInHand(SlotGameObjectName slotGameObjectName, ItemBase item, bool isLeftHand = true)
         {
+            if (IsOwner)
+            {
+                var contents = GameManager.Instance.ResultFactory.GetItemDescription(item);
+                GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateHand(contents, isLeftHand);
+            }
+
             if (!NetworkManager.Singleton.IsClient)
             {
                 Debug.LogError("Tried to spawn a GameObject on a server");
@@ -663,6 +650,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             var newObj = Instantiate(prefab, _playerState.InFrontOfPlayer.transform);
 
+            //todo: a bunch of hard-coded numbers
             newObj.transform.localPosition = isSpell
                 ? new Vector3(isLeftHand ? -0.32f : 0.32f, -0.21f, 1.9f)
                 : new Vector3(isLeftHand ? -0.38f : 0.38f, -0.25f, 1.9f);
@@ -678,6 +666,38 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
 
             _equippedObjects[slotGameObjectName] = newObj;
+        }
+
+        private void InstantiateAroundPlayerNeck(ItemBase item)
+        {
+            //Debug.Log($"Spawning Amulet for {OwnerClientId}");
+
+            if (NetworkManager.LocalClientId == OwnerClientId)
+            {
+                return;
+            }
+
+            if (item.RegistryType is not IGearAccessory registryType)
+            {
+                Debug.LogError("Item did not have a RegistryType");
+                return;
+            }
+
+            if (registryType.Category != IGearAccessory.AccessoryCategory.Amulet)
+            {
+                Debug.LogError("Item is not an Amulet");
+                return;
+            }
+
+            GameManager.Instance.TypeRegistry.LoadAddessable(
+                registryType.PrefabAddress,
+                prefab =>
+                {
+                    //todo: hard-coded value
+                    var newObj = Instantiate(prefab, _playerState.GraphicsTransform);
+                    newObj.transform.position += newObj.transform.forward * 0.2f;
+                    _equippedObjects[SlotGameObjectName.Amulet] = newObj;
+                });
         }
 
     }

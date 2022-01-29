@@ -81,6 +81,10 @@ MonoBehaviour:
     m_Address: Standard/Prefabs/Weapons/Sword2.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 38f890f391196a3439c4073aa142fb32
+    m_Address: Standard/Prefabs/Accessories/Amulet.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 101452080fc0cca43abdd31fc4649980, type: 2}
   m_SchemaSet:

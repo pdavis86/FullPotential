@@ -46,8 +46,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [SerializeField] private Material _defaultMaterial;
 #pragma warning restore 0649
 
-        public GameObject InFrontOfPlayer;
         public GameObject PlayerCamera;
+        public GameObject InFrontOfPlayer;
+        public Transform GraphicsTransform;
 
         public readonly NetworkVariable<int> Stamina = new NetworkVariable<int>(100);
         public readonly NetworkVariable<int> Health = new NetworkVariable<int>(100);
@@ -870,6 +871,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
+        //todo: attribute-based all of these
         public int GetStaminaMax()
         {
             return 100;

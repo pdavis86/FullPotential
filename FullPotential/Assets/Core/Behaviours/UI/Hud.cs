@@ -41,6 +41,18 @@ namespace FullPotential.Core.Behaviours.Ui
             _equippedRightHand.GetComponent<EquippedSummary>().SetContents(contents);
         }
 
+        public void UpdateHand(string contents, bool isLeft)
+        {
+            if (isLeft)
+            {
+                _equippedLeftHand.GetComponent<EquippedSummary>().SetContents(contents);
+            }
+            else
+            {
+                _equippedRightHand.GetComponent<EquippedSummary>().SetContents(contents);
+            }
+        }
+
         public void UpdateStaminaPercentage(int stamina, int maxStamina)
         {
             var values = _staminaSlider.GetStaminaValues(stamina, maxStamina);
