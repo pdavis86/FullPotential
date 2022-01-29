@@ -51,6 +51,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private readonly NetworkVariable<FixedString32Bytes> EquippedAmulet = new NetworkVariable<FixedString32Bytes>();
         // ReSharper restore InconsistentNaming
 
+        [SerializeField] private float _amuletForwardMultiplier = 0.2f;
+
         private PlayerState _playerState;
         private Dictionary<string, ItemBase> _items;
         private Dictionary<SlotGameObjectName, GameObject> _equippedObjects;
@@ -630,13 +632,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                         weapon.IsTwoHanded ? registryType.PrefabAddressTwoHanded : registryType.PrefabAddress,
                         prefab =>
                         {
-                            InstantiateInPlayerHand(prefab, isLeftHand, false, new Vector3(0, 90), slotGameObjectName);
+                            InstantiateInPlayerHand(prefab, isLeftHand, new Vector3(0, 90), slotGameObjectName);
                         }
                     );
                     break;
 
                 case Spell:
-                    InstantiateInPlayerHand(GameManager.Instance.Prefabs.Combat.SpellInHand, isLeftHand, true, null, slotGameObjectName);
+                    InstantiateInPlayerHand(GameManager.Instance.Prefabs.Combat.SpellInHand, isLeftHand, null, slotGameObjectName);
                     break;
 
                 default:
@@ -646,14 +648,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
-        private void InstantiateInPlayerHand(GameObject prefab, bool isLeftHand, bool isSpell, Vector3? rotation, SlotGameObjectName slotGameObjectName)
+        private void InstantiateInPlayerHand(GameObject prefab, bool isLeftHand, Vector3? rotation, SlotGameObjectName slotGameObjectName)
         {
             var newObj = Instantiate(prefab, _playerState.InFrontOfPlayer.transform);
 
-            //todo: a bunch of hard-coded numbers
-            newObj.transform.localPosition = isSpell
-                ? new Vector3(isLeftHand ? -0.32f : 0.32f, -0.21f, 1.9f)
-                : new Vector3(isLeftHand ? -0.38f : 0.38f, -0.25f, 1.9f);
+            newObj.transform.localPosition = isLeftHand
+                ? _playerState.Positions.LeftHand.localPosition
+                : _playerState.Positions.RightHand.localPosition;
 
             if (rotation.HasValue)
             {
@@ -693,9 +694,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 registryType.PrefabAddress,
                 prefab =>
                 {
-                    //todo: hard-coded value
                     var newObj = Instantiate(prefab, _playerState.GraphicsTransform);
-                    newObj.transform.position += newObj.transform.forward * 0.2f;
+                    newObj.transform.position += newObj.transform.forward * _amuletForwardMultiplier;
                     _equippedObjects[SlotGameObjectName.Amulet] = newObj;
                 });
         }

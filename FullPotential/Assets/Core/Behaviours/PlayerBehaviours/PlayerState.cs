@@ -1021,6 +1021,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [Serializable]
         public struct PositionTransforms
         {
+            public Transform LeftHand;
+            public Transform RightHand;
             public Transform LeftHandInFront;
             public Transform RightHandInFront;
         }
