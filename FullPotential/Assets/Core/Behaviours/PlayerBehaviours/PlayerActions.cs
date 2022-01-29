@@ -179,11 +179,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [ServerRpc]
         public void UpdatePlayerSettingsServerRpc(PlayerSettings playerSettings)
         {
+            //Debug.Log("UpdatePlayerSettingsServerRpc called with " + playerSettings?.TextureUrl);
+
             var saveData = GameManager.Instance.UserRegistry.PlayerData[_playerState.Username];
-            saveData.Options = playerSettings;
+            saveData.Settings = playerSettings ?? new PlayerSettings();
             saveData.IsDirty = true;
 
-            _playerState.TextureUrl.Value = playerSettings.TextureUrl;
+            _playerState.TextureUrl.Value = saveData.Settings.TextureUrl;
         }
 
         [ServerRpc]

@@ -497,7 +497,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 //Server loading player data from player state
                 LoadFromPlayerData(playerData);
-                TextureUrl.Value = playerData.Options.TextureUrl ?? string.Empty;
+                TextureUrl.Value = playerData?.Settings?.TextureUrl ?? string.Empty;
             }
         }
 

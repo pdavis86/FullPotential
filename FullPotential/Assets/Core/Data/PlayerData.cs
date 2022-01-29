@@ -9,7 +9,7 @@ namespace FullPotential.Core.Data
     public class PlayerData
     {
         public string Username;
-        public PlayerSettings Options;
+        public PlayerSettings Settings;
         public Inventory Inventory;
 
         [NonSerialized] public bool InventoryLoadedSuccessfully;
