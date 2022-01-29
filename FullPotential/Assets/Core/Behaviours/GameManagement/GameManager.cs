@@ -91,6 +91,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             DontDestroyOnLoad(gameObject);
 
             Instance.GameDataStore.PlayerData = new Dictionary<string, PlayerData>();
+            Instance.GameDataStore.ClientIdToUsername = new Dictionary<ulong, string>();
 
             EnsureAppOptionsLoaded();
 
@@ -171,9 +172,17 @@ namespace FullPotential.Core.Behaviours.GameManagement
         {
             if (NetworkManager.Singleton.IsServer)
             {
-                //todo: maintain a mapping of username and clientid
-                //todo: when a player disconnects, save their data then unload it from memory
-                //Instance.GameDataStore.PlayerData.Remove(dddd);
+                var playerUsername = Instance.GameDataStore.ClientIdToUsername[clientId];
+                
+                if (playerUsername.IsNullOrWhiteSpace())
+                {
+                    Debug.LogError($"Could not get username for client ID {clientId}");
+                    return;
+                }
+
+                //Debug.Log($"Saving player data for '{playerUsername}' because they disconnected");
+                Instance.GameDataStore.PlayerData.Remove(playerUsername, out var playerDataToSave);
+                SavePlayerData(playerDataToSave);
             }
             else
             {

@@ -121,6 +121,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 //Debug.LogError("I am the Server. Loading player data with client ID " + OwnerClientId);
                 GetAndLoadPlayerData(false, null);
+
+                //Debug.Log($"Adding client ID {OwnerClientId} with username '{Username}'");
+                GameManager.Instance.GameDataStore.ClientIdToUsername.Add(OwnerClientId, Username);
             }
             else if (IsOwner)
             {
