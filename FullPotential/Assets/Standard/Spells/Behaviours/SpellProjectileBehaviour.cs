@@ -107,7 +107,6 @@ namespace FullPotential.Standard.Spells.Behaviours
                 }
                 else
                 {
-                    //todo: is this duplicate logic?
                     var pointUnderTarget = new Vector3(target.transform.position.x, -100, target.transform.position.z);
                     var feetOfTarget = target.GetComponent<Collider>().ClosestPointOnBounds(pointUnderTarget);
 

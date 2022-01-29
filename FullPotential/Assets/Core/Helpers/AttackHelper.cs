@@ -27,7 +27,7 @@ namespace FullPotential.Core.Helpers
         {
             if (!NetworkManager.Singleton.IsServer)
             {
-                Debug.LogError("Player tried to deal damage instead of server");
+                Debug.LogWarning("Player tried to deal damage instead of server");
                 return;
             }
 

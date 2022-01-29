@@ -635,7 +635,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 case Weapon weapon:
                     if (item.RegistryType is not IGearWeapon registryType)
                     {
-                        Debug.LogError("Weapon did not have a RegistryType");
+                        Debug.LogError("Item did not have a RegistryType");
                         return;
                     }
 
@@ -653,7 +653,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     break;
 
                 default:
-                    Debug.LogError($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name}");
+                    Debug.LogWarning($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name}");
                     _equippedObjects[slotGameObjectName] = null;
                     break;
             }

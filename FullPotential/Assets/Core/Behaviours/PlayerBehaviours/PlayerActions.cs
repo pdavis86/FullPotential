@@ -204,7 +204,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
             else if (_playerState.Inventory.EquippedRightHand.Value != itemId)
             {
-                Debug.LogError("Player tried to cheat by sending an un-equipped item ID");
+                Debug.LogWarning("Player tried to cheat by sending an un-equipped item ID");
                 return;
             }
 
@@ -332,7 +332,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (components.Count != componentIdArray.Length)
             {
-                Debug.LogError("Someone tried cheating: One or more IDs provided are not in the inventory");
+                Debug.LogWarning("Someone tried cheating: One or more IDs provided are not in the inventory");
                 return;
             }
 
@@ -345,7 +345,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (_playerState.Inventory.ValidateIsCraftable(componentIdArray, craftedItem).Any())
             {
-                Debug.LogError("Someone tried cheating: validation was skipped");
+                Debug.LogWarning("Someone tried cheating: validation was skipped");
                 return;
             }
 
