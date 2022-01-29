@@ -39,7 +39,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [SerializeField] private GameObject[] _gameObjectsForPlayers;
         [SerializeField] private GameObject[] _gameObjectsForRespawn;
         public PositionTransforms Positions;
-        [SerializeField] private TextureMeshes _meshes;
+        public BodyPartTransforms BodyParts;
         [SerializeField] private TextMeshProUGUI _nameTag;
         [SerializeField] private BarSlider _healthSlider;
         [SerializeField] private Transform _head;
@@ -66,7 +66,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private ClientRpcParams _clientRpcParams;
         private GameObject _spellBeingCastLeft;
         private GameObject _spellBeingCastRight;
-        private GameObject _graphicsGameObject;
         private Hud _hud;
 
         private FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
@@ -79,6 +78,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private Vector3 _startingPosition;
         private float _myHeight;
         private ActionQueue<bool> _aliveStateChanges;
+        private MeshRenderer _bodyMeshRenderer;
 
         #region Event handlers
 
@@ -93,7 +93,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             Inventory = GetComponent<PlayerInventory>();
             _rb = GetComponent<Rigidbody>();
             _playerActions = GetComponent<PlayerActions>();
-            _graphicsGameObject = transform.Find("Graphics").gameObject;
+            _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -370,14 +370,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             switch (state)
             {
                 case LivingEntityState.Dead:
-                    _graphicsGameObject.gameObject.SetActive(false);
+                    GraphicsTransform.gameObject.SetActive(false);
                     _rb.isKinematic = true;
                     _rb.useGravity = false;
                     GetComponent<Collider>().enabled = false;
                     break;
 
                 case LivingEntityState.Respawning:
-                    _graphicsGameObject.gameObject.SetActive(true);
+                    GraphicsTransform.gameObject.SetActive(true);
                     _rb.isKinematic = false;
 
                     position.y += _myHeight / 2;
@@ -385,19 +385,19 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
                     _startingPosition = position;
 
-                    var bodyMaterial1 = _meshes.BodyMesh.material;
-                    ShaderHelper.ChangeRenderMode(bodyMaterial1, ShaderHelper.BlendMode.Fade);
-                    bodyMaterial1.color = new Color(1, 1, 1, 0.2f);
-                    ApplyMaterial(bodyMaterial1);
+                    var bodyMaterialForRespawn = _bodyMeshRenderer.material;
+                    ShaderHelper.ChangeRenderMode(bodyMaterialForRespawn, ShaderHelper.BlendMode.Fade);
+                    bodyMaterialForRespawn.color = new Color(1, 1, 1, 0.2f);
+                    ApplyMaterial(bodyMaterialForRespawn);
                     break;
 
                 case LivingEntityState.Alive:
                     GetComponent<Collider>().enabled = true;
                     _rb.useGravity = true;
 
-                    var bodyMaterial2 = _meshes.BodyMesh.material;
-                    ShaderHelper.ChangeRenderMode(bodyMaterial2, ShaderHelper.BlendMode.Opaque);
-                    ApplyMaterial(bodyMaterial2);
+                    var bodyMaterial = _bodyMeshRenderer.material;
+                    ShaderHelper.ChangeRenderMode(bodyMaterial, ShaderHelper.BlendMode.Opaque);
+                    ApplyMaterial(bodyMaterial);
 
                     break;
             }
@@ -678,7 +678,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 Debug.LogWarning("Not applying player texture because the file does not exist");
 
                 ColorUtility.TryParseHtmlString("#2ADB72", out var color);
-                newMat = new Material(_meshes.BodyMesh.material.shader)
+                newMat = new Material(_bodyMeshRenderer.material.shader)
                 {
                     color = color
                 };
@@ -688,7 +688,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
                 tex.LoadImage(System.IO.File.ReadAllBytes(filePath));
 
-                newMat = new Material(_meshes.BodyMesh.material.shader)
+                newMat = new Material(_bodyMeshRenderer.material.shader)
                 {
                     mainTexture = tex
                 };
@@ -1010,10 +1010,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void ApplyMaterial(Material material)
         {
-            _meshes.HeadMesh.material = material;
-            _meshes.BodyMesh.material = material;
-            _meshes.LeftArmMesh.material = material;
-            _meshes.RightArmMesh.material = material;
+            BodyParts.Head.GetComponent<MeshRenderer>().material = material;
+            _bodyMeshRenderer.material = material;
+            BodyParts.LeftArm.GetComponent<MeshRenderer>().material = material;
+            BodyParts.RightArm.GetComponent<MeshRenderer>().material = material;
         }
 
         #region Nested Classes
@@ -1028,12 +1028,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         [Serializable]
-        public struct TextureMeshes
+        public struct BodyPartTransforms
         {
-            public MeshRenderer HeadMesh;
-            public MeshRenderer BodyMesh;
-            public MeshRenderer LeftArmMesh;
-            public MeshRenderer RightArmMesh;
+            public Transform Head;
+            public Transform Body;
+            public Transform LeftArm;
+            public Transform RightArm;
         }
 
         #endregion

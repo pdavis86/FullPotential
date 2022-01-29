@@ -596,11 +596,19 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     break;
 
                 case SlotGameObjectName.Amulet:
-                    InstantiateAccessory(item, _amuletForwardMultiplier);
+                    InstantiateAccessory(item, _playerState.GraphicsTransform, manipulateTransform: t => t.position += t.forward * _amuletForwardMultiplier);
                     break;
 
                 case SlotGameObjectName.Belt:
-                    InstantiateAccessory(item);
+                    InstantiateAccessory(item, _playerState.GraphicsTransform);
+                    break;
+
+                case SlotGameObjectName.LeftRing:
+                    InstantiateAccessory(item, _playerState.BodyParts.LeftArm, true);
+                    break;
+
+                case SlotGameObjectName.RightRing:
+                    InstantiateAccessory(item, _playerState.BodyParts.RightArm, true);
                     break;
 
                 default:
@@ -628,7 +636,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 case Weapon weapon:
                     if (item.RegistryType is not IGearWeapon registryType)
                     {
-                        Debug.LogError("Item did not have a RegistryType");
+                        Debug.LogError("Item is not a weapon");
                         return;
                     }
 
@@ -673,16 +681,18 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _equippedObjects[slotGameObjectName] = newObj;
         }
 
-        private void InstantiateAccessory(ItemBase item, float forwardMultiplier = 0)
+        private void InstantiateAccessory(ItemBase item, Transform parentTransform, bool showsOnPlayerCamera = false, Action<Transform> manipulateTransform = null)
         {
-            if (NetworkManager.LocalClientId == OwnerClientId)
+            var thisClient = NetworkManager.LocalClientId == OwnerClientId;
+
+            if (!showsOnPlayerCamera && thisClient)
             {
                 return;
             }
 
             if (item.RegistryType is not IGearAccessory registryType)
             {
-                Debug.LogError("Item did not have a RegistryType");
+                Debug.LogError("Item is not an accessory");
                 return;
             }
 
@@ -690,8 +700,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 registryType.PrefabAddress,
                 prefab =>
                 {
-                    var newObj = Instantiate(prefab, _playerState.GraphicsTransform);
-                    newObj.transform.position += newObj.transform.forward * forwardMultiplier;
+                    var newObj = Instantiate(prefab, parentTransform);
+
+                    manipulateTransform?.Invoke(newObj.transform);
+
+                    if (showsOnPlayerCamera && thisClient)
+                    {
+                        GameObjectHelper.SetGameLayerRecursive(newObj, LayerMask.NameToLayer(Constants.Layers.InFrontOfPlayer));
+                    }
+
                     _equippedObjects[SlotGameObjectName.Amulet] = newObj;
                 });
         }

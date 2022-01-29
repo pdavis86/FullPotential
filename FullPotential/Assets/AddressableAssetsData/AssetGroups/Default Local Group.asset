@@ -89,6 +89,10 @@ MonoBehaviour:
     m_Address: Standard/Prefabs/Accessories/Belt.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 4cd3d875fdeaea743810e6bae074ab9e
+    m_Address: Standard/Prefabs/Accessories/Ring.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 101452080fc0cca43abdd31fc4649980, type: 2}
   m_SchemaSet:
