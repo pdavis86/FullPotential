@@ -26,7 +26,6 @@ namespace FullPotential.Standard.Spells.Behaviours
 
             _spell = activeSpell;
 
-            //todo: handle situations where player disconnects
             _sourcePlayer = NetworkManager.Singleton.ConnectedClients[senderClientId].PlayerObject.gameObject;
 
             if (Physics.Raycast(startPosition, direction, out var hit, maxDistance: _maxDistance))

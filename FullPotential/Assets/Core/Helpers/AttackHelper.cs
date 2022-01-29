@@ -68,25 +68,24 @@ namespace FullPotential.Core.Helpers
                 ? null
                 : source.GetComponent<NetworkObject>()?.OwnerClientId;
 
-            var sourceIsPlayer = source?.CompareTag(Tags.Player) ?? false;
-            var sourcePlayerState = source?.GetComponent<PlayerState>();
+            var sourceIsPlayer = source != null && source.CompareTag(Tags.Player);
+            var sourcePlayerState = sourceIsPlayer ? source.GetComponent<PlayerState>() : null;
 
-            // ReSharper disable once StringLiteralTypo
             var sourceName = sourceIsPlayer
                 ? sourcePlayerState.Username
-                : source?.name.OrIfNullOrWhitespace(GameManager.Instance.Localizer.Translate("ui.alert.unknownattacker"));
+                : (source != null ? source.name : null).OrIfNullOrWhitespace(GameManager.Instance.Localizer.Translate("ui.alert.unknownattacker"));
 
             var sourceItemName = itemUsed?.Name ?? GameManager.Instance.Localizer.Translate("ui.alert.attack.noitem");
 
             damageable.TakeDamage(damageDealt, sourceClientId, sourceName, sourceItemName);
+
+            //Debug.Log($"Source '{sourceName}' used '{sourceItemName}' to attack target '{target.name}' for {damageDealt} damage");
 
             if (source == null)
             {
                 Debug.LogWarning("Attack source not found. Did they sign out?");
                 return;
             }
-
-            //Debug.Log($"Source '{source.name}' used '{sourceItemName}' to attack target '{target.name}' for {damageDealt} damage");
 
             if (itemUsed == null)
             {
@@ -97,13 +96,12 @@ namespace FullPotential.Core.Helpers
                 }
             }
 
-            if (source.CompareTag(Tags.Player) && position.HasValue)
+            if (sourceIsPlayer && position.HasValue)
             {
                 var offsetX = (float)_random.Next(-9, 10) / 100;
                 var offsetY = (float)_random.Next(-9, 10) / 100;
                 var offsetZ = (float)_random.Next(-9, 10) / 100;
                 var adjustedPosition = position.Value + new Vector3(offsetX, offsetY, offsetZ);
-
 
                 var clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { sourcePlayerState.OwnerClientId } } };
                 sourcePlayerState.ShowDamageClientRpc(adjustedPosition, damageDealt.ToString(CultureInfo.InvariantCulture), clientRpcParams);

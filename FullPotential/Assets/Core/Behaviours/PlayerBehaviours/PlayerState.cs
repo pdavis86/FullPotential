@@ -149,7 +149,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             AliveState = LivingEntityState.Alive;
 
-            //todo: hard-coded value
+            //todo: attribute-based stamina consumption
             _consumeStamina = new DelayedAction(.05f, () =>
             {
                 var staminaCost = GetStaminaCost();
@@ -159,7 +159,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 }
             });
 
-            //todo: hard-coded value
+            //todo: attribute-based stamina recharge
             _replenishStamina = new DelayedAction(.01f, () =>
             {
                 if (!_isSprinting && Stamina.Value < GetStaminaMax())
@@ -168,7 +168,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 }
             });
 
-            //todo: hard-coded value
+            //todo: attribute-based mana recharge
             _replenishMana = new DelayedAction(.2f, () =>
             {
                 var isConsumingMana = _spellBeingCastLeft != null
@@ -639,7 +639,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 filePath = Application.persistentDataPath + "/" + Username + ".png";
 
-                // ReSharper disable once StringLiteralTypo
                 var validatePath = Application.persistentDataPath + "/" + Username + ".skinvalidate";
 
                 var doDownload = true;

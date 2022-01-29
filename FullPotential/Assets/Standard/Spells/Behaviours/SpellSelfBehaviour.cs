@@ -33,7 +33,6 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            //todo: handle situations where player disconnects
             _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId].PlayerObject.gameObject;
 
             _spell = _sourcePlayer.GetComponent<PlayerState>().Inventory.GetItemWithId<Spell>(SpellId);
@@ -59,6 +58,12 @@ namespace FullPotential.Standard.Spells.Behaviours
         {
             if (!IsServer)
             {
+                return;
+            }
+
+            if (_sourcePlayer == null)
+            {
+                Destroy(gameObject);
                 return;
             }
 

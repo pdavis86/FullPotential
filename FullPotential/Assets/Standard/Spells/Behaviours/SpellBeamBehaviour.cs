@@ -14,6 +14,7 @@ namespace FullPotential.Standard.Spells.Behaviours
     {
         public string SpellId;
         public bool IsLeftHand;
+        public float LeftRightAdjustment;
 
         private GameObject _sourcePlayer;
         private PlayerState _sourcePlayerState;
@@ -21,8 +22,8 @@ namespace FullPotential.Standard.Spells.Behaviours
         private Transform _cylinderParentTransform;
         private Transform _cylinderTransform;
         private RaycastHit _hit;
-        private DelayedAction _applyEffectsAction;
         private DelayedAction _takeManaAction;
+        private DelayedAction _applyEffectsAction;
         private bool _stopCasting;
 
         // ReSharper disable once UnusedMember.Local
@@ -62,14 +63,6 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            //todo: hard-coded value
-            _applyEffectsAction = new DelayedAction(0.5f, () =>
-            {
-                //Debug.Log($"Player {_sourcePlayer.name} is hitting {hit.transform.gameObject.name} with beam spell {_spell.Name} at distance {hit.distance}");
-                ApplySpellEffects(_hit.transform.gameObject, _hit.point);
-            });
-
-            //todo: hard-coded value
             _takeManaAction = new DelayedAction(1f, () =>
             {
                 if (!_sourcePlayerState.SpendMana(_spell))
@@ -78,12 +71,18 @@ namespace FullPotential.Standard.Spells.Behaviours
                     _stopCasting = true;
                 }
             });
+
+            _applyEffectsAction = new DelayedAction(1f, () =>
+            {
+                //Debug.Log($"Player {_sourcePlayer.name} is hitting {hit.transform.gameObject.name} with beam spell {_spell.Name} at distance {hit.distance}");
+                ApplySpellEffects(_hit.transform.gameObject, _hit.point);
+            });
         }
 
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            //todo: hard-coded value
+            //todo: attribute-based beam length
             const int maxBeamLength = 10;
 
             if (IsServer)
@@ -152,13 +151,12 @@ namespace FullPotential.Standard.Spells.Behaviours
 
             if (playerState.OwnerClientId == NetworkManager.Singleton.LocalClientId)
             {
-                //todo: hard-coded value
                 //Move it a little sideways
-                _cylinderParentTransform.position += (IsLeftHand ? 0.1f : -0.1f) * _cylinderParentTransform.right;
+                _cylinderParentTransform.position += (IsLeftHand ? LeftRightAdjustment : -LeftRightAdjustment) * _cylinderParentTransform.right;
             }
 
             //Move the tip to the middle
-            _cylinderTransform.position += (_cylinderTransform.up * _cylinderTransform.localScale.y);
+            _cylinderTransform.position += _cylinderTransform.up * _cylinderTransform.localScale.y;
 
             _cylinderTransform.gameObject.SetActive(false);
         }
