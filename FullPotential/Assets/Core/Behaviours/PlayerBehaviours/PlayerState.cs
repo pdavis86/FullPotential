@@ -77,6 +77,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private bool _isSprinting;
         private Vector3 _startingPosition;
         private float _myHeight;
+        private ActionQueue<bool> _aliveStateChanges;
 
         #region Event handlers
 
@@ -174,6 +175,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             MainCanvasObjects.Instance.Respawn.SetActive(false);
             MainCanvasObjects.Instance.Hud.SetActive(true);
+
+            QueueAliveStateChanges();
         }
 
         public void FixedUpdate()
@@ -262,7 +265,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [ServerRpc]
         public void ForceRespawnServerRpc()
         {
-            HandleDeath( GameManager.Instance.Localizer.Translate("ui.alert.suicide"), null);
+            HandleDeath(GameManager.Instance.Localizer.Translate("ui.alert.suicide"), null);
         }
 
         #endregion
@@ -327,48 +330,19 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             lootScript.UnclaimedLootId = id;
         }
 
-        //todo: make a list of commands to run in reverse order when necessary. Delegates for dead and alive
-
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
         public void YouDiedClientRpc(ClientRpcParams clientRpcParams)
         {
             GameManager.Instance.MainCanvasObjects.HideAllMenus();
-
-            foreach (var comp in _behavioursForRespawn)
-            {
-                comp.enabled = false;
-            }
-
-            foreach (var obj in _gameObjectsForRespawn)
-            {
-                obj.SetActive(false);
-            }
-
-            GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCamera).SetActive(true);
-
-            MainCanvasObjects.Instance.Hud.SetActive(false);
-            MainCanvasObjects.Instance.Respawn.SetActive(true);
+            _aliveStateChanges.PlayForwards(false);
         }
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
         public void RespawnClientRpc(ClientRpcParams clientRpcParams)
         {
-            MainCanvasObjects.Instance.Respawn.SetActive(false);
-            MainCanvasObjects.Instance.Hud.SetActive(true);
-
-            GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCamera).SetActive(false);
-
-            foreach (var obj in _gameObjectsForRespawn)
-            {
-                obj.SetActive(true);
-            }
-
-            foreach (var comp in _behavioursForRespawn)
-            {
-                comp.enabled = true;
-            }
+            _aliveStateChanges.PlayBackwards(true);
         }
 
         // ReSharper disable once UnusedParameter.Global
@@ -418,6 +392,33 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         #endregion
+
+        private void QueueAliveStateChanges()
+        {
+            _aliveStateChanges = new ActionQueue<bool>();
+
+            _aliveStateChanges.Queue(isAlive =>
+            {
+                foreach (var comp in _behavioursForRespawn)
+                {
+                    comp.enabled = isAlive;
+                }
+            });
+
+            _aliveStateChanges.Queue(isAlive =>
+            {
+                foreach (var obj in _gameObjectsForRespawn)
+                {
+                    obj.SetActive(isAlive);
+                }
+            });
+
+            _aliveStateChanges.Queue(isAlive => GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCamera).SetActive(!isAlive));
+
+            _aliveStateChanges.Queue(isAlive => MainCanvasObjects.Instance.Hud.SetActive(isAlive));
+
+            _aliveStateChanges.Queue(isAlive => MainCanvasObjects.Instance.Respawn.SetActive(!isAlive));
+        }
 
         private Hud GetHud()
         {
