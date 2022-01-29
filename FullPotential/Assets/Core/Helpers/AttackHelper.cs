@@ -76,8 +76,7 @@ namespace FullPotential.Core.Helpers
                 ? sourcePlayerState.Username
                 : source?.name.OrIfNullOrWhitespace(GameManager.Instance.Localizer.Translate("ui.alert.unknownattacker"));
 
-            //todo: needs a translation
-            var sourceItemName = itemUsed?.Name ?? "their fist";
+            var sourceItemName = itemUsed?.Name ?? GameManager.Instance.Localizer.Translate("ui.alert.attack.noitem");
 
             damageable.TakeDamage(damageDealt, sourceClientId, sourceName, sourceItemName);
 
@@ -121,20 +120,16 @@ namespace FullPotential.Core.Helpers
 
         public static string GetDeathMessage(bool isOwner, string victimName, string killerName, string itemName)
         {
-            //todo: needs translations
-
             if (itemName.IsNullOrWhiteSpace())
             {
                 return isOwner
-                    ? $"You were killed by '{killerName}'"
-                    : $"'{victimName}' was killed by '{killerName}'";
+                    ? string.Format(GameManager.Instance.Localizer.Translate("ui.alert.attack.youwerekilledby"), killerName)
+                    : string.Format(GameManager.Instance.Localizer.Translate("ui.alert.attack.victimkilledby"), victimName, killerName);
             }
-            else
-            {
-                return isOwner
-                    ? $"You were killed by '{killerName}' using '{itemName}'"
-                    : $"{victimName} was killed by '{killerName}' using '{itemName}'";
-            }
+
+            return isOwner
+                ? string.Format(GameManager.Instance.Localizer.Translate("ui.alert.attack.youwerekilledbyusing"), killerName, itemName)
+                : string.Format(GameManager.Instance.Localizer.Translate("ui.alert.attack.victimkilledbyusing"), victimName, killerName, itemName);
         }
 
     }

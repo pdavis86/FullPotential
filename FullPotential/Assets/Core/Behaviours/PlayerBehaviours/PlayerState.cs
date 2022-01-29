@@ -262,8 +262,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [ServerRpc]
         public void ForceRespawnServerRpc()
         {
-            //todo: needs a translation
-            HandleDeath("Yourself!", null);
+            HandleDeath( GameManager.Instance.Localizer.Translate("ui.alert.suicide"), null);
         }
 
         #endregion
@@ -550,16 +549,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc(alertText, _clientRpcParams);
         }
 
-        public void AlertOfInventoryRemovals(int itemsRemoved)
+        public void AlertOfInventoryRemovals(int itemsRemovedCount)
         {
-            //todo: needs a translation
-            GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc($"Removed {itemsRemoved} items from the inventory after handling message on " + (IsServer ? "server" : "client") + " for " + gameObject.name, _clientRpcParams);
+            var message = GameManager.Instance.Localizer.Translate("ui.alert.itemsremoved");
+            GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc(string.Format(message, itemsRemovedCount), _clientRpcParams);
         }
 
         public void AlertInventoryIsFull()
         {
-            //todo: needs a translation
-            GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc("Your inventory is at max", _clientRpcParams);
+            GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc(GameManager.Instance.Localizer.Translate("ui.alert.itemsatmax"), _clientRpcParams);
         }
 
         private void LoadFromPlayerData(PlayerData playerData)

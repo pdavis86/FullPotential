@@ -119,38 +119,6 @@
 
 
     {
-      "Key": "spell.shape.wall",
-      "Value": "Wall"
-    },
-    {
-      "Key": "spell.shape.zone",
-      "Value": "Zone"
-    },
-
-
-    {
-      "Key": "spell.targeting.beam",
-      "Value": "Beam"
-    },
-    {
-      "Key": "spell.targeting.cone",
-      "Value": "Cone"
-    },
-    {
-      "Key": "spell.targeting.projectile",
-      "Value": "Projectile"
-    },
-    {
-      "Key": "spell.targeting.self",
-      "Value": "Self"
-    },
-    {
-      "Key": "spell.targeting.touch",
-      "Value": "Touch"
-    },
-
-
-    {
       "Key": "ui.quit",
       "Value": "Quit"
     },
@@ -328,12 +296,46 @@
       "Value": "Added {0} items"
     },
     {
+      "Key": "ui.alert.itemsremoved",
+      "Value": "Used {0} items"
+    },
+    {
+      "Key": "ui.alert.itemsatmax",
+      "Value": "Your inventory is at max"
+    },
+    {
       "Key": "ui.alert.unknownattacker",
       "Value": "someone"
     },
     {
       "Key": "ui.alert.falldamage",
       "Value": "fall damage"
+    },
+    {
+      "Key": "ui.alert.suicide",
+      "Value": "Yourself"
+    },
+	
+	
+	{
+      "Key": "ui.alert.attack.noitem",
+      "Value": "their fist"
+    },
+	{
+      "Key": "ui.alert.attack.youwerekilledby",
+      "Value": "You were killed by '{0}'"
+    },
+    {
+      "Key": "ui.alert.attack.youwerekilledbyusing",
+      "Value": "You were killed by '{0}' using '{1}'"
+    },
+    {
+      "Key": "ui.alert.attack.victimkilledby",
+      "Value": "'{0}' was killed by '{1}'"
+    },
+    {
+      "Key": "ui.alert.attack.victimkilledbyusing",
+      "Value": "'{0}' was killed by '{1}' using '{2}'"
     },
 
 
