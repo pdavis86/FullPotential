@@ -207,7 +207,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void OnStaminaChanged(int previousValue, int newValue)
         {
-            GetHud().UpdateStaminaPercentage(newValue, GetStaminaMax());
+            if (NetworkManager.LocalClientId == OwnerClientId)
+            {
+                GetHud().UpdateStaminaPercentage(newValue, GetStaminaMax());
+            }
         }
 
         private void OnHealthChanged(int previousValue, int newValue)
@@ -221,17 +224,18 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 _healthSlider.SetValues(values);
             }
 
-            if (NetworkManager.LocalClientId != OwnerClientId)
+            if (NetworkManager.LocalClientId == OwnerClientId)
             {
-                return;
+                GetHud().UpdateHealthPercentage(newValue, maxHealthValue, defenseValue);
             }
-
-            GetHud().UpdateHealthPercentage(newValue, maxHealthValue, defenseValue);
         }
 
         private void OnManaChanged(int previousValue, int newValue)
         {
-            GetHud().UpdateManaPercentage(newValue, GetManaMax());
+            if (NetworkManager.LocalClientId == OwnerClientId)
+            {
+                GetHud().UpdateManaPercentage(newValue, GetManaMax());
+            }
         }
 
         #endregion
