@@ -198,13 +198,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
 
             var isLeftHand = false;
-            if (_playerState.Inventory.EquippedLeftHand.Value == itemId)
+            if (_playerState.Inventory.GetItemIdInSlot(PlayerInventory.SlotGameObjectName.LeftHand) == itemId)
             {
                 isLeftHand = true;
             }
-            else if (_playerState.Inventory.EquippedRightHand.Value != itemId)
+            else if (_playerState.Inventory.GetItemIdInSlot(PlayerInventory.SlotGameObjectName.RightHand) != itemId)
             {
-                Debug.LogWarning("Player tried to cheat by sending an un-equipped item ID");
+                Debug.LogWarning("Player tried to cheat by sending an non-equipped item ID");
                 return;
             }
 

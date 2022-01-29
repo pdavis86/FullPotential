@@ -43,8 +43,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private readonly NetworkVariable<FixedString32Bytes> EquippedLegs = new NetworkVariable<FixedString32Bytes>();
         private readonly NetworkVariable<FixedString32Bytes> EquippedFeet = new NetworkVariable<FixedString32Bytes>();
         private readonly NetworkVariable<FixedString32Bytes> EquippedBarrier = new NetworkVariable<FixedString32Bytes>();
-        public readonly NetworkVariable<FixedString32Bytes> EquippedLeftHand = new NetworkVariable<FixedString32Bytes>();
-        public readonly NetworkVariable<FixedString32Bytes> EquippedRightHand = new NetworkVariable<FixedString32Bytes>();
+        private readonly NetworkVariable<FixedString32Bytes> EquippedLeftHand = new NetworkVariable<FixedString32Bytes>();
+        private readonly NetworkVariable<FixedString32Bytes> EquippedRightHand = new NetworkVariable<FixedString32Bytes>();
         private readonly NetworkVariable<FixedString32Bytes> EquippedLeftRing = new NetworkVariable<FixedString32Bytes>();
         private readonly NetworkVariable<FixedString32Bytes> EquippedRightRing = new NetworkVariable<FixedString32Bytes>();
         private readonly NetworkVariable<FixedString32Bytes> EquippedBelt = new NetworkVariable<FixedString32Bytes>();
@@ -425,18 +425,21 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             return _variableToSlotNameMapping[variable];
         }
 
-        public ItemBase GetItemInSlot(SlotGameObjectName slotName)
+        public string GetItemIdInSlot(SlotGameObjectName slotGameObjectName)
         {
-            return GetItemWithId<ItemBase>(
-                GetVariableFromSlotName(slotName).Value.ToString(),
-                false);
+            return GetVariableFromSlotName(slotGameObjectName).Value.ToString();
+        }
+
+        public ItemBase GetItemInSlot(SlotGameObjectName slotGameObjectName)
+        {
+            return GetItemWithId<ItemBase>(GetItemIdInSlot(slotGameObjectName), false);
         }
 
         public ItemBase GetItemInHand(bool isLeftHand)
         {
             var idInHand = isLeftHand
-                ? EquippedLeftHand.Value.ToString()
-                : EquippedRightHand.Value.ToString();
+                ? GetItemIdInSlot(SlotGameObjectName.LeftHand)
+                : GetItemIdInSlot(SlotGameObjectName.RightHand);
 
             if (idInHand.IsNullOrWhiteSpace())
             {
