@@ -9,15 +9,16 @@ using System;
 using System.Collections;
 using System.Linq;
 using FullPotential.Api.Combat;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.Ui;
+using FullPotential.Core.Networking;
 
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PossibleMultipleEnumeration
 // ReSharper disable ConvertToUsingDeclaration
+
 namespace FullPotential.Core.Behaviours.PlayerBehaviours
 {
     public class PlayerInventory : NetworkBehaviour, IDefensible
@@ -37,32 +38,17 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             Amulet
         }
 
-        // ReSharper disable InconsistentNaming
-        private readonly NetworkVariable<FixedString32Bytes> EquippedHelm = new NetworkVariable<FixedString32Bytes>();
-        private readonly NetworkVariable<FixedString32Bytes> EquippedChest = new NetworkVariable<FixedString32Bytes>();
-        private readonly NetworkVariable<FixedString32Bytes> EquippedLegs = new NetworkVariable<FixedString32Bytes>();
-        private readonly NetworkVariable<FixedString32Bytes> EquippedFeet = new NetworkVariable<FixedString32Bytes>();
-        private readonly NetworkVariable<FixedString32Bytes> EquippedBarrier = new NetworkVariable<FixedString32Bytes>();
-        private readonly NetworkVariable<FixedString32Bytes> EquippedLeftHand = new NetworkVariable<FixedString32Bytes>();
-        private readonly NetworkVariable<FixedString32Bytes> EquippedRightHand = new NetworkVariable<FixedString32Bytes>();
-        private readonly NetworkVariable<FixedString32Bytes> EquippedLeftRing = new NetworkVariable<FixedString32Bytes>();
-        private readonly NetworkVariable<FixedString32Bytes> EquippedRightRing = new NetworkVariable<FixedString32Bytes>();
-        private readonly NetworkVariable<FixedString32Bytes> EquippedBelt = new NetworkVariable<FixedString32Bytes>();
-        private readonly NetworkVariable<FixedString32Bytes> EquippedAmulet = new NetworkVariable<FixedString32Bytes>();
-        // ReSharper restore InconsistentNaming
-
+        // ReSharper disable once FieldCanBeMadeReadOnly.Local
+        // ReSharper disable once ConvertToConstant.Local
         [SerializeField] private float _amuletForwardMultiplier = 0.2f;
 
         private PlayerState _playerState;
         private Dictionary<string, ItemBase> _items;
-        private Dictionary<SlotGameObjectName, GameObject> _equippedObjects;
-        private Dictionary<NetworkVariable<FixedString32Bytes>, SlotGameObjectName> _variableToSlotNameMapping;
-        private Dictionary<SlotGameObjectName, NetworkVariable<FixedString32Bytes>> _slotNameToVariableMapping;
-        private int _slotCount;
+        private Dictionary<SlotGameObjectName, EquippedItem> _equippedItems;
         private int _armorSlotCount;
         private int _maxItems;
-        private bool _inventoryLoaded;
-        private ClientRpcParams _clientRpcParams;
+
+        private readonly FragmentedMessageReconstructor _inventoryChangesReconstructor = new FragmentedMessageReconstructor();
 
         #region Event Handlers
 
@@ -72,46 +58,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _playerState = GetComponent<PlayerState>();
 
             _items = new Dictionary<string, ItemBase>();
-            _equippedObjects = new Dictionary<SlotGameObjectName, GameObject>();
+            _equippedItems = new Dictionary<SlotGameObjectName, EquippedItem>();
 
-            SetupMappings();
-
-            _slotCount = Enum.GetNames(typeof(SlotGameObjectName)).Length;
             _armorSlotCount = Enum.GetNames(typeof(IGearArmor.ArmorCategory)).Length;
-
-            EquippedHelm.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedHelm, x, y);
-            EquippedChest.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedChest, x, y);
-            EquippedLegs.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedLegs, x, y);
-            EquippedFeet.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedFeet, x, y);
-            EquippedBarrier.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedBarrier, x, y);
-            EquippedLeftHand.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedLeftHand, x, y);
-            EquippedRightHand.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedRightHand, x, y);
-            EquippedLeftRing.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedLeftRing, x, y);
-            EquippedRightRing.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedRightRing, x, y);
-            EquippedBelt.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedBelt, x, y);
-            EquippedAmulet.OnValueChanged += (x, y) => OnEquippedValueChanged(EquippedAmulet, x, y);
-        }
-
-        // ReSharper disable once UnusedParameter.Local
-        private void OnEquippedValueChanged(
-            NetworkVariable<FixedString32Bytes> variable,
-            FixedString32Bytes previousValue,
-            FixedString32Bytes newValue)
-        {
-            if (!_inventoryLoaded)
-            {
-                return;
-            }
-
-            var slot = GetSlotNameFromVariable(variable);
-            SpawnEquippedObject(newValue.Value, slot);
-        }
-
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-
-            _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
         }
 
         #endregion
@@ -119,26 +68,112 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         #region ServerRpc calls
 
         [ServerRpc]
-        public void EquipItemServerRpc(string itemId, SlotGameObjectName slot, bool allowUnEquip)
+        public void EquipItemServerRpc(string itemId, SlotGameObjectName slotGameObjectName)
         {
-            EquipItem(itemId, slot, allowUnEquip);
+            var slotsToSend = new List<string> { slotGameObjectName.ToString() };
+
+            var item = _items[itemId];
+
+            var previousKvp = _equippedItems
+                .FirstOrDefault(x => x.Value.Item != null && x.Value?.Item.Id == item.Id);
+
+            var previouslyInSlot = previousKvp.Value != null ? (SlotGameObjectName?)previousKvp.Key : null;
+
+            if (!string.IsNullOrWhiteSpace(item.Id) && previouslyInSlot.HasValue)
+            {
+                if (previouslyInSlot.Value != slotGameObjectName)
+                {
+                    slotsToSend.Add(previouslyInSlot.Value.ToString());
+                }
+                _equippedItems[previouslyInSlot.Value].Item = null;
+            }
+
+            var wasEquipped = false;
+            if (!previouslyInSlot.HasValue || previouslyInSlot.Value != slotGameObjectName)
+            {
+                SetEquippedItem(item, slotGameObjectName);
+                wasEquipped = true;
+            }
 
             var saveData = GameManager.Instance.UserRegistry.PlayerData[_playerState.Username];
             saveData.Inventory = GetSaveData();
             saveData.IsDirty = true;
 
-            ResetEquipmentUiClientRpc(_clientRpcParams);
+            var invChange = new InventoryChanges
+            {
+                EquippedItems = saveData.Inventory.EquippedItems.Where(x => slotsToSend.Contains(x.Key)).ToArray()
+            };
+
+            if (wasEquipped)
+            {
+                PopulateInventoryChangesWithItem(invChange, item);
+            }
+
+            foreach (var message in FragmentedMessageReconstructor.GetFragmentedMessages(invChange))
+            {
+                ApplyEquipChangeClientRpc(message, RpcHelper.ForNearbyPlayers());
+            }
         }
 
         #endregion
 
         #region ClientRpc calls
 
-        [ClientRpc]
         // ReSharper disable once UnusedParameter.Local
-        private void ResetEquipmentUiClientRpc(ClientRpcParams clientRpcParams)
+        [ClientRpc]
+        private void ApplyEquipChangeClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams)
         {
-            StartCoroutine(ResetEquipmentUi());
+            var fragmentedMessage = JsonUtility.FromJson<FragmentedMessage>(fragmentedMessageJson);
+
+            _inventoryChangesReconstructor.AddMessage(fragmentedMessage);
+            if (!_inventoryChangesReconstructor.HaveAllMessages(fragmentedMessage.GroupId))
+            {
+                return;
+            }
+
+            var changes = JsonUtility.FromJson<InventoryChanges>(_inventoryChangesReconstructor.Reconstruct(fragmentedMessage.GroupId));
+
+            var equippedItem = Enumerable.Empty<ItemBase>()
+                .UnionIfNotNull(changes.Accessories)
+                .UnionIfNotNull(changes.Armor)
+                .UnionIfNotNull(changes.Spells)
+                .UnionIfNotNull(changes.Weapons)
+                .FirstOrDefault();
+
+            if (equippedItem != null && !_items.ContainsKey(equippedItem.Id))
+            {
+                FillTypesFromIds(equippedItem);
+                _items.Add(equippedItem.Id, equippedItem);
+            }
+
+            foreach (var sourceKvp in changes.EquippedItems)
+            {
+                var item = sourceKvp.Value.IsNullOrWhiteSpace() ? null : _items[sourceKvp.Value];
+                var slotGameObjectName = Enum.Parse<SlotGameObjectName>(sourceKvp.Key);
+
+                SetEquippedItem(item, slotGameObjectName);
+                SpawnEquippedObject(item, slotGameObjectName);
+            }
+
+            if (NetworkManager.LocalClientId == OwnerClientId)
+            {
+                StartCoroutine(ResetEquipmentUi());
+            }
+            else if (!IsServer)
+            {
+                var keysToRemove = new List<string>();
+                foreach (var kvp in _items)
+                {
+                    if (GetEquippedWithItemId(kvp.Key) == null)
+                    {
+                        keysToRemove.Add(kvp.Key);
+                    }
+                }
+                foreach (var key in keysToRemove)
+                {
+                    _items.Remove(key);
+                }
+            }
         }
 
         #endregion
@@ -154,6 +189,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 equipmentUi.ResetEquipmentUi(true);
             }
+        }
+
+        public void PopulateInventoryChangesWithItem(InventoryChanges invChanges, ItemBase item)
+        {
+            var itemType = item.GetType();
+            invChanges.Accessories = itemType == typeof(Accessory) ? new[] { item as Accessory } : null;
+            invChanges.Armor = itemType == typeof(Armor) ? new[] { item as Armor } : null;
+            invChanges.Spells = itemType == typeof(Spell) ? new[] { item as Spell } : null;
+            invChanges.Weapons = itemType == typeof(Weapon) ? new[] { item as Weapon } : null;
         }
 
         public IEnumerable<ItemBase> GetCompatibleItemsForSlot(IGear.GearCategory? gearCategory)
@@ -183,7 +227,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             foreach (SlotGameObjectName slotGameObjectName in Enum.GetValues(typeof(SlotGameObjectName)))
             {
-                var equippedItemId = GetVariableFromSlotName(slotGameObjectName).Value.ToString();
+                var equippedItemId = _equippedItems.ContainsKey(slotGameObjectName)
+                    ? _equippedItems[slotGameObjectName].Item?.Id
+                    : null;
 
                 if (equippedItemId.IsNullOrWhiteSpace())
                 {
@@ -198,11 +244,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
 
             return (int)Math.Floor((float)defenseSum / _armorSlotCount);
-        }
-
-        public int GetSlotCount()
-        {
-            return _slotCount;
         }
 
         public void ApplyInventoryChanges(InventoryChanges changes)
@@ -240,22 +281,23 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             switch (itemToAddCount)
             {
                 case 1:
-                    {
-                        var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemadded");
-                        _playerState.ShowAlertForItemsAddedToInventory(string.Format(alertText, itemsToAdd.First().Name));
-                        break;
-                    }
-                case > 1:
-                    {
-                        var alertText = GameManager.Instance.Localizer.Translate("ui.alert.itemsadded");
-                        _playerState.ShowAlertForItemsAddedToInventory(string.Format(alertText, itemToAddCount));
-                        break;
-                    }
+                    var alert1Text = GameManager.Instance.Localizer.Translate("ui.alert.itemadded");
+                    _playerState.ShowAlertForItemsAddedToInventory(string.Format(alert1Text,
+                        itemsToAdd.First().Name));
+                    break;
+
+                default:
+                    var alert2Text = GameManager.Instance.Localizer.Translate("ui.alert.itemsadded");
+                    _playerState.ShowAlertForItemsAddedToInventory(string.Format(alert2Text, itemToAddCount));
+                    break;
             }
 
-            var saveData = GameManager.Instance.UserRegistry.PlayerData[_playerState.Username];
-            saveData.Inventory = GetSaveData();
-            saveData.IsDirty = true;
+            if (IsServer)
+            {
+                var saveData = GameManager.Instance.UserRegistry.PlayerData[_playerState.Username];
+                saveData.Inventory = GetSaveData();
+                saveData.IsDirty = true;
+            }
         }
 
         public void LoadInventory(Inventory inventoryData)
@@ -277,18 +319,44 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 _items.Add(item.Id, item);
             }
 
-            if (IsServer)
+            if (inventoryData.EquippedItems != null)
             {
-                SetEquippedVariables(inventoryData.EquippedItems);
-            }
+                foreach (var kvp in inventoryData.EquippedItems)
+                {
+                    if (kvp.Value.IsNullOrWhiteSpace())
+                    {
+                        continue;
+                    }
 
-            foreach (SlotGameObjectName slotGameObjectName in Enum.GetValues(typeof(SlotGameObjectName)))
+                    if (!Enum.TryParse<SlotGameObjectName>(kvp.Key, out var slotGameObjectName))
+                    {
+                        Debug.LogError($"Failed to load slot data for {kvp.Key}");
+                    }
+
+                    var item = itemsToAdd.First(x => x.Id == kvp.Value);
+
+                    SetEquippedItem(item, slotGameObjectName);
+
+                    SpawnEquippedObject(item, slotGameObjectName);
+                }
+            }
+        }
+
+        private void SetEquippedItem(ItemBase item, SlotGameObjectName slotGameObjectName)
+        {
+            //todo: two-handed weapons take both hands
+
+            if (_equippedItems.ContainsKey(slotGameObjectName))
             {
-                var variable = GetVariableFromSlotName(slotGameObjectName);
-                SpawnEquippedObject(variable.Value.Value, slotGameObjectName);
+                _equippedItems[slotGameObjectName].Item = item;
             }
-
-            _inventoryLoaded = true;
+            else
+            {
+                _equippedItems.Add(slotGameObjectName, new EquippedItem
+                {
+                    Item = item
+                });
+            }
         }
 
         private static void FillTypesFromIds(ItemBase item)
@@ -316,34 +384,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
-        public NetworkVariable<FixedString32Bytes> GetVariableSetToItemId(string itemId)
-        {
-            return Enum.GetValues(typeof(SlotGameObjectName))
-                .Cast<SlotGameObjectName>()
-                .Select(GetVariableFromSlotName)
-                .FirstOrDefault(variable => variable.Value.ToString() == itemId);
-        }
-
-        //private IEnumerable<NetworkVariable<FixedString32Bytes>> GetVariablesSetToItemId(string itemId)
-        //{
-        //    return Enum.GetValues(typeof(SlotGameObjectName))
-        //        .Cast<SlotGameObjectName>()
-        //        .Select(GetVariableFromSlotName)
-        //        .Where(variable => variable.Value.ToString() == itemId);
-        //}
-
         private Inventory GetSaveData()
         {
-            var equippedItems = new List<Data.KeyValuePair<string, string>>();
-            for (var i = 0; i < _slotCount; i++)
-            {
-                var equippedItemId = GetVariableFromSlotName((SlotGameObjectName)i).Value.ToString();
-                if (!equippedItemId.IsNullOrWhiteSpace())
-                {
-                    var slotName = Enum.GetName(typeof(SlotGameObjectName), i);
-                    equippedItems.Add(new Data.KeyValuePair<string, string>(slotName, equippedItemId));
-                }
-            }
+            var equippedItems = _equippedItems
+                .Where(x => !(x.Value?.Item?.Id.IsNullOrWhiteSpace() ?? false))
+                .Select(x => new Data.KeyValuePair<string, string>(
+                    Enum.GetName(typeof(SlotGameObjectName), x.Key),
+                    x.Value.Item?.Id));
 
             var groupedItems = _items
                 .Select(x => x.Value)
@@ -382,71 +429,24 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             return castAsType;
         }
 
-        private void SetupMappings()
-        {
-            _slotNameToVariableMapping = new Dictionary<SlotGameObjectName, NetworkVariable<FixedString32Bytes>>
-            {
-                { SlotGameObjectName.Helm, EquippedHelm },
-                { SlotGameObjectName.Chest, EquippedChest },
-                { SlotGameObjectName.Legs, EquippedLegs },
-                { SlotGameObjectName.Feet, EquippedFeet },
-                { SlotGameObjectName.Barrier, EquippedBarrier },
-                { SlotGameObjectName.LeftHand, EquippedLeftHand },
-                { SlotGameObjectName.RightHand, EquippedRightHand },
-                { SlotGameObjectName.LeftRing, EquippedLeftRing },
-                { SlotGameObjectName.RightRing, EquippedRightRing },
-                { SlotGameObjectName.Belt, EquippedBelt },
-                { SlotGameObjectName.Amulet, EquippedAmulet }
-            };
-
-            _variableToSlotNameMapping = _slotNameToVariableMapping.ToDictionary(
-                kvp => kvp.Value,
-                kvp => kvp.Key
-                );
-        }
-
-        private NetworkVariable<FixedString32Bytes> GetVariableFromSlotName(SlotGameObjectName slotName)
-        {
-            if (!_slotNameToVariableMapping.ContainsKey(slotName))
-            {
-                throw new ArgumentException($"Unexpected slot name {slotName}");
-            }
-
-            return _slotNameToVariableMapping[slotName];
-        }
-
-        private SlotGameObjectName GetSlotNameFromVariable(NetworkVariable<FixedString32Bytes> variable)
-        {
-            if (!_variableToSlotNameMapping.ContainsKey(variable))
-            {
-                throw new ArgumentException($"Unexpected variable {variable}");
-            }
-
-            return _variableToSlotNameMapping[variable];
-        }
-
-        public string GetItemIdInSlot(SlotGameObjectName slotGameObjectName)
-        {
-            return GetVariableFromSlotName(slotGameObjectName).Value.ToString();
-        }
-
         public ItemBase GetItemInSlot(SlotGameObjectName slotGameObjectName)
         {
-            return GetItemWithId<ItemBase>(GetItemIdInSlot(slotGameObjectName), false);
+            return _equippedItems.ContainsKey(slotGameObjectName)
+                ? _equippedItems[slotGameObjectName].Item
+                : null;
         }
 
         public ItemBase GetItemInHand(bool isLeftHand)
         {
-            var idInHand = isLeftHand
-                ? GetItemIdInSlot(SlotGameObjectName.LeftHand)
-                : GetItemIdInSlot(SlotGameObjectName.RightHand);
+            return isLeftHand
+                ? GetItemInSlot(SlotGameObjectName.LeftHand)
+                : GetItemInSlot(SlotGameObjectName.RightHand);
+        }
 
-            if (idInHand.IsNullOrWhiteSpace())
-            {
-                return null;
-            }
-
-            return GetItemWithId<ItemBase>(idInHand, false);
+        public System.Collections.Generic.KeyValuePair<SlotGameObjectName, EquippedItem>? GetEquippedWithItemId(string itemId)
+        {
+            var match = _equippedItems.FirstOrDefault(x => x.Value?.Item?.Id == itemId);
+            return match.Value == null ? null : match;
         }
 
         public List<ItemBase> GetComponentsFromIds(string[] componentIds)
@@ -491,73 +491,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             return errors;
         }
 
-        private void SetEquippedVariables(Data.KeyValuePair<string, string>[] equippedItems)
-        {
-            if (!IsServer)
-            {
-                Debug.LogError("Cannot set equipped items on the client");
-                return;
-            }
-
-            if (equippedItems == null)
-            {
-                //Debug.LogWarning("No equipped items provided");
-                return;
-            }
-
-            foreach (var equippedItem in equippedItems)
-            {
-                if (equippedItem.Key.IsNullOrWhiteSpace())
-                {
-                    continue;
-                }
-
-                if (!Enum.TryParse<SlotGameObjectName>(equippedItem.Key, out var slotResult))
-                {
-                    Debug.LogError($"Failed to load slot data for {equippedItem.Key}");
-                }
-
-                GetVariableFromSlotName(slotResult).Value = equippedItem.Value;
-            }
-        }
-
-        private void EquipItem(string itemId, SlotGameObjectName slot, bool allowUnEquip)
-        {
-            if (!IsServer)
-            {
-                Debug.LogError("Cannot equip items on the client");
-                return;
-            }
-
-            var oldVariable = GetVariableSetToItemId(itemId);
-
-            if (!string.IsNullOrWhiteSpace(itemId) && allowUnEquip)
-            {
-
-                if (oldVariable != null)
-                {
-                    oldVariable.Value = string.Empty;
-                }
-            }
-
-            var newVariable = GetVariableFromSlotName(slot);
-
-            if (oldVariable != newVariable)
-            {
-                newVariable.Value = itemId.IsNullOrWhiteSpace()
-                    ? string.Empty
-                    : itemId;
-            }
-        }
-
         private void DespawnEquippedObject(SlotGameObjectName slotGameObjectName)
         {
-            if (!_equippedObjects.ContainsKey(slotGameObjectName))
+            if (!_equippedItems.ContainsKey(slotGameObjectName))
             {
                 return;
             }
 
-            var currentlyInGame = _equippedObjects[slotGameObjectName];
+            var currentlyInGame = _equippedItems[slotGameObjectName].GameObject;
 
             if (currentlyInGame == null)
             {
@@ -566,14 +507,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             currentlyInGame.name = "DESTROY" + currentlyInGame.name;
             Destroy(currentlyInGame);
-            _equippedObjects[slotGameObjectName] = null;
+            _equippedItems[slotGameObjectName].GameObject = null;
         }
 
-        private void SpawnEquippedObject(string itemId, SlotGameObjectName slotGameObjectName)
+        private void SpawnEquippedObject(ItemBase item, SlotGameObjectName slotGameObjectName)
         {
             DespawnEquippedObject(slotGameObjectName);
 
-            if (itemId.IsNullOrWhiteSpace())
+            if (item == null)
             {
                 if (IsOwner && IsClient)
                 {
@@ -589,8 +530,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return;
             }
 
-            var item = GetItemWithId<ItemBase>(itemId);
-
             switch (slotGameObjectName)
             {
                 case SlotGameObjectName.LeftHand:
@@ -599,19 +538,19 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     break;
 
                 case SlotGameObjectName.Amulet:
-                    InstantiateAccessory(item, _playerState.GraphicsTransform, manipulateTransform: t => t.position += t.forward * _amuletForwardMultiplier);
+                    InstantiateAccessory(slotGameObjectName, item, _playerState.GraphicsTransform, manipulateTransform: t => t.position += t.forward * _amuletForwardMultiplier);
                     break;
 
                 case SlotGameObjectName.Belt:
-                    InstantiateAccessory(item, _playerState.GraphicsTransform);
+                    InstantiateAccessory(slotGameObjectName, item, _playerState.GraphicsTransform);
                     break;
 
                 case SlotGameObjectName.LeftRing:
-                    InstantiateAccessory(item, _playerState.BodyParts.LeftArm, true);
+                    InstantiateAccessory(slotGameObjectName, item, _playerState.BodyParts.LeftArm, true);
                     break;
 
                 case SlotGameObjectName.RightRing:
-                    InstantiateAccessory(item, _playerState.BodyParts.RightArm, true);
+                    InstantiateAccessory(slotGameObjectName, item, _playerState.BodyParts.RightArm, true);
                     break;
 
                 default:
@@ -658,7 +597,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
                 default:
                     Debug.LogWarning($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name}");
-                    _equippedObjects[slotGameObjectName] = null;
+                    _equippedItems[slotGameObjectName].GameObject = null;
                     break;
             }
         }
@@ -681,10 +620,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 GameObjectHelper.SetGameLayerRecursive(newObj, _playerState.InFrontOfPlayer.layer);
             }
 
-            _equippedObjects[slotGameObjectName] = newObj;
+            _equippedItems[slotGameObjectName].GameObject = newObj;
         }
 
-        private void InstantiateAccessory(ItemBase item, Transform parentTransform, bool showsOnPlayerCamera = false, Action<Transform> manipulateTransform = null)
+        private void InstantiateAccessory(
+            SlotGameObjectName slotGameObjectName,
+            ItemBase item,
+            Transform parentTransform,
+            bool showsOnPlayerCamera = false,
+            Action<Transform> manipulateTransform = null)
         {
             var thisClient = NetworkManager.LocalClientId == OwnerClientId;
 
@@ -712,7 +656,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                         GameObjectHelper.SetGameLayerRecursive(newObj, LayerMask.NameToLayer(Constants.Layers.InFrontOfPlayer));
                     }
 
-                    _equippedObjects[SlotGameObjectName.Amulet] = newObj;
+                    _equippedItems[slotGameObjectName].GameObject = newObj;
                 });
         }
 

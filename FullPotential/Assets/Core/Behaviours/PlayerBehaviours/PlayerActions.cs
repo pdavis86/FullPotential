@@ -197,18 +197,18 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return;
             }
 
-            var isLeftHand = false;
-            if (_playerState.Inventory.GetItemIdInSlot(PlayerInventory.SlotGameObjectName.LeftHand) == itemId)
-            {
-                isLeftHand = true;
-            }
-            else if (_playerState.Inventory.GetItemIdInSlot(PlayerInventory.SlotGameObjectName.RightHand) != itemId)
+            var slotWithItem = _playerState.Inventory.GetEquippedWithItemId(itemId);
+            var itemInHand = slotWithItem?.Value?.Item;
+
+            if (!slotWithItem.HasValue
+                || (slotWithItem.Value.Key != PlayerInventory.SlotGameObjectName.LeftHand && slotWithItem.Value.Key != PlayerInventory.SlotGameObjectName.RightHand)
+                || itemInHand == null)
             {
                 Debug.LogWarning("Player tried to cheat by sending an non-equipped item ID");
                 return;
             }
 
-            var itemInHand = _playerState.Inventory.GetItemInHand(isLeftHand);
+            var isLeftHand = slotWithItem.Value.Key == PlayerInventory.SlotGameObjectName.LeftHand;
 
             if (itemInHand is Spell spellInHand)
             {
@@ -287,7 +287,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
-        // ReSharper disable once UnusedParameter.Global
         [ServerRpc]
         public void TryToInteractServerRpc(string gameObjectName, ServerRpcParams serverRpcParams = default)
         {
@@ -359,22 +358,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 craftedItem.Name = itemName;
             }
 
-            var craftedType = craftedItem.GetType();
+            var invChange = new InventoryChanges();
 
-            var invChange = new InventoryChanges
-            {
-                IdsToRemove = componentIdArray,
-                Accessories = craftedType == typeof(Accessory) ? new[] { craftedItem as Accessory } : null,
-                Armor = craftedType == typeof(Armor) ? new[] { craftedItem as Armor } : null,
-                Spells = craftedType == typeof(Spell) ? new[] { craftedItem as Spell } : null,
-                Weapons = craftedType == typeof(Weapon) ? new[] { craftedItem as Weapon } : null
-            };
+            _playerState.Inventory.PopulateInventoryChangesWithItem(invChange, craftedItem);
 
             ApplyInventoryChanges(invChange);
 
             if (OwnerClientId != 0)
             {
-                foreach (var message in MessageHelper.GetFragmentedMessages(invChange))
+                foreach (var message in FragmentedMessageReconstructor.GetFragmentedMessages(invChange))
                 {
                     ApplyInventoryChangesClientRpc(message, _clientRpcParams);
                 }
@@ -398,7 +390,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (OwnerClientId != 0)
             {
-                foreach (var message in MessageHelper.GetFragmentedMessages(invChange))
+                foreach (var message in FragmentedMessageReconstructor.GetFragmentedMessages(invChange))
                 {
                     ApplyInventoryChangesClientRpc(message, _clientRpcParams);
                 }

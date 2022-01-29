@@ -506,7 +506,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
-        //Need this to get over the key not found exception caused by too many RPC calls with large payloads
+        //NOTE: Need this to get over the key not found exception caused by too many RPC calls with large payloads
         private IEnumerator LoadFromPlayerDataCoroutine(PlayerData playerData, ulong clientId)
         {
             var clientRpcParams = new ClientRpcParams
@@ -516,7 +516,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             //Debug.LogError($"Sending LoadFromPlayerData messages to client {clientId}");
 
-            foreach (var message in MessageHelper.GetFragmentedMessages(playerData))
+            foreach (var message in FragmentedMessageReconstructor.GetFragmentedMessages(playerData))
             {
                 LoadPlayerDataClientRpc(message, clientRpcParams);
                 yield return null;

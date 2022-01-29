@@ -3,12 +3,34 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FullPotential.Core.Extensions;
+using UnityEngine;
 
 namespace FullPotential.Core.Networking
 {
     public class FragmentedMessageReconstructor
     {
         private readonly Dictionary<string, List<FragmentedMessage>> _messageGroups = new Dictionary<string, List<FragmentedMessage>>();
+
+        public static IEnumerable<string> GetFragmentedMessages(object payload, int chunkSize = 1000)
+        {
+            var json = JsonUtility.ToJson(payload);
+            var groupId = Guid.NewGuid().ToMinimisedString();
+            var groupStartDateTime = DateTime.UtcNow.ToString("u");
+            var fragmentCount = (int)Math.Ceiling((float)json.Length / 1000);
+
+            for (var i = 0; i < json.Length; i += chunkSize)
+            {
+                yield return JsonUtility.ToJson(new FragmentedMessage
+                {
+                    GroupId = groupId,
+                    GroupStartDateTime = groupStartDateTime,
+                    FragmentCount = fragmentCount,
+                    SequenceId = i,
+                    Payload = json.Substring(i, Math.Min(chunkSize, json.Length - i))
+                });
+            }
+        }
 
         private void ClearOldMessageGroups()
         {

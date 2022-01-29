@@ -42,7 +42,7 @@ namespace FullPotential.Core.Behaviours.Ui.Components
 
             foreach (var item in itemsForSlot)
             {
-                var isEquipped = !string.IsNullOrWhiteSpace(inventory.GetVariableSetToItemId(item.Id)?.Value.ToString());
+                var isEquipped = inventory.GetEquippedWithItemId(item.Id) != null;
 
                 if (isEquipped && !showEquippedItems)
                 {

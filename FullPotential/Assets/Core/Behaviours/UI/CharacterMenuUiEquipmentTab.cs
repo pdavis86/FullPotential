@@ -118,10 +118,10 @@ namespace FullPotential.Core.Behaviours.Ui
 
             if (reloadSlots)
             {
-                for (var i = 0; i < _playerState.Inventory.GetSlotCount(); i++)
+                foreach (PlayerInventory.SlotGameObjectName slotGameObjectName in Enum.GetValues(typeof(PlayerInventory.SlotGameObjectName)))
                 {
-                    var slotName = Enum.GetName(typeof(PlayerInventory.SlotGameObjectName), i);
-                    SetSlot(GetSlot(slotName), _playerState.Inventory.GetItemInSlot((PlayerInventory.SlotGameObjectName)i));
+                    var slotName = Enum.GetName(typeof(PlayerInventory.SlotGameObjectName), slotGameObjectName);
+                    SetSlot(GetSlot(slotName), _playerState.Inventory.GetItemInSlot(slotGameObjectName));
                 }
             }
         }
@@ -155,7 +155,7 @@ namespace FullPotential.Core.Behaviours.Ui
                     return;
                 }
 
-                _playerState.Inventory.EquipItemServerRpc(item.Id, slotResult, true);
+                _playerState.Inventory.EquipItemServerRpc(item.Id, slotResult);
             });
         }
 
