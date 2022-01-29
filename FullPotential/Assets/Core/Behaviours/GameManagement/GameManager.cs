@@ -90,8 +90,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            Instance.GameDataStore.PlayerData = new Dictionary<string, PlayerData>();
-            Instance.GameDataStore.ClientIdToUsername = new Dictionary<ulong, string>();
+            GameDataStore.ClientIdToUsername = new Dictionary<ulong, string>();
 
             EnsureAppOptionsLoaded();
 
@@ -104,7 +103,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
             Localizer = new Localizer();
             await Localizer.LoadAvailableCulturesAsync();
-            await Localizer.LoadLocalizationFilesAsync(Instance.AppOptions.Culture);
+            await Localizer.LoadLocalizationFilesAsync(AppOptions.Culture);
 
             ResultFactory = new ResultFactory(TypeRegistry, Localizer);
 
@@ -172,7 +171,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
         {
             if (NetworkManager.Singleton.IsServer)
             {
-                var playerUsername = Instance.GameDataStore.ClientIdToUsername[clientId];
+                var playerUsername = GameDataStore.ClientIdToUsername[clientId];
                 
                 if (playerUsername.IsNullOrWhiteSpace())
                 {
@@ -181,12 +180,12 @@ namespace FullPotential.Core.Behaviours.GameManagement
                 }
 
                 //Debug.Log($"Saving player data for '{playerUsername}' because they disconnected");
-                Instance.GameDataStore.PlayerData.Remove(playerUsername, out var playerDataToSave);
+                UserRegistry.PlayerData.Remove(playerUsername, out var playerDataToSave);
                 SavePlayerData(playerDataToSave);
             }
             else
             {
-                Instance.LocalGameDataStore.HasDisconnected = true;
+                LocalGameDataStore.HasDisconnected = true;
 
                 if (SceneManager.GetActiveScene().buildIndex != 1)
                 {
@@ -229,7 +228,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             MainCanvasObjects.DebuggingOverlay.SetActive(true);
 
             EnsureAppOptionsLoaded();
-            Instance.AppOptions.Culture = culture;
+            AppOptions.Culture = culture;
         }
 
         private static string GetAppOptionsPath()
@@ -239,7 +238,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         private void EnsureAppOptionsLoaded()
         {
-            if (!Instance.AppOptions.Culture.IsNullOrWhiteSpace())
+            if (!AppOptions.Culture.IsNullOrWhiteSpace())
             {
                 return;
             }
@@ -248,11 +247,11 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
             if (System.IO.File.Exists(path))
             {
-                Instance.AppOptions = JsonUtility.FromJson<AppOptions>(System.IO.File.ReadAllText(path));
+                AppOptions = JsonUtility.FromJson<AppOptions>(System.IO.File.ReadAllText(path));
                 return;
             }
 
-            Instance.AppOptions = new AppOptions
+            AppOptions = new AppOptions
             {
                 Culture = Localizer.DefaultCulture
             };
@@ -320,7 +319,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         private async Task SaveAllPlayerDataAsync()
         {
-            var tasks = GameDataStore.PlayerData
+            var tasks = UserRegistry.PlayerData
                 .Where(x => x.Value.InventoryLoadedSuccessfully && x.Value.IsDirty)
                 .Select(x => Task.Run(() => SavePlayerData(x.Value)));
 

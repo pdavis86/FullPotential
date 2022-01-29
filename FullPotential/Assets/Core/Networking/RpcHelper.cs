@@ -6,7 +6,6 @@ namespace FullPotential.Core.Networking
     {
         public static ClientRpcParams ForNearbyPlayers()
         {
-            //todo: implement
             return new ClientRpcParams();
         }
     }

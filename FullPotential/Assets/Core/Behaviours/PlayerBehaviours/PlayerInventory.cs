@@ -121,7 +121,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             EquipItem(itemId, slot, allowUnEquip);
 
-            var saveData = GameManager.Instance.GameDataStore.PlayerData[_playerState.Username];
+            var saveData = GameManager.Instance.UserRegistry.PlayerData[_playerState.Username];
             saveData.Inventory = GetSaveData();
             saveData.IsDirty = true;
 
@@ -251,7 +251,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     }
             }
 
-            var saveData = GameManager.Instance.GameDataStore.PlayerData[_playerState.Username];
+            var saveData = GameManager.Instance.UserRegistry.PlayerData[_playerState.Username];
             saveData.Inventory = GetSaveData();
             saveData.IsDirty = true;
         }

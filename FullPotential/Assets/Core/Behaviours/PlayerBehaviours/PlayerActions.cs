@@ -179,7 +179,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [ServerRpc]
         public void UpdatePlayerSettingsServerRpc(PlayerSettings playerSettings)
         {
-            var saveData = GameManager.Instance.GameDataStore.PlayerData[_playerState.Username];
+            var saveData = GameManager.Instance.UserRegistry.PlayerData[_playerState.Username];
             saveData.Options = playerSettings;
             saveData.IsDirty = true;
 

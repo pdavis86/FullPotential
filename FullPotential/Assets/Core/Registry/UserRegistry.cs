@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using FullPotential.Core.Data;
 using UnityEngine;
 
@@ -9,10 +10,14 @@ namespace FullPotential.Core.Registry
         private readonly bool _isDebugBuild;
         private readonly string _persistentDataPath;
 
+        public Dictionary<string, PlayerData> PlayerData { get; private set; }
+
         public UserRegistry()
         {
             _isDebugBuild = Debug.isDebugBuild;
             _persistentDataPath = Application.persistentDataPath;
+
+            PlayerData = new Dictionary<string, PlayerData>();
         }
 
         public string SignIn(string username, string password)

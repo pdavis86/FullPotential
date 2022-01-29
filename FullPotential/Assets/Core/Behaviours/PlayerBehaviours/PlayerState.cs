@@ -124,7 +124,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 GetAndLoadPlayerData(false, null);
 
                 //Debug.Log($"Adding client ID {OwnerClientId} with username '{Username}'");
-                GameManager.Instance.GameDataStore.ClientIdToUsername.Add(OwnerClientId, Username);
+                if (GameManager.Instance.GameDataStore.ClientIdToUsername.ContainsKey(OwnerClientId))
+                {
+                    GameManager.Instance.GameDataStore.ClientIdToUsername[OwnerClientId] = Username;
+                }
+                else
+                {
+                    GameManager.Instance.GameDataStore.ClientIdToUsername.Add(OwnerClientId, Username);
+                }
             }
             else if (IsOwner)
             {
@@ -470,23 +477,25 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
-        private void GetAndLoadPlayerData(bool reduced, ulong? clientId)
+        private void GetAndLoadPlayerData(bool reduced, ulong? sendToClientId)
         {
             //Debug.Log($"Loading player data for {OwnerClientId}, reduced: {reduced}");
 
             var playerData = GameManager.Instance.UserRegistry.Load(PlayerToken, null, reduced);
 
-            //todo: If it's still in memory, just pass that instead
-
-            if (clientId.HasValue)
+            if (sendToClientId.HasValue)
             {
-                //Don#'t send data to the server. It already has it loaded
-                if (clientId.Value == 0) { return; }
+                //Don't send data to the server. It already has it loaded
+                if (sendToClientId.Value == 0)
+                {
+                    return;
+                }
 
-                StartCoroutine(LoadFromPlayerDataCoroutine(playerData, clientId.Value));
+                StartCoroutine(LoadFromPlayerDataCoroutine(playerData, sendToClientId.Value));
             }
             else
             {
+                //Server loading player data from player state
                 LoadFromPlayerData(playerData);
                 TextureUrl.Value = playerData.Options.TextureUrl ?? string.Empty;
             }
@@ -584,14 +593,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 playerData.InventoryLoadedSuccessfully = false;
             }
 
-            if (GameManager.Instance.GameDataStore.PlayerData.ContainsKey(playerData.Username))
+            if (GameManager.Instance.UserRegistry.PlayerData.ContainsKey(playerData.Username))
             {
                 Debug.LogWarning($"Overwriting player data for username '{playerData.Username}'");
-                GameManager.Instance.GameDataStore.PlayerData[playerData.Username] = playerData;
+                GameManager.Instance.UserRegistry.PlayerData[playerData.Username] = playerData;
             }
             else
             {
-                GameManager.Instance.GameDataStore.PlayerData.Add(playerData.Username, playerData);
+                GameManager.Instance.UserRegistry.PlayerData.Add(playerData.Username, playerData);
             }
         }
 
@@ -658,19 +667,28 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 }
             }
 
+            Material newMat;
+
             if (filePath == null || !System.IO.File.Exists(filePath))
             {
                 Debug.LogWarning("Not applying player texture because the file does not exist");
-                yield break;
+
+                ColorUtility.TryParseHtmlString("#2ADB72", out var color);
+                newMat = new Material(_meshes.BodyMesh.material.shader)
+                {
+                    color = color
+                };
             }
-
-            var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
-            tex.LoadImage(System.IO.File.ReadAllBytes(filePath));
-
-            var newMat = new Material(_meshes.BodyMesh.material.shader)
+            else
             {
-                mainTexture = tex
-            };
+                var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
+                tex.LoadImage(System.IO.File.ReadAllBytes(filePath));
+
+                newMat = new Material(_meshes.BodyMesh.material.shader)
+                {
+                    mainTexture = tex
+                };
+            }
 
             ApplyMaterial(newMat);
         }
