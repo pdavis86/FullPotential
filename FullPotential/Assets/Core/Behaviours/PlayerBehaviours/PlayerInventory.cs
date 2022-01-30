@@ -72,19 +72,20 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             var slotsToSend = new List<string> { slotGameObjectName.ToString() };
 
-            var item = _items[itemId];
-
             var previousKvp = _equippedItems
-                .FirstOrDefault(x => x.Value.Item != null && x.Value?.Item.Id == item.Id);
+                .FirstOrDefault(x => x.Value.Item != null && x.Value?.Item.Id == itemId);
 
             var previouslyInSlot = previousKvp.Value != null ? (SlotGameObjectName?)previousKvp.Key : null;
 
-            if (!string.IsNullOrWhiteSpace(item.Id) && previouslyInSlot.HasValue)
+            var item = _items[itemId];
+
+            if (!string.IsNullOrWhiteSpace(itemId) && previouslyInSlot.HasValue)
             {
                 if (previouslyInSlot.Value != slotGameObjectName)
                 {
                     slotsToSend.Add(previouslyInSlot.Value.ToString());
                 }
+
                 _equippedItems[previouslyInSlot.Value].Item = null;
             }
 
@@ -93,6 +94,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 SetEquippedItem(item, slotGameObjectName);
                 wasEquipped = true;
+            }
+
+            if (item is Weapon weapon && weapon.IsTwoHanded)
+            {
+                var otherSlot = slotGameObjectName == SlotGameObjectName.LeftHand
+                    ? SlotGameObjectName.RightHand
+                    : SlotGameObjectName.LeftHand;
+                SetEquippedItem(null, otherSlot);
             }
 
             var saveData = GameManager.Instance.UserRegistry.PlayerData[_playerState.Username];
@@ -344,8 +353,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void SetEquippedItem(ItemBase item, SlotGameObjectName slotGameObjectName)
         {
-            //todo: two-handed weapons take both hands
-
             if (_equippedItems.ContainsKey(slotGameObjectName))
             {
                 _equippedItems[slotGameObjectName].Item = item;

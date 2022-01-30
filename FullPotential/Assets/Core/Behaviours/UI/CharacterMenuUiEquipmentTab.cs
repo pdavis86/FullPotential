@@ -5,6 +5,7 @@ using FullPotential.Core.Behaviours.Ui.Components;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
 using FullPotential.Core.Extensions;
 using FullPotential.Core.Registry.Base;
+using FullPotential.Core.Registry.Types;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -92,7 +93,7 @@ namespace FullPotential.Core.Behaviours.Ui
             }
         }
 
-        private GameObject GetSlot(string slotName)
+        private GameObject GetSlotGameObject(string slotName)
         {
             var leftAttempt = _lhs.transform.Find(slotName);
             if (leftAttempt != null)
@@ -121,7 +122,17 @@ namespace FullPotential.Core.Behaviours.Ui
                 foreach (PlayerInventory.SlotGameObjectName slotGameObjectName in Enum.GetValues(typeof(PlayerInventory.SlotGameObjectName)))
                 {
                     var slotName = Enum.GetName(typeof(PlayerInventory.SlotGameObjectName), slotGameObjectName);
-                    SetSlot(GetSlot(slotName), _playerState.Inventory.GetItemInSlot(slotGameObjectName));
+                    var item = _playerState.Inventory.GetItemInSlot(slotGameObjectName);
+
+                    SetSlot(GetSlotGameObject(slotName), item);
+
+                    if (item is Weapon weapon && weapon.IsTwoHanded)
+                    {
+                        var otherSlotName = slotGameObjectName == PlayerInventory.SlotGameObjectName.LeftHand
+                            ? PlayerInventory.SlotGameObjectName.RightHand.ToString()
+                            : PlayerInventory.SlotGameObjectName.LeftHand.ToString();
+                        SetSlot(GetSlotGameObject(otherSlotName), null);
+                    }
                 }
             }
         }
