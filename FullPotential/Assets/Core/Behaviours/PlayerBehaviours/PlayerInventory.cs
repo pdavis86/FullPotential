@@ -96,12 +96,26 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 wasEquipped = true;
             }
 
-            if (item is Weapon weapon && weapon.IsTwoHanded)
+            if (slotGameObjectName == SlotGameObjectName.LeftHand || slotGameObjectName == SlotGameObjectName.RightHand)
             {
-                var otherSlot = slotGameObjectName == SlotGameObjectName.LeftHand
+                var otherHandSlot = slotGameObjectName == SlotGameObjectName.LeftHand
                     ? SlotGameObjectName.RightHand
                     : SlotGameObjectName.LeftHand;
-                SetEquippedItem(null, otherSlot);
+
+                if (item is Weapon weapon && weapon.IsTwoHanded)
+                {
+                    SetEquippedItem(null, otherHandSlot);
+                    slotsToSend.Add(otherHandSlot.ToString());
+                }
+                else
+                {
+                    var itemInOtherHand = GetItemInSlot(otherHandSlot);
+                    if (itemInOtherHand is Weapon otherWeapon && otherWeapon.IsTwoHanded)
+                    {
+                        SetEquippedItem(null, otherHandSlot);
+                        slotsToSend.Add(otherHandSlot.ToString());
+                    }
+                }
             }
 
             var saveData = GameManager.Instance.UserRegistry.PlayerData[_playerState.Username];
