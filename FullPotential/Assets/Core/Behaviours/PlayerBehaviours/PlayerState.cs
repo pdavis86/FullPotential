@@ -184,8 +184,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
-                MainCanvasObjects.Instance.Respawn.SetActive(false);
-                MainCanvasObjects.Instance.Hud.SetActive(true);
+                GameManager.Instance.MainCanvasObjects.Respawn.SetActive(false);
+                GameManager.Instance.MainCanvasObjects.Hud.SetActive(true);
             }
 
             QueueAliveStateChanges();
@@ -441,7 +441,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 if (NetworkManager.LocalClientId == OwnerClientId)
                 {
-                    MainCanvasObjects.Instance.Hud.SetActive(isAlive);
+                    GameManager.Instance.MainCanvasObjects.Hud.SetActive(isAlive);
                 }
             });
 
@@ -449,7 +449,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 if (NetworkManager.LocalClientId == OwnerClientId)
                 {
-                    MainCanvasObjects.Instance.Respawn.SetActive(!isAlive);
+                    GameManager.Instance.MainCanvasObjects.Respawn.SetActive(!isAlive);
                 }
             });
         }

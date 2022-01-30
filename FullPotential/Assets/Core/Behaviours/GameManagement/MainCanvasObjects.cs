@@ -30,11 +30,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         private List<GameObject> _menus;
 
-        // ReSharper disable once ArrangeAccessorOwnerBody
         private static MainCanvasObjects _instance;
-        public static MainCanvasObjects Instance { get { return _instance; } }
-
-        //todo: remove Instance in favour of GameManager.Instance.MainCanvasObjects?
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
