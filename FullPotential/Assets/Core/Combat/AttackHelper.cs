@@ -1,17 +1,17 @@
-﻿using FullPotential.Core.Constants;
-using FullPotential.Core.Registry.Base;
-using Unity.Netcode;
-using System;
+﻿using System;
 using System.Globalization;
 using FullPotential.Api.Combat;
 using FullPotential.Api.Enums;
-using UnityEngine;
-using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Behaviours.GameManagement;
+using FullPotential.Core.Behaviours.PlayerBehaviours;
+using FullPotential.Core.Constants;
 using FullPotential.Core.Extensions;
+using FullPotential.Core.Registry.Base;
 using FullPotential.Standard.Enemies.Behaviours;
+using Unity.Netcode;
+using UnityEngine;
 
-namespace FullPotential.Core.Helpers
+namespace FullPotential.Core.Combat
 {
     public static class AttackHelper
     {

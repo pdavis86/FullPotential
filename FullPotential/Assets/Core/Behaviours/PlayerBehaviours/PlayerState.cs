@@ -11,6 +11,7 @@ using FullPotential.Api.Enums;
 using FullPotential.Core.Behaviours.Environment;
 using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Behaviours.UI.Components;
+using FullPotential.Core.Combat;
 using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
 using FullPotential.Core.Utilities;

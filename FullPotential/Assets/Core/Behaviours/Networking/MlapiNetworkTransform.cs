@@ -238,7 +238,7 @@ namespace FullPotential.Core.Behaviours.Networking
             if (IsMoveValidDelegate != null && !IsMoveValidDelegate(rpcParams.Receive.SenderClientId, m_LerpEndPos, position))
             {
                 //Invalid move!
-                //TODO: Add rubber band (just a message telling them to go back)
+                //Add rubber band (just a message telling them to go back)
                 return;
             }
 

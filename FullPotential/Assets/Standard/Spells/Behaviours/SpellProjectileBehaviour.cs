@@ -1,9 +1,9 @@
 ﻿using System;
 using FullPotential.Api.Spells;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
+using FullPotential.Core.Combat;
 using FullPotential.Core.Constants;
 using FullPotential.Core.Extensions;
-using FullPotential.Core.Helpers;
 using FullPotential.Core.Registry.Types;
 using FullPotential.Standard.Spells.Shapes;
 using Unity.Netcode;

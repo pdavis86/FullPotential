@@ -8,6 +8,7 @@ using System.Linq;
 using FullPotential.Api.Enums;
 using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
+using FullPotential.Core.Combat;
 using FullPotential.Core.Extensions;
 using FullPotential.Standard.Spells.Targeting;
 using TMPro;

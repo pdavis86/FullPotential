@@ -4,7 +4,7 @@ using FullPotential.Api.Enums;
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Behaviours.UI.Components;
-using FullPotential.Core.Helpers;
+using FullPotential.Core.Combat;
 using FullPotential.Core.Networking;
 using TMPro;
 using Unity.Collections;
