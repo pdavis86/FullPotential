@@ -31,16 +31,6 @@ namespace FullPotential.Core.Behaviours.Ui
             alert.transform.Find("Text").GetComponent<Text>().text = alertText;
         }
 
-        public void UpdateLeftHand(string contents)
-        {
-            _equippedLeftHand.GetComponent<EquippedSummary>().SetContents(contents);
-        }
-
-        public void UpdateRightHand(string contents)
-        {
-            _equippedRightHand.GetComponent<EquippedSummary>().SetContents(contents);
-        }
-
         public void UpdateHand(string contents, bool isLeft)
         {
             if (isLeft)
@@ -75,6 +65,28 @@ namespace FullPotential.Core.Behaviours.Ui
         //{
         //    _barrierSlider.value = value;
         //}
+
+        public void ToggleCursorCapture(bool isOn)
+        {
+            var newAlpha = isOn ? 1 : 0.5f;
+
+            var leftImage = _equippedLeftHand.GetComponent<Image>();
+            leftImage.color = ChangeColorAlpha(leftImage.color, newAlpha);
+
+            var leftText = _equippedLeftHand.transform.GetChild(0).GetComponent<Text>();
+            leftText.color = ChangeColorAlpha(leftText.color, newAlpha);
+
+            var rightImage = _equippedRightHand.GetComponent<Image>();
+            rightImage.color = ChangeColorAlpha(leftImage.color, newAlpha);
+
+            var rightText = _equippedRightHand.transform.GetChild(0).GetComponent<Text>();
+            rightText.color = ChangeColorAlpha(leftText.color, newAlpha);
+        }
+
+        private Color ChangeColorAlpha(Color originalColor, float alpha)
+        {
+            return new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
+        }
 
     }
 }

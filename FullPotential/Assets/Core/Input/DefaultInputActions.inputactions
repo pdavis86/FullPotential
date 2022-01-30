@@ -103,6 +103,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ShowCursorStart",
+                    "type": "Button",
+                    "id": "004e0517-c6bc-454f-bf81-fb2ca264fe5b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ShowCursorStop",
+                    "type": "Button",
+                    "id": "dc0f2407-36f9-44eb-bd2c-f488d938c055",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -268,6 +286,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "SprintStop",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1a94b1b7-7f27-4f2b-a556-5ec24ed85d1d",
+                    "path": "<Keyboard>/alt",
+                    "interactions": "Press(pressPoint=0.2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ShowCursorStart",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6f444393-f47b-4ef7-8f11-6771cd4983a7",
+                    "path": "<Keyboard>/alt",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ShowCursorStop",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

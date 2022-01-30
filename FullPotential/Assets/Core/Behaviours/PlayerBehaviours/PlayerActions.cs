@@ -94,6 +94,43 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         // ReSharper disable once UnusedMember.Local
+        private void Update()
+        {
+            CheckForInteractable();
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void FixedUpdate()
+        {
+            UpdateMenuStates();
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnDisable()
+        {
+            if (!IsOwner)
+            {
+                return;
+            }
+
+            Cursor.lockState = CursorLockMode.None;
+
+            if (_mainCanvasObjects?.Hud != null)
+            {
+                _mainCanvasObjects.Hud.SetActive(false);
+            }
+
+            if (_sceneCamera != null)
+            {
+                _sceneCamera.gameObject.SetActive(true);
+            }
+        }
+
+        #endregion
+
+        #region Input Event Handlers
+
+        // ReSharper disable once UnusedMember.Local
         private void OnInteract()
         {
             if (_hasMenuOpen)
@@ -141,36 +178,22 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void Update()
+        private void OnShowCursorStart()
         {
-            CheckForInteractable();
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void FixedUpdate()
-        {
-            UpdateMenuStates();
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void OnDisable()
-        {
-            if (!IsOwner)
+            if (_hasMenuOpen)
             {
                 return;
             }
 
-            Cursor.lockState = CursorLockMode.None;
+            GameManager.Instance.MainCanvasObjects.DrawingPad.SetActive(true);
+            GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ToggleCursorCapture(true);
+        }
 
-            if (_mainCanvasObjects?.Hud != null)
-            {
-                _mainCanvasObjects.Hud.SetActive(false);
-            }
-
-            if (_sceneCamera != null)
-            {
-                _sceneCamera.gameObject.SetActive(true);
-            }
+        // ReSharper disable once UnusedMember.Local
+        private void OnShowCursorStop()
+        {
+            GameManager.Instance.MainCanvasObjects.DrawingPad.SetActive(false);
+            GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ToggleCursorCapture(false);
         }
 
         #endregion

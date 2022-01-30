@@ -26,11 +26,15 @@ namespace FullPotential.Core.Behaviours.GameManagement
         public GameObject EscMenu;
         public GameObject CharacterMenu;
         public GameObject SettingsUi;
+        public GameObject DrawingPad;
+
         private List<GameObject> _menus;
 
         // ReSharper disable once ArrangeAccessorOwnerBody
         private static MainCanvasObjects _instance;
         public static MainCanvasObjects Instance { get { return _instance; } }
+
+        //todo: remove Instance in favour of GameManager.Instance.MainCanvasObjects?
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -47,12 +51,13 @@ namespace FullPotential.Core.Behaviours.GameManagement
             TooltipOverlay.SetActive(true);
 
             //NOTE: Be sure to add any new menus!
-            _menus = new List<GameObject>();
-            _menus.AddRange(new[] {
-            EscMenu,
-            CharacterMenu,
-            SettingsUi
-        });
+            _menus = new List<GameObject>
+            {
+                EscMenu,
+                CharacterMenu,
+                SettingsUi,
+                DrawingPad
+            };
         }
 
         public void HideAllMenus()
