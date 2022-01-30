@@ -96,9 +96,11 @@ namespace FullPotential.Standard.Spells.Behaviours
                 }
             }
 
-            //Vector3 endPosition;
+            var playerCameraTransform = _sourcePlayerState.PlayerCamera.transform;
+
+            Vector3 targetDirection;
             float beamLength;
-            if (Physics.Raycast(transform.position, transform.forward, out var hit, maxBeamLength))
+            if (Physics.Raycast(playerCameraTransform.position, playerCameraTransform.forward, out var hit, maxBeamLength))
             {
                 if (hit.transform.gameObject == _sourcePlayer)
                 {
@@ -115,17 +117,16 @@ namespace FullPotential.Standard.Spells.Behaviours
                     _applyEffectsAction.TryPerformAction();
                 }
 
-                //endPosition = hit.point;
-                beamLength = hit.distance;
+                targetDirection = (hit.point - _cylinderParentTransform.position).normalized;
+                beamLength = Vector3.Distance(_cylinderParentTransform.position, hit.point);
             }
             else
             {
-                //endPosition = transform.position + (transform.forward * maxBeamLength / 2);
+                targetDirection = playerCameraTransform.forward;
                 beamLength = maxBeamLength;
             }
 
-            //Debug.DrawLine(transform.position, endPosition, Color.cyan);
-            //Debug.DrawRay(transform.position, transform.forward, Color.cyan);
+            _cylinderParentTransform.rotation = Quaternion.LookRotation(targetDirection);
 
             if (!Mathf.Approximately(_cylinderTransform.localScale.y * 2, beamLength))
             {
@@ -143,7 +144,7 @@ namespace FullPotential.Standard.Spells.Behaviours
         {
             base.OnDestroy();
 
-            Destroy(_cylinderTransform.gameObject);
+            Destroy(_cylinderParentTransform.gameObject);
         }
 
         private void PerformGraphicsAdjustments(PlayerState playerState)
