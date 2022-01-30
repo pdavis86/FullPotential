@@ -155,7 +155,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _consumeStamina = new DelayedAction(.05f, () =>
             {
                 var staminaCost = GetStaminaCost();
-                if (_isSprinting && Stamina.Value > staminaCost)
+                if (_isSprinting && Stamina.Value >= staminaCost)
                 {
                     Stamina.Value -= staminaCost;
                 }
