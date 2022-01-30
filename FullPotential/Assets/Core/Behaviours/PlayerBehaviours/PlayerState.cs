@@ -182,8 +182,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 }
             });
 
-            MainCanvasObjects.Instance.Respawn.SetActive(false);
-            MainCanvasObjects.Instance.Hud.SetActive(true);
+            if (NetworkManager.LocalClientId == OwnerClientId)
+            {
+                MainCanvasObjects.Instance.Respawn.SetActive(false);
+                MainCanvasObjects.Instance.Hud.SetActive(true);
+            }
 
             QueueAliveStateChanges();
         }
@@ -434,9 +437,21 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             _aliveStateChanges.Queue(isAlive => GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.SceneCamera).SetActive(!isAlive));
 
-            _aliveStateChanges.Queue(isAlive => MainCanvasObjects.Instance.Hud.SetActive(isAlive));
+            _aliveStateChanges.Queue(isAlive =>
+            {
+                if (NetworkManager.LocalClientId == OwnerClientId)
+                {
+                    MainCanvasObjects.Instance.Hud.SetActive(isAlive);
+                }
+            });
 
-            _aliveStateChanges.Queue(isAlive => MainCanvasObjects.Instance.Respawn.SetActive(!isAlive));
+            _aliveStateChanges.Queue(isAlive =>
+            {
+                if (NetworkManager.LocalClientId == OwnerClientId)
+                {
+                    MainCanvasObjects.Instance.Respawn.SetActive(!isAlive);
+                }
+            });
         }
 
         private Hud GetHud()
