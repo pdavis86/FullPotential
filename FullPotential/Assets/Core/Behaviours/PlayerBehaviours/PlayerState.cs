@@ -193,6 +193,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public void FixedUpdate()
         {
+            _head.transform.rotation = PlayerCamera.transform.rotation;
+
             HandleSprinting();
             Replenish();
             BecomeVulnerable();
@@ -248,11 +250,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         [ServerRpc]
-        public void UpdatePositionsAndRotationsServerRpc(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation, bool isSprinting)
+        public void UpdateSprintingServerRpc(bool isSprinting)
         {
-            //todo: This does not stop players cheating their position. That's a problem for another day. Also sends data to ALL clients
-            UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation, isSprinting);
-            UpdatePositionsAndRotationsClientRpc(rbPosition, rbRotation, rbVelocity, cameraRotation, isSprinting, new ClientRpcParams());
+            _isSprinting = isSprinting;
         }
 
         [ServerRpc]
@@ -305,16 +305,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             SetName();
 
             StartCoroutine(SetTexture());
-        }
-
-        // ReSharper disable once UnusedParameter.Global
-        [ClientRpc]
-        public void UpdatePositionsAndRotationsClientRpc(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion cameraRotation, bool isSprinting, ClientRpcParams clientRpcParams)
-        {
-            if (!IsOwner)
-            {
-                UpdatePositionsAndRotations(rbPosition, rbRotation, rbVelocity, cameraRotation, isSprinting);
-            }
         }
 
         // ReSharper disable once UnusedParameter.Global
@@ -372,8 +362,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     GraphicsTransform.gameObject.SetActive(true);
                     _rb.isKinematic = false;
 
-                    position.y += _myHeight / 2;
-                    UpdatePositionsAndRotations(position, rotation, Vector3.zero, null, false);
+                    //Don't halve it as object can still end up in the floor
+                    position.y += _myHeight / 1.5f;
 
                     _startingPosition = position;
 
@@ -542,26 +532,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 LoadPlayerDataClientRpc(message, clientRpcParams);
                 yield return null;
-            }
-        }
-
-        private void UpdatePositionsAndRotations(Vector3 rbPosition, Quaternion rbRotation, Vector3 rbVelocity, Quaternion? cameraRotation, bool isSprinting)
-        {
-            transform.position = rbPosition;
-            _rb.rotation = rbRotation;
-            _rb.velocity = rbVelocity;
-
-            _isSprinting = isSprinting;
-
-            if (cameraRotation.HasValue)
-            {
-                PlayerCamera.transform.rotation = cameraRotation.Value;
-                _head.transform.rotation = cameraRotation.Value;
-            }
-            else
-            {
-                PlayerCamera.transform.localEulerAngles = Vector3.zero;
-                _head.transform.localEulerAngles = Vector3.zero;
             }
         }
 

@@ -768,6 +768,7 @@ GameObject:
   - component: {fileID: 7392779647204144591}
   - component: {fileID: 7392779647204144589}
   - component: {fileID: 7392779647204144588}
+  - component: {fileID: 5122951721460891857}
   m_Layer: 0
   m_Name: PlayerCamera
   m_TagString: MainCamera
@@ -843,6 +844,33 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7392779647204144590}
   m_Enabled: 1
+--- !u!114 &5122951721460891857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7392779647204144590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b20b0fbc6bfc0634e95ef2ec63f1e0e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 0
+  SyncPositionY: 0
+  SyncPositionZ: 0
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  InLocalSpace: 0
+  Interpolate: 1
+  CanCommitToTransform: 1
 --- !u!1 &7392779647605690763
 GameObject:
   m_ObjectHideFlags: 0
@@ -944,6 +972,7 @@ GameObject:
   - component: {fileID: 7867810801410850028}
   - component: {fileID: 4700276935100274849}
   - component: {fileID: 2266218230932236417}
+  - component: {fileID: 5352146515166107319}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1155,6 +1184,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pingIntervalSeconds: 0.1
+--- !u!114 &5352146515166107319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7392779647718654627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b20b0fbc6bfc0634e95ef2ec63f1e0e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  InLocalSpace: 0
+  Interpolate: 1
+  CanCommitToTransform: 1
 --- !u!1 &7392779647843419169
 GameObject:
   m_ObjectHideFlags: 0

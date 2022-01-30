@@ -37,7 +37,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private float _maxDistanceToBeStanding;
         private bool _isJumping;
         private bool _isSprinting;
-        //private DelayedAction _sendMovementToServer;
+        private bool _wasSprinting;
 
         #region Event Handlers 
 
@@ -53,11 +53,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
 
             _maxDistanceToBeStanding = gameObject.GetComponent<Collider>().bounds.extents.y + 0.1f;
-
-            //_sendMovementToServer = new DelayedAction(.1f, () =>
-            //{
-            //    _playerState.UpdatePositionsAndRotationsServerRpc(_rb.position, _rb.rotation, _rb.velocity, _playerCamera.transform.rotation, _isSprinting);
-            //});
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -95,7 +90,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (_playerState.Stamina.Value >= _playerState.GetStaminaCost())
             {
-                //Debug.Log("Sprinting");
                 _isSprinting = true;
             }
         }
@@ -103,7 +97,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         // ReSharper disable once UnusedMember.Local
         private void OnSprintStop()
         {
-            //Debug.Log("Stopping");
             _isSprinting = false;
         }
 
@@ -163,7 +156,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 if (IsOnSolidObject())
                 {
-                    //Debug.Log("Resetting _isJumping to false");
                     _isJumping = false;
                 }
             }
@@ -171,19 +163,17 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 if (IsOnSolidObject())
                 {
-                    //Debug.Log("Jumping!");
                     _isJumping = true;
                     _rb.AddForce(_jumpForce * Time.fixedDeltaTime, ForceMode.Acceleration);
                     _jumpForce = Vector3.zero;
                 }
             }
 
-            if (_moveVal != Vector2.zero || _lookVal != Vector2.zero || _rb.velocity != Vector3.zero)
+            if (_wasSprinting != _isSprinting)
             {
-                //todo: try the FullPotential.Core.Behaviours.Networking behaviours instead
-
-                _playerState.UpdatePositionsAndRotationsServerRpc(_rb.position, _rb.rotation, _rb.velocity, _playerCamera.transform.rotation, _isSprinting);
-                //_sendMovementToServer.TryPerformAction();
+                Debug.Log($"_wasSprinting: {_wasSprinting}, _isSprinting: {_isSprinting}");
+                _playerState.UpdateSprintingServerRpc(_isSprinting);
+                _wasSprinting = _isSprinting;
             }
         }
 
