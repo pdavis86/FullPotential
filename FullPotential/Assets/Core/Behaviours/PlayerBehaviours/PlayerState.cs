@@ -217,19 +217,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void OnHealthChanged(int previousValue, int newValue)
         {
-            var maxHealthValue = GetHealthMax();
-            var defenseValue = Inventory.GetDefenseValue();
-
-            if (!IsOwner)
-            {
-                var values = _healthSlider.GetHealthValues(newValue, maxHealthValue, defenseValue);
-                _healthSlider.SetValues(values);
-            }
-
-            if (NetworkManager.LocalClientId == OwnerClientId)
-            {
-                GetHud().UpdateHealthPercentage(newValue, maxHealthValue, defenseValue);
-            }
+            UpdateHealthAndDefenceValues();
         }
 
         private void OnManaChanged(int previousValue, int newValue)
@@ -405,6 +393,24 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         #endregion
+
+        public void UpdateHealthAndDefenceValues()
+        {
+            var health = GetHealth();
+            var maxHealth = GetHealthMax();
+            var defence = Inventory.GetDefenseValue();
+
+            if (!IsOwner)
+            {
+                var values = _healthSlider.GetHealthValues(health, maxHealth, defence);
+                _healthSlider.SetValues(values);
+            }
+
+            if (NetworkManager.LocalClientId == OwnerClientId)
+            {
+                GetHud().UpdateHealthPercentage(health, maxHealth, defence);
+            }
+        }
 
         private void QueueAliveStateChanges()
         {
@@ -608,6 +614,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 GameManager.Instance.UserRegistry.PlayerData.Add(playerData.Username, playerData);
             }
+
+            UpdateHealthAndDefenceValues();
         }
 
         private void SetName()

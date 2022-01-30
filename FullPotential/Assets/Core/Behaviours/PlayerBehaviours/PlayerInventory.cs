@@ -197,6 +197,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     _items.Remove(key);
                 }
             }
+
+            _playerState.UpdateHealthAndDefenceValues();
         }
 
         #endregion
