@@ -359,7 +359,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 craftedItem.Name = itemName;
             }
 
-            var invChange = new InventoryChanges();
+            var invChange = new InventoryChanges
+            {
+                IdsToRemove = componentIdArray
+            };
 
             _playerState.Inventory.PopulateInventoryChangesWithItem(invChange, craftedItem);
 
