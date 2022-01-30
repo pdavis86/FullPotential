@@ -118,7 +118,6 @@ namespace FullPotential.Standard.Enemies.Behaviours
             var deathMessage = AttackHelper.GetDeathMessage(false, name, killerName, itemName);
             GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc(deathMessage, RpcHelper.ForNearbyPlayers());
 
-            //todo: Use object pooling
             Destroy(gameObject);
 
             GameManager.Instance.SceneBehaviour.HandleEnemyDeath();

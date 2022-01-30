@@ -25,6 +25,14 @@ namespace FullPotential.Core.Behaviours.Ui
         private Dictionary<string, string> _cultures;
         private int _newCultureIndex = -1;
         private Resolution[] _availableResolutions;
+        
+        //Revert variables
+        private bool _isRevertRequired;
+        private Resolution _revertResolution;
+        private bool _revertFullScreen;
+        private float _revertFieldOfView;
+
+        #region Event handlers
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -41,29 +49,25 @@ namespace FullPotential.Core.Behaviours.Ui
 
             _languageDropDown.options.Clear();
             _languageDropDown.AddOptions(_cultures.Select(x => x.Value).ToList());
-
-            LoadFromUnitySettings();
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
-            var culture = GameManager.Instance.AppOptions.Culture;
-            int i;
-            for (i = 0; i < _cultures.Count; i++)
-            {
-                if (_cultures.ElementAt(i).Key == culture)
-                {
-                    break;
-                }
-            }
-            _languageDropDown.value = i;
+            LoadApplicationSettings();
+            LoadGameSettings();
+            LoadPlayerSettings();
 
-            var playerState = GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>();
-            _skinUrlInput.text = playerState.TextureUrl.Value.ToString();
-
-            _fovSlider.value = Camera.main.fieldOfView;
+            _isRevertRequired = true;
         }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnDisable()
+        {
+            RevertUnsavedSettings();
+        }
+
+        #endregion
 
         public void SetResolution(int index)
         {
@@ -103,6 +107,8 @@ namespace FullPotential.Core.Behaviours.Ui
 
             GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerActions>().UpdatePlayerSettingsServerRpc(playerSettings);
 
+            _isRevertRequired = false;
+
             GameManager.Instance.MainCanvasObjects.HideAllMenus();
         }
 
@@ -123,7 +129,7 @@ namespace FullPotential.Core.Behaviours.Ui
             return "4:3";
         }
 
-        private void LoadFromUnitySettings()
+        private void LoadApplicationSettings()
         {
             for (var i = 0; i < _availableResolutions.Length; i++)
             {
@@ -133,10 +139,49 @@ namespace FullPotential.Core.Behaviours.Ui
                 }
 
                 _resolutionDropDown.value = i;
+                _revertResolution = _availableResolutions[i];
                 break;
             }
 
+            _revertFullScreen = Screen.fullScreen;
             _fullscreenToggle.isOn = Screen.fullScreen;
+        }
+
+        private void LoadGameSettings()
+        {
+            _revertFieldOfView = Camera.main.fieldOfView;
+            _fovSlider.value = Camera.main.fieldOfView;
+
+            var culture = GameManager.Instance.AppOptions.Culture;
+            int i;
+            for (i = 0; i < _cultures.Count; i++)
+            {
+                if (_cultures.ElementAt(i).Key == culture)
+                {
+                    break;
+                }
+            }
+            _languageDropDown.value = i;
+        }
+
+        private void LoadPlayerSettings()
+        {
+            var playerState = GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>();
+            _skinUrlInput.text = playerState.TextureUrl.Value.ToString();
+        }
+
+        private void RevertUnsavedSettings()
+        {
+            if (!_isRevertRequired)
+            {
+                return;
+            }
+
+            //Application settings
+            Screen.SetResolution(_revertResolution.width, _revertResolution.height, _revertFullScreen);
+
+            //Game settings
+            Camera.main.fieldOfView = _revertFieldOfView;
         }
 
     }
