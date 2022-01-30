@@ -93,6 +93,26 @@ MonoBehaviour:
     m_Address: Standard/Prefabs/Accessories/Ring.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 0b81378bdaf52434a86f167552f4518c
+    m_Address: Standard/Prefabs/Armor/Barrier.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 68cd17b3ebf818b4d8ea85117ca6d428
+    m_Address: Standard/Prefabs/Armor/Chest.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 855f09f2c1d06d248ae93bcd33065e0f
+    m_Address: Standard/Prefabs/Armor/Feet.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: f992588fd5d17eb4a98a4bcb3c2e05ad
+    m_Address: Standard/Prefabs/Armor/Helm.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 70889aa345dc4c24985b6460b0ab66b6
+    m_Address: Standard/Prefabs/Armor/Legs.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 101452080fc0cca43abdd31fc4649980, type: 2}
   m_SchemaSet:

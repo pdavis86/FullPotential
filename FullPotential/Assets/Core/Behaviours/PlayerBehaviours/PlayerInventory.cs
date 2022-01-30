@@ -305,8 +305,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 case 1:
                     var alert1Text = GameManager.Instance.Localizer.Translate("ui.alert.itemadded");
-                    _playerState.ShowAlertForItemsAddedToInventory(string.Format(alert1Text,
-                        itemsToAdd.First().Name));
+                    _playerState.ShowAlertForItemsAddedToInventory(string.Format(alert1Text, itemsToAdd.First().Name));
                     break;
 
                 default:
@@ -574,6 +573,17 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     InstantiateAccessory(slotGameObjectName, item, _playerState.BodyParts.RightArm, true);
                     break;
 
+                case SlotGameObjectName.Helm:
+                    InstantiateArmor(slotGameObjectName, item, _playerState.BodyParts.Head);
+                    break;
+
+                case SlotGameObjectName.Barrier:
+                case SlotGameObjectName.Chest:
+                case SlotGameObjectName.Legs:
+                case SlotGameObjectName.Feet:
+                    InstantiateArmor(slotGameObjectName, item, _playerState.GraphicsTransform);
+                    break;
+
                 default:
                     Debug.LogWarning("Not yet implemented equipping for slot " + slotGameObjectName);
                     break;
@@ -618,7 +628,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
                 default:
                     Debug.LogWarning($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name}");
-                    _equippedItems[slotGameObjectName].GameObject = null;
                     break;
             }
         }
@@ -681,5 +690,29 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 });
         }
 
+        private void InstantiateArmor(
+            SlotGameObjectName slotGameObjectName,
+            ItemBase item,
+            Transform parentTransform)
+        {
+            if (item.RegistryType is not IGearArmor registryType)
+            {
+                Debug.LogError("Item is not armor");
+                return;
+            }
+
+            if (NetworkManager.LocalClientId == OwnerClientId)
+            {
+                return;
+            }
+
+            GameManager.Instance.TypeRegistry.LoadAddessable(
+                registryType.PrefabAddress,
+                prefab =>
+                {
+                    var newObj = Instantiate(prefab, parentTransform);
+                    _equippedItems[slotGameObjectName].GameObject = newObj;
+                });
+        }
     }
 }

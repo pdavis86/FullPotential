@@ -11,7 +11,6 @@ namespace FullPotential.Standard.Armor
 
         public IGearArmor.ArmorCategory Category => IGearArmor.ArmorCategory.Helm;
 
-        //todo: missing prefab
-        public string PrefabAddress => throw new NotImplementedException();
+        public string PrefabAddress => "Standard/Prefabs/Armor/Helm.prefab";
     }
 }

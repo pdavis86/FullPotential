@@ -11,7 +11,6 @@ namespace FullPotential.Standard.Armor
 
         public IGearArmor.ArmorCategory Category => IGearArmor.ArmorCategory.Legs;
 
-        //todo: missing prefab
-        public string PrefabAddress => throw new NotImplementedException();
+        public string PrefabAddress => "Standard/Prefabs/Armor/Legs.prefab";
     }
 }

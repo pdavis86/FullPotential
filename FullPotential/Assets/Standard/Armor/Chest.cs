@@ -10,7 +10,6 @@ namespace FullPotential.Standard.Armor
 
         public IGearArmor.ArmorCategory Category => IGearArmor.ArmorCategory.Chest;
 
-        //todo: missing prefab
-        public string PrefabAddress => throw new NotImplementedException();
+        public string PrefabAddress => "Standard/Prefabs/Armor/Chest.prefab";
     }
 }
