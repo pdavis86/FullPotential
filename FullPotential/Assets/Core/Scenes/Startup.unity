@@ -13235,6 +13235,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Player: {fileID: 7392779647718654627, guid: e289f79f4fd69ec47a403b44b6cf327f, type: 3}
   Combat:
+    ProjectileWithTrail: {fileID: 4563083350583329192, guid: 92356876fd6de514e9c2f4e4bdea6cc0,
+      type: 3}
     SpellInHand: {fileID: 5923469330004543499, guid: 404031c7fdd421f4295a39230469eb19,
       type: 3}
     SpellProjectile: {fileID: 4991308441274877191, guid: 7297a77e0760fc442a8de9c1615f5d4c,

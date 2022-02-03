@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Combat;
 using FullPotential.Api.Enums;
+using FullPotential.Core.Behaviours.Combat;
 using FullPotential.Core.Behaviours.Environment;
 using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Behaviours.UI.Components;
@@ -383,6 +384,20 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
                     break;
             }
+        }
+
+        // ReSharper disable once UnusedParameter.Global
+        [ClientRpc]
+        public void UsedWeaponClientRpc(Vector3 startPosition, Vector3 endPosition, ClientRpcParams clientRpcParams)
+        {
+            var projectile = Instantiate(
+                GameManager.Instance.Prefabs.Combat.ProjectileWithTrail,
+                startPosition,
+                PlayerCamera.transform.rotation);
+
+            var projectileScript = projectile.GetComponent<ProjectileWithTrail>();
+            projectileScript.TargetPosition = endPosition;
+            projectileScript.Speed = 500;
         }
 
         #endregion

@@ -6,6 +6,7 @@ using FullPotential.Core.Registry.Types;
 using System;
 using System.Linq;
 using FullPotential.Api.Enums;
+using FullPotential.Api.Registry;
 using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
 using FullPotential.Core.Combat;
@@ -221,6 +222,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return;
             }
 
+            //todo: do I need lookDirection when I have _playerCamera.ScreenPointToRay ?
+
             var slotWithItem = _playerState.Inventory.GetEquippedWithItemId(itemId);
             var itemInHand = slotWithItem?.Value?.Item;
 
@@ -240,7 +243,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
             else if (itemInHand is Weapon weaponInHand)
             {
-                UseWeapon(weaponInHand);
+                UseWeapon(weaponInHand, lookDirection);
             }
             else
             {
@@ -251,7 +254,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private void Punch()
         {
             var ray = _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
-            if (!Physics.Raycast(ray, out var hit, maxDistance: 4))
+            if (!Physics.Raycast(ray, out var hit, 4))
             {
                 //Debug.Log("Swing and a miss!");
                 return;
@@ -260,16 +263,39 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             AttackHelper.DealDamage(gameObject, null, hit.transform.gameObject, hit.point);
         }
 
-        private void UseWeapon(Weapon itemInHand)
+        private void UseWeapon(Weapon weaponInHand, Vector3 lookDirection)
         {
             var ray = _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
-            if (!Physics.Raycast(ray, out var hit, maxDistance: 4))
-            {
-                //Debug.Log("Weapon can't reach target!");
-                return;
-            }
 
-            AttackHelper.DealDamage(gameObject, itemInHand, hit.transform.gameObject, hit.point);
+            var registryType = (IGearWeapon)weaponInHand.RegistryType;
+
+            if (registryType.Category == IGearWeapon.WeaponCategory.Ranged)
+            {
+                var startPos = _playerState.Positions.RightHandInFront.position + lookDirection * 1;
+
+                //todo: attribute-based weapon range
+                var endPos = Physics.Raycast(ray, out var rangedHit, 30)
+                      ? rangedHit.point
+                      : _playerState.Positions.RightHandInFront.position + lookDirection * 30;
+
+                _playerState.UsedWeaponClientRpc(startPos, endPos, RpcHelper.ForNearbyPlayers());
+
+                if (rangedHit.transform != null)
+                {
+                    AttackHelper.DealDamage(gameObject, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
+                }
+            }
+            else
+            {
+                //todo: attribute-based melee range
+                if (!Physics.Raycast(ray, out var meleeHit, maxDistance: 4))
+                {
+                    //Debug.Log("Weapon can't reach target!");
+                    return;
+                }
+
+                AttackHelper.DealDamage(gameObject, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
+            }
         }
 
         private void CastSpell(Spell activeSpell, bool isLeftHand, Vector3 lookDirection, ServerRpcParams serverRpcParams)

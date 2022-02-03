@@ -18,6 +18,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
         [System.Serializable]
         public class CombatObjects
         {
+            public GameObject ProjectileWithTrail;
             public GameObject SpellInHand;
             public GameObject SpellProjectile;
             public GameObject SpellSelf;
