@@ -15,8 +15,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
     public class PlayerMovement : NetworkBehaviour
     {
 #pragma warning disable 0649
-        [SerializeField] private readonly Vector2 _lookSensitivity = new Vector2(0.2f, 0.2f);
-        [SerializeField] private readonly Vector2 _lookSmoothness = new Vector2(3f, 3f);
+        private readonly Vector2 _lookSensitivity = new Vector2(0.2f, 0.2f);
+        private readonly Vector2 _lookSmoothness = new Vector2(3f, 3f);
         [SerializeField] private Camera _playerCamera;
         [SerializeField] private float _speed = 5f;
         [SerializeField] private float _cameraRotationLimit = 85f;
@@ -125,13 +125,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
                 var moveX = transform.right * _moveVal.x;
                 var moveZ = transform.forward * _moveVal.y;
-                var velocity = (moveX + moveZ) * _speed * (_isSprinting ? _playerState.GetSprintSpeed() : 1);
+                var velocity = (_isSprinting ? _playerState.GetSprintSpeed() : 1) * _speed * (moveX + moveZ);
 
                 //Move
                 _rb.MovePosition(_rb.position + velocity * Time.fixedDeltaTime);
 
                 //Continue after releasing the key
-                _rb.AddForce(100 * velocity * Time.fixedDeltaTime, ForceMode.Acceleration);
+                _rb.AddForce(100 * Time.fixedDeltaTime * velocity, ForceMode.Acceleration);
             }
 
             if (_lookVal != Vector2.zero)

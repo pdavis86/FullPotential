@@ -10,7 +10,7 @@ namespace FullPotential.Core.Registry
         private readonly bool _isDebugBuild;
         private readonly string _persistentDataPath;
 
-        public Dictionary<string, PlayerData> PlayerData { get; private set; }
+        public Dictionary<string, PlayerData> PlayerData { get; }
 
         public UserRegistry()
         {
@@ -38,7 +38,7 @@ namespace FullPotential.Core.Registry
         {
             if (string.IsNullOrWhiteSpace(username))
             {
-               username = token;
+                username = token;
             }
 
             var filePath = GetPlayerSavePath(username);

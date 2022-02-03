@@ -263,7 +263,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             RespawnClientRpc(_clientRpcParams);
 
             AliveState = LivingEntityState.Respawning;
-            PlayerSpawnStateChangeClientRpc(spawnPoint.Position, spawnPoint.Rotation, LivingEntityState.Respawning, null, null, RpcHelper.ForNearbyPlayers());
+            PlayerSpawnStateChangeClientRpc(spawnPoint.Position, LivingEntityState.Respawning, null, null, RpcHelper.ForNearbyPlayers());
         }
 
         [ServerRpc]
@@ -341,7 +341,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void PlayerSpawnStateChangeClientRpc(Vector3 position, Quaternion rotation, LivingEntityState state, string killerName, string itemName, ClientRpcParams clientRpcParams)
+        public void PlayerSpawnStateChangeClientRpc(Vector3 position, LivingEntityState state, string killerName, string itemName, ClientRpcParams clientRpcParams)
         {
             if (!killerName.IsNullOrWhiteSpace())
             {
@@ -489,7 +489,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (distanceMoved > 1)
             {
                 AliveState = LivingEntityState.Alive;
-                PlayerSpawnStateChangeClientRpc(Vector3.zero, Quaternion.identity, LivingEntityState.Alive, null, null, RpcHelper.ForNearbyPlayers());
+                PlayerSpawnStateChangeClientRpc(Vector3.zero, LivingEntityState.Alive, null, null, RpcHelper.ForNearbyPlayers());
                 _startingPosition = Vector3.zero;
             }
         }
@@ -939,7 +939,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _damageTaken.Clear();
 
             AliveState = LivingEntityState.Dead;
-            PlayerSpawnStateChangeClientRpc(Vector3.zero, Quaternion.identity, LivingEntityState.Dead, killerName, itemName, RpcHelper.ForNearbyPlayers());
+            PlayerSpawnStateChangeClientRpc(Vector3.zero, LivingEntityState.Dead, killerName, itemName, RpcHelper.ForNearbyPlayers());
 
             YouDiedClientRpc(_clientRpcParams);
 

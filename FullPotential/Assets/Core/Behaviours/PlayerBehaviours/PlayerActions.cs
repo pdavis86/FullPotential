@@ -28,11 +28,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 {
     public class PlayerActions : NetworkBehaviour
     {
-#pragma warning disable 0649
         [SerializeField] private Camera _playerCamera;
         [SerializeField] private Camera _inFrontOfPlayerCamera;
         [SerializeField] private GameObject _hitTextPrefab;
-#pragma warning restore 0649
 
         private bool _hasMenuOpen;
         private MainCanvasObjects _mainCanvasObjects;
@@ -115,7 +113,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             Cursor.lockState = CursorLockMode.None;
 
-            if (_mainCanvasObjects?.Hud != null)
+            if (_mainCanvasObjects != null && _mainCanvasObjects.Hud != null)
             {
                 _mainCanvasObjects.Hud.SetActive(false);
             }
@@ -129,6 +127,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         #endregion
 
         #region Input Event Handlers
+#pragma warning disable IDE0051 // Remove unused private members
 
         // ReSharper disable once UnusedMember.Local
         private void OnInteract()
@@ -196,6 +195,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ToggleCursorCapture(false);
         }
 
+#pragma warning restore IDE0051 // Remove unused private members
         #endregion
 
         #region ServerRpc calls

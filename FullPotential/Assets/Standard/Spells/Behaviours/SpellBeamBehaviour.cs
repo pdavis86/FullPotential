@@ -15,7 +15,10 @@ namespace FullPotential.Standard.Spells.Behaviours
     {
         public string SpellId;
         public bool IsLeftHand;
-        public float LeftRightAdjustment;
+
+#pragma warning disable 0649
+        [SerializeField] private float _leftRightAdjustment;
+#pragma warning restore CS0649
 
         private GameObject _sourcePlayer;
         private PlayerState _sourcePlayerState;
@@ -154,7 +157,7 @@ namespace FullPotential.Standard.Spells.Behaviours
             if (playerState.OwnerClientId == NetworkManager.Singleton.LocalClientId)
             {
                 //Move it a little sideways
-                _cylinderParentTransform.position += (IsLeftHand ? LeftRightAdjustment : -LeftRightAdjustment) * _cylinderParentTransform.right;
+                _cylinderParentTransform.position += (IsLeftHand ? _leftRightAdjustment : -_leftRightAdjustment) * _cylinderParentTransform.right;
             }
 
             //Move the tip to the middle

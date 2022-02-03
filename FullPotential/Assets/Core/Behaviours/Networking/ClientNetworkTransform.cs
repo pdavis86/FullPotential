@@ -1,9 +1,10 @@
 ﻿using Unity.Netcode.Components;
 using UnityEngine;
 
+// ReSharper disable UnusedType.Global
+
 namespace FullPotential.Core.Behaviours.Networking
 {
-    //Netcode for GameObjects way to handle client-side transform data
     [DisallowMultipleComponent]
     public class ClientNetworkTransform : NetworkTransform
     {

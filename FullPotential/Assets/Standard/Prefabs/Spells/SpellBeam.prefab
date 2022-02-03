@@ -179,4 +179,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SpellId: 
   IsLeftHand: 0
-  LeftRightAdjustment: 0.1
+  _leftRightAdjustment: 0.15
