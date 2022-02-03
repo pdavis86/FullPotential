@@ -1,7 +1,5 @@
 ﻿using FullPotential.Api.Spells;
 
-// ReSharper disable ArrangeAccessorOwnerBody
-
 namespace FullPotential.Core.Registry.Base
 {
     [System.Serializable]

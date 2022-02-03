@@ -9,10 +9,6 @@ using FullPotential.Standard.Spells.Shapes;
 using FullPotential.Standard.Spells.Targeting;
 using UnityEngine.AddressableAssets;
 
-// ReSharper disable ArrangeAccessorOwnerBody
-// ReSharper disable ConvertToNullCoalescingCompoundAssignment
-// ReSharper disable PossibleMultipleEnumeration
-
 namespace FullPotential.Core.Registry
 {
     public class TypeRegistry

@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 
-// ReSharper disable ArrangeAccessorOwnerBody
-
 namespace FullPotential.Core.Storage
 {
     public class GameData

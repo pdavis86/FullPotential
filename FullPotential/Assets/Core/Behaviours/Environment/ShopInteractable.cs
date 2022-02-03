@@ -4,7 +4,7 @@ using FullPotential.Core.Behaviours.UtilityBehaviours;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 
-// ReSharper disable UnusedType.Global
+// ReSharper disable once UnusedType.Global
 
 namespace FullPotential.Core.Behaviours.Environment
 {

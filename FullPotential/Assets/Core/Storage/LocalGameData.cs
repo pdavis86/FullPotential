@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 
-// ReSharper disable ArrangeAccessorOwnerBody
-
 namespace FullPotential.Core.Storage
 {
     public class LocalGameData

@@ -10,7 +10,6 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable PossibleMultipleEnumeration
 
 namespace FullPotential.Core.Behaviours.Ui.Components
 {

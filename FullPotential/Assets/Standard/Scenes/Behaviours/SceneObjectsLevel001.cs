@@ -12,16 +12,15 @@ using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Global
+// ReSharper disable once UnusedType.Global
 
 namespace FullPotential.Standard.Scenes.Behaviours
 {
     public class SceneObjectsLevel001 : NetworkBehaviour, ISceneBehaviour
     {
+        // ReSharper disable once UnassignedField.Global
+        // ReSharper disable once MemberCanBePrivate.Global
         public GameObject EnemyPrefab;
 
         [SerializeField] private readonly Vector2 _spawnVariation = new Vector2(-4f, 4f);
@@ -37,6 +36,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
         public SceneAttributes Attributes
         {
             get => _attributes;
+            // ReSharper disable once UnusedMember.Global
             set => _attributes = value;
         }
 
@@ -85,7 +85,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void HereAreMyJoiningDetailsServerRpc(string playerToken, ServerRpcParams serverRpcParams = default)
+        private void HereAreMyJoiningDetailsServerRpc(string playerToken, ServerRpcParams serverRpcParams = default)
         {
             var chosenSpawnPoint = GetSpawnPoint();
             var playerNetObj = Instantiate(_playerPrefabNetObj, chosenSpawnPoint.Position, chosenSpawnPoint.Rotation);
@@ -110,7 +110,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
             GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ShowAlert(announcement);
         }
 
-        public void SpawnEnemy()
+        private void SpawnEnemy()
         {
             var chosenSpawnPoint = GetSpawnPoint();
 

@@ -6,12 +6,12 @@ using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable InconsistentNaming
 
 namespace FullPotential.Standard.Spells.Behaviours
 {
     public class SpellTouchBehaviour : ISpellBehaviour
     {
+        // ReSharper disable once InconsistentNaming
         private const int _maxDistance = 3;
 
         private readonly Spell _spell;

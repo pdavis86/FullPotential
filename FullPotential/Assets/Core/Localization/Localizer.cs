@@ -7,12 +7,6 @@ using FullPotential.Api.Spells;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-// ReSharper disable ConvertToAutoProperty
-// ReSharper disable ArrangeAccessorOwnerBody
-// ReSharper disable PossibleMultipleEnumeration
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
-
 namespace FullPotential.Core.Localization
 {
     public class Localizer

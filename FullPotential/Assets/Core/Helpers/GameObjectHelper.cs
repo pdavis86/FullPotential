@@ -1,8 +1,6 @@
 ﻿using System.Linq;
 using UnityEngine;
 
-// ReSharper disable UnusedMember.Global
-
 namespace FullPotential.Core.Helpers
 {
     public static class GameObjectHelper

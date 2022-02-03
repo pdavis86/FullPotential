@@ -13,11 +13,10 @@ namespace FullPotential.Core.Extensions
             {
                 first = Enumerable.Empty<T>();
             }
-            if (second != null)
-            {
-                return first.Union(second);
-            }
-            return first;
+
+            return second != null
+                ? first.Union(second)
+                : first;
         }
     }
 }

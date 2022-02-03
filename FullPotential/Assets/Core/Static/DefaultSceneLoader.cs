@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-// ReSharper disable UnusedType.Global
+// ReSharper disable once UnusedType.Global
 // ReSharper disable AccessToStaticMemberViaDerivedType
 
 namespace FullPotential.Core.Static

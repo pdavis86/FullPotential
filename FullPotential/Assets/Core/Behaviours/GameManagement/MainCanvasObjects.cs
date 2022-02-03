@@ -2,18 +2,15 @@
 using System.Linq;
 using UnityEngine;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable ArrangeAccessorOwnerBody
 
 namespace FullPotential.Core.Behaviours.GameManagement
 {
     public class MainCanvasObjects : MonoBehaviour
     {
+        // ReSharper disable UnassignedField.Global
+        // ReSharper disable MemberCanBePrivate.Global
+
         //Overlays
         public GameObject TooltipOverlay;
         public GameObject DebuggingOverlay;
@@ -27,6 +24,9 @@ namespace FullPotential.Core.Behaviours.GameManagement
         public GameObject CharacterMenu;
         public GameObject SettingsUi;
         public GameObject DrawingPad;
+
+        // ReSharper enable MemberCanBePrivate.Global
+        // ReSharper enable UnassignedField.Global
 
         private List<GameObject> _menus;
 

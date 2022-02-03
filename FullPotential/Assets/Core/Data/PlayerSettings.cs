@@ -1,7 +1,4 @@
-﻿// ReSharper disable UnusedMember.Global
-// ReSharper disable UnassignedField.Global
-
-using Unity.Netcode;
+﻿using Unity.Netcode;
 
 namespace FullPotential.Core.Data
 {

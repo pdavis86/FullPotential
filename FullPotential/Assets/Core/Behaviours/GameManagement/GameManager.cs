@@ -17,13 +17,7 @@ using Unity.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable ArrangeAccessorOwnerBody
 
 namespace FullPotential.Core.Behaviours.GameManagement
 {
@@ -204,6 +198,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
         //    var foo = "";
         //}
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public void SendServerToClientSetDisconnectReason(ulong clientId, ConnectStatus status)
         {
             var writer = new FastBufferWriter(sizeof(ConnectStatus), Allocator.Temp);
@@ -277,6 +272,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 #endif
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public static void SaveAppOptions()
         {
             System.IO.File.WriteAllText(GetAppOptionsPath(), JsonUtility.ToJson(Instance.AppOptions));

@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 
-// ReSharper disable AccessToStaticMemberViaDerivedType
-
 namespace FullPotential.Core.Extensions
 {
     public static class UnityExtensions
@@ -10,6 +8,7 @@ namespace FullPotential.Core.Extensions
         {
             foreach (Transform child in transform)
             {
+                // ReSharper disable once AccessToStaticMemberViaDerivedType
                 GameObject.Destroy(child.gameObject);
             }
         }

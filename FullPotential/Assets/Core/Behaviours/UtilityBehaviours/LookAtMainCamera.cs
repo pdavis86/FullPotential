@@ -1,10 +1,7 @@
 ﻿using UnityEngine;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Global
+// ReSharper disable once UnusedType.Global
 
 namespace FullPotential.Core.Behaviours.UtilityBehaviours
 {
@@ -18,7 +15,6 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
                 return;
             }
 
-            //transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward, Camera.main.transform.rotation * Vector3.up);
             transform.LookAt(transform.position + Camera.main.transform.forward);
         }
     }

@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-// ReSharper disable NonReadonlyMemberInGetHashCode
-// ReSharper disable UseFormatSpecifierInInterpolation
-// ReSharper disable ArrangeAccessorOwnerBody
-
 namespace FullPotential.Core.Registry.Base
 {
     [System.Serializable]
@@ -45,6 +41,7 @@ namespace FullPotential.Core.Registry.Base
             }
         }
 
+        // ReSharper disable NonReadonlyMemberInGetHashCode
         public override int GetHashCode()
         {
             unchecked

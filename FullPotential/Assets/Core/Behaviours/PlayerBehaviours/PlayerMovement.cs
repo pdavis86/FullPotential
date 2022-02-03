@@ -3,11 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Global
 
 namespace FullPotential.Core.Behaviours.PlayerBehaviours
 {
@@ -171,7 +167,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (_wasSprinting != _isSprinting)
             {
-                Debug.Log($"_wasSprinting: {_wasSprinting}, _isSprinting: {_isSprinting}");
+                //Debug.Log($"_wasSprinting: {_wasSprinting}, _isSprinting: {_isSprinting}");
                 _playerState.UpdateSprintingServerRpc(_isSprinting);
                 _wasSprinting = _isSprinting;
             }

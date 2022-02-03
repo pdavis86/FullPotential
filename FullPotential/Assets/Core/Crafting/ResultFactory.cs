@@ -13,13 +13,11 @@ using System.Text;
 using FullPotential.Api.Spells;
 using FullPotential.Standard.Spells.Targeting;
 
-// ReSharper disable PossibleMultipleEnumeration
-// ReSharper disable InconsistentNaming
-
 namespace FullPotential.Core.Crafting
 {
     public class ResultFactory
     {
+        // ReSharper disable once InconsistentNaming
         private static readonly Random _random = new Random();
 
         private readonly TypeRegistry _typeRegistry;
@@ -312,7 +310,7 @@ namespace FullPotential.Core.Crafting
 
         private Weapon GetMeleeWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
-            var weapon = new Weapon()
+            var weapon = new Weapon
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),
@@ -332,7 +330,7 @@ namespace FullPotential.Core.Crafting
 
         private Weapon GetRangedWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
-            var weapon = new Weapon()
+            var weapon = new Weapon
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),
@@ -357,7 +355,7 @@ namespace FullPotential.Core.Crafting
 
         private Weapon GetDefensiveWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
-            var weapon = new Weapon()
+            var weapon = new Weapon
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),
@@ -377,7 +375,7 @@ namespace FullPotential.Core.Crafting
 
         private Armor GetArmor(IGearArmor craftableType, IEnumerable<ItemBase> components)
         {
-            var armor = new Armor()
+            var armor = new Armor
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),
@@ -394,7 +392,7 @@ namespace FullPotential.Core.Crafting
 
         private Armor GetBarrier(IGearArmor craftableType, IEnumerable<ItemBase> components)
         {
-            var armor = new Armor()
+            var armor = new Armor
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),
@@ -414,7 +412,7 @@ namespace FullPotential.Core.Crafting
 
         private Accessory GetAccessory(IGearAccessory craftableType, IEnumerable<ItemBase> components)
         {
-            var accessory = new Accessory()
+            var accessory = new Accessory
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),

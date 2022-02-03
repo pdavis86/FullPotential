@@ -1,11 +1,7 @@
 ﻿using UnityEngine;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnassignedField.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace FullPotential.Core.Behaviours.GameManagement
 {

@@ -4,12 +4,8 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Compiler
-// ReSharper disable ConvertToNullCoalescingCompoundAssignment
+// ReSharper disable once UnusedType.Global
 
 namespace FullPotential.Core.Behaviours.Ui
 {

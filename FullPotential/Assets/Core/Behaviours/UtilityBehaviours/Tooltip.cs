@@ -3,11 +3,7 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Compiler
 
 namespace FullPotential.Core.Behaviours.UtilityBehaviours
 {

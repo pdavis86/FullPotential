@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// ReSharper disable UnusedMember.Global
-// ReSharper disable InconsistentNaming
 // ReSharper disable ClassNeverInstantiated.Global
 
 //NOTE: Copied and adapted from the NetworkStats class from https://github.com/Unity-Technologies/com.unity.multiplayer.samples.coop/releases/tag/v0.2.1
@@ -22,11 +20,7 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
         [Tooltip("The interval to send ping RPCs to calculate the RTT. The bigger the number, the less reactive the stat will be to RTT changes")]
         float _pingIntervalSeconds = 0.1f;
 
-        private const int _maxWindowSizeSeconds = 3;
-
         public float LastRtt { get; private set; }
-
-        private float _maxWindowSize => _maxWindowSizeSeconds / _pingIntervalSeconds;
 
         private readonly Queue<float> _movingWindow = new Queue<float>();
         private readonly Dictionary<int, float> _pingHistoryStartTimes = new Dictionary<int, float>();
@@ -80,23 +74,27 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
             var startTime = _pingHistoryStartTimes[pingId];
             _pingHistoryStartTimes.Remove(pingId);
             _movingWindow.Enqueue(Time.realtimeSinceStartup - startTime);
-            UpdateRTTSlidingWindowAverage();
+            UpdateRttSlidingWindowAverage();
         }
 
-        private void UpdateRTTSlidingWindowAverage()
+        private void UpdateRttSlidingWindowAverage()
         {
-            if (_movingWindow.Count > _maxWindowSize)
+            const int maxWindowSizeSeconds = 3;
+
+            var maxWindowSize = maxWindowSizeSeconds / _pingIntervalSeconds;
+
+            if (_movingWindow.Count > maxWindowSize)
             {
                 _movingWindow.Dequeue();
             }
 
             float rttSum = 0;
-            foreach (var singleRTT in _movingWindow)
+            foreach (var singleRtt in _movingWindow)
             {
-                rttSum += singleRTT;
+                rttSum += singleRtt;
             }
 
-            LastRtt = rttSum / _maxWindowSize;
+            LastRtt = rttSum / maxWindowSize;
         }
 
     }

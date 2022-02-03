@@ -6,12 +6,12 @@ using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable InconsistentNaming
 
 namespace FullPotential.Standard.Spells.Behaviours
 {
     public class SpellSelfBehaviour : NetworkBehaviour, ISpellBehaviour
     {
+        // ReSharper disable once InconsistentNaming
         private const float _distanceBeforeReturning = 8f;
 
         public ulong PlayerClientId;

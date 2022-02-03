@@ -16,8 +16,6 @@ using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Networking;
 
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable PossibleMultipleEnumeration
-// ReSharper disable ConvertToUsingDeclaration
 
 namespace FullPotential.Core.Behaviours.PlayerBehaviours
 {

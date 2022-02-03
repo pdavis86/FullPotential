@@ -1,7 +1,4 @@
-﻿// ReSharper disable UnusedMember.Global
-// ReSharper disable UnassignedField.Global
-
-using System;
+﻿using System;
 
 namespace FullPotential.Core.Data
 {

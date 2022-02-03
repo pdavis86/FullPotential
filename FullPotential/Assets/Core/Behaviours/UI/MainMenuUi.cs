@@ -2,8 +2,7 @@ using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using UnityEngine;
 
-// ReSharper disable UnusedType.Global
-// ReSharper disable UnusedMember.Global
+// ReSharper disable once UnusedType.Global
 
 namespace FullPotential.Core.Behaviours.Ui
 {
@@ -17,17 +16,20 @@ namespace FullPotential.Core.Behaviours.Ui
             _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void ForceRespawn()
         {
             GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>().ForceRespawnServerRpc();
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void Disconnect()
         {
             _mainCanvasObjects.HideAllMenus();
             GameManager.Instance.Disconnect();
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void QuitGame()
         {
             GameManager.Instance.Quit();

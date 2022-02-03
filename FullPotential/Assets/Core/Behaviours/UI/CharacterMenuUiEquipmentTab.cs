@@ -10,8 +10,6 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable UnusedType.Global
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Behaviours.Ui
@@ -40,6 +38,7 @@ namespace FullPotential.Core.Behaviours.Ui
             ResetEquipmentUi(true);
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void OnSlotClick(GameObject clickedObject)
         {
             if (_lastClickedSlot == clickedObject)

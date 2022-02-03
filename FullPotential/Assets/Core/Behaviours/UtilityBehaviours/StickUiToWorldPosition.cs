@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Behaviours.UtilityBehaviours

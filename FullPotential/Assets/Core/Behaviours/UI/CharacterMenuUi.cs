@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnassignedField.Global
-// ReSharper disable MemberCanBePrivate.Global
 
 namespace FullPotential.Core.Behaviours.Ui
 {
     public class CharacterMenuUi : MonoBehaviour
     {
+        // ReSharper disable UnassignedField.Global
         public GameObject Equipment;
         public GameObject Crafting;
+        // ReSharper enable UnassignedField.Global
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -24,6 +24,7 @@ namespace FullPotential.Core.Behaviours.Ui
             OnTabClick(0);
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public void OnTabClick(int index)
         {
             switch (index)

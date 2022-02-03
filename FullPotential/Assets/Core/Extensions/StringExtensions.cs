@@ -1,6 +1,6 @@
-﻿// ReSharper disable UnusedMember.Global
+﻿using System;
 
-using System;
+// ReSharper disable UnusedMember.Global
 
 namespace FullPotential.Core.Extensions
 {

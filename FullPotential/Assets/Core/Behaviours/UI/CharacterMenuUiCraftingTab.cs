@@ -12,13 +12,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Compiler
-// ReSharper disable PossibleMultipleEnumeration
-// ReSharper disable InconsistentNaming
 
 namespace FullPotential.Core.Behaviours.Ui
 {
@@ -187,6 +181,7 @@ namespace FullPotential.Core.Behaviours.Ui
             SetHandednessDropDownVisibility();
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public void AddComponent(string itemId)
         {
             var item = _playerState.Inventory.GetItemWithId<ItemBase>(itemId);
@@ -200,6 +195,7 @@ namespace FullPotential.Core.Behaviours.Ui
             _components.Add(item);
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public void RemoveComponent(string itemId)
         {
             var item = _components.FirstOrDefault(x => x.Id == itemId);

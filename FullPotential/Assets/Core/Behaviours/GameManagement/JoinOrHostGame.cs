@@ -9,12 +9,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 //https://docs-multiplayer.unity3d.com/docs
 
@@ -22,7 +17,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 {
     public enum ConnectStatus
     {
-        Success,
+        //Success,
         VersionMismatch,
         //ServerFull,
         //LoggedInAgain,
@@ -104,36 +99,43 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         #region Button Event Handlers
 
+        // ReSharper disable once UnusedMember.Global
         public void SetPlayerUsername(string value)
         {
             _username = value;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void SetPlayerPassword(string value)
         {
             _password = value;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void SetNetworkAddress(string value)
         {
             _networkAddress = value;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void SetNetworkPort(string value)
         {
             _networkPort = value;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void HostGame()
         {
             HostGameInternal();
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void JoinGame()
         {
             JoinGameInternal();
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void QuitGame()
         {
             GameManager.Instance.Quit();
@@ -141,6 +143,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         #endregion
 
+        // ReSharper disable once UnusedMember.Global
         public void SignIn()
         {
             if (_username.IsNullOrWhiteSpace())

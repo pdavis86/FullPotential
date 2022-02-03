@@ -2,11 +2,7 @@
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Compiler
 
 namespace FullPotential.Core.Behaviours.GameManagement
 {
@@ -44,6 +40,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             }
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public void Show(string tooltipText)
         {
             const int padding = 15;
@@ -77,6 +74,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             //Debug.Log("Y mouse " + Input.mousePosition.y);
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public void Hide()
         {
             gameObject.SetActive(false);

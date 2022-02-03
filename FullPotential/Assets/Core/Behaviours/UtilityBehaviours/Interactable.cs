@@ -2,12 +2,7 @@
 using Unity.Netcode;
 using UnityEngine;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Global
-// ReSharper disable InconsistentNaming
 
 namespace FullPotential.Core.Behaviours.UtilityBehaviours
 {
@@ -16,6 +11,7 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
         public float Radius = 3f;
         public bool RequiresServerCheck = true;
 
+        // ReSharper disable once InconsistentNaming
         protected TMPro.TextMeshProUGUI _interactionBubble;
 
         // ReSharper disable once UnusedMember.Local

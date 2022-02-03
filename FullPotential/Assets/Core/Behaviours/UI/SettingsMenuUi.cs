@@ -6,9 +6,7 @@ using FullPotential.Core.Data;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable ConvertIfStatementToNullCoalescingAssignment
+// ReSharper disable once UnusedType.Global
 
 namespace FullPotential.Core.Behaviours.Ui
 {
@@ -69,27 +67,32 @@ namespace FullPotential.Core.Behaviours.Ui
 
         #endregion
 
+        // ReSharper disable once UnusedMember.Global
         public void SetResolution(int index)
         {
             var selectedResolution = _availableResolutions[index];
             Screen.SetResolution(selectedResolution.width, selectedResolution.height, _fullscreenToggle.isOn);
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void ToggleFullscreen(bool isOn)
         {
             Screen.SetResolution(Screen.width, Screen.height, isOn);
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void SetFieldOfView(float degrees)
         {
             Camera.main.fieldOfView = degrees;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void SetLanguage(int index)
         {
             _newCultureIndex = index;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public async void SaveAndClose()
         {
             if (_newCultureIndex > -1)

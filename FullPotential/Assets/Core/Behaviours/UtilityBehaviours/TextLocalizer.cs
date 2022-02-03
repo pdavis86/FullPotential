@@ -3,9 +3,7 @@ using FullPotential.Core.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Global
+// ReSharper disable once UnusedType.Global
 
 namespace FullPotential.Core.Behaviours.UtilityBehaviours
 {
@@ -14,6 +12,7 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
     {
         private Text _textComponent;
 
+        // ReSharper disable once UnassignedField.Global
         public string TranslationId;
 
         // ReSharper disable once UnusedMember.Local

@@ -23,18 +23,13 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Compiler
-// ReSharper disable ConvertToUsingDeclaration
-// ReSharper disable UnassignedField.Global
 
 namespace FullPotential.Core.Behaviours.PlayerBehaviours
 {
     public class PlayerState : NetworkBehaviour, IDamageable
     {
+        // ReSharper disable UnassignedField.Global
 #pragma warning disable 0649
         [SerializeField] private Behaviour[] _behavioursToDisable;
         [SerializeField] private Behaviour[] _behavioursForRespawn;
@@ -51,10 +46,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public GameObject PlayerCamera;
         public GameObject InFrontOfPlayer;
         public Transform GraphicsTransform;
+        // ReSharper enable UnassignedField.Global
 
+        // ReSharper disable MemberCanBePrivate.Global
         public readonly NetworkVariable<int> Stamina = new NetworkVariable<int>(100);
         public readonly NetworkVariable<int> Health = new NetworkVariable<int>(100);
         public readonly NetworkVariable<int> Mana = new NetworkVariable<int>(100);
+        // ReSharper enable MemberCanBePrivate.Global
 
         public LivingEntityState AliveState { get; set; }
 
@@ -192,6 +190,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             QueueAliveStateChanges();
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void FixedUpdate()
         {
             _head.transform.rotation = PlayerCamera.transform.rotation;
@@ -284,9 +283,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _playerActions.ShowDamage(position, damage);
         }
 
-        // ReSharper disable once UnusedParameter.Global
+        // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        public void LoadPlayerDataClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams)
+        private void LoadPlayerDataClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams)
         {
             var fragmentedMessage = JsonUtility.FromJson<FragmentedMessage>(fragmentedMessageJson);
 
@@ -308,9 +307,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             StartCoroutine(SetTexture());
         }
 
-        // ReSharper disable once UnusedParameter.Global
+        // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        public void SpawnLootChestClientRpc(string id, Vector3 position, ClientRpcParams clientRpcParams)
+        private void SpawnLootChestClientRpc(string id, Vector3 position, ClientRpcParams clientRpcParams)
         {
             var prefab = GameManager.Instance.Prefabs.Environment.LootChest;
 
@@ -325,24 +324,24 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             lootScript.UnclaimedLootId = id;
         }
 
-        // ReSharper disable once UnusedParameter.Global
+        // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        public void YouDiedClientRpc(ClientRpcParams clientRpcParams)
+        private void YouDiedClientRpc(ClientRpcParams clientRpcParams)
         {
             GameManager.Instance.MainCanvasObjects.HideAllMenus();
             _aliveStateChanges.PlayForwards(false);
         }
 
-        // ReSharper disable once UnusedParameter.Global
+        // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        public void RespawnClientRpc(ClientRpcParams clientRpcParams)
+        private void RespawnClientRpc(ClientRpcParams clientRpcParams)
         {
             _aliveStateChanges.PlayBackwards(true);
         }
 
-        // ReSharper disable once UnusedParameter.Global
+        // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        public void PlayerSpawnStateChangeClientRpc(Vector3 position, LivingEntityState state, string killerName, string itemName, ClientRpcParams clientRpcParams)
+        private void PlayerSpawnStateChangeClientRpc(Vector3 position, LivingEntityState state, string killerName, string itemName, ClientRpcParams clientRpcParams)
         {
             if (!killerName.IsNullOrWhiteSpace())
             {
@@ -550,21 +549,21 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
-        public static PlayerState GetWithClientId(ulong clientId)
-        {
-            var playerObjects = GameObject.FindGameObjectsWithTag(Constants.Tags.Player);
+        //public static PlayerState GetWithClientId(ulong clientId)
+        //{
+        //    var playerObjects = GameObject.FindGameObjectsWithTag(Constants.Tags.Player);
 
-            foreach (var obj in playerObjects)
-            {
-                var otherPlayerState = obj.GetComponent<PlayerState>();
-                if (otherPlayerState.OwnerClientId == clientId)
-                {
-                    return otherPlayerState;
-                }
-            }
+        //    foreach (var obj in playerObjects)
+        //    {
+        //        var otherPlayerState = obj.GetComponent<PlayerState>();
+        //        if (otherPlayerState.OwnerClientId == clientId)
+        //        {
+        //            return otherPlayerState;
+        //        }
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
 
         public void ShowAlertForItemsAddedToInventory(string alertText)
         {
@@ -1027,6 +1026,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         #region Nested Classes
 
+        // ReSharper disable UnassignedField.Global
+
         [Serializable]
         public struct PositionTransforms
         {
@@ -1044,6 +1045,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             public Transform LeftArm;
             public Transform RightArm;
         }
+
+        // ReSharper enable UnassignedField.Global
 
         #endregion
 

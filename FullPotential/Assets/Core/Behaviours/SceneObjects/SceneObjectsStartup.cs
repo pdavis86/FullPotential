@@ -1,9 +1,8 @@
 using FullPotential.Core.Helpers;
 using UnityEngine;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
+// ReSharper disable once UnusedType.Global
 
 namespace FullPotential.Core.Behaviours.SceneObjects
 {

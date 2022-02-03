@@ -1,7 +1,4 @@
-﻿
-// ReSharper disable NonReadonlyMemberInGetHashCode
-
-namespace FullPotential.Core.Registry
+﻿namespace FullPotential.Core.Registry
 {
     [System.Serializable]
     public struct Attributes
@@ -18,6 +15,7 @@ namespace FullPotential.Core.Registry
         public int Duration;
         public int Luck;
 
+        // ReSharper disable NonReadonlyMemberInGetHashCode
         public override int GetHashCode()
         {
             unchecked

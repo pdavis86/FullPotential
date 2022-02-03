@@ -1,7 +1,6 @@
 using UnityEngine;
 
-// ReSharper disable once UnusedType.Global
-// ReSharper disable once ClassNeverInstantiated.Global
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Behaviours.Combat
 {

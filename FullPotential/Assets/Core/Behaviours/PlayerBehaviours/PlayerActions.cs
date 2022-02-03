@@ -15,23 +15,18 @@ using FullPotential.Standard.Spells.Targeting;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
-using Touch = FullPotential.Standard.Spells.Targeting.Touch;
 
-// ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnassignedField.Compiler
-// ReSharper disable UnassignedField.Global
-// ReSharper disable RedundantDiscardDesignation
 
 namespace FullPotential.Core.Behaviours.PlayerBehaviours
 {
     public class PlayerActions : NetworkBehaviour
     {
+#pragma warning disable CS0649
         [SerializeField] private Camera _playerCamera;
         [SerializeField] private Camera _inFrontOfPlayerCamera;
         [SerializeField] private GameObject _hitTextPrefab;
+#pragma warning restore CS0649
 
         private bool _hasMenuOpen;
         private MainCanvasObjects _mainCanvasObjects;
@@ -214,7 +209,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         [ServerRpc]
-        public void TryToAttackServerRpc(string itemId, Vector3 lookDirection, ServerRpcParams serverRpcParams = default)
+        private void TryToAttackServerRpc(string itemId, Vector3 lookDirection, ServerRpcParams serverRpcParams = default)
         {
             if (itemId.IsNullOrWhiteSpace())
             {
@@ -316,19 +311,19 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             switch (activeSpell.Targeting)
             {
-                case Projectile _:
+                case Projectile:
                     _playerState.SpawnSpellProjectile(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId);
                     break;
 
-                case Self _:
+                case Self:
                     _playerState.SpawnSpellSelf(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId);
                     break;
 
-                case Touch _:
+                case Standard.Spells.Targeting.Touch:
                     _playerState.CastSpellTouch(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId);
                     break;
 
-                case Beam _:
+                case Beam:
                     _playerState.ToggleSpellBeam(isLeftHand, activeSpell, startPosition, targetDirection);
                     break;
 
@@ -338,7 +333,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         [ServerRpc]
-        public void TryToInteractServerRpc(string gameObjectName, ServerRpcParams serverRpcParams = default)
+        private void TryToInteractServerRpc(string gameObjectName, ServerRpcParams serverRpcParams = default)
         {
             const float searchRadius = 5f;
 
@@ -454,9 +449,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         #region ClientRpc calls
 
-        // ReSharper disable once UnusedParameter.Global
+        // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        public void ApplyInventoryChangesClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams)
+        private void ApplyInventoryChangesClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams)
         {
             var fragmentedMessage = JsonUtility.FromJson<FragmentedMessage>(fragmentedMessageJson);
 
@@ -588,7 +583,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             Destroy(hit, 1f);
         }
 
-        public static void RefreshCraftingWindow()
+        private static void RefreshCraftingWindow()
         {
             var characterMenuUi = GameManager.Instance.MainCanvasObjects.CharacterMenu.GetComponent<CharacterMenuUi>();
             var craftingUi = characterMenuUi.Crafting.GetComponent<CharacterMenuUiCraftingTab>();
