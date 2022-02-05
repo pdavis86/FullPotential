@@ -1,4 +1,5 @@
 ﻿using FullPotential.Core.Behaviours.UI.Components;
+using FullPotential.Core.Data;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +18,8 @@ namespace FullPotential.Core.Behaviours.Ui
         [SerializeField] private BarSlider _healthSlider;
         [SerializeField] private BarSlider _manaSlider;
         //[SerializeField] private Slider _barrierSlider;
+        [SerializeField] private Text _ammoLeft;
+        [SerializeField] private Text _ammoRight;
 #pragma warning restore 0649
 
         public void ShowAlert(string alertText)
@@ -31,16 +34,29 @@ namespace FullPotential.Core.Behaviours.Ui
             alert.transform.Find("Text").GetComponent<Text>().text = alertText;
         }
 
-        public void UpdateHand(string contents, bool isLeft)
+        public void UpdateHand(string contents, bool isLeftHand)
         {
-            if (isLeft)
+            var leftOrRight = isLeftHand
+                ? _equippedLeftHand
+                : _equippedRightHand;
+
+            leftOrRight.GetComponent<EquippedSummary>().SetContents(contents);
+        }
+
+        public void UpdateAmmo(bool isLeftHand, AmmoStatus ammoStatus)
+        {
+            var leftOrRight = isLeftHand
+                ? _ammoLeft
+                : _ammoRight;
+
+            if (ammoStatus == null)
             {
-                _equippedLeftHand.GetComponent<EquippedSummary>().SetContents(contents);
+                leftOrRight.gameObject.SetActive(false);
+                return;
             }
-            else
-            {
-                _equippedRightHand.GetComponent<EquippedSummary>().SetContents(contents);
-            }
+
+            leftOrRight.gameObject.SetActive(true);
+            leftOrRight.text = $"{ammoStatus.Ammo}/{ammoStatus.AmmoMax}";
         }
 
         public void UpdateStaminaPercentage(int stamina, int maxStamina)

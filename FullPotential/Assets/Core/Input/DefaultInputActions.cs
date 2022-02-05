@@ -143,6 +143,24 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ReloadLeft"",
+                    ""type"": ""Button"",
+                    ""id"": ""9ba6aec8-c21a-49f9-b7c0-076a771875a7"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ReloadRight"",
+                    ""type"": ""Button"",
+                    ""id"": ""990555f7-2ddc-4f96-ac91-460c7ba1e885"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -314,7 +332,7 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""1a94b1b7-7f27-4f2b-a556-5ec24ed85d1d"",
-                    ""path"": ""<Keyboard>/alt"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
                     ""interactions"": ""Press(pressPoint=0.2)"",
                     ""processors"": """",
                     ""groups"": """",
@@ -325,11 +343,33 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""6f444393-f47b-4ef7-8f11-6771cd4983a7"",
-                    ""path"": ""<Keyboard>/alt"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
                     ""interactions"": ""Press(behavior=1)"",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ShowCursorStop"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a36a97d4-d708-4d8c-9744-7a1fcf3201e1"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ReloadLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""916cc168-04f3-47ca-9fc2-bb5556adf18b"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ReloadRight"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -370,6 +410,8 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
         m_Player_SprintStop = m_Player.FindAction("SprintStop", throwIfNotFound: true);
         m_Player_ShowCursorStart = m_Player.FindAction("ShowCursorStart", throwIfNotFound: true);
         m_Player_ShowCursorStop = m_Player.FindAction("ShowCursorStop", throwIfNotFound: true);
+        m_Player_ReloadLeft = m_Player.FindAction("ReloadLeft", throwIfNotFound: true);
+        m_Player_ReloadRight = m_Player.FindAction("ReloadRight", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -442,6 +484,8 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_SprintStop;
     private readonly InputAction m_Player_ShowCursorStart;
     private readonly InputAction m_Player_ShowCursorStop;
+    private readonly InputAction m_Player_ReloadLeft;
+    private readonly InputAction m_Player_ReloadRight;
     public struct PlayerActions
     {
         private @DefaultInputActions m_Wrapper;
@@ -459,6 +503,8 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
         public InputAction @SprintStop => m_Wrapper.m_Player_SprintStop;
         public InputAction @ShowCursorStart => m_Wrapper.m_Player_ShowCursorStart;
         public InputAction @ShowCursorStop => m_Wrapper.m_Player_ShowCursorStop;
+        public InputAction @ReloadLeft => m_Wrapper.m_Player_ReloadLeft;
+        public InputAction @ReloadRight => m_Wrapper.m_Player_ReloadRight;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -507,6 +553,12 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                 @ShowCursorStop.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShowCursorStop;
                 @ShowCursorStop.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShowCursorStop;
                 @ShowCursorStop.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShowCursorStop;
+                @ReloadLeft.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReloadLeft;
+                @ReloadLeft.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReloadLeft;
+                @ReloadLeft.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReloadLeft;
+                @ReloadRight.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReloadRight;
+                @ReloadRight.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReloadRight;
+                @ReloadRight.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReloadRight;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -550,6 +602,12 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                 @ShowCursorStop.started += instance.OnShowCursorStop;
                 @ShowCursorStop.performed += instance.OnShowCursorStop;
                 @ShowCursorStop.canceled += instance.OnShowCursorStop;
+                @ReloadLeft.started += instance.OnReloadLeft;
+                @ReloadLeft.performed += instance.OnReloadLeft;
+                @ReloadLeft.canceled += instance.OnReloadLeft;
+                @ReloadRight.started += instance.OnReloadRight;
+                @ReloadRight.performed += instance.OnReloadRight;
+                @ReloadRight.canceled += instance.OnReloadRight;
             }
         }
     }
@@ -578,5 +636,7 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
         void OnSprintStop(InputAction.CallbackContext context);
         void OnShowCursorStart(InputAction.CallbackContext context);
         void OnShowCursorStop(InputAction.CallbackContext context);
+        void OnReloadLeft(InputAction.CallbackContext context);
+        void OnReloadRight(InputAction.CallbackContext context);
     }
 }

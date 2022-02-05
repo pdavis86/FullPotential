@@ -7,7 +7,6 @@ using System;
 using System.Linq;
 using FullPotential.Api.Enums;
 using FullPotential.Api.Registry;
-using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
 using FullPotential.Core.Combat;
 using FullPotential.Core.Extensions;
@@ -181,14 +180,28 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
 
             GameManager.Instance.MainCanvasObjects.DrawingPad.SetActive(true);
-            GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ToggleCursorCapture(true);
+            GameManager.Instance.MainCanvasObjects.GetHud().ToggleCursorCapture(true);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnShowCursorStop()
         {
             GameManager.Instance.MainCanvasObjects.DrawingPad.SetActive(false);
-            GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ToggleCursorCapture(false);
+            GameManager.Instance.MainCanvasObjects.GetHud().ToggleCursorCapture(false);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnReloadLeft()
+        {
+            _playerState.AmmoStatusLeft.IsReloading = true;
+            _playerState.ReloadServerRpc(true);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnReloadRight()
+        {
+            _playerState.AmmoStatusRight.IsReloading = true;
+            _playerState.ReloadServerRpc(false);
         }
 
 #pragma warning restore IDE0051 // Remove unused private members
@@ -238,7 +251,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
             else if (itemInHand is Weapon weaponInHand)
             {
-                UseWeapon(weaponInHand, lookDirection);
+                UseWeapon(weaponInHand, isLeftHand, lookDirection);
             }
             else
             {
@@ -258,7 +271,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             AttackHelper.DealDamage(gameObject, null, hit.transform.gameObject, hit.point);
         }
 
-        private void UseWeapon(Weapon weaponInHand, Vector3 lookDirection)
+        private void UseWeapon(Weapon weaponInHand, bool isLeftHand, Vector3 lookDirection)
         {
             var ray = _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
 
@@ -266,6 +279,21 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (registryType.Category == IGearWeapon.WeaponCategory.Ranged)
             {
+                var ammoState = isLeftHand
+                    ? _playerState.AmmoStatusLeft
+                    : _playerState.AmmoStatusRight;
+
+                if (ammoState.Ammo == 0)
+                {
+                    Debug.Log("Trying to fire with no bullets");
+                    return;
+                }
+
+                //todo: attribute-based ammo consumption
+                ammoState.Ammo -= 1;
+
+                GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(isLeftHand, ammoState);
+
                 var startPos = _playerState.Positions.RightHandInFront.position + lookDirection * 1;
 
                 //todo: attribute-based weapon range
@@ -556,6 +584,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return;
             }
 
+            if (isLeftHand)
+            {
+                _playerState.AmmoStatusLeft.IsReloading = false;
+            }
+            else
+            {
+                _playerState.AmmoStatusRight.IsReloading = false;
+            }
+
             var itemInHand = _playerState.Inventory.GetItemInHand(isLeftHand);
 
             TryToAttackServerRpc(itemInHand?.Id, _playerCamera.transform.forward);
@@ -585,8 +622,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private static void RefreshCraftingWindow()
         {
-            var characterMenuUi = GameManager.Instance.MainCanvasObjects.CharacterMenu.GetComponent<CharacterMenuUi>();
-            var craftingUi = characterMenuUi.Crafting.GetComponent<CharacterMenuUiCraftingTab>();
+            var craftingUi = GameManager.Instance.MainCanvasObjects.GetCharacterMenuUiCraftingTab();
 
             if (craftingUi.gameObject.activeSelf)
             {

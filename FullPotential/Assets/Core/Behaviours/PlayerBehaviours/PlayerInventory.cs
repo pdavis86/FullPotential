@@ -12,7 +12,6 @@ using FullPotential.Api.Combat;
 using Unity.Netcode;
 using UnityEngine;
 using FullPotential.Core.Behaviours.GameManagement;
-using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Networking;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -205,8 +204,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             yield return new WaitForSeconds(0.1f);
 
-            var characterMenuUi = GameManager.Instance.MainCanvasObjects.CharacterMenu.GetComponent<CharacterMenuUi>();
-            var equipmentUi = characterMenuUi.Equipment.GetComponent<CharacterMenuUiEquipmentTab>();
+            var equipmentUi = GameManager.Instance.MainCanvasObjects.GetCharacterMenuUiEquipmentTab();
 
             if (equipmentUi.gameObject.activeSelf)
             {
@@ -542,7 +540,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     {
                         case SlotGameObjectName.LeftHand:
                         case SlotGameObjectName.RightHand:
-                            GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateHand(null, slotGameObjectName == SlotGameObjectName.LeftHand);
+                            GameManager.Instance.MainCanvasObjects.GetHud().UpdateHand(null, slotGameObjectName == SlotGameObjectName.LeftHand);
                             break;
                     }
                 }
@@ -595,7 +593,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (IsOwner)
             {
                 var contents = GameManager.Instance.ResultFactory.GetItemDescription(item);
-                GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().UpdateHand(contents, isLeftHand);
+                GameManager.Instance.MainCanvasObjects.GetHud().UpdateHand(contents, isLeftHand);
             }
 
             if (!NetworkManager.Singleton.IsClient)
@@ -620,10 +618,32 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                             InstantiateInPlayerHand(prefab, isLeftHand, new Vector3(0, 90), slotGameObjectName);
                         }
                     );
+
+                    //todo: attribute-based ammo max
+                    var newAmmoStatus = new AmmoStatus
+                    {
+                        AmmoMax = 5,
+                        Ammo = 5
+                    };
+
+                    if (isLeftHand)
+                    {
+                        _playerState.AmmoStatusLeft = newAmmoStatus;
+                    }
+                    else
+                    {
+                        _playerState.AmmoStatusRight = newAmmoStatus;
+                    }
+
+                    GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(isLeftHand, newAmmoStatus);
+
                     break;
 
                 case Spell:
                     InstantiateInPlayerHand(GameManager.Instance.Prefabs.Combat.SpellInHand, isLeftHand, null, slotGameObjectName);
+
+                    GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(isLeftHand, null);
+
                     break;
 
                 default:

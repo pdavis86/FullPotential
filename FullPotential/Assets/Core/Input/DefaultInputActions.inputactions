@@ -121,6 +121,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ReloadLeft",
+                    "type": "Button",
+                    "id": "9ba6aec8-c21a-49f9-b7c0-076a771875a7",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ReloadRight",
+                    "type": "Button",
+                    "id": "990555f7-2ddc-4f96-ac91-460c7ba1e885",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -292,7 +310,7 @@
                 {
                     "name": "",
                     "id": "1a94b1b7-7f27-4f2b-a556-5ec24ed85d1d",
-                    "path": "<Keyboard>/alt",
+                    "path": "<Keyboard>/leftCtrl",
                     "interactions": "Press(pressPoint=0.2)",
                     "processors": "",
                     "groups": "",
@@ -303,11 +321,33 @@
                 {
                     "name": "",
                     "id": "6f444393-f47b-4ef7-8f11-6771cd4983a7",
-                    "path": "<Keyboard>/alt",
+                    "path": "<Keyboard>/leftCtrl",
                     "interactions": "Press(behavior=1)",
                     "processors": "",
                     "groups": "",
                     "action": "ShowCursorStop",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a36a97d4-d708-4d8c-9744-7a1fcf3201e1",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ReloadLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "916cc168-04f3-47ca-9fc2-bb5556adf18b",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ReloadRight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

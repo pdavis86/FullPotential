@@ -3,7 +3,6 @@ using FullPotential.Api.Scenes;
 using FullPotential.Api.Spawning;
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
-using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
 using FullPotential.Core.Spawning;
@@ -32,6 +31,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
         private int _enemyCounter;
 
         [SerializeField] private SceneAttributes _attributes = new SceneAttributes();
+        
         [SerializeField]
         public SceneAttributes Attributes
         {
@@ -107,7 +107,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
                 return;
             }
 
-            GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ShowAlert(announcement);
+            GameManager.Instance.MainCanvasObjects.GetHud().ShowAlert(announcement);
         }
 
         private void SpawnEnemy()

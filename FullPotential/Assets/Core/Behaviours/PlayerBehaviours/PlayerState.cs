@@ -10,7 +10,6 @@ using FullPotential.Api.Combat;
 using FullPotential.Api.Enums;
 using FullPotential.Core.Behaviours.Combat;
 using FullPotential.Core.Behaviours.Environment;
-using FullPotential.Core.Behaviours.Ui;
 using FullPotential.Core.Behaviours.UI.Components;
 using FullPotential.Core.Combat;
 using FullPotential.Core.Extensions;
@@ -54,7 +53,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public readonly NetworkVariable<int> Mana = new NetworkVariable<int>(100);
         // ReSharper enable MemberCanBePrivate.Global
 
-        public LivingEntityState AliveState { get; set; }
+        public LivingEntityState AliveState { get; private set; }
+        public AmmoStatus AmmoStatusLeft = new AmmoStatus();
+        public AmmoStatus AmmoStatusRight = new AmmoStatus();
 
         [HideInInspector] public PlayerInventory Inventory;
         [HideInInspector] public string PlayerToken;
@@ -66,7 +67,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private ClientRpcParams _clientRpcParams;
         private GameObject _spellBeingCastLeft;
         private GameObject _spellBeingCastRight;
-        private Hud _hud;
 
         private FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
         private readonly Dictionary<string, DateTime> _unclaimedLoot = new Dictionary<string, DateTime>();
@@ -74,6 +74,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private DelayedAction _consumeStamina;
         private DelayedAction _replenishStamina;
         private DelayedAction _replenishMana;
+        private DelayedAction _replenishAmmo;
         private bool _isSprinting;
         private Vector3 _startingPosition;
         private float _myHeight;
@@ -181,6 +182,27 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 }
             });
 
+            //todo: animation time-based ammo reloading
+            _replenishAmmo = new DelayedAction(3, () =>
+            {
+                if (AmmoStatusLeft.IsReloading && AmmoStatusLeft.Ammo < AmmoStatusLeft.AmmoMax)
+                {
+                    AmmoStatusLeft.Ammo = AmmoStatusLeft.AmmoMax;
+                    AmmoStatusLeft.IsReloading = false;
+
+                    GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(true, AmmoStatusLeft);
+                    ReloadCompleteClientRpc(true, _clientRpcParams);
+                }
+                else if (AmmoStatusRight.IsReloading && AmmoStatusRight.Ammo < AmmoStatusRight.AmmoMax)
+                {
+                    AmmoStatusRight.Ammo = AmmoStatusRight.AmmoMax;
+                    AmmoStatusRight.IsReloading = false;
+
+                    GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(false, AmmoStatusRight);
+                    ReloadCompleteClientRpc(false, _clientRpcParams);
+                }
+            });
+
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
                 GameManager.Instance.MainCanvasObjects.Respawn.SetActive(false);
@@ -216,7 +238,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
-                GetHud().UpdateStaminaPercentage(newValue, GetStaminaMax());
+                GameManager.Instance.MainCanvasObjects.GetHud().UpdateStaminaPercentage(newValue, GetStaminaMax());
             }
         }
 
@@ -229,7 +251,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
-                GetHud().UpdateManaPercentage(newValue, GetManaMax());
+                GameManager.Instance.MainCanvasObjects.GetHud().UpdateManaPercentage(newValue, GetManaMax());
             }
         }
 
@@ -270,6 +292,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public void ForceRespawnServerRpc()
         {
             HandleDeath(GameManager.Instance.Localizer.Translate("ui.alert.suicide"), null);
+        }
+
+        [ServerRpc]
+        public void ReloadServerRpc(bool isLeftHand)
+        {
+            var leftOrRight = isLeftHand
+                ? AmmoStatusLeft
+                : AmmoStatusRight;
+
+            leftOrRight.IsReloading = true;
         }
 
         #endregion
@@ -346,7 +378,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (!killerName.IsNullOrWhiteSpace())
             {
                 var deathMessage = AttackHelper.GetDeathMessage(IsOwner, Username, killerName, itemName);
-                GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>().ShowAlert(deathMessage);
+                GameManager.Instance.MainCanvasObjects.GetHud().ShowAlert(deathMessage);
             }
 
             switch (state)
@@ -399,6 +431,20 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             projectileScript.Speed = 500;
         }
 
+        // ReSharper disable once UnusedParameter.Local
+        [ClientRpc]
+        private void ReloadCompleteClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
+        {
+            var leftOrRight = isLeftHand
+                ? AmmoStatusLeft
+                : AmmoStatusRight;
+
+            leftOrRight.Ammo = leftOrRight.AmmoMax;
+            leftOrRight.IsReloading = false;
+
+            GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(isLeftHand, leftOrRight);
+        }
+
         #endregion
 
         public void UpdateHealthAndDefenceValues()
@@ -415,7 +461,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
-                GetHud().UpdateHealthPercentage(health, maxHealth, defence);
+                GameManager.Instance.MainCanvasObjects.GetHud().UpdateHealthPercentage(health, maxHealth, defence);
             }
         }
 
@@ -458,16 +504,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             });
         }
 
-        private Hud GetHud()
-        {
-            if (_hud == null)
-            {
-                _hud = GameManager.Instance.MainCanvasObjects.Hud.GetComponent<Hud>();
-            }
-
-            return _hud;
-        }
-
         private void HandleSprinting()
         {
             if (!IsServer)
@@ -480,6 +516,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void Replenish()
         {
+            _replenishAmmo.TryPerformAction();
+
             if (!IsServer)
             {
                 return;
