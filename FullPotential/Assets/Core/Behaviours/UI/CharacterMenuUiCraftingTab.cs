@@ -285,6 +285,7 @@ namespace FullPotential.Core.Behaviours.Ui
 
             if (_components.Count == 0)
             {
+                _craftButton.interactable = false;
                 return;
             }
 

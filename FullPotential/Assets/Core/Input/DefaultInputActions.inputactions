@@ -60,7 +60,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "LeftAttack",
+                    "name": "AttackLeft",
                     "type": "Button",
                     "id": "230e98f7-4efe-4afe-9f23-7da36c1da81d",
                     "expectedControlType": "Button",
@@ -69,7 +69,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "RightAttack",
+                    "name": "AttackRight",
                     "type": "Button",
                     "id": "3ca23353-87c5-4063-a6c0-aba3637af680",
                     "expectedControlType": "Button",
@@ -156,7 +156,7 @@
                 {
                     "name": "",
                     "id": "78ca14de-9446-4569-a572-3f69c79c2e9f",
-                    "path": "<Keyboard>/e",
+                    "path": "<Keyboard>/r",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard and Mouse",
@@ -259,7 +259,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard and Mouse",
-                    "action": "LeftAttack",
+                    "action": "AttackLeft",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -270,7 +270,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard and Mouse",
-                    "action": "RightAttack",
+                    "action": "AttackRight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

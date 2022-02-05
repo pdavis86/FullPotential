@@ -477,6 +477,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public List<string> ValidateIsCraftable(string[] componentIds, ItemBase itemToCraft)
         {
+            if (componentIds == null || componentIds.Length == 0)
+            {
+                return new List<string> { GameManager.Instance.Localizer.Translate("crafting.error.nocomponents") };
+            }
+
             var components = GetComponentsFromIds(componentIds);
 
             var errors = new List<string>();

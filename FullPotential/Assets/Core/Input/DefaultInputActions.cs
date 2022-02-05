@@ -82,7 +82,7 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""LeftAttack"",
+                    ""name"": ""AttackLeft"",
                     ""type"": ""Button"",
                     ""id"": ""230e98f7-4efe-4afe-9f23-7da36c1da81d"",
                     ""expectedControlType"": ""Button"",
@@ -91,7 +91,7 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""RightAttack"",
+                    ""name"": ""AttackRight"",
                     ""type"": ""Button"",
                     ""id"": ""3ca23353-87c5-4063-a6c0-aba3637af680"",
                     ""expectedControlType"": ""Button"",
@@ -178,7 +178,7 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""78ca14de-9446-4569-a572-3f69c79c2e9f"",
-                    ""path"": ""<Keyboard>/e"",
+                    ""path"": ""<Keyboard>/r"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard and Mouse"",
@@ -281,7 +281,7 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard and Mouse"",
-                    ""action"": ""LeftAttack"",
+                    ""action"": ""AttackLeft"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -292,7 +292,7 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard and Mouse"",
-                    ""action"": ""RightAttack"",
+                    ""action"": ""AttackRight"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -403,8 +403,8 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
         m_Player_Cancel = m_Player.FindAction("Cancel", throwIfNotFound: true);
         m_Player_OpenCharacterMenu = m_Player.FindAction("OpenCharacterMenu", throwIfNotFound: true);
-        m_Player_LeftAttack = m_Player.FindAction("LeftAttack", throwIfNotFound: true);
-        m_Player_RightAttack = m_Player.FindAction("RightAttack", throwIfNotFound: true);
+        m_Player_AttackLeft = m_Player.FindAction("AttackLeft", throwIfNotFound: true);
+        m_Player_AttackRight = m_Player.FindAction("AttackRight", throwIfNotFound: true);
         m_Player_Pointer = m_Player.FindAction("Pointer", throwIfNotFound: true);
         m_Player_SprintStart = m_Player.FindAction("SprintStart", throwIfNotFound: true);
         m_Player_SprintStop = m_Player.FindAction("SprintStop", throwIfNotFound: true);
@@ -477,8 +477,8 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Interact;
     private readonly InputAction m_Player_Cancel;
     private readonly InputAction m_Player_OpenCharacterMenu;
-    private readonly InputAction m_Player_LeftAttack;
-    private readonly InputAction m_Player_RightAttack;
+    private readonly InputAction m_Player_AttackLeft;
+    private readonly InputAction m_Player_AttackRight;
     private readonly InputAction m_Player_Pointer;
     private readonly InputAction m_Player_SprintStart;
     private readonly InputAction m_Player_SprintStop;
@@ -496,8 +496,8 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
         public InputAction @Interact => m_Wrapper.m_Player_Interact;
         public InputAction @Cancel => m_Wrapper.m_Player_Cancel;
         public InputAction @OpenCharacterMenu => m_Wrapper.m_Player_OpenCharacterMenu;
-        public InputAction @LeftAttack => m_Wrapper.m_Player_LeftAttack;
-        public InputAction @RightAttack => m_Wrapper.m_Player_RightAttack;
+        public InputAction @AttackLeft => m_Wrapper.m_Player_AttackLeft;
+        public InputAction @AttackRight => m_Wrapper.m_Player_AttackRight;
         public InputAction @Pointer => m_Wrapper.m_Player_Pointer;
         public InputAction @SprintStart => m_Wrapper.m_Player_SprintStart;
         public InputAction @SprintStop => m_Wrapper.m_Player_SprintStop;
@@ -532,12 +532,12 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                 @OpenCharacterMenu.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnOpenCharacterMenu;
                 @OpenCharacterMenu.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnOpenCharacterMenu;
                 @OpenCharacterMenu.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnOpenCharacterMenu;
-                @LeftAttack.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnLeftAttack;
-                @LeftAttack.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnLeftAttack;
-                @LeftAttack.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnLeftAttack;
-                @RightAttack.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRightAttack;
-                @RightAttack.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRightAttack;
-                @RightAttack.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRightAttack;
+                @AttackLeft.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttackLeft;
+                @AttackLeft.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttackLeft;
+                @AttackLeft.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttackLeft;
+                @AttackRight.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttackRight;
+                @AttackRight.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttackRight;
+                @AttackRight.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttackRight;
                 @Pointer.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPointer;
                 @Pointer.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPointer;
                 @Pointer.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPointer;
@@ -581,12 +581,12 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                 @OpenCharacterMenu.started += instance.OnOpenCharacterMenu;
                 @OpenCharacterMenu.performed += instance.OnOpenCharacterMenu;
                 @OpenCharacterMenu.canceled += instance.OnOpenCharacterMenu;
-                @LeftAttack.started += instance.OnLeftAttack;
-                @LeftAttack.performed += instance.OnLeftAttack;
-                @LeftAttack.canceled += instance.OnLeftAttack;
-                @RightAttack.started += instance.OnRightAttack;
-                @RightAttack.performed += instance.OnRightAttack;
-                @RightAttack.canceled += instance.OnRightAttack;
+                @AttackLeft.started += instance.OnAttackLeft;
+                @AttackLeft.performed += instance.OnAttackLeft;
+                @AttackLeft.canceled += instance.OnAttackLeft;
+                @AttackRight.started += instance.OnAttackRight;
+                @AttackRight.performed += instance.OnAttackRight;
+                @AttackRight.canceled += instance.OnAttackRight;
                 @Pointer.started += instance.OnPointer;
                 @Pointer.performed += instance.OnPointer;
                 @Pointer.canceled += instance.OnPointer;
@@ -629,8 +629,8 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
         void OnInteract(InputAction.CallbackContext context);
         void OnCancel(InputAction.CallbackContext context);
         void OnOpenCharacterMenu(InputAction.CallbackContext context);
-        void OnLeftAttack(InputAction.CallbackContext context);
-        void OnRightAttack(InputAction.CallbackContext context);
+        void OnAttackLeft(InputAction.CallbackContext context);
+        void OnAttackRight(InputAction.CallbackContext context);
         void OnPointer(InputAction.CallbackContext context);
         void OnSprintStart(InputAction.CallbackContext context);
         void OnSprintStop(InputAction.CallbackContext context);

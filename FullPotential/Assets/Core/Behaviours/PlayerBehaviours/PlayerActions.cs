@@ -159,13 +159,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void OnLeftAttack()
+        private void OnAttackLeft()
         {
             OnAttack(true);
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void OnRightAttack()
+        private void OnAttackRight()
         {
             OnAttack(false);
         }
@@ -462,7 +462,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
                 var lookDirection = GetLookDirectionRay().direction;
 
-                var startPos = _playerState.Positions.RightHandInFront.position + lookDirection * 1;
+                var leftOrRight = isLeftHand
+                    ? _playerState.Positions.LeftHandInFront
+                    : _playerState.Positions.RightHandInFront;
+
+                var startPos = leftOrRight.position + lookDirection * 1;
 
                 //todo: attribute-based weapon range
                 var endPos = Physics.Raycast(ray, out var rangedHit, 30)

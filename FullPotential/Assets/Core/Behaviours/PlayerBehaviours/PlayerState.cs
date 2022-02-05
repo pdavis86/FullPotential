@@ -277,10 +277,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public void RespawnServerRpc()
         {
             Health.Value = GetHealthMax();
-            var spawnPoint = GameManager.Instance.SceneBehaviour.GetSpawnPoint(gameObject);
+            AliveState = LivingEntityState.Respawning;
+            
             RespawnClientRpc(_clientRpcParams);
 
-            AliveState = LivingEntityState.Respawning;
+            var spawnPoint = GameManager.Instance.SceneBehaviour.GetSpawnPoint(gameObject);
             PlayerSpawnStateChangeClientRpc(spawnPoint.Position, LivingEntityState.Respawning, null, null, RpcHelper.ForNearbyPlayers());
         }
 
@@ -389,9 +390,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     _rb.isKinematic = false;
 
                     //Don't halve it as object can still end up in the floor
-                    position.y += _myHeight / 1.5f;
+                    position.y += _myHeight / 1.95f;
 
                     _startingPosition = position;
+                    transform.position = _startingPosition;
 
                     var bodyMaterialForRespawn = _bodyMeshRenderer.material;
                     ShaderHelper.ChangeRenderMode(bodyMaterialForRespawn, ShaderHelper.BlendMode.Fade);
