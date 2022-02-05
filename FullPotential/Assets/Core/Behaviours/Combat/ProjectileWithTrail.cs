@@ -32,7 +32,6 @@ namespace FullPotential.Core.Behaviours.Combat
 
             if (Vector3.Distance(TargetPosition, transform.position) < 0.01)
             {
-                //Debug.Log("Destroying at destination");
                 Destroy(gameObject);
             }
         }

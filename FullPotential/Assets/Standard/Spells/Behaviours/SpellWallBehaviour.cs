@@ -65,7 +65,6 @@ namespace FullPotential.Standard.Spells.Behaviours
 
             if (!other.gameObject.CompareTagAny(Tags.Player, Tags.Enemy))
             {
-                //Debug.Log("You hit something not damageable");
                 return;
             }
 
@@ -74,9 +73,6 @@ namespace FullPotential.Standard.Spells.Behaviours
 
         public void ApplySpellEffects(GameObject target, Vector3? position)
         {
-            //throw new System.NotImplementedException();
-            Debug.Log("Applying spell effects to " + target.name);
-
             AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
         }
 

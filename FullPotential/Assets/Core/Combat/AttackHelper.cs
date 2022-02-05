@@ -36,7 +36,6 @@ namespace FullPotential.Core.Combat
 
             if (!targetIsPlayer && !targetIsEnemy)
             {
-                //Debug.Log($"You hit {target.name} which is not damageable");
                 return;
             }
 
@@ -78,8 +77,6 @@ namespace FullPotential.Core.Combat
             var sourceItemName = itemUsed?.Name ?? GameManager.Instance.Localizer.Translate("ui.alert.attack.noitem");
 
             damageable.TakeDamage(damageDealt, sourceClientId, sourceName, sourceItemName);
-
-            //Debug.Log($"Source '{sourceName}' used '{sourceItemName}' to attack target '{target.name}' for {damageDealt} damage");
 
             if (source == null)
             {

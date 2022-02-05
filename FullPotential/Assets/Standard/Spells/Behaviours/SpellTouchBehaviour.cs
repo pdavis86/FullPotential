@@ -30,9 +30,6 @@ namespace FullPotential.Standard.Spells.Behaviours
 
             if (Physics.Raycast(startPosition, direction, out var hit, maxDistance: _maxDistance))
             {
-                //var distance = Vector3.Distance(startPosition, hit.transform.position);
-                //Debug.Log($"Player {_sourcePlayer.name} touched {hit.transform.gameObject.name} with spell {activeSpell.Name} at distance {distance}");
-
                 var sourcePlayerState = _sourcePlayer.GetComponent<PlayerState>();
 
                 if (sourcePlayerState == null || !sourcePlayerState.SpendMana(activeSpell))

@@ -77,8 +77,6 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            //Debug.Log("Collided with " + other.gameObject.name);
-
             if (other.isTrigger)
             {
                 return;

@@ -73,7 +73,6 @@ namespace FullPotential.Standard.Spells.Behaviours
             {
                 if (distanceFromPlayer >= _distanceBeforeReturning)
                 {
-                    //Debug.LogError("Far enough away, now returning");
                     _returningToPlayer = true;
                     ClearForce();
                 }
@@ -89,7 +88,6 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            //Debug.LogError("Finally got back to the player!");
             ApplySpellEffects(_sourcePlayer, transform.position);
         }
 
@@ -100,8 +98,6 @@ namespace FullPotential.Standard.Spells.Behaviours
             {
                 return;
             }
-
-            //Debug.Log("Collided with " + other.gameObject.name);
 
             if (other.gameObject != _sourcePlayer)
             {

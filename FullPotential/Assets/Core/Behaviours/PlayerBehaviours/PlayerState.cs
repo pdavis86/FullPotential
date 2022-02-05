@@ -122,10 +122,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (IsServer)
             {
-                //Debug.LogError("I am the Server. Loading player data with client ID " + OwnerClientId);
                 GetAndLoadPlayerData(false, null);
 
-                //Debug.Log($"Adding client ID {OwnerClientId} with username '{Username}'");
                 if (GameManager.Instance.GameDataStore.ClientIdToUsername.ContainsKey(OwnerClientId))
                 {
                     GameManager.Instance.GameDataStore.ClientIdToUsername[OwnerClientId] = Username;
@@ -137,12 +135,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
             else if (IsOwner)
             {
-                //Debug.LogError("Requesting my player data with client ID " + OwnerClientId);
                 RequestPlayerDataServerRpc();
             }
             else
             {
-                //Debug.LogError("Requesting other player data for client ID " + OwnerClientId);
                 RequestReducedPlayerDataServerRpc();
             }
 
@@ -320,8 +316,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private void LoadPlayerDataClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams)
         {
             var fragmentedMessage = JsonUtility.FromJson<FragmentedMessage>(fragmentedMessageJson);
-
-            //Debug.LogError($"Received part message with SequenceId {fragmentedMessage.SequenceId}");
 
             _loadPlayerDataReconstructor.AddMessage(fragmentedMessage);
             if (!_loadPlayerDataReconstructor.HaveAllMessages(fragmentedMessage.GroupId))
@@ -536,8 +530,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             var distanceMoved = Vector3.Distance(transform.position, _startingPosition);
 
-            //Debug.Log("Distance moved since death: " + distanceMoved + ". _startingPosition: " + _startingPosition + ". Current pos: " + transform.position);
-
             if (distanceMoved > 1)
             {
                 AliveState = LivingEntityState.Alive;
@@ -548,8 +540,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void GetAndLoadPlayerData(bool reduced, ulong? sendToClientId)
         {
-            //Debug.Log($"Loading player data for {OwnerClientId}, reduced: {reduced}");
-
             var playerData = GameManager.Instance.UserRegistry.Load(PlayerToken, null, reduced);
 
             if (sendToClientId.HasValue)
@@ -578,30 +568,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 Send = new ClientRpcSendParams { TargetClientIds = new[] { clientId } }
             };
 
-            //Debug.LogError($"Sending LoadFromPlayerData messages to client {clientId}");
-
             foreach (var message in FragmentedMessageReconstructor.GetFragmentedMessages(playerData))
             {
                 LoadPlayerDataClientRpc(message, clientRpcParams);
                 yield return null;
             }
         }
-
-        //public static PlayerState GetWithClientId(ulong clientId)
-        //{
-        //    var playerObjects = GameObject.FindGameObjectsWithTag(Constants.Tags.Player);
-
-        //    foreach (var obj in playerObjects)
-        //    {
-        //        var otherPlayerState = obj.GetComponent<PlayerState>();
-        //        if (otherPlayerState.OwnerClientId == clientId)
-        //        {
-        //            return otherPlayerState;
-        //        }
-        //    }
-
-        //    return null;
-        //}
 
         public void ShowAlertForItemsAddedToInventory(string alertText)
         {
@@ -621,8 +593,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void LoadFromPlayerData(PlayerData playerData)
         {
-            //Debug.LogError($"Loading player data into PlayerState with OwnerClientId: {OwnerClientId}");
-
             Username = playerData.Username;
             SetName();
 
@@ -675,7 +645,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (Username.IsNullOrWhiteSpace())
             {
-                //Debug.LogError("Trying to set texture before player data is loaded");
                 yield break;
             }
 

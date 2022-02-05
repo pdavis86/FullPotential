@@ -454,13 +454,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 : null;
         }
 
-        public ItemBase GetItemInHand(bool isLeftHand)
-        {
-            return isLeftHand
-                ? GetItemInSlot(SlotGameObjectName.LeftHand)
-                : GetItemInSlot(SlotGameObjectName.RightHand);
-        }
-
         public System.Collections.Generic.KeyValuePair<SlotGameObjectName, EquippedItem>? GetEquippedWithItemId(string itemId)
         {
             var match = _equippedItems.FirstOrDefault(x => x.Value?.Item?.Id == itemId);

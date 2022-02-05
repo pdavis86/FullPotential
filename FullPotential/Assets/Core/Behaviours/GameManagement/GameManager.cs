@@ -107,12 +107,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             InputActions = new DefaultInputActions();
 
             NetworkManager.Singleton.ConnectionApprovalCallback += OnApprovalCheck;
-            //NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += OnServerDisconnectedClient;
-            //NetworkManager.Singleton.OnServerStarted += OnServerStarted;
-
-            //var networkTransport = NetworkManager.Singleton.GetComponent<UNetTransport>();
-            //networkTransport.OnTransportEvent += OnTransportEvent;
 
             SceneManager.LoadSceneAsync(1);
         }
@@ -156,11 +151,6 @@ namespace FullPotential.Core.Behaviours.GameManagement
             callback(false, null, true, null, null);
         }
 
-        //private void OnClientConnected(ulong obj)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
         private void OnServerDisconnectedClient(ulong clientId)
         {
             if (NetworkManager.Singleton.IsServer)
@@ -173,7 +163,6 @@ namespace FullPotential.Core.Behaviours.GameManagement
                     return;
                 }
 
-                //Debug.Log($"Saving player data for '{playerUsername}' because they disconnected");
                 UserRegistry.PlayerData.Remove(playerUsername, out var playerDataToSave);
                 SavePlayerData(playerDataToSave);
             }
@@ -187,16 +176,6 @@ namespace FullPotential.Core.Behaviours.GameManagement
                 }
             }
         }
-
-        //private void OnServerStarted()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //private void OnTransportEvent(NetworkEvent eventType, ulong clientId, ArraySegment<byte> payload, float receiveTime)
-        //{
-        //    var foo = "";
-        //}
 
         // ReSharper disable once MemberCanBePrivate.Global
         public void SendServerToClientSetDisconnectReason(ulong clientId, ConnectStatus status)
@@ -214,8 +193,6 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         public async Task SetCultureAsync(string culture)
         {
-            Debug.Log("Setting language to " + culture);
-
             await Localizer.LoadLocalizationFilesAsync(culture);
 
             //Re-activate anything already active
@@ -291,12 +268,9 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
             _isSaving = true;
 
-            //Debug.Log($"Waiting {waitSeconds} seconds before saving...");
             yield return new WaitForSeconds(waitSeconds);
 
-            //Debug.Log("Looking for changes to save...");
             yield return new WaitUntil(() => SaveAllPlayerDataAsync().IsCompleted);
-            //Debug.Log("Save completed!");
 
             _isSaving = false;
         }
@@ -328,8 +302,6 @@ namespace FullPotential.Core.Behaviours.GameManagement
             {
                 Debug.LogError("Tried to save when not on the server");
             }
-
-            Debug.Log($"Saving data for '{playerData.Username}'...");
 
             if (!playerData.InventoryLoadedSuccessfully)
             {

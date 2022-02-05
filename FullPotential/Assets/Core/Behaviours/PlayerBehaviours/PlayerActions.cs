@@ -9,7 +9,6 @@ using FullPotential.Api.Enums;
 using FullPotential.Api.Registry;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
 using FullPotential.Core.Combat;
-using FullPotential.Core.Extensions;
 using FullPotential.Standard.Spells.Targeting;
 using TMPro;
 using Unity.Netcode;
@@ -162,13 +161,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         // ReSharper disable once UnusedMember.Local
         private void OnLeftAttack()
         {
-            TryToAttack(true);
+            OnAttack(true);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnRightAttack()
         {
-            TryToAttack(false);
+            OnAttack(false);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -212,8 +211,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [ServerRpc]
         public void UpdatePlayerSettingsServerRpc(PlayerSettings playerSettings)
         {
-            //Debug.Log("UpdatePlayerSettingsServerRpc called with " + playerSettings?.TextureUrl);
-
             var saveData = GameManager.Instance.UserRegistry.PlayerData[_playerState.Username];
             saveData.Settings = playerSettings ?? new PlayerSettings();
             saveData.IsDirty = true;
@@ -222,141 +219,31 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         [ServerRpc]
-        private void TryToAttackServerRpc(string itemId, Vector3 lookDirection, ServerRpcParams serverRpcParams = default)
+        private void TryToAttackServerRpc(bool isLeftHand, ServerRpcParams serverRpcParams = default)
         {
-            if (itemId.IsNullOrWhiteSpace())
+            StopReloading(isLeftHand);
+
+            var itemInHand = isLeftHand
+                ? _playerState.Inventory.GetItemInSlot(PlayerInventory.SlotGameObjectName.LeftHand)
+                : _playerState.Inventory.GetItemInSlot(PlayerInventory.SlotGameObjectName.RightHand);
+
+            switch (itemInHand)
             {
-                Punch();
-                return;
-            }
-
-            //todo: do I need lookDirection when I have _playerCamera.ScreenPointToRay ?
-
-            var slotWithItem = _playerState.Inventory.GetEquippedWithItemId(itemId);
-            var itemInHand = slotWithItem?.Value?.Item;
-
-            if (!slotWithItem.HasValue
-                || (slotWithItem.Value.Key != PlayerInventory.SlotGameObjectName.LeftHand && slotWithItem.Value.Key != PlayerInventory.SlotGameObjectName.RightHand)
-                || itemInHand == null)
-            {
-                Debug.LogWarning("Player tried to cheat by sending an non-equipped item ID");
-                return;
-            }
-
-            var isLeftHand = slotWithItem.Value.Key == PlayerInventory.SlotGameObjectName.LeftHand;
-
-            if (itemInHand is Spell spellInHand)
-            {
-                CastSpell(spellInHand, isLeftHand, lookDirection, serverRpcParams);
-            }
-            else if (itemInHand is Weapon weaponInHand)
-            {
-                UseWeapon(weaponInHand, isLeftHand, lookDirection);
-            }
-            else
-            {
-                Debug.LogWarning("Not implemented attack for " + itemInHand.Name + " yet");
-            }
-        }
-
-        private void Punch()
-        {
-            var ray = _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
-            if (!Physics.Raycast(ray, out var hit, 4))
-            {
-                //Debug.Log("Swing and a miss!");
-                return;
-            }
-
-            AttackHelper.DealDamage(gameObject, null, hit.transform.gameObject, hit.point);
-        }
-
-        private void UseWeapon(Weapon weaponInHand, bool isLeftHand, Vector3 lookDirection)
-        {
-            var ray = _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
-
-            var registryType = (IGearWeapon)weaponInHand.RegistryType;
-
-            if (registryType.Category == IGearWeapon.WeaponCategory.Ranged)
-            {
-                var ammoState = isLeftHand
-                    ? _playerState.AmmoStatusLeft
-                    : _playerState.AmmoStatusRight;
-
-                if (ammoState.Ammo == 0)
-                {
-                    Debug.Log("Trying to fire with no bullets");
-                    return;
-                }
-
-                //todo: attribute-based ammo consumption
-                ammoState.Ammo -= 1;
-
-                GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(isLeftHand, ammoState);
-
-                var startPos = _playerState.Positions.RightHandInFront.position + lookDirection * 1;
-
-                //todo: attribute-based weapon range
-                var endPos = Physics.Raycast(ray, out var rangedHit, 30)
-                      ? rangedHit.point
-                      : _playerState.Positions.RightHandInFront.position + lookDirection * 30;
-
-                _playerState.UsedWeaponClientRpc(startPos, endPos, RpcHelper.ForNearbyPlayers());
-
-                if (rangedHit.transform != null)
-                {
-                    AttackHelper.DealDamage(gameObject, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
-                }
-            }
-            else
-            {
-                //todo: attribute-based melee range
-                if (!Physics.Raycast(ray, out var meleeHit, maxDistance: 4))
-                {
-                    //Debug.Log("Weapon can't reach target!");
-                    return;
-                }
-
-                AttackHelper.DealDamage(gameObject, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
-            }
-        }
-
-        private void CastSpell(Spell activeSpell, bool isLeftHand, Vector3 lookDirection, ServerRpcParams serverRpcParams)
-        {
-            if (!IsServer)
-            {
-                return;
-            }
-
-            var startPosition = isLeftHand
-                ? _playerState.Positions.LeftHandInFront.position
-                : _playerState.Positions.RightHandInFront.position;
-
-            const float maxDistance = 50f;
-            var targetDirection = Physics.Raycast(_playerCamera.transform.position, lookDirection, out var hit, maxDistance: maxDistance)
-                ? (hit.point - startPosition).normalized
-                : lookDirection;
-
-            switch (activeSpell.Targeting)
-            {
-                case Projectile:
-                    _playerState.SpawnSpellProjectile(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId);
+                case null:
+                    Punch();
                     break;
 
-                case Self:
-                    _playerState.SpawnSpellSelf(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId);
+                case Spell spellInHand:
+                    CastSpell(spellInHand, isLeftHand, serverRpcParams);
                     break;
 
-                case Standard.Spells.Targeting.Touch:
-                    _playerState.CastSpellTouch(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId);
-                    break;
-
-                case Beam:
-                    _playerState.ToggleSpellBeam(isLeftHand, activeSpell, startPosition, targetDirection);
+                case Weapon weaponInHand:
+                    UseWeapon(weaponInHand, isLeftHand);
                     break;
 
                 default:
-                    throw new Exception($"Unexpected spell targeting with TypeName: '{activeSpell.Targeting.TypeName}'");
+                    Debug.LogWarning("Not implemented attack for " + itemInHand.Name + " yet");
+                    break;
             }
         }
 
@@ -390,8 +277,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 Debug.LogError("Failed to find the interactable with gameObjectName " + gameObjectName);
                 return;
             }
-
-            //Debug.Log($"Trying to interact with {interactable.name}");
 
             var distance = Vector3.Distance(transform.position, interactable.transform.position);
             if (distance <= interactable.Radius)
@@ -495,6 +380,114 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         #endregion
 
+        private Ray GetLookDirectionRay()
+        {
+            return _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
+        }
+
+        private void Punch()
+        {
+            if (!Physics.Raycast(GetLookDirectionRay(), out var hit, 4))
+            {
+                return;
+            }
+
+            AttackHelper.DealDamage(gameObject, null, hit.transform.gameObject, hit.point);
+        }
+
+        private void CastSpell(Spell activeSpell, bool isLeftHand, ServerRpcParams serverRpcParams)
+        {
+            if (!IsServer)
+            {
+                return;
+            }
+
+            var startPosition = isLeftHand
+                ? _playerState.Positions.LeftHandInFront.position
+                : _playerState.Positions.RightHandInFront.position;
+
+            const float maxDistance = 50f;
+
+            var lookDirection = GetLookDirectionRay().direction;
+
+            var targetDirection = Physics.Raycast(_playerCamera.transform.position, lookDirection, out var hit, maxDistance: maxDistance)
+                ? (hit.point - startPosition).normalized
+                : lookDirection;
+
+            //todo: generalise this so any spell from any mod will work
+            switch (activeSpell.Targeting)
+            {
+                case Projectile:
+                    _playerState.SpawnSpellProjectile(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId);
+                    break;
+
+                case Self:
+                    _playerState.SpawnSpellSelf(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId);
+                    break;
+
+                case Standard.Spells.Targeting.Touch:
+                    _playerState.CastSpellTouch(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId);
+                    break;
+
+                case Beam:
+                    _playerState.ToggleSpellBeam(isLeftHand, activeSpell, startPosition, targetDirection);
+                    break;
+
+                default:
+                    throw new Exception($"Unexpected spell targeting with TypeName: '{activeSpell.Targeting.TypeName}'");
+            }
+        }
+
+        private void UseWeapon(Weapon weaponInHand, bool isLeftHand)
+        {
+            var ray = _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
+
+            var registryType = (IGearWeapon)weaponInHand.RegistryType;
+
+            if (registryType.Category == IGearWeapon.WeaponCategory.Ranged)
+            {
+                var ammoState = isLeftHand
+                    ? _playerState.AmmoStatusLeft
+                    : _playerState.AmmoStatusRight;
+
+                if (ammoState.Ammo == 0)
+                {
+                    return;
+                }
+
+                //todo: attribute-based ammo consumption
+                ammoState.Ammo -= 1;
+
+                GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(isLeftHand, ammoState);
+
+                var lookDirection = GetLookDirectionRay().direction;
+
+                var startPos = _playerState.Positions.RightHandInFront.position + lookDirection * 1;
+
+                //todo: attribute-based weapon range
+                var endPos = Physics.Raycast(ray, out var rangedHit, 30)
+                      ? rangedHit.point
+                      : _playerState.Positions.RightHandInFront.position + lookDirection * 30;
+
+                _playerState.UsedWeaponClientRpc(startPos, endPos, RpcHelper.ForNearbyPlayers());
+
+                if (rangedHit.transform != null)
+                {
+                    AttackHelper.DealDamage(gameObject, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
+                }
+            }
+            else
+            {
+                //todo: attribute-based melee range
+                if (!Physics.Raycast(ray, out var meleeHit, maxDistance: 4))
+                {
+                    return;
+                }
+
+                AttackHelper.DealDamage(gameObject, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
+            }
+        }
+
         private void UpdateMenuStates()
         {
             if (_toggleGameMenu || _toggleCharacterMenu)
@@ -577,13 +570,30 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
-        private void TryToAttack(bool isLeftHand)
+        private void OnAttack(bool isLeftHand)
         {
             if (_hasMenuOpen || _playerState.AliveState != LivingEntityState.Alive)
             {
                 return;
             }
 
+            if (!IsServer)
+            {
+                var ammoState = isLeftHand ? _playerState.AmmoStatusLeft : _playerState.AmmoStatusRight;
+                if (ammoState.Ammo > 0)
+                {
+                    ammoState.Ammo -= 1;
+                    GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(isLeftHand, ammoState);
+                }
+            }
+
+            StopReloading(isLeftHand);
+
+            TryToAttackServerRpc(isLeftHand);
+        }
+
+        private void StopReloading(bool isLeftHand)
+        {
             if (isLeftHand)
             {
                 _playerState.AmmoStatusLeft.IsReloading = false;
@@ -592,10 +602,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 _playerState.AmmoStatusRight.IsReloading = false;
             }
-
-            var itemInHand = _playerState.Inventory.GetItemInHand(isLeftHand);
-
-            TryToAttackServerRpc(itemInHand?.Id, _playerCamera.transform.forward);
         }
 
         public void ShowDamage(Vector3 position, string damage)

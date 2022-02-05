@@ -74,8 +74,6 @@ namespace FullPotential.Core.Behaviours.Ui
 
         private void SetSlot(GameObject slot, ItemBase item)
         {
-            //Debug.LogError($"Setting slot '{slot?.name}' to '{item?.Id}'");
-
             var slotImage = slot.transform.Find("Image").GetComponent<Image>();
             slotImage.color = item != null ? Color.white : Color.clear;
 

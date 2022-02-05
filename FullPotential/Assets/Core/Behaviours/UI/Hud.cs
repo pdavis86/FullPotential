@@ -17,7 +17,6 @@ namespace FullPotential.Core.Behaviours.Ui
         [SerializeField] private BarSlider _staminaSlider;
         [SerializeField] private BarSlider _healthSlider;
         [SerializeField] private BarSlider _manaSlider;
-        //[SerializeField] private Slider _barrierSlider;
         [SerializeField] private Text _ammoLeft;
         [SerializeField] private Text _ammoRight;
 #pragma warning restore 0649
@@ -76,11 +75,6 @@ namespace FullPotential.Core.Behaviours.Ui
             var values = _manaSlider.GetManaValues(mana, maxMana);
             _manaSlider.SetValues(values);
         }
-
-        //public void UpdateBarrierPercentage(float value)
-        //{
-        //    _barrierSlider.value = value;
-        //}
 
         public void ToggleCursorCapture(bool isOn)
         {

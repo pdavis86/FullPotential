@@ -115,7 +115,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 if (_isSprinting && _playerState.Stamina.Value < _playerState.GetStaminaCost())
                 {
-                    //Debug.Log("Out of stamina");
                     _isSprinting = false;
                 }
 
@@ -167,7 +166,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (_wasSprinting != _isSprinting)
             {
-                //Debug.Log($"_wasSprinting: {_wasSprinting}, _isSprinting: {_isSprinting}");
                 _playerState.UpdateSprintingServerRpc(_isSprinting);
                 _wasSprinting = _isSprinting;
             }

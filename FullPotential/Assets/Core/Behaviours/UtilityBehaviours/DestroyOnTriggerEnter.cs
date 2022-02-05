@@ -13,7 +13,6 @@ namespace FullPotential.Core.Behaviours.UtilityBehaviours
         // ReSharper disable once UnusedMember.Local
         private void OnTriggerEnter()
         {
-            //Debug.Log("Destroying from OnTriggerEnter()");
             Destroy(_gameObjectToDestroy);
         }
     }

@@ -78,7 +78,6 @@ namespace FullPotential.Standard.Spells.Behaviours
 
             _applyEffectsAction = new DelayedAction(1f, () =>
             {
-                //Debug.Log($"Player {_sourcePlayer.name} is hitting {hit.transform.gameObject.name} with beam spell {_spell.Name} at distance {hit.distance}");
                 ApplySpellEffects(_hit.transform.gameObject, _hit.point);
             });
         }
@@ -110,8 +109,6 @@ namespace FullPotential.Standard.Spells.Behaviours
                     Debug.LogWarning("Beam is hitting the source player!");
                     return;
                 }
-
-                //Debug.Log("Beam is hitting the object " + hit.transform.name);
 
                 _hit = hit;
 

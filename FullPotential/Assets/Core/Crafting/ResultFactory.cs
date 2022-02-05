@@ -55,8 +55,6 @@ namespace FullPotential.Core.Crafting
                 ? topEndSkew
                 : (int)Math.Round(topEndSkew - (0.009 * (topEndSkew - 50)), MidpointRounding.AwayFromZero);
 
-            //Debug.Log($"{getProp.Method.Name} = Min:{min}, Max:{max}, Skew:{topEndSkew}, Result:{result}");
-
             return result == 0 ? 1 : result;
         }
 
@@ -237,8 +235,6 @@ namespace FullPotential.Core.Crafting
 
                 lootDrop.Targeting = GetRandomSpellTargeting();
                 lootDrop.Shape = GetRandomSpellShape();
-
-                //Debug.Log($"Added {numberOfEffects} effects: {string.Join(", ", lootDrop.Effects)}");
             }
             else
             {

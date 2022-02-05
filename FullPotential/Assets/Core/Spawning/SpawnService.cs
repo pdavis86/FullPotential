@@ -15,17 +15,15 @@ namespace FullPotential.Core.Spawning
             _groundCollider = ground.GetComponent<Collider>();
         }
 
-        //public Vector3 GetPositionAboveGround(Vector3 startingPoint)
-        //{
-        //    startingPoint.y += 10;
-        //    return _groundCollider.ClosestPointOnBounds(startingPoint);
-        //}
+        private Vector3 GetPositionAboveGround(Vector3 startingPoint)
+        {
+            startingPoint.y += 10;
+            return _groundCollider.ClosestPointOnBounds(startingPoint);
+        }
 
         public void AdjustPositionToBeAboveGround(Vector3 startingPoint, GameObject gameObject, bool removeHalfHeight = true)
         {
-            startingPoint.y += 10;
-
-            var groundClosestPoint = _groundCollider.ClosestPointOnBounds(startingPoint);
+            var groundClosestPoint = GetPositionAboveGround(startingPoint);
 
             var adjustment = 0f;
             if (removeHalfHeight)
