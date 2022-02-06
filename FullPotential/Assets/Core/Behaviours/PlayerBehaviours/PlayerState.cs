@@ -927,7 +927,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public void TakeDamage(int amount, ulong? clientId, string attackerName, string itemName)
         {
-            if (clientId != null)
+            if (clientId != null && clientId != OwnerClientId)
             {
                 if (_damageTaken.ContainsKey(clientId.Value))
                 {

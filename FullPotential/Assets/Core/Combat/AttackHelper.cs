@@ -93,7 +93,7 @@ namespace FullPotential.Core.Combat
                 }
             }
 
-            if (sourceIsPlayer && position.HasValue)
+            if (sourceIsPlayer && position.HasValue && source != target)
             {
                 var offsetX = (float)_random.Next(-9, 10) / 100;
                 var offsetY = (float)_random.Next(-9, 10) / 100;
