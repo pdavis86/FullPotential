@@ -364,6 +364,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private void RespawnClientRpc(ClientRpcParams clientRpcParams)
         {
             _aliveStateChanges.PlayBackwards(true);
+            PlayerCamera.transform.rotation = _rb.rotation;
         }
 
         // ReSharper disable once UnusedParameter.Local
