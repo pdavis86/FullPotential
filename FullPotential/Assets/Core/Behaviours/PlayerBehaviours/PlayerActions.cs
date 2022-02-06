@@ -1,15 +1,14 @@
-﻿using FullPotential.Core.Behaviours.GameManagement;
+﻿using System.Linq;
+using FullPotential.Api.Enums;
+using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Loot;
+using FullPotential.Api.Registry.Spells;
+using FullPotential.Core.Behaviours.GameManagement;
+using FullPotential.Core.Behaviours.UtilityBehaviours;
+using FullPotential.Core.Combat;
 using FullPotential.Core.Data;
 using FullPotential.Core.Helpers;
 using FullPotential.Core.Networking;
-using FullPotential.Core.Registry.Types;
-using System;
-using System.Linq;
-using FullPotential.Api.Enums;
-using FullPotential.Api.Registry;
-using FullPotential.Core.Behaviours.UtilityBehaviours;
-using FullPotential.Core.Combat;
-using FullPotential.Standard.Spells.Targeting;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -192,14 +191,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         // ReSharper disable once UnusedMember.Local
         private void OnReloadLeft()
         {
-            _playerState.AmmoStatusLeft.IsReloading = true;
+            _playerState.HandStatusLeft.IsReloading = true;
             _playerState.ReloadServerRpc(true);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnReloadRight()
         {
-            _playerState.AmmoStatusRight.IsReloading = true;
+            _playerState.HandStatusRight.IsReloading = true;
             _playerState.ReloadServerRpc(false);
         }
 
@@ -402,39 +401,42 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return;
             }
 
+            var leftOrRight = isLeftHand
+                ? _playerState.HandStatusLeft
+                : _playerState.HandStatusRight;
+
+            var behaviourToStop = leftOrRight.SpellBeingCastGameObject != null
+                ? leftOrRight.SpellBeingCastGameObject.GetComponent<ISpellBehaviour>()
+                : null;
+
+            if (behaviourToStop != null)
+            {
+                behaviourToStop.StopCasting();
+                leftOrRight.SpellBeingCastGameObject = null;
+                return;
+            }
+
             var startPosition = isLeftHand
                 ? _playerState.Positions.LeftHandInFront.position
                 : _playerState.Positions.RightHandInFront.position;
 
             const float maxDistance = 50f;
-
             var lookDirection = GetLookDirectionRay().direction;
-
             var targetDirection = Physics.Raycast(_playerCamera.transform.position, lookDirection, out var hit, maxDistance: maxDistance)
                 ? (hit.point - startPosition).normalized
                 : lookDirection;
 
-            //todo: generalise this so any spell from any mod will work
-            switch (activeSpell.Targeting)
+            var spellObject = activeSpell.Targeting.SpawnGameObject(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId, parentTransform: transform);
+
+            leftOrRight.SpellBeingCast = activeSpell;
+
+            if (activeSpell.Targeting.IsContinuous)
             {
-                case Projectile:
-                    _playerState.SpawnSpellProjectile(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId);
-                    break;
-
-                case Self:
-                    _playerState.SpawnSpellSelf(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId);
-                    break;
-
-                case Standard.Spells.Targeting.Touch:
-                    _playerState.CastSpellTouch(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId);
-                    break;
-
-                case Beam:
-                    _playerState.ToggleSpellBeam(isLeftHand, activeSpell, startPosition, targetDirection);
-                    break;
-
-                default:
-                    throw new Exception($"Unexpected spell targeting with TypeName: '{activeSpell.Targeting.TypeName}'");
+                leftOrRight.SpellBeingCastGameObject = spellObject;
+            }
+            else if (spellObject != null)
+            {
+                _playerState.SpendMana(activeSpell);
             }
         }
 
@@ -447,8 +449,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (registryType.Category == IGearWeapon.WeaponCategory.Ranged)
             {
                 var ammoState = isLeftHand
-                    ? _playerState.AmmoStatusLeft
-                    : _playerState.AmmoStatusRight;
+                    ? _playerState.HandStatusLeft
+                    : _playerState.HandStatusRight;
 
                 if (ammoState.Ammo == 0)
                 {
@@ -583,7 +585,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (!IsServer)
             {
-                var ammoState = isLeftHand ? _playerState.AmmoStatusLeft : _playerState.AmmoStatusRight;
+                var ammoState = isLeftHand ? _playerState.HandStatusLeft : _playerState.HandStatusRight;
                 if (ammoState.Ammo > 0)
                 {
                     ammoState.Ammo -= 1;
@@ -600,11 +602,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (isLeftHand)
             {
-                _playerState.AmmoStatusLeft.IsReloading = false;
+                _playerState.HandStatusLeft.IsReloading = false;
             }
             else
             {
-                _playerState.AmmoStatusRight.IsReloading = false;
+                _playerState.HandStatusRight.IsReloading = false;
             }
         }
 

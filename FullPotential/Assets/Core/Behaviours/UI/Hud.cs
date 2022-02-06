@@ -42,20 +42,20 @@ namespace FullPotential.Core.Behaviours.Ui
             leftOrRight.GetComponent<EquippedSummary>().SetContents(contents);
         }
 
-        public void UpdateAmmo(bool isLeftHand, AmmoStatus ammoStatus)
+        public void UpdateAmmo(bool isLeftHand, PlayerHandStatus playerHandStatus)
         {
             var leftOrRight = isLeftHand
                 ? _ammoLeft
                 : _ammoRight;
 
-            if (ammoStatus == null)
+            if (playerHandStatus == null)
             {
                 leftOrRight.gameObject.SetActive(false);
                 return;
             }
 
             leftOrRight.gameObject.SetActive(true);
-            leftOrRight.text = $"{ammoStatus.Ammo}/{ammoStatus.AmmoMax}";
+            leftOrRight.text = $"{playerHandStatus.Ammo}/{playerHandStatus.AmmoMax}";
         }
 
         public void UpdateStaminaPercentage(int stamina, int maxStamina)

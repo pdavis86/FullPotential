@@ -4,7 +4,7 @@ Inspired by the Minecraft mod Ars Magica 2, Skyrim, the Borderlands series, Fina
 
 ## Key Features
 - There is no player level. Each weapon type and spell type has its own level.
-- Components for crafting items or spells have randomly generated stats. This means you can craft any level item/spell but can only use it once you reach the required level.
+- Components for crafting items or spells have randomly generated stats. This means you can craft any level item/spell but can only use it once you reach the required skill level.
 
 
 ## Credit
@@ -31,12 +31,4 @@ Inspired by the Minecraft mod Ars Magica 2, Skyrim, the Borderlands series, Fina
 
 See the [Project Trello Board](https://trello.com/b/biH6NdE0/oasis "Go to Trello") for a better depiction of where the game currently stands.
 
-### Core Gameplay Basics
-- Crafting
-- Network play
-- At least a useable weapon of each type (dagger, axe, sword, hammer, staff, bow, crossbow, gun, shield)
-- At least one spell in each category (buff, debuff, support, elemental, lingering)
-- Basic mod support
-
-### Playable Demo
-- Something that I can actually play!
+My next target is to improve the battle system and implement spell effects.

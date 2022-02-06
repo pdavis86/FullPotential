@@ -1,8 +1,7 @@
-﻿using FullPotential.Api.Spells;
+﻿using FullPotential.Api.Registry.Spells;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Combat;
 using FullPotential.Core.Helpers;
-using FullPotential.Core.Registry.Types;
 using FullPotential.Core.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -26,9 +25,7 @@ namespace FullPotential.Standard.Spells.Behaviours
         private Transform _cylinderParentTransform;
         private Transform _cylinderTransform;
         private RaycastHit _hit;
-        private DelayedAction _takeManaAction;
         private DelayedAction _applyEffectsAction;
-        private bool _stopCasting;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -67,15 +64,6 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            _takeManaAction = new DelayedAction(1f, () =>
-            {
-                if (!_sourcePlayerState.SpendMana(_spell))
-                {
-                    _sourcePlayerState.ToggleSpellBeam(IsLeftHand, _spell, Vector3.zero, Vector3.zero);
-                    _stopCasting = true;
-                }
-            });
-
             _applyEffectsAction = new DelayedAction(1f, () =>
             {
                 ApplySpellEffects(_hit.transform.gameObject, _hit.point);
@@ -87,16 +75,6 @@ namespace FullPotential.Standard.Spells.Behaviours
         {
             //todo: attribute-based beam length
             const int maxBeamLength = 10;
-
-            if (IsServer)
-            {
-                _takeManaAction.TryPerformAction();
-
-                if (_stopCasting)
-                {
-                    return;
-                }
-            }
 
             var playerCameraTransform = _sourcePlayerState.PlayerCamera.transform;
 
@@ -161,6 +139,17 @@ namespace FullPotential.Standard.Spells.Behaviours
             _cylinderTransform.position += _cylinderTransform.up * _cylinderTransform.localScale.y;
 
             _cylinderTransform.gameObject.SetActive(false);
+        }
+
+        // ReSharper disable once UnusedMember.Global
+        public void StartCasting()
+        {
+            //Nothing here
+        }
+
+        public void StopCasting()
+        {
+            Destroy(gameObject);
         }
 
         public void ApplySpellEffects(GameObject target, Vector3? position)

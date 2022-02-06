@@ -1,14 +1,15 @@
-﻿using FullPotential.Api.Registry;
-using FullPotential.Core.Data;
+﻿using FullPotential.Core.Data;
 using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
-using FullPotential.Core.Registry.Base;
-using FullPotential.Core.Registry.Types;
 using System.Collections.Generic;
 using System;
 using System.Collections;
 using System.Linq;
 using FullPotential.Api.Combat;
+using FullPotential.Api.Registry.Base;
+using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Loot;
+using FullPotential.Api.Registry.Spells;
 using Unity.Netcode;
 using UnityEngine;
 using FullPotential.Core.Behaviours.GameManagement;
@@ -618,7 +619,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     );
 
                     //todo: attribute-based ammo max
-                    var newAmmoStatus = new AmmoStatus
+                    var newAmmoStatus = new PlayerHandStatus
                     {
                         AmmoMax = 5,
                         Ammo = 5
@@ -626,11 +627,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
                     if (isLeftHand)
                     {
-                        _playerState.AmmoStatusLeft = newAmmoStatus;
+                        _playerState.HandStatusLeft = newAmmoStatus;
                     }
                     else
                     {
-                        _playerState.AmmoStatusRight = newAmmoStatus;
+                        _playerState.HandStatusRight = newAmmoStatus;
                     }
 
                     GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(isLeftHand, newAmmoStatus);

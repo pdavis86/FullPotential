@@ -66,7 +66,15 @@ namespace FullPotential.Standard
                 typeof(Weapons.Hammer),
                 typeof(Weapons.Shield),
                 typeof(Weapons.Staff),
-                typeof(Weapons.Sword)
+                typeof(Weapons.Sword),
+
+                typeof(Spells.Shapes.Wall),
+                typeof(Spells.Shapes.Zone),
+                
+                typeof(Spells.Targeting.Projectile),
+                typeof(Spells.Targeting.Beam),
+                typeof(Spells.Targeting.Self),
+                typeof(Spells.Targeting.Touch)
             };
         }
     }

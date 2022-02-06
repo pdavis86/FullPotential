@@ -3,15 +3,17 @@ using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
 using FullPotential.Core.Localization;
 using FullPotential.Core.Registry;
-using FullPotential.Core.Registry.Base;
-using FullPotential.Core.Registry.Types;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using FullPotential.Api.Spells;
-using FullPotential.Standard.Spells.Targeting;
+using FullPotential.Api.Registry.Base;
+using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Elements;
+using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Loot;
+using FullPotential.Api.Registry.Spells;
 
 namespace FullPotential.Core.Crafting
 {
@@ -70,7 +72,7 @@ namespace FullPotential.Core.Crafting
 
             if (targetingComponent == null)
             {
-                return _spellTargetingOptions.First(x => x is Projectile);
+                return _typeRegistry.GetRegisteredTypes<ISpellTargeting>().FirstOrDefault();
             }
 
             return targetingComponent.Targeting;

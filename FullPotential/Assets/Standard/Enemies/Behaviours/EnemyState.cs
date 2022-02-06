@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Enemies.Behaviours
 {
-    public class EnemyState : NetworkBehaviour, IDefensible, IDamageable
+    public class EnemyState : NetworkBehaviour, IEnemyStateBehaviour
     {
         public LivingEntityState AliveState { get; private set; }
 
@@ -103,7 +103,6 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
             foreach (var item in _damageTaken)
             {
-
                 if (!NetworkManager.Singleton.ConnectedClients.ContainsKey(item.Key))
                 {
                     continue;

@@ -8,8 +8,7 @@ namespace FullPotential.Core.Extensions
         {
             foreach (Transform child in transform)
             {
-                // ReSharper disable once AccessToStaticMemberViaDerivedType
-                GameObject.Destroy(child.gameObject);
+                Object.Destroy(child.gameObject);
             }
         }
 

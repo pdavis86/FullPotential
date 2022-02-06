@@ -1,11 +1,11 @@
-﻿using FullPotential.Api.Registry;
-using FullPotential.Core.Behaviours.GameManagement;
+﻿using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
 using FullPotential.Core.Extensions;
-using FullPotential.Core.Registry.Base;
 using System;
 using System.Linq;
+using FullPotential.Api.Registry.Base;
+using FullPotential.Api.Registry.Gear;
 using UnityEngine;
 using UnityEngine.UI;
 

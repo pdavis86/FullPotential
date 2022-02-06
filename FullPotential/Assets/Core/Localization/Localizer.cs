@@ -3,7 +3,10 @@ using FullPotential.Core.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FullPotential.Api.Spells;
+using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Loot;
+using FullPotential.Api.Registry.Spells;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 

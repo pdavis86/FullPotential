@@ -1,5 +1,5 @@
-﻿using FullPotential.Api.Registry;
-using System;
+﻿using System;
+using FullPotential.Api.Registry.Loot;
 
 namespace FullPotential.Standard.Loot
 {

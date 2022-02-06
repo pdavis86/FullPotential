@@ -2,12 +2,11 @@
 using System.Globalization;
 using FullPotential.Api.Combat;
 using FullPotential.Api.Enums;
+using FullPotential.Api.Registry.Base;
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Constants;
 using FullPotential.Core.Extensions;
-using FullPotential.Core.Registry.Base;
-using FullPotential.Standard.Enemies.Behaviours;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -49,7 +48,7 @@ namespace FullPotential.Core.Combat
             }
             else
             {
-                var enemyState = target.GetComponent<EnemyState>();
+                var enemyState = target.GetComponent<IEnemyStateBehaviour>();
                 damageable = enemyState;
                 defenceStrength = enemyState.GetDefenseValue();
             }

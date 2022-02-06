@@ -1,12 +1,12 @@
 ﻿using FullPotential.Api.Registry;
-using FullPotential.Core.Registry.Base;
-using FullPotential.Core.Registry.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FullPotential.Api.Spells;
-using FullPotential.Standard.Spells.Shapes;
-using FullPotential.Standard.Spells.Targeting;
+using FullPotential.Api.Registry.Base;
+using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Loot;
+using FullPotential.Api.Registry.Spells;
 using UnityEngine.AddressableAssets;
 
 namespace FullPotential.Core.Registry
@@ -22,21 +22,8 @@ namespace FullPotential.Core.Registry
         private readonly List<ISpellTargeting> _targeting = new List<ISpellTargeting>();
         private readonly Dictionary<string, UnityEngine.GameObject> _loadedAddressables = new Dictionary<string, UnityEngine.GameObject>();
 
-        private void RegisterCoreTypes()
-        {
-            ValidateAndRegister(typeof(Wall));
-            ValidateAndRegister(typeof(Zone));
-
-            ValidateAndRegister(typeof(Beam));
-            ValidateAndRegister(typeof(Projectile));
-            ValidateAndRegister(typeof(Self));
-            ValidateAndRegister(typeof(Touch));
-        }
-
         public void FindAndRegisterAll()
         {
-            RegisterCoreTypes();
-
             foreach (var t in new Standard.Registration().GetRegisterables())
             {
                 ValidateAndRegister(t);

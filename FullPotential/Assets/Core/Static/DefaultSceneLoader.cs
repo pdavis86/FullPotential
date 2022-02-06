@@ -2,9 +2,9 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // ReSharper disable once UnusedType.Global
-// ReSharper disable AccessToStaticMemberViaDerivedType
 
 namespace FullPotential.Core.Static
 {
@@ -26,10 +26,10 @@ namespace FullPotential.Core.Static
 
                 case PlayModeStateChange.EnteredPlayMode:
                 {
-                    var activeScene = EditorSceneManager.GetActiveScene();
+                    var activeScene = SceneManager.GetActiveScene();
                     if (activeScene.buildIndex != 0)
                     {
-                        EditorSceneManager.LoadScene(0);
+                        SceneManager.LoadScene(0);
                         Debug.LogWarning("Force loaded scene 0 as it was not the active scene in the editor");
                     }
 

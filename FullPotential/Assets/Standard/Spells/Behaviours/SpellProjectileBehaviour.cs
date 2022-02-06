@@ -1,10 +1,9 @@
 ﻿using System;
-using FullPotential.Api.Spells;
+using FullPotential.Api.Registry.Spells;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Combat;
 using FullPotential.Core.Constants;
 using FullPotential.Core.Extensions;
-using FullPotential.Core.Registry.Types;
 using FullPotential.Standard.Spells.Shapes;
 using Unity.Netcode;
 using UnityEngine;
@@ -85,6 +84,11 @@ namespace FullPotential.Standard.Spells.Behaviours
             ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
         }
 
+        public void StopCasting()
+        {
+            //Nothing here
+        }
+
         public void ApplySpellEffects(GameObject target, Vector3? position)
         {
             if (!position.HasValue)
@@ -118,11 +122,11 @@ namespace FullPotential.Standard.Spells.Behaviours
                     var rotation = Quaternion.LookRotation(SpellDirection);
                     rotation.x = 0;
                     rotation.z = 0;
-                    _playerState.SpawnSpellWall(_spell, spawnPosition, rotation, PlayerClientId);
+                    _spell.Shape.SpawnGameObject(_spell, spawnPosition, rotation, PlayerClientId);
                 }
                 else if (_shapeType == typeof(Zone))
                 {
-                    _playerState.SpawnSpellZone(_spell, spawnPosition, PlayerClientId);
+                    _spell.Shape.SpawnGameObject(_spell, spawnPosition, Quaternion.identity, PlayerClientId);
                 }
                 else
                 {

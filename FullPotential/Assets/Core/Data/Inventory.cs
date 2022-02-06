@@ -1,4 +1,6 @@
-﻿using FullPotential.Core.Registry.Types;
+﻿using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Loot;
+using FullPotential.Api.Registry.Spells;
 
 namespace FullPotential.Core.Data
 {

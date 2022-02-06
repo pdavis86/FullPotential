@@ -1,7 +1,6 @@
-using FullPotential.Api.Spells;
+using FullPotential.Api.Registry.Spells;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Combat;
-using FullPotential.Core.Registry.Types;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -109,6 +108,11 @@ namespace FullPotential.Standard.Spells.Behaviours
         {
             _rigidBody.velocity = Vector3.zero;
             _rigidBody.angularVelocity = Vector3.zero;
+        }
+
+        public void StopCasting()
+        {
+            //Nothing here
         }
 
         public void ApplySpellEffects(GameObject target, Vector3? position)

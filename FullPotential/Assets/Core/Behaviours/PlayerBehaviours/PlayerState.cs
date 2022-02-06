@@ -1,13 +1,13 @@
 ﻿using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Data;
 using FullPotential.Core.Networking;
-using FullPotential.Core.Registry.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Combat;
 using FullPotential.Api.Enums;
+using FullPotential.Api.Registry.Spells;
 using FullPotential.Core.Behaviours.Combat;
 using FullPotential.Core.Behaviours.Environment;
 using FullPotential.Core.Behaviours.UI.Components;
@@ -15,7 +15,6 @@ using FullPotential.Core.Combat;
 using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
 using FullPotential.Core.Utilities;
-using FullPotential.Standard.Spells.Behaviours;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -26,7 +25,7 @@ using UnityEngine.Networking;
 
 namespace FullPotential.Core.Behaviours.PlayerBehaviours
 {
-    public class PlayerState : NetworkBehaviour, IDamageable
+    public class PlayerState : NetworkBehaviour, IPlayerStateBehaviour
     {
         // ReSharper disable UnassignedField.Global
 #pragma warning disable 0649
@@ -54,8 +53,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         // ReSharper enable MemberCanBePrivate.Global
 
         public LivingEntityState AliveState { get; private set; }
-        public AmmoStatus AmmoStatusLeft = new AmmoStatus();
-        public AmmoStatus AmmoStatusRight = new AmmoStatus();
+        public PlayerHandStatus HandStatusLeft = new PlayerHandStatus();
+        public PlayerHandStatus HandStatusRight = new PlayerHandStatus();
 
         [HideInInspector] public PlayerInventory Inventory;
         [HideInInspector] public string PlayerToken;
@@ -65,14 +64,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private Rigidbody _rb;
         private PlayerActions _playerActions;
         private ClientRpcParams _clientRpcParams;
-        private GameObject _spellBeingCastLeft;
-        private GameObject _spellBeingCastRight;
 
         private FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
         private readonly Dictionary<string, DateTime> _unclaimedLoot = new Dictionary<string, DateTime>();
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
         private DelayedAction _consumeStamina;
         private DelayedAction _replenishStamina;
+        private DelayedAction _consumeMana;
         private DelayedAction _replenishMana;
         private DelayedAction _replenishAmmo;
         private bool _isSprinting;
@@ -166,11 +164,26 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 }
             });
 
+            //todo: attribute-based mana consumption
+            _consumeMana = new DelayedAction(1f, () =>
+            {
+                if (HandStatusLeft.SpellBeingCastGameObject != null && !SpendMana(HandStatusLeft.SpellBeingCast))
+                {
+                    HandStatusLeft.SpellBeingCastGameObject.GetComponent<ISpellBehaviour>().StopCasting();
+                    //todo: tell the client too
+                }
+                if (HandStatusRight.SpellBeingCastGameObject != null && !SpendMana(HandStatusRight.SpellBeingCast))
+                {
+                    HandStatusRight.SpellBeingCastGameObject.GetComponent<ISpellBehaviour>().StopCasting();
+                    //todo: tell the client too
+                }
+            });
+
             //todo: attribute-based mana recharge
             _replenishMana = new DelayedAction(.2f, () =>
             {
-                var isConsumingMana = _spellBeingCastLeft != null
-                    || _spellBeingCastRight != null;
+                var isConsumingMana = HandStatusLeft.SpellBeingCastGameObject != null
+                    || HandStatusRight.SpellBeingCastGameObject != null;
 
                 if (!isConsumingMana && Mana.Value < GetManaMax())
                 {
@@ -181,20 +194,20 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             //todo: animation time-based ammo reloading
             _replenishAmmo = new DelayedAction(3, () =>
             {
-                if (AmmoStatusLeft.IsReloading && AmmoStatusLeft.Ammo < AmmoStatusLeft.AmmoMax)
+                if (HandStatusLeft.IsReloading && HandStatusLeft.Ammo < HandStatusLeft.AmmoMax)
                 {
-                    AmmoStatusLeft.Ammo = AmmoStatusLeft.AmmoMax;
-                    AmmoStatusLeft.IsReloading = false;
+                    HandStatusLeft.Ammo = HandStatusLeft.AmmoMax;
+                    HandStatusLeft.IsReloading = false;
 
-                    GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(true, AmmoStatusLeft);
+                    GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(true, HandStatusLeft);
                     ReloadCompleteClientRpc(true, _clientRpcParams);
                 }
-                else if (AmmoStatusRight.IsReloading && AmmoStatusRight.Ammo < AmmoStatusRight.AmmoMax)
+                else if (HandStatusRight.IsReloading && HandStatusRight.Ammo < HandStatusRight.AmmoMax)
                 {
-                    AmmoStatusRight.Ammo = AmmoStatusRight.AmmoMax;
-                    AmmoStatusRight.IsReloading = false;
+                    HandStatusRight.Ammo = HandStatusRight.AmmoMax;
+                    HandStatusRight.IsReloading = false;
 
-                    GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(false, AmmoStatusRight);
+                    GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(false, HandStatusRight);
                     ReloadCompleteClientRpc(false, _clientRpcParams);
                 }
             });
@@ -213,8 +226,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             _head.transform.rotation = PlayerCamera.transform.rotation;
 
-            HandleSprinting();
-            Replenish();
+            ReplenishAndConsume();
             BecomeVulnerable();
         }
 
@@ -278,7 +290,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             Health.Value = GetHealthMax();
             AliveState = LivingEntityState.Respawning;
-            
+
             RespawnClientRpc(_clientRpcParams);
 
             var spawnPoint = GameManager.Instance.SceneBehaviour.GetSpawnPoint(gameObject);
@@ -295,8 +307,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public void ReloadServerRpc(bool isLeftHand)
         {
             var leftOrRight = isLeftHand
-                ? AmmoStatusLeft
-                : AmmoStatusRight;
+                ? HandStatusLeft
+                : HandStatusRight;
 
             leftOrRight.IsReloading = true;
         }
@@ -433,8 +445,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private void ReloadCompleteClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
         {
             var leftOrRight = isLeftHand
-                ? AmmoStatusLeft
-                : AmmoStatusRight;
+                ? HandStatusLeft
+                : HandStatusRight;
 
             leftOrRight.Ammo = leftOrRight.AmmoMax;
             leftOrRight.IsReloading = false;
@@ -443,6 +455,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         #endregion
+
+        public int GetDefenseValue()
+        {
+            return Inventory.GetDefenseValue();
+        }
 
         public void UpdateHealthAndDefenceValues()
         {
@@ -501,17 +518,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             });
         }
 
-        private void HandleSprinting()
-        {
-            if (!IsServer)
-            {
-                return;
-            }
-
-            _consumeStamina.TryPerformAction();
-        }
-
-        private void Replenish()
+        private void ReplenishAndConsume()
         {
             _replenishAmmo.TryPerformAction();
 
@@ -522,6 +529,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             _replenishStamina.TryPerformAction();
             _replenishMana.TryPerformAction();
+
+            _consumeStamina.TryPerformAction();
+            _consumeMana.TryPerformAction();
         }
 
         private void BecomeVulnerable()
@@ -729,166 +739,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             return true;
         }
 
-        public void SpawnSpellProjectile(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
-        {
-            if (!IsServer)
-            {
-                Debug.LogWarning("Tried to spawn a projectile spell when not on the server");
-            }
-
-            if (!SpendMana(activeSpell))
-            {
-                return;
-            }
-
-            var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellProjectile, startPosition, Quaternion.identity);
-
-            var spellScript = spellObject.GetComponent<SpellProjectileBehaviour>();
-            spellScript.PlayerClientId = senderClientId;
-            spellScript.SpellId = activeSpell.Id;
-            spellScript.SpellDirection = direction;
-
-            spellObject.GetComponent<NetworkObject>().Spawn(true);
-
-            spellObject.transform.parent = GameManager.Instance.SceneBehaviour.GetTransform();
-        }
-
-        public void SpawnSpellSelf(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
-        {
-            if (!IsServer)
-            {
-                Debug.LogWarning("Tried to spawn a self spell when not on the server");
-            }
-
-            if (!SpendMana(activeSpell))
-            {
-                return;
-            }
-
-            var spellObject = Instantiate(GameManager.Instance.Prefabs.Combat.SpellSelf, startPosition, Quaternion.identity);
-
-            var spellScript = spellObject.GetComponent<SpellSelfBehaviour>();
-            spellScript.PlayerClientId = senderClientId;
-            spellScript.SpellId = activeSpell.Id;
-            spellScript.SpellDirection = direction;
-
-            spellObject.GetComponent<NetworkObject>().Spawn(true);
-
-            spellObject.transform.parent = GameManager.Instance.SceneBehaviour.GetTransform();
-        }
-
-        public void SpawnSpellWall(Spell activeSpell, Vector3 startPosition, Quaternion rotation, ulong senderClientId)
-        {
-            if (!IsServer)
-            {
-                Debug.LogWarning("Tried to spawn a wall spell when not on the server");
-            }
-
-            var prefab = GameManager.Instance.Prefabs.Combat.SpellWall;
-
-            var spellObject = Instantiate(prefab, startPosition, rotation);
-            GameManager.Instance.SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(startPosition, spellObject);
-
-            var spellScript = spellObject.GetComponent<SpellWallBehaviour>();
-            spellScript.PlayerClientId = senderClientId;
-            spellScript.SpellId = activeSpell.Id;
-
-            spellObject.GetComponent<NetworkObject>().Spawn(true);
-
-            spellObject.transform.parent = GameManager.Instance.SceneBehaviour.GetTransform();
-        }
-
-        public void SpawnSpellZone(Spell activeSpell, Vector3 startPosition, ulong senderClientId)
-        {
-            if (!IsServer)
-            {
-                Debug.LogWarning("Tried to spawn a zone spell when not on the server");
-            }
-
-            var prefab = GameManager.Instance.Prefabs.Combat.SpellZone;
-
-            var spellObject = Instantiate(prefab, startPosition, Quaternion.identity);
-            GameManager.Instance.SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(startPosition, spellObject, false);
-
-            var spellScript = spellObject.GetComponent<SpellZoneBehaviour>();
-            spellScript.PlayerClientId = senderClientId;
-            spellScript.SpellId = activeSpell.Id;
-
-            spellObject.GetComponent<NetworkObject>().Spawn(true);
-
-            spellObject.transform.parent = GameManager.Instance.SceneBehaviour.GetTransform();
-        }
-
-        public void CastSpellTouch(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
-        {
-            if (!IsServer)
-            {
-                Debug.LogWarning("Tried to cast a touch spell when not on the server");
-            }
-
-            //NOTE: Don't call SpendMana() here as it is called in the behaviour
-            if (Mana.Value < GetManaCost(activeSpell))
-            {
-                return;
-            }
-
-            // ReSharper disable once ObjectCreationAsStatement
-            new SpellTouchBehaviour(activeSpell, startPosition, direction, senderClientId);
-        }
-
-        public void ToggleSpellBeam(bool isLeftHand, Spell activeSpell, Vector3? startPosition, Vector3? direction)
-        {
-            if (isLeftHand && _spellBeingCastLeft != null)
-            {
-                Destroy(_spellBeingCastLeft);
-                _spellBeingCastLeft = null;
-                return;
-            }
-
-            if (!isLeftHand && _spellBeingCastRight != null)
-            {
-                Destroy(_spellBeingCastRight);
-                _spellBeingCastRight = null;
-                return;
-            }
-
-            //NOTE: Don't call SpendMana() here as it is called in the behaviour
-            if (Mana.Value < GetManaCost(activeSpell))
-            {
-                return;
-            }
-
-            if (!startPosition.HasValue || !direction.HasValue)
-            {
-                Debug.LogError("Tried to ToggleSpellBeam on without position and direction");
-                return;
-            }
-
-            //NOTE: Can't parent to PlayerCamera otherwise it doesn't parent at all!
-            var spellObject = Instantiate(
-                GameManager.Instance.Prefabs.Combat.SpellBeam,
-                startPosition.Value,
-                Quaternion.LookRotation(direction.Value)
-            );
-
-            var spellScript = spellObject.GetComponent<SpellBeamBehaviour>();
-            spellScript.SpellId = activeSpell.Id;
-            spellScript.IsLeftHand = isLeftHand;
-
-            spellObject.GetComponent<NetworkObject>().Spawn(true);
-
-            spellObject.transform.parent = transform;
-
-            if (isLeftHand)
-            {
-                _spellBeingCastLeft = spellObject;
-            }
-            else
-            {
-                _spellBeingCastRight = spellObject;
-            }
-        }
-
         //todo: attribute-based all of these
         public int GetStaminaMax()
         {
@@ -967,16 +817,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             YouDiedClientRpc(_clientRpcParams);
 
-            if (_spellBeingCastLeft != null)
+            if (HandStatusLeft.SpellBeingCastGameObject != null)
             {
-                Destroy(_spellBeingCastLeft);
-                _spellBeingCastLeft = null;
+                Destroy(HandStatusLeft.SpellBeingCastGameObject);
+                HandStatusLeft.SpellBeingCastGameObject = null;
             }
 
-            if (_spellBeingCastRight != null)
+            if (HandStatusRight.SpellBeingCastGameObject != null)
             {
-                Destroy(_spellBeingCastRight);
-                _spellBeingCastRight = null;
+                Destroy(HandStatusRight.SpellBeingCastGameObject);
+                HandStatusRight.SpellBeingCastGameObject = null;
             }
         }
 

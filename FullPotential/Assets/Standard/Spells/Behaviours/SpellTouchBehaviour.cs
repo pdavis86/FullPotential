@@ -1,7 +1,6 @@
-﻿using FullPotential.Api.Spells;
+﻿using FullPotential.Api.Registry.Spells;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Combat;
-using FullPotential.Core.Registry.Types;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -16,6 +15,8 @@ namespace FullPotential.Standard.Spells.Behaviours
 
         private readonly Spell _spell;
         private readonly GameObject _sourcePlayer;
+
+        public bool WasSuccessful { get; }
 
         public SpellTouchBehaviour(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
         {
@@ -38,7 +39,13 @@ namespace FullPotential.Standard.Spells.Behaviours
                 }
 
                 ApplySpellEffects(hit.transform.gameObject, hit.point);
+                WasSuccessful = true;
             }
+        }
+
+        public void StopCasting()
+        {
+            //Nothing here
         }
 
         public void ApplySpellEffects(GameObject target, Vector3? position)
