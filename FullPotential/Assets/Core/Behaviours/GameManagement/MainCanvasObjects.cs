@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Ui;
 using FullPotential.Core.Behaviours.Ui;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ using UnityEngine;
 
 namespace FullPotential.Core.Behaviours.GameManagement
 {
-    public class MainCanvasObjects : MonoBehaviour
+    public class MainCanvasObjects : MonoBehaviour, IUserInterface
     {
         // ReSharper disable UnassignedField.Global
         // ReSharper disable MemberCanBePrivate.Global
@@ -38,6 +39,14 @@ namespace FullPotential.Core.Behaviours.GameManagement
         private List<GameObject> _menus;
 
         private static MainCanvasObjects _instance;
+
+        public IHud HudOverlay
+        {
+            get
+            {
+                return _hud ??= Hud.GetComponent<Hud>();
+            }
+        }
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -80,16 +89,6 @@ namespace FullPotential.Core.Behaviours.GameManagement
         {
             HideAllMenus();
             ui.SetActive(true);
-        }
-
-        public Hud GetHud()
-        {
-            if (_hud == null)
-            {
-                _hud = Hud.GetComponent<Hud>();
-            }
-
-            return _hud;
         }
 
         private CharacterMenuUi GetCharacterMenuUi()

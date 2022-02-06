@@ -1,20 +1,22 @@
-﻿using FullPotential.Core.Behaviours.GameManagement;
-using FullPotential.Core.Data;
-using FullPotential.Core.Networking;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using FullPotential.Api.Combat;
+using FullPotential.Api.Data;
 using FullPotential.Api.Enums;
+using FullPotential.Api.Extensions;
+using FullPotential.Api.Gameplay;
+using FullPotential.Api.Helpers;
 using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Utilities;
 using FullPotential.Core.Behaviours.Combat;
 using FullPotential.Core.Behaviours.Environment;
+using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.UI.Components;
-using FullPotential.Core.Combat;
+using FullPotential.Core.Data;
 using FullPotential.Core.Extensions;
 using FullPotential.Core.Helpers;
-using FullPotential.Core.Utilities;
+using FullPotential.Core.Networking;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -52,11 +54,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public readonly NetworkVariable<int> Mana = new NetworkVariable<int>(100);
         // ReSharper enable MemberCanBePrivate.Global
 
-        public LivingEntityState AliveState { get; private set; }
         public PlayerHandStatus HandStatusLeft = new PlayerHandStatus();
         public PlayerHandStatus HandStatusRight = new PlayerHandStatus();
 
-        [HideInInspector] public PlayerInventory Inventory;
+        //todo: rename this then InventoryThingy
         [HideInInspector] public string PlayerToken;
         [HideInInspector] public string Username;
         [HideInInspector] public readonly NetworkVariable<FixedString512Bytes> TextureUrl = new NetworkVariable<FixedString512Bytes>();
@@ -78,6 +79,18 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private float _myHeight;
         private ActionQueue<bool> _aliveStateChanges;
         private MeshRenderer _bodyMeshRenderer;
+
+        public LivingEntityState AliveState { get; private set; }
+
+        public IPlayerInventory Inventory { get; private set; }
+
+        public GameObject PlayerCameraGameObject
+        {
+            get
+            {
+                return PlayerCamera;
+            }
+        }
 
         #region Event handlers
 
@@ -199,7 +212,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     HandStatusLeft.Ammo = HandStatusLeft.AmmoMax;
                     HandStatusLeft.IsReloading = false;
 
-                    GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(true, HandStatusLeft);
+                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(true, HandStatusLeft);
                     ReloadCompleteClientRpc(true, _clientRpcParams);
                 }
                 else if (HandStatusRight.IsReloading && HandStatusRight.Ammo < HandStatusRight.AmmoMax)
@@ -207,7 +220,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     HandStatusRight.Ammo = HandStatusRight.AmmoMax;
                     HandStatusRight.IsReloading = false;
 
-                    GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(false, HandStatusRight);
+                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(false, HandStatusRight);
                     ReloadCompleteClientRpc(false, _clientRpcParams);
                 }
             });
@@ -246,7 +259,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
-                GameManager.Instance.MainCanvasObjects.GetHud().UpdateStaminaPercentage(newValue, GetStaminaMax());
+                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateStaminaPercentage(newValue, GetStaminaMax());
             }
         }
 
@@ -259,7 +272,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
-                GameManager.Instance.MainCanvasObjects.GetHud().UpdateManaPercentage(newValue, GetManaMax());
+                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateManaPercentage(newValue, GetManaMax());
             }
         }
 
@@ -294,7 +307,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             RespawnClientRpc(_clientRpcParams);
 
             var spawnPoint = GameManager.Instance.SceneBehaviour.GetSpawnPoint(gameObject);
-            PlayerSpawnStateChangeClientRpc(spawnPoint.Position, LivingEntityState.Respawning, null, null, RpcHelper.ForNearbyPlayers());
+            PlayerSpawnStateChangeClientRpc(spawnPoint.Position, LivingEntityState.Respawning, null, null, GameManager.Instance.RpcHelper.ForNearbyPlayers());
         }
 
         [ServerRpc]
@@ -385,8 +398,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             if (!killerName.IsNullOrWhiteSpace())
             {
-                var deathMessage = AttackHelper.GetDeathMessage(IsOwner, Username, killerName, itemName);
-                GameManager.Instance.MainCanvasObjects.GetHud().ShowAlert(deathMessage);
+                var deathMessage = GameManager.Instance.AttackHelper.GetDeathMessage(IsOwner, Username, killerName, itemName);
+                GameManager.Instance.MainCanvasObjects.HudOverlay.ShowAlert(deathMessage);
             }
 
             switch (state)
@@ -451,7 +464,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             leftOrRight.Ammo = leftOrRight.AmmoMax;
             leftOrRight.IsReloading = false;
 
-            GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(isLeftHand, leftOrRight);
+            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(isLeftHand, leftOrRight);
         }
 
         #endregion
@@ -475,7 +488,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
-                GameManager.Instance.MainCanvasObjects.GetHud().UpdateHealthPercentage(health, maxHealth, defence);
+                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHealthPercentage(health, maxHealth, defence);
             }
         }
 
@@ -546,7 +559,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (distanceMoved > 1)
             {
                 AliveState = LivingEntityState.Alive;
-                PlayerSpawnStateChangeClientRpc(Vector3.zero, LivingEntityState.Alive, null, null, RpcHelper.ForNearbyPlayers());
+                PlayerSpawnStateChangeClientRpc(Vector3.zero, LivingEntityState.Alive, null, null, GameManager.Instance.RpcHelper.ForNearbyPlayers());
                 _startingPosition = Vector3.zero;
             }
         }
@@ -570,6 +583,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 //Server loading player data from player state
                 LoadFromPlayerData(playerData);
                 TextureUrl.Value = playerData?.Settings?.TextureUrl ?? string.Empty;
+
+                //todo: needs a translation
+                GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc($"{Username} has joined the game", GameManager.Instance.RpcHelper.ForNearbyPlayersExceptMe());
             }
         }
 
@@ -616,7 +632,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             try
             {
-                Inventory.LoadInventory(playerData.Inventory);
+                ((PlayerInventory)Inventory).LoadInventory(playerData.Inventory);
                 playerData.InventoryLoadedSuccessfully = true;
             }
             catch (Exception ex)
@@ -813,7 +829,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _damageTaken.Clear();
 
             AliveState = LivingEntityState.Dead;
-            PlayerSpawnStateChangeClientRpc(Vector3.zero, LivingEntityState.Dead, killerName, itemName, RpcHelper.ForNearbyPlayers());
+            PlayerSpawnStateChangeClientRpc(Vector3.zero, LivingEntityState.Dead, killerName, itemName, GameManager.Instance.RpcHelper.ForNearbyPlayers());
 
             YouDiedClientRpc(_clientRpcParams);
 

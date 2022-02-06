@@ -1,5 +1,6 @@
-﻿using FullPotential.Core.Behaviours.UI.Components;
-using FullPotential.Core.Data;
+﻿using FullPotential.Api.Data;
+using FullPotential.Api.Ui;
+using FullPotential.Core.Behaviours.UI.Components;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,7 +8,7 @@ using UnityEngine.UI;
 
 namespace FullPotential.Core.Behaviours.Ui
 {
-    public class Hud : MonoBehaviour
+    public class Hud : MonoBehaviour, IHud
     {
 #pragma warning disable 0649
         [SerializeField] private GameObject _alertsContainer;

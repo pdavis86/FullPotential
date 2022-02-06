@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Data;
 using FullPotential.Core.Data;
 using UnityEngine;
 
@@ -49,7 +50,7 @@ namespace FullPotential.Core.Registry
                 {
                     Username = username,
                     Settings = new PlayerSettings(),
-                    Inventory = new Inventory()
+                    Inventory = new InventoryData()
                 };
             }
 

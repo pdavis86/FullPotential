@@ -4,12 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using FullPotential.Api.Data;
+using FullPotential.Api.Extensions;
+using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay;
+using FullPotential.Api.Helpers;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Scenes;
+using FullPotential.Api.Ui;
+using FullPotential.Core.Behaviours.PlayerBehaviours;
+using FullPotential.Core.Combat;
 using FullPotential.Core.Crafting;
 using FullPotential.Core.Data;
-using FullPotential.Core.Extensions;
-using FullPotential.Core.Helpers;
 using FullPotential.Core.Localization;
+using FullPotential.Core.Networking;
 using FullPotential.Core.Registry;
 using FullPotential.Core.Storage;
 using Unity.Collections;
@@ -21,14 +29,14 @@ using UnityEngine.SceneManagement;
 
 namespace FullPotential.Core.Behaviours.GameManagement
 {
-    public class GameManager : MonoBehaviour
+    public class GameManager : MonoBehaviour, IGameManager
     {
 #pragma warning disable 0649
         [SerializeField] private GameObject _mainCanvas;
 #pragma warning restore 0649
 
         //Core components
-        public TypeRegistry TypeRegistry { get; private set; }
+        public ITypeRegistry TypeRegistry { get; private set; }
         public UserRegistry UserRegistry { get; private set; }
         public Localizer Localizer { get; private set; }
         public ResultFactory ResultFactory { get; private set; }
@@ -53,6 +61,36 @@ namespace FullPotential.Core.Behaviours.GameManagement
             }
         }
 
+        private IAttackHelper _attackHelper;
+        public IAttackHelper AttackHelper
+        {
+            get
+            {
+                return _attackHelper ??= new AttackHelper();
+            }
+        }
+
+        private IRpcHelper _rpcHelper;
+        public IRpcHelper RpcHelper
+        {
+            get
+            {
+                return _rpcHelper ??= new RpcHelper();
+            }
+        }
+
+        private IUserInterface _ui;
+
+        public IUserInterface UserInterface
+        {
+            get
+            {
+                return _ui ??= MainCanvasObjects;
+            }
+        }
+
+        public AppOptions AppOptions { get; private set; }
+
 
         //Input
         public DefaultInputActions InputActions;
@@ -64,13 +102,14 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
 
         //Variables
-        public AppOptions AppOptions;
         private bool _isSaving;
+        private NetworkObject _playerPrefabNetObj;
 
 
         //Singleton
         public static GameManager Instance { get; private set; }
 
+        #region Unity Event Handlers
 
         // ReSharper disable once UnusedMember.Local
         private async void Awake()
@@ -90,8 +129,9 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
             await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
 
-            TypeRegistry = new TypeRegistry();
-            TypeRegistry.FindAndRegisterAll();
+            var typeRegistry = new TypeRegistry();
+            TypeRegistry = typeRegistry;
+            typeRegistry.FindAndRegisterAll();
 
             UserRegistry = new UserRegistry();
 
@@ -99,7 +139,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
             await Localizer.LoadAvailableCulturesAsync();
             await Localizer.LoadLocalizationFilesAsync(AppOptions.Culture);
 
-            ResultFactory = new ResultFactory(TypeRegistry, Localizer);
+            ResultFactory = new ResultFactory((TypeRegistry)TypeRegistry, Localizer);
 
             Prefabs = GetComponent<Prefabs>();
             MainCanvasObjects = _mainCanvas.GetComponent<MainCanvasObjects>();
@@ -108,6 +148,8 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
             NetworkManager.Singleton.ConnectionApprovalCallback += OnApprovalCheck;
             NetworkManager.Singleton.OnClientDisconnectCallback += OnServerDisconnectedClient;
+
+            _playerPrefabNetObj = Prefabs.Player.GetComponent<NetworkObject>();
 
             SceneManager.LoadSceneAsync(1);
         }
@@ -177,6 +219,31 @@ namespace FullPotential.Core.Behaviours.GameManagement
             }
         }
 
+        #endregion
+
+        public void SpawnPlayerNetworkObject(string playerToken, Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default)
+        {
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                Debug.LogError("Tried to create a player when not on the server");
+                return;
+            }
+
+            var playerNetObj = Instantiate(_playerPrefabNetObj, position, rotation);
+
+            var playerState = playerNetObj.GetComponent<PlayerState>();
+            playerState.PlayerToken = playerToken;
+
+            playerNetObj.SpawnAsPlayerObject(serverRpcParams.Receive.SenderClientId);
+
+            SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(position, playerNetObj.gameObject);
+        }
+
+        public string GetLocalPlayerToken()
+        {
+            return LocalGameDataStore.PlayerToken;
+        }
+
         // ReSharper disable once MemberCanBePrivate.Global
         public void SendServerToClientSetDisconnectReason(ulong clientId, ConnectStatus status)
         {
@@ -210,7 +277,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
         private void EnsureAppOptionsLoaded()
         {
-            if (!AppOptions.Culture.IsNullOrWhiteSpace())
+            if (!(AppOptions?.Culture).IsNullOrWhiteSpace())
             {
                 return;
             }

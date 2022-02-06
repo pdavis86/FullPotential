@@ -1,11 +1,9 @@
 using System.Collections.Generic;
-using FullPotential.Api.Combat;
+using FullPotential.Api;
 using FullPotential.Api.Enums;
-using FullPotential.Core.Behaviours.GameManagement;
-using FullPotential.Core.Behaviours.PlayerBehaviours;
-using FullPotential.Core.Behaviours.UI.Components;
-using FullPotential.Core.Combat;
-using FullPotential.Core.Networking;
+using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay;
+using FullPotential.Api.Ui.Components;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -19,18 +17,24 @@ namespace FullPotential.Standard.Enemies.Behaviours
     {
         public LivingEntityState AliveState { get; private set; }
 
-        public readonly NetworkVariable<FixedString32Bytes> EnemyName = new NetworkVariable<FixedString32Bytes>();
-        private readonly NetworkVariable<int> _health = new NetworkVariable<int>(100);
-        private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
-
 #pragma warning disable 0649
         [SerializeField] private TextMeshProUGUI _nameTag;
-        [SerializeField] private BarSlider _healthSlider;
+        [SerializeField] private GameObject _healthSliderParent;
 #pragma warning restore 0649
+
+        public readonly NetworkVariable<FixedString32Bytes> EnemyName = new NetworkVariable<FixedString32Bytes>();
+
+        private IGameManager _gameManager;
+        private readonly NetworkVariable<int> _health = new NetworkVariable<int>(100);
+        private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
+        private IStatSlider _healthSlider;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
+            _gameManager = ModHelper.GetGameManager();
+            _healthSlider = _healthSliderParent.GetComponent<IStatSlider>();
+
             _health.OnValueChanged += OnHealthChanged;
             EnemyName.OnValueChanged += OnNameChanged;
 
@@ -107,18 +111,18 @@ namespace FullPotential.Standard.Enemies.Behaviours
                 {
                     continue;
                 }
-                var playerState = NetworkManager.Singleton.ConnectedClients[item.Key].PlayerObject.gameObject.GetComponent<PlayerState>();
+                var playerState = NetworkManager.Singleton.ConnectedClients[item.Key].PlayerObject.gameObject.GetComponent<IPlayerStateBehaviour>();
                 playerState.SpawnLootChest(transform.position);
             }
 
             _damageTaken.Clear();
 
-            var deathMessage = AttackHelper.GetDeathMessage(false, name, killerName, itemName);
-            GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc(deathMessage, RpcHelper.ForNearbyPlayers());
+            var deathMessage = _gameManager.AttackHelper.GetDeathMessage(false, name, killerName, itemName);
+            _gameManager.SceneBehaviour.MakeAnnouncementClientRpc(deathMessage, _gameManager.RpcHelper.ForNearbyPlayers());
 
             Destroy(gameObject);
 
-            GameManager.Instance.SceneBehaviour.HandleEnemyDeath();
+            _gameManager.SceneBehaviour.HandleEnemyDeath();
         }
 
         private void SetName()
@@ -134,7 +138,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
         private void CheckIfOffTheMap()
         {
-            AttackHelper.CheckIfOffTheMap(this, transform.position.y);
+            _gameManager.AttackHelper.CheckIfOffTheMap(this, transform.position.y);
         }
 
     }

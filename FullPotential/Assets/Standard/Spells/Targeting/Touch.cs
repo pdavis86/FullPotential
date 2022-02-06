@@ -15,10 +15,15 @@ namespace FullPotential.Standard.Spells.Targeting
 
         public bool IsContinuous => false;
 
-        public GameObject SpawnGameObject(Spell activeSpell, Vector3 startPosition, Vector3 targetDirection, ulong senderClientId, bool isLeftHand = false, Transform parentTransform = null)
+        public string PrefabAddress => null;
+
+        public string IdlePrefabAddress => null;
+
+        public void SetBehaviourVariables(GameObject gameObject, Spell activeSpell, Vector3 startPosition, Vector3 targetDirection, ulong senderClientId, bool isLeftHand = false, Transform parentTransform = null)
         {
-            var spellBehaviour = new SpellTouchBehaviour(activeSpell, startPosition, targetDirection, senderClientId);
-            return spellBehaviour.WasSuccessful ? new GameObject() : null;
+            // ReSharper disable once ObjectCreationAsStatement
+            new SpellTouchBehaviour(activeSpell, startPosition, targetDirection, senderClientId);
         }
+
     }
 }

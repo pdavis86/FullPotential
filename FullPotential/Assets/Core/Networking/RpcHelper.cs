@@ -1,10 +1,16 @@
-﻿using Unity.Netcode;
+﻿using FullPotential.Api.GameManagement;
+using Unity.Netcode;
 
 namespace FullPotential.Core.Networking
 {
-    public static class RpcHelper
+    public class RpcHelper : IRpcHelper
     {
-        public static ClientRpcParams ForNearbyPlayers()
+        public ClientRpcParams ForNearbyPlayers()
+        {
+            return new ClientRpcParams();
+        }
+
+        public ClientRpcParams ForNearbyPlayersExceptMe()
         {
             return new ClientRpcParams();
         }

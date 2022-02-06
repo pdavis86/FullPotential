@@ -1,4 +1,4 @@
-using FullPotential.Core.Extensions;
+using FullPotential.Api.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 

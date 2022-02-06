@@ -1,11 +1,11 @@
-﻿using FullPotential.Core.Behaviours.GameManagement;
-using FullPotential.Core.Behaviours.PlayerBehaviours;
-using FullPotential.Core.Behaviours.UtilityBehaviours;
-using FullPotential.Core.Extensions;
-using System;
+﻿using System;
 using System.Linq;
+using FullPotential.Api.Extensions;
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
+using FullPotential.Core.Behaviours.GameManagement;
+using FullPotential.Core.Behaviours.UtilityBehaviours;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,19 +19,19 @@ namespace FullPotential.Core.Behaviours.Ui.Components
             GameObject slot,
             GameObject componentsContainer,
             GameObject rowPrefab,
-            PlayerInventory inventory,
+            IPlayerInventory playerInventory,
             Action<GameObject, GameObject, ItemBase> toggleAction,
             IGear.GearCategory? gearCategory = null,
             bool showEquippedItems = true
         )
         {
             componentsContainer.SetActive(true);
-            componentsContainer.transform.Clear();
+            componentsContainer.transform.DestroyChildren();
 
             var rowRectTransform = rowPrefab.GetComponent<RectTransform>();
             var rowCounter = 0;
 
-            var itemsForSlot = inventory.GetCompatibleItemsForSlot(gearCategory);
+            var itemsForSlot = playerInventory.GetCompatibleItemsForSlot(gearCategory);
 
             if (!itemsForSlot.Any())
             {
@@ -41,7 +41,7 @@ namespace FullPotential.Core.Behaviours.Ui.Components
 
             foreach (var item in itemsForSlot)
             {
-                var isEquipped = inventory.GetEquippedWithItemId(item.Id) != null;
+                var isEquipped = playerInventory.GetEquippedWithItemId(item.Id) != null;
 
                 if (isEquipped && !showEquippedItems)
                 {

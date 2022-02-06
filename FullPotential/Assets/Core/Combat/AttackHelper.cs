@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Globalization;
 using FullPotential.Api.Combat;
+using FullPotential.Api.Constants;
 using FullPotential.Api.Enums;
+using FullPotential.Api.Extensions;
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.PlayerBehaviours;
-using FullPotential.Core.Constants;
-using FullPotential.Core.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 
 namespace FullPotential.Core.Combat
 {
-    public static class AttackHelper
+    public class AttackHelper : IAttackHelper
     {
         // ReSharper disable once InconsistentNaming
         private static readonly System.Random _random = new System.Random();
 
-        public static void DealDamage(
+        public void DealDamage(
             GameObject source,
             ItemBase itemUsed,
             GameObject target,
@@ -104,7 +105,7 @@ namespace FullPotential.Core.Combat
             }
         }
 
-        public static void CheckIfOffTheMap(IDamageable damageable, float yValue)
+        public void CheckIfOffTheMap(IDamageable damageable, float yValue)
         {
             if (damageable.AliveState != LivingEntityState.Dead && yValue < GameManager.Instance.SceneBehaviour.Attributes.LowestYValue)
             {
@@ -112,7 +113,7 @@ namespace FullPotential.Core.Combat
             }
         }
 
-        public static string GetDeathMessage(bool isOwner, string victimName, string killerName, string itemName)
+        public string GetDeathMessage(bool isOwner, string victimName, string killerName, string itemName)
         {
             if (itemName.IsNullOrWhiteSpace())
             {

@@ -11,7 +11,7 @@ using UnityEngine.AddressableAssets;
 
 namespace FullPotential.Core.Registry
 {
-    public class TypeRegistry
+    public class TypeRegistry : ITypeRegistry
     {
         private readonly List<IGearAccessory> _accessories = new List<IGearAccessory>();
         private readonly List<IGearArmor> _armor = new List<IGearArmor>();

@@ -1,3 +1,4 @@
+using FullPotential.Api.Ui.Components;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,7 +7,7 @@ using UnityEngine.UI;
 
 namespace FullPotential.Core.Behaviours.UI.Components
 {
-    public class BarSlider : MonoBehaviour
+    public class BarSlider : MonoBehaviour, IStatSlider
     {
 #pragma warning disable 0649
         private Slider _slider;

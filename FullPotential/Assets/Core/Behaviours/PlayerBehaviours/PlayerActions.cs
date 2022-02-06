@@ -1,13 +1,14 @@
 ﻿using System.Linq;
+using FullPotential.Api;
+using FullPotential.Api.Constants;
 using FullPotential.Api.Enums;
+using FullPotential.Api.Helpers;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Registry.Spells;
 using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
-using FullPotential.Core.Combat;
 using FullPotential.Core.Data;
-using FullPotential.Core.Helpers;
 using FullPotential.Core.Networking;
 using TMPro;
 using Unity.Netcode;
@@ -71,10 +72,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             //Avoids weapons clipping with other objects
             _playerState.InFrontOfPlayer.transform.parent = _inFrontOfPlayerCamera.transform;
-            GameObjectHelper.SetGameLayerRecursive(_playerState.InFrontOfPlayer, LayerMask.NameToLayer(Constants.Layers.InFrontOfPlayer));
+            GameObjectHelper.SetGameLayerRecursive(_playerState.InFrontOfPlayer, LayerMask.NameToLayer(Layers.InFrontOfPlayer));
 
             _inFrontOfPlayerCamera.gameObject.SetActive(true);
             _playerCamera.gameObject.SetActive(true);
+
+            if (IsClient)
+            {
+                Camera.main.fieldOfView = ModHelper.GetGameManager().AppOptions.FieldOfView;
+            }
         }
 
         public override void OnNetworkSpawn()
@@ -178,14 +184,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
 
             GameManager.Instance.MainCanvasObjects.DrawingPad.SetActive(true);
-            GameManager.Instance.MainCanvasObjects.GetHud().ToggleCursorCapture(true);
+            GameManager.Instance.MainCanvasObjects.HudOverlay.ToggleCursorCapture(true);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnShowCursorStop()
         {
             GameManager.Instance.MainCanvasObjects.DrawingPad.SetActive(false);
-            GameManager.Instance.MainCanvasObjects.GetHud().ToggleCursorCapture(false);
+            GameManager.Instance.MainCanvasObjects.HudOverlay.ToggleCursorCapture(false);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -223,8 +229,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             StopReloading(isLeftHand);
 
             var itemInHand = isLeftHand
-                ? _playerState.Inventory.GetItemInSlot(PlayerInventory.SlotGameObjectName.LeftHand)
-                : _playerState.Inventory.GetItemInSlot(PlayerInventory.SlotGameObjectName.RightHand);
+                ? _playerState.Inventory.GetItemInSlot(SlotGameObjectName.LeftHand)
+                : _playerState.Inventory.GetItemInSlot(SlotGameObjectName.RightHand);
 
             switch (itemInHand)
             {
@@ -320,7 +326,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 IdsToRemove = componentIdArray
             };
 
-            _playerState.Inventory.PopulateInventoryChangesWithItem(invChange, craftedItem);
+            InventoryDataHelper.PopulateInventoryChangesWithItem(invChange, craftedItem);
 
             ApplyInventoryChanges(invChange);
 
@@ -391,7 +397,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return;
             }
 
-            AttackHelper.DealDamage(gameObject, null, hit.transform.gameObject, hit.point);
+            GameManager.Instance.AttackHelper.DealDamage(gameObject, null, hit.transform.gameObject, hit.point);
         }
 
         private void CastSpell(Spell activeSpell, bool isLeftHand, ServerRpcParams serverRpcParams)
@@ -426,18 +432,33 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 ? (hit.point - startPosition).normalized
                 : lookDirection;
 
-            var spellObject = activeSpell.Targeting.SpawnGameObject(activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId, parentTransform: transform);
+            //todo: beam goes on this transform and everything else goes on gameManager.SceneBehaviour.GetTransform()
+            var xxx = GameManager.Instance.SceneBehaviour.GetTransform();
 
-            leftOrRight.SpellBeingCast = activeSpell;
+            GameManager.Instance.TypeRegistry.LoadAddessable(
+                activeSpell.Targeting.PrefabAddress,
+                prefab =>
+                {
+                    var spellObject = Instantiate(prefab, startPosition, Quaternion.identity);
 
-            if (activeSpell.Targeting.IsContinuous)
-            {
-                leftOrRight.SpellBeingCastGameObject = spellObject;
-            }
-            else if (spellObject != null)
-            {
-                _playerState.SpendMana(activeSpell);
-            }
+                    activeSpell.Targeting.SetBehaviourVariables(spellObject, activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId, isLeftHand, xxx);
+
+                    spellObject.GetComponent<NetworkObject>().Spawn(true);
+
+                    spellObject.transform.parent = xxx;
+
+                    leftOrRight.SpellBeingCast = activeSpell;
+
+                    if (activeSpell.Targeting.IsContinuous)
+                    {
+                        leftOrRight.SpellBeingCastGameObject = spellObject;
+                    }
+                    else
+                    {
+                        _playerState.SpendMana(activeSpell);
+                    }
+                }
+            );
         }
 
         private void UseWeapon(Weapon weaponInHand, bool isLeftHand)
@@ -460,7 +481,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 //todo: attribute-based ammo consumption
                 ammoState.Ammo -= 1;
 
-                GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(isLeftHand, ammoState);
+                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(isLeftHand, ammoState);
 
                 var lookDirection = GetLookDirectionRay().direction;
 
@@ -475,11 +496,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                       ? rangedHit.point
                       : _playerState.Positions.RightHandInFront.position + lookDirection * 30;
 
-                _playerState.UsedWeaponClientRpc(startPos, endPos, RpcHelper.ForNearbyPlayers());
+                _playerState.UsedWeaponClientRpc(startPos, endPos, GameManager.Instance.RpcHelper.ForNearbyPlayers());
 
                 if (rangedHit.transform != null)
                 {
-                    AttackHelper.DealDamage(gameObject, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
+                    GameManager.Instance.AttackHelper.DealDamage(gameObject, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
                 }
             }
             else
@@ -490,7 +511,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     return;
                 }
 
-                AttackHelper.DealDamage(gameObject, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
+                GameManager.Instance.AttackHelper.DealDamage(gameObject, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
             }
         }
 
@@ -535,7 +556,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void ApplyInventoryChanges(InventoryChanges changes)
         {
-            _playerState.Inventory.ApplyInventoryChanges(changes);
+            ((PlayerInventory)_playerState.Inventory).ApplyInventoryChanges(changes);
 
             if (changes.IdsToRemove != null && changes.IdsToRemove.Length > 0)
             {
@@ -589,7 +610,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 if (ammoState.Ammo > 0)
                 {
                     ammoState.Ammo -= 1;
-                    GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(isLeftHand, ammoState);
+                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(isLeftHand, ammoState);
                 }
             }
 

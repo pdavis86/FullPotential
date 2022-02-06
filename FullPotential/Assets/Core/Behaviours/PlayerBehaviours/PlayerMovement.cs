@@ -1,4 +1,4 @@
-﻿using FullPotential.Core.Combat;
+﻿using FullPotential.Core.Behaviours.GameManagement;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -173,7 +173,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void CheckIfOffTheMap()
         {
-            AttackHelper.CheckIfOffTheMap(_playerState, transform.position.y);
+            GameManager.Instance.AttackHelper.CheckIfOffTheMap(_playerState, transform.position.y);
         }
 
     }

@@ -2,13 +2,14 @@
 
 namespace FullPotential.Api.Registry.Spells
 {
-    public interface ISpellTargeting : IRegisterable
+    public interface ISpellTargeting : IRegisterable, IHasPrefab, IHasIdlePrefab
     {
         bool HasShape { get; }
 
         bool IsContinuous { get; }
 
-        GameObject SpawnGameObject(
+        void SetBehaviourVariables(
+            GameObject gameObject,
             Spell activeSpell, 
             Vector3 startPosition, 
             Vector3 targetDirection,

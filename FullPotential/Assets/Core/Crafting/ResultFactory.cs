@@ -1,19 +1,19 @@
-﻿using FullPotential.Api.Registry;
-using FullPotential.Core.Extensions;
-using FullPotential.Core.Helpers;
-using FullPotential.Core.Localization;
-using FullPotential.Core.Registry;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Registry.Spells;
+using FullPotential.Core.Extensions;
+using FullPotential.Core.Helpers;
+using FullPotential.Core.Localization;
+using FullPotential.Core.Registry;
 
 namespace FullPotential.Core.Crafting
 {

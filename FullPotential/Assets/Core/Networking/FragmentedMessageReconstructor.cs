@@ -1,8 +1,8 @@
-﻿using FullPotential.Core.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FullPotential.Core.Data;
 using FullPotential.Core.Extensions;
 using UnityEngine;
 

@@ -1,10 +1,6 @@
 ﻿namespace FullPotential.Api.Registry
 {
-    public interface ICraftable : IRegisterable
+    public interface ICraftable : IRegisterable, IHasPrefab
     {
-        /// <summary>
-        /// The address of the prefab to load for this weapon
-        /// </summary>
-        string PrefabAddress { get; }
     }
 }

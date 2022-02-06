@@ -1,41 +1,31 @@
-﻿using FullPotential.Core.Data;
-using FullPotential.Core.Extensions;
-using FullPotential.Core.Helpers;
-using System.Collections.Generic;
-using System;
+﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Combat;
+using FullPotential.Api.Constants;
+using FullPotential.Api.Data;
+using FullPotential.Api.Enums;
+using FullPotential.Api.Extensions;
+using FullPotential.Api.Gameplay;
+using FullPotential.Api.Helpers;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Registry.Spells;
+using FullPotential.Core.Behaviours.GameManagement;
+using FullPotential.Core.Data;
+using FullPotential.Core.Extensions;
+using FullPotential.Core.Networking;
 using Unity.Netcode;
 using UnityEngine;
-using FullPotential.Core.Behaviours.GameManagement;
-using FullPotential.Core.Networking;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Behaviours.PlayerBehaviours
 {
-    public class PlayerInventory : NetworkBehaviour, IDefensible
+    public class PlayerInventory : NetworkBehaviour, IPlayerInventory
     {
-        public enum SlotGameObjectName
-        {
-            Helm,
-            Chest,
-            Legs,
-            Feet,
-            Barrier,
-            LeftHand,
-            RightHand,
-            LeftRing,
-            RightRing,
-            Belt,
-            Amulet
-        }
-
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
         // ReSharper disable once ConvertToConstant.Local
         [SerializeField] private float _amuletForwardMultiplier = 0.2f;
@@ -127,12 +117,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             if (wasEquipped)
             {
-                PopulateInventoryChangesWithItem(invChange, item);
+                InventoryDataHelper.PopulateInventoryChangesWithItem(invChange, item);
             }
 
             foreach (var message in FragmentedMessageReconstructor.GetFragmentedMessages(invChange))
             {
-                ApplyEquipChangeClientRpc(message, RpcHelper.ForNearbyPlayers());
+                ApplyEquipChangeClientRpc(message, GameManager.Instance.RpcHelper.ForNearbyPlayers());
             }
         }
 
@@ -211,15 +201,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 equipmentUi.ResetEquipmentUi(true);
             }
-        }
-
-        public void PopulateInventoryChangesWithItem(InventoryChanges invChanges, ItemBase item)
-        {
-            var itemType = item.GetType();
-            invChanges.Accessories = itemType == typeof(Accessory) ? new[] { item as Accessory } : null;
-            invChanges.Armor = itemType == typeof(Armor) ? new[] { item as Armor } : null;
-            invChanges.Spells = itemType == typeof(Spell) ? new[] { item as Spell } : null;
-            invChanges.Weapons = itemType == typeof(Weapon) ? new[] { item as Weapon } : null;
         }
 
         public IEnumerable<ItemBase> GetCompatibleItemsForSlot(IGear.GearCategory? gearCategory)
@@ -321,7 +302,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
-        public void LoadInventory(Inventory inventoryData)
+        public void LoadInventory(InventoryData inventoryData)
         {
             _maxItems = inventoryData.MaxItems > 0
                 ? inventoryData.MaxItems
@@ -403,7 +384,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
-        private Inventory GetSaveData()
+        private InventoryData GetSaveData()
         {
             var equippedItems = _equippedItems
                 .Where(x => !(x.Value?.Item?.Id.IsNullOrWhiteSpace() ?? false))
@@ -415,7 +396,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 .Select(x => x.Value)
                 .GroupBy(x => x.GetType());
 
-            return new Inventory
+            return new InventoryData
             {
                 MaxItems = _maxItems,
                 Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(Loot))?.Select(x => x as Loot).ToArray(),
@@ -539,7 +520,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     {
                         case SlotGameObjectName.LeftHand:
                         case SlotGameObjectName.RightHand:
-                            GameManager.Instance.MainCanvasObjects.GetHud().UpdateHand(null, slotGameObjectName == SlotGameObjectName.LeftHand);
+                            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHand(null, slotGameObjectName == SlotGameObjectName.LeftHand);
                             break;
                     }
                 }
@@ -592,7 +573,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (IsOwner)
             {
                 var contents = GameManager.Instance.ResultFactory.GetItemDescription(item);
-                GameManager.Instance.MainCanvasObjects.GetHud().UpdateHand(contents, isLeftHand);
+                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHand(contents, isLeftHand);
             }
 
             if (!NetworkManager.Singleton.IsClient)
@@ -604,14 +585,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             switch (item)
             {
                 case Weapon weapon:
-                    if (item.RegistryType is not IGearWeapon registryType)
+                    if (item.RegistryType is not IGearWeapon weaponRegistryType)
                     {
                         Debug.LogError("Item is not a weapon");
                         return;
                     }
 
                     GameManager.Instance.TypeRegistry.LoadAddessable(
-                        weapon.IsTwoHanded ? registryType.PrefabAddressTwoHanded : registryType.PrefabAddress,
+                        weapon.IsTwoHanded ? weaponRegistryType.PrefabAddressTwoHanded : weaponRegistryType.PrefabAddress,
                         prefab =>
                         {
                             InstantiateInPlayerHand(prefab, isLeftHand, new Vector3(0, 90), slotGameObjectName);
@@ -634,14 +615,20 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                         _playerState.HandStatusRight = newAmmoStatus;
                     }
 
-                    GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(isLeftHand, newAmmoStatus);
+                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(isLeftHand, newAmmoStatus);
 
                     break;
 
-                case Spell:
-                    InstantiateInPlayerHand(GameManager.Instance.Prefabs.Combat.SpellInHand, isLeftHand, null, slotGameObjectName);
+                case Spell spell:
+                    GameManager.Instance.TypeRegistry.LoadAddessable(
+                        spell.Targeting.IdlePrefabAddress,
+                        prefab =>
+                        {
+                            InstantiateInPlayerHand(prefab, isLeftHand, null, slotGameObjectName);
+                        }
+                    );
 
-                    GameManager.Instance.MainCanvasObjects.GetHud().UpdateAmmo(isLeftHand, null);
+                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(isLeftHand, null);
 
                     break;
 
@@ -702,7 +689,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
                     if (showsOnPlayerCamera && thisClient)
                     {
-                        GameObjectHelper.SetGameLayerRecursive(newObj, LayerMask.NameToLayer(Constants.Layers.InFrontOfPlayer));
+                        GameObjectHelper.SetGameLayerRecursive(newObj, LayerMask.NameToLayer(Layers.InFrontOfPlayer));
                     }
 
                     _equippedItems[slotGameObjectName].GameObject = newObj;

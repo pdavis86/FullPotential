@@ -1,5 +1,5 @@
 ﻿using FullPotential.Api.Registry;
-using FullPotential.Core.Extensions;
+using FullPotential.Api.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

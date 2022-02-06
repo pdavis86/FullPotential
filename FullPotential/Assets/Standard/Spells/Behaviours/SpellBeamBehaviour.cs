@@ -1,8 +1,9 @@
-﻿using FullPotential.Api.Registry.Spells;
-using FullPotential.Core.Behaviours.PlayerBehaviours;
-using FullPotential.Core.Combat;
-using FullPotential.Core.Helpers;
-using FullPotential.Core.Utilities;
+﻿using FullPotential.Api;
+using FullPotential.Api.Constants;
+using FullPotential.Api.Gameplay;
+using FullPotential.Api.Helpers;
+using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -20,7 +21,7 @@ namespace FullPotential.Standard.Spells.Behaviours
 #pragma warning restore CS0649
 
         private GameObject _sourcePlayer;
-        private PlayerState _sourcePlayerState;
+        private IPlayerStateBehaviour _sourcePlayerState;
         private Spell _spell;
         private Transform _cylinderParentTransform;
         private Transform _cylinderTransform;
@@ -37,7 +38,7 @@ namespace FullPotential.Standard.Spells.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            _sourcePlayer = GameObjectHelper.ClosestParentWithTag(gameObject, Core.Constants.Tags.Player);
+            _sourcePlayer = GameObjectHelper.ClosestParentWithTag(gameObject, Tags.Player);
 
             if (_sourcePlayer == null)
             {
@@ -46,7 +47,7 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            _sourcePlayerState = _sourcePlayer.GetComponent<PlayerState>();
+            _sourcePlayerState = _sourcePlayer.GetComponent<IPlayerStateBehaviour>();
 
             PerformGraphicsAdjustments(_sourcePlayerState);
 
@@ -76,7 +77,7 @@ namespace FullPotential.Standard.Spells.Behaviours
             //todo: attribute-based beam length
             const int maxBeamLength = 10;
 
-            var playerCameraTransform = _sourcePlayerState.PlayerCamera.transform;
+            var playerCameraTransform = _sourcePlayerState.PlayerCameraGameObject.transform;
 
             Vector3 targetDirection;
             float beamLength;
@@ -125,9 +126,9 @@ namespace FullPotential.Standard.Spells.Behaviours
             Destroy(_cylinderParentTransform.gameObject);
         }
 
-        private void PerformGraphicsAdjustments(PlayerState playerState)
+        private void PerformGraphicsAdjustments(IPlayerStateBehaviour playerState)
         {
-            _cylinderParentTransform.parent = playerState.PlayerCamera.transform;
+            _cylinderParentTransform.parent = playerState.PlayerCameraGameObject.transform;
 
             if (playerState.OwnerClientId == NetworkManager.Singleton.LocalClientId)
             {
@@ -159,7 +160,7 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
+            ModHelper.GetGameManager().AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
         }
 
     }

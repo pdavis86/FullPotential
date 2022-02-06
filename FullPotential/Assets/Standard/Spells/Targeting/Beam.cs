@@ -1,8 +1,6 @@
 ﻿using System;
 using FullPotential.Api.Registry.Spells;
-using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Standard.Spells.Behaviours;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace FullPotential.Standard.Spells.Targeting
@@ -17,25 +15,16 @@ namespace FullPotential.Standard.Spells.Targeting
 
         public bool IsContinuous => true;
 
-        public GameObject SpawnGameObject(Spell activeSpell, Vector3 startPosition, Vector3 targetDirection, ulong senderClientId, bool isLeftHand = false, Transform parentTransform = null)
-        {
-            //todo: prefab should be an addressable
-            //NOTE: Can't parent to PlayerCamera otherwise it doesn't parent at all!
-            var spellObject = UnityEngine.Object.Instantiate(
-                GameManager.Instance.Prefabs.Combat.SpellBeam,
-                startPosition,
-                Quaternion.LookRotation(targetDirection)
-            );
+        public string PrefabAddress => "Standard/Prefabs/Spells/SpellBeam.prefab";
 
-            var spellScript = spellObject.GetComponent<SpellBeamBehaviour>();
+        public string IdlePrefabAddress => "Standard/Prefabs/Spells/SpellInHand.prefab";
+
+        public void SetBehaviourVariables(GameObject gameObject, Spell activeSpell, Vector3 startPosition, Vector3 targetDirection, ulong senderClientId, bool isLeftHand = false, Transform parentTransform = null)
+        {
+            var spellScript = gameObject.GetComponent<SpellBeamBehaviour>();
             spellScript.SpellId = activeSpell.Id;
             spellScript.IsLeftHand = isLeftHand;
-
-            spellObject.GetComponent<NetworkObject>().Spawn(true);
-
-            spellObject.transform.parent = parentTransform;
-
-            return spellObject;
         }
+        
     }
 }

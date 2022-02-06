@@ -2,8 +2,9 @@
 using FullPotential.Core.Behaviours.PlayerBehaviours;
 using FullPotential.Core.Behaviours.Ui.Components;
 using FullPotential.Core.Behaviours.UtilityBehaviours;
-using FullPotential.Core.Extensions;
+using FullPotential.Api.Extensions;
 using System;
+using FullPotential.Api.Enums;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using UnityEngine;
@@ -48,20 +49,20 @@ namespace FullPotential.Core.Behaviours.Ui
 
             switch (clickedObject.name)
             {
-                case nameof(PlayerInventory.SlotGameObjectName.Helm): LoadInventoryItems(clickedObject, IGear.GearCategory.Helm); break;
-                case nameof(PlayerInventory.SlotGameObjectName.Chest): LoadInventoryItems(clickedObject, IGear.GearCategory.Chest); break;
-                case nameof(PlayerInventory.SlotGameObjectName.Legs): LoadInventoryItems(clickedObject, IGear.GearCategory.Legs); break;
-                case nameof(PlayerInventory.SlotGameObjectName.Feet): LoadInventoryItems(clickedObject, IGear.GearCategory.Feet); break;
-                case nameof(PlayerInventory.SlotGameObjectName.Barrier): LoadInventoryItems(clickedObject, IGear.GearCategory.Barrier); break;
+                case nameof(SlotGameObjectName.Helm): LoadInventoryItems(clickedObject, IGear.GearCategory.Helm); break;
+                case nameof(SlotGameObjectName.Chest): LoadInventoryItems(clickedObject, IGear.GearCategory.Chest); break;
+                case nameof(SlotGameObjectName.Legs): LoadInventoryItems(clickedObject, IGear.GearCategory.Legs); break;
+                case nameof(SlotGameObjectName.Feet): LoadInventoryItems(clickedObject, IGear.GearCategory.Feet); break;
+                case nameof(SlotGameObjectName.Barrier): LoadInventoryItems(clickedObject, IGear.GearCategory.Barrier); break;
 
-                case nameof(PlayerInventory.SlotGameObjectName.LeftHand):
-                case nameof(PlayerInventory.SlotGameObjectName.RightHand): LoadInventoryItems(clickedObject, IGear.GearCategory.Hand); break;
+                case nameof(SlotGameObjectName.LeftHand):
+                case nameof(SlotGameObjectName.RightHand): LoadInventoryItems(clickedObject, IGear.GearCategory.Hand); break;
 
-                case nameof(PlayerInventory.SlotGameObjectName.LeftRing):
-                case nameof(PlayerInventory.SlotGameObjectName.RightRing): LoadInventoryItems(clickedObject, IGear.GearCategory.Ring); break;
+                case nameof(SlotGameObjectName.LeftRing):
+                case nameof(SlotGameObjectName.RightRing): LoadInventoryItems(clickedObject, IGear.GearCategory.Ring); break;
 
-                case nameof(PlayerInventory.SlotGameObjectName.Amulet): LoadInventoryItems(clickedObject, IGear.GearCategory.Amulet); break;
-                case nameof(PlayerInventory.SlotGameObjectName.Belt): LoadInventoryItems(clickedObject, IGear.GearCategory.Belt); break;
+                case nameof(SlotGameObjectName.Amulet): LoadInventoryItems(clickedObject, IGear.GearCategory.Amulet); break;
+                case nameof(SlotGameObjectName.Belt): LoadInventoryItems(clickedObject, IGear.GearCategory.Belt); break;
 
                 default:
                     Debug.LogError($"Cannot handle click for slot {clickedObject.name}");
@@ -110,23 +111,23 @@ namespace FullPotential.Core.Behaviours.Ui
         public void ResetEquipmentUi(bool reloadSlots = false)
         {
             _componentsContainer.SetActive(false);
-            _componentsContainer.transform.Clear();
+            _componentsContainer.transform.DestroyChildren();
             _lastClickedSlot = null;
 
             if (reloadSlots)
             {
-                foreach (PlayerInventory.SlotGameObjectName slotGameObjectName in Enum.GetValues(typeof(PlayerInventory.SlotGameObjectName)))
+                foreach (SlotGameObjectName slotGameObjectName in Enum.GetValues(typeof(SlotGameObjectName)))
                 {
-                    var slotName = Enum.GetName(typeof(PlayerInventory.SlotGameObjectName), slotGameObjectName);
+                    var slotName = Enum.GetName(typeof(SlotGameObjectName), slotGameObjectName);
                     var item = _playerState.Inventory.GetItemInSlot(slotGameObjectName);
 
                     SetSlot(GetSlotGameObject(slotName), item);
 
                     if (item is Weapon weapon && weapon.IsTwoHanded)
                     {
-                        var otherSlotName = slotGameObjectName == PlayerInventory.SlotGameObjectName.LeftHand
-                            ? PlayerInventory.SlotGameObjectName.RightHand.ToString()
-                            : PlayerInventory.SlotGameObjectName.LeftHand.ToString();
+                        var otherSlotName = slotGameObjectName == SlotGameObjectName.LeftHand
+                            ? SlotGameObjectName.RightHand.ToString()
+                            : SlotGameObjectName.LeftHand.ToString();
                         SetSlot(GetSlotGameObject(otherSlotName), null);
                     }
                 }
@@ -156,13 +157,13 @@ namespace FullPotential.Core.Behaviours.Ui
             {
                 Tooltips.HideTooltip();
 
-                if (!Enum.TryParse<PlayerInventory.SlotGameObjectName>(slot.name, out var slotResult))
+                if (!Enum.TryParse<SlotGameObjectName>(slot.name, out var slotResult))
                 {
                     Debug.LogError($"Failed to find slot for name {slot.name}");
                     return;
                 }
 
-                _playerState.Inventory.EquipItemServerRpc(item.Id, slotResult);
+                ((PlayerInventory)_playerState.Inventory).EquipItemServerRpc(item.Id, slotResult);
             });
         }
 

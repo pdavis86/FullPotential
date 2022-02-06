@@ -1,9 +1,9 @@
 ﻿using System;
+using FullPotential.Api;
+using FullPotential.Api.Constants;
+using FullPotential.Api.Extensions;
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Registry.Spells;
-using FullPotential.Core.Behaviours.PlayerBehaviours;
-using FullPotential.Core.Combat;
-using FullPotential.Core.Constants;
-using FullPotential.Core.Extensions;
 using FullPotential.Standard.Spells.Shapes;
 using Unity.Netcode;
 using UnityEngine;
@@ -19,7 +19,7 @@ namespace FullPotential.Standard.Spells.Behaviours
         public Vector3 SpellDirection;
 
         private GameObject _sourcePlayer;
-        private PlayerState _playerState;
+        private IPlayerStateBehaviour _playerState;
         private Spell _spell;
         private Type _shapeType;
 
@@ -38,7 +38,7 @@ namespace FullPotential.Standard.Spells.Behaviours
 
             Physics.IgnoreCollision(GetComponent<Collider>(), _sourcePlayer.GetComponent<Collider>());
 
-            _playerState = _sourcePlayer.GetComponent<PlayerState>();
+            _playerState = _sourcePlayer.GetComponent<IPlayerStateBehaviour>();
 
             _spell = _playerState.Inventory.GetItemWithId<Spell>(SpellId);
 
@@ -98,7 +98,7 @@ namespace FullPotential.Standard.Spells.Behaviours
 
             if (_shapeType == null)
             {
-                AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
+                ModHelper.GetGameManager().AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
             }
             else
             {

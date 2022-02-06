@@ -1,4 +1,4 @@
-﻿using FullPotential.Core.Helpers;
+﻿using FullPotential.Api.Helpers;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global

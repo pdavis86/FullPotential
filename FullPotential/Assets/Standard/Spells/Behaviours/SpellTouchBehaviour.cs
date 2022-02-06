@@ -1,6 +1,5 @@
-﻿using FullPotential.Api.Registry.Spells;
-using FullPotential.Core.Behaviours.PlayerBehaviours;
-using FullPotential.Core.Combat;
+﻿using FullPotential.Api;
+using FullPotential.Api.Registry.Spells;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -31,13 +30,6 @@ namespace FullPotential.Standard.Spells.Behaviours
 
             if (Physics.Raycast(startPosition, direction, out var hit, maxDistance: _maxDistance))
             {
-                var sourcePlayerState = _sourcePlayer.GetComponent<PlayerState>();
-
-                if (sourcePlayerState == null || !sourcePlayerState.SpendMana(activeSpell))
-                {
-                    return;
-                }
-
                 ApplySpellEffects(hit.transform.gameObject, hit.point);
                 WasSuccessful = true;
             }
@@ -50,7 +42,7 @@ namespace FullPotential.Standard.Spells.Behaviours
 
         public void ApplySpellEffects(GameObject target, Vector3? position)
         {
-            AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
+            ModHelper.GetGameManager().AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
         }
 
     }

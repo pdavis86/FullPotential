@@ -163,7 +163,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _nameTag: {fileID: 3612779855335603929}
-  _healthSlider: {fileID: 2211276185775919372}
+  _healthSliderParent: {fileID: 7812412749593226826}
 --- !u!114 &2712974170162580787
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1006,18 +1006,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 885fcf4cc83eb934c8b19213c1e83ef1, type: 3}
---- !u!114 &2211276185775919372 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2781891065882684970, guid: 885fcf4cc83eb934c8b19213c1e83ef1,
+--- !u!1 &7812412749593226826 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6070853217532367212, guid: 885fcf4cc83eb934c8b19213c1e83ef1,
     type: 3}
   m_PrefabInstance: {fileID: 4047404379537506086}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73c6c128228f41640b4bb379b66ee416, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &7812412749593226827 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6070853217532367213, guid: 885fcf4cc83eb934c8b19213c1e83ef1,

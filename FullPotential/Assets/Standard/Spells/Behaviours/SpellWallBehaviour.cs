@@ -1,8 +1,8 @@
+using FullPotential.Api;
+using FullPotential.Api.Constants;
+using FullPotential.Api.Extensions;
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Registry.Spells;
-using FullPotential.Core.Behaviours.PlayerBehaviours;
-using FullPotential.Core.Combat;
-using FullPotential.Core.Constants;
-using FullPotential.Core.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -34,7 +34,7 @@ namespace FullPotential.Standard.Spells.Behaviours
 
             _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId].PlayerObject.gameObject;
 
-            _spell = _sourcePlayer.GetComponent<PlayerState>().Inventory.GetItemWithId<Spell>(SpellId);
+            _spell = _sourcePlayer.GetComponent<IPlayerStateBehaviour>().Inventory.GetItemWithId<Spell>(SpellId);
 
             if (_spell == null)
             {
@@ -77,7 +77,7 @@ namespace FullPotential.Standard.Spells.Behaviours
 
         public void ApplySpellEffects(GameObject target, Vector3? position)
         {
-            AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
+            ModHelper.GetGameManager().AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
         }
 
     }

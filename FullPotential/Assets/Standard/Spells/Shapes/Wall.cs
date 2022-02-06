@@ -1,6 +1,6 @@
 ﻿using System;
+using FullPotential.Api;
 using FullPotential.Api.Registry.Spells;
-using FullPotential.Core.Behaviours.GameManagement;
 using FullPotential.Standard.Spells.Behaviours;
 using Unity.Netcode;
 using UnityEngine;
@@ -13,21 +13,28 @@ namespace FullPotential.Standard.Spells.Shapes
 
         public string TypeName => nameof(Wall);
 
+        public string PrefabAddress => "Standard/Prefabs/Spells/SpellWall.prefab";
+
         public void SpawnGameObject(Spell activeSpell, Vector3 startPosition, Quaternion rotation, ulong senderClientId)
         {
-            //todo: prefab should be an addressable
-            var prefab = GameManager.Instance.Prefabs.Combat.SpellWall;
+            var gameManager = ModHelper.GetGameManager();
+            gameManager.TypeRegistry.LoadAddessable(
+                activeSpell.Targeting.PrefabAddress,
+                prefab =>
+                {
+                    var spellObject = UnityEngine.Object.Instantiate(prefab, startPosition, rotation);
+                    gameManager.SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(startPosition, spellObject);
 
-            var spellObject = UnityEngine.Object.Instantiate(prefab, startPosition, rotation);
-            GameManager.Instance.SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(startPosition, spellObject);
+                    var spellScript = spellObject.GetComponent<SpellWallBehaviour>();
+                    spellScript.PlayerClientId = senderClientId;
+                    spellScript.SpellId = activeSpell.Id;
 
-            var spellScript = spellObject.GetComponent<SpellWallBehaviour>();
-            spellScript.PlayerClientId = senderClientId;
-            spellScript.SpellId = activeSpell.Id;
+                    spellObject.GetComponent<NetworkObject>().Spawn(true);
 
-            spellObject.GetComponent<NetworkObject>().Spawn(true);
-
-            spellObject.transform.parent = GameManager.Instance.SceneBehaviour.GetTransform();
+                    spellObject.transform.parent = gameManager.SceneBehaviour.GetTransform();
+                }
+            );
         }
+
     }
 }

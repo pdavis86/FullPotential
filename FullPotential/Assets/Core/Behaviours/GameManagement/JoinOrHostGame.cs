@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Linq;
 using FullPotential.Core.Data;
-using FullPotential.Core.Extensions;
+using FullPotential.Api.Extensions;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UNET;
 using UnityEngine;

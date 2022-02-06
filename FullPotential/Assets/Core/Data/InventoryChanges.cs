@@ -1,7 +1,9 @@
-﻿namespace FullPotential.Core.Data
+﻿using FullPotential.Api.Data;
+
+namespace FullPotential.Core.Data
 {
     [System.Serializable]
-    public class InventoryChanges : Inventory
+    public class InventoryChanges : InventoryData
     {
         public string[] IdsToRemove;
     }

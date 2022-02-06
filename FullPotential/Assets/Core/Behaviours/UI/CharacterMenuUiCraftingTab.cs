@@ -1,14 +1,14 @@
-using FullPotential.Core.Behaviours.GameManagement;
-using FullPotential.Core.Behaviours.PlayerBehaviours;
-using FullPotential.Core.Behaviours.Ui.Components;
-using FullPotential.Core.Extensions;
-using FullPotential.Core.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Extensions;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Spells;
+using FullPotential.Core.Behaviours.GameManagement;
+using FullPotential.Core.Behaviours.PlayerBehaviours;
+using FullPotential.Core.Behaviours.Ui.Components;
+using FullPotential.Core.Localization;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -107,7 +107,7 @@ namespace FullPotential.Core.Behaviours.Ui
         // ReSharper disable once UnusedMember.Local
         private void OnDisable()
         {
-            _componentsContainer.transform.Clear();
+            _componentsContainer.transform.DestroyChildren();
         }
 
         private void TypeOnValueChanged(int index)
