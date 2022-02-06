@@ -1,7 +1,7 @@
-﻿using FullPotential.Api.Registry.Base;
+﻿using FullPotential.Api.Data;
+using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Spells;
-using FullPotential.Core.Data;
 
 namespace FullPotential.Api.Helpers
 {

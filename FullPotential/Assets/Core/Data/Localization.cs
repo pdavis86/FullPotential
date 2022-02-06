@@ -1,4 +1,5 @@
 ﻿using System;
+using FullPotential.Api.Data;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnassignedField.Global

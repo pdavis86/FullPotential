@@ -41,9 +41,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [SerializeField] private BarSlider _healthSlider;
         [SerializeField] private Transform _head;
         [SerializeField] private Material _defaultMaterial;
+        [SerializeField] private GameObject _playerCamera;
 #pragma warning restore 0649
 
-        public GameObject PlayerCamera;
         public GameObject InFrontOfPlayer;
         public Transform GraphicsTransform;
         // ReSharper enable UnassignedField.Global
@@ -57,7 +57,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         public PlayerHandStatus HandStatusLeft = new PlayerHandStatus();
         public PlayerHandStatus HandStatusRight = new PlayerHandStatus();
 
-        //todo: rename this then InventoryThingy
         [HideInInspector] public string PlayerToken;
         [HideInInspector] public string Username;
         [HideInInspector] public readonly NetworkVariable<FixedString512Bytes> TextureUrl = new NetworkVariable<FixedString512Bytes>();
@@ -88,7 +87,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             get
             {
-                return PlayerCamera;
+                return _playerCamera;
             }
         }
 
@@ -237,7 +236,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         // ReSharper disable once UnusedMember.Global
         public void FixedUpdate()
         {
-            _head.transform.rotation = PlayerCamera.transform.rotation;
+            _head.transform.rotation = _playerCamera.transform.rotation;
 
             ReplenishAndConsume();
             BecomeVulnerable();
@@ -389,7 +388,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         private void RespawnClientRpc(ClientRpcParams clientRpcParams)
         {
             _aliveStateChanges.PlayBackwards(true);
-            PlayerCamera.transform.rotation = _rb.rotation;
+            _playerCamera.transform.rotation = _rb.rotation;
         }
 
         // ReSharper disable once UnusedParameter.Local
@@ -446,7 +445,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             var projectile = Instantiate(
                 GameManager.Instance.Prefabs.Combat.ProjectileWithTrail,
                 startPosition,
-                PlayerCamera.transform.rotation);
+                _playerCamera.transform.rotation);
 
             var projectileScript = projectile.GetComponent<ProjectileWithTrail>();
             projectileScript.TargetPosition = endPosition;
@@ -584,8 +583,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 LoadFromPlayerData(playerData);
                 TextureUrl.Value = playerData?.Settings?.TextureUrl ?? string.Empty;
 
-                //todo: needs a translation
-                GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc($"{Username} has joined the game", GameManager.Instance.RpcHelper.ForNearbyPlayersExceptMe());
+                var msg = GameManager.Instance.Localizer.Translate("ui.alert.playerjoined");
+                GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc(string.Format(msg, Username), GameManager.Instance.RpcHelper.ForNearbyPlayersExceptMe());
             }
         }
 

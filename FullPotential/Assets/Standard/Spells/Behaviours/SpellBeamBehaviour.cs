@@ -133,7 +133,7 @@ namespace FullPotential.Standard.Spells.Behaviours
             if (playerState.OwnerClientId == NetworkManager.Singleton.LocalClientId)
             {
                 //Move it a little sideways
-                _cylinderParentTransform.position += (IsLeftHand ? _leftRightAdjustment : -_leftRightAdjustment) * _cylinderParentTransform.right;
+                _cylinderParentTransform.position += (IsLeftHand ? _leftRightAdjustment : -_leftRightAdjustment) * _sourcePlayer.transform.right;
             }
 
             //Move the tip to the middle

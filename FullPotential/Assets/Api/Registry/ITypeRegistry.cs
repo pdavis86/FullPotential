@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
 
+// ReSharper disable UnusedMemberInSuper.Global
+
 namespace FullPotential.Api.Registry
 {
     public interface ITypeRegistry

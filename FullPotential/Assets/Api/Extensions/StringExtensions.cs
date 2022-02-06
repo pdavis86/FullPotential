@@ -1,4 +1,6 @@
-﻿namespace FullPotential.Api.Extensions
+﻿// ReSharper disable UnusedMember.Global
+
+namespace FullPotential.Api.Extensions
 {
     public static class StringExtensions
     {

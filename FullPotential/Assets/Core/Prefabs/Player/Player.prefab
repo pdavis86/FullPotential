@@ -1073,10 +1073,9 @@ MonoBehaviour:
   _healthSlider: {fileID: 155634429994666516}
   _head: {fileID: 7392779648629048435}
   _defaultMaterial: {fileID: 2100000, guid: f941e4a9ae20e994198b523fce8b6ab3, type: 2}
-  PlayerCamera: {fileID: 7392779647204144590}
+  _playerCamera: {fileID: 7392779647204144590}
   InFrontOfPlayer: {fileID: 3124563880166737475}
   GraphicsTransform: {fileID: 7392779646582606286}
-  Inventory: {fileID: 0}
   PlayerToken: 
   Username: 
 --- !u!114 &3593277776525206365

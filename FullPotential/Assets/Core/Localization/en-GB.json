@@ -318,6 +318,10 @@
 	
 	
 	{
+      "Key": "ui.alert.playerjoined",
+      "Value": "'{0}' joined the game"
+    },
+	{
       "Key": "ui.alert.attack.noitem",
       "Value": "their fist"
     },

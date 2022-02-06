@@ -388,7 +388,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         {
             var equippedItems = _equippedItems
                 .Where(x => !(x.Value?.Item?.Id.IsNullOrWhiteSpace() ?? false))
-                .Select(x => new Data.KeyValuePair<string, string>(
+                .Select(x => new Api.Data.KeyValuePair<string, string>(
                     Enum.GetName(typeof(SlotGameObjectName), x.Key),
                     x.Value.Item?.Id));
 

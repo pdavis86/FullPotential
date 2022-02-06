@@ -8,13 +8,14 @@ namespace FullPotential.Api.Registry.Spells
 
         bool IsContinuous { get; }
 
+        bool IsParentedToCaster { get; }
+
         void SetBehaviourVariables(
             GameObject gameObject,
             Spell activeSpell, 
             Vector3 startPosition, 
             Vector3 targetDirection,
             ulong senderClientId,
-            bool isLeftHand = false,
-            Transform parentTransform = null);
+            bool isLeftHand = false);
     }
 }

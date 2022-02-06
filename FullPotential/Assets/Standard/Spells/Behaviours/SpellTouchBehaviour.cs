@@ -15,8 +15,6 @@ namespace FullPotential.Standard.Spells.Behaviours
         private readonly Spell _spell;
         private readonly GameObject _sourcePlayer;
 
-        public bool WasSuccessful { get; }
-
         public SpellTouchBehaviour(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
         {
             if (!NetworkManager.Singleton.IsServer)
@@ -31,7 +29,6 @@ namespace FullPotential.Standard.Spells.Behaviours
             if (Physics.Raycast(startPosition, direction, out var hit, maxDistance: _maxDistance))
             {
                 ApplySpellEffects(hit.transform.gameObject, hit.point);
-                WasSuccessful = true;
             }
         }
 

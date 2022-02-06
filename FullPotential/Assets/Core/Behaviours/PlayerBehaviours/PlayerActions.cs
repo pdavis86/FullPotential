@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using FullPotential.Api;
 using FullPotential.Api.Constants;
+using FullPotential.Api.Data;
 using FullPotential.Api.Enums;
 using FullPotential.Api.Helpers;
 using FullPotential.Api.Registry.Gear;
@@ -422,6 +423,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return;
             }
 
+            if (_playerState.Mana.Value < _playerState.GetManaCost(activeSpell))
+            {
+                return;
+            }
+
             var startPosition = isLeftHand
                 ? _playerState.Positions.LeftHandInFront.position
                 : _playerState.Positions.RightHandInFront.position;
@@ -432,8 +438,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 ? (hit.point - startPosition).normalized
                 : lookDirection;
 
-            //todo: beam goes on this transform and everything else goes on gameManager.SceneBehaviour.GetTransform()
-            var xxx = GameManager.Instance.SceneBehaviour.GetTransform();
+            var parentTransform = activeSpell.Targeting.IsParentedToCaster
+                ? transform
+                : GameManager.Instance.SceneBehaviour.GetTransform();
 
             GameManager.Instance.TypeRegistry.LoadAddessable(
                 activeSpell.Targeting.PrefabAddress,
@@ -441,11 +448,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 {
                     var spellObject = Instantiate(prefab, startPosition, Quaternion.identity);
 
-                    activeSpell.Targeting.SetBehaviourVariables(spellObject, activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId, isLeftHand, xxx);
+                    activeSpell.Targeting.SetBehaviourVariables(spellObject, activeSpell, startPosition, targetDirection, serverRpcParams.Receive.SenderClientId, isLeftHand);
 
                     spellObject.GetComponent<NetworkObject>().Spawn(true);
 
-                    spellObject.transform.parent = xxx;
+                    spellObject.transform.parent = parentTransform;
 
                     leftOrRight.SpellBeingCast = activeSpell;
 

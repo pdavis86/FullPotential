@@ -15,11 +15,13 @@ namespace FullPotential.Standard.Spells.Targeting
 
         public bool IsContinuous => false;
 
+        public bool IsParentedToCaster => false;
+
         public string PrefabAddress => "Standard/Prefabs/Spells/SpellSelf.prefab";
 
         public string IdlePrefabAddress => "Standard/Prefabs/Spells/SpellInHand.prefab";
 
-        public void SetBehaviourVariables(GameObject gameObject, Spell activeSpell, Vector3 startPosition, Vector3 targetDirection, ulong senderClientId, bool isLeftHand = false, Transform parentTransform = null)
+        public void SetBehaviourVariables(GameObject gameObject, Spell activeSpell, Vector3 startPosition, Vector3 targetDirection, ulong senderClientId, bool isLeftHand = false)
         {
             var spellScript = gameObject.GetComponent<SpellSelfBehaviour>();
             spellScript.PlayerClientId = senderClientId;

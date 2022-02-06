@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using FullPotential.Api.Combat;
-using FullPotential.Api.Data;
 using FullPotential.Api.Enums;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
@@ -19,6 +18,6 @@ namespace FullPotential.Api.Gameplay
 
         IEnumerable<ItemBase> GetCompatibleItemsForSlot(IGear.GearCategory? gearCategory);
 
-        KeyValuePair<SlotGameObjectName, EquippedItem>? GetEquippedWithItemId(string itemId);
+        KeyValuePair<SlotGameObjectName, Data.EquippedItem>? GetEquippedWithItemId(string itemId);
     }
 }

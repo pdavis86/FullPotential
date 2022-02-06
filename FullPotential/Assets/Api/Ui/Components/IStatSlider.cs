@@ -1,4 +1,6 @@
-﻿namespace FullPotential.Api.Ui.Components
+﻿// ReSharper disable UnusedMemberInSuper.Global
+
+namespace FullPotential.Api.Ui.Components
 {
     public interface IStatSlider
     {

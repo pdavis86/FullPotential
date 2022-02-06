@@ -15,11 +15,13 @@ namespace FullPotential.Standard.Spells.Targeting
 
         public bool IsContinuous => false;
 
+        public bool IsParentedToCaster => false;
+
         public string PrefabAddress => null;
 
         public string IdlePrefabAddress => null;
 
-        public void SetBehaviourVariables(GameObject gameObject, Spell activeSpell, Vector3 startPosition, Vector3 targetDirection, ulong senderClientId, bool isLeftHand = false, Transform parentTransform = null)
+        public void SetBehaviourVariables(GameObject gameObject, Spell activeSpell, Vector3 startPosition, Vector3 targetDirection, ulong senderClientId, bool isLeftHand = false)
         {
             // ReSharper disable once ObjectCreationAsStatement
             new SpellTouchBehaviour(activeSpell, startPosition, targetDirection, senderClientId);

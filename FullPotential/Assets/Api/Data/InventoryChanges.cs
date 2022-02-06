@@ -1,6 +1,4 @@
-﻿using FullPotential.Api.Data;
-
-namespace FullPotential.Core.Data
+﻿namespace FullPotential.Api.Data
 {
     [System.Serializable]
     public class InventoryChanges : InventoryData
