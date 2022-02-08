@@ -83,13 +83,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public IPlayerInventory Inventory { get; private set; }
 
-        public GameObject PlayerCameraGameObject
-        {
-            get
-            {
-                return _playerCamera;
-            }
-        }
+        public GameObject PlayerCameraGameObject => _playerCamera;
 
         #region Event handlers
 
@@ -182,12 +176,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 if (HandStatusLeft.SpellBeingCastGameObject != null && !SpendMana(HandStatusLeft.SpellBeingCast))
                 {
                     HandStatusLeft.SpellBeingCastGameObject.GetComponent<ISpellBehaviour>().StopCasting();
-                    //todo: tell the client too
+                    var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayers(transform.position);
+                    StopCastingClientRpc(true, nearbyClients);
                 }
                 if (HandStatusRight.SpellBeingCastGameObject != null && !SpendMana(HandStatusRight.SpellBeingCast))
                 {
                     HandStatusRight.SpellBeingCastGameObject.GetComponent<ISpellBehaviour>().StopCasting();
-                    //todo: tell the client too
+                    var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayers(transform.position);
+                    StopCastingClientRpc(false, nearbyClients);
                 }
             });
 
@@ -306,7 +302,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             RespawnClientRpc(_clientRpcParams);
 
             var spawnPoint = GameManager.Instance.SceneBehaviour.GetSpawnPoint(gameObject);
-            PlayerSpawnStateChangeClientRpc(spawnPoint.Position, LivingEntityState.Respawning, null, null, GameManager.Instance.RpcHelper.ForNearbyPlayers());
+            var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayers(transform.position);
+            PlayerSpawnStateChangeClientRpc(spawnPoint.Position, LivingEntityState.Respawning, null, null, nearbyClients);
         }
 
         [ServerRpc]
@@ -466,6 +463,24 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(isLeftHand, leftOrRight);
         }
 
+        // ReSharper disable once UnusedParameter.Global
+        [ClientRpc]
+        public void TryToAttackClientRpc(bool isLeftHand, ulong attackerClientId, ClientRpcParams clientRpcParams)
+        {
+            _playerActions.TryToAttack(isLeftHand, attackerClientId);
+        }
+
+        // ReSharper disable once UnusedParameter.Global
+        [ClientRpc]
+        public void StopCastingClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
+        {
+            var leftOrRight = isLeftHand
+                ? HandStatusLeft
+                : HandStatusRight;
+
+            _playerActions.StopIfCastingSpell(leftOrRight);
+        }
+
         #endregion
 
         public int GetDefenseValue()
@@ -558,7 +573,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (distanceMoved > 1)
             {
                 AliveState = LivingEntityState.Alive;
-                PlayerSpawnStateChangeClientRpc(Vector3.zero, LivingEntityState.Alive, null, null, GameManager.Instance.RpcHelper.ForNearbyPlayers());
+                var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayers(transform.position);
+                PlayerSpawnStateChangeClientRpc(Vector3.zero, LivingEntityState.Alive, null, null, nearbyClients);
                 _startingPosition = Vector3.zero;
             }
         }
@@ -584,7 +600,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 TextureUrl.Value = playerData?.Settings?.TextureUrl ?? string.Empty;
 
                 var msg = GameManager.Instance.Localizer.Translate("ui.alert.playerjoined");
-                GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc(string.Format(msg, Username), GameManager.Instance.RpcHelper.ForNearbyPlayersExceptMe());
+                var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayersExcept(transform.position, OwnerClientId);
+                GameManager.Instance.SceneBehaviour.MakeAnnouncementClientRpc(string.Format(msg, Username), nearbyClients);
             }
         }
 
@@ -828,7 +845,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _damageTaken.Clear();
 
             AliveState = LivingEntityState.Dead;
-            PlayerSpawnStateChangeClientRpc(Vector3.zero, LivingEntityState.Dead, killerName, itemName, GameManager.Instance.RpcHelper.ForNearbyPlayers());
+
+            var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayers(transform.position);
+            PlayerSpawnStateChangeClientRpc(Vector3.zero, LivingEntityState.Dead, killerName, itemName, nearbyClients);
 
             YouDiedClientRpc(_clientRpcParams);
 

@@ -120,9 +120,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 InventoryDataHelper.PopulateInventoryChangesWithItem(invChange, item);
             }
 
+            //todo: use ForNearbyPlayersExcept() once CharacterMenuUiEquipmentTab does what it needs to without this ClientRpc
+            var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayers(transform.position);
             foreach (var message in FragmentedMessageReconstructor.GetFragmentedMessages(invChange))
             {
-                ApplyEquipChangeClientRpc(message, GameManager.Instance.RpcHelper.ForNearbyPlayers());
+                ApplyEquipChangeClientRpc(message, nearbyClients);
             }
         }
 
@@ -344,7 +346,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
-        private void SetEquippedItem(ItemBase item, SlotGameObjectName slotGameObjectName)
+        public void SetEquippedItem(ItemBase item, SlotGameObjectName slotGameObjectName)
         {
             if (_equippedItems.ContainsKey(slotGameObjectName))
             {
@@ -508,7 +510,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _equippedItems[slotGameObjectName].GameObject = null;
         }
 
-        private void SpawnEquippedObject(ItemBase item, SlotGameObjectName slotGameObjectName)
+        public void SpawnEquippedObject(ItemBase item, SlotGameObjectName slotGameObjectName)
         {
             DespawnEquippedObject(slotGameObjectName);
 

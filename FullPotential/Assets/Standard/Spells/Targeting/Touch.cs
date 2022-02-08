@@ -17,14 +17,19 @@ namespace FullPotential.Standard.Spells.Targeting
 
         public bool IsParentedToCaster => false;
 
-        public string PrefabAddress => null;
+        public bool IsServerSideOnly => true;
 
-        public string IdlePrefabAddress => null;
+        public string PrefabAddress => "Standard/Prefabs/Spells/SpellTouch.prefab";
 
-        public void SetBehaviourVariables(GameObject gameObject, Spell activeSpell, Vector3 startPosition, Vector3 targetDirection, ulong senderClientId, bool isLeftHand = false)
+        public string IdlePrefabAddress => "Standard/Prefabs/Spells/SpellInHand.prefab";
+
+        public void SetBehaviourVariables(GameObject gameObject, Spell activeSpell, Vector3 startPosition, Vector3 targetDirection, ulong casterClientId, bool isLeftHand = false)
         {
-            // ReSharper disable once ObjectCreationAsStatement
-            new SpellTouchBehaviour(activeSpell, startPosition, targetDirection, senderClientId);
+            var spellScript = gameObject.GetComponent<SpellTouchBehaviour>();
+            spellScript.SpellId = activeSpell.Id;
+            spellScript.StartPosition = startPosition;
+            spellScript.SpellDirection = targetDirection;
+            spellScript.PlayerClientId = casterClientId;
         }
 
     }

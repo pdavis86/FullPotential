@@ -157,13 +157,20 @@ namespace FullPotential.Core.Behaviours.Ui
             {
                 Tooltips.HideTooltip();
 
-                if (!Enum.TryParse<SlotGameObjectName>(slot.name, out var slotResult))
+                if (!Enum.TryParse<SlotGameObjectName>(slot.name, out var slotGameObjectName))
                 {
                     Debug.LogError($"Failed to find slot for name {slot.name}");
                     return;
                 }
 
-                ((PlayerInventory)_playerState.Inventory).EquipItemServerRpc(item.Id, slotResult);
+                var castedPlayerInventory = (PlayerInventory)_playerState.Inventory;
+
+                //todo: this needs some effort to get working, but not tonight
+                //castedPlayerInventory.SetEquippedItem(item, slotGameObjectName);
+                //castedPlayerInventory.SpawnEquippedObject(item, slotGameObjectName);
+                //ResetEquipmentUi(true);
+
+                castedPlayerInventory.EquipItemServerRpc(item.Id, slotGameObjectName);
             });
         }
 

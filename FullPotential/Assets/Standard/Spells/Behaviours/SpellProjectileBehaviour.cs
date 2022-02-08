@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Spells.Behaviours
 {
-    public class SpellProjectileBehaviour : NetworkBehaviour, ISpellBehaviour
+    public class SpellProjectileBehaviour : MonoBehaviour, ISpellBehaviour
     {
         public ulong PlayerClientId;
         public string SpellId;
@@ -26,12 +26,6 @@ namespace FullPotential.Standard.Spells.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            if (!IsServer)
-            {
-                //No need to Debug.LogError(). We only want this behaviour on the server
-                return;
-            }
-
             Destroy(gameObject, 3f);
 
             _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId].PlayerObject.gameObject;
@@ -71,17 +65,19 @@ namespace FullPotential.Standard.Spells.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void OnTriggerEnter(Collider other)
         {
-            if (!IsServer)
-            {
-                return;
-            }
-
             if (other.isTrigger)
             {
                 return;
             }
 
-            ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
+            if (NetworkManager.Singleton.IsServer)
+            {
+                ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position)); 
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
 
         public void StopCasting()
@@ -91,6 +87,11 @@ namespace FullPotential.Standard.Spells.Behaviours
 
         public void ApplySpellEffects(GameObject target, Vector3? position)
         {
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                return;
+            }
+
             if (!position.HasValue)
             {
                 throw new ArgumentException("Position Vector3 cannot be null for projectiles");

@@ -1,4 +1,5 @@
 ﻿using FullPotential.Api;
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Registry.Spells;
 using Unity.Netcode;
 using UnityEngine;
@@ -7,26 +8,34 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Spells.Behaviours
 {
-    public class SpellTouchBehaviour : ISpellBehaviour
+    public class SpellTouchBehaviour : MonoBehaviour, ISpellBehaviour
     {
         // ReSharper disable once InconsistentNaming
         private const int _maxDistance = 3;
 
-        private readonly Spell _spell;
-        private readonly GameObject _sourcePlayer;
+        public string SpellId;
+        public Vector3 StartPosition;
+        public Vector3 SpellDirection;
+        public ulong PlayerClientId;
 
-        public SpellTouchBehaviour(Spell activeSpell, Vector3 startPosition, Vector3 direction, ulong senderClientId)
+        private Spell _spell;
+        private GameObject _sourcePlayer;
+
+        // ReSharper disable once UnusedMember.Local
+        private void Start()
         {
             if (!NetworkManager.Singleton.IsServer)
             {
                 return;
             }
 
-            _spell = activeSpell;
+            _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId].PlayerObject.gameObject;
 
-            _sourcePlayer = NetworkManager.Singleton.ConnectedClients[senderClientId].PlayerObject.gameObject;
+            var playerState = _sourcePlayer.GetComponent<IPlayerStateBehaviour>();
 
-            if (Physics.Raycast(startPosition, direction, out var hit, maxDistance: _maxDistance))
+            _spell = playerState.Inventory.GetItemWithId<Spell>(SpellId);
+
+            if (Physics.Raycast(StartPosition, SpellDirection, out var hit, maxDistance: _maxDistance))
             {
                 ApplySpellEffects(hit.transform.gameObject, hit.point);
             }
@@ -39,6 +48,11 @@ namespace FullPotential.Standard.Spells.Behaviours
 
         public void ApplySpellEffects(GameObject target, Vector3? position)
         {
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                return;
+            }
+
             ModHelper.GetGameManager().AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
         }
 

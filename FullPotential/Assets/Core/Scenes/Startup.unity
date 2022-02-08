@@ -13397,18 +13397,6 @@ MonoBehaviour:
   Combat:
     ProjectileWithTrail: {fileID: 4563083350583329192, guid: 92356876fd6de514e9c2f4e4bdea6cc0,
       type: 3}
-    SpellInHand: {fileID: 5923469330004543499, guid: 404031c7fdd421f4295a39230469eb19,
-      type: 3}
-    SpellProjectile: {fileID: 4991308441274877191, guid: 7297a77e0760fc442a8de9c1615f5d4c,
-      type: 3}
-    SpellSelf: {fileID: 2058307768172192450, guid: bd7b43d17a423b84a96eceaa0a28419f,
-      type: 3}
-    SpellBeam: {fileID: 9101233024267604900, guid: cd7343b2907f0bb43b33607835902cda,
-      type: 3}
-    SpellWall: {fileID: 605297549439960408, guid: da2c19386588bc24cb34810a8530adc5,
-      type: 3}
-    SpellZone: {fileID: 585545506049340028, guid: b7d2fcaa5eb669840928413506c5b9ea,
-      type: 3}
   Environment:
     LootChest: {fileID: 6779003295890321588, guid: 0da494cf737d72c44b603f7a79174481,
       type: 3}
@@ -13812,36 +13800,6 @@ MonoBehaviour:
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
       Prefab: {fileID: 145446360085616433, guid: 6d41a310c4a9c2340b060fd324410cc1,
-        type: 3}
-      SourcePrefabToOverride: {fileID: 0}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
-    - Override: 0
-      Prefab: {fileID: 9101233024267604900, guid: cd7343b2907f0bb43b33607835902cda,
-        type: 3}
-      SourcePrefabToOverride: {fileID: 0}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
-    - Override: 0
-      Prefab: {fileID: 4991308441274877191, guid: 7297a77e0760fc442a8de9c1615f5d4c,
-        type: 3}
-      SourcePrefabToOverride: {fileID: 0}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
-    - Override: 0
-      Prefab: {fileID: 2058307768172192450, guid: bd7b43d17a423b84a96eceaa0a28419f,
-        type: 3}
-      SourcePrefabToOverride: {fileID: 0}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
-    - Override: 0
-      Prefab: {fileID: 605297549439960408, guid: da2c19386588bc24cb34810a8530adc5,
-        type: 3}
-      SourcePrefabToOverride: {fileID: 0}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
-    - Override: 0
-      Prefab: {fileID: 585545506049340028, guid: b7d2fcaa5eb669840928413506c5b9ea,
         type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
@@ -18446,10 +18404,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mainCanvas: {fileID: 7011060654693451861}
-  AppOptions:
-    Username: 
-    Culture: 
-    FieldOfView: 0
 --- !u!4 &8533790816139666109
 Transform:
   m_ObjectHideFlags: 0

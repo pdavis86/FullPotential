@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Spells.Behaviours
 {
-    public class SpellBeamBehaviour : NetworkBehaviour, ISpellBehaviour
+    public class SpellBeamBehaviour : MonoBehaviour, ISpellBehaviour
     {
         public string SpellId;
         public bool IsLeftHand;
@@ -51,7 +51,7 @@ namespace FullPotential.Standard.Spells.Behaviours
 
             PerformGraphicsAdjustments(_sourcePlayerState);
 
-            if (!IsServer)
+            if (!NetworkManager.Singleton.IsServer)
             {
                 return;
             }
@@ -91,7 +91,7 @@ namespace FullPotential.Standard.Spells.Behaviours
 
                 _hit = hit;
 
-                if (IsServer)
+                if (NetworkManager.Singleton.IsServer)
                 {
                     _applyEffectsAction.TryPerformAction();
                 }
@@ -105,41 +105,13 @@ namespace FullPotential.Standard.Spells.Behaviours
                 beamLength = maxBeamLength;
             }
 
-            _cylinderParentTransform.rotation = Quaternion.LookRotation(targetDirection);
-
-            if (!Mathf.Approximately(_cylinderTransform.localScale.y * 2, beamLength))
-            {
-                _cylinderTransform.localScale = new Vector3(_cylinderTransform.localScale.x, beamLength / 2, _cylinderTransform.localScale.z);
-                _cylinderTransform.position = _cylinderParentTransform.position + (_cylinderTransform.up * _cylinderTransform.localScale.y);
-            }
-
-            if (!_cylinderTransform.gameObject.activeInHierarchy)
-            {
-                _cylinderTransform.gameObject.SetActive(true);
-            }
+            UpdateBeam(targetDirection, beamLength);
         }
 
-        public override void OnDestroy()
+        // ReSharper disable once UnusedMember.Global
+        public void OnDestroy()
         {
-            base.OnDestroy();
-
             Destroy(_cylinderParentTransform.gameObject);
-        }
-
-        private void PerformGraphicsAdjustments(IPlayerStateBehaviour playerState)
-        {
-            _cylinderParentTransform.parent = playerState.PlayerCameraGameObject.transform;
-
-            if (playerState.OwnerClientId == NetworkManager.Singleton.LocalClientId)
-            {
-                //Move it a little sideways
-                _cylinderParentTransform.position += (IsLeftHand ? _leftRightAdjustment : -_leftRightAdjustment) * _sourcePlayer.transform.right;
-            }
-
-            //Move the tip to the middle
-            _cylinderTransform.position += _cylinderTransform.up * _cylinderTransform.localScale.y;
-
-            _cylinderTransform.gameObject.SetActive(false);
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -161,6 +133,48 @@ namespace FullPotential.Standard.Spells.Behaviours
             }
 
             ModHelper.GetGameManager().AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
+        }
+
+        private void PerformGraphicsAdjustments(IPlayerStateBehaviour playerState)
+        {
+            if (!NetworkManager.Singleton.IsClient)
+            {
+                return;
+            }
+
+            _cylinderParentTransform.parent = playerState.PlayerCameraGameObject.transform;
+
+            if (playerState.OwnerClientId == NetworkManager.Singleton.LocalClientId)
+            {
+                //Move it a little sideways
+                _cylinderParentTransform.position += (IsLeftHand ? _leftRightAdjustment : -_leftRightAdjustment) * _sourcePlayer.transform.right;
+            }
+
+            //Move the tip to the middle
+            _cylinderTransform.position += _cylinderTransform.up * _cylinderTransform.localScale.y;
+
+            _cylinderTransform.gameObject.SetActive(false);
+        }
+
+        private void UpdateBeam(Vector3 targetDirection, float beamLength)
+        {
+            if (!NetworkManager.Singleton.IsClient)
+            {
+                return;
+            }
+
+            _cylinderParentTransform.rotation = Quaternion.LookRotation(targetDirection);
+
+            if (!Mathf.Approximately(_cylinderTransform.localScale.y * 2, beamLength))
+            {
+                _cylinderTransform.localScale = new Vector3(_cylinderTransform.localScale.x, beamLength / 2, _cylinderTransform.localScale.z);
+                _cylinderTransform.position = _cylinderParentTransform.position + (_cylinderTransform.up * _cylinderTransform.localScale.y);
+            }
+
+            if (!_cylinderTransform.gameObject.activeInHierarchy)
+            {
+                _cylinderTransform.gameObject.SetActive(true);
+            }
         }
 
     }

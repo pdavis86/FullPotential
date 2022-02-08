@@ -2,7 +2,6 @@
 using FullPotential.Api;
 using FullPotential.Api.Registry.Spells;
 using FullPotential.Standard.Spells.Behaviours;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace FullPotential.Standard.Spells.Shapes
@@ -19,7 +18,7 @@ namespace FullPotential.Standard.Spells.Shapes
         {
             var gameManager = ModHelper.GetGameManager();
             gameManager.TypeRegistry.LoadAddessable(
-                activeSpell.Targeting.PrefabAddress,
+                activeSpell.Shape.PrefabAddress,
                 prefab =>
                 {
                     var spellObject = UnityEngine.Object.Instantiate(prefab, startPosition, rotation);
@@ -28,8 +27,6 @@ namespace FullPotential.Standard.Spells.Shapes
                     var spellScript = spellObject.GetComponent<SpellWallBehaviour>();
                     spellScript.PlayerClientId = senderClientId;
                     spellScript.SpellId = activeSpell.Id;
-
-                    spellObject.GetComponent<NetworkObject>().Spawn(true);
 
                     spellObject.transform.parent = gameManager.SceneBehaviour.GetTransform();
                 }

@@ -137,6 +137,10 @@ MonoBehaviour:
     m_Address: Standard/Prefabs/Spells/SpellZone.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 047241ab43d5e0b4d91c0eaf63455b5f
+    m_Address: Standard/Prefabs/Spells/SpellTouch.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 101452080fc0cca43abdd31fc4649980, type: 2}
   m_SchemaSet:

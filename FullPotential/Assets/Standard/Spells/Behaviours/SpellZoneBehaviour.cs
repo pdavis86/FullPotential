@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Spells.Behaviours
 {
-    public class SpellZoneBehaviour : NetworkBehaviour, ISpellBehaviour
+    public class SpellZoneBehaviour : MonoBehaviour, ISpellBehaviour
     {
         public ulong PlayerClientId;
         public string SpellId;
@@ -23,14 +23,13 @@ namespace FullPotential.Standard.Spells.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            if (!IsServer)
-            {
-                //No need to Debug.LogError(). We only want this behaviour on the server
-                return;
-            }
-
             //todo: attribute-based object lifetime
             Destroy(gameObject, 10f);
+
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                return;
+            }
 
             _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId].PlayerObject.gameObject;
 
@@ -49,7 +48,7 @@ namespace FullPotential.Standard.Spells.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void OnTriggerStay(Collider other)
         {
-            if (!IsServer)
+            if (!NetworkManager.Singleton.IsServer)
             {
                 return;
             }
@@ -77,6 +76,11 @@ namespace FullPotential.Standard.Spells.Behaviours
 
         public void ApplySpellEffects(GameObject target, Vector3? position)
         {
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                return;
+            }
+
             var adjustedPosition = position + new Vector3(0, 1);
             ModHelper.GetGameManager().AttackHelper.DealDamage(_sourcePlayer, _spell, target, adjustedPosition);
         }

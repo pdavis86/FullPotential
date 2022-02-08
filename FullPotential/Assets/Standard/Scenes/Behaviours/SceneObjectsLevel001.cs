@@ -40,6 +40,10 @@ namespace FullPotential.Standard.Scenes.Behaviours
         private void Awake()
         {
             _spawnService = new SpawnService();
+
+            //Cannot currently add prefabs at runtime
+            //https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/1360
+            //So enemy prefab is part of FullPotential.Core
         }
 
         // ReSharper disable once UnusedMember.Local

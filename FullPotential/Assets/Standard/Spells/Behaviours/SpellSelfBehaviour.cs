@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Spells.Behaviours
 {
-    public class SpellSelfBehaviour : NetworkBehaviour, ISpellBehaviour
+    public class SpellSelfBehaviour : MonoBehaviour, ISpellBehaviour
     {
         // ReSharper disable once InconsistentNaming
         private const float _distanceBeforeReturning = 8f;
@@ -26,12 +26,6 @@ namespace FullPotential.Standard.Spells.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            if (!IsServer)
-            {
-                //No need to Debug.LogError(). We only want this behaviour on the server
-                return;
-            }
-
             _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId].PlayerObject.gameObject;
 
             _spell = _sourcePlayer.GetComponent<IPlayerStateBehaviour>().Inventory.GetItemWithId<Spell>(SpellId);
@@ -55,11 +49,6 @@ namespace FullPotential.Standard.Spells.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            if (!IsServer)
-            {
-                return;
-            }
-
             if (_sourcePlayer == null)
             {
                 Destroy(gameObject);
@@ -87,20 +76,27 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            ApplySpellEffects(_sourcePlayer, transform.position);
+            if (NetworkManager.Singleton.IsServer)
+            {
+                ApplySpellEffects(_sourcePlayer, transform.position);
+            }
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnTriggerEnter(Collider other)
         {
-            if (!IsServer)
+            if (other.gameObject == _sourcePlayer)
             {
                 return;
             }
 
-            if (other.gameObject != _sourcePlayer)
+            if (NetworkManager.Singleton.IsServer)
             {
                 ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
+            }
+            else
+            {
+                Destroy(gameObject);
             }
         }
 
@@ -117,6 +113,11 @@ namespace FullPotential.Standard.Spells.Behaviours
 
         public void ApplySpellEffects(GameObject target, Vector3? position)
         {
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                return;
+            }
+
             ModHelper.GetGameManager().AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
             Destroy(gameObject);
         }

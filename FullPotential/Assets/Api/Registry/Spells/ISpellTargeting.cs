@@ -10,12 +10,14 @@ namespace FullPotential.Api.Registry.Spells
 
         bool IsParentedToCaster { get; }
 
+        bool IsServerSideOnly { get; }
+
         void SetBehaviourVariables(
             GameObject gameObject,
             Spell activeSpell, 
             Vector3 startPosition, 
             Vector3 targetDirection,
-            ulong senderClientId,
+            ulong casterClientId,
             bool isLeftHand = false);
     }
 }

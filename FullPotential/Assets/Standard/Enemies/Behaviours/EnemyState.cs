@@ -118,7 +118,8 @@ namespace FullPotential.Standard.Enemies.Behaviours
             _damageTaken.Clear();
 
             var deathMessage = _gameManager.AttackHelper.GetDeathMessage(false, name, killerName, itemName);
-            _gameManager.SceneBehaviour.MakeAnnouncementClientRpc(deathMessage, _gameManager.RpcHelper.ForNearbyPlayers());
+            var nearbyClients = _gameManager.RpcHelper.ForNearbyPlayers(transform.position);
+            _gameManager.SceneBehaviour.MakeAnnouncementClientRpc(deathMessage, nearbyClients);
 
             Destroy(gameObject);
 
