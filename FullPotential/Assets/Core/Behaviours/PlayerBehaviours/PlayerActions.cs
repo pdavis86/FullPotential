@@ -227,11 +227,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [ServerRpc]
         private void TryToAttackServerRpc(bool isLeftHand, ServerRpcParams serverRpcParams = default)
         {
-            var tellOtherClients = IsServer || TryToAttack(isLeftHand, serverRpcParams.Receive.SenderClientId);
+            var tellOtherClients = IsServer || TryToAttack(isLeftHand, _playerCamera.transform.position, _playerCamera.transform.forward, serverRpcParams.Receive.SenderClientId);
             if (tellOtherClients)
             {
                 var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayersExcept(transform.position, OwnerClientId);
-                _playerState.TryToAttackClientRpc(isLeftHand, serverRpcParams.Receive.SenderClientId, nearbyClients);
+                _playerState.TryToAttackClientRpc(isLeftHand, _playerCamera.transform.position, _playerCamera.transform.forward, serverRpcParams.Receive.SenderClientId, nearbyClients);
             }
         }
 
@@ -368,7 +368,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         #endregion
 
-        public bool TryToAttack(bool isLeftHand, ulong casterClientId)
+        public bool TryToAttack(bool isLeftHand, Vector3 position, Vector3 forward, ulong casterClientId)
         {
             StopReloading(isLeftHand);
 
@@ -379,13 +379,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             switch (itemInHand)
             {
                 case null:
-                    return Punch() != null;
+                    return Punch(position, forward) != null;
 
                 case Spell spellInHand:
-                    return CastSpell(spellInHand, isLeftHand, casterClientId);
+                    return CastSpell(spellInHand, isLeftHand, position, forward, casterClientId);
 
                 case Weapon weaponInHand:
-                    return UseWeapon(weaponInHand, isLeftHand) != null;
+                    return UseWeapon(weaponInHand, isLeftHand, position, forward) != null;
 
                 default:
                     Debug.LogWarning("Not implemented attack for " + itemInHand.Name + " yet");
@@ -393,14 +393,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
-        private Ray GetLookDirectionRay()
+        private ulong? Punch(Vector3 position, Vector3 forward)
         {
-            return _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
-        }
-
-        private ulong? Punch()
-        {
-            if (!Physics.Raycast(GetLookDirectionRay(), out var hit, 4))
+            if (!Physics.Raycast(position, forward, out var hit, 4))
             {
                 return null;
             }
@@ -432,7 +427,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             return true;
         }
 
-        private bool CastSpell(Spell activeSpell, bool isLeftHand, ulong playerClientId)
+        private bool CastSpell(Spell activeSpell, bool isLeftHand, Vector3 position, Vector3 forward, ulong playerClientId)
         {
             if (activeSpell == null)
             {
@@ -461,10 +456,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 : _playerState.Positions.RightHandInFront.position;
 
             const float maxDistance = 50f;
-            var lookDirection = GetLookDirectionRay().direction;
-            var targetDirection = Physics.Raycast(_playerCamera.transform.position, lookDirection, out var hit, maxDistance: maxDistance)
+            var targetDirection = Physics.Raycast(position, forward, out var hit, maxDistance: maxDistance)
                 ? (hit.point - startPosition).normalized
-                : lookDirection;
+                : forward;
 
             var parentTransform = activeSpell.Targeting.IsParentedToCaster
                 ? transform
@@ -493,7 +487,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 }
             );
 
-                if (activeSpell.Targeting.IsServerSideOnly)
+            if (activeSpell.Targeting.IsServerSideOnly)
             {
                 return false;
             }
@@ -501,18 +495,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             return true;
         }
 
-        private ulong? UseWeapon(Weapon weaponInHand, bool isLeftHand)
+        private ulong? UseWeapon(Weapon weaponInHand, bool isLeftHand, Vector3 position, Vector3 forward)
         {
-            var lookRay = _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
-
             var registryType = (IGearWeapon)weaponInHand.RegistryType;
 
             return registryType.Category == IGearWeapon.WeaponCategory.Ranged
-                ? UseRangedWeapon(weaponInHand, isLeftHand, lookRay)
-                : UseMeleeWeapon(weaponInHand, lookRay);
+                ? UseRangedWeapon(weaponInHand, isLeftHand, position, forward)
+                : UseMeleeWeapon(weaponInHand, position, forward);
         }
 
-        private ulong? UseRangedWeapon(Weapon weaponInHand, bool isLeftHand, Ray lookRay)
+        private ulong? UseRangedWeapon(Weapon weaponInHand, bool isLeftHand, Vector3 position, Vector3 forward)
         {
             var ammoState = isLeftHand
                 ? _playerState.HandStatusLeft
@@ -528,18 +520,16 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(isLeftHand, ammoState);
 
-            var lookDirection = GetLookDirectionRay().direction;
-
             var leftOrRight = isLeftHand
                 ? _playerState.Positions.LeftHandInFront
                 : _playerState.Positions.RightHandInFront;
 
-            var startPos = leftOrRight.position + lookDirection * 1;
+            var startPos = leftOrRight.position + forward;
 
             //todo: attribute-based weapon range
-            var endPos = Physics.Raycast(lookRay, out var rangedHit, 30)
+            var endPos = Physics.Raycast(position, forward, out var rangedHit, 30)
                 ? rangedHit.point
-                : _playerState.Positions.RightHandInFront.position + lookDirection * 30;
+                : _playerState.Positions.RightHandInFront.position + forward * 30;
 
             var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayersExcept(transform.position, OwnerClientId);
             _playerState.UsedWeaponClientRpc(startPos, endPos, nearbyClients);
@@ -557,10 +547,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             return rangedHit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId;
         }
 
-        private ulong? UseMeleeWeapon(Weapon weaponInHand, Ray lookRay)
+        private ulong? UseMeleeWeapon(Weapon weaponInHand, Vector3 position, Vector3 forward)
         {
             //todo: attribute-based melee range
-            if (!Physics.Raycast(lookRay, out var meleeHit, maxDistance: 4))
+            if (!Physics.Raycast(position, forward, out var meleeHit, maxDistance: 4))
             {
                 return null;
             }
@@ -622,10 +612,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
+        private Ray GetLookDirectionRay()
+        {
+            return _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
+        }
+
         private void CheckForInteractable()
         {
-            var ray = _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
-            if (Physics.Raycast(ray, out var hit, maxDistance: 1000))
+            if (Physics.Raycast(GetLookDirectionRay(), out var hit, maxDistance: 1000))
             {
                 var interactable = hit.collider.GetComponent<Interactable>();
                 if (interactable != null)
@@ -672,7 +666,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 }
             }
 
-            if (TryToAttack(isLeftHand, OwnerClientId))
+            if (TryToAttack(isLeftHand, _playerCamera.transform.position, _playerCamera.transform.forward, OwnerClientId))
             {
                 TryToAttackServerRpc(isLeftHand);
             }

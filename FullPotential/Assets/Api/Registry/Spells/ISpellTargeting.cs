@@ -12,6 +12,7 @@ namespace FullPotential.Api.Registry.Spells
 
         bool IsServerSideOnly { get; }
 
+        //todo: don't pass IDs, pass the actual objects instead
         void SetBehaviourVariables(
             GameObject gameObject,
             Spell activeSpell, 

@@ -465,9 +465,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void TryToAttackClientRpc(bool isLeftHand, ulong attackerClientId, ClientRpcParams clientRpcParams)
+        public void TryToAttackClientRpc(bool isLeftHand, Vector3 position, Vector3 forward, ulong attackerClientId, ClientRpcParams clientRpcParams)
         {
-            _playerActions.TryToAttack(isLeftHand, attackerClientId);
+            _playerActions.TryToAttack(isLeftHand, position, forward, attackerClientId);
         }
 
         // ReSharper disable once UnusedParameter.Global
