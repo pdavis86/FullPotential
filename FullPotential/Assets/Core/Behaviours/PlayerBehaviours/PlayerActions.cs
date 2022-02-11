@@ -532,7 +532,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 ? rangedHit.point
                 : _playerState.Positions.RightHandInFront.position + forward * 30;
 
-            var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayersExcept(transform.position, OwnerClientId);
+            var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayers(transform.position);
             _playerState.UsedWeaponClientRpc(startPos, endPos, nearbyClients);
 
             if (rangedHit.transform == null)
