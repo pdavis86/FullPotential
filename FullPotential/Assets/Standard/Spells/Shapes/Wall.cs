@@ -1,5 +1,6 @@
 ﻿using System;
 using FullPotential.Api;
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Registry.Spells;
 using FullPotential.Standard.Spells.Behaviours;
 using UnityEngine;
@@ -14,19 +15,19 @@ namespace FullPotential.Standard.Spells.Shapes
 
         public string PrefabAddress => "Standard/Prefabs/Spells/SpellWall.prefab";
 
-        public void SpawnGameObject(Spell activeSpell, Vector3 startPosition, Quaternion rotation, ulong senderClientId)
+        public void SpawnGameObject(Spell spell, IPlayerStateBehaviour sourceStateBehaviour, Vector3 startPosition, Quaternion rotation)
         {
             var gameManager = ModHelper.GetGameManager();
             gameManager.TypeRegistry.LoadAddessable(
-                activeSpell.Shape.PrefabAddress,
+                spell.Shape.PrefabAddress,
                 prefab =>
                 {
                     var spellObject = UnityEngine.Object.Instantiate(prefab, startPosition, rotation);
                     gameManager.SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(startPosition, spellObject);
 
                     var spellScript = spellObject.GetComponent<SpellWallBehaviour>();
-                    spellScript.PlayerClientId = senderClientId;
-                    spellScript.SpellId = activeSpell.Id;
+                    spellScript.Spell = spell;
+                    spellScript.SourceStateBehaviour = sourceStateBehaviour;
 
                     spellObject.transform.parent = gameManager.SceneBehaviour.GetTransform();
                 }

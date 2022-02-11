@@ -83,7 +83,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         public IPlayerInventory Inventory { get; private set; }
 
-        public GameObject PlayerCameraGameObject => _playerCamera;
+        public Transform Transform => transform;
+
+        public GameObject GameObject => gameObject;
+
+        public GameObject CameraGameObject => _playerCamera;
 
         #region Event handlers
 
@@ -465,9 +469,9 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void TryToAttackClientRpc(bool isLeftHand, Vector3 position, Vector3 forward, ulong attackerClientId, ClientRpcParams clientRpcParams)
+        public void TryToAttackClientRpc(bool isLeftHand, Vector3 position, Vector3 forward, ClientRpcParams clientRpcParams)
         {
-            _playerActions.TryToAttack(isLeftHand, position, forward, attackerClientId);
+            _playerActions.TryToAttack(isLeftHand, position, forward, this);
         }
 
         // ReSharper disable once UnusedParameter.Global

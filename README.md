@@ -7,10 +7,6 @@ Inspired by the Minecraft mod Ars Magica 2, Skyrim, the Borderlands series, Fina
 - Components for crafting items or spells have randomly generated stats. This means you can craft any level item/spell but can only use it once you reach the required skill level.
 
 
-## Credit
-- I mainly learned how to use Unity from the tutorials on https://www.youtube.com/user/Brackeys and https://www.youtube.com/c/DapperDinoCodingTutorials/videos
-
-
 ## Feedback
 - Got an idea? Great! Let me know.
 - Don't like my code? That's OK. I'm a C# developer so may not have written this mod in the "Unity way". Feedback is always welcome.
@@ -24,7 +20,7 @@ Inspired by the Minecraft mod Ars Magica 2, Skyrim, the Borderlands series, Fina
 ## Code Structure
 - API is the code required for any third-party development to be compliant with the game 
 - Core is the code fundamental to the game working 
-- Standard is my implementation using the API to add Accessories, Armor, Effects, Loot, and Weapons to the game 
+- Standard is my implementation using the API to add Accessories, Armor, Effects, Enemies, Loot, Scenes, Spells, and Weapons to the game 
 
 
 ## Product Roadmap
@@ -32,3 +28,7 @@ Inspired by the Minecraft mod Ars Magica 2, Skyrim, the Borderlands series, Fina
 See the [Project Trello Board](https://trello.com/b/biH6NdE0/oasis "Go to Trello") for a better depiction of where the game currently stands.
 
 My next target is to improve the battle system and implement spell effects.
+
+
+## Credit
+- I mainly learned how to use Unity from the tutorials on https://www.youtube.com/user/Brackeys and https://www.youtube.com/c/DapperDinoCodingTutorials/videos

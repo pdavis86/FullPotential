@@ -13,7 +13,8 @@ namespace FullPotential.Standard.Spells.Behaviours
 {
     public class SpellBeamBehaviour : MonoBehaviour, ISpellBehaviour
     {
-        public string SpellId;
+        public Spell Spell;
+        public IPlayerStateBehaviour SourceStateBehaviour;
         public bool IsLeftHand;
 
 #pragma warning disable 0649
@@ -21,8 +22,6 @@ namespace FullPotential.Standard.Spells.Behaviours
 #pragma warning restore CS0649
 
         private GameObject _sourcePlayer;
-        private IPlayerStateBehaviour _sourcePlayerState;
-        private Spell _spell;
         private Transform _cylinderParentTransform;
         private Transform _cylinderTransform;
         private RaycastHit _hit;
@@ -38,6 +37,13 @@ namespace FullPotential.Standard.Spells.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
+            if (Spell == null)
+            {
+                Debug.LogError("No spell has been set");
+                Destroy(gameObject);
+                return;
+            }
+
             _sourcePlayer = GameObjectHelper.ClosestParentWithTag(gameObject, Tags.Player);
 
             if (_sourcePlayer == null)
@@ -47,21 +53,10 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            _sourcePlayerState = _sourcePlayer.GetComponent<IPlayerStateBehaviour>();
-
-            PerformGraphicsAdjustments(_sourcePlayerState);
+            PerformGraphicsAdjustments();
 
             if (!NetworkManager.Singleton.IsServer)
             {
-                return;
-            }
-
-            _spell = _sourcePlayerState.Inventory.GetItemWithId<Spell>(SpellId);
-
-            if (_spell == null)
-            {
-                Debug.LogError($"No spell found in player inventory with ID {SpellId}");
-                Destroy(gameObject);
                 return;
             }
 
@@ -77,7 +72,7 @@ namespace FullPotential.Standard.Spells.Behaviours
             //todo: attribute-based beam length
             const int maxBeamLength = 10;
 
-            var playerCameraTransform = _sourcePlayerState.PlayerCameraGameObject.transform;
+            var playerCameraTransform = SourceStateBehaviour.CameraGameObject.transform;
 
             Vector3 targetDirection;
             float beamLength;
@@ -132,20 +127,22 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            ModHelper.GetGameManager().AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
+            ModHelper.GetGameManager().AttackHelper.DealDamage(_sourcePlayer, Spell, target, position);
         }
 
-        private void PerformGraphicsAdjustments(IPlayerStateBehaviour playerState)
+        private void PerformGraphicsAdjustments()
         {
             if (!NetworkManager.Singleton.IsClient)
             {
                 return;
             }
 
-            _cylinderParentTransform.parent = playerState.PlayerCameraGameObject.transform;
+            _cylinderParentTransform.parent = SourceStateBehaviour.CameraGameObject.transform;
 
-            if (playerState.OwnerClientId == NetworkManager.Singleton.LocalClientId)
+            if (SourceStateBehaviour.OwnerClientId == NetworkManager.Singleton.LocalClientId)
             {
+                //todo: distance needs to vary with FOV
+
                 //Move it a little sideways
                 _cylinderParentTransform.position += (IsLeftHand ? _leftRightAdjustment : -_leftRightAdjustment) * _sourcePlayer.transform.right;
             }

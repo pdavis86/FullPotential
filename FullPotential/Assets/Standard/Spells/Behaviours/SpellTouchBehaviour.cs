@@ -13,32 +13,27 @@ namespace FullPotential.Standard.Spells.Behaviours
         // ReSharper disable once InconsistentNaming
         private const int _maxDistance = 3;
 
-        public string SpellId;
+        public Spell Spell;
+        public IPlayerStateBehaviour SourceStateBehaviour;
         public Vector3 StartPosition;
         public Vector3 SpellDirection;
-        public ulong PlayerClientId;
-
-        private Spell _spell;
-        private GameObject _sourcePlayer;
 
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            if (!NetworkManager.Singleton.IsServer)
+            if (Spell == null)
             {
+                Debug.LogError("No spell has been set");
+                Destroy(gameObject);
                 return;
             }
-
-            _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId].PlayerObject.gameObject;
-
-            var playerState = _sourcePlayer.GetComponent<IPlayerStateBehaviour>();
-
-            _spell = playerState.Inventory.GetItemWithId<Spell>(SpellId);
 
             if (Physics.Raycast(StartPosition, SpellDirection, out var hit, maxDistance: _maxDistance))
             {
                 ApplySpellEffects(hit.transform.gameObject, hit.point);
             }
+
+            Destroy(gameObject);
         }
 
         public void StopCasting()
@@ -53,7 +48,7 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            ModHelper.GetGameManager().AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
+            ModHelper.GetGameManager().AttackHelper.DealDamage(SourceStateBehaviour.GameObject, Spell, target, position);
         }
 
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Registry.Spells;
 using FullPotential.Standard.Spells.Behaviours;
 using UnityEngine;
@@ -23,13 +24,13 @@ namespace FullPotential.Standard.Spells.Targeting
 
         public string IdlePrefabAddress => "Standard/Prefabs/Spells/SpellInHand.prefab";
 
-        public void SetBehaviourVariables(GameObject gameObject, Spell activeSpell, Vector3 startPosition, Vector3 targetDirection, ulong casterClientId, bool isLeftHand = false)
+        public void SetBehaviourVariables(GameObject gameObject, Spell spell, IPlayerStateBehaviour sourceStateBehaviour, Vector3 startPosition, Vector3 forwardDirection, bool isLeftHand = false)
         {
             var spellScript = gameObject.GetComponent<SpellTouchBehaviour>();
-            spellScript.SpellId = activeSpell.Id;
+            spellScript.Spell = spell;
+            spellScript.SourceStateBehaviour = sourceStateBehaviour;
             spellScript.StartPosition = startPosition;
-            spellScript.SpellDirection = targetDirection;
-            spellScript.PlayerClientId = casterClientId;
+            spellScript.SpellDirection = forwardDirection;
         }
 
     }

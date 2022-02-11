@@ -12,35 +12,26 @@ namespace FullPotential.Standard.Spells.Behaviours
 {
     public class SpellWallBehaviour : MonoBehaviour, ISpellBehaviour
     {
-        public ulong PlayerClientId;
-        public string SpellId;
+        public Spell Spell;
+        public IPlayerStateBehaviour SourceStateBehaviour;
 
-        private GameObject _sourcePlayer;
-        private Spell _spell;
         private float _timeSinceLastEffective;
         private float _timeBetweenEffects;
 
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-           //todo: attribute-based object lifetime
+            if (Spell == null)
+            {
+                Debug.LogError("No spell has been set");
+                Destroy(gameObject);
+                return;
+            }
+
+            //todo: attribute-based object lifetime
             Destroy(gameObject, 10f);
 
-            if (!NetworkManager.Singleton.IsServer)
-            {
-                return;
-            }
-
-            _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId].PlayerObject.gameObject;
-
-            _spell = _sourcePlayer.GetComponent<IPlayerStateBehaviour>().Inventory.GetItemWithId<Spell>(SpellId);
-
-            if (_spell == null)
-            {
-                Debug.LogError($"No spell found in player inventory with ID {SpellId}");
-                return;
-            }
-
+            //todo: attribute based cooldown
             _timeBetweenEffects = 0.5f;
             _timeSinceLastEffective = _timeBetweenEffects;
         }
@@ -81,7 +72,7 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            ModHelper.GetGameManager().AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
+            ModHelper.GetGameManager().AttackHelper.DealDamage(SourceStateBehaviour.GameObject, Spell, target, position);
         }
 
     }

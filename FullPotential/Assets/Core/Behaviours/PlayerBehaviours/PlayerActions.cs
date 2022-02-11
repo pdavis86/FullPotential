@@ -3,6 +3,7 @@ using FullPotential.Api;
 using FullPotential.Api.Constants;
 using FullPotential.Api.Data;
 using FullPotential.Api.Enums;
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Helpers;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
@@ -225,13 +226,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         [ServerRpc]
-        private void TryToAttackServerRpc(bool isLeftHand, ServerRpcParams serverRpcParams = default)
+        private void TryToAttackServerRpc(bool isLeftHand)
         {
-            var tellOtherClients = IsServer || TryToAttack(isLeftHand, _playerCamera.transform.position, _playerCamera.transform.forward, serverRpcParams.Receive.SenderClientId);
+            var tellOtherClients = IsServer || TryToAttack(isLeftHand, _playerCamera.transform.position, _playerCamera.transform.forward, _playerState);
             if (tellOtherClients)
             {
                 var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayersExcept(transform.position, OwnerClientId);
-                _playerState.TryToAttackClientRpc(isLeftHand, _playerCamera.transform.position, _playerCamera.transform.forward, serverRpcParams.Receive.SenderClientId, nearbyClients);
+                _playerState.TryToAttackClientRpc(isLeftHand, _playerCamera.transform.position, _playerCamera.transform.forward, nearbyClients);
             }
         }
 
@@ -368,7 +369,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         #endregion
 
-        public bool TryToAttack(bool isLeftHand, Vector3 position, Vector3 forward, ulong casterClientId)
+        public bool TryToAttack(bool isLeftHand, Vector3 position, Vector3 forwardDirection, IPlayerStateBehaviour playerStateBehaviour)
         {
             StopReloading(isLeftHand);
 
@@ -379,13 +380,13 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             switch (itemInHand)
             {
                 case null:
-                    return Punch(position, forward) != null;
+                    return Punch(position, forwardDirection) != null;
 
                 case Spell spellInHand:
-                    return CastSpell(spellInHand, isLeftHand, position, forward, casterClientId);
+                    return CastSpell(spellInHand, isLeftHand, position, forwardDirection, playerStateBehaviour);
 
                 case Weapon weaponInHand:
-                    return UseWeapon(weaponInHand, isLeftHand, position, forward) != null;
+                    return UseWeapon(weaponInHand, isLeftHand, position, forwardDirection) != null;
 
                 default:
                     Debug.LogWarning("Not implemented attack for " + itemInHand.Name + " yet");
@@ -427,7 +428,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             return true;
         }
 
-        private bool CastSpell(Spell activeSpell, bool isLeftHand, Vector3 position, Vector3 forward, ulong playerClientId)
+        private bool CastSpell(Spell activeSpell, bool isLeftHand, Vector3 position, Vector3 forward, IPlayerStateBehaviour playerStateBehaviour)
         {
             if (activeSpell == null)
             {
@@ -470,7 +471,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 {
                     var spellObject = Instantiate(prefab, startPosition, Quaternion.identity);
 
-                    activeSpell.Targeting.SetBehaviourVariables(spellObject, activeSpell, startPosition, targetDirection, playerClientId, isLeftHand);
+                    activeSpell.Targeting.SetBehaviourVariables(spellObject, activeSpell, playerStateBehaviour, startPosition, targetDirection, isLeftHand);
 
                     spellObject.transform.parent = parentTransform;
 
@@ -487,7 +488,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 }
             );
 
-            if (activeSpell.Targeting.IsServerSideOnly)
+            if (activeSpell.Targeting.IsServerSideOnly && IsServer)
             {
                 return false;
             }
@@ -544,7 +545,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 GameManager.Instance.AttackHelper.DealDamage(gameObject, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
             }
 
-            return rangedHit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId;
+            return rangedHit.transform.gameObject.GetComponent<NetworkObject>()?.NetworkObjectId;
         }
 
         private ulong? UseMeleeWeapon(Weapon weaponInHand, Vector3 position, Vector3 forward)
@@ -666,7 +667,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 }
             }
 
-            if (TryToAttack(isLeftHand, _playerCamera.transform.position, _playerCamera.transform.forward, OwnerClientId))
+            if (TryToAttack(isLeftHand, _playerCamera.transform.position, _playerCamera.transform.forward, _playerState))
             {
                 TryToAttackServerRpc(isLeftHand);
             }

@@ -13,12 +13,10 @@ namespace FullPotential.Standard.Spells.Behaviours
         // ReSharper disable once InconsistentNaming
         private const float _distanceBeforeReturning = 8f;
 
-        public ulong PlayerClientId;
-        public string SpellId;
-        public Vector3 SpellDirection;
+        public Spell Spell;
+        public IPlayerStateBehaviour SourceStateBehaviour;
+        public Vector3 ForwardDirection;
 
-        private GameObject _sourcePlayer;
-        private Spell _spell;
         private float _castSpeed;
         private Rigidbody _rigidBody;
         private bool _returningToPlayer;
@@ -26,78 +24,55 @@ namespace FullPotential.Standard.Spells.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            _sourcePlayer = NetworkManager.Singleton.ConnectedClients[PlayerClientId].PlayerObject.gameObject;
-
-            _spell = _sourcePlayer.GetComponent<IPlayerStateBehaviour>().Inventory.GetItemWithId<Spell>(SpellId);
-
-            if (_spell == null)
+            if (Spell == null)
             {
-                Debug.LogError($"No spell found in player inventory with ID {SpellId}");
+                Debug.LogError("No spell has been set");
+                Destroy(gameObject);
                 return;
             }
 
-            _castSpeed = _spell.Attributes.Speed / 50f;
+            _castSpeed = Spell.Attributes.Speed / 50f;
             if (_castSpeed < 0.5)
             {
                 _castSpeed = 0.5f;
             }
 
             _rigidBody = GetComponent<Rigidbody>();
-            _rigidBody.AddForce(_castSpeed * 20f * SpellDirection, ForceMode.VelocityChange);
+            _rigidBody.AddForce(_castSpeed * 20f * ForwardDirection, ForceMode.VelocityChange);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            if (_sourcePlayer == null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            var distanceFromPlayer = Vector3.Distance(transform.position, _sourcePlayer.transform.position);
+            var distanceFromPlayer = Vector3.Distance(transform.position, SourceStateBehaviour.Transform.position);
 
             if (!_returningToPlayer)
             {
-                if (distanceFromPlayer >= _distanceBeforeReturning)
+                if (distanceFromPlayer < _distanceBeforeReturning)
                 {
-                    _returningToPlayer = true;
-                    ClearForce();
+                    return;
                 }
 
-                return;
-            }
-
-            if (distanceFromPlayer > 0.2f)
-            {
+                _returningToPlayer = true;
                 ClearForce();
-                var playerDirection = (_sourcePlayer.transform.position - transform.position).normalized;
-                _rigidBody.AddForce(_castSpeed * 20f * playerDirection, ForceMode.VelocityChange);
                 return;
             }
 
-            if (NetworkManager.Singleton.IsServer)
-            {
-                ApplySpellEffects(_sourcePlayer, transform.position);
-            }
+            ClearForce();
+            var playerDirection = (SourceStateBehaviour.Transform.position - transform.position).normalized;
+            _rigidBody.AddForce(_castSpeed * 20f * playerDirection, ForceMode.VelocityChange);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject == _sourcePlayer)
+            if (!NetworkManager.Singleton.IsServer)
             {
+                Destroy(gameObject);
                 return;
             }
 
-            if (NetworkManager.Singleton.IsServer)
-            {
-                ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
         }
 
         private void ClearForce()
@@ -118,7 +93,7 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            ModHelper.GetGameManager().AttackHelper.DealDamage(_sourcePlayer, _spell, target, position);
+            ModHelper.GetGameManager().AttackHelper.DealDamage(SourceStateBehaviour.GameObject, Spell, target, position);
             Destroy(gameObject);
         }
 

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FullPotential.Api.Gameplay;
+using UnityEngine;
 
 namespace FullPotential.Api.Registry.Spells
 {
@@ -12,13 +13,12 @@ namespace FullPotential.Api.Registry.Spells
 
         bool IsServerSideOnly { get; }
 
-        //todo: don't pass IDs, pass the actual objects instead
         void SetBehaviourVariables(
             GameObject gameObject,
-            Spell activeSpell, 
+            Spell spell,
+            IPlayerStateBehaviour sourceStateBehaviour,
             Vector3 startPosition, 
-            Vector3 targetDirection,
-            ulong casterClientId,
+            Vector3 forwardDirection,
             bool isLeftHand = false);
     }
 }

@@ -1,9 +1,14 @@
-﻿using UnityEngine;
+﻿using FullPotential.Api.Gameplay;
+using UnityEngine;
 
 namespace FullPotential.Api.Registry.Spells
 {
     public interface ISpellShape : IRegisterable, IHasPrefab
     {
-        void SpawnGameObject(Spell activeSpell, Vector3 startPosition, Quaternion rotation, ulong senderClientId);
+        void SpawnGameObject(
+            Spell spell, 
+            IPlayerStateBehaviour sourceStateBehaviour,
+            Vector3 startPosition, 
+            Quaternion startRotation);
     }
 }
