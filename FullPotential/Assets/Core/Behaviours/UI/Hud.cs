@@ -34,7 +34,7 @@ namespace FullPotential.Core.Behaviours.Ui
             alert.transform.Find("Text").GetComponent<Text>().text = alertText;
         }
 
-        public void UpdateHand(string contents, bool isLeftHand)
+        public void UpdateHand(bool isLeftHand, string contents)
         {
             var leftOrRight = isLeftHand
                 ? _equippedLeftHand

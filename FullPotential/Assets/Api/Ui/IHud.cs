@@ -6,7 +6,7 @@ namespace FullPotential.Api.Ui
     {
         void ShowAlert(string content);
 
-        void UpdateHand(string contents, bool isLeftHand);
+        void UpdateHand(bool isLeftHand, string contents);
 
         void UpdateAmmo(bool isLeftHand, PlayerHandStatus playerHandStatus);
 

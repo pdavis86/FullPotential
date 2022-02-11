@@ -346,7 +346,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             }
         }
 
-        public void SetEquippedItem(ItemBase item, SlotGameObjectName slotGameObjectName)
+        private void SetEquippedItem(ItemBase item, SlotGameObjectName slotGameObjectName)
         {
             if (_equippedItems.ContainsKey(slotGameObjectName))
             {
@@ -510,9 +510,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _equippedItems[slotGameObjectName].GameObject = null;
         }
 
-        public void SpawnEquippedObject(ItemBase item, SlotGameObjectName slotGameObjectName)
+        private void SpawnEquippedObject(ItemBase item, SlotGameObjectName slotGameObjectName)
         {
             DespawnEquippedObject(slotGameObjectName);
+
+            var isLeftHand = slotGameObjectName == SlotGameObjectName.LeftHand;
 
             if (item == null)
             {
@@ -522,7 +524,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     {
                         case SlotGameObjectName.LeftHand:
                         case SlotGameObjectName.RightHand:
-                            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHand(null, slotGameObjectName == SlotGameObjectName.LeftHand);
+                            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHand(isLeftHand, null);
+                            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(isLeftHand, null);
                             break;
                     }
                 }
@@ -534,7 +537,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             {
                 case SlotGameObjectName.LeftHand:
                 case SlotGameObjectName.RightHand:
-                    SpawnItemInHand(slotGameObjectName, item, slotGameObjectName == SlotGameObjectName.LeftHand);
+                    SpawnItemInHand(slotGameObjectName, item, isLeftHand);
                     break;
 
                 case SlotGameObjectName.Amulet:
@@ -575,7 +578,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (IsOwner)
             {
                 var contents = GameManager.Instance.ResultFactory.GetItemDescription(item);
-                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHand(contents, isLeftHand);
+                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHand(isLeftHand, contents);
             }
 
             if (!NetworkManager.Singleton.IsClient)
