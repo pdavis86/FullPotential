@@ -1,4 +1,5 @@
 ﻿using FullPotential.Api.Combat;
+using FullPotential.Api.Registry.Spells;
 using UnityEngine;
 
 namespace FullPotential.Api.Gameplay
@@ -13,8 +14,8 @@ namespace FullPotential.Api.Gameplay
 
         GameObject CameraGameObject { get; }
 
-        IPlayerInventory Inventory { get; }
-
         void SpawnLootChest(Vector3 position);
+
+        bool SpendMana(Spell activeSpell, bool slowDrain = false);
     }
 }

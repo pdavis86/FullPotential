@@ -177,13 +177,15 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             //todo: attribute-based mana consumption
             _consumeMana = new DelayedAction(1f, () =>
             {
-                if (HandStatusLeft.SpellBeingCastGameObject != null && !SpendMana(HandStatusLeft.SpellBeingCast))
+                //todo: spells need to manage their own mana consumption or this gets complicated 
+
+                if (HandStatusLeft.SpellBeingCastGameObject != null && !SpendMana(HandStatusLeft.SpellBeingCast, HandStatusLeft.SpellBeingCast.Targeting.IsContinuous))
                 {
                     HandStatusLeft.SpellBeingCastGameObject.GetComponent<ISpellBehaviour>().StopCasting();
                     var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayers(transform.position);
                     StopCastingClientRpc(true, nearbyClients);
                 }
-                if (HandStatusRight.SpellBeingCastGameObject != null && !SpendMana(HandStatusRight.SpellBeingCast))
+                if (HandStatusRight.SpellBeingCastGameObject != null && !SpendMana(HandStatusRight.SpellBeingCast, HandStatusRight.SpellBeingCast.Targeting.IsContinuous))
                 {
                     HandStatusRight.SpellBeingCastGameObject.GetComponent<ISpellBehaviour>().StopCasting();
                     var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayers(transform.position);
@@ -761,9 +763,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             ApplyMaterial(newMat);
         }
 
-        public bool SpendMana(Spell activeSpell)
+        public bool SpendMana(Spell activeSpell, bool slowDrain = false)
         {
             var manaCost = GetManaCost(activeSpell);
+
+            if (slowDrain)
+            {
+                manaCost /= 10;
+            }
 
             if (Mana.Value < manaCost)
             {

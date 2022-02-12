@@ -481,7 +481,8 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     {
                         leftOrRight.SpellBeingCastGameObject = spellObject;
                     }
-                    else if (IsServer)
+                    
+                    if (IsServer)
                     {
                         _playerState.SpendMana(activeSpell);
                     }

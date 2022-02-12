@@ -26,6 +26,7 @@ namespace FullPotential.Standard.Spells.Behaviours
         private Transform _cylinderTransform;
         private RaycastHit _hit;
         private DelayedAction _applyEffectsAction;
+        private DelayedAction _consumeManaAction;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -60,10 +61,9 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            _applyEffectsAction = new DelayedAction(1f, () =>
-            {
-                ApplySpellEffects(_hit.transform.gameObject, _hit.point);
-            });
+            //todo: attribute-based timings
+            _applyEffectsAction = new DelayedAction(1f, () => ApplySpellEffects(_hit.transform.gameObject, _hit.point));
+            _consumeManaAction = new DelayedAction(0.2f, () => SourceStateBehaviour.SpendMana(Spell, true));
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -88,7 +88,8 @@ namespace FullPotential.Standard.Spells.Behaviours
 
                 if (NetworkManager.Singleton.IsServer)
                 {
-                    _applyEffectsAction.TryPerformAction();
+                    var hitTarget = _applyEffectsAction.TryPerformAction();
+                    SourceStateBehaviour.SpendMana(Spell, !hitTarget);
                 }
 
                 targetDirection = (hit.point - _cylinderParentTransform.position).normalized;
@@ -98,6 +99,11 @@ namespace FullPotential.Standard.Spells.Behaviours
             {
                 targetDirection = playerCameraTransform.forward;
                 beamLength = maxBeamLength;
+
+                if (NetworkManager.Singleton.IsServer)
+                {
+                    _consumeManaAction.TryPerformAction();
+                }
             }
 
             UpdateBeam(targetDirection, beamLength);
