@@ -302,10 +302,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         [ServerRpc]
         public void RespawnServerRpc()
         {
+            Stamina.Value = GetStaminaMax();
             Health.Value = GetHealthMax();
-            AliveState = LivingEntityState.Respawning;
+            Mana.Value = GetManaMax();
 
             RespawnClientRpc(_clientRpcParams);
+            AliveState = LivingEntityState.Respawning;
 
             var spawnPoint = GameManager.Instance.SceneBehaviour.GetSpawnPoint(gameObject);
             var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayers(transform.position);
