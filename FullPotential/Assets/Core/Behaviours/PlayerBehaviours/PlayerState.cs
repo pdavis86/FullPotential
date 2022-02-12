@@ -306,12 +306,14 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             Health.Value = GetHealthMax();
             Mana.Value = GetManaMax();
 
-            RespawnClientRpc(_clientRpcParams);
             AliveState = LivingEntityState.Respawning;
 
             var spawnPoint = GameManager.Instance.SceneBehaviour.GetSpawnPoint(gameObject);
+
+            PlayerSpawnStateChangeBothSides(AliveState, spawnPoint.Position, spawnPoint.Rotation);
+
             var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayers(transform.position);
-            PlayerSpawnStateChangeClientRpc(spawnPoint.Position, LivingEntityState.Respawning, null, null, nearbyClients);
+            PlayerSpawnStateChangeClientRpc(AliveState, spawnPoint.Position, spawnPoint.Rotation, null, null, nearbyClients);
         }
 
         [ServerRpc]
@@ -371,7 +373,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             var go = Instantiate(prefab, position, transform.rotation * Quaternion.Euler(0, 90, 0));
 
-            GameManager.Instance.SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(position, go, false);
+            GameManager.Instance.SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(position, go.transform, false);
 
             go.transform.parent = GameManager.Instance.SceneBehaviour.GetTransform();
             go.name = id;
@@ -382,23 +384,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        private void YouDiedClientRpc(ClientRpcParams clientRpcParams)
-        {
-            GameManager.Instance.MainCanvasObjects.HideAllMenus();
-            _aliveStateChanges.PlayForwards(false);
-        }
-
-        // ReSharper disable once UnusedParameter.Local
-        [ClientRpc]
-        private void RespawnClientRpc(ClientRpcParams clientRpcParams)
-        {
-            _aliveStateChanges.PlayBackwards(true);
-            _playerCamera.transform.rotation = _rb.rotation;
-        }
-
-        // ReSharper disable once UnusedParameter.Local
-        [ClientRpc]
-        private void PlayerSpawnStateChangeClientRpc(Vector3 position, LivingEntityState state, string killerName, string itemName, ClientRpcParams clientRpcParams)
+        private void PlayerSpawnStateChangeClientRpc(LivingEntityState state, Vector3 position, Quaternion rotation, string killerName, string itemName, ClientRpcParams clientRpcParams)
         {
             if (!killerName.IsNullOrWhiteSpace())
             {
@@ -406,35 +392,35 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 GameManager.Instance.MainCanvasObjects.HudOverlay.ShowAlert(deathMessage);
             }
 
+            PlayerSpawnStateChangeBothSides(state, position, rotation);
+
             switch (state)
             {
                 case LivingEntityState.Dead:
+                    if (OwnerClientId == NetworkManager.LocalClientId)
+                    {
+                        GameManager.Instance.MainCanvasObjects.HideAllMenus();
+                        _aliveStateChanges.PlayForwards(false);
+                    }
+
                     GraphicsTransform.gameObject.SetActive(false);
-                    _rb.isKinematic = true;
-                    _rb.useGravity = false;
-                    GetComponent<Collider>().enabled = false;
+
                     break;
 
                 case LivingEntityState.Respawning:
-                    GraphicsTransform.gameObject.SetActive(true);
-                    _rb.isKinematic = false;
-
-                    //Don't halve it as object can still end up in the floor
-                    position.y += _myHeight / 1.95f;
-
-                    _startingPosition = position;
-                    transform.position = _startingPosition;
+                    if (OwnerClientId == NetworkManager.LocalClientId)
+                    {
+                        _aliveStateChanges.PlayBackwards(true);
+                    }
 
                     var bodyMaterialForRespawn = _bodyMeshRenderer.material;
                     ShaderHelper.ChangeRenderMode(bodyMaterialForRespawn, ShaderHelper.BlendMode.Fade);
                     bodyMaterialForRespawn.color = new Color(1, 1, 1, 0.2f);
                     ApplyMaterial(bodyMaterialForRespawn);
+
                     break;
 
                 case LivingEntityState.Alive:
-                    GetComponent<Collider>().enabled = true;
-                    _rb.useGravity = true;
-
                     var bodyMaterial = _bodyMeshRenderer.material;
                     ShaderHelper.ChangeRenderMode(bodyMaterial, ShaderHelper.BlendMode.Opaque);
                     ApplyMaterial(bodyMaterial);
@@ -490,6 +476,40 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
         }
 
         #endregion
+
+        private void PlayerSpawnStateChangeBothSides(LivingEntityState state, Vector3 position, Quaternion rotation)
+        {
+            switch (state)
+            {
+                case LivingEntityState.Dead:
+                    _rb.isKinematic = true;
+                    _rb.useGravity = false;
+                    GetComponent<Collider>().enabled = false;
+
+                    transform.position = new Vector3(0, GameManager.Instance.SceneBehaviour.Attributes.LowestYValue - 10, 0);
+
+                    break;
+
+                case LivingEntityState.Respawning:
+                    GameManager.Instance.SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(position, transform, _myHeight);
+
+                    transform.rotation = rotation;
+                    _playerCamera.transform.localEulerAngles = Vector3.zero;
+
+                    _startingPosition = transform.position;
+
+                    GraphicsTransform.gameObject.SetActive(true);
+                    _rb.isKinematic = false;
+
+                    break;
+
+                case LivingEntityState.Alive:
+                    GetComponent<Collider>().enabled = true;
+                    _rb.useGravity = true;
+
+                    break;
+            }
+        }
 
         public int GetDefenseValue()
         {
@@ -571,7 +591,7 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
         private void BecomeVulnerable()
         {
-            if (_startingPosition == Vector3.zero)
+            if (AliveState == LivingEntityState.Dead || _startingPosition == Vector3.zero)
             {
                 return;
             }
@@ -581,8 +601,11 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             if (distanceMoved > 1)
             {
                 AliveState = LivingEntityState.Alive;
+
+                PlayerSpawnStateChangeBothSides(AliveState, Vector3.zero, Quaternion.identity);
+
                 var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayers(transform.position);
-                PlayerSpawnStateChangeClientRpc(Vector3.zero, LivingEntityState.Alive, null, null, nearbyClients);
+                PlayerSpawnStateChangeClientRpc(AliveState, Vector3.zero, Quaternion.identity, null, null, nearbyClients);
                 _startingPosition = Vector3.zero;
             }
         }
@@ -859,10 +882,10 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
 
             AliveState = LivingEntityState.Dead;
 
-            var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayers(transform.position);
-            PlayerSpawnStateChangeClientRpc(Vector3.zero, LivingEntityState.Dead, killerName, itemName, nearbyClients);
+            PlayerSpawnStateChangeBothSides(AliveState, Vector3.zero, Quaternion.identity);
 
-            YouDiedClientRpc(_clientRpcParams);
+            var nearbyClients = GameManager.Instance.RpcHelper.ForNearbyPlayers(transform.position);
+            PlayerSpawnStateChangeClientRpc(AliveState, Vector3.zero, Quaternion.identity, killerName, itemName, nearbyClients);
 
             if (HandStatusLeft.SpellBeingCastGameObject != null)
             {

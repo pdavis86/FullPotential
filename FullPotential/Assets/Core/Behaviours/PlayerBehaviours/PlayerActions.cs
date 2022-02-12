@@ -450,8 +450,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                 return true;
             }
 
-            //Debug.Log("Casting spell: " + activeSpell.Name);
-
             var startPosition = isLeftHand
                 ? _playerState.Positions.LeftHandInFront.position
                 : _playerState.Positions.RightHandInFront.position;

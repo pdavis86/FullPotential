@@ -165,7 +165,7 @@ namespace FullPotential.Core.Behaviours.Ui
 
                 var castedPlayerInventory = (PlayerInventory)_playerState.Inventory;
 
-                //todo: this needs some effort to get working, but not tonight
+                //todo: client-side inventory row toggling needs some effort to get working
                 //castedPlayerInventory.SetEquippedItem(item, slotGameObjectName);
                 //castedPlayerInventory.SpawnEquippedObject(item, slotGameObjectName);
                 //ResetEquipmentUi(true);

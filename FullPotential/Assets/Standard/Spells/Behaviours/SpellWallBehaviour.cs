@@ -31,7 +31,7 @@ namespace FullPotential.Standard.Spells.Behaviours
             //todo: attribute-based object lifetime
             Destroy(gameObject, 10f);
 
-            //todo: attribute based cooldown
+            //todo: attribute-based cooldown
             _timeBetweenEffects = 0.5f;
             _timeSinceLastEffective = _timeBetweenEffects;
         }

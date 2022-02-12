@@ -23,7 +23,7 @@ namespace FullPotential.Standard.Spells.Shapes
                 prefab =>
                 {
                     var spellObject = UnityEngine.Object.Instantiate(prefab, startPosition, rotation);
-                    gameManager.SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(startPosition, spellObject);
+                    gameManager.SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(startPosition, spellObject.transform);
 
                     var spellScript = spellObject.GetComponent<SpellWallBehaviour>();
                     spellScript.Spell = spell;

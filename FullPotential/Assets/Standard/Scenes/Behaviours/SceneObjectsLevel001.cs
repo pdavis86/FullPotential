@@ -104,7 +104,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
             var enemyNetObj = Instantiate(_enemyPrefabNetObj, chosenSpawnPoint.Position, chosenSpawnPoint.Rotation);
 
-            _spawnService.AdjustPositionToBeAboveGround(chosenSpawnPoint.Position, enemyNetObj.gameObject);
+            _spawnService.AdjustPositionToBeAboveGround(chosenSpawnPoint.Position, enemyNetObj.transform);
 
             _enemyCounter++;
 
@@ -140,7 +140,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
             if (gameObjectToSpawn != null)
             {
-                _spawnService.AdjustPositionToBeAboveGround(spawnPosition, gameObjectToSpawn);
+                _spawnService.AdjustPositionToBeAboveGround(spawnPosition, gameObjectToSpawn.transform);
                 return new SpawnPoint
                 {
                     Position = gameObjectToSpawn.transform.position,

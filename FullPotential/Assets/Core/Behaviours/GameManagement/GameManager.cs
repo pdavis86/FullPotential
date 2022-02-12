@@ -236,7 +236,7 @@ namespace FullPotential.Core.Behaviours.GameManagement
 
             playerNetObj.SpawnAsPlayerObject(serverRpcParams.Receive.SenderClientId);
 
-            SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(position, playerNetObj.gameObject);
+            SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(position, playerNetObj.transform);
         }
 
         public string GetLocalPlayerToken()

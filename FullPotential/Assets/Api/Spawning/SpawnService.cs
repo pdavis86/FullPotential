@@ -21,19 +21,31 @@ namespace FullPotential.Api.Spawning
             return _groundCollider.ClosestPointOnBounds(startingPoint);
         }
 
-        public void AdjustPositionToBeAboveGround(Vector3 startingPoint, GameObject gameObject, bool removeHalfHeight = true)
+        public void AdjustPositionToBeAboveGround(Vector3 startingPoint, Transform transform, bool removeHalfHeight = true)
         {
             var groundClosestPoint = GetPositionAboveGround(startingPoint);
 
             var adjustment = 0f;
             if (removeHalfHeight)
             {
-                var gameObjectCollider = gameObject.GetComponent<Collider>();
+                var gameObjectCollider = transform.GetComponent<Collider>();
                 var gameObjectHeight = gameObjectCollider.bounds.max.y - gameObjectCollider.bounds.min.y;
-                adjustment = gameObjectHeight / 2;
+
+                //Don't halve it as object can still end up in the floor
+                adjustment = gameObjectHeight / 1.95f;
             }
 
-            gameObject.transform.position = new Vector3(startingPoint.x, groundClosestPoint.y + adjustment, startingPoint.z);
+            transform.position = new Vector3(startingPoint.x, groundClosestPoint.y + adjustment, startingPoint.z);
+        }
+
+        public void AdjustPositionToBeAboveGround(Vector3 startingPoint, Transform transform, float gameObjectHeight)
+        {
+            var groundClosestPoint = GetPositionAboveGround(startingPoint);
+
+            //Don't halve it as object can still end up in the floor
+            var adjustment = gameObjectHeight / 1.95f;
+
+            transform.position = new Vector3(startingPoint.x, groundClosestPoint.y + adjustment, startingPoint.z);
         }
     }
 }

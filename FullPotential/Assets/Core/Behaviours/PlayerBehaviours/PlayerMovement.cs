@@ -53,6 +53,12 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _maxDistanceToBeStanding = gameObject.GetComponent<Collider>().bounds.extents.y + 0.1f;
 
             _playerCameraNetworkTransform = _playerCamera.GetComponent<ClientNetworkTransform>();
+
+            if (!IsServer)
+            {
+                //Prevent head spinning
+                _playerCameraNetworkTransform.enabled = false;
+            }
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -62,12 +68,6 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
             _currentCameraRotationX = 0;
             _isJumping = false;
             _isSprinting = false;
-
-            if (!IsServer)
-            {
-                //Prevent head spinning
-                _playerCameraNetworkTransform.enabled = false;
-            }
         }
 
         // ReSharper disable once UnusedMember.Local
