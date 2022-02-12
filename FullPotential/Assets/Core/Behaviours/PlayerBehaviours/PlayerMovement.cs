@@ -118,9 +118,17 @@ namespace FullPotential.Core.Behaviours.PlayerBehaviours
                     _isSprinting = false;
                 }
 
-                var moveX = transform.right * _moveVal.x;
-                var moveZ = transform.forward * _moveVal.y;
-                var velocity = (_isSprinting ? _playerState.GetSprintSpeed() : 1) * _speed * (moveX + moveZ);
+                var moveForwards = transform.forward * _moveVal.y;
+                var moveSideways = transform.right * _moveVal.x;
+
+                if (_isSprinting)
+                {
+                    var sprintSpeed = _playerState.GetSprintSpeed();
+                    moveForwards *= _moveVal.y > 0 ? sprintSpeed : sprintSpeed / 2;
+                    moveSideways *= sprintSpeed / 2;
+                }
+
+                var velocity = _speed * (moveForwards + moveSideways);
 
                 //Move
                 _rb.MovePosition(_rb.position + velocity * Time.fixedDeltaTime);
