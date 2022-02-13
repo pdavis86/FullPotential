@@ -9,11 +9,13 @@ using FullPotential.Api.GameManagement.Data;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Scenes;
+using FullPotential.Api.Spawning;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement.Constants;
 using FullPotential.Core.GameManagement.Data;
+using FullPotential.Core.GameManagement.Enums;
 using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Gameplay.Data;
@@ -22,6 +24,7 @@ using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.PlayerBehaviours;
 using FullPotential.Core.Registry;
+using FullPotential.Core.Spawning;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -49,6 +52,10 @@ namespace FullPotential.Core.GameManagement
         public AppOptions AppOptions { get; private set; }
         public readonly GameData GameDataStore = new GameData();
         public readonly LocalGameData LocalGameDataStore = new LocalGameData();
+
+        //Services
+        private UserRegistry _userRegistry;
+        private Localizer _localizer;
 
         //Variables
         private bool _isSaving;
@@ -79,17 +86,14 @@ namespace FullPotential.Core.GameManagement
 
             await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
 
-            var typeRegistry = GetService<TypeRegistry>();
+            var typeRegistry = (TypeRegistry)GetService<ITypeRegistry>();
             typeRegistry.FindAndRegisterAll();
-            TypeRegistry = typeRegistry;
 
-            UserRegistry = GetService<UserRegistry>();
+            _userRegistry = GetService<UserRegistry>();
 
-            Localizer = GetService<Localizer>();
-            await Localizer.LoadAvailableCulturesAsync();
-            await Localizer.LoadLocalizationFilesAsync(AppOptions.Culture);
-
-            ResultFactory = GetService<ResultFactory>();
+            _localizer = GetService<Localizer>();
+            await _localizer.LoadAvailableCulturesAsync();
+            await _localizer.LoadLocalizationFilesAsync(AppOptions.Culture);
 
             Prefabs = GetComponent<Prefabs>();
             MainCanvasObjects = _mainCanvas.GetComponent<MainCanvasObjects>();
@@ -123,7 +127,7 @@ namespace FullPotential.Core.GameManagement
 
             var payload = System.Text.Encoding.UTF8.GetString(connectionData);
             var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
-            if (!UserRegistry.ValidateToken(connectionPayload.PlayerToken))
+            if (!_userRegistry.ValidateToken(connectionPayload.PlayerToken))
             {
                 Debug.LogWarning("Someone tried to connect with an invalid Player token");
                 callback(false, null, false, null, null);
@@ -155,7 +159,7 @@ namespace FullPotential.Core.GameManagement
                     return;
                 }
 
-                UserRegistry.PlayerData.Remove(playerUsername, out var playerDataToSave);
+                _userRegistry.PlayerData.Remove(playerUsername, out var playerDataToSave);
                 SavePlayerData(playerDataToSave);
             }
             else
@@ -170,29 +174,6 @@ namespace FullPotential.Core.GameManagement
         }
 
         #endregion
-
-        public void SpawnPlayerNetworkObject(string playerToken, Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default)
-        {
-            if (!NetworkManager.Singleton.IsServer)
-            {
-                Debug.LogError("Tried to create a player when not on the server");
-                return;
-            }
-
-            var playerNetObj = Instantiate(_playerPrefabNetObj, position, rotation);
-
-            var playerState = playerNetObj.GetComponent<PlayerState>();
-            playerState.PlayerToken = playerToken;
-
-            playerNetObj.SpawnAsPlayerObject(serverRpcParams.Receive.SenderClientId);
-
-            GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, playerNetObj.transform);
-        }
-
-        public string GetLocalPlayerToken()
-        {
-            return LocalGameDataStore.PlayerToken;
-        }
 
         // ReSharper disable once MemberCanBePrivate.Global
         public void SendServerToClientSetDisconnectReason(ulong clientId, ConnectStatus status)
@@ -210,7 +191,7 @@ namespace FullPotential.Core.GameManagement
 
         public async Task SetCultureAsync(string culture)
         {
-            await Localizer.LoadLocalizationFilesAsync(culture);
+            await _localizer.LoadLocalizationFilesAsync(culture);
 
             //Re-activate anything already active
             MainCanvasObjects.DebuggingOverlay.SetActive(false);
@@ -306,14 +287,14 @@ namespace FullPotential.Core.GameManagement
 
         private async Task SaveAllPlayerDataAsync()
         {
-            var tasks = UserRegistry.PlayerData
+            var tasks = _userRegistry.PlayerData
                 .Where(x => x.Value.InventoryLoadedSuccessfully && x.Value.IsDirty)
                 .Select(x => Task.Run(() => SavePlayerData(x.Value)));
 
             await Task.WhenAll(tasks);
         }
 
-        private static void SavePlayerData(PlayerData playerData)
+        private void SavePlayerData(PlayerData playerData)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
@@ -326,7 +307,7 @@ namespace FullPotential.Core.GameManagement
                 return;
             }
 
-            Instance.UserRegistry.Save(playerData);
+            _userRegistry.Save(playerData);
 
             playerData.IsDirty = false;
         }
@@ -339,24 +320,17 @@ namespace FullPotential.Core.GameManagement
 
         private void RegisterServices()
         {
-            _serviceRegistry.Register<ITypeRegistry, TypeRegistry>();
             _serviceRegistry.Register<UserRegistry>();
             _serviceRegistry.Register<Localizer>();
             _serviceRegistry.Register<ResultFactory>();
 
-            //todo: rename these
+            _serviceRegistry.Register<ITypeRegistry, TypeRegistry>();
             _serviceRegistry.Register<IAttackHelper, AttackHelper>();
             _serviceRegistry.Register<IRpcHelper, RpcHelper>();
+            _serviceRegistry.Register<ISpawnService, SpawnService>();
         }
 
-        //todo: delete these
-        public ITypeRegistry TypeRegistry { get; private set; }
-        public UserRegistry UserRegistry { get; private set; }
-        public Localizer Localizer { get; private set; }
-        public ResultFactory ResultFactory { get; private set; }
-
-
-
+        #region Methods for Mods
 
         private GameObject _sceneObjects;
         private ISceneBehaviour _sceneBehaviour;
@@ -374,6 +348,31 @@ namespace FullPotential.Core.GameManagement
         {
             return MainCanvasObjects;
         }
+
+        public string GetLocalPlayerToken()
+        {
+            return LocalGameDataStore.PlayerToken;
+        }
+
+        public void SpawnPlayerNetworkObject(string playerToken, Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default)
+        {
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                Debug.LogError("Tried to create a player when not on the server");
+                return;
+            }
+
+            var playerNetObj = Instantiate(_playerPrefabNetObj, position, rotation);
+
+            var playerState = playerNetObj.GetComponent<PlayerState>();
+            playerState.PlayerToken = playerToken;
+
+            playerNetObj.SpawnAsPlayerObject(serverRpcParams.Receive.SenderClientId);
+
+            GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, playerNetObj.transform);
+        }
+
+        #endregion
 
     }
 }

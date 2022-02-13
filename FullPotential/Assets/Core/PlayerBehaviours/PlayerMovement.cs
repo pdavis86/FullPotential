@@ -23,6 +23,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
         private Rigidbody _rb;
         private PlayerState _playerState;
+        private IAttackHelper _attackHelper;
 
         //Variables for passing values
         private Vector2 _moveVal;
@@ -45,6 +46,8 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             _rb = GetComponent<Rigidbody>();
             _playerState = GetComponent<PlayerState>();
+
+            _attackHelper = GameManager.Instance.GetService<IAttackHelper>();
 
             if (IsServer)
             {
@@ -197,7 +200,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
         private void CheckIfOffTheMap()
         {
-            GameManager.Instance.GetService<IAttackHelper>().CheckIfOffTheMap(_playerState, transform.position.y);
+            _attackHelper.CheckIfOffTheMap(_playerState, transform.position.y);
         }
 
     }

@@ -7,6 +7,7 @@ using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.Localization;
 using FullPotential.Core.PlayerBehaviours;
 using Unity.Netcode;
 using UnityEngine;
@@ -17,6 +18,13 @@ namespace FullPotential.Core.Gameplay.Combat
     {
         // ReSharper disable once InconsistentNaming
         private static readonly System.Random _random = new System.Random();
+
+        private Localizer _localizer;
+
+        public AttackHelper(Localizer localizer)
+        {
+            _localizer = localizer;
+        }
 
         public void DealDamage(
             GameObject source,
@@ -72,9 +80,9 @@ namespace FullPotential.Core.Gameplay.Combat
 
             var sourceName = sourceIsPlayer
                 ? sourcePlayerState.Username
-                : (source != null ? source.name : null).OrIfNullOrWhitespace(GameManager.Instance.Localizer.Translate("ui.alert.unknownattacker"));
+                : (source != null ? source.name : null).OrIfNullOrWhitespace(_localizer.Translate("ui.alert.unknownattacker"));
 
-            var sourceItemName = itemUsed?.Name ?? GameManager.Instance.Localizer.Translate("ui.alert.attack.noitem");
+            var sourceItemName = itemUsed?.Name ?? _localizer.Translate("ui.alert.attack.noitem");
 
             damageable.TakeDamage(damageDealt, sourceClientId, sourceName, sourceItemName);
 
@@ -109,7 +117,7 @@ namespace FullPotential.Core.Gameplay.Combat
         {
             if (damageable.AliveState != LivingEntityState.Dead && yValue < GameManager.Instance.GetSceneBehaviour().Attributes.LowestYValue)
             {
-                damageable.HandleDeath(GameManager.Instance.Localizer.Translate("ui.alert.falldamage"), null);
+                damageable.HandleDeath(_localizer.Translate("ui.alert.falldamage"), null);
             }
         }
 
@@ -118,13 +126,13 @@ namespace FullPotential.Core.Gameplay.Combat
             if (itemName.IsNullOrWhiteSpace())
             {
                 return isOwner
-                    ? string.Format(GameManager.Instance.Localizer.Translate("ui.alert.attack.youwerekilledby"), killerName)
-                    : string.Format(GameManager.Instance.Localizer.Translate("ui.alert.attack.victimkilledby"), victimName, killerName);
+                    ? string.Format(_localizer.Translate("ui.alert.attack.youwerekilledby"), killerName)
+                    : string.Format(_localizer.Translate("ui.alert.attack.victimkilledby"), victimName, killerName);
             }
 
             return isOwner
-                ? string.Format(GameManager.Instance.Localizer.Translate("ui.alert.attack.youwerekilledbyusing"), killerName, itemName)
-                : string.Format(GameManager.Instance.Localizer.Translate("ui.alert.attack.victimkilledbyusing"), victimName, killerName, itemName);
+                ? string.Format(_localizer.Translate("ui.alert.attack.youwerekilledbyusing"), killerName, itemName)
+                : string.Format(_localizer.Translate("ui.alert.attack.victimkilledbyusing"), victimName, killerName, itemName);
         }
 
     }

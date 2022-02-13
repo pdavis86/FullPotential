@@ -9,6 +9,8 @@ using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Registry.Spells;
 using UnityEngine.AddressableAssets;
 
+// ReSharper disable once ClassNeverInstantiated.Global
+
 namespace FullPotential.Core.Registry
 {
     public class TypeRegistry : ITypeRegistry
@@ -45,32 +47,33 @@ namespace FullPotential.Core.Registry
                 Register(_accessories, accessory);
                 return;
             }
-            else if (toRegister is IGearArmor armor)
+
+            if (toRegister is IGearArmor armor)
             {
                 Register(_armor, armor);
                 return;
             }
-            else if (toRegister is IGearWeapon craftableWeapon)
+            if (toRegister is IGearWeapon craftableWeapon)
             {
                 Register(_weapons, craftableWeapon);
                 return;
             }
-            else if (toRegister is ILoot loot)
+            if (toRegister is ILoot loot)
             {
                 Register(_loot, loot);
                 return;
             }
-            else if (toRegister is IEffect effect)
+            if (toRegister is IEffect effect)
             {
                 Register(_effects, effect);
                 return;
             }
-            else if (toRegister is ISpellShape shape)
+            if (toRegister is ISpellShape shape)
             {
                 Register(_shapes, shape);
                 return;
             }
-            else if (toRegister is ISpellTargeting targeting)
+            if (toRegister is ISpellTargeting targeting)
             {
                 Register(_targeting, targeting);
                 return;
@@ -127,7 +130,8 @@ namespace FullPotential.Core.Registry
             {
                 throw new Exception($"Could not find a match for '{typeof(T).Name}' and '{typeId}'");
             }
-            else if (matches.Count() > 1)
+
+            if (matches.Count() > 1)
             {
                 throw new Exception($"How is there more than one match for '{typeof(T).Name}' and '{typeId}'");
             }
@@ -137,24 +141,19 @@ namespace FullPotential.Core.Registry
 
         public IRegisterable GetRegisteredForItem(ItemBase item)
         {
-            if (item is Accessory)
+            switch (item)
             {
-                return GetRegisteredById<IGearAccessory>(item.RegistryTypeId);
+                case Accessory:
+                    return GetRegisteredById<IGearAccessory>(item.RegistryTypeId);
+                case Armor:
+                    return GetRegisteredById<IGearArmor>(item.RegistryTypeId);
+                case Weapon:
+                    return GetRegisteredById<IGearWeapon>(item.RegistryTypeId);
+                case Loot:
+                    return GetRegisteredById<ILoot>(item.RegistryTypeId);
+                default:
+                    return null;
             }
-            else if (item is Armor)
-            {
-                return GetRegisteredById<IGearArmor>(item.RegistryTypeId);
-            }
-            else if (item is Weapon)
-            {
-                return GetRegisteredById<IGearWeapon>(item.RegistryTypeId);
-            }
-            else if (item is Loot)
-            {
-                return GetRegisteredById<ILoot>(item.RegistryTypeId);
-            }
-
-            return null;
         }
 
         public List<IEffect> GetLootPossibilities()

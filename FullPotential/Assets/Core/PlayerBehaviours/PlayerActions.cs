@@ -4,16 +4,18 @@ using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Helpers;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Registry.Spells;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
-using FullPotential.Api.Utilities;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Gameplay.Data;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
+using FullPotential.Core.Registry;
 using FullPotential.Core.Utilities.UtilityBehaviours;
 using TMPro;
 using Unity.Netcode;
@@ -31,12 +33,19 @@ namespace FullPotential.Core.PlayerBehaviours
         [SerializeField] private GameObject _hitTextPrefab;
 #pragma warning restore CS0649
 
+        //Services
+        private IRpcHelper _rpcHelper;
+        private ResultFactory _resultFactory;
+        private IAttackHelper _attackHelper;
+        private ITypeRegistry _typeRegistry;
+
         private bool _hasMenuOpen;
         private MainCanvasObjects _mainCanvasObjects;
         private bool _toggleGameMenu;
         private bool _toggleCharacterMenu;
         private PlayerState _playerState;
         private PlayerMovement _playerMovement;
+        private UserRegistry _userRegistry;
         private Interactable _focusedInteractable;
         private Camera _sceneCamera;
         private ClientRpcParams _clientRpcParams;
@@ -50,6 +59,12 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             _playerState = GetComponent<PlayerState>();
             _playerMovement = GetComponent<PlayerMovement>();
+
+            _userRegistry = GameManager.Instance.GetService<UserRegistry>();
+            _rpcHelper = GameManager.Instance.GetService<IRpcHelper>();
+            _resultFactory = GameManager.Instance.GetService<ResultFactory>();
+            _attackHelper = GameManager.Instance.GetService<IAttackHelper>();
+            _typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -84,7 +99,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (IsClient)
             {
-                Camera.main.fieldOfView = ModHelper.GetGameManager().AppOptions.FieldOfView;
+                Camera.main.fieldOfView = GameManager.Instance.AppOptions.FieldOfView;
             }
         }
 
@@ -221,7 +236,7 @@ namespace FullPotential.Core.PlayerBehaviours
         [ServerRpc]
         public void UpdatePlayerSettingsServerRpc(PlayerSettings playerSettings)
         {
-            var saveData = GameManager.Instance.UserRegistry.PlayerData[_playerState.Username];
+            var saveData = _userRegistry.PlayerData[_playerState.Username];
             saveData.Settings = playerSettings ?? new PlayerSettings();
             saveData.IsDirty = true;
 
@@ -234,7 +249,7 @@ namespace FullPotential.Core.PlayerBehaviours
             var tellOtherClients = IsServer || TryToAttack(isLeftHand, _playerCamera.transform.position, _playerCamera.transform.forward, _playerState);
             if (tellOtherClients)
             {
-                var nearbyClients = GameManager.Instance.GetService<IRpcHelper>().ForNearbyPlayersExcept(transform.position, OwnerClientId);
+                var nearbyClients = _rpcHelper.ForNearbyPlayersExcept(transform.position, OwnerClientId);
                 _playerState.TryToAttackClientRpc(isLeftHand, _playerCamera.transform.position, _playerCamera.transform.forward, nearbyClients);
             }
         }
@@ -290,7 +305,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 return;
             }
 
-            var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(
+            var craftedItem = _resultFactory.GetCraftedItem(
                 categoryName,
                 craftableTypeName,
                 isTwoHanded,
@@ -336,7 +351,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 return;
             }
 
-            var loot = GameManager.Instance.ResultFactory.GetLootDrop();
+            var loot = _resultFactory.GetLootDrop();
             var invChange = new InventoryChanges { Loot = new[] { loot as Loot } };
 
             ApplyInventoryChanges(invChange);
@@ -406,7 +421,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (IsServer)
             {
-                GameManager.Instance.GetService<IAttackHelper>().DealDamage(gameObject, null, hit.transform.gameObject, hit.point);
+                _attackHelper.DealDamage(gameObject, null, hit.transform.gameObject, hit.point);
             }
 
             return hit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId;
@@ -466,7 +481,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 ? transform
                 : GameManager.Instance.GetSceneBehaviour().GetTransform();
 
-            GameManager.Instance.TypeRegistry.LoadAddessable(
+            _typeRegistry.LoadAddessable(
                 activeSpell.Targeting.PrefabAddress,
                 prefab =>
                 {
@@ -534,7 +549,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 ? rangedHit.point
                 : _playerState.Positions.RightHandInFront.position + forward * 30;
 
-            var nearbyClients = GameManager.Instance.GetService<IRpcHelper>().ForNearbyPlayers(transform.position);
+            var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
             _playerState.UsedWeaponClientRpc(startPos, endPos, nearbyClients);
 
             if (rangedHit.transform == null)
@@ -544,7 +559,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (IsServer)
             {
-                GameManager.Instance.GetService<IAttackHelper>().DealDamage(gameObject, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
+                _attackHelper.DealDamage(gameObject, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
             }
 
             return rangedHit.transform.gameObject.GetComponent<NetworkObject>()?.NetworkObjectId;
@@ -560,7 +575,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (IsServer)
             {
-                GameManager.Instance.GetService<IAttackHelper>().DealDamage(gameObject, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
+                _attackHelper.DealDamage(gameObject, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
             }
 
             return meleeHit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId;

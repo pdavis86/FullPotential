@@ -29,9 +29,9 @@ namespace FullPotential.Core.Gameplay.Crafting
         private readonly List<ISpellTargeting> _spellTargetingOptions;
         private readonly List<ISpellShape> _spellShapeOptions;
 
-        public ResultFactory(TypeRegistry typeRegistry, Localizer localizer)
+        public ResultFactory(ITypeRegistry typeRegistry, Localizer localizer)
         {
-            _typeRegistry = typeRegistry;
+            _typeRegistry = (TypeRegistry)typeRegistry;
             _localizer = localizer;
 
             _lootTypes = _typeRegistry.GetRegisteredTypes<ILoot>().ToList();

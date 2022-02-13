@@ -1,5 +1,6 @@
 ﻿using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.Localization;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,6 +12,7 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
     public class TextLocalizer : MonoBehaviour
     {
         private Text _textComponent;
+        private Localizer _localizer;
 
         // ReSharper disable once UnassignedField.Global
         public string TranslationId;
@@ -19,6 +21,7 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
         private void Awake()
         {
             _textComponent = GetComponent<Text>();
+            _localizer = GameManager.Instance.GetService<Localizer>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -29,7 +32,7 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
                 Debug.LogWarning($"Missing {nameof(TranslationId)} on {gameObject.name} under {transform.parent.gameObject.name}");
             }
 
-            _textComponent.text = GameManager.Instance.Localizer.Translate(TranslationId);
+            _textComponent.text = _localizer.Translate(TranslationId);
         }
 
     }

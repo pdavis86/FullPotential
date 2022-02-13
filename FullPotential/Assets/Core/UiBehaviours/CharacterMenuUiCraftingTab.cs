@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Spells;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Localization;
 using FullPotential.Core.PlayerBehaviours;
 using FullPotential.Core.UiBehaviours.Components;
@@ -32,6 +34,7 @@ namespace FullPotential.Core.UiBehaviours
 
         private PlayerState _playerState;
         private PlayerActions _playerActions;
+        private ResultFactory _resultFactory;
         private List<ItemBase> _components;
         private Dictionary<Type, string> _craftingCategories;
         private Dictionary<IGearArmor, string> _armorTypes;
@@ -48,6 +51,8 @@ namespace FullPotential.Core.UiBehaviours
             _playerState = GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>();
             _playerActions = _playerState.gameObject.GetComponent<PlayerActions>();
 
+            _resultFactory = GameManager.Instance.GetService<ResultFactory>();
+
             _typeDropdown.onValueChanged.AddListener(TypeOnValueChanged);
 
             _subTypeDropdown.onValueChanged.AddListener(SubTypeOnValueChanged);
@@ -56,30 +61,34 @@ namespace FullPotential.Core.UiBehaviours
 
             _craftButton.onClick.AddListener(CraftButtonOnClick);
 
+            var localizer = GameManager.Instance.GetService<Localizer>();
+
             _craftingCategories = new Dictionary<Type, string>
-        {
-            { typeof(Weapon), GameManager.Instance.Localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Weapon)) },
-            { typeof(Armor), GameManager.Instance.Localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Armor)) },
-            { typeof(Accessory), GameManager.Instance.Localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Accessory)) },
-            { typeof(Spell), GameManager.Instance.Localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Spell)) }
-        };
+            {
+                { typeof(Weapon), localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Weapon)) },
+                { typeof(Armor), localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Armor)) },
+                { typeof(Accessory), localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Accessory)) },
+                { typeof(Spell), localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Spell)) }
+            };
 
             _handednessOptions = new List<string> {
-            { GameManager.Instance.Localizer.Translate(Localizer.TranslationType.WeaponHandedness, "one") },
-            { GameManager.Instance.Localizer.Translate(Localizer.TranslationType.WeaponHandedness, "two") }
-        };
+                { localizer.Translate(Localizer.TranslationType.WeaponHandedness, "one") },
+                { localizer.Translate(Localizer.TranslationType.WeaponHandedness, "two") }
+            };
 
-            _armorTypes = GameManager.Instance.TypeRegistry.GetRegisteredTypes<IGearArmor>()
-                .ToDictionary(x => x, x => GameManager.Instance.Localizer.GetTranslatedTypeName(x))
+            var typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
+
+            _armorTypes = typeRegistry.GetRegisteredTypes<IGearArmor>()
+                .ToDictionary(x => x, x => localizer.GetTranslatedTypeName(x))
                 .ToDictionary(x => x.Key, x => x.Value);
 
-            _accessoryTypes = GameManager.Instance.TypeRegistry.GetRegisteredTypes<IGearAccessory>()
-                .ToDictionary(x => x, x => GameManager.Instance.Localizer.GetTranslatedTypeName(x))
+            _accessoryTypes = typeRegistry.GetRegisteredTypes<IGearAccessory>()
+                .ToDictionary(x => x, x => localizer.GetTranslatedTypeName(x))
                 .OrderBy(x => x.Value)
                 .ToDictionary(x => x.Key, x => x.Value);
 
-            _weaponTypes = GameManager.Instance.TypeRegistry.GetRegisteredTypes<IGearWeapon>()
-                .ToDictionary(x => x, x => GameManager.Instance.Localizer.GetTranslatedTypeName(x))
+            _weaponTypes = typeRegistry.GetRegisteredTypes<IGearWeapon>()
+                .ToDictionary(x => x, x => localizer.GetTranslatedTypeName(x))
                 .OrderBy(x => x.Value)
                 .ToDictionary(x => x.Key, x => x.Value);
 
@@ -291,7 +300,7 @@ namespace FullPotential.Core.UiBehaviours
 
             var craftingCategory = GetCraftingCategory();
 
-            var craftedItem = GameManager.Instance.ResultFactory.GetCraftedItem(
+            var craftedItem = _resultFactory.GetCraftedItem(
                 craftingCategory,
                 GetCraftableTypeName(craftingCategory),
                 IsTwoHandedSelected(),
@@ -307,7 +316,7 @@ namespace FullPotential.Core.UiBehaviours
             }
 
             _craftButton.interactable = true;
-            _outputText.text = GameManager.Instance.ResultFactory.GetItemDescription(craftedItem);
+            _outputText.text = _resultFactory.GetItemDescription(craftedItem);
         }
 
     }

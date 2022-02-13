@@ -8,6 +8,7 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Helpers;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
@@ -16,8 +17,11 @@ using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.Gameplay.Crafting;
+using FullPotential.Core.Localization;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
+using FullPotential.Core.Registry;
 using FullPotential.Core.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
@@ -31,6 +35,13 @@ namespace FullPotential.Core.PlayerBehaviours
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
         // ReSharper disable once ConvertToConstant.Local
         [SerializeField] private float _amuletForwardMultiplier = 0.2f;
+
+        //Services
+        private ITypeRegistry _typeRegistry;
+        private ResultFactory _resultFactory;
+        private UserRegistry _userRegistry;
+        private IRpcHelper _rpcHelper;
+        private Localizer _localizer;
 
         private PlayerState _playerState;
         private Dictionary<string, ItemBase> _items;
@@ -46,6 +57,12 @@ namespace FullPotential.Core.PlayerBehaviours
         private void Awake()
         {
             _playerState = GetComponent<PlayerState>();
+
+            _typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
+            _resultFactory = GameManager.Instance.GetService<ResultFactory>();
+            _userRegistry = GameManager.Instance.GetService<UserRegistry>();
+            _rpcHelper = GameManager.Instance.GetService<IRpcHelper>();
+            _localizer = GameManager.Instance.GetService<Localizer>();
 
             _items = new Dictionary<string, ItemBase>();
             _equippedItems = new Dictionary<SlotGameObjectName, EquippedItem>();
@@ -108,7 +125,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 }
             }
 
-            var saveData = GameManager.Instance.UserRegistry.PlayerData[_playerState.Username];
+            var saveData = _userRegistry.PlayerData[_playerState.Username];
             saveData.Inventory = GetSaveData();
             saveData.IsDirty = true;
 
@@ -123,7 +140,7 @@ namespace FullPotential.Core.PlayerBehaviours
             }
 
             //todo: use ForNearbyPlayersExcept() once CharacterMenuUiEquipmentTab does what it needs to without this ClientRpc
-            var nearbyClients = GameManager.Instance.GetService<IRpcHelper>().ForNearbyPlayers(transform.position);
+            var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
             foreach (var message in FragmentedMessageReconstructor.GetFragmentedMessages(invChange))
             {
                 ApplyEquipChangeClientRpc(message, nearbyClients);
@@ -288,19 +305,19 @@ namespace FullPotential.Core.PlayerBehaviours
             switch (itemToAddCount)
             {
                 case 1:
-                    var alert1Text = GameManager.Instance.Localizer.Translate("ui.alert.itemadded");
+                    var alert1Text = _localizer.Translate("ui.alert.itemadded");
                     _playerState.ShowAlertForItemsAddedToInventory(string.Format(alert1Text, itemsToAdd.First().Name));
                     break;
 
                 default:
-                    var alert2Text = GameManager.Instance.Localizer.Translate("ui.alert.itemsadded");
+                    var alert2Text = _localizer.Translate("ui.alert.itemsadded");
                     _playerState.ShowAlertForItemsAddedToInventory(string.Format(alert2Text, itemToAddCount));
                     break;
             }
 
             if (IsServer)
             {
-                var saveData = GameManager.Instance.UserRegistry.PlayerData[_playerState.Username];
+                var saveData = _userRegistry.PlayerData[_playerState.Username];
                 saveData.Inventory = GetSaveData();
                 saveData.IsDirty = true;
             }
@@ -365,26 +382,29 @@ namespace FullPotential.Core.PlayerBehaviours
 
         private static void FillTypesFromIds(ItemBase item)
         {
+            var typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
+
             if (!string.IsNullOrWhiteSpace(item.RegistryTypeId) && item.RegistryType == null)
             {
-                item.RegistryType = GameManager.Instance.TypeRegistry.GetRegisteredForItem(item);
+                item.RegistryType = typeRegistry.GetRegisteredForItem(item);
             }
 
             if (item is MagicalItemBase magicalItem)
             {
+                var resultFactory = GameManager.Instance.GetService<ResultFactory>();
                 if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeName))
                 {
-                    magicalItem.Shape = GameManager.Instance.ResultFactory.GetSpellShape(magicalItem.ShapeTypeName);
+                    magicalItem.Shape = resultFactory.GetSpellShape(magicalItem.ShapeTypeName);
                 }
                 if (!string.IsNullOrWhiteSpace(magicalItem.TargetingTypeName))
                 {
-                    magicalItem.Targeting = GameManager.Instance.ResultFactory.GetSpellTargeting(magicalItem.TargetingTypeName);
+                    magicalItem.Targeting = resultFactory.GetSpellTargeting(magicalItem.TargetingTypeName);
                 }
             }
 
             if (item.EffectIds != null && item.EffectIds.Length > 0 && item.Effects == null)
             {
-                item.Effects = item.EffectIds.Select(x => GameManager.Instance.TypeRegistry.GetEffect(new Guid(x))).ToList();
+                item.Effects = item.EffectIds.Select(x => typeRegistry.GetEffect(new Guid(x))).ToList();
             }
         }
 
@@ -465,7 +485,7 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             if (componentIds == null || componentIds.Length == 0)
             {
-                return new List<string> { GameManager.Instance.Localizer.Translate("crafting.error.nocomponents") };
+                return new List<string> { _localizer.Translate("crafting.error.nocomponents") };
             }
 
             var components = GetComponentsFromIds(componentIds);
@@ -475,18 +495,18 @@ namespace FullPotential.Core.PlayerBehaviours
             {
                 if (spell.EffectIds.Length == 0)
                 {
-                    errors.Add(GameManager.Instance.Localizer.Translate("crafting.error.spellmissingeffect"));
+                    errors.Add(_localizer.Translate("crafting.error.spellmissingeffect"));
                 }
             }
             else if (itemToCraft is Weapon weapon)
             {
                 if (components.Count > 8)
                 {
-                    errors.Add(GameManager.Instance.Localizer.Translate("crafting.error.toomanycomponents"));
+                    errors.Add(_localizer.Translate("crafting.error.toomanycomponents"));
                 }
                 if (components.Count > 4 && !weapon.IsTwoHanded)
                 {
-                    errors.Add(GameManager.Instance.Localizer.Translate("crafting.error.toomanyforonehanded"));
+                    errors.Add(_localizer.Translate("crafting.error.toomanyforonehanded"));
                 }
             }
 
@@ -579,7 +599,7 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             if (IsOwner)
             {
-                var contents = GameManager.Instance.ResultFactory.GetItemDescription(item);
+                var contents = _resultFactory.GetItemDescription(item);
                 GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHand(isLeftHand, contents);
             }
 
@@ -598,7 +618,7 @@ namespace FullPotential.Core.PlayerBehaviours
                         return;
                     }
 
-                    GameManager.Instance.TypeRegistry.LoadAddessable(
+                    _typeRegistry.LoadAddessable(
                         weapon.IsTwoHanded ? weaponRegistryType.PrefabAddressTwoHanded : weaponRegistryType.PrefabAddress,
                         prefab =>
                         {
@@ -627,7 +647,7 @@ namespace FullPotential.Core.PlayerBehaviours
                     break;
 
                 case Spell spell:
-                    GameManager.Instance.TypeRegistry.LoadAddessable(
+                    _typeRegistry.LoadAddessable(
                         spell.Targeting.IdlePrefabAddress,
                         prefab =>
                         {
@@ -686,7 +706,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 return;
             }
 
-            GameManager.Instance.TypeRegistry.LoadAddessable(
+            _typeRegistry.LoadAddessable(
                 registryType.PrefabAddress,
                 prefab =>
                 {
@@ -719,7 +739,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 return;
             }
 
-            GameManager.Instance.TypeRegistry.LoadAddessable(
+            _typeRegistry.LoadAddessable(
                 registryType.PrefabAddress,
                 prefab =>
                 {

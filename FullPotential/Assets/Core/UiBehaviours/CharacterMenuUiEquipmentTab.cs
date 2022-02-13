@@ -4,6 +4,7 @@ using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.PlayerBehaviours;
 using FullPotential.Core.UiBehaviours.Components;
 using FullPotential.Core.Utilities.UtilityBehaviours;
@@ -25,11 +26,13 @@ namespace FullPotential.Core.UiBehaviours
 
         private GameObject _lastClickedSlot;
         private PlayerState _playerState;
+        private ResultFactory _resultFactory;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _playerState = GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>();
+            _resultFactory = GameManager.Instance.GetService<ResultFactory>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -85,7 +88,7 @@ namespace FullPotential.Core.UiBehaviours
                 // ReSharper disable once UnusedParameter.Local
                 tooltip.OnPointerEnterForTooltip += pointerEventData =>
                 {
-                    Tooltips.ShowTooltip(GameManager.Instance.ResultFactory.GetItemDescription(item));
+                    Tooltips.ShowTooltip(_resultFactory.GetItemDescription(item));
                 };
             }
         }

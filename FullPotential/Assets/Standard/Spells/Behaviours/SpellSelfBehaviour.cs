@@ -17,6 +17,8 @@ namespace FullPotential.Standard.Spells.Behaviours
         public IPlayerStateBehaviour SourceStateBehaviour;
         public Vector3 ForwardDirection;
 
+        private IAttackHelper _attackHelper;
+
         private float _castSpeed;
         private Rigidbody _rigidBody;
         private bool _returningToPlayer;
@@ -30,6 +32,8 @@ namespace FullPotential.Standard.Spells.Behaviours
                 Destroy(gameObject);
                 return;
             }
+
+            _attackHelper = ModHelper.GetGameManager().GetService<IAttackHelper>();
 
             _castSpeed = Spell.Attributes.Speed / 50f;
             if (_castSpeed < 0.5)
@@ -93,7 +97,7 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            ModHelper.GetGameManager().GetService<IAttackHelper>().DealDamage(SourceStateBehaviour.GameObject, Spell, target, position);
+            _attackHelper.DealDamage(SourceStateBehaviour.GameObject, Spell, target, position);
             Destroy(gameObject);
         }
 

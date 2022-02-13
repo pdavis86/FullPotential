@@ -25,6 +25,9 @@ namespace FullPotential.Standard.Enemies.Behaviours
         public readonly NetworkVariable<FixedString32Bytes> EnemyName = new NetworkVariable<FixedString32Bytes>();
 
         private IGameManager _gameManager;
+        private IAttackHelper _attackHelper;
+        private IRpcHelper _rpcHelper;
+
         private readonly NetworkVariable<int> _health = new NetworkVariable<int>(100);
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
         private IStatSlider _healthSlider;
@@ -33,6 +36,9 @@ namespace FullPotential.Standard.Enemies.Behaviours
         private void Awake()
         {
             _gameManager = ModHelper.GetGameManager();
+            _attackHelper = _gameManager.GetService<IAttackHelper>();
+            _rpcHelper = _gameManager.GetService<IRpcHelper>();
+
             _healthSlider = _healthSliderParent.GetComponent<IStatSlider>();
 
             _health.OnValueChanged += OnHealthChanged;
@@ -117,8 +123,8 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
             _damageTaken.Clear();
 
-            var deathMessage = _gameManager.GetService<IAttackHelper>().GetDeathMessage(false, name, killerName, itemName);
-            var nearbyClients = _gameManager.GetService<IRpcHelper>().ForNearbyPlayers(transform.position);
+            var deathMessage = _attackHelper.GetDeathMessage(false, name, killerName, itemName);
+            var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
             _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(deathMessage, nearbyClients);
 
             Destroy(gameObject);
@@ -139,7 +145,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
         private void CheckIfOffTheMap()
         {
-            _gameManager.GetService<IAttackHelper>().CheckIfOffTheMap(this, transform.position.y);
+            _attackHelper.CheckIfOffTheMap(this, transform.position.y);
         }
 
     }

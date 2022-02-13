@@ -2,7 +2,10 @@
 using System.Collections;
 using System.Linq;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Core.GameManagement.Enums;
+using FullPotential.Core.Localization;
 using FullPotential.Core.Networking.Data;
+using FullPotential.Core.Registry;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UNET;
 using UnityEngine;
@@ -15,14 +18,6 @@ using UnityEngine.UI;
 
 namespace FullPotential.Core.GameManagement
 {
-    public enum ConnectStatus
-    {
-        //Success,
-        VersionMismatch,
-        //ServerFull,
-        //LoggedInAgain,
-    }
-
     public class JoinOrHostGame : MonoBehaviour
     {
 #pragma warning disable 0649
@@ -34,6 +29,9 @@ namespace FullPotential.Core.GameManagement
         [SerializeField] private Text _gameDetailsError;
         [SerializeField] private GameObject _joiningMessage;
 #pragma warning restore 0649
+
+        private UserRegistry _userRegistry;
+        private Localizer _localizer;
 
         private NetworkManager _networkManager;
         private UNetTransport _networkTransport;
@@ -53,6 +51,9 @@ namespace FullPotential.Core.GameManagement
             _scene2Name = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(2));
 
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
+
+            _userRegistry = GameManager.Instance.GetService<UserRegistry>();
+            _localizer = GameManager.Instance.GetService<Localizer>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -148,16 +149,16 @@ namespace FullPotential.Core.GameManagement
         {
             if (_username.IsNullOrWhiteSpace())
             {
-                _signinError.text = GameManager.Instance.Localizer.Translate("ui.signin.missing");
+                _signinError.text = _localizer.Translate("ui.signin.missing");
                 _signinError.gameObject.SetActive(true);
                 return;
             }
 
-            var token = GameManager.Instance.UserRegistry.SignIn(_username, _password);
+            var token = _userRegistry.SignIn(_username, _password);
 
             if (string.IsNullOrWhiteSpace(token))
             {
-                _signinError.text = GameManager.Instance.Localizer.Translate("ui.signin.error");
+                _signinError.text = _localizer.Translate("ui.signin.error");
                 _signinError.gameObject.SetActive(true);
                 return;
             }
@@ -183,7 +184,7 @@ namespace FullPotential.Core.GameManagement
                 _gameDetailsContainer.SetActive(true);
                 _joiningMessage.SetActive(false);
 
-                _gameDetailsError.text = GameManager.Instance.Localizer.Translate("ui.connect.disconnected");
+                _gameDetailsError.text = _localizer.Translate("ui.connect.disconnected");
                 _gameDetailsError.gameObject.SetActive(true);
             }
         }
@@ -207,7 +208,7 @@ namespace FullPotential.Core.GameManagement
 
             if (!IsPortFree())
             {
-                _signinError.text = GameManager.Instance.Localizer.Translate("ui.connect.portnotfree");
+                _signinError.text = _localizer.Translate("ui.connect.portnotfree");
                 _signinError.gameObject.SetActive(true);
                 return;
             }
@@ -270,7 +271,7 @@ namespace FullPotential.Core.GameManagement
 
                     if (!_gameDetailsError.gameObject.activeInHierarchy)
                     {
-                        _gameDetailsError.text = GameManager.Instance.Localizer.Translate("ui.connect.jointimeout");
+                        _gameDetailsError.text = _localizer.Translate("ui.connect.jointimeout");
                         _gameDetailsError.gameObject.SetActive(true);
                         _joiningMessage.SetActive(false);
                         _gameDetailsContainer.SetActive(true);
@@ -288,7 +289,7 @@ namespace FullPotential.Core.GameManagement
         {
             reader.ReadValueSafe(out ConnectStatus status);
             Debug.LogWarning($"Server refused connection with status {status}");
-            _gameDetailsError.text = GameManager.Instance.Localizer.Translate("ui.connect.joinrejected");
+            _gameDetailsError.text = _localizer.Translate("ui.connect.joinrejected");
             _gameDetailsError.gameObject.SetActive(true);
             _joiningMessage.SetActive(false);
             _gameDetailsContainer.SetActive(true);

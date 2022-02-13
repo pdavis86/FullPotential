@@ -15,6 +15,8 @@ namespace FullPotential.Standard.Spells.Behaviours
         public Spell Spell;
         public IPlayerStateBehaviour SourceStateBehaviour;
 
+        private IAttackHelper _attackHelper;
+
         private float _timeSinceLastEffective;
         private float _timeBetweenEffects;
 
@@ -30,6 +32,8 @@ namespace FullPotential.Standard.Spells.Behaviours
 
             //todo: attribute-based object lifetime
             Destroy(gameObject, 10f);
+
+            _attackHelper = ModHelper.GetGameManager().GetService<IAttackHelper>();
 
             //todo: attribute-based cooldown
             _timeBetweenEffects = 0.5f;
@@ -72,7 +76,7 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            ModHelper.GetGameManager().GetService<IAttackHelper>().DealDamage(SourceStateBehaviour.GameObject, Spell, target, position);
+            _attackHelper.DealDamage(SourceStateBehaviour.GameObject, Spell, target, position);
         }
 
     }

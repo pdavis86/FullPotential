@@ -1,4 +1,5 @@
 ﻿using FullPotential.Core.GameManagement;
+using FullPotential.Core.Localization;
 using FullPotential.Core.PlayerBehaviours;
 using FullPotential.Core.Utilities.UtilityBehaviours;
 using Unity.Netcode;
@@ -12,7 +13,7 @@ namespace FullPotential.Core.Environment
     {
         public override void OnFocus()
         {
-            var translation = GameManager.Instance.Localizer.Translate("ui.interact.shop");
+            var translation = GameManager.Instance.GetService<Localizer>().Translate("ui.interact.shop");
             var interactInputName = GameManager.Instance.InputActions.Player.Interact.GetBindingDisplayString();
             _interactionBubble.text = string.Format(translation, interactInputName);
             _interactionBubble.gameObject.SetActive(true);

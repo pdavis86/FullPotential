@@ -18,6 +18,8 @@ namespace FullPotential.Standard.Spells.Behaviours
         public IPlayerStateBehaviour SourceStateBehaviour;
         public Vector3 ForwardDirection;
 
+        private IAttackHelper _attackHelper;
+
         private Type _shapeType;
 
         // ReSharper disable once UnusedMember.Local
@@ -33,6 +35,8 @@ namespace FullPotential.Standard.Spells.Behaviours
             Destroy(gameObject, 3f);
 
             Physics.IgnoreCollision(GetComponent<Collider>(), SourceStateBehaviour.GameObject.GetComponent<Collider>());
+
+            _attackHelper = ModHelper.GetGameManager().GetService<IAttackHelper>();
 
             //todo: attribute-based cast speed
             var castSpeed = Spell.Attributes.Speed / 50f;
@@ -85,7 +89,7 @@ namespace FullPotential.Standard.Spells.Behaviours
                     return;
                 }
 
-                ModHelper.GetGameManager().GetService<IAttackHelper>().DealDamage(SourceStateBehaviour.GameObject, Spell, target, position);
+                _attackHelper.DealDamage(SourceStateBehaviour.GameObject, Spell, target, position);
             }
             else
             {

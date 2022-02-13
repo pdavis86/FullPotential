@@ -1,4 +1,5 @@
 ﻿using FullPotential.Core.GameManagement;
+using FullPotential.Core.Localization;
 using FullPotential.Core.PlayerBehaviours;
 using FullPotential.Core.Utilities.UtilityBehaviours;
 using Unity.Netcode;
@@ -24,7 +25,7 @@ namespace FullPotential.Core.Environment
             {
                 return;
             }
-            var translation = GameManager.Instance.Localizer.Translate("ui.interact.loot");
+            var translation = GameManager.Instance.GetService<Localizer>().Translate("ui.interact.loot");
             var interactInputName = GameManager.Instance.InputActions.Player.Interact.GetBindingDisplayString().ToUpper();
             _interactionBubble.text = string.Format(translation, interactInputName);
             _interactionBubble.gameObject.SetActive(true);

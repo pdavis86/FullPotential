@@ -5,6 +5,7 @@ using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Utilities.UtilityBehaviours;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,6 +26,8 @@ namespace FullPotential.Core.UiBehaviours.Components
             bool showEquippedItems = true
         )
         {
+            var resultFactory = GameManager.Instance.GetService<ResultFactory>();
+
             componentsContainer.SetActive(true);
             componentsContainer.transform.DestroyChildren();
 
@@ -68,7 +71,7 @@ namespace FullPotential.Core.UiBehaviours.Components
                 // ReSharper disable once UnusedParameter.Local
                 tooltip.OnPointerEnterForTooltip += pointerEventData =>
                 {
-                    Tooltips.ShowTooltip(GameManager.Instance.ResultFactory.GetItemDescription(item, false));
+                    Tooltips.ShowTooltip(resultFactory.GetItemDescription(item, false));
                 };
 
                 rowCounter++;

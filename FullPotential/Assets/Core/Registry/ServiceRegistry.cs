@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace FullPotential.Core.Registry
 {
@@ -59,6 +60,10 @@ namespace FullPotential.Core.Registry
                 var args = new List<object>();
                 foreach (var param in ctor.GetParameters())
                 {
+                    if (!_registry.ContainsKey(param.ParameterType))
+                    {
+                        Debug.LogError($"'{requestedType}' takes a parameter of '{param.ParameterType}' but this type is not registered");
+                    }
                     args.Add(GetServiceInternal(param.ParameterType));
                 }
 

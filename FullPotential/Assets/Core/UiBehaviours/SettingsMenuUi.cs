@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Data;
+using FullPotential.Core.Localization;
 using FullPotential.Core.PlayerBehaviours;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,7 +44,7 @@ namespace FullPotential.Core.UiBehaviours
             _resolutionDropDown.options.Clear();
             _resolutionDropDown.AddOptions(_availableResolutions.Select(x => $"{x.width} x {x.height} ({GetAspectRatio(x.width, x.height)})").ToList());
 
-            _cultures = GameManager.Instance.Localizer.GetAvailableCultures();
+            _cultures = GameManager.Instance.GetService<Localizer>().GetAvailableCultures();
 
             _languageDropDown.options.Clear();
             _languageDropDown.AddOptions(_cultures.Select(x => x.Value).ToList());

@@ -20,6 +20,8 @@ namespace FullPotential.Standard.Spells.Behaviours
         [SerializeField] private float _leftRightAdjustment;
 #pragma warning restore CS0649
 
+        private IAttackHelper _attackHelper;
+
         private GameObject _sourcePlayer;
         private Transform _cylinderParentTransform;
         private Transform _cylinderTransform;
@@ -32,6 +34,8 @@ namespace FullPotential.Standard.Spells.Behaviours
         {
             _cylinderParentTransform = transform.GetChild(0);
             _cylinderTransform = _cylinderParentTransform.GetChild(0);
+
+            _attackHelper = ModHelper.GetGameManager().GetService<IAttackHelper>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -132,7 +136,7 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            ModHelper.GetGameManager().GetService<IAttackHelper>().DealDamage(_sourcePlayer, Spell, target, position);
+            _attackHelper.DealDamage(_sourcePlayer, Spell, target, position);
         }
 
         private void PerformGraphicsAdjustments()
