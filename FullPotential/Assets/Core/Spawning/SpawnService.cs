@@ -1,7 +1,8 @@
-﻿using FullPotential.Api.Constants;
-using FullPotential.Api.Extensions;
-using FullPotential.Api.Helpers;
-using FullPotential.Api.Spawning;
+﻿using FullPotential.Api.Spawning;
+using FullPotential.Api.Unity.Constants;
+using FullPotential.Api.Unity.Extensions;
+using FullPotential.Api.Unity.Helpers;
+using FullPotential.Core.GameManagement.Constants;
 using UnityEngine;
 
 namespace FullPotential.Core.Spawning
@@ -12,7 +13,7 @@ namespace FullPotential.Core.Spawning
 
         public SpawnService()
         {
-            var ground = GameObjectHelper.GetObjectAtRoot(Constants.GameObjectNames.Environment).FindChildWithTag(Tags.Ground);
+            var ground = GameObjectHelper.GetObjectAtRoot(GameObjectNames.Environment).FindChildWithTag(Tags.Ground);
             _groundCollider = ground.GetComponent<Collider>();
         }
 

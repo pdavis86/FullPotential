@@ -1,7 +1,8 @@
 ﻿using System;
-using FullPotential.Api;
 using FullPotential.Api.Gameplay;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Utilities;
 using FullPotential.Standard.Spells.Behaviours;
 using UnityEngine;
 
@@ -18,18 +19,18 @@ namespace FullPotential.Standard.Spells.Shapes
         public void SpawnGameObject(Spell spell, IPlayerStateBehaviour sourceStateBehaviour, Vector3 startPosition, Quaternion rotation)
         {
             var gameManager = ModHelper.GetGameManager();
-            gameManager.TypeRegistry.LoadAddessable(
+            gameManager.GetService<ITypeRegistry>().LoadAddessable(
                 spell.Shape.PrefabAddress,
                 prefab =>
                 {
                     var spellObject = UnityEngine.Object.Instantiate(prefab, startPosition, rotation);
-                    gameManager.SceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(startPosition, spellObject.transform);
+                    gameManager.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(startPosition, spellObject.transform);
 
                     var spellScript = spellObject.GetComponent<SpellWallBehaviour>();
                     spellScript.Spell = spell;
                     spellScript.SourceStateBehaviour = sourceStateBehaviour;
 
-                    spellObject.transform.parent = gameManager.SceneBehaviour.GetTransform();
+                    spellObject.transform.parent = gameManager.GetSceneBehaviour().GetTransform();
                 }
             );
         }

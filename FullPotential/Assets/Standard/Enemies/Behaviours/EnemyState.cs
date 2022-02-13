@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using FullPotential.Api;
-using FullPotential.Api.Enums;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay;
+using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Ui.Components;
+using FullPotential.Api.Utilities;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -117,13 +117,13 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
             _damageTaken.Clear();
 
-            var deathMessage = _gameManager.AttackHelper.GetDeathMessage(false, name, killerName, itemName);
-            var nearbyClients = _gameManager.RpcHelper.ForNearbyPlayers(transform.position);
-            _gameManager.SceneBehaviour.MakeAnnouncementClientRpc(deathMessage, nearbyClients);
+            var deathMessage = _gameManager.GetService<IAttackHelper>().GetDeathMessage(false, name, killerName, itemName);
+            var nearbyClients = _gameManager.GetService<IRpcHelper>().ForNearbyPlayers(transform.position);
+            _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(deathMessage, nearbyClients);
 
             Destroy(gameObject);
 
-            _gameManager.SceneBehaviour.HandleEnemyDeath();
+            _gameManager.GetSceneBehaviour().HandleEnemyDeath();
         }
 
         private void SetName()
@@ -139,7 +139,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
         private void CheckIfOffTheMap()
         {
-            _gameManager.AttackHelper.CheckIfOffTheMap(this, transform.position.y);
+            _gameManager.GetService<IAttackHelper>().CheckIfOffTheMap(this, transform.position.y);
         }
 
     }

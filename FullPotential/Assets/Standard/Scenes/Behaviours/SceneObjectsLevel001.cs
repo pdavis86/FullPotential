@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
-using FullPotential.Api;
-using FullPotential.Api.Extensions;
-using FullPotential.Api.Helpers;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Spawning;
+using FullPotential.Api.Unity.Helpers;
+using FullPotential.Api.Utilities;
+using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Core.GameManagement.Constants;
 using FullPotential.Standard.Enemies.Behaviours;
 using Unity.Netcode;
 using UnityEngine;
@@ -39,7 +40,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _spawnService = new SpawnService();
+            _spawnService = ModHelper.GetGameManager().GetService<ISpawnService>();
 
             //Cannot currently add prefabs at runtime
             //https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/1360
@@ -49,7 +50,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            GameObjectHelper.GetObjectAtRoot(Core.Constants.GameObjectNames.SceneCanvas).SetActive(true);
+            GameObjectHelper.GetObjectAtRoot(GameObjectNames.SceneCanvas).SetActive(true);
 
             if (!IsServer)
             {
@@ -65,7 +66,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
             _enemyPrefabNetObj = EnemyPrefab.GetComponent<NetworkObject>();
 
-            var spawnPointsParent = GameObjectHelper.GetObjectAtRoot(Core.Constants.GameObjectNames.SpawnPoints).transform;
+            var spawnPointsParent = GameObjectHelper.GetObjectAtRoot(GameObjectNames.SpawnPoints).transform;
             _spawnPoints = new List<Transform>();
             foreach (Transform spawnPoint in spawnPointsParent)
             {
@@ -95,7 +96,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
                 return;
             }
 
-            ModHelper.GetGameManager().UserInterface.HudOverlay.ShowAlert(announcement);
+            ModHelper.GetGameManager().GetUserInterface().HudOverlay.ShowAlert(announcement);
         }
 
         private void SpawnEnemy()

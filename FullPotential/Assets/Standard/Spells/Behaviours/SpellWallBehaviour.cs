@@ -1,8 +1,8 @@
-using FullPotential.Api;
-using FullPotential.Api.Constants;
-using FullPotential.Api.Extensions;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Unity.Constants;
+using FullPotential.Api.Unity.Extensions;
+using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -72,7 +72,7 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            ModHelper.GetGameManager().AttackHelper.DealDamage(SourceStateBehaviour.GameObject, Spell, target, position);
+            ModHelper.GetGameManager().GetService<IAttackHelper>().DealDamage(SourceStateBehaviour.GameObject, Spell, target, position);
         }
 
     }

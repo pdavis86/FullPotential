@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using FullPotential.Api.Data;
-using FullPotential.Core.Data;
+using FullPotential.Api.Gameplay.Data;
+using FullPotential.Core.Gameplay.Data;
 using UnityEngine;
 
 namespace FullPotential.Core.Registry
