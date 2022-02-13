@@ -10,6 +10,8 @@ using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
+// ReSharper disable once ClassNeverInstantiated.Global
+
 namespace FullPotential.Core.Localization
 {
     public class Localizer

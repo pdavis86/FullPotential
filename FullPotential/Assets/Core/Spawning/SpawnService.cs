@@ -5,6 +5,8 @@ using FullPotential.Api.Unity.Helpers;
 using FullPotential.Core.GameManagement.Constants;
 using UnityEngine;
 
+// ReSharper disable once ClassNeverInstantiated.Global
+
 namespace FullPotential.Core.Spawning
 {
     public class SpawnService : ISpawnService

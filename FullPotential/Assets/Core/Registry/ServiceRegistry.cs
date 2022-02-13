@@ -6,9 +6,9 @@ namespace FullPotential.Core.Registry
 {
     public class ServiceRegistry
     {
-        private List<Type> _doNotCache = new List<Type>();
-        private Dictionary<Type, Type> _registry = new Dictionary<Type, Type>();
-        private Dictionary<Type, object> _cache = new Dictionary<Type, object>();
+        private readonly List<Type> _doNotCache = new List<Type>();
+        private readonly Dictionary<Type, Type> _registry = new Dictionary<Type, Type>();
+        private readonly Dictionary<Type, object> _cache = new Dictionary<Type, object>();
 
         public void Register<TInterface, TClass>(bool doNotCache = false)
             where TClass : class, TInterface
@@ -37,10 +37,10 @@ namespace FullPotential.Core.Registry
             return (T)GetServiceInternal(typeof(T));
         }
 
-        public T GetService<T>(T type)
-        {
-            return (T)GetServiceInternal(typeof(T));
-        }
+        //public T GetService<T>(T type)
+        //{
+        //    return (T)GetServiceInternal(typeof(T));
+        //}
 
         private object GetServiceInternal(Type requestedType)
         {

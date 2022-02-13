@@ -12,6 +12,8 @@ using FullPotential.Core.PlayerBehaviours;
 using Unity.Netcode;
 using UnityEngine;
 
+// ReSharper disable once ClassNeverInstantiated.Global
+
 namespace FullPotential.Core.Gameplay.Combat
 {
     public class AttackHelper : IAttackHelper
@@ -19,7 +21,7 @@ namespace FullPotential.Core.Gameplay.Combat
         // ReSharper disable once InconsistentNaming
         private static readonly System.Random _random = new System.Random();
 
-        private Localizer _localizer;
+        private readonly Localizer _localizer;
 
         public AttackHelper(Localizer localizer)
         {
@@ -71,9 +73,8 @@ namespace FullPotential.Core.Gameplay.Combat
             var adder = _random.Next(0, 6);
             var damageDealt = (int)Math.Ceiling(damageDealtBasic / multiplier) + adder;
 
-            var sourceClientId = source == null
-                ? null
-                : source.GetComponent<NetworkObject>()?.OwnerClientId;
+            var sourceNetworkObject = source != null ? source.GetComponent<NetworkObject>() : null;
+            var sourceClientId = source != null ? (ulong?)sourceNetworkObject.OwnerClientId : null;
 
             var sourceIsPlayer = source != null && source.CompareTag(Tags.Player);
             var sourcePlayerState = sourceIsPlayer ? source.GetComponent<PlayerState>() : null;

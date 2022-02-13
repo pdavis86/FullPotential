@@ -15,6 +15,8 @@ using FullPotential.Core.Registry;
 using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.Helpers;
 
+// ReSharper disable once ClassNeverInstantiated.Global
+
 namespace FullPotential.Core.Gameplay.Crafting
 {
     public class ResultFactory

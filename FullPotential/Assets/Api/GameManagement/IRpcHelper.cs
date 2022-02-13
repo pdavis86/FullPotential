@@ -2,6 +2,9 @@
 using Unity.Netcode;
 using UnityEngine;
 
+// ReSharper disable UnusedParameter.Global
+// ReSharper disable once UnusedMemberInSuper.Global
+
 namespace FullPotential.Api.GameManagement
 {
     public interface IRpcHelper

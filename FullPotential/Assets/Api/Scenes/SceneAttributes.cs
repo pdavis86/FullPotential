@@ -1,5 +1,7 @@
 ﻿using System;
 
+// ReSharper disable UnassignedField.Global
+
 namespace FullPotential.Api.Scenes
 {
     [Serializable]

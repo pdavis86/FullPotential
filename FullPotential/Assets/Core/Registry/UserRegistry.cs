@@ -4,6 +4,8 @@ using FullPotential.Api.Gameplay.Data;
 using FullPotential.Core.Gameplay.Data;
 using UnityEngine;
 
+// ReSharper disable once ClassNeverInstantiated.Global
+
 namespace FullPotential.Core.Registry
 {
     public class UserRegistry

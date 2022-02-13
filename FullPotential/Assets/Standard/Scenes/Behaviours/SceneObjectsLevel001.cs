@@ -20,7 +20,8 @@ namespace FullPotential.Standard.Scenes.Behaviours
         // ReSharper disable once MemberCanBePrivate.Global
         public GameObject EnemyPrefab;
 
-        [SerializeField] private readonly Vector2 _spawnVariation = new Vector2(-4f, 4f);
+        [SerializeField] private float _spawnVariationMin = -4f;
+        [SerializeField] private float _spawnVariationMax = 4f;
 
         private List<Transform> _spawnPoints;
         private NetworkObject _enemyPrefabNetObj;
@@ -29,7 +30,6 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
         [SerializeField] private SceneAttributes _attributes = new SceneAttributes();
         
-        [SerializeField]
         public SceneAttributes Attributes
         {
             get => _attributes;
@@ -135,9 +135,9 @@ namespace FullPotential.Standard.Scenes.Behaviours
         {
             var chosenSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Count)];
             var spawnPosition = chosenSpawnPoint.position + new Vector3(
-                Random.Range(_spawnVariation.x, _spawnVariation.y),
+                Random.Range(_spawnVariationMin, _spawnVariationMax),
                 0,
-                Random.Range(_spawnVariation.x, _spawnVariation.y));
+                Random.Range(_spawnVariationMin, _spawnVariationMax));
 
             if (gameObjectToSpawn != null)
             {

@@ -4,6 +4,8 @@ using FullPotential.Api.GameManagement;
 using Unity.Netcode;
 using UnityEngine;
 
+// ReSharper disable once ClassNeverInstantiated.Global
+
 namespace FullPotential.Core.Networking
 {
     public class RpcHelper : IRpcHelper
