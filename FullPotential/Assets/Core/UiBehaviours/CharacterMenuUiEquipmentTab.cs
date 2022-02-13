@@ -166,14 +166,13 @@ namespace FullPotential.Core.UiBehaviours
                     return;
                 }
 
-                var castedPlayerInventory = (PlayerInventory)_playerState.Inventory;
+                var playerInventory = (PlayerInventory)_playerState.Inventory;
 
-                //todo: client-side inventory row toggling needs some effort to get working
-                //castedPlayerInventory.SetEquippedItem(item, slotGameObjectName);
-                //castedPlayerInventory.SpawnEquippedObject(item, slotGameObjectName);
-                //ResetEquipmentUi(true);
+                playerInventory.HandleSlotChange(item, slotGameObjectName);
+                playerInventory.SpawnEquippedObject(item, slotGameObjectName);
+                ResetEquipmentUi(true);
 
-                castedPlayerInventory.EquipItemServerRpc(item.Id, slotGameObjectName);
+                playerInventory.EquipItemServerRpc(item.Id, slotGameObjectName);
             });
         }
 

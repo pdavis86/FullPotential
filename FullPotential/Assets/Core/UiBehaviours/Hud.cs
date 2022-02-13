@@ -34,7 +34,7 @@ namespace FullPotential.Core.UiBehaviours
             alert.transform.Find("Text").GetComponent<Text>().text = alertText;
         }
 
-        public void UpdateHand(bool isLeftHand, string contents)
+        public void UpdateHandDescription(bool isLeftHand, string contents)
         {
             var leftOrRight = isLeftHand
                 ? _equippedLeftHand
@@ -43,7 +43,7 @@ namespace FullPotential.Core.UiBehaviours
             leftOrRight.GetComponent<EquippedSummary>().SetContents(contents);
         }
 
-        public void UpdateAmmo(bool isLeftHand, PlayerHandStatus playerHandStatus)
+        public void UpdateHandAmmo(bool isLeftHand, PlayerHandStatus playerHandStatus)
         {
             var leftOrRight = isLeftHand
                 ? _ammoLeft

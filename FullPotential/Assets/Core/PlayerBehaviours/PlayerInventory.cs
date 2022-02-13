@@ -18,6 +18,7 @@ using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
+using FullPotential.Core.Gameplay.Data;
 using FullPotential.Core.Localization;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
@@ -77,70 +78,29 @@ namespace FullPotential.Core.PlayerBehaviours
         [ServerRpc]
         public void EquipItemServerRpc(string itemId, SlotGameObjectName slotGameObjectName)
         {
-            var slotsToSend = new List<string> { slotGameObjectName.ToString() };
-
-            var previousKvp = _equippedItems
-                .FirstOrDefault(x => x.Value.Item != null && x.Value?.Item.Id == itemId);
-
-            var previouslyInSlot = previousKvp.Value != null ? (SlotGameObjectName?)previousKvp.Key : null;
+            if (OwnerClientId == 0)
+            {
+                PlayerDataNeedsSaving();
+                return;
+            }
 
             var item = _items[itemId];
 
-            if (!string.IsNullOrWhiteSpace(itemId) && previouslyInSlot.HasValue)
-            {
-                if (previouslyInSlot.Value != slotGameObjectName)
-                {
-                    slotsToSend.Add(previouslyInSlot.Value.ToString());
-                }
+            var slotChange = HandleSlotChange(item, slotGameObjectName);
 
-                _equippedItems[previouslyInSlot.Value].Item = null;
-            }
-
-            var wasEquipped = false;
-            if (!previouslyInSlot.HasValue || previouslyInSlot.Value != slotGameObjectName)
-            {
-                SetEquippedItem(item, slotGameObjectName);
-                wasEquipped = true;
-            }
-
-            if (slotGameObjectName == SlotGameObjectName.LeftHand || slotGameObjectName == SlotGameObjectName.RightHand)
-            {
-                var otherHandSlot = slotGameObjectName == SlotGameObjectName.LeftHand
-                    ? SlotGameObjectName.RightHand
-                    : SlotGameObjectName.LeftHand;
-
-                if (item is Weapon weapon && weapon.IsTwoHanded)
-                {
-                    SetEquippedItem(null, otherHandSlot);
-                    slotsToSend.Add(otherHandSlot.ToString());
-                }
-                else
-                {
-                    var itemInOtherHand = GetItemInSlot(otherHandSlot);
-                    if (itemInOtherHand is Weapon otherWeapon && otherWeapon.IsTwoHanded)
-                    {
-                        SetEquippedItem(null, otherHandSlot);
-                        slotsToSend.Add(otherHandSlot.ToString());
-                    }
-                }
-            }
-
-            var saveData = _userRegistry.PlayerData[_playerState.Username];
-            saveData.Inventory = GetSaveData();
-            saveData.IsDirty = true;
+            var saveData = PlayerDataNeedsSaving();
 
             var invChange = new InventoryChanges
             {
-                EquippedItems = saveData.Inventory.EquippedItems.Where(x => slotsToSend.Contains(x.Key)).ToArray()
+                EquippedItems = saveData.Inventory.EquippedItems.Where(x => slotChange.SlotsToSend.Contains(x.Key)).ToArray()
             };
 
-            if (wasEquipped)
+            if (slotChange.WasEquipped)
             {
                 InventoryDataHelper.PopulateInventoryChangesWithItem(invChange, item);
             }
 
-            //todo: use ForNearbyPlayersExcept() once CharacterMenuUiEquipmentTab does what it needs to without this ClientRpc
-            var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
+            var nearbyClients = _rpcHelper.ForNearbyPlayersExcept(transform.position, OwnerClientId);
             foreach (var message in FragmentedMessageReconstructor.GetFragmentedMessages(invChange))
             {
                 ApplyEquipChangeClientRpc(message, nearbyClients);
@@ -211,6 +171,65 @@ namespace FullPotential.Core.PlayerBehaviours
         }
 
         #endregion
+
+        public (bool WasEquipped, List<string> SlotsToSend) HandleSlotChange(ItemBase item, SlotGameObjectName slotGameObjectName)
+        {
+            var slotsToSend = new List<string> { slotGameObjectName.ToString() };
+
+            var previousKvp = _equippedItems
+                .FirstOrDefault(x => x.Value.Item != null && x.Value?.Item.Id == item.Id);
+
+            var previouslyInSlot = previousKvp.Value != null ? (SlotGameObjectName?)previousKvp.Key : null;
+
+            if (previouslyInSlot.HasValue)
+            {
+                if (previouslyInSlot.Value != slotGameObjectName)
+                {
+                    slotsToSend.Add(previouslyInSlot.Value.ToString());
+                }
+
+                _equippedItems[previouslyInSlot.Value].Item = null;
+            }
+
+            var wasEquipped = false;
+            if (!previouslyInSlot.HasValue || previouslyInSlot.Value != slotGameObjectName)
+            {
+                SetEquippedItem(item, slotGameObjectName);
+                wasEquipped = true;
+            }
+
+            if (slotGameObjectName == SlotGameObjectName.LeftHand || slotGameObjectName == SlotGameObjectName.RightHand)
+            {
+                var otherHandSlot = slotGameObjectName == SlotGameObjectName.LeftHand
+                    ? SlotGameObjectName.RightHand
+                    : SlotGameObjectName.LeftHand;
+
+                if (item is Weapon weapon && weapon.IsTwoHanded)
+                {
+                    SetEquippedItem(null, otherHandSlot);
+                    slotsToSend.Add(otherHandSlot.ToString());
+                }
+                else
+                {
+                    var itemInOtherHand = GetItemInSlot(otherHandSlot);
+                    if (itemInOtherHand is Weapon otherWeapon && otherWeapon.IsTwoHanded)
+                    {
+                        SetEquippedItem(null, otherHandSlot);
+                        slotsToSend.Add(otherHandSlot.ToString());
+                    }
+                }
+            }
+
+            return (wasEquipped, slotsToSend);
+        }
+
+        private PlayerData PlayerDataNeedsSaving()
+        {
+            var playerData = _userRegistry.PlayerData[_playerState.Username];
+            playerData.Inventory = GetSaveData();
+            playerData.IsDirty = true;
+            return playerData;
+        }
 
         private IEnumerator ResetEquipmentUi()
         {
@@ -317,9 +336,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (IsServer)
             {
-                var saveData = _userRegistry.PlayerData[_playerState.Username];
-                saveData.Inventory = GetSaveData();
-                saveData.IsDirty = true;
+                PlayerDataNeedsSaving();
             }
         }
 
@@ -532,7 +549,7 @@ namespace FullPotential.Core.PlayerBehaviours
             _equippedItems[slotGameObjectName].GameObject = null;
         }
 
-        private void SpawnEquippedObject(ItemBase item, SlotGameObjectName slotGameObjectName)
+        public void SpawnEquippedObject(ItemBase item, SlotGameObjectName slotGameObjectName)
         {
             DespawnEquippedObject(slotGameObjectName);
 
@@ -546,8 +563,8 @@ namespace FullPotential.Core.PlayerBehaviours
                     {
                         case SlotGameObjectName.LeftHand:
                         case SlotGameObjectName.RightHand:
-                            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHand(isLeftHand, null);
-                            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(isLeftHand, null);
+                            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandDescription(isLeftHand, null);
+                            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, null);
                             break;
                     }
                 }
@@ -600,7 +617,7 @@ namespace FullPotential.Core.PlayerBehaviours
             if (IsOwner)
             {
                 var contents = _resultFactory.GetItemDescription(item);
-                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHand(isLeftHand, contents);
+                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandDescription(isLeftHand, contents);
             }
 
             if (!NetworkManager.Singleton.IsClient)
@@ -642,7 +659,7 @@ namespace FullPotential.Core.PlayerBehaviours
                         _playerState.HandStatusRight = newAmmoStatus;
                     }
 
-                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(isLeftHand, newAmmoStatus);
+                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, newAmmoStatus);
 
                     break;
 
@@ -655,7 +672,7 @@ namespace FullPotential.Core.PlayerBehaviours
                         }
                     );
 
-                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(isLeftHand, null);
+                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, null);
 
                     break;
 

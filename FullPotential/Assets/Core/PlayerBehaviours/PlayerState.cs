@@ -228,7 +228,7 @@ namespace FullPotential.Core.PlayerBehaviours
                     HandStatusLeft.Ammo = HandStatusLeft.AmmoMax;
                     HandStatusLeft.IsReloading = false;
 
-                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(true, HandStatusLeft);
+                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(true, HandStatusLeft);
                     ReloadCompleteClientRpc(true, _clientRpcParams);
                 }
                 else if (HandStatusRight.IsReloading && HandStatusRight.Ammo < HandStatusRight.AmmoMax)
@@ -236,7 +236,7 @@ namespace FullPotential.Core.PlayerBehaviours
                     HandStatusRight.Ammo = HandStatusRight.AmmoMax;
                     HandStatusRight.IsReloading = false;
 
-                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(false, HandStatusRight);
+                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(false, HandStatusRight);
                     ReloadCompleteClientRpc(false, _clientRpcParams);
                 }
             });
@@ -469,7 +469,7 @@ namespace FullPotential.Core.PlayerBehaviours
             leftOrRight.Ammo = leftOrRight.AmmoMax;
             leftOrRight.IsReloading = false;
 
-            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(isLeftHand, leftOrRight);
+            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, leftOrRight);
         }
 
         // ReSharper disable once UnusedParameter.Global

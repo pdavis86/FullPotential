@@ -536,7 +536,7 @@ namespace FullPotential.Core.PlayerBehaviours
             //todo: attribute-based ammo consumption
             ammoState.Ammo -= 1;
 
-            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(isLeftHand, ammoState);
+            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, ammoState);
 
             var leftOrRight = isLeftHand
                 ? _playerState.Positions.LeftHandInFront
@@ -680,7 +680,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 if (ammoState.Ammo > 0)
                 {
                     ammoState.Ammo -= 1;
-                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateAmmo(isLeftHand, ammoState);
+                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, ammoState);
                 }
             }
 
