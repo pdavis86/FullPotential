@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using UnityEngine;
 
-namespace FullPotential.Api.Helpers
+namespace FullPotential.Api.Unity.Helpers
 {
     public static class GameObjectHelper
     {

@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Data
+﻿namespace FullPotential.Api.GameManagement.Data
 {
     [System.Serializable]
     public class AppOptions

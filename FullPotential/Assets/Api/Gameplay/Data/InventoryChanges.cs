@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Data
+﻿namespace FullPotential.Api.Gameplay.Data
 {
     [System.Serializable]
     public class InventoryChanges : InventoryData

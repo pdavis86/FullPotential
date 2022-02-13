@@ -1,6 +1,6 @@
 ﻿// ReSharper disable UnusedMember.Global
 
-namespace FullPotential.Api.Constants
+namespace FullPotential.Api.Unity.Constants
 {
     public static class Layers
     {

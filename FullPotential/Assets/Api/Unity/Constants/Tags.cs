@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Constants
+﻿namespace FullPotential.Api.Unity.Constants
 {
     public static class Tags
     {

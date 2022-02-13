@@ -1,6 +1,6 @@
 ﻿// ReSharper disable UnusedMemberInSuper.Global
 
-namespace FullPotential.Api.Combat
+namespace FullPotential.Api.Gameplay.Combat
 {
     public interface IDefensible
     {

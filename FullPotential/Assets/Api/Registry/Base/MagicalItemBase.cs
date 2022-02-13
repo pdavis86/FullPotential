@@ -3,7 +3,7 @@
 namespace FullPotential.Api.Registry.Base
 {
     [System.Serializable]
-    public class MagicalItemBase : ItemBase, IMagical
+    public abstract class MagicalItemBase : ItemBase, IMagical
     {
         public string TargetingTypeName;
         public string ShapeTypeName;

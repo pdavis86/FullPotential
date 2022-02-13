@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Combat;
+﻿using FullPotential.Api.Gameplay.Combat;
 
 namespace FullPotential.Api.Registry.Gear
 {

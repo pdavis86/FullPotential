@@ -1,7 +1,7 @@
 ﻿using FullPotential.Api.Registry.Spells;
 using UnityEngine;
 
-namespace FullPotential.Api.Data
+namespace FullPotential.Api.Gameplay.Data
 {
     public class PlayerHandStatus
     {

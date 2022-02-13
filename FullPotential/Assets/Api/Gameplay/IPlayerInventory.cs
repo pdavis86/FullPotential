@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using FullPotential.Api.Combat;
-using FullPotential.Api.Enums;
+using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 

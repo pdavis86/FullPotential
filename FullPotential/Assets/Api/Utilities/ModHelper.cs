@@ -1,6 +1,6 @@
 ﻿using FullPotential.Api.GameManagement;
 
-namespace FullPotential.Api
+namespace FullPotential.Api.Utilities
 {
     public static class ModHelper
     {

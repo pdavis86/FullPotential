@@ -3,7 +3,7 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnassignedField.Global
 
-namespace FullPotential.Api.GameManagement
+namespace FullPotential.Core.Behaviours.GameManagement
 {
     public class Prefabs : MonoBehaviour
     {

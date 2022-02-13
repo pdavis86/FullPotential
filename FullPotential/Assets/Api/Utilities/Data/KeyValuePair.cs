@@ -2,7 +2,7 @@
 
 // ReSharper disable InconsistentNaming
 
-namespace FullPotential.Api.Data
+namespace FullPotential.Api.Utilities.Data
 {
     [Serializable]
     public struct KeyValuePair<K, V>

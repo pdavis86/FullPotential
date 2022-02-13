@@ -1,9 +1,9 @@
-﻿using FullPotential.Api.Data;
+﻿using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Spells;
 
-namespace FullPotential.Api.Helpers
+namespace FullPotential.Api.Gameplay.Helpers
 {
     public static class InventoryDataHelper
     {

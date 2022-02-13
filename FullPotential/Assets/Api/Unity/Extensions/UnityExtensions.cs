@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FullPotential.Api.Extensions
+namespace FullPotential.Api.Unity.Extensions
 {
     public static class UnityExtensions
     {

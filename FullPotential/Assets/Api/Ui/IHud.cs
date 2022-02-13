@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Data;
+﻿using FullPotential.Api.Gameplay.Data;
 
 namespace FullPotential.Api.Ui
 {

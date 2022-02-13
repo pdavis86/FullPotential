@@ -1,8 +1,8 @@
-﻿using FullPotential.Api.Enums;
+﻿using FullPotential.Api.Gameplay.Enums;
 
 // ReSharper disable UnusedMemberInSuper.Global
 
-namespace FullPotential.Api.Combat
+namespace FullPotential.Api.Gameplay.Combat
 {
     public interface IDamageable
     {

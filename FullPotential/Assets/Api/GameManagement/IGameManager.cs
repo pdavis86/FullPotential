@@ -1,6 +1,4 @@
-﻿using FullPotential.Api.Data;
-using FullPotential.Api.Gameplay;
-using FullPotential.Api.Registry;
+﻿using FullPotential.Api.GameManagement.Data;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Ui;
 using Unity.Netcode;
@@ -10,17 +8,13 @@ namespace FullPotential.Api.GameManagement
 {
     public interface IGameManager
     {
-        IAttackHelper AttackHelper { get; }
-
-        IRpcHelper RpcHelper { get; }
-
-        ISceneBehaviour SceneBehaviour { get; }
-
         AppOptions AppOptions { get; }
 
-        IUserInterface UserInterface { get; }
+        T GetService<T>();
 
-        ITypeRegistry TypeRegistry { get; }
+        ISceneBehaviour GetSceneBehaviour();
+
+        IUserInterface GetUserInterface();
 
         void SpawnPlayerNetworkObject(string playerToken, Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default);
 
