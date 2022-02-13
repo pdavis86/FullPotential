@@ -12,6 +12,7 @@ namespace FullPotential.Api.Registry.Base
         public string Name;
         public Attributes Attributes;
         public string[] EffectIds;
+        public bool IsTwoHanded;
 
         private List<IEffect> _effects;
         public List<IEffect> Effects
