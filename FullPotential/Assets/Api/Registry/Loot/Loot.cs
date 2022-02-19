@@ -1,9 +1,9 @@
-﻿using FullPotential.Api.Registry.Base;
+﻿using FullPotential.Api.Registry.SpellsAndGadgets;
 
 namespace FullPotential.Api.Registry.Loot
 {
     [System.Serializable]
-    public class Loot : MagicalItemBase
+    public class Loot : SpellOrGadgetItemBase
     {
     }
 }

@@ -347,33 +347,33 @@
 
 
     {
-      "Key": "spell.shape.wall",
+      "Key": "shape.wall",
       "Value": "Wall"
     },
     {
-      "Key": "spell.shape.zone",
+      "Key": "shape.zone",
       "Value": "Zone"
     },
 
 
     {
-      "Key": "spell.targeting.beam",
+      "Key": "targeting.beam",
       "Value": "Beam"
     },
     {
-      "Key": "spell.targeting.cone",
+      "Key": "targeting.cone",
       "Value": "Cone"
     },
     {
-      "Key": "spell.targeting.projectile",
+      "Key": "targeting.projectile",
       "Value": "Projectile"
     },
     {
-      "Key": "spell.targeting.self",
+      "Key": "targeting.self",
       "Value": "Self"
     },
     {
-      "Key": "spell.targeting.touch",
+      "Key": "targeting.touch",
       "Value": "Touch"
     }
 	

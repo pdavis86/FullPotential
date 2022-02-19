@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Registry.Spells;
+﻿using FullPotential.Api.Registry.SpellsAndGadgets;
 using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Data

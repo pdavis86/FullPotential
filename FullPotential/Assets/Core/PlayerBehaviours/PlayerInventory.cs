@@ -12,7 +12,7 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
-using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities.Extensions;
@@ -406,16 +406,16 @@ namespace FullPotential.Core.PlayerBehaviours
                 item.RegistryType = typeRegistry.GetRegisteredForItem(item);
             }
 
-            if (item is MagicalItemBase magicalItem)
+            if (item is SpellOrGadgetItemBase magicalItem)
             {
                 var resultFactory = GameManager.Instance.GetService<ResultFactory>();
                 if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeName))
                 {
-                    magicalItem.Shape = resultFactory.GetSpellShape(magicalItem.ShapeTypeName);
+                    magicalItem.Shape = resultFactory.GetShape(magicalItem.ShapeTypeName);
                 }
                 if (!string.IsNullOrWhiteSpace(magicalItem.TargetingTypeName))
                 {
-                    magicalItem.Targeting = resultFactory.GetSpellTargeting(magicalItem.TargetingTypeName);
+                    magicalItem.Targeting = resultFactory.GetTargeting(magicalItem.TargetingTypeName);
                 }
             }
 
@@ -663,15 +663,13 @@ namespace FullPotential.Core.PlayerBehaviours
 
                     break;
 
-                case Spell spell:
-                    _typeRegistry.LoadAddessable(
-                        spell.Targeting.IdlePrefabAddress,
-                        prefab =>
-                        {
-                            InstantiateInPlayerHand(prefab, isLeftHand, null, slotGameObjectName);
-                        }
-                    );
+                case Spell:
+                case Gadget:
+                    var prefab = item is Spell
+                        ? GameManager.Instance.Prefabs.Combat.SpellInHand
+                        : GameManager.Instance.Prefabs.Combat.GadgetInHand;
 
+                    InstantiateInPlayerHand(prefab, isLeftHand, null, slotGameObjectName);
                     GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, null);
 
                     break;

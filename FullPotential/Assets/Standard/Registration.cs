@@ -10,15 +10,36 @@ namespace FullPotential.Standard
         {
             return new[]
             {
-                typeof(Accessories.Amulet),
-                typeof(Accessories.Belt),
-                typeof(Accessories.Ring),
-
                 typeof(Armor.Helm),
                 typeof(Armor.Chest),
                 typeof(Armor.Legs),
                 typeof(Armor.Feet),
                 typeof(Armor.Barrier),
+
+                typeof(Weapons.Axe),
+                typeof(Weapons.Bow),
+                typeof(Weapons.Crossbow),
+                typeof(Weapons.Dagger),
+                typeof(Weapons.Gun),
+                typeof(Weapons.Hammer),
+                typeof(Weapons.Shield),
+                typeof(Weapons.Staff),
+                typeof(Weapons.Sword),
+
+                typeof(Accessories.Amulet),
+                typeof(Accessories.Belt),
+                typeof(Accessories.Ring),
+
+                typeof(Loot.Scrap),
+                typeof(Loot.Shard),
+
+                typeof(SpellsAndGadgets.Shapes.Wall),
+                typeof(SpellsAndGadgets.Shapes.Zone),
+                
+                typeof(SpellsAndGadgets.Targeting.Projectile),
+                typeof(SpellsAndGadgets.Targeting.Beam),
+                typeof(SpellsAndGadgets.Targeting.Self),
+                typeof(SpellsAndGadgets.Targeting.Touch),
 
                 typeof(Effects.Buffs.Courage),
                 typeof(Effects.Buffs.Focus),
@@ -54,27 +75,6 @@ namespace FullPotential.Standard
                 typeof(Effects.Support.Reflect),
                 typeof(Effects.Support.Soften),
                 typeof(Effects.Support.Summon),
-
-                typeof(Loot.Scrap),
-                typeof(Loot.Shard),
-
-                typeof(Weapons.Axe),
-                typeof(Weapons.Bow),
-                typeof(Weapons.Crossbow),
-                typeof(Weapons.Dagger),
-                typeof(Weapons.Gun),
-                typeof(Weapons.Hammer),
-                typeof(Weapons.Shield),
-                typeof(Weapons.Staff),
-                typeof(Weapons.Sword),
-
-                typeof(Spells.Shapes.Wall),
-                typeof(Spells.Shapes.Zone),
-                
-                typeof(Spells.Targeting.Projectile),
-                typeof(Spells.Targeting.Beam),
-                typeof(Spells.Targeting.Self),
-                typeof(Spells.Targeting.Touch)
             };
         }
     }

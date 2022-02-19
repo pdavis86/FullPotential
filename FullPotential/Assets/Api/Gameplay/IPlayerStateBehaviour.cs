@@ -1,5 +1,5 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Registry.SpellsAndGadgets;
 using UnityEngine;
 
 namespace FullPotential.Api.Gameplay
@@ -16,6 +16,6 @@ namespace FullPotential.Api.Gameplay
 
         void SpawnLootChest(Vector3 position);
 
-        bool SpendMana(Spell activeSpell, bool slowDrain = false);
+        bool ConsumeResource(SpellOrGadgetItemBase spellOrGadget, bool slowDrain = false);
     }
 }

@@ -4,11 +4,12 @@ using System.Linq;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
-using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Localization;
+using FullPotential.Core.Localization.Enums;
 using FullPotential.Core.PlayerBehaviours;
 using FullPotential.Core.UiBehaviours.Components;
 using UnityEngine;
@@ -65,15 +66,16 @@ namespace FullPotential.Core.UiBehaviours
 
             _craftingCategories = new Dictionary<Type, string>
             {
-                { typeof(Weapon), localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Weapon)) },
-                { typeof(Armor), localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Armor)) },
-                { typeof(Accessory), localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Accessory)) },
-                { typeof(Spell), localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Spell)) }
+                { typeof(Weapon), localizer.Translate(TranslationType.CraftingCategory, nameof(Weapon)) },
+                { typeof(Armor), localizer.Translate(TranslationType.CraftingCategory, nameof(Armor)) },
+                { typeof(Accessory), localizer.Translate(TranslationType.CraftingCategory, nameof(Accessory)) },
+                { typeof(Spell), localizer.Translate(TranslationType.CraftingCategory, nameof(Spell)) },
+                { typeof(Gadget), localizer.Translate(TranslationType.CraftingCategory, nameof(Gadget)) }
             };
 
             _handednessOptions = new List<string> {
-                { localizer.Translate(Localizer.TranslationType.WeaponHandedness, "one") },
-                { localizer.Translate(Localizer.TranslationType.WeaponHandedness, "two") }
+                { localizer.Translate(TranslationType.CraftingHandedness, "one") },
+                { localizer.Translate(TranslationType.CraftingHandedness, "two") }
             };
 
             var typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();

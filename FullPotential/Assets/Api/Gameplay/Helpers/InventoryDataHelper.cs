@@ -1,7 +1,7 @@
 ﻿using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
-using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Registry.SpellsAndGadgets;
 
 namespace FullPotential.Api.Gameplay.Helpers
 {

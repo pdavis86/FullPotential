@@ -6,7 +6,7 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Enums;
-using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
@@ -75,7 +75,6 @@ namespace FullPotential.Core.PlayerBehaviours
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
         private DelayedAction _consumeStamina;
         private DelayedAction _replenishStamina;
-        private DelayedAction _consumeMana;
         private DelayedAction _replenishMana;
         private DelayedAction _replenishAmmo;
         private bool _isSprinting;
@@ -186,25 +185,6 @@ namespace FullPotential.Core.PlayerBehaviours
                 if (!_isSprinting && Stamina.Value < GetStaminaMax())
                 {
                     Stamina.Value += 1;
-                }
-            });
-
-            //todo: attribute-based mana consumption
-            _consumeMana = new DelayedAction(1f, () =>
-            {
-                //todo: spells need to manage their own mana consumption or this gets complicated 
-
-                if (HandStatusLeft.SpellBeingCastGameObject != null && !SpendMana(HandStatusLeft.SpellBeingCast, HandStatusLeft.SpellBeingCast.Targeting.IsContinuous))
-                {
-                    HandStatusLeft.SpellBeingCastGameObject.GetComponent<ISpellBehaviour>().StopCasting();
-                    var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
-                    StopCastingClientRpc(true, nearbyClients);
-                }
-                if (HandStatusRight.SpellBeingCastGameObject != null && !SpendMana(HandStatusRight.SpellBeingCast, HandStatusRight.SpellBeingCast.Targeting.IsContinuous))
-                {
-                    HandStatusRight.SpellBeingCastGameObject.GetComponent<ISpellBehaviour>().StopCasting();
-                    var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
-                    StopCastingClientRpc(false, nearbyClients);
                 }
             });
 
@@ -601,7 +581,20 @@ namespace FullPotential.Core.PlayerBehaviours
             _replenishMana.TryPerformAction();
 
             _consumeStamina.TryPerformAction();
-            _consumeMana.TryPerformAction();
+
+            //todo: does this go here?
+            //if (HandStatusLeft.SpellBeingCastGameObject != null && !SpendMana(HandStatusLeft.SpellBeingCast, HandStatusLeft.SpellBeingCast.Targeting.IsContinuous))
+            //{
+            //    HandStatusLeft.SpellBeingCastGameObject.GetComponent<ISpellBehaviour>().StopCasting();
+            //    var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
+            //    StopCastingClientRpc(true, nearbyClients);
+            //}
+            //if (HandStatusRight.SpellBeingCastGameObject != null && !SpendMana(HandStatusRight.SpellBeingCast, HandStatusRight.SpellBeingCast.Targeting.IsContinuous))
+            //{
+            //    HandStatusRight.SpellBeingCastGameObject.GetComponent<ISpellBehaviour>().StopCasting();
+            //    var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
+            //    StopCastingClientRpc(false, nearbyClients);
+            //}
         }
 
         private void BecomeVulnerable()
@@ -803,21 +796,43 @@ namespace FullPotential.Core.PlayerBehaviours
             ApplyMaterial(newMat);
         }
 
-        public bool SpendMana(Spell activeSpell, bool slowDrain = false)
+        private (NetworkVariable<int> Variable, int? Cost)? GetResourceVariableAndCost(SpellOrGadgetItemBase spellOrGadget)
         {
-            var manaCost = GetManaCost(activeSpell);
+            switch (spellOrGadget.ResourceConsumptionType)
+            {
+                case ResourceConsumptionType.Mana:
+                    return (Mana, GetManaCost(spellOrGadget));
+
+                default:
+                    Debug.LogError("Not yet implemented GetResourceVariable() for resource type " + spellOrGadget.ResourceConsumptionType);
+                    return null;
+            }
+        }
+
+        public bool ConsumeResource(SpellOrGadgetItemBase spellOrGadget, bool slowDrain = false)
+        {
+            var tuple = GetResourceVariableAndCost(spellOrGadget);
+
+            if (!tuple.HasValue || !tuple.Value.Cost.HasValue)
+            {
+                Debug.LogError("Failed to get GetResourceVariableAndCost");
+                return false;
+            }
+
+            var resourceCost = tuple.Value.Cost.Value;
+            var resourceVariable = tuple.Value.Variable;
 
             if (slowDrain)
             {
-                manaCost /= 10;
+                resourceCost /= 10;
             }
 
-            if (Mana.Value < manaCost)
+            if (resourceVariable.Value < resourceCost)
             {
                 return false;
             }
 
-            Mana.Value -= manaCost;
+            resourceVariable.Value -= resourceCost;
 
             return true;
         }
@@ -848,7 +863,7 @@ namespace FullPotential.Core.PlayerBehaviours
             return 100;
         }
 
-        public int GetManaCost(Spell activeSpell)
+        public int GetManaCost(SpellOrGadgetItemBase spellOrGadget)
         {
             return 20;
         }

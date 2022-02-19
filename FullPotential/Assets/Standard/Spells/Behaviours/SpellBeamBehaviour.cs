@@ -1,5 +1,5 @@
 ﻿using FullPotential.Api.Gameplay;
-using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities;
@@ -10,9 +10,9 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Spells.Behaviours
 {
-    public class SpellBeamBehaviour : MonoBehaviour, ISpellBehaviour
+    public class SpellBeamBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
-        public Spell Spell;
+        public SpellOrGadgetItemBase SpellOrGadget;
         public IPlayerStateBehaviour SourceStateBehaviour;
         public bool IsLeftHand;
 
@@ -27,7 +27,7 @@ namespace FullPotential.Standard.Spells.Behaviours
         private Transform _cylinderTransform;
         private RaycastHit _hit;
         private DelayedAction _applyEffectsAction;
-        private DelayedAction _consumeManaAction;
+        private DelayedAction _consumeResourceAction;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -41,9 +41,9 @@ namespace FullPotential.Standard.Spells.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            if (Spell == null)
+            if (SpellOrGadget == null)
             {
-                Debug.LogError("No spell has been set");
+                Debug.LogError("No SpellOrGadget has been set");
                 Destroy(gameObject);
                 return;
             }
@@ -65,8 +65,8 @@ namespace FullPotential.Standard.Spells.Behaviours
             }
 
             //todo: attribute-based timings
-            _applyEffectsAction = new DelayedAction(1f, () => ApplySpellEffects(_hit.transform.gameObject, _hit.point));
-            _consumeManaAction = new DelayedAction(0.2f, () => SourceStateBehaviour.SpendMana(Spell, true));
+            _applyEffectsAction = new DelayedAction(1f, () => ApplyEffects(_hit.transform.gameObject, _hit.point));
+            _consumeResourceAction = new DelayedAction(0.2f, () => SourceStateBehaviour.ConsumeResource(SpellOrGadget, true));
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -92,7 +92,7 @@ namespace FullPotential.Standard.Spells.Behaviours
                 if (NetworkManager.Singleton.IsServer)
                 {
                     var hitTarget = _applyEffectsAction.TryPerformAction();
-                    SourceStateBehaviour.SpendMana(Spell, !hitTarget);
+                    SourceStateBehaviour.ConsumeResource(SpellOrGadget, !hitTarget);
                 }
 
                 targetDirection = (hit.point - _cylinderParentTransform.position).normalized;
@@ -105,7 +105,7 @@ namespace FullPotential.Standard.Spells.Behaviours
 
                 if (NetworkManager.Singleton.IsServer)
                 {
-                    _consumeManaAction.TryPerformAction();
+                    _consumeResourceAction.TryPerformAction();
                 }
             }
 
@@ -124,19 +124,19 @@ namespace FullPotential.Standard.Spells.Behaviours
             //Nothing here
         }
 
-        public void StopCasting()
+        public void Stop()
         {
             Destroy(gameObject);
         }
 
-        public void ApplySpellEffects(GameObject target, Vector3? position)
+        public void ApplyEffects(GameObject target, Vector3? position)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
                 return;
             }
 
-            _attackHelper.DealDamage(_sourcePlayer, Spell, target, position);
+            _attackHelper.DealDamage(_sourcePlayer, SpellOrGadget, target, position);
         }
 
         private void PerformGraphicsAdjustments()

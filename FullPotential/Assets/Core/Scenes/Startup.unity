@@ -2618,43 +2618,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.main.settings
---- !u!1 &480093498
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 480093499}
-  m_Layer: 5
-  m_Name: HealthBarContainer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &480093499
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 480093498}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 2107654876}
-  m_Father: {fileID: 7011060654785410895}
-  m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: -106.15, y: 0.5}
-  m_SizeDelta: {x: 212.30261, y: 40.6451}
-  m_Pivot: {x: 0, y: 0}
 --- !u!1 &503269632
 GameObject:
   m_ObjectHideFlags: 0
@@ -9822,7 +9785,7 @@ PrefabInstance:
     - target: {fileID: 8011148014962034056, guid: 5cae4756fd521a347add7f21283a21a2,
         type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8011148014962034056, guid: 5cae4756fd521a347add7f21283a21a2,
         type: 3}
@@ -9922,12 +9885,12 @@ PrefabInstance:
     - target: {fileID: 8011148015258623000, guid: 5cae4756fd521a347add7f21283a21a2,
         type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8011148015258623000, guid: 5cae4756fd521a347add7f21283a21a2,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5cae4756fd521a347add7f21283a21a2, type: 3}
@@ -9980,7 +9943,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7011060654785410895}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
@@ -10123,7 +10086,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7011060654785410895}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -10846,12 +10809,12 @@ PrefabInstance:
     - target: {fileID: 5823982482648248902, guid: 6e1ed3f35f27c6b4587ed0bc59d04f52,
         type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5823982482648248902, guid: 6e1ed3f35f27c6b4587ed0bc59d04f52,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5823982484088105942, guid: 6e1ed3f35f27c6b4587ed0bc59d04f52,
         type: 3}
@@ -11433,7 +11396,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1879450924}
   m_Layer: 5
-  m_Name: StaminaBarContainer
+  m_Name: LeftBarsContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11451,14 +11414,15 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 2107654876}
   - {fileID: 1672944697}
   m_Father: {fileID: 7011060654785410895}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 107.5, y: 20.5}
-  m_SizeDelta: {x: 215, y: 41}
+  m_AnchoredPosition: {x: 107.5, y: 22.904999}
+  m_SizeDelta: {x: 215, y: 45.81}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1888452148
 GameObject:
@@ -12404,7 +12368,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2023004451}
   m_Layer: 5
-  m_Name: ManaBarContainer
+  m_Name: RightBarsContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12424,7 +12388,7 @@ RectTransform:
   m_Children:
   - {fileID: 1809368270}
   m_Father: {fileID: 7011060654785410895}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
@@ -13127,7 +13091,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 480093499}
+    m_TransformParent: {fileID: 1879450924}
     m_Modifications:
     - target: {fileID: 6070853217532367212, guid: 885fcf4cc83eb934c8b19213c1e83ef1,
         type: 3}
@@ -13202,17 +13166,17 @@ PrefabInstance:
     - target: {fileID: 6070853217532367213, guid: 885fcf4cc83eb934c8b19213c1e83ef1,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 6070853217532367213, guid: 885fcf4cc83eb934c8b19213c1e83ef1,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 6070853217532367213, guid: 885fcf4cc83eb934c8b19213c1e83ef1,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 6070853217532367213, guid: 885fcf4cc83eb934c8b19213c1e83ef1,
         type: 3}
@@ -13222,7 +13186,7 @@ PrefabInstance:
     - target: {fileID: 6070853217532367213, guid: 885fcf4cc83eb934c8b19213c1e83ef1,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 6070853217532367213, guid: 885fcf4cc83eb934c8b19213c1e83ef1,
         type: 3}
@@ -13242,12 +13206,12 @@ PrefabInstance:
     - target: {fileID: 6070853218378598653, guid: 885fcf4cc83eb934c8b19213c1e83ef1,
         type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6070853218378598653, guid: 885fcf4cc83eb934c8b19213c1e83ef1,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 885fcf4cc83eb934c8b19213c1e83ef1, type: 3}
@@ -13397,6 +13361,9 @@ MonoBehaviour:
   Combat:
     ProjectileWithTrail: {fileID: 4563083350583329192, guid: 92356876fd6de514e9c2f4e4bdea6cc0,
       type: 3}
+    SpellInHand: {fileID: 5923469330004543499, guid: 404031c7fdd421f4295a39230469eb19,
+      type: 3}
+    GadgetInHand: {fileID: 0}
   Environment:
     LootChest: {fileID: 6779003295890321588, guid: 0da494cf737d72c44b603f7a79174481,
       type: 3}
@@ -17943,7 +17910,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &7011060654785410895
 RectTransform:
   m_ObjectHideFlags: 0
@@ -17962,7 +17929,6 @@ RectTransform:
   - {fileID: 2002564664}
   - {fileID: 1888452149}
   - {fileID: 1879450924}
-  - {fileID: 480093499}
   - {fileID: 2023004451}
   - {fileID: 1715200631}
   - {fileID: 1678711890}

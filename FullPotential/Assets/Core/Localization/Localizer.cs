@@ -1,12 +1,14 @@
 ﻿using FullPotential.Api.Registry;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
-using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Core.Localization.Enums;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -132,29 +134,22 @@ namespace FullPotential.Core.Localization
             if (registeredItem is IGearWeapon) { return Translate("weapon." + registeredItem.TypeName); }
             if (registeredItem is ILoot) { return Translate("loot." + registeredItem.TypeName); }
             if (registeredItem is IEffect) { return Translate("effect." + registeredItem.TypeName); }
-            if (registeredItem is ISpellShape) { return Translate("spell.shape." + registeredItem.TypeName); }
-            if (registeredItem is ISpellTargeting) { return Translate("spell.targeting." + registeredItem.TypeName); }
+            if (registeredItem is IShape) { return Translate("shape." + registeredItem.TypeName); }
+            if (registeredItem is ITargeting) { return Translate("targeting." + registeredItem.TypeName); }
             return "Unexpected ICraftable type";
         }
 
-        public enum TranslationType
+        private static string[] SplitOnCapitals(string value)
         {
-            CraftingCategory,
-            CraftingNamePrefix,
-            WeaponHandedness,
-            Attribute
+            const string regexSplitOnCapitals = @"(?<!^)(?=[A-Z])";
+            return Regex.Split(value, regexSplitOnCapitals);
         }
 
         public string Translate(TranslationType type, string suffix)
         {
-            switch (type)
-            {
-                case TranslationType.CraftingCategory: return Translate("crafting.category." + suffix);
-                case TranslationType.CraftingNamePrefix: return Translate("crafting.name.prefix." + suffix);
-                case TranslationType.WeaponHandedness: return Translate("crafting.handedness." + suffix);
-                case TranslationType.Attribute: return Translate("attribute." + suffix);
-                default: return "Unexpected translation type";
-            }
+            var split = SplitOnCapitals(type.ToString());
+            var translationKey = string.Join('.', split) + '.' + suffix;
+            return Translate(translationKey);
         }
 
     }

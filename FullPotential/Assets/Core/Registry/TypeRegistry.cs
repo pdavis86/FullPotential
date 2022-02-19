@@ -6,7 +6,7 @@ using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
-using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Registry.SpellsAndGadgets;
 using UnityEngine.AddressableAssets;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -20,8 +20,8 @@ namespace FullPotential.Core.Registry
         private readonly List<IGearWeapon> _weapons = new List<IGearWeapon>();
         private readonly List<ILoot> _loot = new List<ILoot>();
         private readonly List<IEffect> _effects = new List<IEffect>();
-        private readonly List<ISpellShape> _shapes = new List<ISpellShape>();
-        private readonly List<ISpellTargeting> _targeting = new List<ISpellTargeting>();
+        private readonly List<IShape> _shapes = new List<IShape>();
+        private readonly List<ITargeting> _targeting = new List<ITargeting>();
         private readonly Dictionary<string, UnityEngine.GameObject> _loadedAddressables = new Dictionary<string, UnityEngine.GameObject>();
 
         public void FindAndRegisterAll()
@@ -68,12 +68,12 @@ namespace FullPotential.Core.Registry
                 Register(_effects, effect);
                 return;
             }
-            if (toRegister is ISpellShape shape)
+            if (toRegister is IShape shape)
             {
                 Register(_shapes, shape);
                 return;
             }
-            if (toRegister is ISpellTargeting targeting)
+            if (toRegister is ITargeting targeting)
             {
                 Register(_targeting, targeting);
                 return;
@@ -104,8 +104,8 @@ namespace FullPotential.Core.Registry
                 case nameof(IGearWeapon): return (IEnumerable<T>)_weapons;
                 case nameof(ILoot): return (IEnumerable<T>)_loot;
                 case nameof(IEffect): return (IEnumerable<T>)_effects;
-                case nameof(ISpellShape): return (IEnumerable<T>)_shapes;
-                case nameof(ISpellTargeting): return (IEnumerable<T>)_targeting;
+                case nameof(IShape): return (IEnumerable<T>)_shapes;
+                case nameof(ITargeting): return (IEnumerable<T>)_targeting;
                 default: throw new Exception($"Unexpected type {interfaceName}");
             }
         }

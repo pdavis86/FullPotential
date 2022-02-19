@@ -1,10 +1,10 @@
 ﻿using System;
 using FullPotential.Api.Gameplay;
-using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities;
-using FullPotential.Standard.Spells.Shapes;
+using FullPotential.Standard.SpellsAndGadgets.Shapes;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -12,9 +12,9 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Spells.Behaviours
 {
-    public class SpellProjectileBehaviour : MonoBehaviour, ISpellBehaviour
+    public class SpellProjectileBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
-        public Spell Spell;
+        public SpellOrGadgetItemBase SpellOrGadget;
         public IPlayerStateBehaviour SourceStateBehaviour;
         public Vector3 ForwardDirection;
 
@@ -25,7 +25,7 @@ namespace FullPotential.Standard.Spells.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            if (Spell == null)
+            if (SpellOrGadget == null)
             {
                 Debug.LogError("No spell has been set");
                 Destroy(gameObject);
@@ -39,15 +39,15 @@ namespace FullPotential.Standard.Spells.Behaviours
             _attackHelper = ModHelper.GetGameManager().GetService<IAttackHelper>();
 
             //todo: attribute-based cast speed
-            var castSpeed = Spell.Attributes.Speed / 50f;
+            var castSpeed = SpellOrGadget.Attributes.Speed / 50f;
             if (castSpeed < 0.5)
             {
                 castSpeed = 0.5f;
             }
 
-            var affectedByGravity = Spell.Shape != null;
+            var affectedByGravity = SpellOrGadget.Shape != null;
 
-            _shapeType = Spell.Shape?.GetType();
+            _shapeType = SpellOrGadget.Shape?.GetType();
 
             var rigidBody = GetComponent<Rigidbody>();
 
@@ -67,15 +67,15 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
+            ApplyEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
         }
 
-        public void StopCasting()
+        public void Stop()
         {
             //Nothing here
         }
 
-        public void ApplySpellEffects(GameObject target, Vector3? position)
+        public void ApplyEffects(GameObject target, Vector3? position)
         {
             if (!position.HasValue)
             {
@@ -89,7 +89,7 @@ namespace FullPotential.Standard.Spells.Behaviours
                     return;
                 }
 
-                _attackHelper.DealDamage(SourceStateBehaviour.GameObject, Spell, target, position);
+                _attackHelper.DealDamage(SourceStateBehaviour.GameObject, SpellOrGadget, target, position);
             }
             else
             {
@@ -113,15 +113,15 @@ namespace FullPotential.Standard.Spells.Behaviours
                     var rotation = Quaternion.LookRotation(ForwardDirection);
                     rotation.x = 0;
                     rotation.z = 0;
-                    Spell.Shape.SpawnGameObject(Spell, SourceStateBehaviour, spawnPosition, rotation);
+                    SpellOrGadget.Shape.SpawnGameObject(SpellOrGadget, SourceStateBehaviour, spawnPosition, rotation);
                 }
                 else if (_shapeType == typeof(Zone))
                 {
-                    Spell.Shape.SpawnGameObject(Spell, SourceStateBehaviour, spawnPosition, Quaternion.identity);
+                    SpellOrGadget.Shape.SpawnGameObject(SpellOrGadget, SourceStateBehaviour, spawnPosition, Quaternion.identity);
                 }
                 else
                 {
-                    Debug.LogError($"Unexpected secondary effect for spell {Spell.Id} '{Spell.Name}'");
+                    Debug.LogError($"Unexpected secondary effect for spell {SpellOrGadget.Id} '{SpellOrGadget.Name}'");
                 }
             }
 

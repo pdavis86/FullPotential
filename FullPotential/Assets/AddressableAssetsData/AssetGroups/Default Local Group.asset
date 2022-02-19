@@ -114,31 +114,27 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: cd7343b2907f0bb43b33607835902cda
-    m_Address: Standard/Prefabs/Spells/SpellBeam.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 404031c7fdd421f4295a39230469eb19
-    m_Address: Standard/Prefabs/Spells/SpellInHand.prefab
+    m_Address: Standard/Prefabs/SpellOrGadget/Beam.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 7297a77e0760fc442a8de9c1615f5d4c
-    m_Address: Standard/Prefabs/Spells/SpellProjectile.prefab
+    m_Address: Standard/Prefabs/SpellOrGadget/Projectile.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: bd7b43d17a423b84a96eceaa0a28419f
-    m_Address: Standard/Prefabs/Spells/SpellSelf.prefab
+    m_Address: Standard/Prefabs/SpellOrGadget/Self.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: da2c19386588bc24cb34810a8530adc5
-    m_Address: Standard/Prefabs/Spells/SpellWall.prefab
+    m_Address: Standard/Prefabs/SpellOrGadget/Wall.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: b7d2fcaa5eb669840928413506c5b9ea
-    m_Address: Standard/Prefabs/Spells/SpellZone.prefab
+    m_Address: Standard/Prefabs/SpellOrGadget/Zone.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 047241ab43d5e0b4d91c0eaf63455b5f
-    m_Address: Standard/Prefabs/Spells/SpellTouch.prefab
+    m_Address: Standard/Prefabs/SpellOrGadget/Touch.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0

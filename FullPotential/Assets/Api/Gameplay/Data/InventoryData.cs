@@ -1,6 +1,6 @@
 ﻿using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
-using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities.Data;
 
 namespace FullPotential.Api.Gameplay.Data

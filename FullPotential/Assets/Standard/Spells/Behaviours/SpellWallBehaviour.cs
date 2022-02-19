@@ -1,5 +1,5 @@
 using FullPotential.Api.Gameplay;
-using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities;
@@ -10,9 +10,9 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Spells.Behaviours
 {
-    public class SpellWallBehaviour : MonoBehaviour, ISpellBehaviour
+    public class SpellWallBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
-        public Spell Spell;
+        public SpellOrGadgetItemBase SpellOrGadget;
         public IPlayerStateBehaviour SourceStateBehaviour;
 
         private IAttackHelper _attackHelper;
@@ -23,7 +23,7 @@ namespace FullPotential.Standard.Spells.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            if (Spell == null)
+            if (SpellOrGadget == null)
             {
                 Debug.LogError("No spell has been set");
                 Destroy(gameObject);
@@ -61,22 +61,22 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
+            ApplyEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
         }
 
-        public void StopCasting()
+        public void Stop()
         {
             //Nothing here
         }
 
-        public void ApplySpellEffects(GameObject target, Vector3? position)
+        public void ApplyEffects(GameObject target, Vector3? position)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
                 return;
             }
 
-            _attackHelper.DealDamage(SourceStateBehaviour.GameObject, Spell, target, position);
+            _attackHelper.DealDamage(SourceStateBehaviour.GameObject, SpellOrGadget, target, position);
         }
 
     }

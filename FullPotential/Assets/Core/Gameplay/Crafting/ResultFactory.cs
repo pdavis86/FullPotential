@@ -9,8 +9,9 @@ using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
-using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Core.Localization;
+using FullPotential.Core.Localization.Enums;
 using FullPotential.Core.Registry;
 using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.Helpers;
@@ -28,8 +29,8 @@ namespace FullPotential.Core.Gameplay.Crafting
         private readonly Localizer _localizer;
         private readonly List<ILoot> _lootTypes;
         private readonly List<IEffect> _effectsForLoot;
-        private readonly List<ISpellTargeting> _spellTargetingOptions;
-        private readonly List<ISpellShape> _spellShapeOptions;
+        private readonly List<ITargeting> _targetingOptions;
+        private readonly List<IShape> _shapeOptions;
 
         public ResultFactory(ITypeRegistry typeRegistry, Localizer localizer)
         {
@@ -38,8 +39,8 @@ namespace FullPotential.Core.Gameplay.Crafting
 
             _lootTypes = _typeRegistry.GetRegisteredTypes<ILoot>().ToList();
             _effectsForLoot = _typeRegistry.GetLootPossibilities();
-            _spellTargetingOptions = _typeRegistry.GetRegisteredTypes<ISpellTargeting>().ToList();
-            _spellShapeOptions = _typeRegistry.GetRegisteredTypes<ISpellShape>().ToList();
+            _targetingOptions = _typeRegistry.GetRegisteredTypes<ITargeting>().ToList();
+            _shapeOptions = _typeRegistry.GetRegisteredTypes<IShape>().ToList();
         }
 
         private int ComputeAttribute(IEnumerable<ItemBase> components, Func<ItemBase, int> getProp, bool allowMax = true)
@@ -62,30 +63,30 @@ namespace FullPotential.Core.Gameplay.Crafting
             return result == 0 ? 1 : result;
         }
 
-        public ISpellTargeting GetSpellTargeting(string typeName)
+        public ITargeting GetTargeting(string typeName)
         {
-            return _spellTargetingOptions.First(x => x.TypeName == typeName);
+            return _targetingOptions.First(x => x.TypeName == typeName);
         }
 
-        private ISpellTargeting GetSpellTargeting(IEnumerable<IMagical> spellComponents)
+        private ITargeting GetTargeting(IEnumerable<ISpellOrGadget> components)
         {
             //Exactly one targeting option
-            var targetingComponent = spellComponents.FirstOrDefault(x => x.Targeting != null);
+            var targetingComponent = components.FirstOrDefault(x => x.Targeting != null);
 
             if (targetingComponent == null)
             {
-                return _typeRegistry.GetRegisteredTypes<ISpellTargeting>().FirstOrDefault();
+                return _typeRegistry.GetRegisteredTypes<ITargeting>().FirstOrDefault();
             }
 
             return targetingComponent.Targeting;
         }
 
-        public ISpellShape GetSpellShape(string typeName)
+        public IShape GetShape(string typeName)
         {
-            return _spellShapeOptions.First(x => x.TypeName == typeName);
+            return _shapeOptions.First(x => x.TypeName == typeName);
         }
 
-        private ISpellShape GetSpellShape(ISpellTargeting targeting, IEnumerable<IMagical> spellComponents)
+        private IShape GetShapeOrNone(ITargeting targeting, IEnumerable<ISpellOrGadget> components)
         {
             //Only one shape, if any
             if (!targeting.HasShape)
@@ -93,14 +94,14 @@ namespace FullPotential.Core.Gameplay.Crafting
                 return null;
             }
 
-            var shapeComponent = spellComponents.FirstOrDefault(x => x.Shape != null);
+            var shapeComponent = components.FirstOrDefault(x => x.Shape != null);
 
             if (shapeComponent == null)
             {
                 return null;
             }
 
-            return _spellShapeOptions.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
+            return _shapeOptions.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
         }
 
         private List<IEffect> GetEffects(string craftingType, IEnumerable<ItemBase> components)
@@ -134,7 +135,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     .ToList();
             }
 
-            if (craftingType != nameof(Spell))
+            if (craftingType != nameof(Spell) && craftingType != nameof(Gadget))
             {
                 throw new Exception($"Unexpected craftingType '{craftingType}'");
             }
@@ -165,20 +166,20 @@ namespace FullPotential.Core.Gameplay.Crafting
             return _effectsForLoot.ElementAt(_random.Next(0, _effectsForLoot.Count));
         }
 
-        private ISpellTargeting GetRandomSpellTargeting()
+        private ITargeting GetRandomTargetingOrNone()
         {
             if (IsSuccess(50))
             {
-                return _spellTargetingOptions.ElementAt(_random.Next(0, _spellTargetingOptions.Count));
+                return _targetingOptions.ElementAt(_random.Next(0, _targetingOptions.Count));
             }
             return null;
         }
 
-        private ISpellShape GetRandomSpellShape()
+        private IShape GetRandomShapeOrNone()
         {
             if (IsSuccess(10))
             {
-                return _spellShapeOptions.ElementAt(_random.Next(0, _spellShapeOptions.Count));
+                return _shapeOptions.ElementAt(_random.Next(0, _shapeOptions.Count));
             }
             return null;
         }
@@ -237,8 +238,8 @@ namespace FullPotential.Core.Gameplay.Crafting
 
                 lootDrop.Effects = effects.ToList();
 
-                lootDrop.Targeting = GetRandomSpellTargeting();
-                lootDrop.Shape = GetRandomSpellShape();
+                lootDrop.Targeting = GetRandomTargetingOrNone();
+                lootDrop.Shape = GetRandomShapeOrNone();
             }
             else
             {
@@ -255,49 +256,56 @@ namespace FullPotential.Core.Gameplay.Crafting
             return lootDrop;
         }
 
-        private Spell GetSpell(IEnumerable<ItemBase> components)
+        private SpellOrGadgetItemBase GetSpellOrGadget(IEnumerable<ItemBase> components, bool isSpell)
         {
-            var spellComponents = components.OfType<IMagical>();
+            var relevantComponents = components.OfType<ISpellOrGadget>();
 
-            var targeting = GetSpellTargeting(spellComponents);
+            var targeting = GetTargeting(relevantComponents);
 
-            var spell = new Spell
+            SpellOrGadgetItemBase spellOrGadget;
+            if (isSpell)
             {
-                Id = Guid.NewGuid().ToMinimisedString(),
-                Targeting = targeting,
-                Shape = GetSpellShape(targeting, spellComponents),
-                Attributes = new Attributes
-                {
-                    IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                    Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
-                    Range = ComputeAttribute(components, x => x.Attributes.Range),
-                    Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
-                    Speed = ComputeAttribute(components, x => x.Attributes.Speed),
-                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery),
-                    Duration = ComputeAttribute(components, x => x.Attributes.Duration)
-                },
-                Effects = GetEffects(nameof(Spell), components)
-            };
-
-            var suffix = _localizer.Translate(Localizer.TranslationType.CraftingCategory, nameof(Spell));
-
-            if (spell.Effects.Count > 0)
-            {
-                spell.Name = _localizer.GetTranslatedTypeName(spell.Effects.First()) + " " + suffix;
+                spellOrGadget = new Spell();
             }
             else
             {
-                var customSuffix = _localizer.GetTranslatedTypeName(spell.Targeting) + " " + suffix;
-                spell.Name = GetItemName(true, spell, customSuffix);
+                spellOrGadget = new Gadget();
             }
 
-            return spell;
+            spellOrGadget.Id = Guid.NewGuid().ToMinimisedString();
+            spellOrGadget.Targeting = targeting;
+            spellOrGadget.Shape = GetShapeOrNone(targeting, relevantComponents);
+            spellOrGadget.Attributes = new Attributes
+            {
+                IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
+                Strength = ComputeAttribute(components, x => x.Attributes.Strength),
+                Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
+                Range = ComputeAttribute(components, x => x.Attributes.Range),
+                Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
+                Speed = ComputeAttribute(components, x => x.Attributes.Speed),
+                Recovery = ComputeAttribute(components, x => x.Attributes.Recovery),
+                Duration = ComputeAttribute(components, x => x.Attributes.Duration)
+            };
+            spellOrGadget.Effects = GetEffects(nameof(Spell), components);
+
+            var suffix = _localizer.Translate(TranslationType.CraftingCategory, nameof(Spell));
+
+            if (spellOrGadget.Effects.Count > 0)
+            {
+                spellOrGadget.Name = _localizer.GetTranslatedTypeName(spellOrGadget.Effects.First()) + " " + suffix;
+            }
+            else
+            {
+                var customSuffix = _localizer.GetTranslatedTypeName(spellOrGadget.Targeting) + " " + suffix;
+                spellOrGadget.Name = GetItemName(true, spellOrGadget, customSuffix);
+            }
+
+            return spellOrGadget;
         }
 
         private string GetItemNamePrefix(bool isAttack)
         {
-            return _localizer.Translate(Localizer.TranslationType.CraftingNamePrefix, isAttack ? "attack" : "defence");
+            return _localizer.Translate(TranslationType.CraftingNamePrefix, isAttack ? "attack" : "defence");
         }
 
         private string GetItemName(bool isAttack, ItemBase item, string customSuffix = null)
@@ -429,9 +437,9 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         public ItemBase GetCraftedItem(string categoryName, string typeName, bool isTwoHanded, IEnumerable<ItemBase> components)
         {
-            if (categoryName == nameof(Spell))
+            if (categoryName == nameof(Spell) || categoryName == nameof(Gadget))
             {
-                return GetSpell(components);
+                return GetSpellOrGadget(components, categoryName == nameof(Spell));
             }
 
             switch (categoryName)
@@ -448,11 +456,9 @@ namespace FullPotential.Core.Gameplay.Crafting
 
                 case nameof(Armor):
                     var craftableArmor = _typeRegistry.GetRegisteredByTypeName<IGearArmor>(typeName);
-                    if (craftableArmor.Category == IGearArmor.ArmorCategory.Barrier)
-                    {
-                        return GetBarrier(craftableArmor, components);
-                    }
-                    return GetArmor(craftableArmor, components);
+                    return craftableArmor.Category == IGearArmor.ArmorCategory.Barrier 
+                        ? GetBarrier(craftableArmor, components) 
+                        : GetArmor(craftableArmor, components);
 
                 case nameof(Accessory):
                     var craftableAccessory = _typeRegistry.GetRegisteredByTypeName<IGearAccessory>(typeName);
@@ -465,7 +471,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private string GetAttributeTranslation(string suffix)
         {
-            return _localizer.Translate(Localizer.TranslationType.Attribute, suffix);
+            return _localizer.Translate(TranslationType.Attribute, suffix);
         }
 
         public string GetItemDescription(ItemBase item, bool includeName = true)
@@ -495,10 +501,10 @@ namespace FullPotential.Core.Gameplay.Crafting
                 sb.Append($"{GetAttributeTranslation(nameof(item.Effects))}: {string.Join(", ", localisedEffects)}\n");
             }
 
-            if (item is IMagical spell)
+            if (item is ISpellOrGadget spellOrGadget)
             {
-                if (spell.Targeting != null) { sb.Append($"{GetAttributeTranslation(nameof(spell.Targeting))}: {_localizer.GetTranslatedTypeName(spell.Targeting)}\n"); }
-                if (spell.Shape != null) { sb.Append($"{GetAttributeTranslation(nameof(spell.Shape))}: {_localizer.GetTranslatedTypeName(spell.Shape)}\n"); }
+                if (spellOrGadget.Targeting != null) { sb.Append($"{GetAttributeTranslation(nameof(spellOrGadget.Targeting))}: {_localizer.GetTranslatedTypeName(spellOrGadget.Targeting)}\n"); }
+                if (spellOrGadget.Shape != null) { sb.Append($"{GetAttributeTranslation(nameof(spellOrGadget.Shape))}: {_localizer.GetTranslatedTypeName(spellOrGadget.Shape)}\n"); }
             }
 
             return sb.ToString();

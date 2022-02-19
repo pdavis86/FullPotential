@@ -1,5 +1,5 @@
 using FullPotential.Api.Gameplay;
-using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -8,12 +8,12 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Spells.Behaviours
 {
-    public class SpellSelfBehaviour : MonoBehaviour, ISpellBehaviour
+    public class SpellSelfBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
         // ReSharper disable once InconsistentNaming
         private const float _distanceBeforeReturning = 8f;
 
-        public Spell Spell;
+        public SpellOrGadgetItemBase SpellOrGadget;
         public IPlayerStateBehaviour SourceStateBehaviour;
         public Vector3 ForwardDirection;
 
@@ -26,7 +26,7 @@ namespace FullPotential.Standard.Spells.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            if (Spell == null)
+            if (SpellOrGadget == null)
             {
                 Debug.LogError("No spell has been set");
                 Destroy(gameObject);
@@ -35,7 +35,7 @@ namespace FullPotential.Standard.Spells.Behaviours
 
             _attackHelper = ModHelper.GetGameManager().GetService<IAttackHelper>();
 
-            _castSpeed = Spell.Attributes.Speed / 50f;
+            _castSpeed = SpellOrGadget.Attributes.Speed / 50f;
             if (_castSpeed < 0.5)
             {
                 _castSpeed = 0.5f;
@@ -76,7 +76,7 @@ namespace FullPotential.Standard.Spells.Behaviours
                 return;
             }
 
-            ApplySpellEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
+            ApplyEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
         }
 
         private void ClearForce()
@@ -85,19 +85,19 @@ namespace FullPotential.Standard.Spells.Behaviours
             _rigidBody.angularVelocity = Vector3.zero;
         }
 
-        public void StopCasting()
+        public void Stop()
         {
             //Nothing here
         }
 
-        public void ApplySpellEffects(GameObject target, Vector3? position)
+        public void ApplyEffects(GameObject target, Vector3? position)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
                 return;
             }
 
-            _attackHelper.DealDamage(SourceStateBehaviour.GameObject, Spell, target, position);
+            _attackHelper.DealDamage(SourceStateBehaviour.GameObject, SpellOrGadget, target, position);
             Destroy(gameObject);
         }
 

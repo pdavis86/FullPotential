@@ -7,7 +7,7 @@ using FullPotential.Api.Gameplay.Helpers;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
-using FullPotential.Api.Registry.Spells;
+using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Core.GameManagement;
@@ -430,7 +430,7 @@ namespace FullPotential.Core.PlayerBehaviours
         public bool StopIfCastingSpell(PlayerHandStatus leftOrRight)
         {
             var behaviourToStop = leftOrRight.SpellBeingCastGameObject != null
-                ? leftOrRight.SpellBeingCastGameObject.GetComponent<ISpellBehaviour>()
+                ? leftOrRight.SpellBeingCastGameObject.GetComponent<ISpellOrGadgetBehaviour>()
                 : null;
 
             //Debug.Log("behaviourToStop is null: " + (behaviourToStop == null));
@@ -440,7 +440,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 return false;
             }
 
-            behaviourToStop.StopCasting();
+            behaviourToStop.Stop();
             leftOrRight.SpellBeingCastGameObject = null;
 
             return true;
@@ -477,7 +477,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 ? (hit.point - startPosition).normalized
                 : forward;
 
-            var parentTransform = activeSpell.Targeting.IsParentedToCaster
+            var parentTransform = activeSpell.Targeting.IsParentedToSource
                 ? transform
                 : GameManager.Instance.GetSceneBehaviour().GetTransform();
 
@@ -500,7 +500,7 @@ namespace FullPotential.Core.PlayerBehaviours
                     
                     if (IsServer)
                     {
-                        _playerState.SpendMana(activeSpell);
+                        _playerState.ConsumeResource(activeSpell);
                     }
                 }
             );
@@ -562,7 +562,8 @@ namespace FullPotential.Core.PlayerBehaviours
                 _attackHelper.DealDamage(gameObject, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
             }
 
-            return rangedHit.transform.gameObject.GetComponent<NetworkObject>()?.NetworkObjectId;
+            var rangedHitNetworkObject = rangedHit.transform.gameObject.GetComponent<NetworkObject>();
+            return rangedHitNetworkObject != null ? rangedHitNetworkObject.NetworkObjectId : null;
         }
 
         private ulong? UseMeleeWeapon(Weapon weaponInHand, Vector3 position, Vector3 forward)
