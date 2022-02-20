@@ -327,7 +327,7 @@ namespace FullPotential.Core.GameManagement
             _serviceRegistry.Register<ITypeRegistry, TypeRegistry>();
             _serviceRegistry.Register<IAttackHelper, AttackHelper>();
             _serviceRegistry.Register<IRpcHelper, RpcHelper>();
-            _serviceRegistry.Register<ISpawnService, SpawnService>();
+            _serviceRegistry.Register<ISpawnService, SpawnService>(true);
         }
 
         #region Methods for Mods
