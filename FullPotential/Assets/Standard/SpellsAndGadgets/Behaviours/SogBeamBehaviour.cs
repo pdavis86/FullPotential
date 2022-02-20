@@ -142,7 +142,9 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             if (SourceStateBehaviour.OwnerClientId == NetworkManager.Singleton.LocalClientId)
             {
-                //todo: distance needs to vary with FOV
+                //Adjust for FoV
+                var adjustment = (Camera.main.fieldOfView - 50) * 0.0125f;
+                _cylinderParentTransform.position -= _sourcePlayer.transform.forward * adjustment;
 
                 //Move it a little sideways
                 _cylinderParentTransform.position += (IsLeftHand ? _leftRightAdjustment : -_leftRightAdjustment) * _sourcePlayer.transform.right;
