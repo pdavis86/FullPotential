@@ -168,8 +168,8 @@ namespace FullPotential.Core.Ui.Behaviours
 
                 var playerInventory = (PlayerInventory)_playerState.Inventory;
 
-                playerInventory.HandleSlotChange(item, slotGameObjectName);
-                playerInventory.SpawnEquippedObject(item, slotGameObjectName);
+                var changeResult = playerInventory.HandleSlotChange(item, slotGameObjectName);
+                playerInventory.SpawnEquippedObject(changeResult.WasEquipped ? item : null, slotGameObjectName);
                 ResetEquipmentUi(true);
 
                 playerInventory.EquipItemServerRpc(item.Id, slotGameObjectName);
