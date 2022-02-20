@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
@@ -170,6 +171,10 @@ namespace FullPotential.Core.Ui.Behaviours
 
                 var changeResult = playerInventory.HandleSlotChange(item, slotGameObjectName);
                 playerInventory.SpawnEquippedObject(changeResult.WasEquipped ? item : null, slotGameObjectName);
+                foreach (var slotString in changeResult.SlotsToSend.Where(x => x != slotGameObjectName.ToString()))
+                {
+                    playerInventory.SpawnEquippedObject(null, Enum.Parse<SlotGameObjectName>(slotString));
+                }
                 ResetEquipmentUi(true);
 
                 playerInventory.EquipItemServerRpc(item.Id, slotGameObjectName);
