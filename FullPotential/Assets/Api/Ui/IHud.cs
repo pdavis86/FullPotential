@@ -16,6 +16,8 @@ namespace FullPotential.Api.Ui
 
         void UpdateManaPercentage(int mana, int maxMana);
 
+        void UpdateEnergyPercentage(int energy, int maxEnergy);
+
         void ToggleCursorCapture(bool isOn);
     }
 }

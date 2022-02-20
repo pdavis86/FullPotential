@@ -19,7 +19,7 @@ using FullPotential.Core.Localization;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Registry;
-using FullPotential.Core.UiBehaviours.Components;
+using FullPotential.Core.Ui.Components;
 using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.Helpers;
 using TMPro;
@@ -57,6 +57,7 @@ namespace FullPotential.Core.PlayerBehaviours
         public readonly NetworkVariable<int> Stamina = new NetworkVariable<int>(100);
         public readonly NetworkVariable<int> Health = new NetworkVariable<int>(100);
         public readonly NetworkVariable<int> Mana = new NetworkVariable<int>(100);
+        public readonly NetworkVariable<int> Energy = new NetworkVariable<int>(100);
         // ReSharper enable MemberCanBePrivate.Global
 
         public PlayerHandStatus HandStatusLeft = new PlayerHandStatus();
@@ -73,10 +74,12 @@ namespace FullPotential.Core.PlayerBehaviours
         private FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
         private readonly Dictionary<string, DateTime> _unclaimedLoot = new Dictionary<string, DateTime>();
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
-        private DelayedAction _consumeStamina;
+        private DelayedAction _replenishAmmo;
         private DelayedAction _replenishStamina;
         private DelayedAction _replenishMana;
-        private DelayedAction _replenishAmmo;
+        private DelayedAction _replenishEnergy;
+        private DelayedAction _consumeStamina;
+        private DelayedAction _consumeResource;
         private bool _isSprinting;
         private Vector3 _startingPosition;
         private float _myHeight;
@@ -107,6 +110,7 @@ namespace FullPotential.Core.PlayerBehaviours
             Stamina.OnValueChanged += OnStaminaChanged;
             Health.OnValueChanged += OnHealthChanged;
             Mana.OnValueChanged += OnManaChanged;
+            Energy.OnValueChanged += OnEnergyChanged;
 
             Inventory = GetComponent<PlayerInventory>();
             _rb = GetComponent<Rigidbody>();
@@ -169,34 +173,38 @@ namespace FullPotential.Core.PlayerBehaviours
 
             AliveState = LivingEntityState.Alive;
 
-            //todo: attribute-based stamina consumption
-            _consumeStamina = new DelayedAction(.05f, () =>
-            {
-                var staminaCost = GetStaminaCost();
-                if (_isSprinting && Stamina.Value >= staminaCost)
-                {
-                    Stamina.Value -= staminaCost;
-                }
-            });
-
-            //todo: attribute-based stamina recharge
             _replenishStamina = new DelayedAction(.01f, () =>
             {
                 if (!_isSprinting && Stamina.Value < GetStaminaMax())
                 {
+                    //todo: attribute-based stamina recharge
                     Stamina.Value += 1;
                 }
             });
 
-            //todo: attribute-based mana recharge
             _replenishMana = new DelayedAction(.2f, () =>
             {
-                var isConsumingMana = HandStatusLeft.SpellBeingCastGameObject != null
-                    || HandStatusRight.SpellBeingCastGameObject != null;
+                var isConsumingMana =
+                    (HandStatusLeft.SpellOrGadgetItem is Spell && HandStatusLeft.SpellOrGadgetGameObject != null)
+                    || (HandStatusRight.SpellOrGadgetItem is Spell && HandStatusRight.SpellOrGadgetGameObject != null);
 
                 if (!isConsumingMana && Mana.Value < GetManaMax())
                 {
+                    //todo: attribute-based mana recharge
                     Mana.Value += 1;
+                }
+            });
+
+            _replenishEnergy = new DelayedAction(.2f, () =>
+            {
+                var isConsumingEnergy =
+                    (HandStatusLeft.SpellOrGadgetItem is Gadget && HandStatusLeft.SpellOrGadgetGameObject != null)
+                    || (HandStatusRight.SpellOrGadgetItem is Gadget && HandStatusRight.SpellOrGadgetGameObject != null);
+
+                if (!isConsumingEnergy && Energy.Value < GetEnergyMax())
+                {
+                    //todo: attribute-based energy recharge
+                    Energy.Value += 1;
                 }
             });
 
@@ -218,6 +226,29 @@ namespace FullPotential.Core.PlayerBehaviours
 
                     GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(false, HandStatusRight);
                     ReloadCompleteClientRpc(false, _clientRpcParams);
+                }
+            });
+
+            _consumeStamina = new DelayedAction(.05f, () =>
+            {
+                var staminaCost = GetStaminaCost();
+                if (_isSprinting && Stamina.Value >= staminaCost)
+                {
+                    Stamina.Value -= staminaCost / 2;
+                }
+            });
+
+            _consumeResource = new DelayedAction(.5f, () =>
+            {
+                if (HandStatusLeft.SpellOrGadgetBehaviour != null && !ConsumeResource(HandStatusLeft.SpellOrGadgetItem, HandStatusLeft.SpellOrGadgetItem.Targeting.IsContinuous))
+                {
+                    HandStatusLeft.SpellOrGadgetBehaviour.Stop();
+                    StopCastingClientRpc(true, _rpcHelper.ForNearbyPlayers(transform.position));
+                }
+                if (HandStatusRight.SpellOrGadgetBehaviour != null && !ConsumeResource(HandStatusRight.SpellOrGadgetItem, HandStatusRight.SpellOrGadgetItem.Targeting.IsContinuous))
+                {
+                    HandStatusRight.SpellOrGadgetBehaviour.Stop();
+                    StopCastingClientRpc(false, _rpcHelper.ForNearbyPlayers(transform.position));
                 }
             });
 
@@ -272,6 +303,14 @@ namespace FullPotential.Core.PlayerBehaviours
             }
         }
 
+        private void OnEnergyChanged(int previousValue, int newValue)
+        {
+            if (NetworkManager.LocalClientId == OwnerClientId)
+            {
+                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateEnergyPercentage(newValue, GetEnergyMax());
+            }
+        }
+
         #endregion
 
         #region ServerRpc calls
@@ -300,6 +339,7 @@ namespace FullPotential.Core.PlayerBehaviours
             Stamina.Value = GetStaminaMax();
             Health.Value = GetHealthMax();
             Mana.Value = GetManaMax();
+            Energy.Value = GetEnergyMax();
 
             AliveState = LivingEntityState.Respawning;
 
@@ -467,7 +507,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 ? HandStatusLeft
                 : HandStatusRight;
 
-            _playerActions.StopIfCastingSpell(leftOrRight);
+            _playerActions.StopSpellOrGadget(leftOrRight);
         }
 
         #endregion
@@ -579,22 +619,10 @@ namespace FullPotential.Core.PlayerBehaviours
 
             _replenishStamina.TryPerformAction();
             _replenishMana.TryPerformAction();
+            _replenishEnergy.TryPerformAction();
 
             _consumeStamina.TryPerformAction();
-
-            //todo: does this go here?
-            //if (HandStatusLeft.SpellBeingCastGameObject != null && !SpendMana(HandStatusLeft.SpellBeingCast, HandStatusLeft.SpellBeingCast.Targeting.IsContinuous))
-            //{
-            //    HandStatusLeft.SpellBeingCastGameObject.GetComponent<ISpellBehaviour>().StopCasting();
-            //    var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
-            //    StopCastingClientRpc(true, nearbyClients);
-            //}
-            //if (HandStatusRight.SpellBeingCastGameObject != null && !SpendMana(HandStatusRight.SpellBeingCast, HandStatusRight.SpellBeingCast.Targeting.IsContinuous))
-            //{
-            //    HandStatusRight.SpellBeingCastGameObject.GetComponent<ISpellBehaviour>().StopCasting();
-            //    var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
-            //    StopCastingClientRpc(false, nearbyClients);
-            //}
+            _consumeResource.TryPerformAction();
         }
 
         private void BecomeVulnerable()
@@ -801,7 +829,10 @@ namespace FullPotential.Core.PlayerBehaviours
             switch (spellOrGadget.ResourceConsumptionType)
             {
                 case ResourceConsumptionType.Mana:
-                    return (Mana, GetManaCost(spellOrGadget));
+                    return (Mana, GetManaCost((Spell)spellOrGadget));
+
+                case ResourceConsumptionType.Energy:
+                    return (Energy, GetEnergyCost((Gadget)spellOrGadget));
 
                 default:
                     Debug.LogError("Not yet implemented GetResourceVariable() for resource type " + spellOrGadget.ResourceConsumptionType);
@@ -809,7 +840,7 @@ namespace FullPotential.Core.PlayerBehaviours
             }
         }
 
-        public bool ConsumeResource(SpellOrGadgetItemBase spellOrGadget, bool slowDrain = false)
+        public bool ConsumeResource(SpellOrGadgetItemBase spellOrGadget, bool slowDrain = false, bool isTest = false)
         {
             var tuple = GetResourceVariableAndCost(spellOrGadget);
 
@@ -824,7 +855,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (slowDrain)
             {
-                resourceCost /= 10;
+                resourceCost = (int)Math.Ceiling(resourceCost / 10f) + 1;
             }
 
             if (resourceVariable.Value < resourceCost)
@@ -832,7 +863,10 @@ namespace FullPotential.Core.PlayerBehaviours
                 return false;
             }
 
-            resourceVariable.Value -= resourceCost;
+            if (!isTest)
+            {
+                resourceVariable.Value -= resourceCost;
+            }
 
             return true;
         }
@@ -863,7 +897,17 @@ namespace FullPotential.Core.PlayerBehaviours
             return 100;
         }
 
-        public int GetManaCost(SpellOrGadgetItemBase spellOrGadget)
+        public int GetEnergyMax()
+        {
+            return 100;
+        }
+
+        public int GetManaCost(Spell spell)
+        {
+            return 20;
+        }
+
+        public int GetEnergyCost(Gadget gadget)
         {
             return 20;
         }
@@ -917,16 +961,16 @@ namespace FullPotential.Core.PlayerBehaviours
             var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
             PlayerSpawnStateChangeClientRpc(AliveState, Vector3.zero, Quaternion.identity, killerName, itemName, nearbyClients);
 
-            if (HandStatusLeft.SpellBeingCastGameObject != null)
+            if (HandStatusLeft.SpellOrGadgetGameObject != null)
             {
-                Destroy(HandStatusLeft.SpellBeingCastGameObject);
-                HandStatusLeft.SpellBeingCastGameObject = null;
+                Destroy(HandStatusLeft.SpellOrGadgetGameObject);
+                HandStatusLeft.SpellOrGadgetGameObject = null;
             }
 
-            if (HandStatusRight.SpellBeingCastGameObject != null)
+            if (HandStatusRight.SpellOrGadgetGameObject != null)
             {
-                Destroy(HandStatusRight.SpellBeingCastGameObject);
-                HandStatusRight.SpellBeingCastGameObject = null;
+                Destroy(HandStatusRight.SpellOrGadgetGameObject);
+                HandStatusRight.SpellOrGadgetGameObject = null;
             }
         }
 

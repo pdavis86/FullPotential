@@ -3,7 +3,7 @@ using FullPotential.Api.Gameplay;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
-using FullPotential.Standard.Spells.Behaviours;
+using FullPotential.Standard.SpellsAndGadgets.Behaviours;
 using UnityEngine;
 
 namespace FullPotential.Standard.SpellsAndGadgets.Shapes
@@ -26,7 +26,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Shapes
                     var spellObject = UnityEngine.Object.Instantiate(prefab, startPosition, rotation);
                     gameManager.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(startPosition, spellObject.transform, false);
 
-                    var spellScript = spellObject.GetComponent<SpellZoneBehaviour>();
+                    var spellScript = spellObject.GetComponent<SogZoneBehaviour>();
                     spellScript.SpellOrGadget = spellOrGadget;
                     spellScript.SourceStateBehaviour = sourceStateBehaviour;
 

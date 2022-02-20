@@ -2,7 +2,7 @@ using UnityEngine;
 
 // ReSharper disable once UnusedType.Global
 
-namespace FullPotential.Core.UiBehaviours.Components
+namespace FullPotential.Core.Ui.Components
 {
     public class SlideOutAlert : MonoBehaviour
     {

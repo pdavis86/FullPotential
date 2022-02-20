@@ -1,12 +1,12 @@
 ﻿using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Ui;
-using FullPotential.Core.UiBehaviours.Components;
+using FullPotential.Core.Ui.Components;
 using UnityEngine;
 using UnityEngine.UI;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Core.UiBehaviours
+namespace FullPotential.Core.Ui.Behaviours
 {
     public class Hud : MonoBehaviour, IHud
     {
@@ -18,6 +18,7 @@ namespace FullPotential.Core.UiBehaviours
         [SerializeField] private BarSlider _staminaSlider;
         [SerializeField] private BarSlider _healthSlider;
         [SerializeField] private BarSlider _manaSlider;
+        [SerializeField] private BarSlider _energySlider;
         [SerializeField] private Text _ammoLeft;
         [SerializeField] private Text _ammoRight;
 #pragma warning restore 0649
@@ -75,6 +76,12 @@ namespace FullPotential.Core.UiBehaviours
         {
             var values = _manaSlider.GetManaValues(mana, maxMana);
             _manaSlider.SetValues(values);
+        }
+
+        public void UpdateEnergyPercentage(int energy, int maxEnergy)
+        {
+            var values = _energySlider.GetEnergyValues(energy, maxEnergy);
+            _energySlider.SetValues(values);
         }
 
         public void ToggleCursorCapture(bool isOn)

@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Core.UiBehaviours.Components
+namespace FullPotential.Core.Ui.Components
 {
     public class EquippedSummary : MonoBehaviour
     {

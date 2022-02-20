@@ -10,9 +10,9 @@ using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Standard.Spells.Behaviours
+namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
-    public class SpellProjectileBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
+    public class SogProjectileBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
         public SpellOrGadgetItemBase SpellOrGadget;
         public IPlayerStateBehaviour SourceStateBehaviour;

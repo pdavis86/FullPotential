@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 // ReSharper disable once UnusedType.Global
 
-namespace FullPotential.Core.UiBehaviours
+namespace FullPotential.Core.Ui.Behaviours
 {
     public class SettingsMenuUi : MonoBehaviour
     {

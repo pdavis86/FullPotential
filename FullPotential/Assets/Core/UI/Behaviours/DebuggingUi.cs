@@ -8,7 +8,7 @@ using UnityEngine.UI;
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable once UnusedType.Global
 
-namespace FullPotential.Core.UiBehaviours
+namespace FullPotential.Core.Ui.Behaviours
 {
     public class DebuggingUi : MonoBehaviour
     {

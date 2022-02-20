@@ -18,6 +18,10 @@
       "Key": "crafting.category.spell",
       "Value": "Spell"
     },
+    {
+      "Key": "crafting.category.gadget",
+      "Value": "Gadget"
+    },
 
 
     {

@@ -8,9 +8,9 @@ using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Standard.Spells.Behaviours
+namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
-    public class SpellWallBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
+    public class SogWallBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
         public SpellOrGadgetItemBase SpellOrGadget;
         public IPlayerStateBehaviour SourceStateBehaviour;

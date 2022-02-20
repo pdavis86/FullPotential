@@ -2,6 +2,8 @@
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using UnityEngine;
 
+// ReSharper disable UnusedMemberInSuper.Global
+
 namespace FullPotential.Api.Gameplay
 {
     public interface IPlayerStateBehaviour : IDamageable, IDefensible
@@ -16,6 +18,6 @@ namespace FullPotential.Api.Gameplay
 
         void SpawnLootChest(Vector3 position);
 
-        bool ConsumeResource(SpellOrGadgetItemBase spellOrGadget, bool slowDrain = false);
+        bool ConsumeResource(SpellOrGadgetItemBase spellOrGadget, bool slowDrain = false, bool isTest = false);
     }
 }

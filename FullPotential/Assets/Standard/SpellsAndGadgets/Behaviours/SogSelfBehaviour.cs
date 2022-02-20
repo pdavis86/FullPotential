@@ -6,9 +6,9 @@ using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Standard.Spells.Behaviours
+namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
-    public class SpellSelfBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
+    public class SogSelfBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
         // ReSharper disable once InconsistentNaming
         private const float _distanceBeforeReturning = 8f;

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Ui;
-using FullPotential.Core.UiBehaviours;
+using FullPotential.Core.Ui.Behaviours;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Core.UiBehaviours.Components
+namespace FullPotential.Core.Ui.Components
 {
     public class BarSlider : MonoBehaviour, IStatSlider
     {
@@ -41,6 +41,12 @@ namespace FullPotential.Core.UiBehaviours.Components
         {
             var newMana = (float)mana / maxMana;
             return (newMana, $"M{mana}");
+        }
+
+        public (float percent, string text) GetEnergyValues(int energy, int maxEnergy)
+        {
+            var newEnergy = (float)energy / maxEnergy;
+            return (newEnergy, $"E{energy}");
         }
     }
 }

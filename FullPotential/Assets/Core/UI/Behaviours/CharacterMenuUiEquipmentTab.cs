@@ -6,14 +6,14 @@ using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.PlayerBehaviours;
-using FullPotential.Core.UiBehaviours.Components;
+using FullPotential.Core.Ui.Components;
 using FullPotential.Core.Utilities.UtilityBehaviours;
 using UnityEngine;
 using UnityEngine.UI;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Core.UiBehaviours
+namespace FullPotential.Core.Ui.Behaviours
 {
     public class CharacterMenuUiEquipmentTab : MonoBehaviour
     {

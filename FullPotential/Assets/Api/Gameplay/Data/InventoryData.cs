@@ -13,6 +13,7 @@ namespace FullPotential.Api.Gameplay.Data
         public Loot[] Loot;
         public Accessory[] Accessories;
         public Armor[] Armor;
+        public Gadget[] Gadgets;
         public Spell[] Spells;
         public Weapon[] Weapons;
 

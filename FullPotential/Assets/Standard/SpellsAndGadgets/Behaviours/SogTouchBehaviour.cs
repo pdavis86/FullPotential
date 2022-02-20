@@ -6,9 +6,9 @@ using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Standard.Spells.Behaviours
+namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
-    public class SpellTouchBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
+    public class SogTouchBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
         // ReSharper disable once InconsistentNaming
         private const int _maxDistance = 3;

@@ -256,14 +256,14 @@ namespace FullPotential.Core.Gameplay.Crafting
             return lootDrop;
         }
 
-        private SpellOrGadgetItemBase GetSpellOrGadget(IEnumerable<ItemBase> components, bool isSpell)
+        private SpellOrGadgetItemBase GetSpellOrGadget(string categoryName, IEnumerable<ItemBase> components)
         {
             var relevantComponents = components.OfType<ISpellOrGadget>();
 
             var targeting = GetTargeting(relevantComponents);
 
             SpellOrGadgetItemBase spellOrGadget;
-            if (isSpell)
+            if (categoryName == nameof(Spell))
             {
                 spellOrGadget = new Spell();
             }
@@ -286,9 +286,9 @@ namespace FullPotential.Core.Gameplay.Crafting
                 Recovery = ComputeAttribute(components, x => x.Attributes.Recovery),
                 Duration = ComputeAttribute(components, x => x.Attributes.Duration)
             };
-            spellOrGadget.Effects = GetEffects(nameof(Spell), components);
+            spellOrGadget.Effects = GetEffects(categoryName, components);
 
-            var suffix = _localizer.Translate(TranslationType.CraftingCategory, nameof(Spell));
+            var suffix = _localizer.Translate(TranslationType.CraftingCategory, categoryName);
 
             if (spellOrGadget.Effects.Count > 0)
             {
@@ -439,7 +439,7 @@ namespace FullPotential.Core.Gameplay.Crafting
         {
             if (categoryName == nameof(Spell) || categoryName == nameof(Gadget))
             {
-                return GetSpellOrGadget(components, categoryName == nameof(Spell));
+                return GetSpellOrGadget(categoryName, components);
             }
 
             switch (categoryName)

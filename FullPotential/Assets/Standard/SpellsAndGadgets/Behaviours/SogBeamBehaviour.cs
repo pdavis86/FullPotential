@@ -8,9 +8,9 @@ using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Standard.Spells.Behaviours
+namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
-    public class SpellBeamBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
+    public class SogBeamBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
         public SpellOrGadgetItemBase SpellOrGadget;
         public IPlayerStateBehaviour SourceStateBehaviour;
@@ -27,7 +27,6 @@ namespace FullPotential.Standard.Spells.Behaviours
         private Transform _cylinderTransform;
         private RaycastHit _hit;
         private DelayedAction _applyEffectsAction;
-        private DelayedAction _consumeResourceAction;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -66,7 +65,6 @@ namespace FullPotential.Standard.Spells.Behaviours
 
             //todo: attribute-based timings
             _applyEffectsAction = new DelayedAction(1f, () => ApplyEffects(_hit.transform.gameObject, _hit.point));
-            _consumeResourceAction = new DelayedAction(0.2f, () => SourceStateBehaviour.ConsumeResource(SpellOrGadget, true));
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -91,8 +89,7 @@ namespace FullPotential.Standard.Spells.Behaviours
 
                 if (NetworkManager.Singleton.IsServer)
                 {
-                    var hitTarget = _applyEffectsAction.TryPerformAction();
-                    SourceStateBehaviour.ConsumeResource(SpellOrGadget, !hitTarget);
+                   _applyEffectsAction.TryPerformAction();
                 }
 
                 targetDirection = (hit.point - _cylinderParentTransform.position).normalized;
@@ -102,11 +99,6 @@ namespace FullPotential.Standard.Spells.Behaviours
             {
                 targetDirection = playerCameraTransform.forward;
                 beamLength = maxBeamLength;
-
-                if (NetworkManager.Singleton.IsServer)
-                {
-                    _consumeResourceAction.TryPerformAction();
-                }
             }
 
             UpdateBeam(targetDirection, beamLength);

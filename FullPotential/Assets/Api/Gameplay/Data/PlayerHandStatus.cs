@@ -8,7 +8,8 @@ namespace FullPotential.Api.Gameplay.Data
         public bool IsReloading;
         public int Ammo;
         public int AmmoMax;
-        public Spell SpellBeingCast;
-        public GameObject SpellBeingCastGameObject;
+        public SpellOrGadgetItemBase SpellOrGadgetItem;
+        public GameObject SpellOrGadgetGameObject;
+        public ISpellOrGadgetBehaviour SpellOrGadgetBehaviour;
     }
 }

@@ -2,7 +2,7 @@
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Core.UiBehaviours
+namespace FullPotential.Core.Ui.Behaviours
 {
     public class CharacterMenuUi : MonoBehaviour
     {

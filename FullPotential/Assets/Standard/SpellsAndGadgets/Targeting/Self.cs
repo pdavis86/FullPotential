@@ -1,7 +1,7 @@
 ﻿using System;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Registry.SpellsAndGadgets;
-using FullPotential.Standard.Spells.Behaviours;
+using FullPotential.Standard.SpellsAndGadgets.Behaviours;
 using UnityEngine;
 
 namespace FullPotential.Standard.SpellsAndGadgets.Targeting
@@ -24,7 +24,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Targeting
 
         public void SetBehaviourVariables(GameObject gameObject, SpellOrGadgetItemBase spellOrGadget, IPlayerStateBehaviour sourceStateBehaviour, Vector3 startPosition, Vector3 forwardDirection, bool isLeftHand = false)
         {
-            var spellScript = gameObject.GetComponent<SpellSelfBehaviour>();
+            var spellScript = gameObject.GetComponent<SogSelfBehaviour>();
             spellScript.SpellOrGadget = spellOrGadget;
             spellScript.SourceStateBehaviour = sourceStateBehaviour;
             spellScript.ForwardDirection = forwardDirection;

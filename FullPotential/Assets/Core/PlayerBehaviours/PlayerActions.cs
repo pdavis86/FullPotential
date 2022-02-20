@@ -400,8 +400,9 @@ namespace FullPotential.Core.PlayerBehaviours
                 case null:
                     return Punch(position, forwardDirection) != null;
 
-                case Spell spellInHand:
-                    return CastSpell(spellInHand, isLeftHand, position, forwardDirection, playerStateBehaviour);
+                case Gadget:
+                case Spell:
+                    return UseSpellOrGadget(itemInHand as SpellOrGadgetItemBase, isLeftHand, position, forwardDirection, playerStateBehaviour);
 
                 case Weapon weaponInHand:
                     return UseWeapon(weaponInHand, isLeftHand, position, forwardDirection) != null;
@@ -427,33 +428,28 @@ namespace FullPotential.Core.PlayerBehaviours
             return hit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId;
         }
 
-        public bool StopIfCastingSpell(PlayerHandStatus leftOrRight)
+        public bool StopSpellOrGadget(PlayerHandStatus leftOrRight)
         {
-            var behaviourToStop = leftOrRight.SpellBeingCastGameObject != null
-                ? leftOrRight.SpellBeingCastGameObject.GetComponent<ISpellOrGadgetBehaviour>()
-                : null;
-
-            //Debug.Log("behaviourToStop is null: " + (behaviourToStop == null));
-
-            if (behaviourToStop == null)
+            if (leftOrRight.SpellOrGadgetBehaviour == null)
             {
                 return false;
             }
 
-            behaviourToStop.Stop();
-            leftOrRight.SpellBeingCastGameObject = null;
+            leftOrRight.SpellOrGadgetBehaviour.Stop();
+            leftOrRight.SpellOrGadgetGameObject = null;
+            leftOrRight.SpellOrGadgetBehaviour = null;
 
             return true;
         }
 
-        private bool CastSpell(Spell activeSpell, bool isLeftHand, Vector3 position, Vector3 forward, IPlayerStateBehaviour playerStateBehaviour)
+        private bool UseSpellOrGadget(SpellOrGadgetItemBase spellOrGadget, bool isLeftHand, Vector3 position, Vector3 forward, IPlayerStateBehaviour playerStateBehaviour)
         {
-            if (activeSpell == null)
+            if (spellOrGadget == null)
             {
                 return false;
             }
 
-            if (_playerState.Mana.Value < _playerState.GetManaCost(activeSpell))
+            if (!_playerState.ConsumeResource(spellOrGadget, isTest: true))
             {
                 return false;
             }
@@ -462,7 +458,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 ? _playerState.HandStatusLeft
                 : _playerState.HandStatusRight;
 
-            if (StopIfCastingSpell(leftOrRight))
+            if (StopSpellOrGadget(leftOrRight))
             {
                 //Return true as the action also needs performing on the server
                 return true;
@@ -477,35 +473,36 @@ namespace FullPotential.Core.PlayerBehaviours
                 ? (hit.point - startPosition).normalized
                 : forward;
 
-            var parentTransform = activeSpell.Targeting.IsParentedToSource
+            var parentTransform = spellOrGadget.Targeting.IsParentedToSource
                 ? transform
                 : GameManager.Instance.GetSceneBehaviour().GetTransform();
 
             _typeRegistry.LoadAddessable(
-                activeSpell.Targeting.PrefabAddress,
+                spellOrGadget.Targeting.PrefabAddress,
                 prefab =>
                 {
-                    var spellObject = Instantiate(prefab, startPosition, Quaternion.identity);
+                    var spellOrGadgetGameObject = Instantiate(prefab, startPosition, Quaternion.identity);
 
-                    activeSpell.Targeting.SetBehaviourVariables(spellObject, activeSpell, playerStateBehaviour, startPosition, targetDirection, isLeftHand);
+                    spellOrGadget.Targeting.SetBehaviourVariables(spellOrGadgetGameObject, spellOrGadget, playerStateBehaviour, startPosition, targetDirection, isLeftHand);
 
-                    spellObject.transform.parent = parentTransform;
+                    spellOrGadgetGameObject.transform.parent = parentTransform;
 
-                    leftOrRight.SpellBeingCast = activeSpell;
+                    leftOrRight.SpellOrGadgetItem = spellOrGadget;
 
-                    if (activeSpell.Targeting.IsContinuous)
+                    if (spellOrGadget.Targeting.IsContinuous)
                     {
-                        leftOrRight.SpellBeingCastGameObject = spellObject;
+                        leftOrRight.SpellOrGadgetGameObject = spellOrGadgetGameObject;
+                        leftOrRight.SpellOrGadgetBehaviour = spellOrGadgetGameObject.GetComponent<ISpellOrGadgetBehaviour>();
                     }
                     
                     if (IsServer)
                     {
-                        _playerState.ConsumeResource(activeSpell);
+                        _playerState.ConsumeResource(spellOrGadget);
                     }
                 }
             );
 
-            if (activeSpell.Targeting.IsServerSideOnly && IsServer)
+            if (spellOrGadget.Targeting.IsServerSideOnly && IsServer)
             {
                 return false;
             }

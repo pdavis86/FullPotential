@@ -11,13 +11,13 @@ using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Localization;
 using FullPotential.Core.Localization.Enums;
 using FullPotential.Core.PlayerBehaviours;
-using FullPotential.Core.UiBehaviours.Components;
+using FullPotential.Core.Ui.Components;
 using UnityEngine;
 using UnityEngine.UI;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Core.UiBehaviours
+namespace FullPotential.Core.Ui.Behaviours
 {
     public class CharacterMenuUiCraftingTab : MonoBehaviour
     {
@@ -132,7 +132,7 @@ namespace FullPotential.Core.UiBehaviours
             _craftButton.interactable = false;
 
             var componentIds = string.Join(',', _components.Select(x => x.Id));
-            var selectedType = GetCraftingCategory();
+            var selectedType = GetCraftingCategory().Key.Name;
             var selectedSubType = GetCraftableTypeName(selectedType);
             var isTwoHanded = IsTwoHandedSelected();
 
@@ -159,34 +159,39 @@ namespace FullPotential.Core.UiBehaviours
 
         private void SetHandednessDropDownVisibility()
         {
-            _handednessDropdown.gameObject.SetActive(GetCraftingCategory() == nameof(Weapon) && _optionalTwoHandedWeaponIndexes.Contains(_subTypeDropdown.value));
+            _handednessDropdown.gameObject.SetActive(GetCraftingCategory().Key == typeof(Weapon) && _optionalTwoHandedWeaponIndexes.Contains(_subTypeDropdown.value));
         }
 
         private void UpdateSecondaryDropDowns()
         {
             _subTypeDropdown.ClearOptions();
 
-            var isSpell = false;
+            var shownSubTypes = true;
 
-            switch (GetCraftingCategory())
+            var craftingCategory = GetCraftingCategory();
+            switch (craftingCategory.Key.Name)
             {
                 case nameof(Weapon): _subTypeDropdown.AddOptions(_weaponTypes.Select(x => x.Value).ToList()); break;
                 case nameof(Armor): _subTypeDropdown.AddOptions(_armorTypes.Select(x => x.Value).ToList()); break;
                 case nameof(Accessory): _subTypeDropdown.AddOptions(_accessoryTypes.Select(x => x.Value).ToList()); break;
-                case nameof(Spell): isSpell = true; break;
+                
+                case nameof(Spell): 
+                case nameof(Gadget): 
+                    shownSubTypes = false; 
+                    break;
 
                 default:
                     throw new InvalidOperationException("Unknown crafting type");
             }
 
-            if (isSpell)
-            {
-                _subTypeDropdown.gameObject.SetActive(false);
-            }
-            else
+            if (shownSubTypes)
             {
                 _subTypeDropdown.RefreshShownValue();
                 _subTypeDropdown.gameObject.SetActive(true);
+            }
+            else
+            {
+                _subTypeDropdown.gameObject.SetActive(false);
             }
 
             SetHandednessDropDownVisibility();
@@ -268,9 +273,9 @@ namespace FullPotential.Core.UiBehaviours
             });
         }
 
-        private string GetCraftingCategory()
+        private KeyValuePair<Type, string> GetCraftingCategory()
         {
-            return _craftingCategories.ElementAt(_typeDropdown.value).Key.Name;
+            return _craftingCategories.ElementAt(_typeDropdown.value);
         }
 
         private string GetCraftableTypeName(string craftingCategory)
@@ -280,7 +285,11 @@ namespace FullPotential.Core.UiBehaviours
                 case nameof(Weapon): return _weaponTypes.ElementAt(_subTypeDropdown.value).Key.TypeName;
                 case nameof(Armor): return _armorTypes.ElementAt(_subTypeDropdown.value).Key.TypeName;
                 case nameof(Accessory): return _accessoryTypes.ElementAt(_subTypeDropdown.value).Key.TypeName;
-                case nameof(Spell): return null;
+
+                case nameof(Spell): 
+                case nameof(Gadget): 
+                    return null;
+
                 default: throw new InvalidOperationException("Unknown crafting type");
             }
         }
@@ -300,7 +309,7 @@ namespace FullPotential.Core.UiBehaviours
                 return;
             }
 
-            var craftingCategory = GetCraftingCategory();
+            var craftingCategory = GetCraftingCategory().Key.Name;
 
             var craftedItem = _resultFactory.GetCraftedItem(
                 craftingCategory,

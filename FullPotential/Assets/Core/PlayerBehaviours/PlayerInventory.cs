@@ -128,6 +128,7 @@ namespace FullPotential.Core.PlayerBehaviours
             var equippedItem = Enumerable.Empty<ItemBase>()
                 .UnionIfNotNull(changes.Accessories)
                 .UnionIfNotNull(changes.Armor)
+                .UnionIfNotNull(changes.Gadgets)
                 .UnionIfNotNull(changes.Spells)
                 .UnionIfNotNull(changes.Weapons)
                 .FirstOrDefault();
@@ -253,7 +254,7 @@ namespace FullPotential.Core.PlayerBehaviours
             if (gearCategory == IGear.GearCategory.Hand)
             {
                 return _items
-                    .Where(x => x.Value is Weapon or Spell)
+                    .Where(x => x.Value is Weapon or Spell or Gadget)
                     .Select(x => x.Value);
             }
 
@@ -310,6 +311,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 .UnionIfNotNull(changes.Loot)
                 .UnionIfNotNull(changes.Accessories)
                 .UnionIfNotNull(changes.Armor)
+                .UnionIfNotNull(changes.Gadgets)
                 .UnionIfNotNull(changes.Spells)
                 .UnionIfNotNull(changes.Weapons);
 
@@ -350,6 +352,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 .UnionIfNotNull(inventoryData.Loot)
                 .UnionIfNotNull(inventoryData.Accessories)
                 .UnionIfNotNull(inventoryData.Armor)
+                .UnionIfNotNull(inventoryData.Gadgets)
                 .UnionIfNotNull(inventoryData.Spells)
                 .UnionIfNotNull(inventoryData.Weapons);
 
@@ -443,6 +446,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(Loot))?.Select(x => x as Loot).ToArray(),
                 Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray(),
                 Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
+                Gadgets = groupedItems.FirstOrDefault(x => x.Key == typeof(Gadget))?.Select(x => x as Gadget).ToArray(),
                 Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray(),
                 Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
                 EquippedItems = equippedItems.ToArray()
