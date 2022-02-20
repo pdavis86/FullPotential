@@ -18,6 +18,8 @@ namespace FullPotential.Core.Gameplay.Combat
 {
     public class AttackHelper : IAttackHelper
     {
+        public const int MeleeRangeLimit = 8;
+
         // ReSharper disable once InconsistentNaming
         private static readonly System.Random _random = new System.Random();
 

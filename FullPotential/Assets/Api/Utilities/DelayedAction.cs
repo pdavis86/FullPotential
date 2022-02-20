@@ -5,31 +5,37 @@ namespace FullPotential.Api.Utilities
 {
     public class DelayedAction
     {
-        private readonly float _timeBetweenEffects;
         private readonly Action _actionToDo;
 
-        private float _timeSinceLastEffective;
+        private float _timeBetweenActions;
+        private float _timeSinceLastAction;
 
-        public DelayedAction(float delay, Action actionToDo)
+        public DelayedAction(float delay, Action actionToDo, bool noDelayForFirstCall = true)
         {
-            _timeBetweenEffects = delay;
-            _timeSinceLastEffective = _timeBetweenEffects;
+            _timeBetweenActions = delay;
+            _timeSinceLastAction = noDelayForFirstCall ? _timeBetweenActions : 0;
 
             _actionToDo = actionToDo;
+        }
+
+        // ReSharper disable once UnusedMember.Global
+        public void SetTimeBetweenEffects(float delay)
+        {
+            _timeBetweenActions = delay;
         }
 
         // ReSharper disable once UnusedMethodReturnValue.Global
         public bool TryPerformAction()
         {
-            if (_timeSinceLastEffective < _timeBetweenEffects)
+            if (_timeSinceLastAction < _timeBetweenActions)
             {
-                _timeSinceLastEffective += Time.deltaTime;
+                _timeSinceLastAction += Time.deltaTime;
                 return false;
             }
 
-            _timeSinceLastEffective = 0;
-
             _actionToDo();
+
+            _timeSinceLastAction = 0;
 
             return true;
         }

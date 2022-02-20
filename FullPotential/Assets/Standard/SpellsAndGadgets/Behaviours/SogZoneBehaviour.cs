@@ -3,6 +3,7 @@ using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities;
+using FullPotential.Api.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -30,13 +31,11 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            //todo: attribute-based object lifetime
-            Destroy(gameObject, 10f);
+            Destroy(gameObject, SpellOrGadget.Attributes.GetShapeLifetime());
 
             _attackHelper = ModHelper.GetGameManager().GetService<IAttackHelper>();
 
-            //todo: attribute-based cooldown
-            _timeBetweenEffects = 0.5f;
+            _timeBetweenEffects = SpellOrGadget.Attributes.GetTimeBetweenEffects();
             _timeSinceLastEffective = _timeBetweenEffects;
         }
 

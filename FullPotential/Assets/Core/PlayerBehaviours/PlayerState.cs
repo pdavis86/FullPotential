@@ -177,7 +177,7 @@ namespace FullPotential.Core.PlayerBehaviours
             {
                 if (!_isSprinting && Stamina.Value < GetStaminaMax())
                 {
-                    //todo: attribute-based stamina recharge
+                    //todo: xp-based stamina recharge
                     Stamina.Value += 1;
                 }
             });
@@ -190,7 +190,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
                 if (!isConsumingMana && Mana.Value < GetManaMax())
                 {
-                    //todo: attribute-based mana recharge
+                    //todo: xp-based mana recharge
                     Mana.Value += 1;
                 }
             });
@@ -203,29 +203,20 @@ namespace FullPotential.Core.PlayerBehaviours
 
                 if (!isConsumingEnergy && Energy.Value < GetEnergyMax())
                 {
-                    //todo: attribute-based energy recharge
+                    //todo: xp-based energy recharge
                     Energy.Value += 1;
                 }
             });
 
-            //todo: animation time-based ammo reloading
-            _replenishAmmo = new DelayedAction(3, () =>
+            _replenishAmmo = new DelayedAction(0.5f, () =>
             {
                 if (HandStatusLeft.IsReloading && HandStatusLeft.Ammo < HandStatusLeft.AmmoMax)
                 {
-                    HandStatusLeft.Ammo = HandStatusLeft.AmmoMax;
-                    HandStatusLeft.IsReloading = false;
-
-                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(true, HandStatusLeft);
-                    ReloadCompleteClientRpc(true, _clientRpcParams);
+                    StartCoroutine(ReloadCoroutine(HandStatusLeft, true));
                 }
                 else if (HandStatusRight.IsReloading && HandStatusRight.Ammo < HandStatusRight.AmmoMax)
                 {
-                    HandStatusRight.Ammo = HandStatusRight.AmmoMax;
-                    HandStatusRight.IsReloading = false;
-
-                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(false, HandStatusRight);
-                    ReloadCompleteClientRpc(false, _clientRpcParams);
+                    StartCoroutine(ReloadCoroutine(HandStatusRight, false));
                 }
             });
 
@@ -259,6 +250,18 @@ namespace FullPotential.Core.PlayerBehaviours
             }
 
             QueueAliveStateChanges();
+        }
+
+        private IEnumerator ReloadCoroutine(PlayerHandStatus handStatus, bool isLeftHand)
+        {
+            var item = Inventory.GetItemInSlot(isLeftHand ? SlotGameObjectName.LeftHand : SlotGameObjectName.RightHand);
+            yield return new WaitForSeconds(item.Attributes.GetReloadTime());
+
+            handStatus.Ammo = handStatus.AmmoMax;
+            handStatus.IsReloading = false;
+
+            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, handStatus);
+            ReloadCompleteClientRpc(isLeftHand, _clientRpcParams);
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -871,7 +874,12 @@ namespace FullPotential.Core.PlayerBehaviours
             return true;
         }
 
-        //todo: attribute-based all of these
+        public int GetHealth()
+        {
+            return Health.Value;
+        }
+
+        //todo: xp-based max, cost, speed values
         public int GetStaminaMax()
         {
             return 100;
@@ -902,6 +910,7 @@ namespace FullPotential.Core.PlayerBehaviours
             return 100;
         }
 
+        //todo: attribute-based costs
         public int GetManaCost(Spell spell)
         {
             return 20;
@@ -910,11 +919,6 @@ namespace FullPotential.Core.PlayerBehaviours
         public int GetEnergyCost(Gadget gadget)
         {
             return 20;
-        }
-
-        public int GetHealth()
-        {
-            return Health.Value;
         }
 
         public void TakeDamage(int amount, ulong? clientId, string attackerName, string itemName)

@@ -647,11 +647,11 @@ namespace FullPotential.Core.PlayerBehaviours
                         }
                     );
 
-                    //todo: attribute-based ammo max
+                    var ammoMax = weapon.Attributes.GetAmmoMax();
                     var newAmmoStatus = new PlayerHandStatus
                     {
-                        AmmoMax = 5,
-                        Ammo = 5
+                        AmmoMax = ammoMax,
+                        Ammo = ammoMax
                     };
 
                     if (isLeftHand)

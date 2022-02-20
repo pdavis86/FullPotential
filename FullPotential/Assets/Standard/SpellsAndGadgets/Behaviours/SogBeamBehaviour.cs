@@ -3,6 +3,7 @@ using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities;
+using FullPotential.Api.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -27,6 +28,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         private Transform _cylinderTransform;
         private RaycastHit _hit;
         private DelayedAction _applyEffectsAction;
+        private float _maxBeamLength;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -47,6 +49,8 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
+            _maxBeamLength = SpellOrGadget.Attributes.GetContinuousRange();
+
             _sourcePlayer = GameObjectHelper.ClosestParentWithTag(gameObject, Tags.Player);
 
             if (_sourcePlayer == null)
@@ -63,21 +67,18 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            //todo: attribute-based timings
-            _applyEffectsAction = new DelayedAction(1f, () => ApplyEffects(_hit.transform.gameObject, _hit.point));
+            var effectsDelay = SpellOrGadget.Attributes.GetTimeBetweenEffects();
+            _applyEffectsAction = new DelayedAction(effectsDelay, () => ApplyEffects(_hit.transform.gameObject, _hit.point));
         }
 
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            //todo: attribute-based beam length
-            const int maxBeamLength = 10;
-
             var playerCameraTransform = SourceStateBehaviour.CameraGameObject.transform;
 
             Vector3 targetDirection;
             float beamLength;
-            if (Physics.Raycast(playerCameraTransform.position, playerCameraTransform.forward, out var hit, maxBeamLength))
+            if (Physics.Raycast(playerCameraTransform.position, playerCameraTransform.forward, out var hit, _maxBeamLength))
             {
                 if (hit.transform.gameObject == _sourcePlayer)
                 {
@@ -98,7 +99,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             else
             {
                 targetDirection = playerCameraTransform.forward;
-                beamLength = maxBeamLength;
+                beamLength = _maxBeamLength;
             }
 
             UpdateBeam(targetDirection, beamLength);

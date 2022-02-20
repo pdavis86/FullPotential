@@ -4,6 +4,7 @@ using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities;
+using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.SpellsAndGadgets.Shapes;
 using Unity.Netcode;
 using UnityEngine;
@@ -38,20 +39,13 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             _attackHelper = ModHelper.GetGameManager().GetService<IAttackHelper>();
 
-            //todo: attribute-based cast speed
-            var castSpeed = SpellOrGadget.Attributes.Speed / 50f;
-            if (castSpeed < 0.5)
-            {
-                castSpeed = 0.5f;
-            }
-
             var affectedByGravity = SpellOrGadget.Shape != null;
 
             _shapeType = SpellOrGadget.Shape?.GetType();
 
             var rigidBody = GetComponent<Rigidbody>();
 
-            rigidBody.AddForce(20f * castSpeed * ForwardDirection, ForceMode.VelocityChange);
+            rigidBody.AddForce(20f * SpellOrGadget.Attributes.GetProjectileSpeed() * ForwardDirection, ForceMode.VelocityChange);
 
             if (affectedByGravity)
             {

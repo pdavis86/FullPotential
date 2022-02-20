@@ -10,7 +10,9 @@ using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
+using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Gameplay.Data;
 using FullPotential.Core.Networking;
@@ -494,7 +496,7 @@ namespace FullPotential.Core.PlayerBehaviours
                         leftOrRight.SpellOrGadgetGameObject = spellOrGadgetGameObject;
                         leftOrRight.SpellOrGadgetBehaviour = spellOrGadgetGameObject.GetComponent<ISpellOrGadgetBehaviour>();
                     }
-                    
+
                     if (IsServer)
                     {
                         _playerState.ConsumeResource(spellOrGadget);
@@ -530,21 +532,23 @@ namespace FullPotential.Core.PlayerBehaviours
                 return null;
             }
 
+            //todo: attribute-based automatic weapons
+
             //todo: attribute-based ammo consumption
             ammoState.Ammo -= 1;
 
             GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, ammoState);
 
-            var leftOrRight = isLeftHand
+            var leftOrRightPosition = isLeftHand
                 ? _playerState.Positions.LeftHandInFront
                 : _playerState.Positions.RightHandInFront;
 
-            var startPos = leftOrRight.position + forward;
+            var startPos = leftOrRightPosition.position + forward;
 
-            //todo: attribute-based weapon range
-            var endPos = Physics.Raycast(position, forward, out var rangedHit, 30)
+            var range = weaponInHand.Attributes.GetProjectileRange();
+            var endPos = Physics.Raycast(position, forward, out var rangedHit, range)
                 ? rangedHit.point
-                : _playerState.Positions.RightHandInFront.position + forward * 30;
+                : _playerState.Positions.RightHandInFront.position + forward * range;
 
             var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
             _playerState.UsedWeaponClientRpc(startPos, endPos, nearbyClients);
@@ -565,8 +569,11 @@ namespace FullPotential.Core.PlayerBehaviours
 
         private ulong? UseMeleeWeapon(Weapon weaponInHand, Vector3 position, Vector3 forward)
         {
-            //todo: attribute-based melee range
-            if (!Physics.Raycast(position, forward, out var meleeHit, maxDistance: 4))
+            var meleeRange = weaponInHand.IsTwoHanded
+                ? AttackHelper.MeleeRangeLimit
+                : AttackHelper.MeleeRangeLimit / 2;
+
+            if (!Physics.Raycast(position, forward, out var meleeHit, maxDistance: meleeRange))
             {
                 return null;
             }

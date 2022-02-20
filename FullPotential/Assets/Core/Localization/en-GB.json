@@ -89,6 +89,10 @@
       "Value": "Efficiency"
     },
     {
+      "Key": "attribute.efficiency.tooltip",
+      "Value": "Used in mana, energy, and ammo calculations"
+    },
+    {
       "Key": "attribute.range",
       "Value": "Range"
     },
@@ -105,8 +109,16 @@
       "Value": "Recovery"
     },
     {
+      "Key": "attribute.recovery.tooltip",
+      "Value": "Used in cooldown and reload timing calculations"
+    },
+    {
       "Key": "attribute.duration",
       "Value": "Duration"
+    },
+    {
+      "Key": "attribute.duration.tooltip",
+      "Value": "Used in lifetime calculations"
     },
     {
       "Key": "attribute.effects",
