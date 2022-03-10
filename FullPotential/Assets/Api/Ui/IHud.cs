@@ -1,4 +1,6 @@
-﻿using FullPotential.Api.Gameplay.Data;
+﻿using System.Collections.Generic;
+using FullPotential.Api.Gameplay.Data;
+using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Api.Ui
 {
@@ -19,5 +21,7 @@ namespace FullPotential.Api.Ui
         void UpdateEnergyPercentage(int energy, int maxEnergy);
 
         void ToggleCursorCapture(bool isOn);
+
+        void UpdateActiveEffects(Dictionary<IEffect, float> activeEffects);
     }
 }

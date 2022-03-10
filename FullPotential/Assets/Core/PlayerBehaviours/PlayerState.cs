@@ -6,6 +6,7 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Enums;
+using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities;
@@ -22,6 +23,7 @@ using FullPotential.Core.Registry;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.Helpers;
+using FullPotential.Standard.Effects.Debuffs;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -80,6 +82,7 @@ namespace FullPotential.Core.PlayerBehaviours
         private DelayedAction _replenishEnergy;
         private DelayedAction _consumeStamina;
         private DelayedAction _consumeResource;
+        private DelayedAction _updateUi;
         private bool _isSprinting;
         private Vector3 _startingPosition;
         private float _myHeight;
@@ -243,6 +246,11 @@ namespace FullPotential.Core.PlayerBehaviours
                 }
             });
 
+            _updateUi = new DelayedAction(1, () =>
+            {
+                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateActiveEffects(GetActiveEffects());
+            });
+
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
                 GameManager.Instance.MainCanvasObjects.Respawn.SetActive(false);
@@ -271,6 +279,11 @@ namespace FullPotential.Core.PlayerBehaviours
 
             ReplenishAndConsume();
             BecomeVulnerable();
+
+            if (IsClient)
+            {
+                _updateUi.TryPerformAction();
+            }
         }
 
         public override void OnNetworkSpawn()
@@ -1030,6 +1043,12 @@ namespace FullPotential.Core.PlayerBehaviours
             _bodyMeshRenderer.material = material;
             BodyParts.LeftArm.GetComponent<MeshRenderer>().material = material;
             BodyParts.RightArm.GetComponent<MeshRenderer>().material = material;
+        }
+
+        private Dictionary<IEffect, float> GetActiveEffects()
+        {
+            //todo: implement this properly
+            return new Dictionary<IEffect, float> { { new Weakness(), 2 } };
         }
 
         #region Nested Classes

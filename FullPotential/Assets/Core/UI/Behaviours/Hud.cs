@@ -1,5 +1,9 @@
-﻿using FullPotential.Api.Gameplay.Data;
+﻿using System;
+using System.Collections.Generic;
+using FullPotential.Api.Gameplay.Data;
+using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Ui;
+using FullPotential.Core.UI.Behaviours;
 using FullPotential.Core.Ui.Components;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +16,7 @@ namespace FullPotential.Core.Ui.Behaviours
     {
 #pragma warning disable 0649
         [SerializeField] private GameObject _alertsContainer;
+        [SerializeField] private GameObject _activeEffectsContainer;
         [SerializeField] private GameObject _alertPrefab;
         [SerializeField] private GameObject _equippedLeftHand;
         [SerializeField] private GameObject _equippedRightHand;
@@ -22,6 +27,14 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private Text _ammoLeft;
         [SerializeField] private Text _ammoRight;
 #pragma warning restore 0649
+
+        private GameObject _activeEffectPrefab;
+
+        // ReSharper disable once UnusedMember.Local
+        private void Awake()
+        {
+            _activeEffectPrefab = _activeEffectsContainer.GetComponent<ActiveEffects>().ActiveEffectPrefab;
+        }
 
         public void ShowAlert(string alertText)
         {
@@ -104,6 +117,33 @@ namespace FullPotential.Core.Ui.Behaviours
         private Color ChangeColorAlpha(Color originalColor, float alpha)
         {
             return new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
+        }
+
+        public void UpdateActiveEffects(Dictionary<IEffect, float> activeEffects)
+        {
+            var existingObjects = GetActiveEffectGameObjects();
+
+            foreach (var (effect, timeToLive) in activeEffects)
+            {
+                var effectType = effect.GetType();
+
+                var activeEffectObj = existingObjects.ContainsKey(effectType)
+                    ? existingObjects[effectType]
+                    : Instantiate(_activeEffectPrefab, _activeEffectsContainer.transform);
+
+                var activeEffectScript = activeEffectObj.GetComponent<ActiveEffect>();
+                activeEffectScript.SetEffect(effect, timeToLive);
+            }
+        }
+
+        private Dictionary<Type, GameObject> GetActiveEffectGameObjects()
+        {
+            var results = new Dictionary<Type, GameObject>();
+            foreach (Transform child in _activeEffectsContainer.transform)
+            {
+                results.Add(child.gameObject.GetComponent<ActiveEffect>().Effect.GetType(), child.gameObject);
+            }
+            return results;
         }
 
     }
