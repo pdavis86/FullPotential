@@ -112,7 +112,9 @@ namespace FullPotential.Core.Gameplay.Crafting
 
             var effects = components
                 .Where(x => x.Effects != null)
-                .SelectMany(x => x.Effects);
+                .SelectMany(x => x.Effects)
+                .GroupBy(x => x.TypeName)
+                .Select(x => x.First());
 
             var effectTypeLookup = effects
                 .ToDictionary(
