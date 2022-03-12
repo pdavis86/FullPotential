@@ -1,12 +1,11 @@
-﻿using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Registry.SpellsAndGadgets;
+﻿using FullPotential.Api.Registry.SpellsAndGadgets;
 using UnityEngine;
 
 // ReSharper disable UnusedMemberInSuper.Global
 
 namespace FullPotential.Api.Gameplay
 {
-    public interface IPlayerStateBehaviour : IDamageable, IDefensible
+    public interface IPlayerStateBehaviour : IFighter
     {
         ulong OwnerClientId { get; }
 

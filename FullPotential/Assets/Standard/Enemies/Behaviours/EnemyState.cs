@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Enums;
+using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Utilities;
 using TMPro;
@@ -68,11 +69,13 @@ namespace FullPotential.Standard.Enemies.Behaviours
             SetName();
         }
 
+        //todo: attribute-based defense
         public int GetDefenseValue()
         {
             return 50;
         }
 
+        //todo: attribute-based health
         public int GetHealthMax()
         {
             return 100;
@@ -148,5 +151,9 @@ namespace FullPotential.Standard.Enemies.Behaviours
             _attackHelper.CheckIfOffTheMap(this, transform.position.y);
         }
 
+        public void ApplyEffect(IEffect effect)
+        {
+            //todo: effects on enemies
+        }
     }
 }

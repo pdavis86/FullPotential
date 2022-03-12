@@ -1,9 +1,10 @@
 ﻿using System;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Standard.Effects.Buffs;
 
 namespace FullPotential.Standard.Effects.Debuffs
 {
-    public class ManaDrain : IStatEffect
+    public class ManaDrain : IStatEffect, IHasSideEffect
     {
         public Guid TypeId => new Guid("e1ab10b2-fcae-4f25-a11f-ac5aeeadbdce");
 
@@ -12,5 +13,7 @@ namespace FullPotential.Standard.Effects.Debuffs
         public Affect Affect => Affect.PeriodicDecrease;
 
         public AffectableStats? StatToAffect => AffectableStats.Mana;
+
+        public Type SideEffectType => typeof(ManaTap);
     }
 }

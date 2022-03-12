@@ -1051,6 +1051,11 @@ namespace FullPotential.Core.PlayerBehaviours
             return new Dictionary<IEffect, float> { { new Weaken(), 2 } };
         }
 
+        public void ApplyEffect(IEffect effect)
+        {
+            throw new NotImplementedException();
+        }
+
         #region Nested Classes
 
         // ReSharper disable UnassignedField.Global

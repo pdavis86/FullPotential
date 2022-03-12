@@ -3,7 +3,9 @@ using System.Globalization;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Enums;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
+using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
@@ -24,10 +26,12 @@ namespace FullPotential.Core.Gameplay.Combat
         private static readonly System.Random _random = new System.Random();
 
         private readonly Localizer _localizer;
+        private readonly ITypeRegistry _typeRegistry;
 
-        public AttackHelper(Localizer localizer)
+        public AttackHelper(Localizer localizer, ITypeRegistry typeRegistry)
         {
             _localizer = localizer;
+            _typeRegistry = typeRegistry;
         }
 
         public void DealDamage(
@@ -48,27 +52,30 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (!targetIsPlayer && !targetIsEnemy)
             {
+                Debug.Log("Target is neither a player nor enemy");
                 return;
             }
 
-            IDamageable damageable;
-            int defenceStrength;
-            if (targetIsPlayer)
+            var sourceFighter = source != null ? source.GetComponent<IFighter>() : null;
+            var targetFighter = target.GetComponent<IFighter>();
+
+            if (itemUsed != null)
             {
-                var otherPlayerState = target.GetComponent<PlayerState>();
-                damageable = otherPlayerState;
-                defenceStrength = otherPlayerState.Inventory.GetDefenseValue();
-            }
-            else
-            {
-                var enemyState = target.GetComponent<IEnemyStateBehaviour>();
-                damageable = enemyState;
-                defenceStrength = enemyState.GetDefenseValue();
+                foreach (var effect in itemUsed.Effects)
+                {
+                    targetFighter.ApplyEffect(effect);
+
+                    if (sourceFighter != null && effect is IHasSideEffect withSideEffect)
+                    {
+                        var sideEffect = _typeRegistry.GetEffect(withSideEffect.SideEffectType);
+                        sourceFighter.ApplyEffect(sideEffect);
+                    }
+                }
             }
 
             //Even a small attack can still do damage
             var attackStrength = itemUsed?.Attributes.Strength ?? 1;
-            var damageDealtBasic = attackStrength * 100f / (100 + defenceStrength);
+            var damageDealtBasic = attackStrength * 100f / (100 + targetFighter.GetDefenseValue());
 
             //Throw in some variation
             var multiplier = (float)_random.Next(90, 111) / 100;
@@ -87,7 +94,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             var sourceItemName = itemUsed?.Name ?? _localizer.Translate("ui.alert.attack.noitem");
 
-            damageable.TakeDamage(damageDealt, sourceClientId, sourceName, sourceItemName);
+            targetFighter.TakeDamage(damageDealt, sourceClientId, sourceName, sourceItemName);
 
             if (source == null)
             {
@@ -113,6 +120,27 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 var clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { sourcePlayerState.OwnerClientId } } };
                 sourcePlayerState.ShowDamageClientRpc(adjustedPosition, damageDealt.ToString(CultureInfo.InvariantCulture), clientRpcParams);
+            }
+        }
+
+        private void ApplyEffect(IEffect effect, IAffectable target, IAffectable source)
+        {
+            switch (effect.Affect)
+            {
+                case Affect.PeriodicDecrease:
+                case Affect.TemporaryMaxIncrease:
+                case Affect.ConjureAlly:
+                case Affect.ConjureWeapon:
+                case Affect.Elemental:
+                case Affect.Move:
+                case Affect.PeriodicIncrease:
+                case Affect.ReduceMass:
+                case Affect.ReflectAttacks:
+                case Affect.SingleDecrease:
+                case Affect.SingleIncrease:
+                case Affect.TemporaryMaxDecrease:
+                default:
+                    throw new NotImplementedException();
             }
         }
 

@@ -2,7 +2,7 @@
 
 namespace FullPotential.Api.Gameplay
 {
-    public interface IEnemyStateBehaviour : IFighter
+    public interface IFighter : IDamageable, IDefensible, IAffectable
     {
     }
 }

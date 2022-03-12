@@ -159,13 +159,18 @@ namespace FullPotential.Core.Registry
         public List<IEffect> GetLootPossibilities()
         {
             return _effects
-                .Where(x => x is not ISideEffect)
+                .Where(x => x is not IIsSideEffect)
                 .ToList();
         }
 
         public IEffect GetEffect(Guid typeId)
         {
             return _effects.FirstOrDefault(x => x.TypeId == typeId);
+        }
+
+        public IEffect GetEffect(Type type)
+        {
+            return _effects.FirstOrDefault(x => x.GetType() == type);
         }
 
         public void LoadAddessable(string address, Action<UnityEngine.GameObject> action)
