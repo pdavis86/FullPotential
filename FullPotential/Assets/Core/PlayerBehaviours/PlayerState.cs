@@ -1048,7 +1048,7 @@ namespace FullPotential.Core.PlayerBehaviours
         private Dictionary<IEffect, float> GetActiveEffects()
         {
             //todo: implement this properly
-            return new Dictionary<IEffect, float> { { new Weakness(), 2 } };
+            return new Dictionary<IEffect, float> { { new Weaken(), 2 } };
         }
 
         #region Nested Classes

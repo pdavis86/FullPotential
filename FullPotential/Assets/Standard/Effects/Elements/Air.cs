@@ -1,4 +1,5 @@
 ﻿using System;
+using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
 
 namespace FullPotential.Standard.Effects.Elements
@@ -9,8 +10,10 @@ namespace FullPotential.Standard.Effects.Elements
 
         public string TypeName => nameof(Air);
 
-        public bool IsSideEffect => false;
+        public Affect Affect => Affect.Elemental;
 
         public string LingeringTypeName => "Suffocate";
+
+        public Type Opposite => typeof(Earth);
     }
 }

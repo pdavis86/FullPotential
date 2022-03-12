@@ -159,7 +159,7 @@ namespace FullPotential.Core.Registry
         public List<IEffect> GetLootPossibilities()
         {
             return _effects
-                .Where(x => !x.IsSideEffect)
+                .Where(x => x is not ISideEffect)
                 .ToList();
         }
 

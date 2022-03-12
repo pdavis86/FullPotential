@@ -106,7 +106,35 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private List<IEffect> GetEffects(string craftingType, IEnumerable<ItemBase> components)
         {
-            var effects = components.Where(x => x.Effects != null).SelectMany(x => x.Effects);
+            const string buff = "Buff";
+            const string debuff = "Debuff";
+            const string support = "Support";
+
+            var effects = components
+                .Where(x => x.Effects != null)
+                .SelectMany(x => x.Effects);
+
+            var effectTypeLookup = effects
+                .ToDictionary(
+                    x => x,
+                    x =>
+                    {
+                        switch (x.Affect)
+                        {
+                            case Affect.PeriodicIncrease:
+                            case Affect.SingleIncrease:
+                            case Affect.TemporaryMaxIncrease:
+                                return buff;
+
+                            case Affect.PeriodicDecrease:
+                            case Affect.SingleDecrease:
+                            case Affect.TemporaryMaxDecrease:
+                                return debuff;
+
+                            default:
+                                return support;
+                        }
+                    });
 
             var elementalEffects = effects.Where(x => x is IElement);
             var elementalEffect = elementalEffects.FirstOrDefault();
@@ -116,12 +144,11 @@ namespace FullPotential.Core.Gameplay.Crafting
                     .Except(elementalEffects.Where(x => x != elementalEffect));
             }
 
-            if (craftingType == nameof(Armor) || craftingType == nameof(Accessory))
+            if (craftingType is nameof(Armor) or nameof(Accessory))
             {
                 return effects
                     .Where(x =>
-                         x is IEffectBuff
-                        || x is IEffectSupport
+                        effectTypeLookup[x] == buff
                         || x is IElement)
                     .ToList();
             }
@@ -130,7 +157,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             {
                 return effects
                     .Where(x =>
-                        x is IEffectDebuff
+                        effectTypeLookup[x] == debuff
                         || x is IElement)
                     .ToList();
             }
@@ -140,12 +167,12 @@ namespace FullPotential.Core.Gameplay.Crafting
                 throw new Exception($"Unexpected craftingType '{craftingType}'");
             }
 
-            if (effects.Any(x => x is IEffectBuff || x is IEffectSupport))
+            if (effects.Any(x => effectTypeLookup[x] == buff || effectTypeLookup[x] == support))
             {
                 effects = effects
                     .Where(x =>
-                        !(x is IEffectDebuff)
-                        && !(x is IElement));
+                        effectTypeLookup[x] != debuff
+                        && x is not IElement);
             }
 
             return effects.ToList();
@@ -456,8 +483,8 @@ namespace FullPotential.Core.Gameplay.Crafting
 
                 case nameof(Armor):
                     var craftableArmor = _typeRegistry.GetRegisteredByTypeName<IGearArmor>(typeName);
-                    return craftableArmor.Category == IGearArmor.ArmorCategory.Barrier 
-                        ? GetBarrier(craftableArmor, components) 
+                    return craftableArmor.Category == IGearArmor.ArmorCategory.Barrier
+                        ? GetBarrier(craftableArmor, components)
                         : GetArmor(craftableArmor, components);
 
                 case nameof(Accessory):

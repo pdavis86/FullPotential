@@ -47,7 +47,7 @@ namespace FullPotential.Standard
                 typeof(Effects.Buffs.LifeTap),
                 typeof(Effects.Buffs.ManaTap),
                 typeof(Effects.Buffs.Regeneration),
-                typeof(Effects.Buffs.Strength),
+                typeof(Effects.Buffs.Strengthen),
 
                 typeof(Effects.Debuffs.Distract),
                 typeof(Effects.Debuffs.Fear),
@@ -55,7 +55,7 @@ namespace FullPotential.Standard
                 typeof(Effects.Debuffs.ManaDrain),
                 typeof(Effects.Debuffs.Poison),
                 typeof(Effects.Debuffs.Slow),
-                typeof(Effects.Debuffs.Weakness),
+                typeof(Effects.Debuffs.Weaken),
 
                 typeof(Effects.Elements.Air),
                 typeof(Effects.Elements.Earth),
@@ -69,11 +69,10 @@ namespace FullPotential.Standard
                 typeof(Effects.Movement.Launch),
                 typeof(Effects.Movement.Repel),
 
-                typeof(Effects.Support.Absorb),
-                typeof(Effects.Support.Deflect),
+                typeof(Effects.Support.Conjure),
                 typeof(Effects.Support.Heal),
                 typeof(Effects.Support.Reflect),
-                typeof(Effects.Support.Soften),
+                typeof(Effects.Support.Float),
                 typeof(Effects.Support.Summon),
             };
         }
