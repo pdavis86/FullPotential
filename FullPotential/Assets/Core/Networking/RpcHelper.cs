@@ -10,6 +10,17 @@ namespace FullPotential.Core.Networking
 {
     public class RpcHelper : IRpcHelper
     {
+        public ClientRpcParams ForPlayer(ulong clientId)
+        {
+            return new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new[] { clientId }
+                }
+            };
+        }
+
         public ClientRpcParams ForNearbyPlayers(Vector3 position)
         {
             //Debug.Log("Sending RPC call to all clients near " + position);

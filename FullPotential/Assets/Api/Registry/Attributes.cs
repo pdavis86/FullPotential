@@ -6,6 +6,7 @@
         public bool IsAutomatic;
         public bool IsSoulbound;
         public int ExtraAmmoPerShot;
+
         public int Strength;
         public int Efficiency;
         public int Range;
@@ -23,8 +24,8 @@
                 int hash = 101;
                 hash = hash * 103 + IsAutomatic.GetHashCode();
                 hash = hash * 107 + IsSoulbound.GetHashCode();
-                
                 hash = hash * 109 + ExtraAmmoPerShot.GetHashCode();
+
                 hash = hash * 113 + Strength.GetHashCode();
                 hash = hash * 127 + Efficiency.GetHashCode();
                 hash = hash * 131 + Range.GetHashCode();

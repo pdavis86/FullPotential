@@ -18,7 +18,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         public Vector3 StartPosition;
         public Vector3 ForwardDirection;
 
-        private IAttackHelper _attackHelper;
+        private IEffectHelper _effectHelper;
 
         // ReSharper disable once UnusedMember.Local
         private void Start()
@@ -30,7 +30,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _attackHelper = ModHelper.GetGameManager().GetService<IAttackHelper>();
+            _effectHelper = ModHelper.GetGameManager().GetService<IEffectHelper>();
 
             if (Physics.Raycast(StartPosition, ForwardDirection, out var hit, maxDistance: _maxDistance))
             {
@@ -52,7 +52,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _attackHelper.DealDamage(SourceStateBehaviour.GameObject, SpellOrGadget, target, position);
+            _effectHelper.ApplyEffects(SourceStateBehaviour.GameObject, SpellOrGadget, target, position);
         }
 
     }

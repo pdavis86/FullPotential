@@ -9,8 +9,6 @@ namespace FullPotential.Standard.Effects.Movement
 
         public string TypeName => nameof(Repel);
 
-        public Affect Affect => Affect.Move;
-
-        public MovementDirection Direction => MovementDirection.Away;
+        public MovementDirection Direction => MovementDirection.AwayFromSource;
     }
 }

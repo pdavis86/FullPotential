@@ -108,7 +108,7 @@ namespace FullPotential.Core.Gameplay.Crafting
         {
             const string buff = "Buff";
             const string debuff = "Debuff";
-            const string support = "Support";
+            const string other = "Other";
 
             var effects = components
                 .Where(x => x.Effects != null)
@@ -121,7 +121,19 @@ namespace FullPotential.Core.Gameplay.Crafting
                     x => x,
                     x =>
                     {
-                        switch (x.Affect)
+                        if (x is IAttributeEffect attributeEffect)
+                        {
+                            return attributeEffect.TemporaryMaxIncrease
+                                ? buff
+                                : debuff;
+                        }
+
+                        if (x is not IStatEffect statEffect)
+                        {
+                            return other;
+                        }
+                        
+                        switch (statEffect.Affect)
                         {
                             case Affect.PeriodicIncrease:
                             case Affect.SingleIncrease:
@@ -134,7 +146,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                                 return debuff;
 
                             default:
-                                return support;
+                                return other;
                         }
                     });
 
@@ -169,7 +181,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 throw new Exception($"Unexpected craftingType '{craftingType}'");
             }
 
-            if (effects.Any(x => effectTypeLookup[x] == buff || effectTypeLookup[x] == support))
+            if (effects.Any(x => effectTypeLookup[x] == buff || effectTypeLookup[x] == other))
             {
                 effects = effects
                     .Where(x =>

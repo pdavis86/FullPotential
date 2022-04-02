@@ -1,5 +1,4 @@
 ﻿using System;
-using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Standard.Effects.Buffs
@@ -10,8 +9,8 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public string TypeName => nameof(Haste);
 
-        public Affect Affect => Affect.TemporaryMaxIncrease;
+        public bool TemporaryMaxIncrease => true;
 
-        public string AttributeToAffect => nameof(Attributes.Speed);
+        public AffectableAttribute AttributeToAffect => AffectableAttribute.Speed;
     }
 }

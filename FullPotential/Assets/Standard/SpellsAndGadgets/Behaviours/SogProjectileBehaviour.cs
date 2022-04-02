@@ -19,7 +19,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         public IPlayerStateBehaviour SourceStateBehaviour;
         public Vector3 ForwardDirection;
 
-        private IAttackHelper _attackHelper;
+        private IEffectHelper _effectHelper;
 
         private Type _shapeType;
 
@@ -37,7 +37,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             Physics.IgnoreCollision(GetComponent<Collider>(), SourceStateBehaviour.GameObject.GetComponent<Collider>());
 
-            _attackHelper = ModHelper.GetGameManager().GetService<IAttackHelper>();
+            _effectHelper = ModHelper.GetGameManager().GetService<IEffectHelper>();
 
             var affectedByGravity = SpellOrGadget.Shape != null;
 
@@ -83,7 +83,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                     return;
                 }
 
-                _attackHelper.DealDamage(SourceStateBehaviour.GameObject, SpellOrGadget, target, position);
+                _effectHelper.ApplyEffects(SourceStateBehaviour.GameObject, SpellOrGadget, target, position);
             }
             else
             {

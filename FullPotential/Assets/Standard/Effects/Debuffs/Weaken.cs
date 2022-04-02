@@ -1,5 +1,4 @@
 ﻿using System;
-using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Standard.Effects.Debuffs
@@ -10,8 +9,8 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public string TypeName => nameof(Weaken);
 
-        public Affect Affect => Affect.TemporaryMaxDecrease;
+        public bool TemporaryMaxIncrease => false;
 
-        public string AttributeToAffect => nameof(Attributes.Strength);
+        public AffectableAttribute AttributeToAffect => AffectableAttribute.Strength;
     }
 }

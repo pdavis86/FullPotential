@@ -12,7 +12,6 @@ using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Gameplay.Data;
 using FullPotential.Core.Networking;
@@ -29,6 +28,8 @@ namespace FullPotential.Core.PlayerBehaviours
 {
     public class PlayerActions : NetworkBehaviour
     {
+        private const int MeleeRangeLimit = 8;
+
 #pragma warning disable CS0649
         [SerializeField] private Camera _playerCamera;
         [SerializeField] private Camera _inFrontOfPlayerCamera;
@@ -38,7 +39,7 @@ namespace FullPotential.Core.PlayerBehaviours
         //Services
         private IRpcHelper _rpcHelper;
         private ResultFactory _resultFactory;
-        private IAttackHelper _attackHelper;
+        private IEffectHelper _effectHelper;
         private ITypeRegistry _typeRegistry;
 
         private bool _hasMenuOpen;
@@ -65,7 +66,7 @@ namespace FullPotential.Core.PlayerBehaviours
             _userRegistry = GameManager.Instance.GetService<UserRegistry>();
             _rpcHelper = GameManager.Instance.GetService<IRpcHelper>();
             _resultFactory = GameManager.Instance.GetService<ResultFactory>();
-            _attackHelper = GameManager.Instance.GetService<IAttackHelper>();
+            _effectHelper = GameManager.Instance.GetService<IEffectHelper>();
             _typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
         }
 
@@ -354,6 +355,7 @@ namespace FullPotential.Core.PlayerBehaviours
             }
 
             var loot = _resultFactory.GetLootDrop();
+
             var invChange = new InventoryChanges { Loot = new[] { loot as Loot } };
 
             ApplyInventoryChanges(invChange);
@@ -424,7 +426,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (IsServer)
             {
-                _attackHelper.DealDamage(gameObject, null, hit.transform.gameObject, hit.point);
+                _effectHelper.ApplyEffects(gameObject, null, hit.transform.gameObject, hit.point);
             }
 
             return hit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId;
@@ -560,7 +562,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (IsServer)
             {
-                _attackHelper.DealDamage(gameObject, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
+                _effectHelper.ApplyEffects(gameObject, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
             }
 
             var rangedHitNetworkObject = rangedHit.transform.gameObject.GetComponent<NetworkObject>();
@@ -570,8 +572,8 @@ namespace FullPotential.Core.PlayerBehaviours
         private ulong? UseMeleeWeapon(Weapon weaponInHand, Vector3 position, Vector3 forward)
         {
             var meleeRange = weaponInHand.IsTwoHanded
-                ? AttackHelper.MeleeRangeLimit
-                : AttackHelper.MeleeRangeLimit / 2;
+                ? MeleeRangeLimit
+                : MeleeRangeLimit / 2;
 
             if (!Physics.Raycast(position, forward, out var meleeHit, maxDistance: meleeRange))
             {
@@ -580,7 +582,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (IsServer)
             {
-                _attackHelper.DealDamage(gameObject, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
+                _effectHelper.ApplyEffects(gameObject, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
             }
 
             return meleeHit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId;

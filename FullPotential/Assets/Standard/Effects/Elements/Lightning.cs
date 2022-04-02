@@ -1,5 +1,4 @@
 ﻿using System;
-using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
 
 namespace FullPotential.Standard.Effects.Elements
@@ -9,8 +8,6 @@ namespace FullPotential.Standard.Effects.Elements
         public Guid TypeId => new Guid("80f913d3-0969-42e1-8f32-8ac54c1b3203");
 
         public string TypeName => nameof(Lightning);
-
-        public Affect Affect => Affect.Elemental;
 
         public string LingeringTypeName => "Shock";
 

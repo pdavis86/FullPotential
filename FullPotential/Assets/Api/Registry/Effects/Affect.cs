@@ -7,12 +7,6 @@
         PeriodicIncrease,
         PeriodicDecrease,
         TemporaryMaxIncrease,
-        TemporaryMaxDecrease,
-        Move,
-        ReflectAttacks,
-        ConjureWeapon,
-        ConjureAlly,
-        ReduceMass,
-        Elemental
+        TemporaryMaxDecrease
     }
 }

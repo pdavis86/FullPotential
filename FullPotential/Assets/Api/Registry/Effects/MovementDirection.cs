@@ -8,7 +8,8 @@
         Down,
         Forwards,
         Backwards,
-        Toward,
-        Away
+        TowardSource,
+        AwayFromSource,
+        MaintainDistance
     }
 }

@@ -3,8 +3,13 @@
     public interface IAttributeEffect : IEffect
     {
         /// <summary>
+        /// Whether the maximum will be temporarily increased (otherwise decreased)
+        /// </summary>
+        bool TemporaryMaxIncrease { get; }
+
+        /// <summary>
         /// The attribute which will be affected
         /// </summary>
-        string AttributeToAffect { get; }
+        AffectableAttribute AttributeToAffect { get; }
     }
 }

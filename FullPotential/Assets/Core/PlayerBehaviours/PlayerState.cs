@@ -6,6 +6,7 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Enums;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Helpers;
@@ -23,7 +24,6 @@ using FullPotential.Core.Registry;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.Helpers;
-using FullPotential.Standard.Effects.Debuffs;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -36,6 +36,9 @@ namespace FullPotential.Core.PlayerBehaviours
 {
     public class PlayerState : NetworkBehaviour, IPlayerStateBehaviour
     {
+        // ReSharper disable once InconsistentNaming
+        private static readonly System.Random _random = new System.Random();
+
         // ReSharper disable UnassignedField.Global
 #pragma warning disable 0649
         [SerializeField] private Behaviour[] _behavioursToDisable;
@@ -49,10 +52,9 @@ namespace FullPotential.Core.PlayerBehaviours
         [SerializeField] private Transform _head;
         [SerializeField] private Material _defaultMaterial;
         [SerializeField] private GameObject _playerCamera;
-#pragma warning restore 0649
-
         public GameObject InFrontOfPlayer;
         public Transform GraphicsTransform;
+#pragma warning restore 0649
         // ReSharper enable UnassignedField.Global
 
         // ReSharper disable MemberCanBePrivate.Global
@@ -60,22 +62,29 @@ namespace FullPotential.Core.PlayerBehaviours
         public readonly NetworkVariable<int> Health = new NetworkVariable<int>(100);
         public readonly NetworkVariable<int> Mana = new NetworkVariable<int>(100);
         public readonly NetworkVariable<int> Energy = new NetworkVariable<int>(100);
+        [HideInInspector] public readonly NetworkVariable<FixedString512Bytes> TextureUrl = new NetworkVariable<FixedString512Bytes>();
         // ReSharper enable MemberCanBePrivate.Global
 
         public PlayerHandStatus HandStatusLeft = new PlayerHandStatus();
         public PlayerHandStatus HandStatusRight = new PlayerHandStatus();
-
         [HideInInspector] public string PlayerToken;
         [HideInInspector] public string Username;
-        [HideInInspector] public readonly NetworkVariable<FixedString512Bytes> TextureUrl = new NetworkVariable<FixedString512Bytes>();
 
-        private Rigidbody _rb;
         private PlayerActions _playerActions;
         private ClientRpcParams _clientRpcParams;
 
-        private FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
+        private readonly FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
         private readonly Dictionary<string, DateTime> _unclaimedLoot = new Dictionary<string, DateTime>();
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
+        private readonly Dictionary<IEffect, DateTime> _activeEffects = new Dictionary<IEffect, DateTime>();
+
+        private Rigidbody _rb;
+        private bool _isSprinting;
+        private Vector3 _startingPosition;
+        private float _myHeight;
+        private MeshRenderer _bodyMeshRenderer;
+
+        //Action-related
         private DelayedAction _replenishAmmo;
         private DelayedAction _replenishStamina;
         private DelayedAction _replenishMana;
@@ -83,16 +92,14 @@ namespace FullPotential.Core.PlayerBehaviours
         private DelayedAction _consumeStamina;
         private DelayedAction _consumeResource;
         private DelayedAction _updateUi;
-        private bool _isSprinting;
-        private Vector3 _startingPosition;
-        private float _myHeight;
         private ActionQueue<bool> _aliveStateChanges;
-        private MeshRenderer _bodyMeshRenderer;
 
-        private IRpcHelper _rpcHelper;
-        private IAttackHelper _attackHelper;
+        //Registered Services
+        private GameManager _gameManager;
         private UserRegistry _userRegistry;
         private Localizer _localizer;
+        private IRpcHelper _rpcHelper;
+        private IAttackHelper _attackHelper;
 
         public LivingEntityState AliveState { get; private set; }
 
@@ -120,10 +127,12 @@ namespace FullPotential.Core.PlayerBehaviours
             _playerActions = GetComponent<PlayerActions>();
             _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
 
-            _rpcHelper = GameManager.Instance.GetService<IRpcHelper>();
-            _attackHelper = GameManager.Instance.GetService<IAttackHelper>();
-            _userRegistry = GameManager.Instance.GetService<UserRegistry>();
-            _localizer = GameManager.Instance.GetService<Localizer>();
+            _gameManager = GameManager.Instance;
+            _rpcHelper = _gameManager.GetService<IRpcHelper>();
+            _attackHelper = _gameManager.GetService<IAttackHelper>();
+            _userRegistry = _gameManager.GetService<UserRegistry>();
+            _localizer = _gameManager.GetService<Localizer>();
+            //_effectHelper = _gameManager.GetService<IEffectHelper>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -132,7 +141,7 @@ namespace FullPotential.Core.PlayerBehaviours
             if (IsOwner)
             {
                 GameObjectHelper.GetObjectAtRoot(GameObjectNames.SceneCanvas).SetActive(false);
-                GameManager.Instance.LocalGameDataStore.GameObject = gameObject;
+                _gameManager.LocalGameDataStore.GameObject = gameObject;
 
                 foreach (var obj in _gameObjectsForPlayers)
                 {
@@ -153,13 +162,13 @@ namespace FullPotential.Core.PlayerBehaviours
             {
                 GetAndLoadPlayerData(false, null);
 
-                if (GameManager.Instance.GameDataStore.ClientIdToUsername.ContainsKey(OwnerClientId))
+                if (_gameManager.GameDataStore.ClientIdToUsername.ContainsKey(OwnerClientId))
                 {
-                    GameManager.Instance.GameDataStore.ClientIdToUsername[OwnerClientId] = Username;
+                    _gameManager.GameDataStore.ClientIdToUsername[OwnerClientId] = Username;
                 }
                 else
                 {
-                    GameManager.Instance.GameDataStore.ClientIdToUsername.Add(OwnerClientId, Username);
+                    _gameManager.GameDataStore.ClientIdToUsername.Add(OwnerClientId, Username);
                 }
             }
             else if (IsOwner)
@@ -248,13 +257,13 @@ namespace FullPotential.Core.PlayerBehaviours
 
             _updateUi = new DelayedAction(1, () =>
             {
-                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateActiveEffects(GetActiveEffects());
+                _gameManager.MainCanvasObjects.HudOverlay.UpdateActiveEffects(GetActiveEffects());
             });
 
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
-                GameManager.Instance.MainCanvasObjects.Respawn.SetActive(false);
-                GameManager.Instance.MainCanvasObjects.Hud.SetActive(true);
+                _gameManager.MainCanvasObjects.Respawn.SetActive(false);
+                _gameManager.MainCanvasObjects.Hud.SetActive(true);
             }
 
             QueueAliveStateChanges();
@@ -268,7 +277,7 @@ namespace FullPotential.Core.PlayerBehaviours
             handStatus.Ammo = handStatus.AmmoMax;
             handStatus.IsReloading = false;
 
-            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, handStatus);
+            _gameManager.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, handStatus);
             ReloadCompleteClientRpc(isLeftHand, _clientRpcParams);
         }
 
@@ -302,7 +311,7 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
-                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateStaminaPercentage(newValue, GetStaminaMax());
+                _gameManager.MainCanvasObjects.HudOverlay.UpdateStaminaPercentage(newValue, GetStaminaMax());
             }
         }
 
@@ -315,7 +324,7 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
-                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateManaPercentage(newValue, GetManaMax());
+                _gameManager.MainCanvasObjects.HudOverlay.UpdateManaPercentage(newValue, GetManaMax());
             }
         }
 
@@ -323,7 +332,7 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
-                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateEnergyPercentage(newValue, GetEnergyMax());
+                _gameManager.MainCanvasObjects.HudOverlay.UpdateEnergyPercentage(newValue, GetEnergyMax());
             }
         }
 
@@ -359,7 +368,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             AliveState = LivingEntityState.Respawning;
 
-            var spawnPoint = GameManager.Instance.GetSceneBehaviour().GetSpawnPoint(gameObject);
+            var spawnPoint = _gameManager.GetSceneBehaviour().GetSpawnPoint(gameObject);
 
             PlayerSpawnStateChangeBothSides(AliveState, spawnPoint.Position, spawnPoint.Rotation);
 
@@ -370,7 +379,7 @@ namespace FullPotential.Core.PlayerBehaviours
         [ServerRpc]
         public void ForceRespawnServerRpc()
         {
-            HandleDeath(_localizer.Translate("ui.alert.suicide"), null);
+            HandleDeath(Username, null);
         }
 
         [ServerRpc]
@@ -391,7 +400,11 @@ namespace FullPotential.Core.PlayerBehaviours
         [ClientRpc]
         public void ShowDamageClientRpc(Vector3 position, string damage, ClientRpcParams clientRpcParams)
         {
-            _playerActions.ShowDamage(position, damage);
+            var offsetX = (float)_random.Next(-9, 10) / 100;
+            var offsetY = (float)_random.Next(-9, 10) / 100;
+            var offsetZ = (float)_random.Next(-9, 10) / 100;
+            var adjustedPosition = position + new Vector3(offsetX, offsetY, offsetZ);
+            _playerActions.ShowDamage(adjustedPosition, damage);
         }
 
         // ReSharper disable once UnusedParameter.Local
@@ -409,8 +422,6 @@ namespace FullPotential.Core.PlayerBehaviours
             var playerData = JsonUtility.FromJson<PlayerData>(_loadPlayerDataReconstructor.Reconstruct(fragmentedMessage.GroupId));
             LoadFromPlayerData(playerData);
 
-            _loadPlayerDataReconstructor = null;
-
             SetName();
 
             StartCoroutine(SetTexture());
@@ -420,13 +431,13 @@ namespace FullPotential.Core.PlayerBehaviours
         [ClientRpc]
         private void SpawnLootChestClientRpc(string id, Vector3 position, ClientRpcParams clientRpcParams)
         {
-            var prefab = GameManager.Instance.Prefabs.Environment.LootChest;
+            var prefab = _gameManager.Prefabs.Environment.LootChest;
 
             var go = Instantiate(prefab, position, transform.rotation * Quaternion.Euler(0, 90, 0));
 
-            GameManager.Instance.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, go.transform, false);
+            _gameManager.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, go.transform, false);
 
-            go.transform.parent = GameManager.Instance.GetSceneBehaviour().GetTransform();
+            go.transform.parent = _gameManager.GetSceneBehaviour().GetTransform();
             go.name = id;
 
             var lootScript = go.GetComponent<LootInteractable>();
@@ -440,7 +451,7 @@ namespace FullPotential.Core.PlayerBehaviours
             if (!killerName.IsNullOrWhiteSpace())
             {
                 var deathMessage = _attackHelper.GetDeathMessage(IsOwner, Username, killerName, itemName);
-                GameManager.Instance.MainCanvasObjects.HudOverlay.ShowAlert(deathMessage);
+                _gameManager.MainCanvasObjects.HudOverlay.ShowAlert(deathMessage);
             }
 
             PlayerSpawnStateChangeBothSides(state, position, rotation);
@@ -450,7 +461,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 case LivingEntityState.Dead:
                     if (OwnerClientId == NetworkManager.LocalClientId)
                     {
-                        GameManager.Instance.MainCanvasObjects.HideAllMenus();
+                        _gameManager.MainCanvasObjects.HideAllMenus();
                         _aliveStateChanges.PlayForwards(false);
                     }
 
@@ -485,7 +496,7 @@ namespace FullPotential.Core.PlayerBehaviours
         public void UsedWeaponClientRpc(Vector3 startPosition, Vector3 endPosition, ClientRpcParams clientRpcParams)
         {
             var projectile = Instantiate(
-                GameManager.Instance.Prefabs.Combat.ProjectileWithTrail,
+                _gameManager.Prefabs.Combat.ProjectileWithTrail,
                 startPosition,
                 _playerCamera.transform.rotation);
 
@@ -505,7 +516,7 @@ namespace FullPotential.Core.PlayerBehaviours
             leftOrRight.Ammo = leftOrRight.AmmoMax;
             leftOrRight.IsReloading = false;
 
-            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, leftOrRight);
+            _gameManager.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, leftOrRight);
         }
 
         // ReSharper disable once UnusedParameter.Global
@@ -537,12 +548,12 @@ namespace FullPotential.Core.PlayerBehaviours
                     _rb.useGravity = false;
                     GetComponent<Collider>().enabled = false;
 
-                    transform.position = new Vector3(0, GameManager.Instance.GetSceneBehaviour().Attributes.LowestYValue - 10, 0);
+                    transform.position = new Vector3(0, _gameManager.GetSceneBehaviour().Attributes.LowestYValue - 10, 0);
 
                     break;
 
                 case LivingEntityState.Respawning:
-                    GameManager.Instance.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, transform, _myHeight);
+                    _gameManager.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, transform, _myHeight);
 
                     transform.rotation = rotation;
                     _playerCamera.transform.localEulerAngles = Vector3.zero;
@@ -581,7 +592,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
-                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHealthPercentage(health, maxHealth, defence);
+                _gameManager.MainCanvasObjects.HudOverlay.UpdateHealthPercentage(health, maxHealth, defence);
             }
         }
 
@@ -611,7 +622,7 @@ namespace FullPotential.Core.PlayerBehaviours
             {
                 if (NetworkManager.LocalClientId == OwnerClientId)
                 {
-                    GameManager.Instance.MainCanvasObjects.Hud.SetActive(isAlive);
+                    _gameManager.MainCanvasObjects.Hud.SetActive(isAlive);
                 }
             });
 
@@ -619,7 +630,7 @@ namespace FullPotential.Core.PlayerBehaviours
             {
                 if (NetworkManager.LocalClientId == OwnerClientId)
                 {
-                    GameManager.Instance.MainCanvasObjects.Respawn.SetActive(!isAlive);
+                    _gameManager.MainCanvasObjects.Respawn.SetActive(!isAlive);
                 }
             });
         }
@@ -684,7 +695,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
                 var msg = _localizer.Translate("ui.alert.playerjoined");
                 var nearbyClients = _rpcHelper.ForNearbyPlayersExcept(transform.position, OwnerClientId);
-                GameManager.Instance.GetSceneBehaviour().MakeAnnouncementClientRpc(string.Format(msg, Username), nearbyClients);
+                _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(string.Format(msg, Username), nearbyClients);
             }
         }
 
@@ -705,18 +716,18 @@ namespace FullPotential.Core.PlayerBehaviours
 
         public void ShowAlertForItemsAddedToInventory(string alertText)
         {
-            GameManager.Instance.GetSceneBehaviour().MakeAnnouncementClientRpc(alertText, _clientRpcParams);
+            _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(alertText, _clientRpcParams);
         }
 
         public void AlertOfInventoryRemovals(int itemsRemovedCount)
         {
             var message = _localizer.Translate("ui.alert.itemsremoved");
-            GameManager.Instance.GetSceneBehaviour().MakeAnnouncementClientRpc(string.Format(message, itemsRemovedCount), _clientRpcParams);
+            _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(string.Format(message, itemsRemovedCount), _clientRpcParams);
         }
 
         public void AlertInventoryIsFull()
         {
-            GameManager.Instance.GetSceneBehaviour().MakeAnnouncementClientRpc(_localizer.Translate("ui.alert.itemsatmax"), _clientRpcParams);
+            _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(_localizer.Translate("ui.alert.itemsatmax"), _clientRpcParams);
         }
 
         private void LoadFromPlayerData(PlayerData playerData)
@@ -958,6 +969,11 @@ namespace FullPotential.Core.PlayerBehaviours
 
         public void HandleDeath(string killerName, string itemName)
         {
+            if (killerName == Username)
+            {
+                killerName = _localizer.Translate("ui.alert.suicide");
+            }
+
             foreach (var item in _damageTaken)
             {
                 if (!NetworkManager.Singleton.ConnectedClients.ContainsKey(item.Key))
@@ -1047,13 +1063,44 @@ namespace FullPotential.Core.PlayerBehaviours
 
         private Dictionary<IEffect, float> GetActiveEffects()
         {
-            //todo: implement this properly
-            return new Dictionary<IEffect, float> { { new Weaken(), 2 } };
+            var expiredEffects = _activeEffects
+                .Where(x => x.Value < DateTime.Now)
+                .ToList();
+
+            foreach (var kvp in expiredEffects)
+            {
+                _activeEffects.Remove(kvp.Key);
+            }
+
+            return _activeEffects.ToDictionary(
+                x => x.Key, 
+                x => (float)(DateTime.Now - x.Value).TotalSeconds);
         }
 
-        public void ApplyEffect(IEffect effect)
+        public NetworkVariable<int> GetStatVariable(AffectableStats stat)
         {
-            throw new NotImplementedException();
+            switch (stat)
+            {
+                case AffectableStats.Energy: return Energy;
+                case AffectableStats.Health: return Health;
+                case AffectableStats.Mana: return Mana;
+                case AffectableStats.Stamina: return Stamina;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public int GetStatVariableMax(AffectableStats stat)
+        {
+            switch (stat)
+            {
+                case AffectableStats.Energy: return GetEnergyMax();
+                case AffectableStats.Health: return GetHealthMax();
+                case AffectableStats.Mana: return GetManaMax();
+                case AffectableStats.Stamina: return GetStaminaMax();
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         #region Nested Classes
@@ -1082,5 +1129,81 @@ namespace FullPotential.Core.PlayerBehaviours
 
         #endregion
 
+        //todo: move these
+        public void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes)
+        {
+            //todo:
+            throw new NotImplementedException();
+        }
+
+        public void ApplyPeriodicActionToStat(IStatEffect statEffect, Attributes attributes)
+        {
+            //todo:
+            throw new NotImplementedException();
+        }
+
+        public void AlterValue(IStatEffect statEffect, Attributes attributes)
+        {
+            var statVariable = GetStatVariable(statEffect.StatToAffect);
+            var statMax = GetStatVariableMax(statEffect.StatToAffect);
+
+            //todo: attribute-based values
+            var change = 10;
+            var duration = 2f;
+
+            if (_activeEffects.ContainsKey(statEffect))
+            {
+                _activeEffects.Remove(statEffect);
+            }
+            _activeEffects.Add(statEffect, DateTime.Now.AddSeconds(duration));
+
+            if (statVariable.Value >= statMax)
+            {
+                return;
+            }
+
+            if (statEffect.Affect == Affect.SingleIncrease)
+            {
+                if (statVariable.Value < statMax - change)
+                {
+                    statVariable.Value += change;
+                }
+                else
+                {
+                    statVariable.Value = statMax;
+                }
+                return;
+            }
+
+            if (statVariable.Value - change >= 0)
+            {
+                statVariable.Value -= change;
+            }
+            else
+            {
+                statVariable.Value = 0;
+
+                //todo: other min values
+                if (statVariable == Health)
+                {
+                    HandleDeath(Username, null); //todo: replace null
+                }
+            }
+
+
+            
+        }
+
+        public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, Attributes attributes)
+        {
+            //todo:
+            throw new NotImplementedException();
+        }
+
+        public Rigidbody GetRigidBody()
+        {
+            //todo:
+            throw new NotImplementedException();
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         public SpellOrGadgetItemBase SpellOrGadget;
         public IPlayerStateBehaviour SourceStateBehaviour;
 
-        private IAttackHelper _attackHelper;
+        private IEffectHelper _effectHelper;
 
         private float _timeSinceLastEffective;
         private float _timeBetweenEffects;
@@ -33,7 +33,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             Destroy(gameObject, SpellOrGadget.Attributes.GetShapeLifetime());
 
-            _attackHelper = ModHelper.GetGameManager().GetService<IAttackHelper>();
+            _effectHelper = ModHelper.GetGameManager().GetService<IEffectHelper>();
 
             _timeBetweenEffects = SpellOrGadget.Attributes.GetTimeBetweenEffects();
             _timeSinceLastEffective = _timeBetweenEffects;
@@ -75,8 +75,9 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
+            //todo: replace hard-coded value
             var adjustedPosition = position + new Vector3(0, 1);
-            _attackHelper.DealDamage(SourceStateBehaviour.GameObject, SpellOrGadget, target, adjustedPosition);
+            _effectHelper.ApplyEffects(SourceStateBehaviour.GameObject, SpellOrGadget, target, adjustedPosition);
         }
     }
 }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Enums;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Utilities;
@@ -28,6 +29,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
         private IGameManager _gameManager;
         private IAttackHelper _attackHelper;
         private IRpcHelper _rpcHelper;
+        //private IEffectHelper _effectHelper;
 
         private readonly NetworkVariable<int> _health = new NetworkVariable<int>(100);
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
@@ -39,6 +41,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
             _gameManager = ModHelper.GetGameManager();
             _attackHelper = _gameManager.GetService<IAttackHelper>();
             _rpcHelper = _gameManager.GetService<IRpcHelper>();
+            //_effectHelper = _gameManager.GetService<IEffectHelper>();
 
             _healthSlider = _healthSliderParent.GetComponent<IStatSlider>();
 
@@ -151,9 +154,46 @@ namespace FullPotential.Standard.Enemies.Behaviours
             _attackHelper.CheckIfOffTheMap(this, transform.position.y);
         }
 
-        public void ApplyEffect(IEffect effect)
+        public NetworkVariable<int> GetStatVariable(AffectableStats stat)
         {
-            //todo: effects on enemies
+            //todo:
+            return null;
+        }
+
+        public int GetStatVariableMax(AffectableStats stat)
+        {
+            //todo:
+            return -1;
+        }
+
+        //todo: move these
+        public void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void ApplyPeriodicActionToStat(IStatEffect statEffect, Attributes attributes)
+        {
+            //todo:
+            throw new System.NotImplementedException();
+        }
+
+        public void AlterValue(IStatEffect statEffect, Attributes attributes)
+        {
+            //todo:
+            throw new System.NotImplementedException();
+        }
+
+        public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, Attributes attributes)
+        {
+            //todo:
+            throw new System.NotImplementedException();
+        }
+
+        public Rigidbody GetRigidBody()
+        {
+            //todo:
+            throw new System.NotImplementedException();
         }
     }
 }

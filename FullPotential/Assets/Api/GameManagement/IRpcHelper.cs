@@ -9,6 +9,8 @@ namespace FullPotential.Api.GameManagement
 {
     public interface IRpcHelper
     {
+        ClientRpcParams ForPlayer(ulong clientId);
+
         ClientRpcParams ForNearbyPlayers(Vector3 position);
 
         ClientRpcParams ForNearbyPlayersExcept(Vector3 position, ulong exceptClientId);

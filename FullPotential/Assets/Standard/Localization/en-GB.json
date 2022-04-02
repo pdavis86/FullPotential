@@ -111,7 +111,7 @@
       "Value": "Regeneration"
     },
     {
-      "Key": "effect.strength",
+      "Key": "effect.strengthen",
       "Value": "Strength"
     },
 
@@ -141,7 +141,7 @@
       "Value": "Slow"
     },
     {
-      "Key": "effect.weakness",
+      "Key": "effect.weaken",
       "Value": "Weakness"
     },
 
@@ -195,6 +195,10 @@
     {
       "Key": "effect.summon",
       "Value": "Summon"
+    },
+    {
+      "Key": "effect.float",
+      "Value": "Float"
     },
 	
 	
