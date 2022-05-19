@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Helpers;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
@@ -39,9 +39,8 @@ namespace FullPotential.Core.PlayerBehaviours
 
         //Services
         private ITypeRegistry _typeRegistry;
-        private ResultFactory _resultFactory;
         private UserRegistry _userRegistry;
-        private IRpcHelper _rpcHelper;
+        private IRpcService _rpcService;
         private Localizer _localizer;
 
         private PlayerState _playerState;
@@ -52,7 +51,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
         private readonly FragmentedMessageReconstructor _inventoryChangesReconstructor = new FragmentedMessageReconstructor();
 
-        #region Event Handlers
+        #region Unity Events Handlers
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -60,9 +59,8 @@ namespace FullPotential.Core.PlayerBehaviours
             _playerState = GetComponent<PlayerState>();
 
             _typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
-            _resultFactory = GameManager.Instance.GetService<ResultFactory>();
             _userRegistry = GameManager.Instance.GetService<UserRegistry>();
-            _rpcHelper = GameManager.Instance.GetService<IRpcHelper>();
+            _rpcService = GameManager.Instance.GetService<IRpcService>();
             _localizer = GameManager.Instance.GetService<Localizer>();
 
             _items = new Dictionary<string, ItemBase>();
@@ -100,7 +98,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 InventoryDataHelper.PopulateInventoryChangesWithItem(invChange, item);
             }
 
-            var nearbyClients = _rpcHelper.ForNearbyPlayersExcept(transform.position, OwnerClientId);
+            var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, OwnerClientId);
             foreach (var message in FragmentedMessageReconstructor.GetFragmentedMessages(invChange))
             {
                 ApplyEquipChangeClientRpc(message, nearbyClients);
@@ -398,6 +396,15 @@ namespace FullPotential.Core.PlayerBehaviours
                     Item = item
                 });
             }
+
+            if (slotGameObjectName == SlotGameObjectName.LeftHand)
+            {
+                _playerState.HandStatusLeft.EquippedItem = item;
+            }
+            else if (slotGameObjectName == SlotGameObjectName.RightHand)
+            {
+                _playerState.HandStatusRight.EquippedItem = item;
+            }
         }
 
         private static void FillTypesFromIds(ItemBase item)
@@ -561,18 +568,6 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (item == null)
             {
-                if (IsOwner && IsClient)
-                {
-                    switch (slotGameObjectName)
-                    {
-                        case SlotGameObjectName.LeftHand:
-                        case SlotGameObjectName.RightHand:
-                            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandDescription(isLeftHand, null);
-                            GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, null);
-                            break;
-                    }
-                }
-
                 return;
             }
 
@@ -618,12 +613,6 @@ namespace FullPotential.Core.PlayerBehaviours
 
         private void SpawnItemInHand(SlotGameObjectName slotGameObjectName, ItemBase item, bool isLeftHand = true)
         {
-            if (IsOwner)
-            {
-                var contents = _resultFactory.GetItemDescription(item);
-                GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandDescription(isLeftHand, contents);
-            }
-
             if (!NetworkManager.Singleton.IsClient)
             {
                 Debug.LogError("Tried to spawn a GameObject on a server");
@@ -647,23 +636,18 @@ namespace FullPotential.Core.PlayerBehaviours
                         }
                     );
 
+                    //todo: current ammo should come from the item, not the max
                     var ammoMax = weapon.Attributes.GetAmmoMax();
-                    var newAmmoStatus = new PlayerHandStatus
-                    {
-                        AmmoMax = ammoMax,
-                        Ammo = ammoMax
-                    };
-
                     if (isLeftHand)
                     {
-                        _playerState.HandStatusLeft = newAmmoStatus;
+                        _playerState.HandStatusLeft.AmmoMax = ammoMax;
+                        _playerState.HandStatusLeft.Ammo = ammoMax;
                     }
                     else
                     {
-                        _playerState.HandStatusRight = newAmmoStatus;
+                        _playerState.HandStatusRight.AmmoMax = ammoMax;
+                        _playerState.HandStatusRight.Ammo = ammoMax;
                     }
-
-                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, newAmmoStatus);
 
                     break;
 
@@ -674,7 +658,6 @@ namespace FullPotential.Core.PlayerBehaviours
                         : GameManager.Instance.Prefabs.Combat.GadgetInHand;
 
                     InstantiateInPlayerHand(prefab, isLeftHand, null, slotGameObjectName);
-                    GameManager.Instance.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, null);
 
                     break;
 

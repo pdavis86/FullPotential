@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using FullPotential.Api.Gameplay;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Unity.Extensions;

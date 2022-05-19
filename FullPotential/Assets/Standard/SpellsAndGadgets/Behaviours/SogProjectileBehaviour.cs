@@ -1,5 +1,5 @@
 ﻿using System;
-using FullPotential.Api.Gameplay;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
@@ -16,10 +16,10 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
     public class SogProjectileBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
         public SpellOrGadgetItemBase SpellOrGadget;
-        public IPlayerStateBehaviour SourceStateBehaviour;
+        public IFighter SourceFighter;
         public Vector3 ForwardDirection;
 
-        private IEffectHelper _effectHelper;
+        private IEffectService _effectService;
 
         private Type _shapeType;
 
@@ -35,9 +35,9 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             Destroy(gameObject, 3f);
 
-            Physics.IgnoreCollision(GetComponent<Collider>(), SourceStateBehaviour.GameObject.GetComponent<Collider>());
+            Physics.IgnoreCollision(GetComponent<Collider>(), SourceFighter.GameObject.GetComponent<Collider>());
 
-            _effectHelper = ModHelper.GetGameManager().GetService<IEffectHelper>();
+            _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
 
             var affectedByGravity = SpellOrGadget.Shape != null;
 
@@ -83,7 +83,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                     return;
                 }
 
-                _effectHelper.ApplyEffects(SourceStateBehaviour.GameObject, SpellOrGadget, target, position);
+                _effectService.ApplyEffects(SourceFighter.GameObject, SpellOrGadget, target, position);
             }
             else
             {
@@ -107,11 +107,11 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                     var rotation = Quaternion.LookRotation(ForwardDirection);
                     rotation.x = 0;
                     rotation.z = 0;
-                    SpellOrGadget.Shape.SpawnGameObject(SpellOrGadget, SourceStateBehaviour, spawnPosition, rotation);
+                    SpellOrGadget.Shape.SpawnGameObject(SpellOrGadget, SourceFighter, spawnPosition, rotation);
                 }
                 else if (_shapeType == typeof(Zone))
                 {
-                    SpellOrGadget.Shape.SpawnGameObject(SpellOrGadget, SourceStateBehaviour, spawnPosition, Quaternion.identity);
+                    SpellOrGadget.Shape.SpawnGameObject(SpellOrGadget, SourceFighter, spawnPosition, Quaternion.identity);
                 }
                 else
                 {

@@ -1,4 +1,4 @@
-using FullPotential.Api.Gameplay;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
 using Unity.Netcode;
@@ -14,10 +14,10 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         private const float _distanceBeforeReturning = 8f;
 
         public SpellOrGadgetItemBase SpellOrGadget;
-        public IPlayerStateBehaviour SourceStateBehaviour;
+        public IFighter SourceFighter;
         public Vector3 ForwardDirection;
 
-        private IEffectHelper _effectHelper;
+        private IEffectService _effectService;
 
         private float _castSpeed;
         private Rigidbody _rigidBody;
@@ -33,7 +33,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _effectHelper = ModHelper.GetGameManager().GetService<IEffectHelper>();
+            _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
 
             _castSpeed = SpellOrGadget.Attributes.Speed / 50f;
             if (_castSpeed < 0.5)
@@ -48,7 +48,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            var distanceFromPlayer = Vector3.Distance(transform.position, SourceStateBehaviour.Transform.position);
+            var distanceFromPlayer = Vector3.Distance(transform.position, SourceFighter.Transform.position);
 
             if (!_returningToPlayer)
             {
@@ -63,7 +63,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             }
 
             ClearForce();
-            var playerDirection = (SourceStateBehaviour.Transform.position - transform.position).normalized;
+            var playerDirection = (SourceFighter.Transform.position - transform.position).normalized;
             _rigidBody.AddForce(_castSpeed * 20f * playerDirection, ForceMode.VelocityChange);
         }
 
@@ -102,7 +102,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _effectHelper.ApplyEffects(SourceStateBehaviour.GameObject, SpellOrGadget, target, position);
+            _effectService.ApplyEffects(SourceFighter.GameObject, SpellOrGadget, target, position);
             Destroy(gameObject);
         }
 

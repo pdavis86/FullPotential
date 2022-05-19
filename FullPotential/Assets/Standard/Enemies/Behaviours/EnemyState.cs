@@ -1,12 +1,4 @@
-using System.Collections.Generic;
-using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay;
-using FullPotential.Api.Gameplay.Enums;
-using FullPotential.Api.Registry;
-using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Ui.Components;
-using FullPotential.Api.Utilities;
-using TMPro;
+using FullPotential.Core.Gameplay.Combat;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -15,44 +7,42 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Enemies.Behaviours
 {
-    public class EnemyState : NetworkBehaviour, IEnemyStateBehaviour
+    public class EnemyState : FighterBase
     {
-        public LivingEntityState AliveState { get; private set; }
-
-#pragma warning disable 0649
-        [SerializeField] private TextMeshProUGUI _nameTag;
-        [SerializeField] private GameObject _healthSliderParent;
-#pragma warning restore 0649
+        #region Properties
 
         public readonly NetworkVariable<FixedString32Bytes> EnemyName = new NetworkVariable<FixedString32Bytes>();
 
-        private IGameManager _gameManager;
-        private IAttackHelper _attackHelper;
-        private IRpcHelper _rpcHelper;
-        //private IEffectHelper _effectHelper;
+        public override Transform Transform => transform;
 
-        private readonly NetworkVariable<int> _health = new NetworkVariable<int>(100);
-        private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
-        private IStatSlider _healthSlider;
+        public override GameObject GameObject => gameObject;
 
-        // ReSharper disable once UnusedMember.Local
-        private void Awake()
+        public override Transform LookTransform => transform;
+
+        public override string FighterName => EnemyName.Value.ToString();
+
+        #endregion
+        
+        #region Unity Event Handlers
+
+         protected override void Awake()
         {
-            _gameManager = ModHelper.GetGameManager();
-            _attackHelper = _gameManager.GetService<IAttackHelper>();
-            _rpcHelper = _gameManager.GetService<IRpcHelper>();
-            //_effectHelper = _gameManager.GetService<IEffectHelper>();
-
-            _healthSlider = _healthSliderParent.GetComponent<IStatSlider>();
+            base.Awake();
 
             _health.OnValueChanged += OnHealthChanged;
             EnemyName.OnValueChanged += OnNameChanged;
-
-            if (IsServer)
-            {
-                InvokeRepeating(nameof(CheckIfOffTheMap), 1, 1);
-            }
         }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+
+            SetName();
+        }
+
+        #endregion
+
+        #region NetworkVariable Event Handlers
 
         private void OnHealthChanged(int previousValue, int newValue)
         {
@@ -65,79 +55,8 @@ namespace FullPotential.Standard.Enemies.Behaviours
             SetName();
         }
 
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-
-            SetName();
-        }
-
-        //todo: attribute-based defense
-        public int GetDefenseValue()
-        {
-            return 50;
-        }
-
-        //todo: attribute-based health
-        public int GetHealthMax()
-        {
-            return 100;
-        }
-
-        public int GetHealth()
-        {
-            return _health.Value;
-        }
-
-        public void TakeDamage(int amount, ulong? clientId, string attackerName, string itemName)
-        {
-            if (clientId != null)
-            {
-                if (_damageTaken.ContainsKey(clientId.Value))
-                {
-                    _damageTaken[clientId.Value] += amount;
-                }
-                else
-                {
-                    _damageTaken.Add(clientId.Value, amount);
-                }
-            }
-
-            _health.Value -= amount;
-
-            if (_health.Value <= 0)
-            {
-                HandleDeath(attackerName, itemName);
-            }
-        }
-
-        public void HandleDeath(string killerName, string itemName)
-        {
-            AliveState = LivingEntityState.Dead;
-
-            GetComponent<Collider>().enabled = false;
-
-            foreach (var item in _damageTaken)
-            {
-                if (!NetworkManager.Singleton.ConnectedClients.ContainsKey(item.Key))
-                {
-                    continue;
-                }
-                var playerState = NetworkManager.Singleton.ConnectedClients[item.Key].PlayerObject.gameObject.GetComponent<IPlayerStateBehaviour>();
-                playerState.SpawnLootChest(transform.position);
-            }
-
-            _damageTaken.Clear();
-
-            var deathMessage = _attackHelper.GetDeathMessage(false, name, killerName, itemName);
-            var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
-            _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(deathMessage, nearbyClients);
-
-            Destroy(gameObject);
-
-            _gameManager.GetSceneBehaviour().HandleEnemyDeath();
-        }
-
+        #endregion
+        
         private void SetName()
         {
             var variableValue = EnemyName.Value.ToString();
@@ -149,51 +68,14 @@ namespace FullPotential.Standard.Enemies.Behaviours
             _nameTag.text = displayName;
         }
 
-        private void CheckIfOffTheMap()
+        public override void HandleDeath(string killerName, string itemName)
         {
-            _attackHelper.CheckIfOffTheMap(this, transform.position.y);
+            base.HandleDeath(killerName, itemName);
+
+            Destroy(gameObject);
+
+            _gameManager.GetSceneBehaviour().HandleEnemyDeath();
         }
 
-        public NetworkVariable<int> GetStatVariable(AffectableStats stat)
-        {
-            //todo:
-            return null;
-        }
-
-        public int GetStatVariableMax(AffectableStats stat)
-        {
-            //todo:
-            return -1;
-        }
-
-        //todo: move these
-        public void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void ApplyPeriodicActionToStat(IStatEffect statEffect, Attributes attributes)
-        {
-            //todo:
-            throw new System.NotImplementedException();
-        }
-
-        public void AlterValue(IStatEffect statEffect, Attributes attributes)
-        {
-            //todo:
-            throw new System.NotImplementedException();
-        }
-
-        public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, Attributes attributes)
-        {
-            //todo:
-            throw new System.NotImplementedException();
-        }
-
-        public Rigidbody GetRigidBody()
-        {
-            //todo:
-            throw new System.NotImplementedException();
-        }
     }
 }

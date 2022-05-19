@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace FullPotential.Api.GameManagement
 {
-    public interface IRpcHelper
+    public interface IRpcService
     {
         ClientRpcParams ForPlayer(ulong clientId);
 

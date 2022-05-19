@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Gameplay;
+﻿using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
 using Unity.Netcode;
@@ -14,11 +14,11 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         private const int _maxDistance = 3;
 
         public SpellOrGadgetItemBase SpellOrGadget;
-        public IPlayerStateBehaviour SourceStateBehaviour;
+        public IFighter SourceFighter;
         public Vector3 StartPosition;
         public Vector3 ForwardDirection;
 
-        private IEffectHelper _effectHelper;
+        private IEffectService _effectService;
 
         // ReSharper disable once UnusedMember.Local
         private void Start()
@@ -30,7 +30,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _effectHelper = ModHelper.GetGameManager().GetService<IEffectHelper>();
+            _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
 
             if (Physics.Raycast(StartPosition, ForwardDirection, out var hit, maxDistance: _maxDistance))
             {
@@ -52,7 +52,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _effectHelper.ApplyEffects(SourceStateBehaviour.GameObject, SpellOrGadget, target, position);
+            _effectService.ApplyEffects(SourceFighter.GameObject, SpellOrGadget, target, position);
         }
 
     }

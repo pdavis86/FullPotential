@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Gameplay;
+﻿using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
@@ -14,9 +14,9 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
     public class SogZoneBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
         public SpellOrGadgetItemBase SpellOrGadget;
-        public IPlayerStateBehaviour SourceStateBehaviour;
+        public IFighter SourceFighter;
 
-        private IEffectHelper _effectHelper;
+        private IEffectService _effectService;
 
         private float _timeSinceLastEffective;
         private float _timeBetweenEffects;
@@ -33,7 +33,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             Destroy(gameObject, SpellOrGadget.Attributes.GetShapeLifetime());
 
-            _effectHelper = ModHelper.GetGameManager().GetService<IEffectHelper>();
+            _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
 
             _timeBetweenEffects = SpellOrGadget.Attributes.GetTimeBetweenEffects();
             _timeSinceLastEffective = _timeBetweenEffects;
@@ -77,7 +77,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             //todo: replace hard-coded value
             var adjustedPosition = position + new Vector3(0, 1);
-            _effectHelper.ApplyEffects(SourceStateBehaviour.GameObject, SpellOrGadget, target, adjustedPosition);
+            _effectService.ApplyEffects(SourceFighter.GameObject, SpellOrGadget, target, adjustedPosition);
         }
     }
 }

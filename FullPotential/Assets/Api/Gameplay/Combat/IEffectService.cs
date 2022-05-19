@@ -1,9 +1,9 @@
 ﻿using FullPotential.Api.Registry.Base;
 using UnityEngine;
 
-namespace FullPotential.Api.Gameplay
+namespace FullPotential.Api.Gameplay.Combat
 {
-    public interface IEffectHelper
+    public interface IEffectService
     {
         void ApplyEffects(
             GameObject source,

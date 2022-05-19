@@ -1,5 +1,5 @@
 ﻿using System;
-using FullPotential.Api.Gameplay;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
@@ -16,7 +16,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Shapes
 
         public string PrefabAddress => "Standard/Prefabs/SpellOrGadget/Wall.prefab";
 
-        public void SpawnGameObject(SpellOrGadgetItemBase spellOrGadget, IPlayerStateBehaviour sourceStateBehaviour, Vector3 startPosition, Quaternion rotation)
+        public void SpawnGameObject(SpellOrGadgetItemBase spellOrGadget, IFighter sourceFighter, Vector3 startPosition, Quaternion rotation)
         {
             var gameManager = ModHelper.GetGameManager();
             gameManager.GetService<ITypeRegistry>().LoadAddessable(
@@ -28,7 +28,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Shapes
 
                     var spellScript = spellObject.GetComponent<SogWallBehaviour>();
                     spellScript.SpellOrGadget = spellOrGadget;
-                    spellScript.SourceStateBehaviour = sourceStateBehaviour;
+                    spellScript.SourceFighter = sourceFighter;
 
                     spellObject.transform.parent = gameManager.GetSceneBehaviour().GetTransform();
                 }

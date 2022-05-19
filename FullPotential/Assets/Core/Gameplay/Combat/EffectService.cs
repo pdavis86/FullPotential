@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Unity.Constants;
-using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Localization;
-using FullPotential.Core.PlayerBehaviours;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -18,23 +15,20 @@ using UnityEngine;
 
 namespace FullPotential.Core.Gameplay.Combat
 {
-    public class EffectHelper : IEffectHelper
+    public class EffectService : IEffectService
     {
-        // ReSharper disable once InconsistentNaming
-        private static readonly System.Random _random = new System.Random();
-
         private readonly Localizer _localizer;
         private readonly ITypeRegistry _typeRegistry;
-        private readonly IRpcHelper _rpcHelper;
+        private readonly IRpcService _rpcService;
 
-        public EffectHelper(
+        public EffectService(
             Localizer localizer,
             ITypeRegistry typeRegistry,
-            IRpcHelper rpcHelper)
+            IRpcService rpcService)
         {
             _localizer = localizer;
             _typeRegistry = typeRegistry;
-            _rpcHelper = rpcHelper;
+            _rpcService = rpcService;
         }
 
         public void ApplyEffects(
@@ -56,7 +50,21 @@ namespace FullPotential.Core.Gameplay.Combat
                 return;
             }
 
-            if (itemUsed?.Effects != null && itemUsed.Effects.Any())
+            var itemHasEffects = itemUsed?.Effects != null && itemUsed.Effects.Any();
+
+            if (!itemHasEffects)
+            {
+                var targetFighter = target.GetComponent<IDamageable>();
+                if (targetFighter != null)
+                {
+                    targetFighter.TakeDamage(source, itemUsed, position);
+                }
+                else
+                {
+                    Debug.LogWarning("Target was not an IDamageable");
+                }
+            }
+            else
             {
                 foreach (var effect in itemUsed.Effects)
                 {
@@ -68,70 +76,11 @@ namespace FullPotential.Core.Gameplay.Combat
                         ApplyEffect(null, sideEffect, itemUsed, source, position);
                     }
                 }
-
-                if (source == null)
-                {
-                    Debug.LogWarning("Attack source not found. Did they sign out?");
-                    return;
-                }
-
-                return;
             }
 
-            ApplyDamage(source, itemUsed, target, position, target.GetComponent<IFighter>());
-        }
-
-        private void ApplyDamage(
-            GameObject source,
-            ItemBase itemUsed,
-            GameObject target,
-            Vector3? position,
-            IFighter targetFighter
-        )
-        {
-            var sourceIsPlayer = source != null && source.CompareTag(Tags.Player);
-            var sourcePlayerState = sourceIsPlayer ? source.GetComponent<PlayerState>() : null;
-
-            //Even a small attack can still do damage
-            var attackStrength = itemUsed?.Attributes.Strength ?? 1;
-            var damageDealtBasic = attackStrength * 100f / (100 + targetFighter.GetDefenseValue());
-
-            //Throw in some variation
-            var multiplier = (float)_random.Next(90, 111) / 100;
-            var adder = _random.Next(0, 6);
-            var damageDealt = (int)Math.Ceiling(damageDealtBasic / multiplier) + adder;
-
-            //TakeDamage call
-            var sourceName = sourceIsPlayer
-                ? sourcePlayerState.Username
-                : (source != null ? source.name : null).OrIfNullOrWhitespace(_localizer.Translate("ui.alert.unknownattacker"));
-            var sourceItemName = itemUsed?.Name ?? _localizer.Translate("ui.alert.attack.noitem");
-            var sourceNetworkObject = source != null ? source.GetComponent<NetworkObject>() : null;
-            var sourceClientId = source != null ? (ulong?)sourceNetworkObject.OwnerClientId : null;
-            targetFighter.TakeDamage(damageDealt, sourceClientId, sourceName, sourceItemName);
-
-            //Extras
             if (source == null)
             {
                 Debug.LogWarning("Attack source not found. Did they sign out?");
-                return;
-            }
-
-            if (itemUsed == null)
-            {
-                var targetRb = target.GetComponent<Rigidbody>();
-                if (targetRb != null && position.HasValue)
-                {
-                    targetRb.AddForceAtPosition(source.transform.forward * 150, position.Value);
-                }
-            }
-
-            if (sourceIsPlayer && position.HasValue && source != target)
-            {
-                sourcePlayerState.ShowDamageClientRpc(
-                    position.Value,
-                    damageDealt.ToString(CultureInfo.InvariantCulture),
-                    _rpcHelper.ForPlayer(sourcePlayerState.OwnerClientId));
             }
         }
 
@@ -165,8 +114,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private void ApplyAttributeEffect(IAttributeEffect attributeEffect, Attributes attributes, GameObject target)
         {
-            //todo: attribute-based change value
-            target.GetComponent<IFighter>().AddAttributeModifier(attributeEffect, attributes);
+            //todo: target.GetComponent<IFighter>().AddAttributeModifier(attributeEffect, attributes);
         }
 
         private void ApplyStatEffect(GameObject source, IStatEffect statEffect, ItemBase itemUsed, GameObject target, Vector3? position)
@@ -177,7 +125,7 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 case Affect.PeriodicDecrease:
                 case Affect.PeriodicIncrease:
-                    targetFighter.ApplyPeriodicActionToStat(statEffect, itemUsed.Attributes);
+                    //todo: targetFighter.ApplyPeriodicActionToStat(statEffect, itemUsed.Attributes);
                     return;
 
                 case Affect.SingleDecrease:
@@ -185,16 +133,16 @@ namespace FullPotential.Core.Gameplay.Combat
 
                     if (statEffect.Affect == Affect.SingleDecrease && statEffect.StatToAffect == AffectableStats.Health)
                     {
-                        ApplyDamage(source, itemUsed, target, position, targetFighter);
+                        targetFighter.TakeDamage(source, itemUsed, position);
                         return;
                     }
 
-                    targetFighter.AlterValue(statEffect, itemUsed.Attributes);
+                    //todo: targetFighter.AlterValue(statEffect, itemUsed.Attributes);
                     return;
 
                 case Affect.TemporaryMaxDecrease:
                 case Affect.TemporaryMaxIncrease:
-                    targetFighter.ApplyTemporaryMaxActionToStat(statEffect, itemUsed.Attributes);
+                    //todo: targetFighter.ApplyTemporaryMaxActionToStat(statEffect, itemUsed.Attributes);
                     return;
 
                 default:
@@ -204,7 +152,8 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private void ApplyMovementEffect(GameObject source, IMovementEffect movementEffect, Attributes attributes, GameObject target)
         {
-            var rb = target.GetComponent<IFighter>().GetRigidBody();
+            var targetFighter = target.GetComponent<IFighter>();
+            var targetRigidBody = targetFighter.RigidBody;
 
             //todo: handle periodic
 
@@ -219,8 +168,8 @@ namespace FullPotential.Core.Gameplay.Combat
                         Debug.LogWarning("Attack source not found. Did they sign out?");
                         return;
                     }
-                    var awayVector = rb.transform.position - source.GetComponent<IFighter>().GetRigidBody().transform.position;
-                    rb.AddForce(awayVector * force, ForceMode.Acceleration);
+                    var awayVector = targetRigidBody.transform.position - source.GetComponent<IFighter>().RigidBody.transform.position;
+                    targetRigidBody.AddForce(awayVector * force, ForceMode.Acceleration);
                     return;
 
                 case MovementDirection.TowardSource:
@@ -229,8 +178,8 @@ namespace FullPotential.Core.Gameplay.Combat
                         Debug.LogWarning("Attack source not found. Did they sign out?");
                         return;
                     }
-                    var towardVector = source.GetComponent<IFighter>().GetRigidBody().transform.position - rb.transform.position;
-                    rb.AddForce(towardVector * force, ForceMode.Acceleration);
+                    var towardVector = source.GetComponent<IFighter>().RigidBody.transform.position - targetRigidBody.transform.position;
+                    targetRigidBody.AddForce(towardVector * force, ForceMode.Acceleration);
                     return;
 
                 case MovementDirection.Backwards:

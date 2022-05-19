@@ -366,6 +366,12 @@
     {
       "Key": "ui.respawn.respawn",
       "Value": "Respawn"
+    },
+	
+	
+    {
+      "Key": "ui.hub.reloading",
+      "Value": "Reloading..."
     }
 
   ]

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace FullPotential.Core.Networking
 {
-    public class RpcHelper : IRpcHelper
+    public class RpcService : IRpcService
     {
         public ClientRpcParams ForPlayer(ulong clientId)
         {

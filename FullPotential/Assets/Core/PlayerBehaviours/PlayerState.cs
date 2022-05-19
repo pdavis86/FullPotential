@@ -2,29 +2,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay;
-using FullPotential.Api.Gameplay.Data;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Enums;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Registry;
-using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Environment;
-using FullPotential.Core.GameManagement;
 using FullPotential.Core.GameManagement.Constants;
 using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Data;
-using FullPotential.Core.Localization;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Registry;
-using FullPotential.Core.Ui.Components;
 using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.Helpers;
-using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -34,110 +27,89 @@ using UnityEngine.Networking;
 
 namespace FullPotential.Core.PlayerBehaviours
 {
-    public class PlayerState : NetworkBehaviour, IPlayerStateBehaviour
+    public class PlayerState : FighterBase
     {
-        // ReSharper disable once InconsistentNaming
-        private static readonly System.Random _random = new System.Random();
+        #region Variables
 
-        // ReSharper disable UnassignedField.Global
-#pragma warning disable 0649
-        [SerializeField] private Behaviour[] _behavioursToDisable;
-        [SerializeField] private Behaviour[] _behavioursForRespawn;
-        [SerializeField] private GameObject[] _gameObjectsForPlayers;
-        [SerializeField] private GameObject[] _gameObjectsForRespawn;
-        public PositionTransforms Positions;
-        public BodyPartTransforms BodyParts;
-        [SerializeField] private TextMeshProUGUI _nameTag;
-        [SerializeField] private BarSlider _healthSlider;
-        [SerializeField] private Transform _head;
-        [SerializeField] private Material _defaultMaterial;
-        [SerializeField] private GameObject _playerCamera;
-        public GameObject InFrontOfPlayer;
-        public Transform GraphicsTransform;
-#pragma warning restore 0649
-        // ReSharper enable UnassignedField.Global
-
-        // ReSharper disable MemberCanBePrivate.Global
-        public readonly NetworkVariable<int> Stamina = new NetworkVariable<int>(100);
-        public readonly NetworkVariable<int> Health = new NetworkVariable<int>(100);
-        public readonly NetworkVariable<int> Mana = new NetworkVariable<int>(100);
-        public readonly NetworkVariable<int> Energy = new NetworkVariable<int>(100);
         [HideInInspector] public readonly NetworkVariable<FixedString512Bytes> TextureUrl = new NetworkVariable<FixedString512Bytes>();
-        // ReSharper enable MemberCanBePrivate.Global
-
-        public PlayerHandStatus HandStatusLeft = new PlayerHandStatus();
-        public PlayerHandStatus HandStatusRight = new PlayerHandStatus();
         [HideInInspector] public string PlayerToken;
         [HideInInspector] public string Username;
 
-        private PlayerActions _playerActions;
         private ClientRpcParams _clientRpcParams;
 
         private readonly FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
         private readonly Dictionary<string, DateTime> _unclaimedLoot = new Dictionary<string, DateTime>();
-        private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
-        private readonly Dictionary<IEffect, DateTime> _activeEffects = new Dictionary<IEffect, DateTime>();
 
-        private Rigidbody _rb;
-        private bool _isSprinting;
         private Vector3 _startingPosition;
         private float _myHeight;
         private MeshRenderer _bodyMeshRenderer;
 
         //Action-related
-        private DelayedAction _replenishAmmo;
-        private DelayedAction _replenishStamina;
-        private DelayedAction _replenishMana;
-        private DelayedAction _replenishEnergy;
-        private DelayedAction _consumeStamina;
-        private DelayedAction _consumeResource;
-        private DelayedAction _updateUi;
         private ActionQueue<bool> _aliveStateChanges;
 
         //Registered Services
-        private GameManager _gameManager;
         private UserRegistry _userRegistry;
-        private Localizer _localizer;
-        private IRpcHelper _rpcHelper;
-        private IAttackHelper _attackHelper;
 
-        public LivingEntityState AliveState { get; private set; }
+        #endregion
+
+        #region Inspector Variables
+        // ReSharper disable UnassignedField.Global
+#pragma warning disable 0649
+
+        [SerializeField] private Behaviour[] _behavioursToDisable;
+        [SerializeField] private Behaviour[] _behavioursForRespawn;
+        [SerializeField] private GameObject[] _gameObjectsForPlayers;
+        [SerializeField] private GameObject[] _gameObjectsForRespawn;
+        [SerializeField] private Material _defaultMaterial;
+        [SerializeField] private GameObject _playerCamera;
+        public GameObject InFrontOfPlayer;
+        public Transform GraphicsTransform;
+
+#pragma warning restore 0649
+        // ReSharper enable UnassignedField.Global
+        #endregion
+
+        #region Properties
 
         public IPlayerInventory Inventory { get; private set; }
 
-        public Transform Transform => transform;
+        public override Transform Transform => transform;
 
-        public GameObject GameObject => gameObject;
+        public override GameObject GameObject => gameObject;
 
-        public GameObject CameraGameObject => _playerCamera;
+        public override Transform LookTransform => _playerCamera.transform;
 
-        #region Event handlers
+        public override string FighterName => Username;
+
+        #endregion
+
+        #region Unity Event Handlers
 
         // ReSharper disable once UnusedMember.Local
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             TextureUrl.OnValueChanged += OnTextureChanged;
-            Stamina.OnValueChanged += OnStaminaChanged;
-            Health.OnValueChanged += OnHealthChanged;
-            Mana.OnValueChanged += OnManaChanged;
-            Energy.OnValueChanged += OnEnergyChanged;
+            //_stamina.OnValueChanged += OnStaminaChanged;
+            _health.OnValueChanged += OnHealthChanged;
+            //_mana.OnValueChanged += OnManaChanged;
+            //_energy.OnValueChanged += OnEnergyChanged;
 
             Inventory = GetComponent<PlayerInventory>();
-            _rb = GetComponent<Rigidbody>();
-            _playerActions = GetComponent<PlayerActions>();
+            _inventory = Inventory;
             _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
 
-            _gameManager = GameManager.Instance;
-            _rpcHelper = _gameManager.GetService<IRpcHelper>();
-            _attackHelper = _gameManager.GetService<IAttackHelper>();
             _userRegistry = _gameManager.GetService<UserRegistry>();
-            _localizer = _gameManager.GetService<Localizer>();
-            //_effectHelper = _gameManager.GetService<IEffectHelper>();
+            _typeRegistry = _gameManager.GetService<ITypeRegistry>();
+            _effectService = _gameManager.GetService<IEffectService>();
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
+
             if (IsOwner)
             {
                 GameObjectHelper.GetObjectAtRoot(GameObjectNames.SceneCanvas).SetActive(false);
@@ -183,116 +155,25 @@ namespace FullPotential.Core.PlayerBehaviours
             var gameObjectCollider = gameObject.GetComponent<Collider>();
             _myHeight = gameObjectCollider.bounds.max.y - gameObjectCollider.bounds.min.y;
 
-            AliveState = LivingEntityState.Alive;
-
-            _replenishStamina = new DelayedAction(.01f, () =>
-            {
-                if (!_isSprinting && Stamina.Value < GetStaminaMax())
-                {
-                    //todo: xp-based stamina recharge
-                    Stamina.Value += 1;
-                }
-            });
-
-            _replenishMana = new DelayedAction(.2f, () =>
-            {
-                var isConsumingMana =
-                    (HandStatusLeft.SpellOrGadgetItem is Spell && HandStatusLeft.SpellOrGadgetGameObject != null)
-                    || (HandStatusRight.SpellOrGadgetItem is Spell && HandStatusRight.SpellOrGadgetGameObject != null);
-
-                if (!isConsumingMana && Mana.Value < GetManaMax())
-                {
-                    //todo: xp-based mana recharge
-                    Mana.Value += 1;
-                }
-            });
-
-            _replenishEnergy = new DelayedAction(.2f, () =>
-            {
-                var isConsumingEnergy =
-                    (HandStatusLeft.SpellOrGadgetItem is Gadget && HandStatusLeft.SpellOrGadgetGameObject != null)
-                    || (HandStatusRight.SpellOrGadgetItem is Gadget && HandStatusRight.SpellOrGadgetGameObject != null);
-
-                if (!isConsumingEnergy && Energy.Value < GetEnergyMax())
-                {
-                    //todo: xp-based energy recharge
-                    Energy.Value += 1;
-                }
-            });
-
-            _replenishAmmo = new DelayedAction(0.5f, () =>
-            {
-                if (HandStatusLeft.IsReloading && HandStatusLeft.Ammo < HandStatusLeft.AmmoMax)
-                {
-                    StartCoroutine(ReloadCoroutine(HandStatusLeft, true));
-                }
-                else if (HandStatusRight.IsReloading && HandStatusRight.Ammo < HandStatusRight.AmmoMax)
-                {
-                    StartCoroutine(ReloadCoroutine(HandStatusRight, false));
-                }
-            });
-
-            _consumeStamina = new DelayedAction(.05f, () =>
-            {
-                var staminaCost = GetStaminaCost();
-                if (_isSprinting && Stamina.Value >= staminaCost)
-                {
-                    Stamina.Value -= staminaCost / 2;
-                }
-            });
-
-            _consumeResource = new DelayedAction(.5f, () =>
-            {
-                if (HandStatusLeft.SpellOrGadgetBehaviour != null && !ConsumeResource(HandStatusLeft.SpellOrGadgetItem, HandStatusLeft.SpellOrGadgetItem.Targeting.IsContinuous))
-                {
-                    HandStatusLeft.SpellOrGadgetBehaviour.Stop();
-                    StopCastingClientRpc(true, _rpcHelper.ForNearbyPlayers(transform.position));
-                }
-                if (HandStatusRight.SpellOrGadgetBehaviour != null && !ConsumeResource(HandStatusRight.SpellOrGadgetItem, HandStatusRight.SpellOrGadgetItem.Targeting.IsContinuous))
-                {
-                    HandStatusRight.SpellOrGadgetBehaviour.Stop();
-                    StopCastingClientRpc(false, _rpcHelper.ForNearbyPlayers(transform.position));
-                }
-            });
-
-            _updateUi = new DelayedAction(1, () =>
-            {
-                _gameManager.MainCanvasObjects.HudOverlay.UpdateActiveEffects(GetActiveEffects());
-            });
-
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
                 _gameManager.MainCanvasObjects.Respawn.SetActive(false);
+
+                _gameManager.MainCanvasObjects.HudOverlay.Initialise(this);
                 _gameManager.MainCanvasObjects.Hud.SetActive(true);
             }
 
             QueueAliveStateChanges();
         }
 
-        private IEnumerator ReloadCoroutine(PlayerHandStatus handStatus, bool isLeftHand)
-        {
-            var item = Inventory.GetItemInSlot(isLeftHand ? SlotGameObjectName.LeftHand : SlotGameObjectName.RightHand);
-            yield return new WaitForSeconds(item.Attributes.GetReloadTime());
-
-            handStatus.Ammo = handStatus.AmmoMax;
-            handStatus.IsReloading = false;
-
-            _gameManager.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, handStatus);
-            ReloadCompleteClientRpc(isLeftHand, _clientRpcParams);
-        }
-
         // ReSharper disable once UnusedMember.Global
-        public void FixedUpdate()
+        protected override void FixedUpdate()
         {
-            _head.transform.rotation = _playerCamera.transform.rotation;
+            base.FixedUpdate();
 
-            ReplenishAndConsume();
+            BodyParts.Head.rotation = _playerCamera.transform.rotation;
+
             BecomeVulnerable();
-
-            if (IsClient)
-            {
-                _updateUi.TryPerformAction();
-            }
         }
 
         public override void OnNetworkSpawn()
@@ -302,38 +183,19 @@ namespace FullPotential.Core.PlayerBehaviours
             _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
         }
 
+        #endregion
+
+        #region NetworkVariable Event Handlers
+
         private void OnTextureChanged(FixedString512Bytes previousValue, FixedString512Bytes newValue)
         {
             StartCoroutine(SetTexture());
         }
 
-        private void OnStaminaChanged(int previousValue, int newValue)
-        {
-            if (NetworkManager.LocalClientId == OwnerClientId)
-            {
-                _gameManager.MainCanvasObjects.HudOverlay.UpdateStaminaPercentage(newValue, GetStaminaMax());
-            }
-        }
 
         private void OnHealthChanged(int previousValue, int newValue)
         {
             UpdateHealthAndDefenceValues();
-        }
-
-        private void OnManaChanged(int previousValue, int newValue)
-        {
-            if (NetworkManager.LocalClientId == OwnerClientId)
-            {
-                _gameManager.MainCanvasObjects.HudOverlay.UpdateManaPercentage(newValue, GetManaMax());
-            }
-        }
-
-        private void OnEnergyChanged(int previousValue, int newValue)
-        {
-            if (NetworkManager.LocalClientId == OwnerClientId)
-            {
-                _gameManager.MainCanvasObjects.HudOverlay.UpdateEnergyPercentage(newValue, GetEnergyMax());
-            }
         }
 
         #endregion
@@ -341,30 +203,24 @@ namespace FullPotential.Core.PlayerBehaviours
         #region ServerRpc calls
 
         [ServerRpc]
-        public void RequestPlayerDataServerRpc(ServerRpcParams serverRpcParams = default)
+        private void RequestPlayerDataServerRpc(ServerRpcParams serverRpcParams = default)
         {
             GetAndLoadPlayerData(false, serverRpcParams.Receive.SenderClientId);
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void RequestReducedPlayerDataServerRpc(ServerRpcParams serverRpcParams = default)
+        private void RequestReducedPlayerDataServerRpc(ServerRpcParams serverRpcParams = default)
         {
             GetAndLoadPlayerData(true, serverRpcParams.Receive.SenderClientId);
         }
 
         [ServerRpc]
-        public void UpdateSprintingServerRpc(bool isSprinting)
+        private void RespawnServerRpc()
         {
-            _isSprinting = isSprinting;
-        }
-
-        [ServerRpc]
-        public void RespawnServerRpc()
-        {
-            Stamina.Value = GetStaminaMax();
-            Health.Value = GetHealthMax();
-            Mana.Value = GetManaMax();
-            Energy.Value = GetEnergyMax();
+            _stamina.Value = GetStaminaMax();
+            _health.Value = GetHealthMax();
+            _mana.Value = GetManaMax();
+            _energy.Value = GetEnergyMax();
 
             AliveState = LivingEntityState.Respawning;
 
@@ -372,7 +228,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             PlayerSpawnStateChangeBothSides(AliveState, spawnPoint.Position, spawnPoint.Rotation);
 
-            var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
+            var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             PlayerSpawnStateChangeClientRpc(AliveState, spawnPoint.Position, spawnPoint.Rotation, null, null, nearbyClients);
         }
 
@@ -382,30 +238,9 @@ namespace FullPotential.Core.PlayerBehaviours
             HandleDeath(Username, null);
         }
 
-        [ServerRpc]
-        public void ReloadServerRpc(bool isLeftHand)
-        {
-            var leftOrRight = isLeftHand
-                ? HandStatusLeft
-                : HandStatusRight;
-
-            leftOrRight.IsReloading = true;
-        }
-
         #endregion
 
         #region ClientRpc calls
-
-        // ReSharper disable once UnusedParameter.Global
-        [ClientRpc]
-        public void ShowDamageClientRpc(Vector3 position, string damage, ClientRpcParams clientRpcParams)
-        {
-            var offsetX = (float)_random.Next(-9, 10) / 100;
-            var offsetY = (float)_random.Next(-9, 10) / 100;
-            var offsetZ = (float)_random.Next(-9, 10) / 100;
-            var adjustedPosition = position + new Vector3(offsetX, offsetY, offsetZ);
-            _playerActions.ShowDamage(adjustedPosition, damage);
-        }
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
@@ -450,7 +285,7 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             if (!killerName.IsNullOrWhiteSpace())
             {
-                var deathMessage = _attackHelper.GetDeathMessage(IsOwner, Username, killerName, itemName);
+                var deathMessage = GetDeathMessage(IsOwner, Username, killerName, itemName);
                 _gameManager.MainCanvasObjects.HudOverlay.ShowAlert(deathMessage);
             }
 
@@ -491,52 +326,6 @@ namespace FullPotential.Core.PlayerBehaviours
             }
         }
 
-        // ReSharper disable once UnusedParameter.Global
-        [ClientRpc]
-        public void UsedWeaponClientRpc(Vector3 startPosition, Vector3 endPosition, ClientRpcParams clientRpcParams)
-        {
-            var projectile = Instantiate(
-                _gameManager.Prefabs.Combat.ProjectileWithTrail,
-                startPosition,
-                _playerCamera.transform.rotation);
-
-            var projectileScript = projectile.GetComponent<ProjectileWithTrail>();
-            projectileScript.TargetPosition = endPosition;
-            projectileScript.Speed = 500;
-        }
-
-        // ReSharper disable once UnusedParameter.Local
-        [ClientRpc]
-        private void ReloadCompleteClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
-        {
-            var leftOrRight = isLeftHand
-                ? HandStatusLeft
-                : HandStatusRight;
-
-            leftOrRight.Ammo = leftOrRight.AmmoMax;
-            leftOrRight.IsReloading = false;
-
-            _gameManager.MainCanvasObjects.HudOverlay.UpdateHandAmmo(isLeftHand, leftOrRight);
-        }
-
-        // ReSharper disable once UnusedParameter.Global
-        [ClientRpc]
-        public void TryToAttackClientRpc(bool isLeftHand, Vector3 position, Vector3 forward, ClientRpcParams clientRpcParams)
-        {
-            _playerActions.TryToAttack(isLeftHand, position, forward, this);
-        }
-
-        // ReSharper disable once UnusedParameter.Global
-        [ClientRpc]
-        public void StopCastingClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
-        {
-            var leftOrRight = isLeftHand
-                ? HandStatusLeft
-                : HandStatusRight;
-
-            _playerActions.StopSpellOrGadget(leftOrRight);
-        }
-
         #endregion
 
         private void PlayerSpawnStateChangeBothSides(LivingEntityState state, Vector3 position, Quaternion rotation)
@@ -544,8 +333,8 @@ namespace FullPotential.Core.PlayerBehaviours
             switch (state)
             {
                 case LivingEntityState.Dead:
-                    _rb.isKinematic = true;
-                    _rb.useGravity = false;
+                    RigidBody.isKinematic = true;
+                    RigidBody.useGravity = false;
                     GetComponent<Collider>().enabled = false;
 
                     transform.position = new Vector3(0, _gameManager.GetSceneBehaviour().Attributes.LowestYValue - 10, 0);
@@ -561,39 +350,35 @@ namespace FullPotential.Core.PlayerBehaviours
                     _startingPosition = transform.position;
 
                     GraphicsTransform.gameObject.SetActive(true);
-                    _rb.isKinematic = false;
+                    RigidBody.isKinematic = false;
 
                     break;
 
                 case LivingEntityState.Alive:
                     GetComponent<Collider>().enabled = true;
-                    _rb.useGravity = true;
+                    RigidBody.useGravity = true;
 
                     break;
             }
         }
 
-        public int GetDefenseValue()
+        public override int GetDefenseValue()
         {
             return Inventory.GetDefenseValue();
         }
 
         public void UpdateHealthAndDefenceValues()
         {
+            if (IsOwner)
+            {
+                return;
+            }
+
             var health = GetHealth();
             var maxHealth = GetHealthMax();
             var defence = Inventory.GetDefenseValue();
-
-            if (!IsOwner)
-            {
-                var values = _healthSlider.GetHealthValues(health, maxHealth, defence);
-                _healthSlider.SetValues(values);
-            }
-
-            if (NetworkManager.LocalClientId == OwnerClientId)
-            {
-                _gameManager.MainCanvasObjects.HudOverlay.UpdateHealthPercentage(health, maxHealth, defence);
-            }
+            var values = _healthSlider.GetHealthValues(health, maxHealth, defence);
+            _healthSlider.SetValues(values);
         }
 
         private void QueueAliveStateChanges()
@@ -635,23 +420,6 @@ namespace FullPotential.Core.PlayerBehaviours
             });
         }
 
-        private void ReplenishAndConsume()
-        {
-            _replenishAmmo.TryPerformAction();
-
-            if (!IsServer)
-            {
-                return;
-            }
-
-            _replenishStamina.TryPerformAction();
-            _replenishMana.TryPerformAction();
-            _replenishEnergy.TryPerformAction();
-
-            _consumeStamina.TryPerformAction();
-            _consumeResource.TryPerformAction();
-        }
-
         private void BecomeVulnerable()
         {
             if (AliveState == LivingEntityState.Dead || _startingPosition == Vector3.zero)
@@ -667,7 +435,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
                 PlayerSpawnStateChangeBothSides(AliveState, Vector3.zero, Quaternion.identity);
 
-                var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
+                var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
                 PlayerSpawnStateChangeClientRpc(AliveState, Vector3.zero, Quaternion.identity, null, null, nearbyClients);
                 _startingPosition = Vector3.zero;
             }
@@ -694,7 +462,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 TextureUrl.Value = playerData?.Settings?.TextureUrl ?? string.Empty;
 
                 var msg = _localizer.Translate("ui.alert.playerjoined");
-                var nearbyClients = _rpcHelper.ForNearbyPlayersExcept(transform.position, OwnerClientId);
+                var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, OwnerClientId);
                 _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(string.Format(msg, Username), nearbyClients);
             }
         }
@@ -714,22 +482,6 @@ namespace FullPotential.Core.PlayerBehaviours
             }
         }
 
-        public void ShowAlertForItemsAddedToInventory(string alertText)
-        {
-            _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(alertText, _clientRpcParams);
-        }
-
-        public void AlertOfInventoryRemovals(int itemsRemovedCount)
-        {
-            var message = _localizer.Translate("ui.alert.itemsremoved");
-            _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(string.Format(message, itemsRemovedCount), _clientRpcParams);
-        }
-
-        public void AlertInventoryIsFull()
-        {
-            _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(_localizer.Translate("ui.alert.itemsatmax"), _clientRpcParams);
-        }
-
         private void LoadFromPlayerData(PlayerData playerData)
         {
             Username = playerData.Username;
@@ -737,7 +489,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (IsServer)
             {
-                Health.Value = GetHealthMax();
+                _health.Value = GetHealthMax();
             }
 
             try
@@ -851,160 +603,19 @@ namespace FullPotential.Core.PlayerBehaviours
             ApplyMaterial(newMat);
         }
 
-        private (NetworkVariable<int> Variable, int? Cost)? GetResourceVariableAndCost(SpellOrGadgetItemBase spellOrGadget)
+        public override void HandleDeath(string killerName, string itemName)
         {
-            switch (spellOrGadget.ResourceConsumptionType)
-            {
-                case ResourceConsumptionType.Mana:
-                    return (Mana, GetManaCost((Spell)spellOrGadget));
+            base.HandleDeath(killerName, itemName);
 
-                case ResourceConsumptionType.Energy:
-                    return (Energy, GetEnergyCost((Gadget)spellOrGadget));
+            PlayerSpawnStateChangeBothSides(AliveState, Vector3.zero, Quaternion.identity);
 
-                default:
-                    Debug.LogError("Not yet implemented GetResourceVariable() for resource type " + spellOrGadget.ResourceConsumptionType);
-                    return null;
-            }
-        }
-
-        public bool ConsumeResource(SpellOrGadgetItemBase spellOrGadget, bool slowDrain = false, bool isTest = false)
-        {
-            var tuple = GetResourceVariableAndCost(spellOrGadget);
-
-            if (!tuple.HasValue || !tuple.Value.Cost.HasValue)
-            {
-                Debug.LogError("Failed to get GetResourceVariableAndCost");
-                return false;
-            }
-
-            var resourceCost = tuple.Value.Cost.Value;
-            var resourceVariable = tuple.Value.Variable;
-
-            if (slowDrain)
-            {
-                resourceCost = (int)Math.Ceiling(resourceCost / 10f) + 1;
-            }
-
-            if (resourceVariable.Value < resourceCost)
-            {
-                return false;
-            }
-
-            if (!isTest)
-            {
-                resourceVariable.Value -= resourceCost;
-            }
-
-            return true;
-        }
-
-        public int GetHealth()
-        {
-            return Health.Value;
-        }
-
-        //todo: xp-based max, cost, speed values
-        public int GetStaminaMax()
-        {
-            return 100;
-        }
-
-        public int GetStaminaCost()
-        {
-            return 10;
-        }
-
-        public float GetSprintSpeed()
-        {
-            return 2.5f;
-        }
-
-        public int GetHealthMax()
-        {
-            return 100;
-        }
-
-        public int GetManaMax()
-        {
-            return 100;
-        }
-
-        public int GetEnergyMax()
-        {
-            return 100;
-        }
-
-        //todo: attribute-based costs
-        public int GetManaCost(Spell spell)
-        {
-            return 20;
-        }
-
-        public int GetEnergyCost(Gadget gadget)
-        {
-            return 20;
-        }
-
-        public void TakeDamage(int amount, ulong? clientId, string attackerName, string itemName)
-        {
-            if (clientId != null && clientId != OwnerClientId)
-            {
-                if (_damageTaken.ContainsKey(clientId.Value))
-                {
-                    _damageTaken[clientId.Value] += amount;
-                }
-                else
-                {
-                    _damageTaken.Add(clientId.Value, amount);
-                }
-            }
-
-            Health.Value -= amount;
-
-            if (Health.Value <= 0)
-            {
-                HandleDeath(attackerName, itemName);
-            }
-        }
-
-        public void HandleDeath(string killerName, string itemName)
-        {
             if (killerName == Username)
             {
                 killerName = _localizer.Translate("ui.alert.suicide");
             }
 
-            foreach (var item in _damageTaken)
-            {
-                if (!NetworkManager.Singleton.ConnectedClients.ContainsKey(item.Key))
-                {
-                    continue;
-                }
-
-                var playerState = NetworkManager.Singleton.ConnectedClients[item.Key].PlayerObject.gameObject.GetComponent<PlayerState>();
-                playerState.SpawnLootChest(transform.position);
-            }
-
-            _damageTaken.Clear();
-
-            AliveState = LivingEntityState.Dead;
-
-            PlayerSpawnStateChangeBothSides(AliveState, Vector3.zero, Quaternion.identity);
-
-            var nearbyClients = _rpcHelper.ForNearbyPlayers(transform.position);
+            var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             PlayerSpawnStateChangeClientRpc(AliveState, Vector3.zero, Quaternion.identity, killerName, itemName, nearbyClients);
-
-            if (HandStatusLeft.SpellOrGadgetGameObject != null)
-            {
-                Destroy(HandStatusLeft.SpellOrGadgetGameObject);
-                HandStatusLeft.SpellOrGadgetGameObject = null;
-            }
-
-            if (HandStatusRight.SpellOrGadgetGameObject != null)
-            {
-                Destroy(HandStatusRight.SpellOrGadgetGameObject);
-                HandStatusRight.SpellOrGadgetGameObject = null;
-            }
         }
 
         public void SpawnLootChest(Vector3 position)
@@ -1061,149 +672,25 @@ namespace FullPotential.Core.PlayerBehaviours
             BodyParts.RightArm.GetComponent<MeshRenderer>().material = material;
         }
 
-        private Dictionary<IEffect, float> GetActiveEffects()
+        #region UI Updates
+
+        public void ShowAlertForItemsAddedToInventory(string alertText)
         {
-            var expiredEffects = _activeEffects
-                .Where(x => x.Value < DateTime.Now)
-                .ToList();
-
-            foreach (var kvp in expiredEffects)
-            {
-                _activeEffects.Remove(kvp.Key);
-            }
-
-            return _activeEffects.ToDictionary(
-                x => x.Key, 
-                x => (float)(DateTime.Now - x.Value).TotalSeconds);
+            _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(alertText, _clientRpcParams);
         }
 
-        public NetworkVariable<int> GetStatVariable(AffectableStats stat)
+        public void AlertOfInventoryRemovals(int itemsRemovedCount)
         {
-            switch (stat)
-            {
-                case AffectableStats.Energy: return Energy;
-                case AffectableStats.Health: return Health;
-                case AffectableStats.Mana: return Mana;
-                case AffectableStats.Stamina: return Stamina;
-                default:
-                    throw new NotImplementedException();
-            }
+            var message = _localizer.Translate("ui.alert.itemsremoved");
+            _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(string.Format(message, itemsRemovedCount), _clientRpcParams);
         }
 
-        public int GetStatVariableMax(AffectableStats stat)
+        public void AlertInventoryIsFull()
         {
-            switch (stat)
-            {
-                case AffectableStats.Energy: return GetEnergyMax();
-                case AffectableStats.Health: return GetHealthMax();
-                case AffectableStats.Mana: return GetManaMax();
-                case AffectableStats.Stamina: return GetStaminaMax();
-                default:
-                    throw new NotImplementedException();
-            }
+            _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(_localizer.Translate("ui.alert.itemsatmax"), _clientRpcParams);
         }
-
-        #region Nested Classes
-
-        // ReSharper disable UnassignedField.Global
-
-        [Serializable]
-        public struct PositionTransforms
-        {
-            public Transform LeftHand;
-            public Transform RightHand;
-            public Transform LeftHandInFront;
-            public Transform RightHandInFront;
-        }
-
-        [Serializable]
-        public struct BodyPartTransforms
-        {
-            public Transform Head;
-            public Transform Body;
-            public Transform LeftArm;
-            public Transform RightArm;
-        }
-
-        // ReSharper enable UnassignedField.Global
 
         #endregion
 
-        //todo: move these
-        public void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes)
-        {
-            //todo:
-            throw new NotImplementedException();
-        }
-
-        public void ApplyPeriodicActionToStat(IStatEffect statEffect, Attributes attributes)
-        {
-            //todo:
-            throw new NotImplementedException();
-        }
-
-        public void AlterValue(IStatEffect statEffect, Attributes attributes)
-        {
-            var statVariable = GetStatVariable(statEffect.StatToAffect);
-            var statMax = GetStatVariableMax(statEffect.StatToAffect);
-
-            //todo: attribute-based values
-            var change = 10;
-            var duration = 2f;
-
-            if (_activeEffects.ContainsKey(statEffect))
-            {
-                _activeEffects.Remove(statEffect);
-            }
-            _activeEffects.Add(statEffect, DateTime.Now.AddSeconds(duration));
-
-            if (statVariable.Value >= statMax)
-            {
-                return;
-            }
-
-            if (statEffect.Affect == Affect.SingleIncrease)
-            {
-                if (statVariable.Value < statMax - change)
-                {
-                    statVariable.Value += change;
-                }
-                else
-                {
-                    statVariable.Value = statMax;
-                }
-                return;
-            }
-
-            if (statVariable.Value - change >= 0)
-            {
-                statVariable.Value -= change;
-            }
-            else
-            {
-                statVariable.Value = 0;
-
-                //todo: other min values
-                if (statVariable == Health)
-                {
-                    HandleDeath(Username, null); //todo: replace null
-                }
-            }
-
-
-            
-        }
-
-        public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, Attributes attributes)
-        {
-            //todo:
-            throw new NotImplementedException();
-        }
-
-        public Rigidbody GetRigidBody()
-        {
-            //todo:
-            throw new NotImplementedException();
-        }
     }
 }
