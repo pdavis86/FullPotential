@@ -1,5 +1,5 @@
 ﻿using System;
-using FullPotential.Api.Gameplay;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Standard.SpellsAndGadgets.Behaviours;
 using UnityEngine;
@@ -22,11 +22,11 @@ namespace FullPotential.Standard.SpellsAndGadgets.Targeting
 
         public string PrefabAddress => "Standard/Prefabs/SpellOrGadget/Beam.prefab";
 
-        public void SetBehaviourVariables(GameObject gameObject, SpellOrGadgetItemBase spellOrGadget, IPlayerStateBehaviour sourceStateBehaviour, Vector3 startPosition, Vector3 forwardDirection, bool isLeftHand = false)
+        public void SetBehaviourVariables(GameObject gameObject, SpellOrGadgetItemBase spellOrGadget, IFighter sourceFighter, Vector3 startPosition, Vector3 forwardDirection, bool isLeftHand = false)
         {
             var spellScript = gameObject.GetComponent<SogBeamBehaviour>();
             spellScript.SpellOrGadget = spellOrGadget;
-            spellScript.SourceStateBehaviour = sourceStateBehaviour;
+            spellScript.SourceFighter = sourceFighter;
             spellScript.IsLeftHand = isLeftHand;
         }
 

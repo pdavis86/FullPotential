@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Gameplay;
+﻿using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
@@ -14,14 +14,14 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
     public class SogBeamBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
         public SpellOrGadgetItemBase SpellOrGadget;
-        public IPlayerStateBehaviour SourceStateBehaviour;
+        public IFighter SourceFighter;
         public bool IsLeftHand;
 
 #pragma warning disable 0649
         [SerializeField] private float _leftRightAdjustment;
 #pragma warning restore CS0649
 
-        private IEffectHelper _effectHelper;
+        private IEffectService _effectService;
 
         private GameObject _sourcePlayer;
         private Transform _cylinderParentTransform;
@@ -36,7 +36,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             _cylinderParentTransform = transform.GetChild(0);
             _cylinderTransform = _cylinderParentTransform.GetChild(0);
 
-            _effectHelper = ModHelper.GetGameManager().GetService<IEffectHelper>();
+            _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -74,11 +74,9 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            var playerCameraTransform = SourceStateBehaviour.CameraGameObject.transform;
-
             Vector3 targetDirection;
             float beamLength;
-            if (Physics.Raycast(playerCameraTransform.position, playerCameraTransform.forward, out var hit, _maxBeamLength))
+            if (Physics.Raycast(SourceFighter.LookTransform.position, SourceFighter.LookTransform.forward, out var hit, _maxBeamLength))
             {
                 if (hit.transform.gameObject == _sourcePlayer)
                 {
@@ -98,7 +96,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             }
             else
             {
-                targetDirection = playerCameraTransform.forward;
+                targetDirection = SourceFighter.LookTransform.forward;
                 beamLength = _maxBeamLength;
             }
 
@@ -129,7 +127,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _effectHelper.ApplyEffects(_sourcePlayer, SpellOrGadget, target, position);
+            _effectService.ApplyEffects(_sourcePlayer, SpellOrGadget, target, position);
         }
 
         private void PerformGraphicsAdjustments()
@@ -139,9 +137,9 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _cylinderParentTransform.parent = SourceStateBehaviour.CameraGameObject.transform;
+            _cylinderParentTransform.parent = SourceFighter.LookTransform;
 
-            if (SourceStateBehaviour.OwnerClientId == NetworkManager.Singleton.LocalClientId)
+            if (SourceFighter.OwnerClientId == NetworkManager.Singleton.LocalClientId)
             {
                 //Adjust for FoV
                 var adjustment = (Camera.main.fieldOfView - 50) * 0.0125f;

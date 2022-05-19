@@ -1,6 +1,4 @@
-﻿using FullPotential.Api.Gameplay;
-using FullPotential.Core.GameManagement;
-using FullPotential.Core.Networking;
+﻿using FullPotential.Core.Networking;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -23,7 +21,6 @@ namespace FullPotential.Core.PlayerBehaviours
 
         private Rigidbody _rb;
         private PlayerState _playerState;
-        private IAttackHelper _attackHelper;
 
         //Variables for passing values
         private Vector2 _moveVal;
@@ -46,13 +43,6 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             _rb = GetComponent<Rigidbody>();
             _playerState = GetComponent<PlayerState>();
-
-            _attackHelper = GameManager.Instance.GetService<IAttackHelper>();
-
-            if (IsServer)
-            {
-                InvokeRepeating(nameof(CheckIfOffTheMap), 1, 1);
-            }
 
             _maxDistanceToBeStanding = gameObject.GetComponent<Collider>().bounds.extents.y + 0.1f;
 
@@ -98,7 +88,7 @@ namespace FullPotential.Core.PlayerBehaviours
         // ReSharper disable once UnusedMember.Local
         private void OnSprintStart()
         {
-            if (_playerState.Stamina.Value >= _playerState.GetStaminaCost())
+            if (_playerState.GetStamina() >= _playerState.GetStaminaCost())
             {
                 _isSprinting = true;
             }
@@ -127,7 +117,7 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             if (!_isJumping && _moveVal != Vector2.zero)
             {
-                if (_isSprinting && _playerState.Stamina.Value < _playerState.GetStaminaCost())
+                if (_isSprinting && _playerState.GetStamina() < _playerState.GetStaminaCost())
                 {
                     _isSprinting = false;
                 }
@@ -197,11 +187,6 @@ namespace FullPotential.Core.PlayerBehaviours
                 _wasSprinting = _isSprinting;
             }
         }
-
-        private void CheckIfOffTheMap()
-        {
-            _attackHelper.CheckIfOffTheMap(_playerState, transform.position.y);
-        }
-
+        
     }
 }

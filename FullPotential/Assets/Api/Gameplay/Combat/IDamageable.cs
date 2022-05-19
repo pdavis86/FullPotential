@@ -1,4 +1,6 @@
 ﻿using FullPotential.Api.Gameplay.Enums;
+using FullPotential.Api.Registry.Base;
+using UnityEngine;
 
 // ReSharper disable UnusedMemberInSuper.Global
 
@@ -12,7 +14,10 @@ namespace FullPotential.Api.Gameplay.Combat
 
         int GetHealth();
 
-        void TakeDamage(int amount, ulong? clientId, string attackerName, string itemName);
+        void TakeDamage(
+            GameObject source,
+            ItemBase itemUsed,
+            Vector3? position);
 
         void HandleDeath(string killerName, string itemName);
     }

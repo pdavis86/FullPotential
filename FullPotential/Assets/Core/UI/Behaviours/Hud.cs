@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Data;
-using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Ui;
+using FullPotential.Core.GameManagement;
+using FullPotential.Core.Gameplay.Combat;
+using FullPotential.Core.Gameplay.Crafting;
+using FullPotential.Core.Localization;
 using FullPotential.Core.UI.Behaviours;
 using FullPotential.Core.Ui.Components;
 using UnityEngine;
@@ -28,12 +31,58 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private Text _ammoRight;
 #pragma warning restore 0649
 
+        private string _reloadingTranslation;
+        private ResultFactory _resultFactory;
+
         private GameObject _activeEffectPrefab;
+        private Image _equippedLeftHandBackground;
+        private EquippedSummary _equippedLeftHandSummary;
+        private Text _equippedLeftHandAmmo;
+        private Image _equippedRightHandBackground;
+        private EquippedSummary _equippedRightHandSummary;
+        private Text _equippedRightHandAmmo;
+        private FighterBase _fighter;
+
+        #region Unity Events Handlers
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
+            _reloadingTranslation = GameManager.Instance.GetService<Localizer>().Translate("ui.hub.reloading");
+            _resultFactory = GameManager.Instance.GetService<ResultFactory>();
+
             _activeEffectPrefab = _activeEffectsContainer.GetComponent<ActiveEffects>().ActiveEffectPrefab;
+
+            _equippedLeftHandBackground = _equippedLeftHand.GetComponent<Image>();
+            _equippedLeftHandSummary = _equippedLeftHand.GetComponent<EquippedSummary>();
+            _equippedLeftHandAmmo = _equippedLeftHand.transform.GetChild(0).GetComponent<Text>();
+
+            _equippedRightHandBackground = _equippedRightHand.GetComponent<Image>();
+            _equippedRightHandSummary = _equippedRightHand.GetComponent<EquippedSummary>();
+            _equippedRightHandAmmo = _equippedRightHand.transform.GetChild(0).GetComponent<Text>();
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void FixedUpdate()
+        {
+            if (_fighter == null)
+            {
+                return;
+            }
+
+            UpdateStaminaPercentage();
+            UpdateHealthPercentage();
+            UpdateManaPercentage();
+            UpdateEnergyPercentage();
+            UpdateHandOverlays();
+            UpdateActiveEffects();
+        }
+
+        #endregion
+
+        public void Initialise(FighterBase fighter)
+        {
+            _fighter = fighter;
         }
 
         public void ShowAlert(string alertText)
@@ -48,80 +97,72 @@ namespace FullPotential.Core.Ui.Behaviours
             alert.transform.Find("Text").GetComponent<Text>().text = alertText;
         }
 
-        public void UpdateHandDescription(bool isLeftHand, string contents)
+        private void UpdateHandOverlays()
         {
-            var leftOrRight = isLeftHand
-                ? _equippedLeftHand
-                : _equippedRightHand;
+            UpdateHandDescription(_equippedLeftHandSummary, _fighter.HandStatusLeft);
+            UpdateHandAmmo(_ammoLeft, _fighter.HandStatusLeft);
 
-            leftOrRight.GetComponent<EquippedSummary>().SetContents(contents);
+            UpdateHandDescription(_equippedRightHandSummary, _fighter.HandStatusRight);
+            UpdateHandAmmo(_ammoRight, _fighter.HandStatusRight);
         }
 
-        public void UpdateHandAmmo(bool isLeftHand, PlayerHandStatus playerHandStatus)
+        private void UpdateHandDescription(EquippedSummary equippedSummary, HandStatus handStatus)
         {
-            var leftOrRight = isLeftHand
-                ? _ammoLeft
-                : _ammoRight;
+            //todo: only if changed
+            equippedSummary.SetContents(_resultFactory.GetItemDescription(handStatus.EquippedItem));
+        }
 
-            if (playerHandStatus == null)
+        private void UpdateHandAmmo(Text ammoText, HandStatus handStatus)
+        {
+            if (handStatus == null || handStatus.AmmoMax == 0)
             {
-                leftOrRight.gameObject.SetActive(false);
+                ammoText.gameObject.SetActive(false);
                 return;
             }
 
-            leftOrRight.gameObject.SetActive(true);
-            leftOrRight.text = $"{playerHandStatus.Ammo}/{playerHandStatus.AmmoMax}";
+            if (!ammoText.gameObject.activeInHierarchy)
+            {
+                ammoText.gameObject.SetActive(true);
+            }
+
+            ammoText.text = handStatus.IsReloading
+                ? _reloadingTranslation
+                : $"{handStatus.Ammo}/{handStatus.AmmoMax}";
         }
 
-        public void UpdateStaminaPercentage(int stamina, int maxStamina)
+        private void UpdateStaminaPercentage()
         {
-            var values = _staminaSlider.GetStaminaValues(stamina, maxStamina);
+            var values = _staminaSlider.GetStaminaValues(_fighter.GetStamina(), _fighter.GetStaminaMax());
             _staminaSlider.SetValues(values);
         }
 
-        public void UpdateHealthPercentage(int health, int maxHealth, int defence)
+        private void UpdateHealthPercentage()
         {
+            var health = _fighter.GetHealth();
+            var maxHealth = _fighter.GetHealthMax();
+            var defence = _fighter.GetDefenseValue();
+
             var values = _healthSlider.GetHealthValues(health, maxHealth, defence);
             _healthSlider.SetValues(values);
         }
 
-        public void UpdateManaPercentage(int mana, int maxMana)
+        private void UpdateManaPercentage()
         {
-            var values = _manaSlider.GetManaValues(mana, maxMana);
+            var values = _manaSlider.GetManaValues(_fighter.GetMana(), _fighter.GetManaMax());
             _manaSlider.SetValues(values);
         }
 
-        public void UpdateEnergyPercentage(int energy, int maxEnergy)
+        private void UpdateEnergyPercentage()
         {
-            var values = _energySlider.GetEnergyValues(energy, maxEnergy);
+            var values = _energySlider.GetEnergyValues(_fighter.GetEnergy(), _fighter.GetEnergyMax());
             _energySlider.SetValues(values);
         }
 
-        public void ToggleCursorCapture(bool isOn)
-        {
-            var newAlpha = isOn ? 1 : 0.5f;
-
-            var leftImage = _equippedLeftHand.GetComponent<Image>();
-            leftImage.color = ChangeColorAlpha(leftImage.color, newAlpha);
-
-            var leftText = _equippedLeftHand.transform.GetChild(0).GetComponent<Text>();
-            leftText.color = ChangeColorAlpha(leftText.color, newAlpha);
-
-            var rightImage = _equippedRightHand.GetComponent<Image>();
-            rightImage.color = ChangeColorAlpha(leftImage.color, newAlpha);
-
-            var rightText = _equippedRightHand.transform.GetChild(0).GetComponent<Text>();
-            rightText.color = ChangeColorAlpha(leftText.color, newAlpha);
-        }
-
-        private Color ChangeColorAlpha(Color originalColor, float alpha)
-        {
-            return new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
-        }
-
-        public void UpdateActiveEffects(Dictionary<IEffect, float> activeEffects)
+        private void UpdateActiveEffects()
         {
             var existingObjects = GetActiveEffectGameObjects();
+
+            var activeEffects = _fighter.GetActiveEffects();
 
             foreach (var (effect, timeToLive) in activeEffects)
             {
@@ -131,6 +172,7 @@ namespace FullPotential.Core.Ui.Behaviours
                     ? existingObjects[effectType]
                     : Instantiate(_activeEffectPrefab, _activeEffectsContainer.transform);
 
+                //todo: replace GetComponent<>() call
                 var activeEffectScript = activeEffectObj.GetComponent<ActiveEffect>();
                 activeEffectScript.SetEffect(effect, timeToLive);
             }
@@ -141,9 +183,28 @@ namespace FullPotential.Core.Ui.Behaviours
             var results = new Dictionary<Type, GameObject>();
             foreach (Transform child in _activeEffectsContainer.transform)
             {
+                //todo: replace GetComponent<>() call
                 results.Add(child.gameObject.GetComponent<ActiveEffect>().Effect.GetType(), child.gameObject);
             }
             return results;
+        }
+
+        public void ToggleCursorCapture(bool isOn)
+        {
+            var newAlpha = isOn ? 1 : 0.5f;
+
+            _equippedLeftHandBackground.color = ChangeColorAlpha(_equippedLeftHandBackground.color, newAlpha);
+
+            _equippedLeftHandAmmo.color = ChangeColorAlpha(_equippedLeftHandAmmo.color, newAlpha);
+
+            _equippedRightHandBackground.color = ChangeColorAlpha(_equippedRightHandBackground.color, newAlpha);
+
+            _equippedRightHandAmmo.color = ChangeColorAlpha(_equippedRightHandAmmo.color, newAlpha);
+        }
+
+        private Color ChangeColorAlpha(Color originalColor, float alpha)
+        {
+            return new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
         }
 
     }

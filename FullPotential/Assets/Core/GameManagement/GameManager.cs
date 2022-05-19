@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.GameManagement.Data;
-using FullPotential.Api.Gameplay;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Spawning;
@@ -325,10 +325,10 @@ namespace FullPotential.Core.GameManagement
             _serviceRegistry.Register<ResultFactory>();
 
             _serviceRegistry.Register<ITypeRegistry, TypeRegistry>();
-            _serviceRegistry.Register<IAttackHelper, AttackHelper>();
-            _serviceRegistry.Register<IRpcHelper, RpcHelper>();
+
             _serviceRegistry.Register<ISpawnService, SpawnService>(true);
-            _serviceRegistry.Register<IEffectHelper, EffectHelper>();
+            _serviceRegistry.Register<IRpcService, RpcService>();
+            _serviceRegistry.Register<IEffectService, EffectService>();
         }
 
         #region Methods for Mods

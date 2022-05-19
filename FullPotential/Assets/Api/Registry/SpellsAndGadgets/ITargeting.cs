@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Gameplay;
+﻿using FullPotential.Api.Gameplay.Combat;
 using UnityEngine;
 
 namespace FullPotential.Api.Registry.SpellsAndGadgets
@@ -16,7 +16,7 @@ namespace FullPotential.Api.Registry.SpellsAndGadgets
         void SetBehaviourVariables(
             GameObject gameObject,
             SpellOrGadgetItemBase spellOrGadget,
-            IPlayerStateBehaviour sourceStateBehaviour,
+            IFighter sourceFighter,
             Vector3 startPosition, 
             Vector3 forwardDirection,
             bool isLeftHand = false);
