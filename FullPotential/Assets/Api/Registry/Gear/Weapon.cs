@@ -3,5 +3,6 @@
     [System.Serializable]
     public class Weapon : GearBase
     {
+        public int Ammo;
     }
 }
