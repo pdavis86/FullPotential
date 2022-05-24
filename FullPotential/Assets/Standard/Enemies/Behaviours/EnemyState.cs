@@ -1,6 +1,4 @@
 using FullPotential.Core.Gameplay.Combat;
-using Unity.Collections;
-using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -9,9 +7,13 @@ namespace FullPotential.Standard.Enemies.Behaviours
 {
     public class EnemyState : FighterBase
     {
-        #region Properties
+        #region Variables
 
-        public readonly NetworkVariable<FixedString32Bytes> EnemyName = new NetworkVariable<FixedString32Bytes>();
+        private string _enemyName;
+
+        #endregion
+
+        #region Properties
 
         public override Transform Transform => transform;
 
@@ -19,7 +21,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
         public override Transform LookTransform => transform;
 
-        public override string FighterName => EnemyName.Value.ToString();
+        public override string FighterName => _enemyName;
 
         #endregion
         
@@ -30,14 +32,6 @@ namespace FullPotential.Standard.Enemies.Behaviours
             base.Awake();
 
             _health.OnValueChanged += OnHealthChanged;
-            EnemyName.OnValueChanged += OnNameChanged;
-        }
-
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-
-            SetName();
         }
 
         #endregion
@@ -50,19 +44,15 @@ namespace FullPotential.Standard.Enemies.Behaviours
             _healthSlider.SetValues(values);
         }
 
-        private void OnNameChanged(FixedString32Bytes previousValue, FixedString32Bytes newValue)
-        {
-            SetName();
-        }
-
         #endregion
         
-        private void SetName()
+        public void SetName(string newName)
         {
-            var variableValue = EnemyName.Value.ToString();
-            var displayName = string.IsNullOrWhiteSpace(variableValue)
-                ? "Enemy " + NetworkObjectId
-                : variableValue;
+            _enemyName = newName;
+
+            var displayName = string.IsNullOrWhiteSpace(_enemyName)
+                ? "Enemy ID " + NetworkObjectId
+                : _enemyName;
 
             gameObject.name = displayName;
             _nameTag.text = displayName;
