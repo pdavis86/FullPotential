@@ -109,7 +109,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 TextureUrl = _skinUrlInput.text
             };
 
-            GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerActions>().UpdatePlayerSettingsServerRpc(playerSettings);
+            GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerActions>().UpdatePlayerSettings(playerSettings);
 
             _isRevertRequired = false;
 
@@ -171,7 +171,7 @@ namespace FullPotential.Core.Ui.Behaviours
         private void LoadPlayerSettings()
         {
             var playerState = GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>();
-            _skinUrlInput.text = playerState.TextureUrl.Value.ToString();
+            _skinUrlInput.text = playerState.TextureUrl;
         }
 
         private void RevertUnsavedSettings()

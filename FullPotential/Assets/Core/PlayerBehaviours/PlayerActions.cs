@@ -229,7 +229,7 @@ namespace FullPotential.Core.PlayerBehaviours
             saveData.Settings = playerSettings ?? new PlayerSettings();
             saveData.IsAsapSaveRequired = true;
 
-            _playerState.TextureUrl.Value = saveData.Settings.TextureUrl;
+            UpdatePlayerSettings(saveData.Settings);
         }
 
         [ServerRpc]
@@ -377,6 +377,21 @@ namespace FullPotential.Core.PlayerBehaviours
 
         #endregion
 
+        public void UpdatePlayerSettings(PlayerSettings playerSettings)
+        {
+            if (playerSettings == null)
+            {
+                playerSettings = new PlayerSettings();
+            }
+
+            _playerState.TextureUrl = playerSettings.TextureUrl;
+
+            if (!IsServer)
+            {
+                UpdatePlayerSettingsServerRpc(playerSettings);
+            }
+        }
+
         private void UpdateMenuStates()
         {
             if (_toggleGameMenu || _toggleCharacterMenu)
@@ -469,10 +484,6 @@ namespace FullPotential.Core.PlayerBehaviours
             {
                 return;
             }
-
-            var handPosition = isLeftHand
-                ? _playerState.Positions.LeftHandInFront.position
-                : _playerState.Positions.RightHandInFront.position;
 
             if (IsServer || _playerState.TryToAttack(isLeftHand))
             {

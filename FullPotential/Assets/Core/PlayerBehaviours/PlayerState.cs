@@ -18,7 +18,6 @@ using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Registry;
 using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.Helpers;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -31,15 +30,12 @@ namespace FullPotential.Core.PlayerBehaviours
     {
         #region Variables
 
-        [HideInInspector] public readonly NetworkVariable<FixedString512Bytes> TextureUrl = new NetworkVariable<FixedString512Bytes>();
-        [HideInInspector] public string PlayerToken;
-        [HideInInspector] public string Username;
-
         private ClientRpcParams _clientRpcParams;
 
         private readonly FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
         private readonly Dictionary<string, DateTime> _unclaimedLoot = new Dictionary<string, DateTime>();
 
+        private string _textureUrl;
         private Vector3 _startingPosition;
         private float _myHeight;
         private MeshRenderer _bodyMeshRenderer;
@@ -71,6 +67,20 @@ namespace FullPotential.Core.PlayerBehaviours
 
         #region Properties
 
+        [HideInInspector] public string TextureUrl {
+            get
+            {
+                return _textureUrl;
+            }
+            set
+            {
+                _textureUrl = value;
+                StartCoroutine(SetTexture());
+            }
+        }
+        [HideInInspector] public string PlayerToken { get; set; }
+        [HideInInspector] public string Username { get; set; }
+
         public IPlayerInventory Inventory { get; private set; }
 
         public override Transform Transform => transform;
@@ -90,7 +100,6 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             base.Awake();
 
-            TextureUrl.OnValueChanged += OnTextureChanged;
             //_stamina.OnValueChanged += OnStaminaChanged;
             _health.OnValueChanged += OnHealthChanged;
             //_mana.OnValueChanged += OnManaChanged;
@@ -186,12 +195,6 @@ namespace FullPotential.Core.PlayerBehaviours
         #endregion
 
         #region NetworkVariable Event Handlers
-
-        private void OnTextureChanged(FixedString512Bytes previousValue, FixedString512Bytes newValue)
-        {
-            StartCoroutine(SetTexture());
-        }
-
 
         private void OnHealthChanged(int previousValue, int newValue)
         {
@@ -459,7 +462,7 @@ namespace FullPotential.Core.PlayerBehaviours
             {
                 //Server loading player data from player state
                 LoadFromPlayerData(playerData);
-                TextureUrl.Value = playerData?.Settings?.TextureUrl ?? string.Empty;
+                TextureUrl = playerData?.Settings?.TextureUrl ?? string.Empty;
 
                 var msg = _localizer.Translate("ui.alert.playerjoined");
                 var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, OwnerClientId);
@@ -485,6 +488,8 @@ namespace FullPotential.Core.PlayerBehaviours
         private void LoadFromPlayerData(PlayerData playerData)
         {
             Username = playerData.Username;
+            TextureUrl = playerData.Settings.TextureUrl;
+
             SetName();
 
             if (IsServer)
@@ -539,10 +544,8 @@ namespace FullPotential.Core.PlayerBehaviours
                 yield break;
             }
 
-            var textureUrl = TextureUrl.Value.ToString();
-
             string filePath = null;
-            if (textureUrl.ToLower().StartsWith("http"))
+            if (TextureUrl.ToLower().StartsWith("http"))
             {
                 filePath = Application.persistentDataPath + "/" + Username + ".png";
 
@@ -553,7 +556,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 if (System.IO.File.Exists(validatePath))
                 {
                     var checkUrl = System.IO.File.ReadAllText(validatePath);
-                    if (checkUrl.Equals(textureUrl, StringComparison.OrdinalIgnoreCase))
+                    if (checkUrl.Equals(TextureUrl, StringComparison.OrdinalIgnoreCase))
                     {
                         doDownload = false;
                     }
@@ -561,7 +564,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
                 if (doDownload)
                 {
-                    using (var webRequest = UnityWebRequest.Get(textureUrl))
+                    using (var webRequest = UnityWebRequest.Get(TextureUrl))
                     {
                         yield return webRequest.SendWebRequest();
 
@@ -572,7 +575,7 @@ namespace FullPotential.Core.PlayerBehaviours
                         }
 
                         System.IO.File.WriteAllBytes(filePath, webRequest.downloadHandler.data);
-                        System.IO.File.WriteAllText(validatePath, textureUrl);
+                        System.IO.File.WriteAllText(validatePath, TextureUrl);
                     }
                 }
             }

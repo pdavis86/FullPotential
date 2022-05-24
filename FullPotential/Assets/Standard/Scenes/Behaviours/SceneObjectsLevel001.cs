@@ -113,7 +113,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
             enemyNetObj.transform.parent = transform;
 
-            enemyNetObj.GetComponent<EnemyState>().EnemyName.Value = "Enemy " + _enemyCounter;
+            enemyNetObj.GetComponent<EnemyState>().SetName("Enemy " + _enemyCounter);
         }
 
         public void HandleEnemyDeath()
