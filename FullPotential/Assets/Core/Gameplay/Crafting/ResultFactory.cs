@@ -10,6 +10,7 @@ using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Registry.SpellsAndGadgets;
+using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Localization;
 using FullPotential.Core.Localization.Enums;
 using FullPotential.Core.Registry;
@@ -396,6 +397,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 Effects = GetEffects(nameof(Weapon), components)
             };
             weapon.Name = GetItemName(true, weapon);
+            weapon.Ammo = weapon.Attributes.GetAmmoMax();
             return weapon;
         }
 

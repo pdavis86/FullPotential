@@ -12,6 +12,7 @@ using FullPotential.Api.Scenes;
 using FullPotential.Api.Spawning;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Helpers;
+using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement.Constants;
 using FullPotential.Core.GameManagement.Data;
@@ -60,6 +61,7 @@ namespace FullPotential.Core.GameManagement
         //Variables
         private bool _isSaving;
         private NetworkObject _playerPrefabNetObj;
+        private DelayedAction _periodicSave;
 
         //Singleton
         public static GameManager Instance { get; private set; }
@@ -109,12 +111,15 @@ namespace FullPotential.Core.GameManagement
         }
 
         // ReSharper disable once UnusedMember.Local
+        private void Start()
+        {
+            _periodicSave = new DelayedAction(15f, SaveAllPlayerData);
+        }
+
+        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            if (!_isSaving && NetworkManager.Singleton.IsServer)
-            {
-                StartCoroutine(PeriodicSave());
-            }
+            _periodicSave.TryPerformAction();
         }
 
         private void OnApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
@@ -147,6 +152,7 @@ namespace FullPotential.Core.GameManagement
             callback(false, null, true, null, null);
         }
 
+        //todo: rename if also fired when client disconnects
         private void OnServerDisconnectedClient(ulong clientId)
         {
             if (NetworkManager.Singleton.IsServer)
@@ -260,25 +266,15 @@ namespace FullPotential.Core.GameManagement
             return new Version(appVersion + "." + lastWrite.ToString("yyyyMMdd"));
         }
 
-        private IEnumerator PeriodicSave()
-        {
-            const int waitSeconds = 15;
-
-            _isSaving = true;
-
-            yield return new WaitForSeconds(waitSeconds);
-
-            yield return new WaitUntil(() => SaveAllPlayerDataAsync().IsCompleted);
-
-            _isSaving = false;
-        }
-
         private void SaveAllPlayerData()
         {
             if (_isSaving || !NetworkManager.Singleton.IsServer)
             {
                 return;
             }
+
+            //todo: set IsAsapSaveRequired on major events like crafting
+            //todo: save more frequently where saveData.IsAsapSaveRequired == true
 
             Task.Run(async () => await SaveAllPlayerDataAsync())
                 .GetAwaiter()
@@ -287,11 +283,15 @@ namespace FullPotential.Core.GameManagement
 
         private async Task SaveAllPlayerDataAsync()
         {
+            _isSaving = true;
+
             var tasks = _userRegistry.PlayerData
-                .Where(x => x.Value.InventoryLoadedSuccessfully && x.Value.IsDirty)
+                .Where(x => x.Value.InventoryLoadedSuccessfully)
                 .Select(x => Task.Run(() => SavePlayerData(x.Value)));
 
             await Task.WhenAll(tasks);
+
+            _isSaving = false;
         }
 
         private void SavePlayerData(PlayerData playerData)
@@ -307,9 +307,9 @@ namespace FullPotential.Core.GameManagement
                 return;
             }
 
-            _userRegistry.Save(playerData);
+            Debug.Log("Saving player data for " + playerData.Username);
 
-            playerData.IsDirty = false;
+            _userRegistry.Save(playerData);
         }
 
         private readonly ServiceRegistry _serviceRegistry = new ServiceRegistry();

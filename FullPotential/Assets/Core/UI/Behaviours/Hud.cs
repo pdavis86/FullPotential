@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Ui;
+using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Combat;
-using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Localization;
 using FullPotential.Core.UI.Behaviours;
 using FullPotential.Core.Ui.Components;
@@ -32,7 +32,6 @@ namespace FullPotential.Core.Ui.Behaviours
 #pragma warning restore 0649
 
         private string _reloadingTranslation;
-        private ResultFactory _resultFactory;
 
         private GameObject _activeEffectPrefab;
         private Image _equippedLeftHandBackground;
@@ -49,7 +48,6 @@ namespace FullPotential.Core.Ui.Behaviours
         private void Awake()
         {
             _reloadingTranslation = GameManager.Instance.GetService<Localizer>().Translate("ui.hub.reloading");
-            _resultFactory = GameManager.Instance.GetService<ResultFactory>();
 
             _activeEffectPrefab = _activeEffectsContainer.GetComponent<ActiveEffects>().ActiveEffectPrefab;
 
@@ -108,13 +106,12 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateHandDescription(EquippedSummary equippedSummary, HandStatus handStatus)
         {
-            //todo: only if changed
-            equippedSummary.SetContents(_resultFactory.GetItemDescription(handStatus.EquippedItem));
+            equippedSummary.SetContents(handStatus.EquippedItemDescription);
         }
 
         private void UpdateHandAmmo(Text ammoText, HandStatus handStatus)
         {
-            if (handStatus == null || handStatus.AmmoMax == 0)
+            if (handStatus == null || handStatus.EquippedWeapon == null)
             {
                 ammoText.gameObject.SetActive(false);
                 return;
@@ -127,7 +124,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
             ammoText.text = handStatus.IsReloading
                 ? _reloadingTranslation
-                : $"{handStatus.Ammo}/{handStatus.AmmoMax}";
+                : $"{handStatus.EquippedWeapon.Ammo}/{handStatus.EquippedWeapon.Attributes.GetAmmoMax()}";
         }
 
         private void UpdateStaminaPercentage()
@@ -172,7 +169,6 @@ namespace FullPotential.Core.Ui.Behaviours
                     ? existingObjects[effectType]
                     : Instantiate(_activeEffectPrefab, _activeEffectsContainer.transform);
 
-                //todo: replace GetComponent<>() call
                 var activeEffectScript = activeEffectObj.GetComponent<ActiveEffect>();
                 activeEffectScript.SetEffect(effect, timeToLive);
             }
@@ -183,7 +179,6 @@ namespace FullPotential.Core.Ui.Behaviours
             var results = new Dictionary<Type, GameObject>();
             foreach (Transform child in _activeEffectsContainer.transform)
             {
-                //todo: replace GetComponent<>() call
                 results.Add(child.gameObject.GetComponent<ActiveEffect>().Effect.GetType(), child.gameObject);
             }
             return results;

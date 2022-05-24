@@ -42,6 +42,7 @@ namespace FullPotential.Core.PlayerBehaviours
         private UserRegistry _userRegistry;
         private IRpcService _rpcService;
         private Localizer _localizer;
+        private ResultFactory _resultFactory;
 
         private PlayerState _playerState;
         private Dictionary<string, ItemBase> _items;
@@ -62,6 +63,7 @@ namespace FullPotential.Core.PlayerBehaviours
             _userRegistry = GameManager.Instance.GetService<UserRegistry>();
             _rpcService = GameManager.Instance.GetService<IRpcService>();
             _localizer = GameManager.Instance.GetService<Localizer>();
+            _resultFactory = GameManager.Instance.GetService<ResultFactory>();
 
             _items = new Dictionary<string, ItemBase>();
             _equippedItems = new Dictionary<SlotGameObjectName, EquippedItem>();
@@ -222,11 +224,11 @@ namespace FullPotential.Core.PlayerBehaviours
             return (wasEquipped, slotsToSend);
         }
 
+        //todo: rename
         private PlayerData PlayerDataNeedsSaving()
         {
             var playerData = _userRegistry.PlayerData[_playerState.Username];
             playerData.Inventory = GetSaveData();
-            playerData.IsDirty = true;
             return playerData;
         }
 
@@ -399,11 +401,11 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (slotGameObjectName == SlotGameObjectName.LeftHand)
             {
-                _playerState.HandStatusLeft.EquippedItem = item;
+                _playerState.HandStatusLeft.SetEquippedItem(item, _resultFactory.GetItemDescription(item));
             }
             else if (slotGameObjectName == SlotGameObjectName.RightHand)
             {
-                _playerState.HandStatusRight.EquippedItem = item;
+                _playerState.HandStatusRight.SetEquippedItem(item, _resultFactory.GetItemDescription(item));
             }
         }
 
@@ -635,19 +637,6 @@ namespace FullPotential.Core.PlayerBehaviours
                             InstantiateInPlayerHand(prefab, isLeftHand, new Vector3(0, 90), slotGameObjectName);
                         }
                     );
-
-                    //todo: current ammo should come from the item, not the max
-                    var ammoMax = weapon.Attributes.GetAmmoMax();
-                    if (isLeftHand)
-                    {
-                        _playerState.HandStatusLeft.AmmoMax = ammoMax;
-                        _playerState.HandStatusLeft.Ammo = ammoMax;
-                    }
-                    else
-                    {
-                        _playerState.HandStatusRight.AmmoMax = ammoMax;
-                        _playerState.HandStatusRight.Ammo = ammoMax;
-                    }
 
                     break;
 

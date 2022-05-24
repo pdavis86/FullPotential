@@ -227,7 +227,7 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             var saveData = _userRegistry.PlayerData[_playerState.Username];
             saveData.Settings = playerSettings ?? new PlayerSettings();
-            saveData.IsDirty = true;
+            saveData.IsAsapSaveRequired = true;
 
             _playerState.TextureUrl.Value = saveData.Settings.TextureUrl;
         }
@@ -470,7 +470,11 @@ namespace FullPotential.Core.PlayerBehaviours
                 return;
             }
 
-            if (IsServer || _playerState.TryToAttack(isLeftHand, _playerCamera.transform.position, _playerCamera.transform.forward))
+            var handPosition = isLeftHand
+                ? _playerState.Positions.LeftHandInFront.position
+                : _playerState.Positions.RightHandInFront.position;
+
+            if (IsServer || _playerState.TryToAttack(isLeftHand))
             {
                 _playerState.TryToAttackServerRpc(isLeftHand);
             }
