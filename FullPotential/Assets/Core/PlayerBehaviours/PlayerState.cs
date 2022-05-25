@@ -46,8 +46,8 @@ namespace FullPotential.Core.PlayerBehaviours
         //Registered Services
         private UserRegistry _userRegistry;
 
-        //Others
-        private DelayedAction _updatePlayerData;
+        //Data
+        private PlayerData _saveData;
 
         #endregion
 
@@ -77,7 +77,7 @@ namespace FullPotential.Core.PlayerBehaviours
             {
                 return _textureUrl;
             }
-            set
+            private set
             {
                 _textureUrl = value;
                 StartCoroutine(SetTexture());
@@ -156,8 +156,6 @@ namespace FullPotential.Core.PlayerBehaviours
                 {
                     _gameManager.GameDataStore.ClientIdToUsername.Add(OwnerClientId, Username);
                 }
-
-                _updatePlayerData = new DelayedAction(15f, UpdatePlayerDataConsumables);
             }
             else if (IsOwner)
             {
@@ -190,8 +188,6 @@ namespace FullPotential.Core.PlayerBehaviours
             BodyParts.Head.rotation = _playerCamera.transform.rotation;
 
             BecomeVulnerable();
-
-            _updatePlayerData.TryPerformAction();
         }
 
         public override void OnNetworkSpawn()
@@ -201,13 +197,21 @@ namespace FullPotential.Core.PlayerBehaviours
             _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
         }
 
+        public override void OnDestroy()
+        {
+            if (IsServer)
+            {
+                _gameManager.SavePlayerData(_saveData);
+            }
+        }
+
         #endregion
 
         #region NetworkVariable Event Handlers
 
         private void OnHealthChanged(int previousValue, int newValue)
         {
-            UpdateHealthAndDefenceValues();
+            UpdateUiHealthAndDefenceValues();
         }
 
         #endregion
@@ -248,6 +252,16 @@ namespace FullPotential.Core.PlayerBehaviours
         public void ForceRespawnServerRpc()
         {
             HandleDeath(Username, null);
+        }
+
+        [ServerRpc]
+        private void UpdatePlayerSettingsServerRpc(PlayerSettings playerSettings)
+        {
+            _gameManager.QueueAsapSave(Username);
+
+            _saveData.Settings = playerSettings;
+
+            UpdatePlayerSettings(_saveData.Settings);
         }
 
         #endregion
@@ -379,20 +393,6 @@ namespace FullPotential.Core.PlayerBehaviours
             return Inventory.GetDefenseValue();
         }
 
-        public void UpdateHealthAndDefenceValues()
-        {
-            if (IsOwner)
-            {
-                return;
-            }
-
-            var health = GetHealth();
-            var maxHealth = GetHealthMax();
-            var defence = Inventory.GetDefenseValue();
-            var values = _healthSlider.GetHealthValues(health, maxHealth, defence);
-            _healthSlider.SetValues(values);
-        }
-
         private void QueueAliveStateChanges()
         {
             _aliveStateChanges = new ActionQueue<bool>();
@@ -520,17 +520,19 @@ namespace FullPotential.Core.PlayerBehaviours
                 playerData.InventoryLoadedSuccessfully = false;
             }
 
-            if (_userRegistry.PlayerData.ContainsKey(playerData.Username))
-            {
-                Debug.LogWarning($"Overwriting player data for username '{playerData.Username}'");
-                _userRegistry.PlayerData[playerData.Username] = playerData;
-            }
-            else
-            {
-                _userRegistry.PlayerData.Add(playerData.Username, playerData);
-            }
+            _saveData = playerData;
 
-            UpdateHealthAndDefenceValues();
+            UpdateUiHealthAndDefenceValues();
+        }
+
+        public void UpdatePlayerSettings(PlayerSettings playerSettings)
+        {
+            TextureUrl = playerSettings.TextureUrl;
+
+            if (!IsServer)
+            {
+                UpdatePlayerSettingsServerRpc(playerSettings);
+            }
         }
 
         private void SetName()
@@ -687,16 +689,31 @@ namespace FullPotential.Core.PlayerBehaviours
             BodyParts.RightArm.GetComponent<MeshRenderer>().material = material;
         }
 
-        private void UpdatePlayerDataConsumables()
+        public PlayerData UpdateAndReturnPlayerData()
         {
-            var playerData = _userRegistry.PlayerData[Username];
-            playerData.Consumables.Energy = _energy.Value;
-            playerData.Consumables.Health = _health.Value;
-            playerData.Consumables.Mana = _mana.Value;
-            playerData.Consumables.Stamina = _stamina.Value;
+            _saveData.Consumables.Energy = _energy.Value;
+            _saveData.Consumables.Health = _health.Value;
+            _saveData.Consumables.Mana = _mana.Value;
+            _saveData.Consumables.Stamina = _stamina.Value;
+            _saveData.Inventory = Inventory.GetSaveData();
+            return _saveData;
         }
 
         #region UI Updates
+
+        public void UpdateUiHealthAndDefenceValues()
+        {
+            if (IsOwner)
+            {
+                return;
+            }
+
+            var health = GetHealth();
+            var maxHealth = GetHealthMax();
+            var defence = Inventory.GetDefenseValue();
+            var values = _healthSlider.GetHealthValues(health, maxHealth, defence);
+            _healthSlider.SetValues(values);
+        }
 
         public void ShowAlertForItemsAddedToInventory(string alertText)
         {

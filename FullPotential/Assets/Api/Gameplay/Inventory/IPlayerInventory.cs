@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
@@ -12,5 +13,7 @@ namespace FullPotential.Api.Gameplay.Inventory
         IEnumerable<ItemBase> GetCompatibleItemsForSlot(IGear.GearCategory? gearCategory);
 
         KeyValuePair<SlotGameObjectName, Data.EquippedItem>? GetEquippedWithItemId(string itemId);
+
+        InventoryData GetSaveData();
     }
 }
