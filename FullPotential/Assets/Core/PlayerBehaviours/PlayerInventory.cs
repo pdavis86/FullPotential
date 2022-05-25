@@ -80,7 +80,7 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             if (OwnerClientId == 0)
             {
-                PlayerDataNeedsSaving();
+                UpdatePlayerData();
                 return;
             }
 
@@ -88,7 +88,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             var slotChange = HandleSlotChange(item, slotGameObjectName);
 
-            var saveData = PlayerDataNeedsSaving();
+            var saveData = UpdatePlayerData();
 
             var invChange = new InventoryChanges
             {
@@ -224,10 +224,9 @@ namespace FullPotential.Core.PlayerBehaviours
             return (wasEquipped, slotsToSend);
         }
 
-        //todo: rename
-        private PlayerData PlayerDataNeedsSaving()
+        private PlayerData UpdatePlayerData()
         {
-            var playerData = _userRegistry.PlayerData[_playerState.Username];
+            var playerData = _userRegistry.GetPlayerData(_playerState.Username, true);
             playerData.Inventory = GetSaveData();
             return playerData;
         }
@@ -338,7 +337,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (IsServer)
             {
-                PlayerDataNeedsSaving();
+                UpdatePlayerData();
             }
         }
 

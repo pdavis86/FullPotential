@@ -8,6 +8,7 @@ namespace FullPotential.Core.Gameplay.Data
     {
         public string Username;
         public PlayerSettings Settings;
+        public Consumables Consumables;
         public InventoryData Inventory;
 
         [NonSerialized] public bool InventoryLoadedSuccessfully;

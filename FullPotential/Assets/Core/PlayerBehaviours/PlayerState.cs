@@ -46,6 +46,9 @@ namespace FullPotential.Core.PlayerBehaviours
         //Registered Services
         private UserRegistry _userRegistry;
 
+        //Others
+        private DelayedAction _updatePlayerData;
+
         #endregion
 
         #region Inspector Variables
@@ -67,7 +70,9 @@ namespace FullPotential.Core.PlayerBehaviours
 
         #region Properties
 
-        [HideInInspector] public string TextureUrl {
+        [HideInInspector]
+        public string TextureUrl
+        {
             get
             {
                 return _textureUrl;
@@ -79,7 +84,7 @@ namespace FullPotential.Core.PlayerBehaviours
             }
         }
         [HideInInspector] public string PlayerToken { get; set; }
-        [HideInInspector] public string Username { get; set; }
+        [HideInInspector] public string Username { get; private set; }
 
         public IPlayerInventory Inventory { get; private set; }
 
@@ -151,6 +156,8 @@ namespace FullPotential.Core.PlayerBehaviours
                 {
                     _gameManager.GameDataStore.ClientIdToUsername.Add(OwnerClientId, Username);
                 }
+
+                _updatePlayerData = new DelayedAction(15f, UpdatePlayerDataConsumables);
             }
             else if (IsOwner)
             {
@@ -183,6 +190,8 @@ namespace FullPotential.Core.PlayerBehaviours
             BodyParts.Head.rotation = _playerCamera.transform.rotation;
 
             BecomeVulnerable();
+
+            _updatePlayerData.TryPerformAction();
         }
 
         public override void OnNetworkSpawn()
@@ -494,7 +503,10 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (IsServer)
             {
-                _health.Value = GetHealthMax();
+                _energy.Value = playerData.Consumables.Energy;
+                _health.Value = playerData.Consumables.Health > 0 ? playerData.Consumables.Health : GetHealthMax();
+                _mana.Value = playerData.Consumables.Mana;
+                _stamina.Value = playerData.Consumables.Stamina;
             }
 
             try
@@ -545,7 +557,7 @@ namespace FullPotential.Core.PlayerBehaviours
             }
 
             string filePath = null;
-            if (TextureUrl.ToLower().StartsWith("http"))
+            if (TextureUrl != null && TextureUrl.ToLower().StartsWith("http"))
             {
                 filePath = Application.persistentDataPath + "/" + Username + ".png";
 
@@ -673,6 +685,15 @@ namespace FullPotential.Core.PlayerBehaviours
             _bodyMeshRenderer.material = material;
             BodyParts.LeftArm.GetComponent<MeshRenderer>().material = material;
             BodyParts.RightArm.GetComponent<MeshRenderer>().material = material;
+        }
+
+        private void UpdatePlayerDataConsumables()
+        {
+            var playerData = _userRegistry.PlayerData[Username];
+            playerData.Consumables.Energy = _energy.Value;
+            playerData.Consumables.Health = _health.Value;
+            playerData.Consumables.Mana = _mana.Value;
+            playerData.Consumables.Stamina = _stamina.Value;
         }
 
         #region UI Updates

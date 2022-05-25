@@ -62,6 +62,7 @@ namespace FullPotential.Core.GameManagement
         private bool _isSaving;
         private NetworkObject _playerPrefabNetObj;
         private DelayedAction _periodicSave;
+        private int _saveCounter;
 
         //Singleton
         public static GameManager Instance { get; private set; }
@@ -103,7 +104,7 @@ namespace FullPotential.Core.GameManagement
             InputActions = new DefaultInputActions();
 
             NetworkManager.Singleton.ConnectionApprovalCallback += OnApprovalCheck;
-            NetworkManager.Singleton.OnClientDisconnectCallback += OnServerDisconnectedClient;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnDisconnectedFromServer;
 
             _playerPrefabNetObj = Prefabs.Player.GetComponent<NetworkObject>();
 
@@ -152,8 +153,7 @@ namespace FullPotential.Core.GameManagement
             callback(false, null, true, null, null);
         }
 
-        //todo: rename if also fired when client disconnects
-        private void OnServerDisconnectedClient(ulong clientId)
+        private void OnDisconnectedFromServer(ulong clientId)
         {
             if (NetworkManager.Singleton.IsServer)
             {
@@ -249,7 +249,7 @@ namespace FullPotential.Core.GameManagement
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #else
-        Application.Quit ();
+            Application.Quit ();
 #endif
         }
 
@@ -268,30 +268,37 @@ namespace FullPotential.Core.GameManagement
 
         private void SaveAllPlayerData()
         {
+            const int numberOfAsapSavesBeforeAllSaves = 5;
+
             if (_isSaving || !NetworkManager.Singleton.IsServer)
             {
                 return;
             }
 
-            //todo: set IsAsapSaveRequired on major events like crafting
-            //todo: save more frequently where saveData.IsAsapSaveRequired == true
+            var asapOnly = _saveCounter <= numberOfAsapSavesBeforeAllSaves;
 
-            Task.Run(async () => await SaveAllPlayerDataAsync())
+            //Debug.Log($"Checking whether to save (ASAP Only: {asapOnly}, save count: {_saveCounter})");
+
+            Task.Run(async () =>
+                {
+                    _isSaving = true;
+
+                    var tasks = _userRegistry.PlayerData
+                        .Where(x =>
+                            x.Value.InventoryLoadedSuccessfully
+                            && (!asapOnly || x.Value.IsAsapSaveRequired))
+                        .Select(x => Task.Run(() => SavePlayerData(x.Value)));
+
+                    await Task.WhenAll(tasks);
+
+                    _saveCounter = asapOnly 
+                        ? _saveCounter + 1
+                        : 0;
+
+                    _isSaving = false;
+                })
                 .GetAwaiter()
                 .GetResult();
-        }
-
-        private async Task SaveAllPlayerDataAsync()
-        {
-            _isSaving = true;
-
-            var tasks = _userRegistry.PlayerData
-                .Where(x => x.Value.InventoryLoadedSuccessfully)
-                .Select(x => Task.Run(() => SavePlayerData(x.Value)));
-
-            await Task.WhenAll(tasks);
-
-            _isSaving = false;
         }
 
         private void SavePlayerData(PlayerData playerData)

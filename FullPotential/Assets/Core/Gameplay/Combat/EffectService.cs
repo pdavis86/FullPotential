@@ -137,7 +137,8 @@ namespace FullPotential.Core.Gameplay.Combat
                         return;
                     }
 
-                    //todo: targetFighter.AlterValue(statEffect, itemUsed.Attributes);
+                    targetFighter.AlterValue(statEffect, itemUsed.Attributes);
+
                     return;
 
                 case Affect.TemporaryMaxDecrease:
