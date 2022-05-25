@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Core.Gameplay.Data;
 using UnityEngine;
@@ -14,14 +13,12 @@ namespace FullPotential.Core.Registry
         private readonly string _persistentDataPath;
 
         //todo: invert control. All classes currently having responsibility for updating this
-        public Dictionary<string, PlayerData> PlayerData { get; }
+        //public Dictionary<string, PlayerData> PlayerData { get; }
 
         public UserRegistry()
         {
             _isDebugBuild = Debug.isDebugBuild;
             _persistentDataPath = Application.persistentDataPath;
-
-            PlayerData = new Dictionary<string, PlayerData>();
         }
 
         public string SignIn(string username, string password)
@@ -67,18 +64,6 @@ namespace FullPotential.Core.Registry
             }
 
             return playerData;
-        }
-
-        public PlayerData GetPlayerData(string playerUsername, bool asapSaveRequired = false)
-        {
-            var data = PlayerData[playerUsername];
-
-            if (asapSaveRequired)
-            {
-                data.IsAsapSaveRequired = true;
-            }
-
-            return data;
         }
 
         public void Save(PlayerData playerData)

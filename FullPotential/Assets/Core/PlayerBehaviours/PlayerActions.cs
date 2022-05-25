@@ -7,10 +7,8 @@ using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
-using FullPotential.Core.Gameplay.Data;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
-using FullPotential.Core.Registry;
 using FullPotential.Core.Utilities.UtilityBehaviours;
 using TMPro;
 using Unity.Netcode;
@@ -37,14 +35,13 @@ namespace FullPotential.Core.PlayerBehaviours
         private bool _toggleCharacterMenu;
         private PlayerState _playerState;
         private PlayerMovement _playerMovement;
-        private UserRegistry _userRegistry;
         private Interactable _focusedInteractable;
         private Camera _sceneCamera;
         private ClientRpcParams _clientRpcParams;
 
         private readonly FragmentedMessageReconstructor _inventoryChangesReconstructor = new FragmentedMessageReconstructor();
 
-        #region Event handlers
+        #region Unity Event handlers
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -52,7 +49,6 @@ namespace FullPotential.Core.PlayerBehaviours
             _playerState = GetComponent<PlayerState>();
             _playerMovement = GetComponent<PlayerMovement>();
 
-            _userRegistry = GameManager.Instance.GetService<UserRegistry>();
             _resultFactory = GameManager.Instance.GetService<ResultFactory>();
         }
 
@@ -223,14 +219,6 @@ namespace FullPotential.Core.PlayerBehaviours
         #region ServerRpc calls
 
         [ServerRpc]
-        private void UpdatePlayerSettingsServerRpc(PlayerSettings playerSettings)
-        {
-            var saveData = _userRegistry.GetPlayerData(_playerState.Username, true);
-            saveData.Settings = playerSettings ?? new PlayerSettings();
-            UpdatePlayerSettings(saveData.Settings);
-        }
-
-        [ServerRpc]
         private void TryToInteractServerRpc(string gameObjectName, ServerRpcParams serverRpcParams = default)
         {
             const float searchRadius = 5f;
@@ -374,21 +362,6 @@ namespace FullPotential.Core.PlayerBehaviours
         }
 
         #endregion
-
-        public void UpdatePlayerSettings(PlayerSettings playerSettings)
-        {
-            if (playerSettings == null)
-            {
-                playerSettings = new PlayerSettings();
-            }
-
-            _playerState.TextureUrl = playerSettings.TextureUrl;
-
-            if (!IsServer)
-            {
-                UpdatePlayerSettingsServerRpc(playerSettings);
-            }
-        }
 
         private void UpdateMenuStates()
         {

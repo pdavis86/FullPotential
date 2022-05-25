@@ -36,7 +36,7 @@ namespace FullPotential.Core.PlayerBehaviours
         private bool _isSprinting;
         private bool _wasSprinting;
 
-        #region Event Handlers 
+        #region Unity Event Handlers 
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()

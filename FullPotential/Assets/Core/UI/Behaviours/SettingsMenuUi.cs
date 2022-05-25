@@ -31,7 +31,7 @@ namespace FullPotential.Core.Ui.Behaviours
         private bool _revertFullScreen;
         private float _revertFieldOfView;
 
-        #region Event handlers
+        #region Unity Event handlers
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -109,7 +109,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 TextureUrl = _skinUrlInput.text
             };
 
-            GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerActions>().UpdatePlayerSettings(playerSettings);
+            GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>().UpdatePlayerSettings(playerSettings);
 
             _isRevertRequired = false;
 

@@ -12,6 +12,5 @@ namespace FullPotential.Core.Gameplay.Data
         public InventoryData Inventory;
 
         [NonSerialized] public bool InventoryLoadedSuccessfully;
-        [NonSerialized] public bool IsAsapSaveRequired;
     }
 }

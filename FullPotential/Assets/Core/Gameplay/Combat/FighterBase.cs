@@ -413,7 +413,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     continue;
                 }
 
-                var playerState = NetworkManager.Singleton.ConnectedClients[item.Key].PlayerObject.gameObject.GetComponent<PlayerState>();
+                var playerState = NetworkManager.Singleton.ConnectedClients[item.Key].PlayerObject.GetComponent<PlayerState>();
                 playerState.SpawnLootChest(transform.position);
             }
 

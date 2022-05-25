@@ -62,7 +62,7 @@ namespace FullPotential.Core.GameManagement
         private bool _isSaving;
         private NetworkObject _playerPrefabNetObj;
         private DelayedAction _periodicSave;
-        private int _saveCounter;
+        private List<string> _asapSaveUsernames;
 
         //Singleton
         public static GameManager Instance { get; private set; }
@@ -114,7 +114,8 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            _periodicSave = new DelayedAction(15f, SaveAllPlayerData);
+            _periodicSave = new DelayedAction(15f, SaveAsapPlayerData);
+            _asapSaveUsernames = new List<string>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -155,20 +156,7 @@ namespace FullPotential.Core.GameManagement
 
         private void OnDisconnectedFromServer(ulong clientId)
         {
-            if (NetworkManager.Singleton.IsServer)
-            {
-                var playerUsername = GameDataStore.ClientIdToUsername[clientId];
-
-                if (playerUsername.IsNullOrWhiteSpace())
-                {
-                    Debug.LogError($"Could not get username for client ID {clientId}");
-                    return;
-                }
-
-                _userRegistry.PlayerData.Remove(playerUsername, out var playerDataToSave);
-                SavePlayerData(playerDataToSave);
-            }
-            else
+            if (!NetworkManager.Singleton.IsServer)
             {
                 LocalGameDataStore.HasDisconnected = true;
 
@@ -235,7 +223,7 @@ namespace FullPotential.Core.GameManagement
 
         public void Disconnect()
         {
-            SaveAllPlayerData();
+            SaveAsapPlayerData();
 
             NetworkManager.Singleton.Shutdown();
             SceneManager.LoadSceneAsync(1);
@@ -244,7 +232,7 @@ namespace FullPotential.Core.GameManagement
         public void Quit()
         {
             SaveAppOptions();
-            SaveAllPlayerData();
+            SaveAsapPlayerData();
 
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
@@ -266,55 +254,73 @@ namespace FullPotential.Core.GameManagement
             return new Version(appVersion + "." + lastWrite.ToString("yyyyMMdd"));
         }
 
-        private void SaveAllPlayerData()
+        private void SaveAsapPlayerData()
         {
-            const int numberOfAsapSavesBeforeAllSaves = 5;
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                Debug.LogWarning("Tried saving when not on the server");
+                return;
+            }
 
-            if (_isSaving || !NetworkManager.Singleton.IsServer)
+            if (_isSaving)
+            {
+                Debug.LogWarning("Already saving");
+                return;
+            }
+
+            Debug.Log("Checking if anything to save");
+
+            var playerDataCollection = new List<PlayerData>();
+            foreach (var kvp in NetworkManager.Singleton.ConnectedClients)
+            {
+                if (_asapSaveUsernames.Contains(GameDataStore.ClientIdToUsername[kvp.Key]))
+                {
+                    playerDataCollection.Add(kvp.Value.PlayerObject.GetComponent<PlayerState>().UpdateAndReturnPlayerData());
+                }
+            }
+
+            if (!playerDataCollection.Any())
             {
                 return;
             }
 
-            var asapOnly = _saveCounter <= numberOfAsapSavesBeforeAllSaves;
+            _isSaving = true;
 
-            //Debug.Log($"Checking whether to save (ASAP Only: {asapOnly}, save count: {_saveCounter})");
-
-            Task.Run(async () =>
-                {
-                    _isSaving = true;
-
-                    var tasks = _userRegistry.PlayerData
-                        .Where(x =>
-                            x.Value.InventoryLoadedSuccessfully
-                            && (!asapOnly || x.Value.IsAsapSaveRequired))
-                        .Select(x => Task.Run(() => SavePlayerData(x.Value)));
-
-                    await Task.WhenAll(tasks);
-
-                    _saveCounter = asapOnly 
-                        ? _saveCounter + 1
-                        : 0;
-
-                    _isSaving = false;
-                })
-                .GetAwaiter()
-                .GetResult();
+            try
+            {
+                var tasks = playerDataCollection.Select(x => Task.Run(() => SavePlayerData(x)));
+                Task.Run(async () => await Task.WhenAll(tasks))
+                    .GetAwaiter()
+                    .GetResult();
+            }
+            finally
+            {
+                _isSaving = false;
+            }
         }
 
-        private void SavePlayerData(PlayerData playerData)
+        public void QueueAsapSave(string username)
+        {
+            if (!_asapSaveUsernames.Contains(username))
+            {
+                _asapSaveUsernames.Add(username);
+            }
+        }
+
+        public void SavePlayerData(PlayerData playerData)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
-                Debug.LogError("Tried to save when not on the server");
+                Debug.LogError($"Tried to save player data for '{playerData.Username}' when not on the server");
             }
 
             if (!playerData.InventoryLoadedSuccessfully)
             {
-                Debug.LogWarning("Not saving because the load failed");
+                Debug.LogWarning($"Not saving player data for '{playerData.Username}' because the load failed");
                 return;
             }
 
-            Debug.Log("Saving player data for " + playerData.Username);
+            Debug.Log($"Saving player data for {playerData.Username}");
 
             _userRegistry.Save(playerData);
         }

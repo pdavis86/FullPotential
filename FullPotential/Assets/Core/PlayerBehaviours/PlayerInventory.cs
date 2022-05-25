@@ -18,11 +18,9 @@ using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
-using FullPotential.Core.Gameplay.Data;
 using FullPotential.Core.Localization;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
-using FullPotential.Core.Registry;
 using FullPotential.Core.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
@@ -39,7 +37,6 @@ namespace FullPotential.Core.PlayerBehaviours
 
         //Services
         private ITypeRegistry _typeRegistry;
-        private UserRegistry _userRegistry;
         private IRpcService _rpcService;
         private Localizer _localizer;
         private ResultFactory _resultFactory;
@@ -60,7 +57,6 @@ namespace FullPotential.Core.PlayerBehaviours
             _playerState = GetComponent<PlayerState>();
 
             _typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
-            _userRegistry = GameManager.Instance.GetService<UserRegistry>();
             _rpcService = GameManager.Instance.GetService<IRpcService>();
             _localizer = GameManager.Instance.GetService<Localizer>();
             _resultFactory = GameManager.Instance.GetService<ResultFactory>();
@@ -80,7 +76,6 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             if (OwnerClientId == 0)
             {
-                UpdatePlayerData();
                 return;
             }
 
@@ -88,11 +83,13 @@ namespace FullPotential.Core.PlayerBehaviours
 
             var slotChange = HandleSlotChange(item, slotGameObjectName);
 
-            var saveData = UpdatePlayerData();
+            var saveData = GetSaveData();
+
+            GameManager.Instance.QueueAsapSave(_playerState.Username);
 
             var invChange = new InventoryChanges
             {
-                EquippedItems = saveData.Inventory.EquippedItems.Where(x => slotChange.SlotsToSend.Contains(x.Key)).ToArray()
+                EquippedItems = saveData.EquippedItems.Where(x => slotChange.SlotsToSend.Contains(x.Key)).ToArray()
             };
 
             if (slotChange.WasEquipped)
@@ -168,7 +165,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 }
             }
 
-            _playerState.UpdateHealthAndDefenceValues();
+            _playerState.UpdateUiHealthAndDefenceValues();
         }
 
         #endregion
@@ -222,13 +219,6 @@ namespace FullPotential.Core.PlayerBehaviours
             }
 
             return (wasEquipped, slotsToSend);
-        }
-
-        private PlayerData UpdatePlayerData()
-        {
-            var playerData = _userRegistry.GetPlayerData(_playerState.Username, true);
-            playerData.Inventory = GetSaveData();
-            return playerData;
         }
 
         private IEnumerator ResetEquipmentUi()
@@ -335,10 +325,7 @@ namespace FullPotential.Core.PlayerBehaviours
                     break;
             }
 
-            if (IsServer)
-            {
-                UpdatePlayerData();
-            }
+            GameManager.Instance.QueueAsapSave(_playerState.Username);
         }
 
         public void LoadInventory(InventoryData inventoryData)
@@ -436,7 +423,7 @@ namespace FullPotential.Core.PlayerBehaviours
             }
         }
 
-        private InventoryData GetSaveData()
+        public InventoryData GetSaveData()
         {
             var equippedItems = _equippedItems
                 .Where(x => !(x.Value?.Item?.Id.IsNullOrWhiteSpace() ?? false))
