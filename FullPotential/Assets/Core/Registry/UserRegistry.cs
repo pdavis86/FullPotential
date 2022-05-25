@@ -13,6 +13,7 @@ namespace FullPotential.Core.Registry
         private readonly bool _isDebugBuild;
         private readonly string _persistentDataPath;
 
+        //todo: invert control. All classes currently having responsibility for updating this
         public Dictionary<string, PlayerData> PlayerData { get; }
 
         public UserRegistry()
@@ -52,6 +53,7 @@ namespace FullPotential.Core.Registry
                 {
                     Username = username,
                     Settings = new PlayerSettings(),
+                    Consumables = new Consumables(),
                     Inventory = new InventoryData()
                 };
             }
@@ -65,6 +67,18 @@ namespace FullPotential.Core.Registry
             }
 
             return playerData;
+        }
+
+        public PlayerData GetPlayerData(string playerUsername, bool asapSaveRequired = false)
+        {
+            var data = PlayerData[playerUsername];
+
+            if (asapSaveRequired)
+            {
+                data.IsAsapSaveRequired = true;
+            }
+
+            return data;
         }
 
         public void Save(PlayerData playerData)

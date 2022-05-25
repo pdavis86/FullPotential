@@ -54,10 +54,10 @@ namespace FullPotential.Core.Gameplay.Combat
         protected IRpcService _rpcService;
         protected Localizer _localizer;
 
-        protected readonly NetworkVariable<int> _stamina = new NetworkVariable<int>(100);
+        protected readonly NetworkVariable<int> _energy = new NetworkVariable<int>(100);
         protected readonly NetworkVariable<int> _health = new NetworkVariable<int>(100);
         protected readonly NetworkVariable<int> _mana = new NetworkVariable<int>(100);
-        protected readonly NetworkVariable<int> _energy = new NetworkVariable<int>(100);
+        protected readonly NetworkVariable<int> _stamina = new NetworkVariable<int>(100);
         // ReSharper enable InconsistentNaming
 
         [SerializeField] protected TextMeshProUGUI _nameTag;
@@ -119,11 +119,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             _replenishMana = new DelayedAction(.2f, () =>
             {
-                //todo: this check is flawed. Can spawn a thing that should drain resource then unequip
-                var isConsumingMana =
-                    (HandStatusLeft.EquippedSpell != null && HandStatusLeft.SpellOrGadgetGameObject != null)
-                    || (HandStatusRight.EquippedSpell != null && HandStatusRight.SpellOrGadgetGameObject != null);
-
+                var isConsumingMana = HandStatusLeft.IsConsumingMana() || HandStatusRight.IsConsumingMana();
                 if (!isConsumingMana && _mana.Value < GetManaMax())
                 {
                     //todo: xp-based mana recharge
@@ -133,11 +129,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             _replenishEnergy = new DelayedAction(.2f, () =>
             {
-                //todo: this check is flawed. Can spawn a thing that should drain resource then unequip
-                var isConsumingEnergy =
-                    (HandStatusLeft.EquippedGadget != null && HandStatusLeft.SpellOrGadgetGameObject != null)
-                    || (HandStatusRight.EquippedGadget != null && HandStatusRight.SpellOrGadgetGameObject != null);
-
+                var isConsumingEnergy = HandStatusLeft.IsConsumingEnergy() || HandStatusRight.IsConsumingEnergy();
                 if (!isConsumingEnergy && _energy.Value < GetEnergyMax())
                 {
                     //todo: xp-based energy recharge
@@ -156,17 +148,17 @@ namespace FullPotential.Core.Gameplay.Combat
 
             _consumeResource = new DelayedAction(.5f, () =>
             {
-                if (HandStatusLeft.SpellOrGadgetBehaviour != null
-                    && !ConsumeResource(HandStatusLeft.ContinuousSpellOrGadgetItem, HandStatusLeft.ContinuousSpellOrGadgetItem.Targeting.IsContinuous))
+                if (HandStatusLeft.ActiveSpellOrGadgetGameObject != null
+                    && !ConsumeResource(HandStatusLeft.EquippedSpellOrGadget, HandStatusLeft.EquippedSpellOrGadget.Targeting.IsContinuous))
                 {
-                    HandStatusLeft.SpellOrGadgetBehaviour.Stop();
+                    HandStatusLeft.StopConsumingResources();
                     StopCastingClientRpc(true, _rpcService.ForNearbyPlayers(transform.position));
                 }
 
-                if (HandStatusRight.SpellOrGadgetBehaviour != null
-                    && !ConsumeResource(HandStatusRight.ContinuousSpellOrGadgetItem, HandStatusRight.ContinuousSpellOrGadgetItem.Targeting.IsContinuous))
+                if (HandStatusRight.ActiveSpellOrGadgetGameObject != null
+                    && !ConsumeResource(HandStatusRight.EquippedSpellOrGadget, HandStatusRight.EquippedSpellOrGadget.Targeting.IsContinuous))
                 {
-                    HandStatusRight.SpellOrGadgetBehaviour.Stop();
+                    HandStatusRight.StopConsumingResources();
                     StopCastingClientRpc(false, _rpcService.ForNearbyPlayers(transform.position));
                 }
             });
@@ -255,21 +247,23 @@ namespace FullPotential.Core.Gameplay.Combat
                 ? HandStatusLeft
                 : HandStatusRight;
 
-            StopSpellOrGadget(leftOrRight);
+            leftOrRight.StopConsumingResources();
         }
 
         #endregion
 
         public IEnumerator ReloadCoroutine(HandStatus handStatus)
         {
+            if (handStatus.EquippedWeapon == null)
+            {
+                yield break;
+            }
+
             handStatus.IsReloading = true;
 
-            yield return new WaitForSeconds(handStatus.EquippedItem.Attributes.GetReloadTime());
+            yield return new WaitForSeconds(handStatus.EquippedWeapon.Attributes.GetReloadTime());
 
-            if (handStatus.EquippedWeapon != null)
-            {
-                handStatus.EquippedWeapon.Ammo = handStatus.EquippedWeapon.Attributes.GetAmmoMax();
-            }
+            handStatus.EquippedWeapon.Ammo = handStatus.EquippedWeapon.Attributes.GetAmmoMax();
 
             handStatus.IsReloading = false;
         }
@@ -326,7 +320,7 @@ namespace FullPotential.Core.Gameplay.Combat
             return 100;
         }
 
-        //todo: attribute-based costs
+        //todo: attribute-based mana and energy costs
         public int GetManaCost(Spell spell)
         {
             return 20;
@@ -425,17 +419,8 @@ namespace FullPotential.Core.Gameplay.Combat
 
             _damageTaken.Clear();
 
-            if (HandStatusLeft.SpellOrGadgetGameObject != null)
-            {
-                Destroy(HandStatusLeft.SpellOrGadgetGameObject);
-                HandStatusLeft.SpellOrGadgetGameObject = null;
-            }
-
-            if (HandStatusRight.SpellOrGadgetGameObject != null)
-            {
-                Destroy(HandStatusRight.SpellOrGadgetGameObject);
-                HandStatusRight.SpellOrGadgetGameObject = null;
-            }
+            HandStatusLeft.StopConsumingResources();
+            HandStatusRight.StopConsumingResources();
 
             var deathMessage = GetDeathMessage(false, name, killerName, itemName);
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
@@ -548,7 +533,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 ? HandStatusLeft
                 : HandStatusRight;
 
-            if (StopSpellOrGadget(leftOrRight))
+            if (leftOrRight.StopConsumingResources())
             {
                 //Return true as the action also needs performing on the server
                 return true;
@@ -570,12 +555,9 @@ namespace FullPotential.Core.Gameplay.Combat
 
                     spellOrGadgetGameObject.transform.parent = parentTransform;
 
-                    leftOrRight.ContinuousSpellOrGadgetItem = spellOrGadget;
-
                     if (spellOrGadget.Targeting.IsContinuous)
                     {
-                        leftOrRight.SpellOrGadgetGameObject = spellOrGadgetGameObject;
-                        leftOrRight.SpellOrGadgetBehaviour = spellOrGadgetGameObject.GetComponent<ISpellOrGadgetBehaviour>();
+                        leftOrRight.ActiveSpellOrGadgetGameObject = spellOrGadgetGameObject;
                     }
 
                     if (IsServer)
@@ -611,9 +593,6 @@ namespace FullPotential.Core.Gameplay.Combat
                 ? rangedHit.point
                 : handPosition + LookTransform.forward * range;
 
-            //todo: remove
-            Debug.DrawLine(transform.position, endPos, Color.green, 2f);
-
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             UsedWeaponClientRpc(handPosition, endPos, nearbyClients);
 
@@ -648,20 +627,6 @@ namespace FullPotential.Core.Gameplay.Combat
             }
 
             return meleeHit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId;
-        }
-
-        private bool StopSpellOrGadget(HandStatus leftOrRight)
-        {
-            if (leftOrRight.SpellOrGadgetBehaviour == null)
-            {
-                return false;
-            }
-
-            leftOrRight.SpellOrGadgetBehaviour.Stop();
-            leftOrRight.SpellOrGadgetGameObject = null;
-            leftOrRight.SpellOrGadgetBehaviour = null;
-
-            return true;
         }
 
         public void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes)

@@ -11,46 +11,63 @@ namespace FullPotential.Api.Gameplay.Data
         
         public string EquippedItemDescription { get; private set; }
 
-        public ItemBase EquippedItem { get; private set; }
         public Weapon EquippedWeapon { get; private set; }
-        public Spell EquippedSpell { get; private set; }
-        public Gadget EquippedGadget { get; private set; }
 
+        public SpellOrGadgetItemBase EquippedSpellOrGadget { get; private set; }
 
-        //todo: Do continuous resource drain better
-        public SpellOrGadgetItemBase ContinuousSpellOrGadgetItem { get; set; }
-        public GameObject SpellOrGadgetGameObject { get; set; }
-        public ISpellOrGadgetBehaviour SpellOrGadgetBehaviour { get; set; }
-
+        public GameObject ActiveSpellOrGadgetGameObject { get; set; }
 
         public void SetEquippedItem(ItemBase item, string description)
         {
-            EquippedItem = item;
             EquippedItemDescription = description;
 
             switch (item)
             {
                 case Weapon weapon:
                     EquippedWeapon = weapon;
-                    EquippedSpell = null;
-                    EquippedGadget = null;
-                    ContinuousSpellOrGadgetItem = null;
+                    EquippedSpellOrGadget = null;
                     break;
 
                 case Spell spell:
                     EquippedWeapon = null;
-                    EquippedSpell = spell;
-                    EquippedGadget = null;
-                    ContinuousSpellOrGadgetItem = null;
+                    EquippedSpellOrGadget = spell;
                     break;
 
                 case Gadget gadget:
                     EquippedWeapon = null;
-                    EquippedSpell = null;
-                    EquippedGadget = gadget;
-                    ContinuousSpellOrGadgetItem = null;
+                    EquippedSpellOrGadget = gadget;
                     break;
             }
+        }
+
+        public bool IsConsumingMana()
+        {
+            return EquippedSpellOrGadget is Spell && ActiveSpellOrGadgetGameObject != null;
+        }
+
+        public bool IsConsumingEnergy()
+        {
+            return EquippedSpellOrGadget is Gadget && ActiveSpellOrGadgetGameObject != null;
+        }
+
+        public bool StopConsumingResources()
+        {
+            if (ActiveSpellOrGadgetGameObject == null)
+            {
+                return false;
+            }
+
+            var behaviour = ActiveSpellOrGadgetGameObject.GetComponent<ISpellOrGadgetBehaviour>();
+
+            if (behaviour == null)
+            {
+                return false;
+            }
+
+            behaviour.Stop();
+            ActiveSpellOrGadgetGameObject = null;
+
+            return true;
         }
     }
 }

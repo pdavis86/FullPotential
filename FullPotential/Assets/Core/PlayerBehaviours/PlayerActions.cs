@@ -223,12 +223,10 @@ namespace FullPotential.Core.PlayerBehaviours
         #region ServerRpc calls
 
         [ServerRpc]
-        public void UpdatePlayerSettingsServerRpc(PlayerSettings playerSettings)
+        private void UpdatePlayerSettingsServerRpc(PlayerSettings playerSettings)
         {
-            var saveData = _userRegistry.PlayerData[_playerState.Username];
+            var saveData = _userRegistry.GetPlayerData(_playerState.Username, true);
             saveData.Settings = playerSettings ?? new PlayerSettings();
-            saveData.IsAsapSaveRequired = true;
-
             UpdatePlayerSettings(saveData.Settings);
         }
 
@@ -501,7 +499,7 @@ namespace FullPotential.Core.PlayerBehaviours
             }
         }
 
-        public void ShowDamage(Vector3 position, string damage)
+        private void ShowDamage(Vector3 position, string damage)
         {
             var hit = Instantiate(_hitTextPrefab);
             hit.transform.SetParent(GameManager.Instance.MainCanvasObjects.HitNumberContainer.transform, false);
