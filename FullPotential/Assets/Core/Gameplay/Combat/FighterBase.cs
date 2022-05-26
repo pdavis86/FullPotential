@@ -17,7 +17,6 @@ using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Localization;
 using FullPotential.Core.PlayerBehaviours;
 using FullPotential.Core.Ui.Components;
@@ -33,15 +32,21 @@ namespace FullPotential.Core.Gameplay.Combat
         private const float SpellOrGadgetRangeLimit = 50f;
 
         #region Inspector Variables
-        // ReSharper disable UnassignedField.Global
 #pragma warning disable 0649
+        // ReSharper disable UnassignedField.Global
+        // ReSharper disable InconsistentNaming
 
         public PositionTransforms Positions;
         public BodyPartTransforms BodyParts;
+        [SerializeField] protected TextMeshProUGUI _nameTag;
+        [SerializeField] protected BarSlider _healthSlider;
 
-#pragma warning restore 0649
         // ReSharper enable UnassignedField.Global
+        // ReSharper enable InconsistentNaming
+#pragma warning restore 0649
         #endregion
+
+        #region Other Variables
 
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
         private readonly Dictionary<IEffect, DateTime> _activeEffects = new Dictionary<IEffect, DateTime>();
@@ -60,12 +65,23 @@ namespace FullPotential.Core.Gameplay.Combat
         protected readonly NetworkVariable<int> _stamina = new NetworkVariable<int>(100);
         // ReSharper enable InconsistentNaming
 
-        [SerializeField] protected TextMeshProUGUI _nameTag;
-        [SerializeField] protected BarSlider _healthSlider;
-
         public readonly HandStatus HandStatusLeft = new HandStatus();
         public readonly HandStatus HandStatusRight = new HandStatus();
 
+        protected IInventory _inventory;
+        protected IEffectService _effectService;
+        protected ITypeRegistry _typeRegistry;
+
+        //Action-related
+        private DelayedAction _replenishStamina;
+        private DelayedAction _replenishMana;
+        private DelayedAction _replenishEnergy;
+        private DelayedAction _consumeStamina;
+        private DelayedAction _consumeResource;
+
+        #endregion
+
+        #region Properties
         public abstract Transform Transform { get; }
 
         public abstract GameObject GameObject { get; }
@@ -78,16 +94,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
         public LivingEntityState AliveState { get; protected set; }
 
-        protected IInventory _inventory;
-        protected IEffectService _effectService;
-        protected ITypeRegistry _typeRegistry;
-
-        //Action-related
-        private DelayedAction _replenishStamina;
-        private DelayedAction _replenishMana;
-        private DelayedAction _replenishEnergy;
-        private DelayedAction _consumeStamina;
-        private DelayedAction _consumeResource;
+        #endregion
 
         #region Unity Events Handlers
         // ReSharper disable UnusedMemberHierarchy.Global
@@ -321,12 +328,12 @@ namespace FullPotential.Core.Gameplay.Combat
         }
 
         //todo: attribute-based mana and energy costs
-        public int GetManaCost(Spell spell)
+        private int GetManaCost(Spell spell)
         {
             return 20;
         }
 
-        public int GetEnergyCost(Gadget gadget)
+        private int GetEnergyCost(Gadget gadget)
         {
             return 20;
         }
@@ -337,14 +344,12 @@ namespace FullPotential.Core.Gameplay.Combat
             return 50;
         }
 
-        public void TakeDamage(
-            GameObject source,
+        public void TakeDamage(IFighter sourceFighter,
             ItemBase itemUsed,
-            Vector3? position
-        )
+            Vector3? position)
         {
-            var sourceIsPlayer = source != null && source.CompareTag(Tags.Player);
-            var sourcePlayerState = sourceIsPlayer ? source.GetComponent<PlayerState>() : null;
+            var sourceIsPlayer = sourceFighter != null && sourceFighter.GameObject.CompareTag(Tags.Player);
+            var sourcePlayerState = sourceIsPlayer ? sourceFighter.GameObject.GetComponent<PlayerState>() : null;
 
             var targetFighter = this;
 
@@ -352,9 +357,9 @@ namespace FullPotential.Core.Gameplay.Combat
 
             var sourceName = sourceIsPlayer
                 ? sourcePlayerState.Username
-                : (source != null ? source.name : null).OrIfNullOrWhitespace(_localizer.Translate("ui.alert.unknownattacker"));
+                : (sourceFighter != null ? sourceFighter.FighterName : null).OrIfNullOrWhitespace(_localizer.Translate("ui.alert.unknownattacker"));
             var sourceItemName = itemUsed?.Name ?? _localizer.Translate("ui.alert.attack.noitem");
-            var sourceNetworkObject = source != null ? source.GetComponent<NetworkObject>() : null;
+            var sourceNetworkObject = sourceFighter != null ? sourceFighter.GameObject.GetComponent<NetworkObject>() : null;
             var sourceClientId = sourceNetworkObject != null ? (ulong?)sourceNetworkObject.OwnerClientId : null;
 
             if (sourceClientId != null)
@@ -369,7 +374,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 }
             }
 
-            if (source == null)
+            if (sourceFighter == null)
             {
                 Debug.LogWarning("Attack source not found. Did they sign out?");
                 return;
@@ -380,13 +385,13 @@ namespace FullPotential.Core.Gameplay.Combat
                 var targetRb = GetComponent<Rigidbody>();
                 if (targetRb != null && position.HasValue)
                 {
-                    targetRb.AddForceAtPosition(source.transform.forward * 150, position.Value);
+                    targetRb.AddForceAtPosition(sourceFighter.Transform.forward * 150, position.Value);
                 }
             }
 
-            if (sourceIsPlayer && position.HasValue && source != this)
+            if (sourceIsPlayer && position.HasValue && !ReferenceEquals(sourceFighter, this))
             {
-                source.GetComponent<PlayerActions>().ShowDamageClientRpc(
+                sourceFighter.GameObject.GetComponent<PlayerActions>().ShowDamageClientRpc(
                     position.Value,
                     damageDealt.ToString(CultureInfo.InvariantCulture),
                     _rpcService.ForPlayer(sourcePlayerState.OwnerClientId));
@@ -511,7 +516,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (IsServer)
             {
-                _effectService.ApplyEffects(gameObject, null, hit.transform.gameObject, hit.point);
+                _effectService.ApplyEffects(this, null, hit.transform.gameObject, hit.point);
             }
 
             return hit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId;
@@ -603,7 +608,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (IsServer)
             {
-                _effectService.ApplyEffects(gameObject, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
+                _effectService.ApplyEffects(this, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
             }
 
             var rangedHitNetworkObject = rangedHit.transform.gameObject.GetComponent<NetworkObject>();
@@ -623,7 +628,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (IsServer)
             {
-                _effectService.ApplyEffects(gameObject, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
+                _effectService.ApplyEffects(this, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
             }
 
             return meleeHit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId;
@@ -696,6 +701,16 @@ namespace FullPotential.Core.Gameplay.Combat
             throw new NotImplementedException();
         }
 
+        public void ApplyElementalEffect(IEffect elementalEffect, Attributes attributes)
+        {
+
+        }
+
+        public void BeginMaintainDistanceOn(GameObject targetGameObject)
+        {
+
+        }
+
         public Dictionary<IEffect, float> GetActiveEffects()
         {
             var expiredEffects = _activeEffects
@@ -712,7 +727,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 x => (float)(DateTime.Now - x.Value).TotalSeconds);
         }
 
-        public NetworkVariable<int> GetStatVariable(AffectableStats stat)
+        private NetworkVariable<int> GetStatVariable(AffectableStats stat)
         {
             switch (stat)
             {
@@ -725,7 +740,7 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        public int GetStatVariableMax(AffectableStats stat)
+        private int GetStatVariableMax(AffectableStats stat)
         {
             switch (stat)
             {
@@ -769,7 +784,7 @@ namespace FullPotential.Core.Gameplay.Combat
             _consumeResource.TryPerformAction();
         }
 
-        public bool ConsumeResource(SpellOrGadgetItemBase spellOrGadget, bool slowDrain = false, bool isTest = false)
+        private bool ConsumeResource(SpellOrGadgetItemBase spellOrGadget, bool slowDrain = false, bool isTest = false)
         {
             var tuple = GetResourceVariableAndCost(spellOrGadget);
 

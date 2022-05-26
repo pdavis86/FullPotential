@@ -28,5 +28,9 @@ namespace FullPotential.Api.Gameplay.Combat
         void AlterValue(IStatEffect statEffect, Attributes attributes);
 
         void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, Attributes attributes);
+
+        void ApplyElementalEffect(IEffect elementalEffect, Attributes attributes);
+
+        void BeginMaintainDistanceOn(GameObject targetGameObject);
     }
 }

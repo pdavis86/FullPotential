@@ -3,7 +3,7 @@
     public interface IMovementEffect : IEffect
     {
         /// <summary>
-        /// The direction in which the target will be moved
+        /// The direction in which the source/target will be moved
         /// </summary>
         MovementDirection Direction { get; }
     }

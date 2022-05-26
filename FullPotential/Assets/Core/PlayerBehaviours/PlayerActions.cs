@@ -6,6 +6,7 @@ using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;

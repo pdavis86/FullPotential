@@ -75,7 +75,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _effectService.ApplyEffects(SourceFighter.GameObject, SpellOrGadget, target, position);
+            _effectService.ApplyEffects(SourceFighter, SpellOrGadget, target, position);
         }
 
     }

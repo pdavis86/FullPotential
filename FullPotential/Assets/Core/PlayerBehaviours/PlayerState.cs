@@ -309,6 +309,7 @@ namespace FullPotential.Core.PlayerBehaviours
         [ClientRpc]
         private void PlayerSpawnStateChangeClientRpc(LivingEntityState state, Vector3 position, Quaternion rotation, string killerName, string itemName, ClientRpcParams clientRpcParams)
         {
+            //todo: why is this necessary? Doesn't HandleDeath show the message?
             if (!killerName.IsNullOrWhiteSpace())
             {
                 var deathMessage = GetDeathMessage(IsOwner, Username, killerName, itemName);

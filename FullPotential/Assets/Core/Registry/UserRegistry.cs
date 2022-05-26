@@ -12,9 +12,6 @@ namespace FullPotential.Core.Registry
         private readonly bool _isDebugBuild;
         private readonly string _persistentDataPath;
 
-        //todo: invert control. All classes currently having responsibility for updating this
-        //public Dictionary<string, PlayerData> PlayerData { get; }
-
         public UserRegistry()
         {
             _isDebugBuild = Debug.isDebugBuild;

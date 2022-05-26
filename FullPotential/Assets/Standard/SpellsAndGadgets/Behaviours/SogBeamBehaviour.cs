@@ -1,7 +1,5 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Registry.SpellsAndGadgets;
-using FullPotential.Api.Unity.Constants;
-using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using Unity.Netcode;
@@ -23,7 +21,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
         private IEffectService _effectService;
 
-        private GameObject _sourcePlayer;
+        //private GameObject _sourcePlayer;
         private Transform _cylinderParentTransform;
         private Transform _cylinderTransform;
         private RaycastHit _hit;
@@ -51,14 +49,14 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             _maxBeamLength = SpellOrGadget.Attributes.GetContinuousRange();
 
-            _sourcePlayer = GameObjectHelper.ClosestParentWithTag(gameObject, Tags.Player);
+            //_sourcePlayer = GameObjectHelper.ClosestParentWithTag(gameObject, Tags.Player);
 
-            if (_sourcePlayer == null)
-            {
-                Debug.LogError("No player found in parents");
-                Destroy(gameObject);
-                return;
-            }
+            //if (_sourcePlayer == null)
+            //{
+            //    Debug.LogError("No player found in parents");
+            //    Destroy(gameObject);
+            //    return;
+            //}
 
             PerformGraphicsAdjustments();
 
@@ -78,7 +76,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             float beamLength;
             if (Physics.Raycast(SourceFighter.LookTransform.position, SourceFighter.LookTransform.forward, out var hit, _maxBeamLength))
             {
-                if (hit.transform.gameObject == _sourcePlayer)
+                if (hit.transform.gameObject == SourceFighter.GameObject)
                 {
                     Debug.LogWarning("Beam is hitting the source player!");
                     return;
@@ -127,7 +125,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _effectService.ApplyEffects(_sourcePlayer, SpellOrGadget, target, position);
+            _effectService.ApplyEffects(SourceFighter, SpellOrGadget, target, position);
         }
 
         private void PerformGraphicsAdjustments()
@@ -143,10 +141,10 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             {
                 //Adjust for FoV
                 var adjustment = (Camera.main.fieldOfView - 50) * 0.0125f;
-                _cylinderParentTransform.position -= _sourcePlayer.transform.forward * adjustment;
+                _cylinderParentTransform.position -= SourceFighter.Transform.forward * adjustment;
 
                 //Move it a little sideways
-                _cylinderParentTransform.position += (IsLeftHand ? _leftRightAdjustment : -_leftRightAdjustment) * _sourcePlayer.transform.right;
+                _cylinderParentTransform.position += (IsLeftHand ? _leftRightAdjustment : -_leftRightAdjustment) * SourceFighter.Transform.right;
             }
 
             //Move the tip to the middle

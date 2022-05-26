@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 
 // ReSharper disable once UnusedType.Global
 
-namespace FullPotential.Core.Environment
+namespace FullPotential.Standard.Scenes.Behaviours
 {
     public class ShopInteractable : Interactable
     {
@@ -21,6 +21,7 @@ namespace FullPotential.Core.Environment
 
         public override void OnInteract(NetworkObject networkObject)
         {
+            //todo: swap out for UI for crafting an item with user-chosen effects
             networkObject.GetComponent<PlayerActions>().ClaimLootServerRpc("justgimmieloot");
         }
 

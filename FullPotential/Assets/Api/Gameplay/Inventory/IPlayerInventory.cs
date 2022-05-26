@@ -12,7 +12,7 @@ namespace FullPotential.Api.Gameplay.Inventory
 
         IEnumerable<ItemBase> GetCompatibleItemsForSlot(IGear.GearCategory? gearCategory);
 
-        KeyValuePair<SlotGameObjectName, Data.EquippedItem>? GetEquippedWithItemId(string itemId);
+        KeyValuePair<SlotGameObjectName, EquippedItem>? GetEquippedWithItemId(string itemId);
 
         InventoryData GetSaveData();
     }

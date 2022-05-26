@@ -1,13 +1,9 @@
-﻿using System;
-using System.Linq;
-using FullPotential.Api.GameManagement;
+﻿using System.Linq;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
-using FullPotential.Api.Unity.Constants;
-using FullPotential.Core.Localization;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -17,22 +13,16 @@ namespace FullPotential.Core.Gameplay.Combat
 {
     public class EffectService : IEffectService
     {
-        private readonly Localizer _localizer;
         private readonly ITypeRegistry _typeRegistry;
-        private readonly IRpcService _rpcService;
 
         public EffectService(
-            Localizer localizer,
-            ITypeRegistry typeRegistry,
-            IRpcService rpcService)
+            ITypeRegistry typeRegistry)
         {
-            _localizer = localizer;
             _typeRegistry = typeRegistry;
-            _rpcService = rpcService;
         }
 
         public void ApplyEffects(
-            GameObject source,
+            IFighter sourceFighter,
             ItemBase itemUsed,
             GameObject target,
             Vector3? position
@@ -44,9 +34,11 @@ namespace FullPotential.Core.Gameplay.Combat
                 return;
             }
 
-            if (!target.CompareTag(Tags.Player) && !target.CompareTag(Tags.Enemy))
+            var targetFighter = target.GetComponent<IFighter>();
+
+            if (targetFighter == null)
             {
-                Debug.LogWarning("Target is neither a player nor enemy. Target was: " + target);
+                Debug.LogWarning("Target is not an IFighter. Target was: " + target);
                 return;
             }
 
@@ -54,78 +46,61 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (!itemHasEffects)
             {
-                var targetFighter = target.GetComponent<IDamageable>();
-                if (targetFighter != null)
-                {
-                    targetFighter.TakeDamage(source, itemUsed, position);
-                }
-                else
-                {
-                    Debug.LogWarning("Target was not an IDamageable");
-                }
-            }
-            else
-            {
-                foreach (var effect in itemUsed.Effects)
-                {
-                    ApplyEffect(source, effect, itemUsed, target, position);
-
-                    if (source != null && effect is IHasSideEffect withSideEffect)
-                    {
-                        var sideEffect = _typeRegistry.GetEffect(withSideEffect.SideEffectType);
-                        ApplyEffect(null, sideEffect, itemUsed, source, position);
-                    }
-                }
+                targetFighter.TakeDamage(sourceFighter, itemUsed, position);
+                return;
             }
 
-            if (source == null)
+            foreach (var effect in itemUsed.Effects)
             {
-                Debug.LogWarning("Attack source not found. Did they sign out?");
+                ApplyEffect(sourceFighter, effect, itemUsed, target, targetFighter, position);
+
+                if (sourceFighter != null && effect is IHasSideEffect withSideEffect)
+                {
+                    var sideEffect = _typeRegistry.GetEffect(withSideEffect.SideEffectType);
+                    ApplyEffect(null, sideEffect, itemUsed, sourceFighter.GameObject, sourceFighter, position);
+                }
             }
         }
 
-        private void ApplyEffect(GameObject source, IEffect effect, ItemBase itemUsed, GameObject target, Vector3? position)
+        private void ApplyEffect(IFighter sourceFighter, IEffect effect, ItemBase itemUsed, GameObject targetGameObject, IFighter targetFighter, Vector3? position)
         {
-            //var sourceFighter = source != null ? source.GetComponent<IFighter>() : null;
-            //var targetFighter = target.GetComponent<IFighter>();
-
             switch (effect)
             {
-                case IAttributeEffect attributeEffect:
-                    ApplyAttributeEffect(attributeEffect, itemUsed.Attributes, target);
-                    return;
 
                 case IStatEffect statEffect:
-                    ApplyStatEffect(source, statEffect, itemUsed, target, position);
+                    ApplyStatEffect(sourceFighter, statEffect, itemUsed, targetFighter, position);
                     return;
 
                 case IMovementEffect movementEffect:
-                    ApplyMovementEffect(source, movementEffect, itemUsed.Attributes, target);
+                    ApplyMovementEffect(sourceFighter, movementEffect, itemUsed.Attributes, targetGameObject);
+                    return;
+
+                case IAttributeEffect attributeEffect:
+                    ApplyAttributeEffect(attributeEffect, itemUsed.Attributes, targetFighter);
                     return;
 
                 case IElement elementalEffect:
-                    ApplyElementalEffect(elementalEffect, itemUsed.Attributes, target);
+                    ApplyElementalEffect(elementalEffect, itemUsed.Attributes, targetFighter);
                     return;
 
                 default:
-                    throw new NotImplementedException();
+                    Debug.LogError($"Not implemented handling for effect {effect}");
+                    return;
             }
         }
 
-        private void ApplyAttributeEffect(IAttributeEffect attributeEffect, Attributes attributes, GameObject target)
+        private void ApplyAttributeEffect(IAttributeEffect attributeEffect, Attributes attributes, IFighter targetFighter)
         {
-            //todo: target.GetComponent<IFighter>().AddAttributeModifier(attributeEffect, attributes);
+            targetFighter.AddAttributeModifier(attributeEffect, attributes);
         }
 
-        private void ApplyStatEffect(GameObject source, IStatEffect statEffect, ItemBase itemUsed, GameObject target, Vector3? position)
+        private void ApplyStatEffect(IFighter sourceFighter, IStatEffect statEffect, ItemBase itemUsed, IFighter targetFighter, Vector3? position)
         {
-            var targetFighter = target.GetComponent<IFighter>();
-
             switch (statEffect.Affect)
             {
                 case Affect.PeriodicDecrease:
                 case Affect.PeriodicIncrease:
-                    //todo: targetFighter.ApplyPeriodicActionToStat(statEffect, itemUsed.Attributes);
+                    targetFighter.ApplyPeriodicActionToStat(statEffect, itemUsed.Attributes);
                     return;
 
                 case Affect.SingleDecrease:
@@ -133,75 +108,94 @@ namespace FullPotential.Core.Gameplay.Combat
 
                     if (statEffect.Affect == Affect.SingleDecrease && statEffect.StatToAffect == AffectableStats.Health)
                     {
-                        targetFighter.TakeDamage(source, itemUsed, position);
+                        targetFighter.TakeDamage(sourceFighter, itemUsed, position);
                         return;
                     }
 
                     targetFighter.AlterValue(statEffect, itemUsed.Attributes);
-
                     return;
 
                 case Affect.TemporaryMaxDecrease:
                 case Affect.TemporaryMaxIncrease:
-                    //todo: targetFighter.ApplyTemporaryMaxActionToStat(statEffect, itemUsed.Attributes);
+                    targetFighter.ApplyTemporaryMaxActionToStat(statEffect, itemUsed.Attributes);
                     return;
 
                 default:
-                    throw new NotImplementedException();
+                    Debug.LogError($"Not implemented handling for affect {statEffect.Affect}");
+                    return;
             }
         }
 
-        private void ApplyMovementEffect(GameObject source, IMovementEffect movementEffect, Attributes attributes, GameObject target)
+        private void ApplyMovementEffect(IFighter sourceFighter, IMovementEffect movementEffect, Attributes attributes, GameObject targetGameObject)
         {
-            var targetFighter = target.GetComponent<IFighter>();
-            var targetRigidBody = targetFighter.RigidBody;
+            var targetRigidBody = targetGameObject.GetComponent<Rigidbody>();
 
-            //todo: handle periodic
+            if (targetRigidBody == null)
+            {
+                Debug.LogWarning($"Cannot move target '{targetGameObject.name}' as it does not have a RigidBody");
+                return;
+            }
 
-            //todo: attribute-based force value
-            var force = 100f;
+            var force = AttributeCalculator.GetForceValue(attributes);
 
             switch (movementEffect.Direction)
             {
                 case MovementDirection.AwayFromSource:
-                    if (source == null)
-                    {
-                        Debug.LogWarning("Attack source not found. Did they sign out?");
-                        return;
-                    }
-                    var awayVector = targetRigidBody.transform.position - source.GetComponent<IFighter>().RigidBody.transform.position;
-                    targetRigidBody.AddForce(awayVector * force, ForceMode.Acceleration);
-                    return;
-
                 case MovementDirection.TowardSource:
-                    if (source == null)
+
+                    if (sourceFighter == null)
                     {
                         Debug.LogWarning("Attack source not found. Did they sign out?");
                         return;
                     }
-                    var towardVector = source.GetComponent<IFighter>().RigidBody.transform.position - targetRigidBody.transform.position;
-                    targetRigidBody.AddForce(towardVector * force, ForceMode.Acceleration);
+
+                    var sourcePosition = sourceFighter.RigidBody.transform.position;
+                    var targetPosition = targetRigidBody.transform.position;
+
+                    var vector = movementEffect.Direction == MovementDirection.AwayFromSource
+                        ? targetPosition - sourcePosition
+                        : sourcePosition - targetPosition;
+
+                    targetRigidBody.AddForce(vector * force, ForceMode.Acceleration);
                     return;
 
                 case MovementDirection.Backwards:
+                    targetRigidBody.AddForce(-sourceFighter.Transform.forward * force, ForceMode.Acceleration);
+                    return;
+
                 case MovementDirection.Forwards:
+                    targetRigidBody.AddForce(sourceFighter.Transform.forward * force, ForceMode.Acceleration);
+                    return;
 
                 case MovementDirection.Down:
+                    targetRigidBody.AddForce(-sourceFighter.Transform.up * force, ForceMode.Acceleration);
+                    return;
+
                 case MovementDirection.Up:
+                    targetRigidBody.AddForce(sourceFighter.Transform.up * force, ForceMode.Acceleration);
+                    return;
 
                 case MovementDirection.Left:
+                    targetRigidBody.AddForce(-sourceFighter.Transform.right * force, ForceMode.Acceleration);
+                    return;
+
                 case MovementDirection.Right:
+                    targetRigidBody.AddForce(sourceFighter.Transform.right * force, ForceMode.Acceleration);
+                    return;
 
                 case MovementDirection.MaintainDistance:
+                    sourceFighter.BeginMaintainDistanceOn(targetGameObject);
+                    return;
 
                 default:
-                    throw new NotImplementedException();
+                    Debug.LogError($"Not implemented handling for movement direction {movementEffect.Direction}");
+                    return;
             }
         }
 
-        private void ApplyElementalEffect(IEffect elementalEffect, Attributes attributes, GameObject target)
+        private void ApplyElementalEffect(IEffect elementalEffect, Attributes attributes, IFighter targetFighter)
         {
-            throw new NotImplementedException();
+            targetFighter.ApplyElementalEffect(elementalEffect, attributes);
         }
 
     }

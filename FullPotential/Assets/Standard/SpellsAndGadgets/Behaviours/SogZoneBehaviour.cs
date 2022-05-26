@@ -79,7 +79,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             }
 
             var adjustedPosition = position + new Vector3(0, _distanceFromGround);
-            _effectService.ApplyEffects(SourceFighter.GameObject, SpellOrGadget, target, adjustedPosition);
+            _effectService.ApplyEffects(SourceFighter, SpellOrGadget, target, adjustedPosition);
         }
     }
 }

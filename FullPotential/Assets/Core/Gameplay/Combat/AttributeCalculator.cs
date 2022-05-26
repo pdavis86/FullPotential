@@ -1,7 +1,7 @@
 ﻿using System;
 using FullPotential.Api.Registry;
 
-namespace FullPotential.Core.Gameplay.Crafting
+namespace FullPotential.Core.Gameplay.Combat
 {
     public static class AttributeCalculator
     {
@@ -17,6 +17,12 @@ namespace FullPotential.Core.Gameplay.Crafting
             var multiplier = (float)Random.Next(90, 111) / 100;
             var adder = Random.Next(0, 6);
             return (int)Math.Ceiling(damageDealtBasic / multiplier) + adder;
+        }
+
+        public static float GetForceValue(Attributes attributes)
+        {
+            //todo: attribute-based force value
+            return 100f;
         }
     }
 }

@@ -71,6 +71,7 @@ namespace FullPotential.Standard
 
                 typeof(Effects.Support.Conjure),
                 typeof(Effects.Support.Heal),
+                typeof(Effects.Support.Hurt),
                 typeof(Effects.Support.Reflect),
                 typeof(Effects.Support.Float),
                 typeof(Effects.Support.Summon),

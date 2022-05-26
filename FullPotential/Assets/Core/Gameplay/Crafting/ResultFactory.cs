@@ -11,6 +11,7 @@ using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Localization;
 using FullPotential.Core.Localization.Enums;
 using FullPotential.Core.Registry;

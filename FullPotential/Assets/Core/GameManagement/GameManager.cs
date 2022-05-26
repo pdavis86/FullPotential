@@ -63,6 +63,7 @@ namespace FullPotential.Core.GameManagement
         private NetworkObject _playerPrefabNetObj;
         private DelayedAction _periodicSave;
         private List<string> _asapSaveUsernames;
+        private bool _serverHasBeenStarted;
 
         //Singleton
         public static GameManager Instance { get; private set; }
@@ -114,14 +115,21 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            _periodicSave = new DelayedAction(15f, SaveAsapPlayerData);
+            _periodicSave = new DelayedAction(15f, SaveAsapPlayerData, false);
             _asapSaveUsernames = new List<string>();
         }
 
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            _periodicSave.TryPerformAction();
+            if (_serverHasBeenStarted)
+            {
+                _periodicSave.TryPerformAction();
+            }
+            else if (NetworkManager.Singleton.IsServer)
+            {
+                _serverHasBeenStarted = true;
+            }
         }
 
         private void OnApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
@@ -268,11 +276,17 @@ namespace FullPotential.Core.GameManagement
                 return;
             }
 
-            Debug.Log("Checking if anything to save");
+            //Debug.Log("Checking if anything to save");
 
             var playerDataCollection = new List<PlayerData>();
             foreach (var kvp in NetworkManager.Singleton.ConnectedClients)
             {
+                if (!GameDataStore.ClientIdToUsername.ContainsKey(kvp.Key))
+                {
+                    Debug.LogWarning($"Could not find username for client {kvp.Key}");
+                    continue;
+                }
+
                 if (_asapSaveUsernames.Contains(GameDataStore.ClientIdToUsername[kvp.Key]))
                 {
                     playerDataCollection.Add(kvp.Value.PlayerObject.GetComponent<PlayerState>().UpdateAndReturnPlayerData());

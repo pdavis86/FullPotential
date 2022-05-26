@@ -4,8 +4,6 @@ namespace FullPotential.Api.Utilities.Extensions
 {
     public static class AttributeExtensions
     {
-        //todo: replace hard-coded values 
-
         public static float GetReloadTime(this Attributes attributes)
         {
             return (101 - attributes.Recovery) / 50f + 0.5f;
