@@ -1,17 +1,12 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
-using FullPotential.Api.Registry.Gear;
-using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
-using FullPotential.Core.Localization;
-using FullPotential.Core.Localization.Enums;
 using FullPotential.Core.PlayerBehaviours;
 using FullPotential.Core.Ui.Components;
+using FullPotential.Core.UI.Components;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,10 +18,8 @@ namespace FullPotential.Core.Ui.Behaviours
     {
 #pragma warning disable 0649
         [SerializeField] private GameObject _componentsContainer;
+        [SerializeField] private CraftingSelector _craftingSelector;
         [SerializeField] private Text _outputText;
-        [SerializeField] private Dropdown _typeDropdown;
-        [SerializeField] private Dropdown _subTypeDropdown;
-        [SerializeField] private Dropdown _handednessDropdown;
         [SerializeField] private InputField _craftName;
         [SerializeField] private Button _craftButton;
         [SerializeField] private Text _craftErrors;
@@ -37,81 +30,29 @@ namespace FullPotential.Core.Ui.Behaviours
         private PlayerActions _playerActions;
         private ResultFactory _resultFactory;
         private List<ItemBase> _components;
-        private Dictionary<Type, string> _craftingCategories;
-        private Dictionary<IGearArmor, string> _armorTypes;
-        private Dictionary<IGearAccessory, string> _accessoryTypes;
-        private Dictionary<IGearWeapon, string> _weaponTypes;
-        private List<string> _handednessOptions;
-        private List<int?> _optionalTwoHandedWeaponIndexes;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _components = new List<ItemBase>();
 
-            _playerState = GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>();
+            _playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>();
             _playerActions = _playerState.gameObject.GetComponent<PlayerActions>();
 
             _resultFactory = GameManager.Instance.GetService<ResultFactory>();
 
-            _typeDropdown.onValueChanged.AddListener(TypeOnValueChanged);
-
-            _subTypeDropdown.onValueChanged.AddListener(SubTypeOnValueChanged);
-
-            _handednessDropdown.onValueChanged.AddListener(HandednessOnValueChanged);
-
             _craftButton.onClick.AddListener(CraftButtonOnClick);
 
-            var localizer = GameManager.Instance.GetService<Localizer>();
+            _craftingSelector.TypeDropdown.onValueChanged.AddListener(TypeOnValueChanged);
 
-            _craftingCategories = new Dictionary<Type, string>
-            {
-                { typeof(Weapon), localizer.Translate(TranslationType.CraftingCategory, nameof(Weapon)) },
-                { typeof(Armor), localizer.Translate(TranslationType.CraftingCategory, nameof(Armor)) },
-                { typeof(Accessory), localizer.Translate(TranslationType.CraftingCategory, nameof(Accessory)) },
-                { typeof(Spell), localizer.Translate(TranslationType.CraftingCategory, nameof(Spell)) },
-                { typeof(Gadget), localizer.Translate(TranslationType.CraftingCategory, nameof(Gadget)) }
-            };
+            _craftingSelector.SubTypeDropdown.onValueChanged.AddListener(SubTypeOnValueChanged);
 
-            _handednessOptions = new List<string> {
-                { localizer.Translate(TranslationType.CraftingHandedness, "one") },
-                { localizer.Translate(TranslationType.CraftingHandedness, "two") }
-            };
-
-            var typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
-
-            _armorTypes = typeRegistry.GetRegisteredTypes<IGearArmor>()
-                .ToDictionary(x => x, x => localizer.GetTranslatedTypeName(x))
-                .ToDictionary(x => x.Key, x => x.Value);
-
-            _accessoryTypes = typeRegistry.GetRegisteredTypes<IGearAccessory>()
-                .ToDictionary(x => x, x => localizer.GetTranslatedTypeName(x))
-                .OrderBy(x => x.Value)
-                .ToDictionary(x => x.Key, x => x.Value);
-
-            _weaponTypes = typeRegistry.GetRegisteredTypes<IGearWeapon>()
-                .ToDictionary(x => x, x => localizer.GetTranslatedTypeName(x))
-                .OrderBy(x => x.Value)
-                .ToDictionary(x => x.Key, x => x.Value);
-
-            _optionalTwoHandedWeaponIndexes = _weaponTypes
-                .Select((x, i) => !x.Key.EnforceTwoHanded && x.Key.AllowTwoHanded ? (int?)i : null)
-                .Where(x => x != null)
-                .ToList();
-
-            _typeDropdown.ClearOptions();
-            _typeDropdown.AddOptions(_craftingCategories.Select(x => x.Value).ToList());
-
-            _handednessDropdown.ClearOptions();
-            _handednessDropdown.AddOptions(_handednessOptions);
-
-            UpdateSecondaryDropDowns();
+            _craftingSelector.HandednessDropdown.onValueChanged.AddListener(HandednessOnValueChanged);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
-            _typeDropdown.value = 0;
             ResetUi();
         }
 
@@ -123,7 +64,16 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void TypeOnValueChanged(int index)
         {
-            UpdateSecondaryDropDowns();
+            UpdateResults();
+        }
+
+        private void SubTypeOnValueChanged(int index)
+        {
+            UpdateResults();
+        }
+
+        private void HandednessOnValueChanged(int index)
+        {
             UpdateResults();
         }
 
@@ -132,69 +82,11 @@ namespace FullPotential.Core.Ui.Behaviours
             _craftButton.interactable = false;
 
             var componentIds = string.Join(',', _components.Select(x => x.Id));
-            var selectedType = GetCraftingCategory().Key.Name;
-            var selectedSubType = GetCraftableTypeName(selectedType);
-            var isTwoHanded = IsTwoHandedSelected();
+            var selectedType = _craftingSelector.GetCraftingCategory().Key.Name;
+            var selectedSubType = _craftingSelector.GetCraftableTypeName(selectedType);
+            var isTwoHanded = _craftingSelector.IsTwoHandedSelected();
 
             _playerActions.CraftItemServerRpc(componentIds, selectedType, selectedSubType, isTwoHanded, _craftName.text);
-        }
-
-        private void SubTypeOnValueChanged(int index)
-        {
-            try
-            {
-                SetHandednessDropDownVisibility();
-                UpdateResults();
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError(ex);
-            }
-        }
-
-        private void HandednessOnValueChanged(int index)
-        {
-            UpdateResults();
-        }
-
-        private void SetHandednessDropDownVisibility()
-        {
-            _handednessDropdown.gameObject.SetActive(GetCraftingCategory().Key == typeof(Weapon) && _optionalTwoHandedWeaponIndexes.Contains(_subTypeDropdown.value));
-        }
-
-        private void UpdateSecondaryDropDowns()
-        {
-            _subTypeDropdown.ClearOptions();
-
-            var shownSubTypes = true;
-
-            var craftingCategory = GetCraftingCategory();
-            switch (craftingCategory.Key.Name)
-            {
-                case nameof(Weapon): _subTypeDropdown.AddOptions(_weaponTypes.Select(x => x.Value).ToList()); break;
-                case nameof(Armor): _subTypeDropdown.AddOptions(_armorTypes.Select(x => x.Value).ToList()); break;
-                case nameof(Accessory): _subTypeDropdown.AddOptions(_accessoryTypes.Select(x => x.Value).ToList()); break;
-                
-                case nameof(Spell): 
-                case nameof(Gadget): 
-                    shownSubTypes = false; 
-                    break;
-
-                default:
-                    throw new InvalidOperationException("Unknown crafting type");
-            }
-
-            if (shownSubTypes)
-            {
-                _subTypeDropdown.RefreshShownValue();
-                _subTypeDropdown.gameObject.SetActive(true);
-            }
-            else
-            {
-                _subTypeDropdown.gameObject.SetActive(false);
-            }
-
-            SetHandednessDropDownVisibility();
         }
 
         // ReSharper disable once MemberCanBePrivate.Global
@@ -273,32 +165,6 @@ namespace FullPotential.Core.Ui.Behaviours
             });
         }
 
-        private KeyValuePair<Type, string> GetCraftingCategory()
-        {
-            return _craftingCategories.ElementAt(_typeDropdown.value);
-        }
-
-        private string GetCraftableTypeName(string craftingCategory)
-        {
-            switch (craftingCategory)
-            {
-                case nameof(Weapon): return _weaponTypes.ElementAt(_subTypeDropdown.value).Key.TypeName;
-                case nameof(Armor): return _armorTypes.ElementAt(_subTypeDropdown.value).Key.TypeName;
-                case nameof(Accessory): return _accessoryTypes.ElementAt(_subTypeDropdown.value).Key.TypeName;
-
-                case nameof(Spell): 
-                case nameof(Gadget): 
-                    return null;
-
-                default: throw new InvalidOperationException("Unknown crafting type");
-            }
-        }
-
-        private bool IsTwoHandedSelected()
-        {
-            return _handednessDropdown.options.Count > 0 && _handednessDropdown.value == 1;
-        }
-
         private void UpdateResults()
         {
             ResetUiText();
@@ -309,12 +175,12 @@ namespace FullPotential.Core.Ui.Behaviours
                 return;
             }
 
-            var craftingCategory = GetCraftingCategory().Key.Name;
+            var craftingCategory = _craftingSelector.GetCraftingCategory().Key.Name;
 
             var craftedItem = _resultFactory.GetCraftedItem(
                 craftingCategory,
-                GetCraftableTypeName(craftingCategory),
-                IsTwoHandedSelected(),
+                _craftingSelector.GetCraftableTypeName(craftingCategory),
+                _craftingSelector.IsTwoHandedSelected(),
                 _components
             );
 

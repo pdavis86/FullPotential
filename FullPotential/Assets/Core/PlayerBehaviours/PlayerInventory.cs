@@ -49,6 +49,8 @@ namespace FullPotential.Core.PlayerBehaviours
 
         private readonly FragmentedMessageReconstructor _inventoryChangesReconstructor = new FragmentedMessageReconstructor();
 
+        //todo: separate UI updates from this class
+
         #region Unity Events Handlers
 
         // ReSharper disable once UnusedMember.Local
@@ -723,6 +725,13 @@ namespace FullPotential.Core.PlayerBehaviours
                     var newObj = Instantiate(prefab, parentTransform);
                     _equippedItems[slotGameObjectName].GameObject = newObj;
                 });
+        }
+
+        //todo: make access to admin-only methods permission-based
+        public void AddItemAsAdmin(ItemBase item)
+        {
+            FillTypesFromIds(item);
+            _items.Add(item.Id, item);
         }
     }
 }

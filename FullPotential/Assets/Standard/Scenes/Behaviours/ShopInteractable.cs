@@ -1,4 +1,6 @@
-﻿using FullPotential.Core.GameManagement;
+﻿using FullPotential.Api.Unity.Helpers;
+using FullPotential.Core.GameManagement;
+using FullPotential.Core.GameManagement.Constants;
 using FullPotential.Core.Localization;
 using FullPotential.Core.PlayerBehaviours;
 using FullPotential.Core.Utilities.UtilityBehaviours;
@@ -21,8 +23,11 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
         public override void OnInteract(NetworkObject networkObject)
         {
-            //todo: swap out for UI for crafting an item with user-chosen effects
-            networkObject.GetComponent<PlayerActions>().ClaimLootServerRpc("justgimmieloot");
+            //networkObject.GetComponent<PlayerActions>().ClaimLootServerRpc("justgimmieloot");
+
+            var shopUiGameObject = GameObjectHelper.GetObjectAtRoot(GameObjectNames.SceneCanvas).transform.Find("ShopUi").gameObject;
+
+            GameManager.Instance.MainCanvasObjects.OpenCustomMenu(shopUiGameObject);
         }
 
         public override void OnBlur()

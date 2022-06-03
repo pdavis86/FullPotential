@@ -5,7 +5,7 @@
     {
         public bool IsAutomatic;
         public bool IsSoulbound;
-        public int ExtraAmmoPerShot;
+        public byte ExtraAmmoPerShot;
 
         public int Strength;
         public int Efficiency;

@@ -16,5 +16,7 @@ namespace FullPotential.Api.GameManagement
         void SpawnPlayerNetworkObject(string playerToken, Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default);
 
         string GetLocalPlayerToken();
+
+        GameObject GetLocalPlayerGameObject();
     }
 }

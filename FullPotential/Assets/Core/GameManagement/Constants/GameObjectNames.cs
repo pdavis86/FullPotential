@@ -7,5 +7,6 @@
         public const string SceneCamera = "SceneCamera";
         public const string SpawnPoints = "SpawnPoints";
         public const string Environment = "Environment";
+        public const string LoadingScreen = "LoadingScreen";
     }
 }

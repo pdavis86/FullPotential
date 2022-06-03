@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace FullPotential.Core.GameManagement
 {
+    //todo: rename at some point e.g. UserInterface
     public class MainCanvasObjects : MonoBehaviour, IUserInterface
     {
         // ReSharper disable UnassignedField.Global
@@ -26,6 +27,7 @@ namespace FullPotential.Core.GameManagement
         public GameObject CharacterMenu;
         public GameObject SettingsUi;
         public GameObject DrawingPad;
+        private GameObject _customMenu;
 
         // ReSharper enable MemberCanBePrivate.Global
         // ReSharper enable UnassignedField.Global
@@ -78,11 +80,17 @@ namespace FullPotential.Core.GameManagement
             {
                 menu.SetActive(false);
             }
+
+            if (_customMenu != null)
+            {
+                _customMenu.SetActive(false);
+                _customMenu = null;
+            }
         }
 
         public bool IsAnyMenuOpen()
         {
-            return _menus.Any(x => x.activeSelf);
+            return _menus.Any(x => x.activeSelf) || _customMenu != null;
         }
 
         public void HideOthersOpenThis(GameObject ui)
@@ -119,6 +127,12 @@ namespace FullPotential.Core.GameManagement
             }
 
             return _characterMenuUiEquipmentTab;
+        }
+
+        public void OpenCustomMenu(GameObject menuGameObject)
+        {
+            _customMenu = menuGameObject;
+            _customMenu.SetActive(true);
         }
 
     }

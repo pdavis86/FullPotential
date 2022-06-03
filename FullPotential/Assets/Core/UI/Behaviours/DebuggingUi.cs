@@ -54,15 +54,15 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private NetworkStats GetNetworkStats()
         {
-            if (GameManager.Instance.LocalGameDataStore.GameObject == null)
+            if (GameManager.Instance.LocalGameDataStore.PlayerGameObject == null)
             {
                 return null;
             }
 
-            if (_playerObj != GameManager.Instance.LocalGameDataStore.GameObject)
+            if (_playerObj != GameManager.Instance.LocalGameDataStore.PlayerGameObject)
             {
-                _playerObj = GameManager.Instance.LocalGameDataStore.GameObject;
-                _networkStats = GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<NetworkStats>();
+                _playerObj = GameManager.Instance.LocalGameDataStore.PlayerGameObject;
+                _networkStats = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<NetworkStats>();
             }
 
             return _networkStats;

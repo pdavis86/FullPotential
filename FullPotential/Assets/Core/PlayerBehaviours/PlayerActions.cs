@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Helpers;
@@ -10,6 +11,7 @@ using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
+using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.UtilityBehaviours;
 using TMPro;
 using Unity.Netcode;
@@ -304,6 +306,18 @@ namespace FullPotential.Core.PlayerBehaviours
                     ApplyInventoryChangesClientRpc(message, _clientRpcParams);
                 }
             }
+        }
+
+        //todo: make access to admin-only methods permission-based
+        [ServerRpc]
+        public void CraftItemAsAdminServerRpc(string serialisedLoot, string categoryName, string craftableTypeName, bool isTwoHanded, string itemName)
+        {
+            var loot = JsonUtility.FromJson<Loot>(serialisedLoot);
+            loot.Id = Guid.NewGuid().ToMinimisedString();
+
+            ((PlayerInventory)_playerState.Inventory).AddItemAsAdmin(loot);
+
+            CraftItemServerRpc(loot.Id, categoryName, craftableTypeName, isTwoHanded, itemName);
         }
 
         [ServerRpc]

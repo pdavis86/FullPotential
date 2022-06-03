@@ -19,7 +19,7 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Global
         public void ForceRespawn()
         {
-            GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>().ForceRespawnServerRpc();
+            GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>().ForceRespawnServerRpc();
         }
 
         // ReSharper disable once UnusedMember.Global

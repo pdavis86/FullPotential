@@ -32,7 +32,7 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _playerState = GameManager.Instance.LocalGameDataStore.GameObject.GetComponent<PlayerState>();
+            _playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>();
             _resultFactory = GameManager.Instance.GetService<ResultFactory>();
         }
 

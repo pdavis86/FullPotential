@@ -24,6 +24,8 @@ namespace FullPotential.Core.Gameplay.Crafting
 {
     public class ResultFactory
     {
+        public const int MaxExtraAmmo = 3;
+
         private readonly TypeRegistry _typeRegistry;
         private readonly Localizer _localizer;
         private readonly List<ILoot> _lootTypes;
@@ -233,7 +235,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 {
                     IsAutomatic = IsSuccess(50),
                     IsSoulbound = IsSuccess(10),
-                    ExtraAmmoPerShot = IsSuccess(20) ? AttributeCalculator.Random.Next(1, 4) : 0,
+                    ExtraAmmoPerShot = IsSuccess(20) ? Convert.ToByte(AttributeCalculator.Random.Next(1, MaxExtraAmmo + 1)) : (byte)0,
                     Strength = GetAttributeValue(75),
                     Efficiency = GetAttributeValue(75),
                     Range = GetAttributeValue(75),

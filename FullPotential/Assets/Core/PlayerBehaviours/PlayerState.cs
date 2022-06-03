@@ -126,8 +126,11 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (IsOwner)
             {
-                GameObjectHelper.GetObjectAtRoot(GameObjectNames.SceneCanvas).SetActive(false);
-                _gameManager.LocalGameDataStore.GameObject = gameObject;
+                GameObjectHelper.GetObjectAtRoot(GameObjectNames.SceneCanvas).transform
+                    .Find(GameObjectNames.LoadingScreen).gameObject
+                    .SetActive(false);
+
+                _gameManager.LocalGameDataStore.PlayerGameObject = gameObject;
 
                 foreach (var obj in _gameObjectsForPlayers)
                 {

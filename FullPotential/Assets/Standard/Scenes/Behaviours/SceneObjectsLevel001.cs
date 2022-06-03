@@ -42,6 +42,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
         {
             _spawnService = ModHelper.GetGameManager().GetService<ISpawnService>();
 
+            //todo: this may no longer be true
             //Cannot currently add prefabs at runtime
             //https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/1360
             //So enemy prefab is part of FullPotential.Core

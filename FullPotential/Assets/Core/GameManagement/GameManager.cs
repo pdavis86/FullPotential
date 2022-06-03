@@ -384,6 +384,11 @@ namespace FullPotential.Core.GameManagement
             return LocalGameDataStore.PlayerToken;
         }
 
+        public GameObject GetLocalPlayerGameObject()
+        {
+            return LocalGameDataStore.PlayerGameObject;
+        }
+
         public void SpawnPlayerNetworkObject(string playerToken, Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default)
         {
             if (!NetworkManager.Singleton.IsServer)

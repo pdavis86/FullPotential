@@ -636,13 +636,13 @@ namespace FullPotential.Core.Gameplay.Combat
 
         public void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes)
         {
-            //todo:
+            //todo: AddAttributeModifier
             throw new NotImplementedException();
         }
 
         public void ApplyPeriodicActionToStat(IStatEffect statEffect, Attributes attributes)
         {
-            //todo:
+            //todo: ApplyPeriodicActionToStat
             throw new NotImplementedException();
         }
 
@@ -697,18 +697,20 @@ namespace FullPotential.Core.Gameplay.Combat
 
         public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, Attributes attributes)
         {
-            //todo:
+            //todo: ApplyTemporaryMaxActionToStat
             throw new NotImplementedException();
         }
 
         public void ApplyElementalEffect(IEffect elementalEffect, Attributes attributes)
         {
-
+            //todo: ApplyElementalEffect
+            throw new NotImplementedException();
         }
 
         public void BeginMaintainDistanceOn(GameObject targetGameObject)
         {
-
+            //todo: BeginMaintainDistanceOn
+            throw new NotImplementedException();
         }
 
         public Dictionary<IEffect, float> GetActiveEffects()
