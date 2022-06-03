@@ -337,6 +337,8 @@ namespace FullPotential.Core.GameManagement
             Debug.Log($"Saving player data for {playerData.Username}");
 
             _userRegistry.Save(playerData);
+
+            _asapSaveUsernames.Remove(playerData.Username);
         }
 
         private readonly ServiceRegistry _serviceRegistry = new ServiceRegistry();
