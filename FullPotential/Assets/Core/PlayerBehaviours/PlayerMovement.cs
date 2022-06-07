@@ -13,6 +13,7 @@ namespace FullPotential.Core.PlayerBehaviours
 #pragma warning disable 0649
         private readonly Vector2 _lookSensitivity = new Vector2(0.2f, 0.2f);
         private readonly Vector2 _lookSmoothness = new Vector2(3f, 3f);
+        private readonly int _sprintStoppingFactor = 65;
         [SerializeField] private Camera _playerCamera;
         [SerializeField] private float _speed = 5f;
         [SerializeField] private float _cameraRotationLimit = 85f;
@@ -138,7 +139,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 _rb.MovePosition(_rb.position + velocity * Time.fixedDeltaTime);
 
                 //Continue after releasing the key
-                _rb.AddForce(100 * Time.fixedDeltaTime * velocity, ForceMode.Acceleration);
+                _rb.AddForce(_sprintStoppingFactor * Time.fixedDeltaTime * velocity, ForceMode.Acceleration);
             }
 
             if (_lookVal != Vector2.zero)
