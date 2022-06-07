@@ -115,7 +115,7 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            _periodicSave = new DelayedAction(15f, SaveAsapPlayerData, false);
+            _periodicSave = new DelayedAction(15f, () => SavePlayerData(), false);
             _asapSaveUsernames = new List<string>();
         }
 
@@ -231,7 +231,7 @@ namespace FullPotential.Core.GameManagement
 
         public void Disconnect()
         {
-            SaveAsapPlayerData();
+            SavePlayerData(true);
 
             NetworkManager.Singleton.Shutdown();
             SceneManager.LoadSceneAsync(1);
@@ -240,7 +240,7 @@ namespace FullPotential.Core.GameManagement
         public void Quit()
         {
             SaveAppOptions();
-            SaveAsapPlayerData();
+            SavePlayerData(true);
 
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
@@ -262,7 +262,7 @@ namespace FullPotential.Core.GameManagement
             return new Version(appVersion + "." + lastWrite.ToString("yyyyMMdd"));
         }
 
-        private void SaveAsapPlayerData()
+        private void SavePlayerData(bool allData = false)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
@@ -287,7 +287,7 @@ namespace FullPotential.Core.GameManagement
                     continue;
                 }
 
-                if (_asapSaveUsernames.Contains(GameDataStore.ClientIdToUsername[kvp.Key]))
+                if (allData || _asapSaveUsernames.Contains(GameDataStore.ClientIdToUsername[kvp.Key]))
                 {
                     playerDataCollection.Add(kvp.Value.PlayerObject.GetComponent<PlayerState>().UpdateAndReturnPlayerData());
                 }
