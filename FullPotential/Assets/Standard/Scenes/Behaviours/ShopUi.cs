@@ -28,12 +28,19 @@ namespace FullPotential.Standard.Scenes.Behaviours
 #pragma warning restore CS0649
 
         private ResultFactory _resultFactory;
+
         private List<IEffect> _registeredEffects;
         private List<ITargeting> _registeredTargetingOptions;
         private List<IShape> _registeredShapes;
 
+        private List<NameAndValueSlider> _attributeSliderBehaviours;
+        private List<NameAndToggle> _attributeToggleBehaviours;
+        private List<NameAndToggle> _effectToggleBehaviours;
+        private List<NameAndToggle> _targetingToggleBehaviours;
+        private List<NameAndToggle> _shapeToggleBehaviours;
+
         // ReSharper disable once UnusedMember.Local
-        private void Start()
+        private void Awake()
         {
             var gameManager = ModHelper.GetGameManager();
 
@@ -50,13 +57,24 @@ namespace FullPotential.Standard.Scenes.Behaviours
             InstantiateShapeControls();
         }
 
+        // ReSharper disable once UnusedMember.Local
+        private void OnEnable()
+        {
+            ResetUi();
+        }
+
         private void ResetUi()
         {
+            ResetSliders();
+            ResetToggles();
             _resultsText.text = null;
         }
 
         private void InstantiateAttributeControls()
         {
+            _attributeSliderBehaviours = new List<NameAndValueSlider>();
+            _attributeToggleBehaviours = new List<NameAndToggle>();
+
             foreach (var field in typeof(Attributes).GetFields())
             {
                 if (field.FieldType == typeof(int))
@@ -64,14 +82,16 @@ namespace FullPotential.Standard.Scenes.Behaviours
                     var slider = Instantiate(_nameAndValueSliderPrefab, _attributesScrollViewContentParent.transform);
                     var behaviour = slider.GetComponent<NameAndValueSlider>();
                     behaviour.Name.text = field.Name;
-                    behaviour.Slider.value = AttributeCalculator.Random.Next(1, 101);
+
+                    _attributeSliderBehaviours.Add(behaviour);
                 }
                 else if (field.FieldType == typeof(bool))
                 {
                     var toggle = Instantiate(_nameAndTogglePrefab, _attributesScrollViewContentParent.transform);
                     var behaviour = toggle.GetComponent<NameAndToggle>();
                     behaviour.Name.text = field.Name;
-                    behaviour.Toggle.isOn = false;
+
+                    _attributeToggleBehaviours.Add(behaviour);
                 }
                 else if (field.Name == nameof(Attributes.ExtraAmmoPerShot))
                 {
@@ -79,6 +99,10 @@ namespace FullPotential.Standard.Scenes.Behaviours
                     var behaviour = slider.GetComponent<NameAndValueSlider>();
                     behaviour.Name.text = field.Name;
                     behaviour.Slider.maxValue = ResultFactory.MaxExtraAmmo;
+
+                    _attributeSliderBehaviours.Add(behaviour);
+
+                    //Work-around for UI quirk
                     behaviour.Slider.value = 1;
                     behaviour.Slider.value = 0;
                 }
@@ -87,68 +111,94 @@ namespace FullPotential.Standard.Scenes.Behaviours
                     Debug.LogWarning("Unhandled Attributes type: " + field.FieldType);
                 }
             }
-        }
 
+            ResetSliders();
+        }
+        
         private void InstantiateEffectControls()
         {
+            _effectToggleBehaviours = new List<NameAndToggle>();
+
             foreach (var effect in _registeredEffects)
             {
                 var toggle = Instantiate(_nameAndTogglePrefab, _effectsScrollViewContentParent.transform);
                 var behaviour = toggle.GetComponent<NameAndToggle>();
                 behaviour.Name.text = effect.TypeName;
-                behaviour.Toggle.isOn = false;
+
+                _effectToggleBehaviours.Add(behaviour);
             }
         }
 
         private void InstantiateTargetingControls()
         {
+            _targetingToggleBehaviours = new List<NameAndToggle>();
+
             foreach (var option in _registeredTargetingOptions)
             {
                 var toggle = Instantiate(_nameAndTogglePrefab, _targetingScrollViewContentParent.transform);
                 var behaviour = toggle.GetComponent<NameAndToggle>();
                 behaviour.Name.text = option.TypeName;
-                behaviour.Toggle.isOn = false;
+
+                _targetingToggleBehaviours.Add(behaviour);
             }
         }
 
         private void InstantiateShapeControls()
         {
+            _shapeToggleBehaviours = new List<NameAndToggle>();
+
             foreach (var shape in _registeredShapes)
             {
                 var toggle = Instantiate(_nameAndTogglePrefab, _shapesScrollViewContentParent.transform);
                 var behaviour = toggle.GetComponent<NameAndToggle>();
                 behaviour.Name.text = shape.TypeName;
+
+                _shapeToggleBehaviours.Add(behaviour);
+            }
+        }
+
+        private void ResetSliders()
+        {
+            foreach (var behaviour in _attributeSliderBehaviours)
+            {
+                behaviour.Slider.value = Mathf.Approximately(behaviour.Slider.maxValue, 100)
+                    ? AttributeCalculator.Random.Next(1, 101)
+                    : 0;
+            }
+        }
+
+        private void ResetToggles()
+        {
+            var allToggles = _attributeToggleBehaviours
+                .Union(_effectToggleBehaviours)
+                .Union(_targetingToggleBehaviours)
+                .Union(_shapeToggleBehaviours);
+
+            foreach (var behaviour in allToggles)
+            {
                 behaviour.Toggle.isOn = false;
             }
         }
 
         private Attributes GetAttributes()
         {
-            var sliders = _attributesScrollViewContentParent.transform
-                .GetComponentsInChildren(typeof(NameAndValueSlider))
-                .Select(c => c.GetComponent<NameAndValueSlider>());
-
-            var toggles = _attributesScrollViewContentParent.transform
-                .GetComponentsInChildren(typeof(NameAndToggle))
-                .Select(c => c.GetComponent<NameAndToggle>());
-
             var attributes = (object)new Attributes();
 
             foreach (var field in typeof(Attributes).GetFields())
             {
                 if (field.FieldType == typeof(int))
                 {
-                    var slider = sliders.First(s => s.Name.text == field.Name);
+                    var slider = _attributeSliderBehaviours.First(s => s.Name.text == field.Name);
                     field.SetValue(attributes, (int)slider.Slider.value);
                 }
                 else if (field.FieldType == typeof(bool))
                 {
-                    var toggle = toggles.First(t => t.Name.text == field.Name);
+                    var toggle = _attributeToggleBehaviours.First(t => t.Name.text == field.Name);
                     field.SetValue(attributes, toggle.Toggle.isOn);
                 }
                 else if (field.FieldType == typeof(byte))
                 {
-                    var slider = sliders.First(s => s.Name.text == field.Name);
+                    var slider = _attributeSliderBehaviours.First(s => s.Name.text == field.Name);
                     field.SetValue(attributes, (byte)slider.Slider.value);
                 }
             }
@@ -158,15 +208,11 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
         private List<IEffect> GetEffects()
         {
-            var toggles = _effectsScrollViewContentParent.transform
-                .GetComponentsInChildren(typeof(NameAndToggle))
-                .Select(c => c.GetComponent<NameAndToggle>());
-
             var effects = new List<IEffect>();
 
             foreach (var effect in _registeredEffects)
             {
-                var toggle = toggles.First(t => t.Name.text == effect.TypeName);
+                var toggle = _effectToggleBehaviours.First(t => t.Name.text == effect.TypeName);
                 if (toggle.Toggle.isOn)
                 {
                     effects.Add(effect);
@@ -178,9 +224,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
         private ITargeting GetTargeting()
         {
-            var typeName = _targetingScrollViewContentParent.transform
-                .GetComponentsInChildren(typeof(NameAndToggle))
-                .Select(c => c.GetComponent<NameAndToggle>())
+            var typeName = _targetingToggleBehaviours
                 .FirstOrDefault(x => x.Toggle.isOn)
                 ?.Name.text;
 
@@ -189,9 +233,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
         private IShape GetShape()
         {
-            var typeName = _shapesScrollViewContentParent.transform
-                .GetComponentsInChildren(typeof(NameAndToggle))
-                .Select(c => c.GetComponent<NameAndToggle>())
+            var typeName = _shapeToggleBehaviours
                 .FirstOrDefault(x => x.Toggle.isOn)
                 ?.Name.text;
 
