@@ -11,6 +11,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public Affect Affect => Affect.TemporaryMaxDecrease;
 
-        public AffectableStats StatToAffect => AffectableStats.Mana;
+        public AffectableStat StatToAffect => AffectableStat.Mana;
     }
 }

@@ -11,6 +11,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public Affect Affect => Affect.PeriodicDecrease;
 
-        public AffectableStats StatToAffect => AffectableStats.Health;
+        public AffectableStat StatToAffect => AffectableStat.Health;
     }
 }

@@ -11,6 +11,6 @@ namespace FullPotential.Standard.Effects.Support
 
         public Affect Affect => Affect.SingleDecrease;
 
-        public AffectableStats StatToAffect => AffectableStats.Health;
+        public AffectableStat StatToAffect => AffectableStat.Health;
     }
 }

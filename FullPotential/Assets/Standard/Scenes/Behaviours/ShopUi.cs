@@ -50,6 +50,11 @@ namespace FullPotential.Standard.Scenes.Behaviours
             InstantiateShapeControls();
         }
 
+        private void ResetUi()
+        {
+            _resultsText.text = null;
+        }
+
         private void InstantiateAttributeControls()
         {
             foreach (var field in typeof(Attributes).GetFields())
@@ -239,6 +244,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
                 _itemNameText.text
                 );
 
+            ResetUi();
         }
     }
 }

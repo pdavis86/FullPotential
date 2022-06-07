@@ -11,6 +11,6 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public Affect Affect => Affect.TemporaryMaxIncrease;
 
-        public AffectableStats StatToAffect => AffectableStats.Health;
+        public AffectableStat StatToAffect => AffectableStat.Health;
     }
 }

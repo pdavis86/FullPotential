@@ -7,10 +7,10 @@ namespace FullPotential.Core.Gameplay.Combat
     {
         public static readonly Random Random = new Random();
 
-        public static int GetAttackValue(Attributes? itemAttributes, int targetDefense)
+        public static int GetAttackValue(Attributes? attributes, int targetDefense)
         {
             //Even a small attack can still do damage
-            var attackStrength = itemAttributes?.Strength ?? 1;
+            var attackStrength = attributes?.Strength ?? 1;
             var damageDealtBasic = attackStrength * 100f / (100 + targetDefense);
 
             //Throw in some variation
@@ -23,6 +23,12 @@ namespace FullPotential.Core.Gameplay.Combat
         {
             //todo: attribute-based force value
             return 100f;
+        }
+
+        public static (int Change, float Duration) GetStatChangeAndDuration(Attributes attributes)
+        {
+            //todo: attribute-based change and duration values
+            return (10, 2f);
         }
     }
 }

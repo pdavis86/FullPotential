@@ -48,5 +48,13 @@ namespace FullPotential.Api.Unity.Extensions
             return null;
         }
 
+        public static void DeleteAllChildren(this GameObject gameObject)
+        {
+            foreach (Transform child in gameObject.transform)
+            {
+                Object.Destroy(child.gameObject);
+            }
+        }
+
     }
 }

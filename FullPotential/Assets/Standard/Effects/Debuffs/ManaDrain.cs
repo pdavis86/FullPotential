@@ -12,7 +12,7 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public Affect Affect => Affect.PeriodicDecrease;
 
-        public AffectableStats StatToAffect => AffectableStats.Mana;
+        public AffectableStat StatToAffect => AffectableStat.Mana;
 
         public Type SideEffectType => typeof(ManaTap);
     }

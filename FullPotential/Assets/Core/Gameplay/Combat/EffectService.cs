@@ -30,15 +30,7 @@ namespace FullPotential.Core.Gameplay.Combat
         {
             if (!NetworkManager.Singleton.IsServer)
             {
-                Debug.LogWarning("Player tried to apply effects instead of server");
-                return;
-            }
-
-            var targetFighter = target.GetComponent<IFighter>();
-
-            if (targetFighter == null)
-            {
-                Debug.LogWarning("Target is not an IFighter. Target was: " + target);
+                Debug.LogWarning("ApplyEffects was not called on the server");
                 return;
             }
 
@@ -46,41 +38,50 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (!itemHasEffects)
             {
+                var targetFighter = target.GetComponent<IFighter>();
+
+                if (targetFighter == null)
+                {
+                    Debug.LogWarning("Target is not an IFighter. Target was: " + target);
+                    return;
+                }
+
                 targetFighter.TakeDamage(sourceFighter, itemUsed, position);
                 return;
             }
 
             foreach (var effect in itemUsed.Effects)
             {
-                ApplyEffect(sourceFighter, effect, itemUsed, target, targetFighter, position);
+                ApplyEffect(sourceFighter, effect, itemUsed, target, position);
 
                 if (sourceFighter != null && effect is IHasSideEffect withSideEffect)
                 {
                     var sideEffect = _typeRegistry.GetEffect(withSideEffect.SideEffectType);
-                    ApplyEffect(null, sideEffect, itemUsed, sourceFighter.GameObject, sourceFighter, position);
+                    ApplyEffect(null, sideEffect, itemUsed, sourceFighter.GameObject, position);
                 }
             }
         }
 
-        private void ApplyEffect(IFighter sourceFighter, IEffect effect, ItemBase itemUsed, GameObject targetGameObject, IFighter targetFighter, Vector3? position)
+        private void ApplyEffect(IFighter sourceFighter, IEffect effect, ItemBase itemUsed, GameObject targetGameObject, Vector3? position)
         {
+            var targetFighter = targetGameObject.GetComponent<IFighter>();
+
             switch (effect)
             {
-
                 case IStatEffect statEffect:
-                    ApplyStatEffect(sourceFighter, statEffect, itemUsed, targetFighter, position);
+                    ApplyStatEffect(targetFighter, statEffect, itemUsed, sourceFighter, position);
                     return;
 
                 case IMovementEffect movementEffect:
-                    ApplyMovementEffect(sourceFighter, movementEffect, itemUsed.Attributes, targetGameObject);
+                    ApplyMovementEffect(targetGameObject, movementEffect, itemUsed.Attributes, sourceFighter);
                     return;
 
                 case IAttributeEffect attributeEffect:
-                    ApplyAttributeEffect(attributeEffect, itemUsed.Attributes, targetFighter);
+                    ApplyAttributeEffect(targetFighter, attributeEffect, itemUsed.Attributes);
                     return;
 
                 case IElement elementalEffect:
-                    ApplyElementalEffect(elementalEffect, itemUsed.Attributes, targetFighter);
+                    ApplyElementalEffect(targetFighter, elementalEffect, itemUsed.Attributes);
                     return;
 
                 default:
@@ -89,12 +90,12 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private void ApplyAttributeEffect(IAttributeEffect attributeEffect, Attributes attributes, IFighter targetFighter)
+        private void ApplyAttributeEffect(IFighter targetFighter, IAttributeEffect attributeEffect, Attributes attributes)
         {
             targetFighter.AddAttributeModifier(attributeEffect, attributes);
         }
 
-        private void ApplyStatEffect(IFighter sourceFighter, IStatEffect statEffect, ItemBase itemUsed, IFighter targetFighter, Vector3? position)
+        private void ApplyStatEffect(IFighter targetFighter, IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
             switch (statEffect.Affect)
             {
@@ -105,14 +106,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 case Affect.SingleDecrease:
                 case Affect.SingleIncrease:
-
-                    if (statEffect.Affect == Affect.SingleDecrease && statEffect.StatToAffect == AffectableStats.Health)
-                    {
-                        targetFighter.TakeDamage(sourceFighter, itemUsed, position);
-                        return;
-                    }
-
-                    targetFighter.AlterValue(statEffect, itemUsed.Attributes);
+                    targetFighter.ApplyStatValueChange(statEffect, itemUsed, sourceFighter, position);
                     return;
 
                 case Affect.TemporaryMaxDecrease:
@@ -126,7 +120,7 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private void ApplyMovementEffect(IFighter sourceFighter, IMovementEffect movementEffect, Attributes attributes, GameObject targetGameObject)
+        private void ApplyMovementEffect(GameObject targetGameObject, IMovementEffect movementEffect, Attributes attributes, IFighter sourceFighter)
         {
             var targetRigidBody = targetGameObject.GetComponent<Rigidbody>();
 
@@ -193,7 +187,7 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private void ApplyElementalEffect(IEffect elementalEffect, Attributes attributes, IFighter targetFighter)
+        private void ApplyElementalEffect(IFighter targetFighter, IEffect elementalEffect, Attributes attributes)
         {
             targetFighter.ApplyElementalEffect(elementalEffect, attributes);
         }

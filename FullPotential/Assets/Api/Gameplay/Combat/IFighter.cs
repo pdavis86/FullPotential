@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FullPotential.Api.Registry;
+using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
 using UnityEngine;
 
@@ -25,7 +26,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
         void ApplyPeriodicActionToStat(IStatEffect statEffect, Attributes attributes);
 
-        void AlterValue(IStatEffect statEffect, Attributes attributes);
+        void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position);
 
         void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, Attributes attributes);
 

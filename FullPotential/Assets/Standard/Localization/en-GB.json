@@ -185,6 +185,10 @@
       "Value": "Heal"
     },
     {
+      "Key": "effect.hurt",
+      "Value": "Hurt"
+    },
+    {
       "Key": "effect.reflect",
       "Value": "Reflect"
     },

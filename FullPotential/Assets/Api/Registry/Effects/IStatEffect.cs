@@ -10,6 +10,6 @@
         /// <summary>
         /// The stat which will be affected
         /// </summary>
-        AffectableStats StatToAffect { get; }
+        AffectableStat StatToAffect { get; }
     }
 }

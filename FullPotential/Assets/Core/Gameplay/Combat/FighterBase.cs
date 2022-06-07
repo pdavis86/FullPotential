@@ -119,7 +119,7 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 if (!_isSprinting && _stamina.Value < GetStaminaMax())
                 {
-                    //todo: xp-based stamina recharge
+                    //todo: trait-based stamina recharge
                     _stamina.Value += 1;
                 }
             });
@@ -129,7 +129,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 var isConsumingMana = HandStatusLeft.IsConsumingMana() || HandStatusRight.IsConsumingMana();
                 if (!isConsumingMana && _mana.Value < GetManaMax())
                 {
-                    //todo: xp-based mana recharge
+                    //todo: trait-based mana recharge
                     _mana.Value += 1;
                 }
             });
@@ -139,7 +139,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 var isConsumingEnergy = HandStatusLeft.IsConsumingEnergy() || HandStatusRight.IsConsumingEnergy();
                 if (!isConsumingEnergy && _energy.Value < GetEnergyMax())
                 {
-                    //todo: xp-based energy recharge
+                    //todo: trait-based energy recharge
                     _energy.Value += 1;
                 }
             });
@@ -282,7 +282,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
         public virtual int GetHealthMax()
         {
-            //todo: attribute-based health
+            //todo: trait-based health max
             return 100;
         }
 
@@ -291,19 +291,21 @@ namespace FullPotential.Core.Gameplay.Combat
             return _stamina.Value;
         }
 
-        //todo: xp-based max, cost, speed values
         public int GetStaminaMax()
         {
+            //todo: trait-based stamina max
             return 100;
         }
 
         public int GetStaminaCost()
         {
+            //todo: trait-based stamina cost
             return 10;
         }
 
         public float GetSprintSpeed()
         {
+            //todo: trait-based sprint speed
             return 2.5f;
         }
 
@@ -314,7 +316,14 @@ namespace FullPotential.Core.Gameplay.Combat
 
         public int GetManaMax()
         {
+            //todo: trait-based mana max
             return 100;
+        }
+
+        private int GetManaCost(Spell spell)
+        {
+            //todo: trait-based mana cost
+            return 20;
         }
 
         public int GetEnergy()
@@ -324,23 +333,19 @@ namespace FullPotential.Core.Gameplay.Combat
 
         public int GetEnergyMax()
         {
+            //todo: trait-based energy max
             return 100;
-        }
-
-        //todo: attribute-based mana and energy costs
-        private int GetManaCost(Spell spell)
-        {
-            return 20;
         }
 
         private int GetEnergyCost(Gadget gadget)
         {
+            //todo: trait-based energy cost
             return 20;
         }
 
         public virtual int GetDefenseValue()
         {
-            //todo: attribute-based defense
+            //todo: trait-based defense
             return 50;
         }
 
@@ -399,10 +404,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             _health.Value -= damageDealt;
 
-            if (_health.Value <= 0)
-            {
-                HandleDeath(sourceName, sourceItemName);
-            }
+            CheckStats(sourceName, sourceItemName);
         }
 
         public virtual void HandleDeath(string killerName, string itemName)
@@ -411,14 +413,14 @@ namespace FullPotential.Core.Gameplay.Combat
 
             GetComponent<Collider>().enabled = false;
 
-            foreach (var item in _damageTaken)
+            foreach (var (clientId, _) in _damageTaken)
             {
-                if (!NetworkManager.Singleton.ConnectedClients.ContainsKey(item.Key))
+                if (!NetworkManager.Singleton.ConnectedClients.ContainsKey(clientId))
                 {
                     continue;
                 }
 
-                var playerState = NetworkManager.Singleton.ConnectedClients[item.Key].PlayerObject.GetComponent<PlayerState>();
+                var playerState = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.GetComponent<PlayerState>();
                 playerState.SpawnLootChest(transform.position);
             }
 
@@ -439,6 +441,16 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 HandleDeath(_localizer.Translate("ui.alert.falldamage"), null);
             }
+        }
+
+        private void CheckStats(string sourceName, string sourceItemName)
+        {
+            if (_health.Value <= 0)
+            {
+                HandleDeath(sourceName, sourceItemName);
+            }
+
+            //todo: other min values
         }
 
         protected string GetDeathMessage(bool isOwner, string victimName, string killerName, string itemName)
@@ -591,7 +603,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private ulong? UseRangedWeapon(Vector3 handPosition, Weapon weaponInHand)
         {
-            //todo: attribute-based automatic weapons
+            //todo: automatic weapons
 
             var range = weaponInHand.Attributes.GetProjectileRange();
             var endPos = Physics.Raycast(LookTransform.position, LookTransform.forward, out var rangedHit, range)
@@ -646,20 +658,26 @@ namespace FullPotential.Core.Gameplay.Combat
             throw new NotImplementedException();
         }
 
-        public void AlterValue(IStatEffect statEffect, Attributes attributes)
+        public void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
+            const float displayTimeForSingleChangeToStat = 2f;
+
             var statVariable = GetStatVariable(statEffect.StatToAffect);
             var statMax = GetStatVariableMax(statEffect.StatToAffect);
 
-            //todo: attribute-based values
-            var change = 10;
-            var duration = 2f;
+            var (change, duration) = AttributeCalculator.GetStatChangeAndDuration(itemUsed.Attributes);
 
             if (_activeEffects.ContainsKey(statEffect))
             {
                 _activeEffects.Remove(statEffect);
             }
-            _activeEffects.Add(statEffect, DateTime.Now.AddSeconds(duration));
+            _activeEffects.Add(statEffect, DateTime.Now.AddSeconds(displayTimeForSingleChangeToStat));
+
+            if (statEffect.Affect == Affect.SingleDecrease && statEffect.StatToAffect == AffectableStat.Health)
+            {
+                TakeDamage(sourceFighter, itemUsed, position);
+                return;
+            }
 
             if (statVariable.Value >= statMax)
             {
@@ -687,11 +705,7 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 statVariable.Value = 0;
 
-                //todo: other min values
-                if (statVariable == _health)
-                {
-                    HandleDeath(FighterName, null); //todo: replace null
-                }
+                CheckStats(FighterName, itemUsed.Name);
             }
         }
 
@@ -726,32 +740,32 @@ namespace FullPotential.Core.Gameplay.Combat
 
             return _activeEffects.ToDictionary(
                 x => x.Key,
-                x => (float)(DateTime.Now - x.Value).TotalSeconds);
+                x => (float)(x.Value - DateTime.Now).TotalSeconds);
         }
 
-        private NetworkVariable<int> GetStatVariable(AffectableStats stat)
+        private NetworkVariable<int> GetStatVariable(AffectableStat stat)
         {
             switch (stat)
             {
-                case AffectableStats.Energy: return _energy;
-                case AffectableStats.Health: return _health;
-                case AffectableStats.Mana: return _mana;
-                case AffectableStats.Stamina: return _stamina;
+                case AffectableStat.Energy: return _energy;
+                case AffectableStat.Health: return _health;
+                case AffectableStat.Mana: return _mana;
+                case AffectableStat.Stamina: return _stamina;
                 default:
-                    throw new NotImplementedException();
+                    throw new ArgumentException("Unexpected AffectableStat: " + stat);
             }
         }
 
-        private int GetStatVariableMax(AffectableStats stat)
+        private int GetStatVariableMax(AffectableStat stat)
         {
             switch (stat)
             {
-                case AffectableStats.Energy: return GetEnergyMax();
-                case AffectableStats.Health: return GetHealthMax();
-                case AffectableStats.Mana: return GetManaMax();
-                case AffectableStats.Stamina: return GetStaminaMax();
+                case AffectableStat.Energy: return GetEnergyMax();
+                case AffectableStat.Health: return GetHealthMax();
+                case AffectableStat.Mana: return GetManaMax();
+                case AffectableStat.Stamina: return GetStaminaMax();
                 default:
-                    throw new NotImplementedException();
+                    throw new ArgumentException("Unexpected AffectableStat: " + stat);
             }
         }
 

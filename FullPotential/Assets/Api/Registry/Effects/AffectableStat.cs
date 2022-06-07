@@ -1,6 +1,6 @@
 ﻿namespace FullPotential.Api.Registry.Effects
 {
-    public enum AffectableStats
+    public enum AffectableStat
     {
         Health,
         Mana,
