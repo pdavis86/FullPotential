@@ -1,5 +1,4 @@
 ﻿using FullPotential.Api.GameManagement;
-using FullPotential.Core.GameManagement;
 
 namespace FullPotential.Api.Utilities
 {
@@ -9,7 +8,7 @@ namespace FullPotential.Api.Utilities
 
         public static IGameManager GetGameManager()
         {
-            return _gameManager ??= UnityEngine.GameObject.Find(nameof(GameManager)).GetComponent<IGameManager>();
+            return _gameManager ??= UnityEngine.GameObject.Find("GameManager").GetComponent<IGameManager>();
         }
     }
 }

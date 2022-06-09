@@ -4,27 +4,25 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.SpellsAndGadgets;
+using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Core.GameManagement;
-using FullPotential.Core.Localization;
-using FullPotential.Core.PlayerBehaviours;
-using FullPotential.Core.Ui.Components;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace FullPotential.Core.Gameplay.Combat
+namespace FullPotential.Api.Gameplay.Combat
 {
     public abstract class FighterBase : NetworkBehaviour, IFighter
     {
@@ -39,7 +37,7 @@ namespace FullPotential.Core.Gameplay.Combat
         public PositionTransforms Positions;
         public BodyPartTransforms BodyParts;
         [SerializeField] protected TextMeshProUGUI _nameTag;
-        [SerializeField] protected BarSlider _healthSlider;
+        [SerializeField] protected IStatSlider _healthSlider;
 
         // ReSharper enable UnassignedField.Global
         // ReSharper enable InconsistentNaming
@@ -55,9 +53,9 @@ namespace FullPotential.Core.Gameplay.Combat
         private bool _isSprinting;
 
         // ReSharper disable InconsistentNaming
-        protected GameManager _gameManager;
+        protected IGameManager _gameManager;
         protected IRpcService _rpcService;
-        protected Localizer _localizer;
+        protected ILocalizer _localizer;
 
         protected readonly NetworkVariable<int> _energy = new NetworkVariable<int>(100);
         protected readonly NetworkVariable<int> _health = new NetworkVariable<int>(100);
@@ -101,9 +99,9 @@ namespace FullPotential.Core.Gameplay.Combat
 
         protected virtual void Awake()
         {
-            _gameManager = GameManager.Instance;
+            _gameManager = ModHelper.GetGameManager();
             _rpcService = _gameManager.GetService<IRpcService>();
-            _localizer = _gameManager.GetService<Localizer>();
+            _localizer = _gameManager.GetService<ILocalizer>();
 
             if (IsServer)
             {
@@ -215,18 +213,18 @@ namespace FullPotential.Core.Gameplay.Combat
         #region ClientRpc calls
 
         // ReSharper disable once UnusedParameter.Local
-        [ClientRpc]
-        private void UsedWeaponClientRpc(Vector3 startPosition, Vector3 endPosition, ClientRpcParams clientRpcParams)
-        {
-            var projectile = Instantiate(
-                _gameManager.Prefabs.Combat.ProjectileWithTrail,
-                startPosition,
-                Quaternion.identity);
+        //[ClientRpc]
+        //private void UsedWeaponClientRpc(Vector3 startPosition, Vector3 endPosition, ClientRpcParams clientRpcParams)
+        //{
+        //    var projectile = Instantiate(
+        //        _gameManager.Prefabs.Combat.ProjectileWithTrail,
+        //        startPosition,
+        //        Quaternion.identity);
 
-            var projectileScript = projectile.GetComponent<ProjectileWithTrail>();
-            projectileScript.TargetPosition = endPosition;
-            projectileScript.Speed = 500;
-        }
+        //    var projectileScript = projectile.GetComponent<ProjectileWithTrail>();
+        //    projectileScript.TargetPosition = endPosition;
+        //    projectileScript.Speed = 500;
+        //}
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
@@ -275,18 +273,18 @@ namespace FullPotential.Core.Gameplay.Combat
             handStatus.IsReloading = false;
         }
 
-        public virtual int GetHealth()
+        public int GetHealth()
         {
             return _health.Value;
         }
 
-        public virtual int GetHealthMax()
+        public int GetHealthMax()
         {
             //todo: trait-based health max
             return 100;
         }
 
-        public virtual int GetStamina()
+        public int GetStamina()
         {
             return _stamina.Value;
         }
@@ -343,10 +341,10 @@ namespace FullPotential.Core.Gameplay.Combat
             return 20;
         }
 
-        public virtual int GetDefenseValue()
+        public int GetDefenseValue()
         {
             //todo: trait-based defense
-            return 50;
+            return _inventory.GetDefenseValue();
         }
 
         public void TakeDamage(IFighter sourceFighter,
@@ -354,15 +352,9 @@ namespace FullPotential.Core.Gameplay.Combat
             Vector3? position)
         {
             var sourceIsPlayer = sourceFighter != null && sourceFighter.GameObject.CompareTag(Tags.Player);
-            var sourcePlayerState = sourceIsPlayer ? sourceFighter.GameObject.GetComponent<PlayerState>() : null;
 
-            var targetFighter = this;
+            var damageDealt = AttributeCalculator.GetAttackValue(itemUsed?.Attributes, GetDefenseValue());
 
-            var damageDealt = AttributeCalculator.GetAttackValue(itemUsed?.Attributes, targetFighter.GetDefenseValue());
-
-            var sourceName = sourceIsPlayer
-                ? sourcePlayerState.Username
-                : (sourceFighter != null ? sourceFighter.FighterName : null).OrIfNullOrWhitespace(_localizer.Translate("ui.alert.unknownattacker"));
             var sourceItemName = itemUsed?.Name ?? _localizer.Translate("ui.alert.attack.noitem");
             var sourceNetworkObject = sourceFighter != null ? sourceFighter.GameObject.GetComponent<NetworkObject>() : null;
             var sourceClientId = sourceNetworkObject != null ? (ulong?)sourceNetworkObject.OwnerClientId : null;
@@ -396,18 +388,18 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (sourceIsPlayer && position.HasValue && !ReferenceEquals(sourceFighter, this))
             {
-                sourceFighter.GameObject.GetComponent<PlayerActions>().ShowDamageClientRpc(
+                sourceFighter.GameObject.GetComponent<IPlayerBehaviour>().ShowDamageClientRpc(
                     position.Value,
                     damageDealt.ToString(CultureInfo.InvariantCulture),
-                    _rpcService.ForPlayer(sourcePlayerState.OwnerClientId));
+                    _rpcService.ForPlayer(sourceFighter.OwnerClientId));
             }
 
             _health.Value -= damageDealt;
 
-            CheckStats(sourceName, sourceItemName);
+            CheckStats(sourceFighter.FighterName, sourceItemName);
         }
 
-        public virtual void HandleDeath(string killerName, string itemName)
+        public void HandleDeath(string killerName, string itemName)
         {
             AliveState = LivingEntityState.Dead;
 
@@ -420,7 +412,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     continue;
                 }
 
-                var playerState = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.GetComponent<PlayerState>();
+                var playerState = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.GetComponent<IPlayerFighter>();
                 playerState.SpawnLootChest(transform.position);
             }
 
@@ -432,7 +424,16 @@ namespace FullPotential.Core.Gameplay.Combat
             var deathMessage = GetDeathMessage(false, name, killerName, itemName);
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(deathMessage, nearbyClients);
+
+            HandleDeathAfter(killerName, itemName);
         }
+
+        // ReSharper disable UnusedParameter.Global
+        protected virtual void HandleDeathAfter(string killerName, string itemName)
+        {
+            //Nothing here
+        }
+        // ReSharper enable UnusedParameter.Global
 
         public void CheckIfOffTheMap()
         {
@@ -611,7 +612,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 : handPosition + LookTransform.forward * range;
 
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-            UsedWeaponClientRpc(handPosition, endPos, nearbyClients);
+            //UsedWeaponClientRpc(handPosition, endPos, nearbyClients);
 
             if (rangedHit.transform == null)
             {

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.GameManagement.Constants;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Inventory;
@@ -10,8 +11,7 @@ using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Environment;
-using FullPotential.Core.GameManagement.Constants;
-using FullPotential.Core.Gameplay.Combat;
+using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Data;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
@@ -26,7 +26,7 @@ using UnityEngine.Networking;
 
 namespace FullPotential.Core.PlayerBehaviours
 {
-    public class PlayerState : FighterBase
+    public class PlayerState : FighterBase, IPlayerFighter
     {
         #region Variables
 
@@ -114,9 +114,9 @@ namespace FullPotential.Core.PlayerBehaviours
             _inventory = Inventory;
             _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
 
-            _userRegistry = _gameManager.GetService<UserRegistry>();
-            _typeRegistry = _gameManager.GetService<ITypeRegistry>();
-            _effectService = _gameManager.GetService<IEffectService>();
+            _userRegistry = GameManager.Instance.GetService<UserRegistry>();
+            _typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
+            _effectService = GameManager.Instance.GetService<IEffectService>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -130,7 +130,7 @@ namespace FullPotential.Core.PlayerBehaviours
                     .Find(GameObjectNames.LoadingScreen).gameObject
                     .SetActive(false);
 
-                _gameManager.LocalGameDataStore.PlayerGameObject = gameObject;
+                GameManager.Instance.LocalGameDataStore.PlayerGameObject = gameObject;
 
                 foreach (var obj in _gameObjectsForPlayers)
                 {
@@ -151,13 +151,13 @@ namespace FullPotential.Core.PlayerBehaviours
             {
                 GetAndLoadPlayerData(false, null);
 
-                if (_gameManager.GameDataStore.ClientIdToUsername.ContainsKey(OwnerClientId))
+                if (GameManager.Instance.GameDataStore.ClientIdToUsername.ContainsKey(OwnerClientId))
                 {
-                    _gameManager.GameDataStore.ClientIdToUsername[OwnerClientId] = Username;
+                    GameManager.Instance.GameDataStore.ClientIdToUsername[OwnerClientId] = Username;
                 }
                 else
                 {
-                    _gameManager.GameDataStore.ClientIdToUsername.Add(OwnerClientId, Username);
+                    GameManager.Instance.GameDataStore.ClientIdToUsername.Add(OwnerClientId, Username);
                 }
             }
             else if (IsOwner)
@@ -174,10 +174,10 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
-                _gameManager.MainCanvasObjects.Respawn.SetActive(false);
+                GameManager.Instance.UserInterface.Respawn.SetActive(false);
 
-                _gameManager.MainCanvasObjects.HudOverlay.Initialise(this);
-                _gameManager.MainCanvasObjects.Hud.SetActive(true);
+                GameManager.Instance.UserInterface.HudOverlay.Initialise(this);
+                GameManager.Instance.UserInterface.Hud.SetActive(true);
             }
 
             QueueAliveStateChanges();
@@ -204,7 +204,7 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             if (IsServer)
             {
-                _gameManager.SavePlayerData(_saveData);
+                GameManager.Instance.SavePlayerData(_saveData);
             }
         }
 
@@ -243,7 +243,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             AliveState = LivingEntityState.Respawning;
 
-            var spawnPoint = _gameManager.GetSceneBehaviour().GetSpawnPoint(gameObject);
+            var spawnPoint = GameManager.Instance.GetSceneBehaviour().GetSpawnPoint(gameObject);
 
             PlayerSpawnStateChangeBothSides(AliveState, spawnPoint.Position, spawnPoint.Rotation);
 
@@ -260,7 +260,7 @@ namespace FullPotential.Core.PlayerBehaviours
         [ServerRpc]
         private void UpdatePlayerSettingsServerRpc(PlayerSettings playerSettings)
         {
-            _gameManager.QueueAsapSave(Username);
+            GameManager.Instance.QueueAsapSave(Username);
 
             _saveData.Settings = playerSettings;
 
@@ -295,13 +295,13 @@ namespace FullPotential.Core.PlayerBehaviours
         [ClientRpc]
         private void SpawnLootChestClientRpc(string id, Vector3 position, ClientRpcParams clientRpcParams)
         {
-            var prefab = _gameManager.Prefabs.Environment.LootChest;
+            var prefab = GameManager.Instance.Prefabs.Environment.LootChest;
 
             var go = Instantiate(prefab, position, transform.rotation * Quaternion.Euler(0, 90, 0));
 
-            _gameManager.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, go.transform, false);
+            GameManager.Instance.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, go.transform, false);
 
-            go.transform.parent = _gameManager.GetSceneBehaviour().GetTransform();
+            go.transform.parent = GameManager.Instance.GetSceneBehaviour().GetTransform();
             go.name = id;
 
             var lootScript = go.GetComponent<LootInteractable>();
@@ -316,7 +316,7 @@ namespace FullPotential.Core.PlayerBehaviours
             if (!killerName.IsNullOrWhiteSpace())
             {
                 var deathMessage = GetDeathMessage(IsOwner, Username, killerName, itemName);
-                _gameManager.MainCanvasObjects.HudOverlay.ShowAlert(deathMessage);
+                GameManager.Instance.UserInterface.HudOverlay.ShowAlert(deathMessage);
             }
 
             PlayerSpawnStateChangeBothSides(state, position, rotation);
@@ -326,7 +326,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 case LivingEntityState.Dead:
                     if (OwnerClientId == NetworkManager.LocalClientId)
                     {
-                        _gameManager.MainCanvasObjects.HideAllMenus();
+                        GameManager.Instance.UserInterface.HideAllMenus();
                         _aliveStateChanges.PlayForwards(false);
                     }
 
@@ -367,12 +367,12 @@ namespace FullPotential.Core.PlayerBehaviours
                     RigidBody.useGravity = false;
                     GetComponent<Collider>().enabled = false;
 
-                    transform.position = new Vector3(0, _gameManager.GetSceneBehaviour().Attributes.LowestYValue - 10, 0);
+                    transform.position = new Vector3(0, GameManager.Instance.GetSceneBehaviour().Attributes.LowestYValue - 10, 0);
 
                     break;
 
                 case LivingEntityState.Respawning:
-                    _gameManager.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, transform, _myHeight);
+                    GameManager.Instance.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, transform, _myHeight);
 
                     transform.rotation = rotation;
                     _playerCamera.transform.localEulerAngles = Vector3.zero;
@@ -390,11 +390,6 @@ namespace FullPotential.Core.PlayerBehaviours
 
                     break;
             }
-        }
-
-        public override int GetDefenseValue()
-        {
-            return Inventory.GetDefenseValue();
         }
 
         private void QueueAliveStateChanges()
@@ -423,7 +418,7 @@ namespace FullPotential.Core.PlayerBehaviours
             {
                 if (NetworkManager.LocalClientId == OwnerClientId)
                 {
-                    _gameManager.MainCanvasObjects.Hud.SetActive(isAlive);
+                    GameManager.Instance.UserInterface.Hud.SetActive(isAlive);
                 }
             });
 
@@ -431,7 +426,7 @@ namespace FullPotential.Core.PlayerBehaviours
             {
                 if (NetworkManager.LocalClientId == OwnerClientId)
                 {
-                    _gameManager.MainCanvasObjects.Respawn.SetActive(!isAlive);
+                    GameManager.Instance.UserInterface.Respawn.SetActive(!isAlive);
                 }
             });
         }
@@ -479,7 +474,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
                 var msg = _localizer.Translate("ui.alert.playerjoined");
                 var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, OwnerClientId);
-                _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(string.Format(msg, Username), nearbyClients);
+                GameManager.Instance.GetSceneBehaviour().MakeAnnouncementClientRpc(string.Format(msg, Username), nearbyClients);
             }
         }
 
@@ -624,10 +619,8 @@ namespace FullPotential.Core.PlayerBehaviours
             ApplyMaterial(newMat);
         }
 
-        public override void HandleDeath(string killerName, string itemName)
+        protected override void HandleDeathAfter(string killerName, string itemName)
         {
-            base.HandleDeath(killerName, itemName);
-
             PlayerSpawnStateChangeBothSides(AliveState, Vector3.zero, Quaternion.identity);
 
             if (killerName == Username)
@@ -721,18 +714,18 @@ namespace FullPotential.Core.PlayerBehaviours
 
         public void ShowAlertForItemsAddedToInventory(string alertText)
         {
-            _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(alertText, _clientRpcParams);
+            GameManager.Instance.GetSceneBehaviour().MakeAnnouncementClientRpc(alertText, _clientRpcParams);
         }
 
         public void AlertOfInventoryRemovals(int itemsRemovedCount)
         {
             var message = _localizer.Translate("ui.alert.itemsremoved");
-            _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(string.Format(message, itemsRemovedCount), _clientRpcParams);
+            GameManager.Instance.GetSceneBehaviour().MakeAnnouncementClientRpc(string.Format(message, itemsRemovedCount), _clientRpcParams);
         }
 
         public void AlertInventoryIsFull()
         {
-            _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(_localizer.Translate("ui.alert.itemsatmax"), _clientRpcParams);
+            GameManager.Instance.GetSceneBehaviour().MakeAnnouncementClientRpc(_localizer.Translate("ui.alert.itemsatmax"), _clientRpcParams);
         }
 
         #endregion

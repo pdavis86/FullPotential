@@ -1,11 +1,10 @@
 ﻿using System;
-using FullPotential.Core.GameManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Core.Utilities.UtilityBehaviours
+namespace FullPotential.Core.Gameplay.Tooltips
 {
     public class Tooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {

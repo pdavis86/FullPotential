@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Helpers;
@@ -7,8 +9,8 @@ using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Crafting;
+using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Utilities.Extensions;
@@ -21,7 +23,7 @@ using UnityEngine;
 
 namespace FullPotential.Core.PlayerBehaviours
 {
-    public class PlayerActions : NetworkBehaviour
+    public class PlayerBehaviour : NetworkBehaviour, IPlayerBehaviour
     {
 #pragma warning disable CS0649
         [SerializeField] private Camera _playerCamera;
@@ -33,7 +35,7 @@ namespace FullPotential.Core.PlayerBehaviours
         private ResultFactory _resultFactory;
 
         private bool _hasMenuOpen;
-        private MainCanvasObjects _mainCanvasObjects;
+        private UserInterface _userInterface;
         private bool _toggleGameMenu;
         private bool _toggleCharacterMenu;
         private PlayerState _playerState;
@@ -63,13 +65,13 @@ namespace FullPotential.Core.PlayerBehaviours
                 return;
             }
 
-            _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;
+            _userInterface = GameManager.Instance.UserInterface;
 
-            _mainCanvasObjects.Hud.SetActive(true);
+            _userInterface.Hud.SetActive(true);
 
             if (Debug.isDebugBuild)
             {
-                _mainCanvasObjects.DebuggingOverlay.SetActive(true);
+                _userInterface.DebuggingOverlay.SetActive(true);
             }
 
             _sceneCamera = Camera.main;
@@ -120,9 +122,9 @@ namespace FullPotential.Core.PlayerBehaviours
 
             Cursor.lockState = CursorLockMode.None;
 
-            if (_mainCanvasObjects != null && _mainCanvasObjects.Hud != null)
+            if (_userInterface != null && _userInterface.Hud != null)
             {
-                _mainCanvasObjects.Hud.SetActive(false);
+                _userInterface.Hud.SetActive(false);
             }
 
             if (_sceneCamera != null)
@@ -191,15 +193,15 @@ namespace FullPotential.Core.PlayerBehaviours
                 return;
             }
 
-            GameManager.Instance.MainCanvasObjects.DrawingPad.SetActive(true);
-            GameManager.Instance.MainCanvasObjects.HudOverlay.ToggleCursorCapture(true);
+            GameManager.Instance.UserInterface.DrawingPad.SetActive(true);
+            GameManager.Instance.UserInterface.HudOverlay.ToggleCursorCapture(true);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnShowCursorStop()
         {
-            GameManager.Instance.MainCanvasObjects.DrawingPad.SetActive(false);
-            GameManager.Instance.MainCanvasObjects.HudOverlay.ToggleCursorCapture(false);
+            GameManager.Instance.UserInterface.DrawingPad.SetActive(false);
+            GameManager.Instance.UserInterface.HudOverlay.ToggleCursorCapture(false);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -373,7 +375,25 @@ namespace FullPotential.Core.PlayerBehaviours
             var offsetY = (float)AttributeCalculator.Random.Next(-9, 10) / 100;
             var offsetZ = (float)AttributeCalculator.Random.Next(-9, 10) / 100;
             var adjustedPosition = position + new Vector3(offsetX, offsetY, offsetZ);
-            ShowDamage(adjustedPosition, damage);
+
+            var hit = Instantiate(_hitTextPrefab);
+            hit.transform.SetParent(GameManager.Instance.UserInterface.HitNumberContainer.transform, false);
+            hit.SetActive(true);
+
+            var hitText = hit.GetComponent<TextMeshProUGUI>();
+            hitText.text = damage;
+
+            const int maxDistanceForMinFontSize = 40;
+            var distance = Vector3.Distance(Camera.main.transform.position, adjustedPosition);
+            var fontSize = maxDistanceForMinFontSize - distance;
+            if (fontSize < hitText.fontSizeMin) { fontSize = hitText.fontSizeMin; }
+            else if (fontSize > hitText.fontSizeMax) { fontSize = hitText.fontSizeMax; }
+            hitText.fontSize = fontSize;
+
+            var sticky = hit.GetComponent<StickUiToWorldPosition>();
+            sticky.WorldPosition = adjustedPosition;
+
+            Destroy(hit, 1f);
         }
 
         #endregion
@@ -384,15 +404,15 @@ namespace FullPotential.Core.PlayerBehaviours
             {
                 if (_hasMenuOpen)
                 {
-                    _mainCanvasObjects.HideAllMenus();
+                    _userInterface.HideAllMenus();
                 }
                 else if (_toggleGameMenu)
                 {
-                    _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.EscMenu);
+                    _userInterface.HideOthersOpenThis(_userInterface.EscMenu);
                 }
                 else if (_toggleCharacterMenu)
                 {
-                    _mainCanvasObjects.HideOthersOpenThis(_mainCanvasObjects.CharacterMenu);
+                    _userInterface.HideOthersOpenThis(_userInterface.CharacterMenu);
                 }
 
                 Tooltips.HideTooltip();
@@ -401,7 +421,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 _toggleCharacterMenu = false;
             }
 
-            _hasMenuOpen = _mainCanvasObjects.IsAnyMenuOpen();
+            _hasMenuOpen = _userInterface.IsAnyMenuOpen();
             _playerMovement.enabled = !_hasMenuOpen;
 
             if (_hasMenuOpen)
@@ -479,34 +499,12 @@ namespace FullPotential.Core.PlayerBehaviours
 
         private static void RefreshCraftingWindow()
         {
-            var craftingUi = GameManager.Instance.MainCanvasObjects.GetCharacterMenuUiCraftingTab();
+            var craftingUi = GameManager.Instance.UserInterface.GetCharacterMenuUiCraftingTab();
 
             if (craftingUi.gameObject.activeSelf)
             {
                 craftingUi.ResetUi();
             }
-        }
-
-        private void ShowDamage(Vector3 position, string damage)
-        {
-            var hit = Instantiate(_hitTextPrefab);
-            hit.transform.SetParent(GameManager.Instance.MainCanvasObjects.HitNumberContainer.transform, false);
-            hit.SetActive(true);
-
-            var hitText = hit.GetComponent<TextMeshProUGUI>();
-            hitText.text = damage;
-
-            const int maxDistanceForMinFontSize = 40;
-            var distance = Vector3.Distance(Camera.main.transform.position, position);
-            var fontSize = maxDistanceForMinFontSize - distance;
-            if (fontSize < hitText.fontSizeMin) { fontSize = hitText.fontSizeMin; }
-            else if (fontSize > hitText.fontSizeMax) { fontSize = hitText.fontSizeMax; }
-            hitText.fontSize = fontSize;
-
-            var sticky = hit.GetComponent<StickUiToWorldPosition>();
-            sticky.WorldPosition = position;
-
-            Destroy(hit, 1f);
         }
 
     }

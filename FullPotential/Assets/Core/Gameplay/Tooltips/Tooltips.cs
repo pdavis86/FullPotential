@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Core.GameManagement
+namespace FullPotential.Core.Gameplay.Tooltips
 {
     public class Tooltips : MonoBehaviour
     {
@@ -18,7 +18,13 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
+            if (_instance != null && _instance != this)
+            {
+                Destroy(this);
+                return;
+            }
             _instance = this;
+
             _tooltipText = transform.Find("Text").GetComponent<Text>();
             _rect = GetComponent<RectTransform>();
             gameObject.SetActive(false);

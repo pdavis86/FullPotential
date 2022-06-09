@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Core.GameManagement.Constants
+﻿namespace FullPotential.Api.GameManagement.Constants
 {
     public static class GameObjectNames
     {

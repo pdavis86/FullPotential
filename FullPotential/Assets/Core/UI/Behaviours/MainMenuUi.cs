@@ -8,12 +8,12 @@ namespace FullPotential.Core.Ui.Behaviours
 {
     public class MainMenuUi : MonoBehaviour
     {
-        private MainCanvasObjects _mainCanvasObjects;
+        private UserInterface _userInterface;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _mainCanvasObjects = GameManager.Instance.MainCanvasObjects;
+            _userInterface = GameManager.Instance.UserInterface;
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -25,7 +25,7 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Global
         public void Disconnect()
         {
-            _mainCanvasObjects.HideAllMenus();
+            _userInterface.HideAllMenus();
             GameManager.Instance.Disconnect();
         }
 

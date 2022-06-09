@@ -1,7 +1,7 @@
 ﻿using System;
 using FullPotential.Api.Registry;
 
-namespace FullPotential.Core.Gameplay.Combat
+namespace FullPotential.Api.Gameplay.Combat
 {
     public static class AttributeCalculator
     {

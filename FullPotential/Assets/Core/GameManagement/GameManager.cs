@@ -5,8 +5,10 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using FullPotential.Api.GameManagement;
+using FullPotential.Api.GameManagement.Constants;
 using FullPotential.Api.GameManagement.Data;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Spawning;
@@ -14,7 +16,6 @@ using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Core.GameManagement.Constants;
 using FullPotential.Core.GameManagement.Data;
 using FullPotential.Core.GameManagement.Enums;
 using FullPotential.Core.Gameplay.Combat;
@@ -44,10 +45,10 @@ namespace FullPotential.Core.GameManagement
 
         //Components
         public Prefabs Prefabs { get; private set; }
-        public MainCanvasObjects MainCanvasObjects { get; private set; }
+        public UserInterface UserInterface { get; private set; }
 
         //Input
-        public DefaultInputActions InputActions;
+        public DefaultInputActions InputActions { get; private set; }
 
         //Data Stores
         public AppOptions AppOptions { get; private set; }
@@ -56,7 +57,7 @@ namespace FullPotential.Core.GameManagement
 
         //Services
         private UserRegistry _userRegistry;
-        private Localizer _localizer;
+        private ILocalizer _localizer;
 
         //Variables
         private bool _isSaving;
@@ -95,12 +96,12 @@ namespace FullPotential.Core.GameManagement
 
             _userRegistry = GetService<UserRegistry>();
 
-            _localizer = GetService<Localizer>();
+            _localizer = GetService<ILocalizer>();
             await _localizer.LoadAvailableCulturesAsync();
             await _localizer.LoadLocalizationFilesAsync(AppOptions.Culture);
 
             Prefabs = GetComponent<Prefabs>();
-            MainCanvasObjects = _mainCanvas.GetComponent<MainCanvasObjects>();
+            UserInterface = _mainCanvas.GetComponent<UserInterface>();
 
             InputActions = new DefaultInputActions();
 
@@ -162,6 +163,7 @@ namespace FullPotential.Core.GameManagement
             callback(false, null, true, null, null);
         }
 
+#pragma warning disable UNT0006 // Incorrect message signature
         private void OnDisconnectedFromServer(ulong clientId)
         {
             if (!NetworkManager.Singleton.IsServer)
@@ -174,6 +176,7 @@ namespace FullPotential.Core.GameManagement
                 }
             }
         }
+#pragma warning restore UNT0006 // Incorrect message signature
 
         #endregion
 
@@ -196,8 +199,8 @@ namespace FullPotential.Core.GameManagement
             await _localizer.LoadLocalizationFilesAsync(culture);
 
             //Re-activate anything already active
-            MainCanvasObjects.DebuggingOverlay.SetActive(false);
-            MainCanvasObjects.DebuggingOverlay.SetActive(true);
+            UserInterface.DebuggingOverlay.SetActive(false);
+            UserInterface.DebuggingOverlay.SetActive(true);
 
             EnsureAppOptionsLoaded();
             AppOptions.Culture = culture;
@@ -350,11 +353,10 @@ namespace FullPotential.Core.GameManagement
         private void RegisterServices()
         {
             _serviceRegistry.Register<UserRegistry>();
-            _serviceRegistry.Register<Localizer>();
             _serviceRegistry.Register<ResultFactory>();
 
+            _serviceRegistry.Register<ILocalizer, Localizer>();
             _serviceRegistry.Register<ITypeRegistry, TypeRegistry>();
-
             _serviceRegistry.Register<ISpawnService, SpawnService>(true);
             _serviceRegistry.Register<IRpcService, RpcService>();
             _serviceRegistry.Register<IEffectService, EffectService>();
@@ -376,7 +378,7 @@ namespace FullPotential.Core.GameManagement
 
         public IUserInterface GetUserInterface()
         {
-            return MainCanvasObjects;
+            return UserInterface;
         }
 
         public string GetLocalPlayerToken()

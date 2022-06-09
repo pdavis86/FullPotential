@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using FullPotential.Api.Localization;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement.Enums;
-using FullPotential.Core.Localization;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Registry;
 using Unity.Netcode;
@@ -31,7 +31,7 @@ namespace FullPotential.Core.GameManagement
 #pragma warning restore 0649
 
         private UserRegistry _userRegistry;
-        private Localizer _localizer;
+        private ILocalizer _localizer;
 
         private NetworkManager _networkManager;
         private UNetTransport _networkTransport;
@@ -53,7 +53,7 @@ namespace FullPotential.Core.GameManagement
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
 
             _userRegistry = GameManager.Instance.GetService<UserRegistry>();
-            _localizer = GameManager.Instance.GetService<Localizer>();
+            _localizer = GameManager.Instance.GetService<ILocalizer>();
         }
 
         // ReSharper disable once UnusedMember.Local

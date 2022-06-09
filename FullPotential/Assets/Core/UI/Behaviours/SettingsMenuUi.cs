@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Localization;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Data;
-using FullPotential.Core.Localization;
 using FullPotential.Core.PlayerBehaviours;
 using UnityEngine;
 using UnityEngine.UI;
@@ -44,7 +44,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _resolutionDropDown.options.Clear();
             _resolutionDropDown.AddOptions(_availableResolutions.Select(x => $"{x.width} x {x.height} ({GetAspectRatio(x.width, x.height)})").ToList());
 
-            _cultures = GameManager.Instance.GetService<Localizer>().GetAvailableCultures();
+            _cultures = GameManager.Instance.GetService<ILocalizer>().GetAvailableCultures();
 
             _languageDropDown.options.Clear();
             _languageDropDown.AddOptions(_cultures.Select(x => x.Value).ToList());
@@ -113,7 +113,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
             _isRevertRequired = false;
 
-            GameManager.Instance.MainCanvasObjects.HideAllMenus();
+            GameManager.Instance.UserInterface.HideAllMenus();
         }
 
         private string GetAspectRatio(int width, int height)

@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Core.Localization.Enums
+﻿namespace FullPotential.Api.Localization.Enums
 {
     public enum TranslationType
     {

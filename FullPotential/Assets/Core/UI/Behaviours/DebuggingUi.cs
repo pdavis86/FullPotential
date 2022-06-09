@@ -1,5 +1,5 @@
+using FullPotential.Api.Localization;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Localization;
 using FullPotential.Core.Utilities.UtilityBehaviours;
 using Unity.Netcode;
 using UnityEngine;
@@ -29,7 +29,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 Destroy(gameObject);
             }
 
-            _hostString = GameManager.Instance.GetService<Localizer>().Translate("ui.debugging.host");
+            _hostString = GameManager.Instance.GetService<ILocalizer>().Translate("ui.debugging.host");
             GetNetworkStats();
 
             GetFps();

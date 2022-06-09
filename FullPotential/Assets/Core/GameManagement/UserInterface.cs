@@ -8,8 +8,7 @@ using UnityEngine;
 
 namespace FullPotential.Core.GameManagement
 {
-    //todo: rename at some point e.g. UserInterface
-    public class MainCanvasObjects : MonoBehaviour, IUserInterface
+    public class UserInterface : MonoBehaviour, IUserInterface
     {
         // ReSharper disable UnassignedField.Global
         // ReSharper disable MemberCanBePrivate.Global
@@ -40,15 +39,17 @@ namespace FullPotential.Core.GameManagement
 
         private List<GameObject> _menus;
 
-        private static MainCanvasObjects _instance;
+        private static UserInterface _instance;
 
         public IHud HudOverlay
         {
             get
             {
-                return _hud ??= Hud.GetComponent<Hud>();
+                return _hud = _hud != null ? _hud : Hud.GetComponent<Hud>();
             }
         }
+
+        public GameObject InteractionBubbleOverlay => InteractionBubble;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()

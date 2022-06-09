@@ -1,5 +1,5 @@
+using FullPotential.Api.GameManagement.Constants;
 using FullPotential.Api.Unity.Helpers;
-using FullPotential.Core.GameManagement.Constants;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global

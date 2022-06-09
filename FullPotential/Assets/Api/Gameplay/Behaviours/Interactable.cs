@@ -1,10 +1,10 @@
-﻿using FullPotential.Core.GameManagement;
+﻿using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Core.Utilities.UtilityBehaviours
+namespace FullPotential.Api.Gameplay.Behaviours
 {
     public abstract class Interactable : MonoBehaviour
     {
@@ -17,7 +17,7 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            _interactionBubble = GameManager.Instance.MainCanvasObjects.InteractionBubble.GetComponent<TMPro.TextMeshProUGUI>();
+            _interactionBubble = ModHelper.GetGameManager().GetUserInterface().InteractionBubbleOverlay.GetComponent<TMPro.TextMeshProUGUI>();
         }
 
         // ReSharper disable once UnusedMember.Local

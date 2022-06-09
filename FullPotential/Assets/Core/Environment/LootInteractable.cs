@@ -1,7 +1,7 @@
-﻿using FullPotential.Core.GameManagement;
-using FullPotential.Core.Localization;
+﻿using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Localization;
+using FullPotential.Core.GameManagement;
 using FullPotential.Core.PlayerBehaviours;
-using FullPotential.Core.Utilities.UtilityBehaviours;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 
@@ -25,7 +25,7 @@ namespace FullPotential.Core.Environment
             {
                 return;
             }
-            var translation = GameManager.Instance.GetService<Localizer>().Translate("ui.interact.loot");
+            var translation = GameManager.Instance.GetService<ILocalizer>().Translate("ui.interact.loot");
             var interactInputName = GameManager.Instance.InputActions.Player.Interact.GetBindingDisplayString().ToUpper();
             _interactionBubble.text = string.Format(translation, interactInputName);
             _interactionBubble.gameObject.SetActive(true);
@@ -33,7 +33,7 @@ namespace FullPotential.Core.Environment
 
         public override void OnInteract(NetworkObject networkObject)
         {
-            networkObject.GetComponent<PlayerActions>().ClaimLootServerRpc(UnclaimedLootId);
+            networkObject.GetComponent<PlayerBehaviour>().ClaimLootServerRpc(UnclaimedLootId);
             Destroy(gameObject);
         }
 

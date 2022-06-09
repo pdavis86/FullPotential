@@ -1,19 +1,19 @@
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
-using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.UI.Components;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FullPotential.Standard.Scenes.Behaviours
+namespace FullPotential.Core.UI.Admin
 {
-    public class ShopUi : MonoBehaviour
+    public class AdminShopUi : MonoBehaviour
     {
 #pragma warning disable CS0649
         [SerializeField] private CraftingSelector _craftingSelector;
@@ -224,19 +224,15 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
         private ITargeting GetTargeting()
         {
-            var typeName = _targetingToggleBehaviours
-                .FirstOrDefault(x => x.Toggle.isOn)
-                ?.Name.text;
-
+            var firstToggle = _targetingToggleBehaviours.FirstOrDefault(x => x.Toggle.isOn);
+            var typeName = firstToggle != null ? firstToggle.Name.text: null;
             return _registeredTargetingOptions.FirstOrDefault(x => x.TypeName == typeName);
         }
 
         private IShape GetShape()
         {
-            var typeName = _shapeToggleBehaviours
-                .FirstOrDefault(x => x.Toggle.isOn)
-                ?.Name.text;
-
+            var firstToggle = _shapeToggleBehaviours.FirstOrDefault(x => x.Toggle.isOn);
+            var typeName = firstToggle != null ? firstToggle.Name.text: null;
             return _registeredShapes.FirstOrDefault(x => x.TypeName == typeName);
         }
 
@@ -277,8 +273,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
             var componentJson = JsonUtility.ToJson(component);
             var category = _craftingSelector.GetCraftingCategory().Key.Name;
 
-            //todo: do not call Core
-            ModHelper.GetGameManager().GetLocalPlayerGameObject().GetComponent<Core.PlayerBehaviours.PlayerActions>().CraftItemAsAdminServerRpc(
+            ModHelper.GetGameManager().GetLocalPlayerGameObject().GetComponent<PlayerBehaviours.PlayerBehaviour>().CraftItemAsAdminServerRpc(
                 componentJson,
                 category,
                 _craftingSelector.GetCraftableTypeName(category),

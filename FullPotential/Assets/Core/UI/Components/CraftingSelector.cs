@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Localization;
+using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Localization;
-using FullPotential.Core.Localization.Enums;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -32,7 +32,7 @@ namespace FullPotential.Core.UI.Components
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            var localizer = GameManager.Instance.GetService<Localizer>();
+            var localizer = GameManager.Instance.GetService<ILocalizer>();
 
             _craftingCategories = new Dictionary<Type, string>
             {

@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using FullPotential.Api.Localization;
+using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Core.Localization.Enums;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -16,7 +17,7 @@ using UnityEngine.AddressableAssets;
 
 namespace FullPotential.Core.Localization
 {
-    public class Localizer
+    public class Localizer : ILocalizer
     {
         private Dictionary<string, string> _translations;
         private List<CultureAddressables> _availableCultures;

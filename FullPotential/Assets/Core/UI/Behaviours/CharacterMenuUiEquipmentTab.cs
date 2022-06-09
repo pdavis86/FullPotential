@@ -6,9 +6,9 @@ using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
+using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.PlayerBehaviours;
 using FullPotential.Core.Ui.Components;
-using FullPotential.Core.Utilities.UtilityBehaviours;
 using UnityEngine;
 using UnityEngine.UI;
 

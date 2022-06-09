@@ -34,7 +34,7 @@ namespace FullPotential.Api.Unity.Helpers
 
             } while (current != null && !current.CompareTag(tag));
 
-            return current?.gameObject;
+            return current == null ? null : current.gameObject;
         }
 
     }

@@ -1,4 +1,4 @@
-using FullPotential.Core.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Combat;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -58,12 +58,9 @@ namespace FullPotential.Standard.Enemies.Behaviours
             _nameTag.text = displayName;
         }
 
-        public override void HandleDeath(string killerName, string itemName)
+        protected override void HandleDeathAfter(string killerName, string itemName)
         {
-            base.HandleDeath(killerName, itemName);
-
             Destroy(gameObject);
-
             _gameManager.GetSceneBehaviour().HandleEnemyDeath();
         }
 

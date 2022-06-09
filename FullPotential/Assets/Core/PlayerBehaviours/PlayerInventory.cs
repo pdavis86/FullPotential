@@ -8,6 +8,7 @@ using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Helpers;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
@@ -18,7 +19,6 @@ using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
-using FullPotential.Core.Localization;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Utilities.Extensions;
@@ -38,7 +38,7 @@ namespace FullPotential.Core.PlayerBehaviours
         //Services
         private ITypeRegistry _typeRegistry;
         private IRpcService _rpcService;
-        private Localizer _localizer;
+        private ILocalizer _localizer;
         private ResultFactory _resultFactory;
 
         private PlayerState _playerState;
@@ -60,7 +60,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             _typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
             _rpcService = GameManager.Instance.GetService<IRpcService>();
-            _localizer = GameManager.Instance.GetService<Localizer>();
+            _localizer = GameManager.Instance.GetService<ILocalizer>();
             _resultFactory = GameManager.Instance.GetService<ResultFactory>();
 
             _items = new Dictionary<string, ItemBase>();
@@ -227,7 +227,7 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             yield return new WaitForSeconds(0.1f);
 
-            var equipmentUi = GameManager.Instance.MainCanvasObjects.GetCharacterMenuUiEquipmentTab();
+            var equipmentUi = GameManager.Instance.UserInterface.GetCharacterMenuUiEquipmentTab();
 
             if (equipmentUi.gameObject.activeSelf)
             {

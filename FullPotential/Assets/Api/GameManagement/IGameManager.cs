@@ -7,6 +7,8 @@ namespace FullPotential.Api.GameManagement
 {
     public interface IGameManager
     {
+        DefaultInputActions InputActions { get; }
+
         T GetService<T>();
 
         ISceneBehaviour GetSceneBehaviour();

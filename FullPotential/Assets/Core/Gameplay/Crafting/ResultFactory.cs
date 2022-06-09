@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Localization;
+using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
@@ -11,9 +14,6 @@ using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Core.Gameplay.Combat;
-using FullPotential.Core.Localization;
-using FullPotential.Core.Localization.Enums;
 using FullPotential.Core.Registry;
 using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.Helpers;
@@ -27,13 +27,13 @@ namespace FullPotential.Core.Gameplay.Crafting
         public const int MaxExtraAmmo = 3;
 
         private readonly TypeRegistry _typeRegistry;
-        private readonly Localizer _localizer;
+        private readonly ILocalizer _localizer;
         private readonly List<ILoot> _lootTypes;
         private readonly List<IEffect> _effectsForLoot;
         private readonly List<ITargeting> _targetingOptions;
         private readonly List<IShape> _shapeOptions;
 
-        public ResultFactory(ITypeRegistry typeRegistry, Localizer localizer)
+        public ResultFactory(ITypeRegistry typeRegistry, ILocalizer localizer)
         {
             _typeRegistry = (TypeRegistry)typeRegistry;
             _localizer = localizer;

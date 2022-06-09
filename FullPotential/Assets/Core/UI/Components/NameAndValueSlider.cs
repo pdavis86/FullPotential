@@ -2,7 +2,7 @@ using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FullPotential
+namespace FullPotential.Core.UI.Components
 {
     // ReSharper disable once ClassNeverInstantiated.Global
 

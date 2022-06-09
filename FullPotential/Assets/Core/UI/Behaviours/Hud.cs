@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Data;
+using FullPotential.Api.Localization;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Gameplay.Combat;
-using FullPotential.Core.Localization;
 using FullPotential.Core.UI.Behaviours;
 using FullPotential.Core.Ui.Components;
 using UnityEngine;
@@ -47,7 +47,7 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _reloadingTranslation = GameManager.Instance.GetService<Localizer>().Translate("ui.hub.reloading");
+            _reloadingTranslation = GameManager.Instance.GetService<ILocalizer>().Translate("ui.hub.reloading");
 
             _activeEffectPrefab = _activeEffectsContainer.GetComponent<ActiveEffects>().ActiveEffectPrefab;
 

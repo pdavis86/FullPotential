@@ -27,7 +27,7 @@ namespace FullPotential.Core.Ui.Behaviours
 #pragma warning restore 0649
 
         private PlayerState _playerState;
-        private PlayerActions _playerActions;
+        private PlayerBehaviour _playerBehaviour;
         private ResultFactory _resultFactory;
         private List<ItemBase> _components;
 
@@ -37,7 +37,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _components = new List<ItemBase>();
 
             _playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>();
-            _playerActions = _playerState.gameObject.GetComponent<PlayerActions>();
+            _playerBehaviour = _playerState.gameObject.GetComponent<PlayerBehaviour>();
 
             _resultFactory = GameManager.Instance.GetService<ResultFactory>();
 
@@ -86,7 +86,7 @@ namespace FullPotential.Core.Ui.Behaviours
             var selectedSubType = _craftingSelector.GetCraftableTypeName(selectedType);
             var isTwoHanded = _craftingSelector.IsTwoHandedSelected();
 
-            _playerActions.CraftItemServerRpc(componentIds, selectedType, selectedSubType, isTwoHanded, _craftName.text);
+            _playerBehaviour.CraftItemServerRpc(componentIds, selectedType, selectedSubType, isTwoHanded, _craftName.text);
         }
 
         // ReSharper disable once MemberCanBePrivate.Global

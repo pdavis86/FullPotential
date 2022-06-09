@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FullPotential
+namespace FullPotential.Core.UI.Components
 {
     public class NameAndToggle : MonoBehaviour
     {
