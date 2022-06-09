@@ -29,6 +29,8 @@ namespace FullPotential.Core.UI.Behaviours
             Effect = effect;
 
             //todo: activeEffectScript.Image = 
+
+            //todo: translate
             Text.text = effect.TypeName;
 
             Invoke(nameof(DestroyMe), timeToLive);

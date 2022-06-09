@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Ui;
+using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Ui.Behaviours;
 using UnityEngine;
 
@@ -134,6 +135,18 @@ namespace FullPotential.Core.GameManagement
         {
             _customMenu = menuGameObject;
             _customMenu.SetActive(true);
+        }
+
+        public void SpawnProjectileTrail(Vector3 startPosition, Vector3 endPosition)
+        {
+            var projectile = Instantiate(
+                GameManager.Instance.Prefabs.Combat.ProjectileWithTrail,
+                startPosition,
+                Quaternion.identity);
+
+            var projectileScript = projectile.GetComponent<ProjectileWithTrail>();
+            projectileScript.TargetPosition = endPosition;
+            projectileScript.Speed = 500;
         }
 
     }

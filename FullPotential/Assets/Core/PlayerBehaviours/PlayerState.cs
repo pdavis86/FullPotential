@@ -248,13 +248,15 @@ namespace FullPotential.Core.PlayerBehaviours
             PlayerSpawnStateChangeBothSides(AliveState, spawnPoint.Position, spawnPoint.Rotation);
 
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-            PlayerSpawnStateChangeClientRpc(AliveState, spawnPoint.Position, spawnPoint.Rotation, null, null, nearbyClients);
+            PlayerSpawnStateChangeClientRpc(AliveState, spawnPoint.Position, spawnPoint.Rotation, nearbyClients);
         }
 
         [ServerRpc]
         public void ForceRespawnServerRpc()
         {
-            HandleDeath(Username, null);
+            _lastDamageSourceName = Username;
+            _lastDamageItemName = null;
+            HandleDeath();
         }
 
         [ServerRpc]
@@ -310,14 +312,14 @@ namespace FullPotential.Core.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        private void PlayerSpawnStateChangeClientRpc(LivingEntityState state, Vector3 position, Quaternion rotation, string killerName, string itemName, ClientRpcParams clientRpcParams)
+        private void PlayerSpawnStateChangeClientRpc(LivingEntityState state, Vector3 position, Quaternion rotation, ClientRpcParams clientRpcParams)
         {
             //todo: why is this necessary? Doesn't HandleDeath show the message?
-            if (!killerName.IsNullOrWhiteSpace())
-            {
-                var deathMessage = GetDeathMessage(IsOwner, Username, killerName, itemName);
-                GameManager.Instance.UserInterface.HudOverlay.ShowAlert(deathMessage);
-            }
+            //if (!killerName.IsNullOrWhiteSpace())
+            //{
+            //    var deathMessage = GetDeathMessage(IsOwner, Username);
+            //    GameManager.Instance.UserInterface.HudOverlay.ShowAlert(deathMessage);
+            //}
 
             PlayerSpawnStateChangeBothSides(state, position, rotation);
 
@@ -447,7 +449,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 PlayerSpawnStateChangeBothSides(AliveState, Vector3.zero, Quaternion.identity);
 
                 var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-                PlayerSpawnStateChangeClientRpc(AliveState, Vector3.zero, Quaternion.identity, null, null, nearbyClients);
+                PlayerSpawnStateChangeClientRpc(AliveState, Vector3.zero, Quaternion.identity, nearbyClients);
                 _startingPosition = Vector3.zero;
             }
         }
@@ -628,8 +630,9 @@ namespace FullPotential.Core.PlayerBehaviours
                 killerName = _localizer.Translate("ui.alert.suicide");
             }
 
+            //todo: why was I passing killerName and itemName into PlayerSpawnStateChangeClientRpc?
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-            PlayerSpawnStateChangeClientRpc(AliveState, Vector3.zero, Quaternion.identity, killerName, itemName, nearbyClients);
+            PlayerSpawnStateChangeClientRpc(AliveState, Vector3.zero, Quaternion.identity, nearbyClients);
         }
 
         public void SpawnLootChest(Vector3 position)

@@ -47,12 +47,13 @@ namespace FullPotential.Api.Gameplay.Combat
         #region Other Variables
 
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
-        private readonly Dictionary<IEffect, DateTime> _activeEffects = new Dictionary<IEffect, DateTime>();
+        private readonly Dictionary<IEffect, (DateTime Expiry, int Change)> _activeEffects = new Dictionary<IEffect, (DateTime Expiry, int Change)>();
 
         private Rigidbody _rb;
         private bool _isSprinting;
+        protected string _lastDamageSourceName;
+        protected string _lastDamageItemName;
 
-        // ReSharper disable InconsistentNaming
         protected IGameManager _gameManager;
         protected IRpcService _rpcService;
         protected ILocalizer _localizer;
@@ -61,7 +62,6 @@ namespace FullPotential.Api.Gameplay.Combat
         protected readonly NetworkVariable<int> _health = new NetworkVariable<int>(100);
         protected readonly NetworkVariable<int> _mana = new NetworkVariable<int>(100);
         protected readonly NetworkVariable<int> _stamina = new NetworkVariable<int>(100);
-        // ReSharper enable InconsistentNaming
 
         public readonly HandStatus HandStatusLeft = new HandStatus();
         public readonly HandStatus HandStatusRight = new HandStatus();
@@ -213,18 +213,11 @@ namespace FullPotential.Api.Gameplay.Combat
         #region ClientRpc calls
 
         // ReSharper disable once UnusedParameter.Local
-        //[ClientRpc]
-        //private void UsedWeaponClientRpc(Vector3 startPosition, Vector3 endPosition, ClientRpcParams clientRpcParams)
-        //{
-        //    var projectile = Instantiate(
-        //        _gameManager.Prefabs.Combat.ProjectileWithTrail,
-        //        startPosition,
-        //        Quaternion.identity);
-
-        //    var projectileScript = projectile.GetComponent<ProjectileWithTrail>();
-        //    projectileScript.TargetPosition = endPosition;
-        //    projectileScript.Speed = 500;
-        //}
+        [ClientRpc]
+        private void UsedWeaponClientRpc(Vector3 startPosition, Vector3 endPosition, ClientRpcParams clientRpcParams)
+        {
+            _gameManager.GetUserInterface().SpawnProjectileTrail(startPosition, endPosition);
+        }
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
@@ -275,17 +268,44 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public int GetHealth()
         {
+            var healthMax = GetHealthMax();
+            if (_health.Value > healthMax)
+            {
+                _health.Value = healthMax;
+            }
+            else if (_health.Value <= 0)
+            {
+                HandleDeath();
+            }
+
             return _health.Value;
         }
 
         public int GetHealthMax()
         {
+            var adjustment = _activeEffects
+                .Where(x =>
+                    x.Key is IStatEffect statEffect
+                    && statEffect.StatToAffect == AffectableStat.Health
+                    && statEffect.Affect is Affect.TemporaryMaxIncrease or Affect.TemporaryMaxDecrease)
+                .Sum(x => x.Value.Change);
+
             //todo: trait-based health max
-            return 100;
+            return 100 + adjustment;
         }
 
         public int GetStamina()
         {
+            var staminaMax = GetStaminaMax();
+            if (_stamina.Value > staminaMax)
+            {
+                _stamina.Value = staminaMax;
+            }
+            else if (_stamina.Value <= 0)
+            {
+                //todo: handle no stamina
+            }
+
             return _stamina.Value;
         }
 
@@ -309,6 +329,16 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public int GetMana()
         {
+            var manaMax = GetManaMax();
+            if (_mana.Value > manaMax)
+            {
+                _mana.Value = manaMax;
+            }
+            else if (_mana.Value <= 0)
+            {
+                //todo: handle no mana
+            }
+
             return _mana.Value;
         }
 
@@ -326,6 +356,17 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public int GetEnergy()
         {
+            //todo: Use a separate calculation for effective max so we can show the difference on the UI
+            var energyMax = GetEnergyMax();
+            if (_energy.Value > energyMax)
+            {
+                _energy.Value = energyMax;
+            }
+            else if (_energy.Value <= 0)
+            {
+                //todo: handle no energy
+            }
+
             return _energy.Value;
         }
 
@@ -351,11 +392,13 @@ namespace FullPotential.Api.Gameplay.Combat
             ItemBase itemUsed,
             Vector3? position)
         {
+            _lastDamageSourceName = sourceFighter != null ? sourceFighter.FighterName : null;
+            _lastDamageItemName = itemUsed?.Name ?? _localizer.Translate("ui.alert.attack.noitem");
+
             var sourceIsPlayer = sourceFighter != null && sourceFighter.GameObject.CompareTag(Tags.Player);
 
             var damageDealt = AttributeCalculator.GetAttackValue(itemUsed?.Attributes, GetDefenseValue());
 
-            var sourceItemName = itemUsed?.Name ?? _localizer.Translate("ui.alert.attack.noitem");
             var sourceNetworkObject = sourceFighter != null ? sourceFighter.GameObject.GetComponent<NetworkObject>() : null;
             var sourceClientId = sourceNetworkObject != null ? (ulong?)sourceNetworkObject.OwnerClientId : null;
 
@@ -395,11 +438,9 @@ namespace FullPotential.Api.Gameplay.Combat
             }
 
             _health.Value -= damageDealt;
-
-            CheckStats(sourceFighter.FighterName, sourceItemName);
         }
 
-        public void HandleDeath(string killerName, string itemName)
+        public void HandleDeath()
         {
             AliveState = LivingEntityState.Dead;
 
@@ -421,17 +462,17 @@ namespace FullPotential.Api.Gameplay.Combat
             HandStatusLeft.StopConsumingResources();
             HandStatusRight.StopConsumingResources();
 
-            var deathMessage = GetDeathMessage(false, name, killerName, itemName);
+            var deathMessage = GetDeathMessage(false, name);
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(deathMessage, nearbyClients);
 
-            HandleDeathAfter(killerName, itemName);
+            HandleDeathAfter(_lastDamageSourceName, _lastDamageItemName);
         }
 
         // ReSharper disable UnusedParameter.Global
         protected virtual void HandleDeathAfter(string killerName, string itemName)
         {
-            //Nothing here
+            //Here for override only
         }
         // ReSharper enable UnusedParameter.Global
 
@@ -440,32 +481,24 @@ namespace FullPotential.Api.Gameplay.Combat
             if (AliveState != LivingEntityState.Dead
                 && transform.position.y < _gameManager.GetSceneBehaviour().Attributes.LowestYValue)
             {
-                HandleDeath(_localizer.Translate("ui.alert.falldamage"), null);
+                _lastDamageSourceName = _localizer.Translate("ui.alert.falldamage");
+                _lastDamageItemName = null;
+                HandleDeath();
             }
         }
 
-        private void CheckStats(string sourceName, string sourceItemName)
+        protected string GetDeathMessage(bool isOwner, string victimName)
         {
-            if (_health.Value <= 0)
-            {
-                HandleDeath(sourceName, sourceItemName);
-            }
-
-            //todo: other min values
-        }
-
-        protected string GetDeathMessage(bool isOwner, string victimName, string killerName, string itemName)
-        {
-            if (itemName.IsNullOrWhiteSpace())
+            if (_lastDamageItemName.IsNullOrWhiteSpace())
             {
                 return isOwner
-                    ? string.Format(_localizer.Translate("ui.alert.attack.youwerekilledby"), killerName)
-                    : string.Format(_localizer.Translate("ui.alert.attack.victimkilledby"), victimName, killerName);
+                    ? string.Format(_localizer.Translate("ui.alert.attack.youwerekilledby"), _lastDamageSourceName)
+                    : string.Format(_localizer.Translate("ui.alert.attack.victimkilledby"), victimName, _lastDamageSourceName);
             }
 
             return isOwner
-                ? string.Format(_localizer.Translate("ui.alert.attack.youwerekilledbyusing"), killerName, itemName)
-                : string.Format(_localizer.Translate("ui.alert.attack.victimkilledbyusing"), victimName, killerName, itemName);
+                ? string.Format(_localizer.Translate("ui.alert.attack.youwerekilledbyusing"), _lastDamageSourceName, _lastDamageItemName)
+                : string.Format(_localizer.Translate("ui.alert.attack.victimkilledbyusing"), victimName, _lastDamageSourceName, _lastDamageItemName);
         }
 
         public bool TryToAttack(bool isLeftHand)
@@ -612,7 +645,7 @@ namespace FullPotential.Api.Gameplay.Combat
                 : handPosition + LookTransform.forward * range;
 
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-            //UsedWeaponClientRpc(handPosition, endPos, nearbyClients);
+            UsedWeaponClientRpc(handPosition, endPos, nearbyClients);
 
             if (rangedHit.transform == null)
             {
@@ -647,6 +680,15 @@ namespace FullPotential.Api.Gameplay.Combat
             return meleeHit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId;
         }
 
+        private void AddOrUpdateEffect(IEffect effect, int change, DateTime expiry)
+        {
+            if (_activeEffects.ContainsKey(effect))
+            {
+                _activeEffects.Remove(effect);
+            }
+            _activeEffects.Add(effect, (expiry, change));
+        }
+
         public void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes)
         {
             //todo: AddAttributeModifier
@@ -661,18 +703,11 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
-            const float displayTimeForSingleChangeToStat = 2f;
-
             var statVariable = GetStatVariable(statEffect.StatToAffect);
-            var statMax = GetStatVariableMax(statEffect.StatToAffect);
 
-            var (change, duration) = AttributeCalculator.GetStatChangeAndDuration(itemUsed.Attributes);
+            var (change, duration) = AttributeCalculator.GetStatChangeAndExpiry(itemUsed.Attributes);
 
-            if (_activeEffects.ContainsKey(statEffect))
-            {
-                _activeEffects.Remove(statEffect);
-            }
-            _activeEffects.Add(statEffect, DateTime.Now.AddSeconds(displayTimeForSingleChangeToStat));
+            AddOrUpdateEffect(statEffect, change, duration);
 
             if (statEffect.Affect == Affect.SingleDecrease && statEffect.StatToAffect == AffectableStat.Health)
             {
@@ -680,40 +715,17 @@ namespace FullPotential.Api.Gameplay.Combat
                 return;
             }
 
-            if (statVariable.Value >= statMax)
-            {
-                return;
-            }
-
-            if (statEffect.Affect == Affect.SingleIncrease)
-            {
-                if (statVariable.Value < statMax - change)
-                {
-                    statVariable.Value += change;
-                }
-                else
-                {
-                    statVariable.Value = statMax;
-                }
-                return;
-            }
-
-            if (statVariable.Value - change >= 0)
-            {
-                statVariable.Value -= change;
-            }
-            else
-            {
-                statVariable.Value = 0;
-
-                CheckStats(FighterName, itemUsed.Name);
-            }
+            statVariable.Value += change;
         }
 
         public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, Attributes attributes)
         {
-            //todo: ApplyTemporaryMaxActionToStat
-            throw new NotImplementedException();
+            var (change, duration) = AttributeCalculator.GetStatChangeAndExpiry(attributes);
+
+            AddOrUpdateEffect(statEffect, change, duration);
+
+            var statVariable = GetStatVariable(statEffect.StatToAffect);
+            statVariable.Value += change;
         }
 
         public void ApplyElementalEffect(IEffect elementalEffect, Attributes attributes)
@@ -728,10 +740,10 @@ namespace FullPotential.Api.Gameplay.Combat
             throw new NotImplementedException();
         }
 
-        public Dictionary<IEffect, float> GetActiveEffects()
+        public Dictionary<IEffect, (DateTime Expiry, int Change)> GetActiveEffects()
         {
             var expiredEffects = _activeEffects
-                .Where(x => x.Value < DateTime.Now)
+                .Where(x => x.Value.Expiry < DateTime.Now)
                 .ToList();
 
             foreach (var kvp in expiredEffects)
@@ -739,9 +751,7 @@ namespace FullPotential.Api.Gameplay.Combat
                 _activeEffects.Remove(kvp.Key);
             }
 
-            return _activeEffects.ToDictionary(
-                x => x.Key,
-                x => (float)(x.Value - DateTime.Now).TotalSeconds);
+            return _activeEffects;
         }
 
         private NetworkVariable<int> GetStatVariable(AffectableStat stat)
@@ -757,18 +767,18 @@ namespace FullPotential.Api.Gameplay.Combat
             }
         }
 
-        private int GetStatVariableMax(AffectableStat stat)
-        {
-            switch (stat)
-            {
-                case AffectableStat.Energy: return GetEnergyMax();
-                case AffectableStat.Health: return GetHealthMax();
-                case AffectableStat.Mana: return GetManaMax();
-                case AffectableStat.Stamina: return GetStaminaMax();
-                default:
-                    throw new ArgumentException("Unexpected AffectableStat: " + stat);
-            }
-        }
+        //private int GetStatVariableMax(AffectableStat stat)
+        //{
+        //    switch (stat)
+        //    {
+        //        case AffectableStat.Energy: return GetEnergyMax();
+        //        case AffectableStat.Health: return GetHealthMax();
+        //        case AffectableStat.Mana: return GetManaMax();
+        //        case AffectableStat.Stamina: return GetStaminaMax();
+        //        default:
+        //            throw new ArgumentException("Unexpected AffectableStat: " + stat);
+        //    }
+        //}
 
         private (NetworkVariable<int> Variable, int? Cost)? GetResourceVariableAndCost(SpellOrGadgetItemBase spellOrGadget)
         {

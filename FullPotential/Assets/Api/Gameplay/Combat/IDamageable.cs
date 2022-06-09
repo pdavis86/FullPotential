@@ -18,6 +18,6 @@ namespace FullPotential.Api.Gameplay.Combat
             ItemBase itemUsed,
             Vector3? position);
 
-        void HandleDeath(string killerName, string itemName);
+        void HandleDeath();
     }
 }

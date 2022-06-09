@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
@@ -20,7 +21,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
         ulong OwnerClientId { get; }
 
-        Dictionary<IEffect, float> GetActiveEffects();
+        Dictionary<IEffect, (DateTime Expiry, int Change)> GetActiveEffects();
 
         void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes);
 

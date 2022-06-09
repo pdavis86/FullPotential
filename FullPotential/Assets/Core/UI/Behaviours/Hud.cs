@@ -40,7 +40,7 @@ namespace FullPotential.Core.Ui.Behaviours
         private Image _equippedRightHandBackground;
         private EquippedSummary _equippedRightHandSummary;
         private Text _equippedRightHandAmmo;
-        private FighterBase _fighter;
+        private FighterBase _playerFighter;
 
         #region Unity Events Handlers
 
@@ -63,7 +63,7 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            if (_fighter == null)
+            if (_playerFighter == null)
             {
                 return;
             }
@@ -80,7 +80,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         public void Initialise(FighterBase fighter)
         {
-            _fighter = fighter;
+            _playerFighter = fighter;
         }
 
         public void ShowAlert(string alertText)
@@ -97,11 +97,11 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateHandOverlays()
         {
-            UpdateHandDescription(_equippedLeftHandSummary, _fighter.HandStatusLeft);
-            UpdateHandAmmo(_ammoLeft, _fighter.HandStatusLeft);
+            UpdateHandDescription(_equippedLeftHandSummary, _playerFighter.HandStatusLeft);
+            UpdateHandAmmo(_ammoLeft, _playerFighter.HandStatusLeft);
 
-            UpdateHandDescription(_equippedRightHandSummary, _fighter.HandStatusRight);
-            UpdateHandAmmo(_ammoRight, _fighter.HandStatusRight);
+            UpdateHandDescription(_equippedRightHandSummary, _playerFighter.HandStatusRight);
+            UpdateHandAmmo(_ammoRight, _playerFighter.HandStatusRight);
         }
 
         private void UpdateHandDescription(EquippedSummary equippedSummary, HandStatus handStatus)
@@ -129,15 +129,15 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateStaminaPercentage()
         {
-            var values = _staminaSlider.GetStaminaValues(_fighter.GetStamina(), _fighter.GetStaminaMax());
+            var values = _staminaSlider.GetStaminaValues(_playerFighter.GetStamina(), _playerFighter.GetStaminaMax());
             _staminaSlider.SetValues(values);
         }
 
         private void UpdateHealthPercentage()
         {
-            var health = _fighter.GetHealth();
-            var maxHealth = _fighter.GetHealthMax();
-            var defence = _fighter.GetDefenseValue();
+            var health = _playerFighter.GetHealth();
+            var maxHealth = _playerFighter.GetHealthMax();
+            var defence = _playerFighter.GetDefenseValue();
 
             var values = _healthSlider.GetHealthValues(health, maxHealth, defence);
             _healthSlider.SetValues(values);
@@ -145,13 +145,13 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateManaPercentage()
         {
-            var values = _manaSlider.GetManaValues(_fighter.GetMana(), _fighter.GetManaMax());
+            var values = _manaSlider.GetManaValues(_playerFighter.GetMana(), _playerFighter.GetManaMax());
             _manaSlider.SetValues(values);
         }
 
         private void UpdateEnergyPercentage()
         {
-            var values = _energySlider.GetEnergyValues(_fighter.GetEnergy(), _fighter.GetEnergyMax());
+            var values = _energySlider.GetEnergyValues(_playerFighter.GetEnergy(), _playerFighter.GetEnergyMax());
             _energySlider.SetValues(values);
         }
 
@@ -159,9 +159,9 @@ namespace FullPotential.Core.Ui.Behaviours
         {
             var existingObjects = GetActiveEffectGameObjects();
 
-            var activeEffects = _fighter.GetActiveEffects();
+            var activeEffects = _playerFighter.GetActiveEffects();
 
-            foreach (var (effect, timeToLive) in activeEffects)
+            foreach (var (effect, details) in activeEffects)
             {
                 var effectType = effect.GetType();
 
@@ -170,7 +170,7 @@ namespace FullPotential.Core.Ui.Behaviours
                     : Instantiate(_activeEffectPrefab, _activeEffectsContainer.transform);
 
                 var activeEffectScript = activeEffectObj.GetComponent<ActiveEffect>();
-                activeEffectScript.SetEffect(effect, timeToLive);
+                activeEffectScript.SetEffect(effect, (float)(details.Expiry - DateTime.Now).TotalSeconds);
             }
         }
 
