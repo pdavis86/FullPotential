@@ -19,7 +19,7 @@ namespace FullPotential.Core.UI.Behaviours
 
         private bool _isDestroySet;
 
-        public void SetEffect(IEffect effect, float timeToLive)
+        public void SetEffect(IEffect effect, string effectTranslation, float timeToLive)
         {
             if (_isDestroySet)
             {
@@ -30,8 +30,7 @@ namespace FullPotential.Core.UI.Behaviours
 
             //todo: activeEffectScript.Image = 
 
-            //todo: translate
-            Text.text = effect.TypeName;
+            Text.text = effectTranslation;
 
             Invoke(nameof(DestroyMe), timeToLive);
             _isDestroySet = true;

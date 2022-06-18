@@ -42,18 +42,22 @@ namespace FullPotential.Standard
                 typeof(SpellsAndGadgets.Targeting.Touch),
 
                 typeof(Effects.Buffs.Courage),
+                typeof(Effects.Buffs.Endurance),
                 typeof(Effects.Buffs.Focus),
                 typeof(Effects.Buffs.Haste),
                 typeof(Effects.Buffs.LifeTap),
                 typeof(Effects.Buffs.ManaTap),
                 typeof(Effects.Buffs.Regeneration),
                 typeof(Effects.Buffs.Strengthen),
+                typeof(Effects.Buffs.Surge),
 
                 typeof(Effects.Debuffs.Distract),
                 typeof(Effects.Debuffs.Fear),
+                typeof(Effects.Debuffs.Lethargy),
                 typeof(Effects.Debuffs.LifeDrain),
                 typeof(Effects.Debuffs.ManaDrain),
                 typeof(Effects.Debuffs.Poison),
+                typeof(Effects.Debuffs.ShortCircuit),
                 typeof(Effects.Debuffs.Slow),
                 typeof(Effects.Debuffs.Weaken),
 

@@ -31,6 +31,7 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private Text _ammoRight;
 #pragma warning restore 0649
 
+        private ILocalizer _localizer;
         private string _reloadingTranslation;
 
         private GameObject _activeEffectPrefab;
@@ -47,7 +48,8 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _reloadingTranslation = GameManager.Instance.GetService<ILocalizer>().Translate("ui.hub.reloading");
+            _localizer = GameManager.Instance.GetService<ILocalizer>();
+            _reloadingTranslation = _localizer.Translate("ui.hub.reloading");
 
             _activeEffectPrefab = _activeEffectsContainer.GetComponent<ActiveEffects>().ActiveEffectPrefab;
 
@@ -170,7 +172,7 @@ namespace FullPotential.Core.Ui.Behaviours
                     : Instantiate(_activeEffectPrefab, _activeEffectsContainer.transform);
 
                 var activeEffectScript = activeEffectObj.GetComponent<ActiveEffect>();
-                activeEffectScript.SetEffect(effect, (float)(details.Expiry - DateTime.Now).TotalSeconds);
+                activeEffectScript.SetEffect(effect, _localizer.GetTranslatedTypeName(effect), (float)(details.Expiry - DateTime.Now).TotalSeconds);
             }
         }
 

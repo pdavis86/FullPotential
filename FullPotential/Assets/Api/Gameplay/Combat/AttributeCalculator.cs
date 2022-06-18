@@ -28,7 +28,6 @@ namespace FullPotential.Api.Gameplay.Combat
         public static (int Change, DateTime Expiry) GetStatChangeAndExpiry(Attributes attributes)
         {
             //const float displayTimeForSingleChangeToStat = 2f;
-            //todo: negative change value for decreases
             //todo: attribute-based change and duration values
             return (10, DateTime.Now.AddSeconds(5f));
         }

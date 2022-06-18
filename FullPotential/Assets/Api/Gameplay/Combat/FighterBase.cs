@@ -283,15 +283,8 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public int GetHealthMax()
         {
-            var adjustment = _activeEffects
-                .Where(x =>
-                    x.Key is IStatEffect statEffect
-                    && statEffect.StatToAffect == AffectableStat.Health
-                    && statEffect.Affect is Affect.TemporaryMaxIncrease or Affect.TemporaryMaxDecrease)
-                .Sum(x => x.Value.Change);
-
             //todo: trait-based health max
-            return 100 + adjustment;
+            return 100 + GetStatMaxAdjustment(AffectableStat.Health); ;
         }
 
         public int GetStamina()
@@ -312,7 +305,7 @@ namespace FullPotential.Api.Gameplay.Combat
         public int GetStaminaMax()
         {
             //todo: trait-based stamina max
-            return 100;
+            return 100 + GetStatMaxAdjustment(AffectableStat.Stamina); ;
         }
 
         public int GetStaminaCost()
@@ -345,7 +338,7 @@ namespace FullPotential.Api.Gameplay.Combat
         public int GetManaMax()
         {
             //todo: trait-based mana max
-            return 100;
+            return 100 + GetStatMaxAdjustment(AffectableStat.Mana);
         }
 
         private int GetManaCost(Spell spell)
@@ -373,7 +366,7 @@ namespace FullPotential.Api.Gameplay.Combat
         public int GetEnergyMax()
         {
             //todo: trait-based energy max
-            return 100;
+            return 100 + GetStatMaxAdjustment(AffectableStat.Energy); ;
         }
 
         private int GetEnergyCost(Gadget gadget)
@@ -487,7 +480,7 @@ namespace FullPotential.Api.Gameplay.Combat
             }
         }
 
-        protected string GetDeathMessage(bool isOwner, string victimName)
+        private string GetDeathMessage(bool isOwner, string victimName)
         {
             if (_lastDamageItemName.IsNullOrWhiteSpace())
             {
@@ -680,6 +673,16 @@ namespace FullPotential.Api.Gameplay.Combat
             return meleeHit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId;
         }
 
+        private int GetStatMaxAdjustment(AffectableStat affectableStat)
+        {
+            return _activeEffects
+                .Where(x =>
+                    x.Key is IStatEffect statEffect
+                    && statEffect.StatToAffect == affectableStat
+                    && statEffect.Affect is Affect.TemporaryMaxIncrease or Affect.TemporaryMaxDecrease)
+                .Sum(x => x.Value.Change);
+        }
+
         private void AddOrUpdateEffect(IEffect effect, int change, DateTime expiry)
         {
             if (_activeEffects.ContainsKey(effect))
@@ -707,6 +710,11 @@ namespace FullPotential.Api.Gameplay.Combat
 
             var (change, duration) = AttributeCalculator.GetStatChangeAndExpiry(itemUsed.Attributes);
 
+            if (statEffect.Affect is Affect.PeriodicDecrease or Affect.SingleDecrease or Affect.TemporaryMaxDecrease)
+            {
+                change *= -1;
+            }
+
             AddOrUpdateEffect(statEffect, change, duration);
 
             if (statEffect.Affect == Affect.SingleDecrease && statEffect.StatToAffect == AffectableStat.Health)
@@ -721,6 +729,11 @@ namespace FullPotential.Api.Gameplay.Combat
         public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, Attributes attributes)
         {
             var (change, duration) = AttributeCalculator.GetStatChangeAndExpiry(attributes);
+
+            if (statEffect.Affect is Affect.PeriodicDecrease or Affect.SingleDecrease or Affect.TemporaryMaxDecrease)
+            {
+                change *= -1;
+            }
 
             AddOrUpdateEffect(statEffect, change, duration);
 

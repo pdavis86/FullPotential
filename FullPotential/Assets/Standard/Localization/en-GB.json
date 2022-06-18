@@ -84,35 +84,79 @@
       "Key": "weapon.sword",
       "Value": "Sword"
     },
-
-
+    
+    
     {
       "Key": "effect.courage",
       "Value": "Courage"
+    },
+    {
+      "Key": "effect.courage.description",
+      "Value": "Boosts max HP"
     },
     {
       "Key": "effect.focus",
       "Value": "Focus"
     },
     {
+      "Key": "effect.focus.description",
+      "Value": "Boosts max mana"
+    },
+    {
       "Key": "effect.haste",
       "Value": "Haste"
+    },
+    {
+      "Key": "effect.haste.description",
+      "Value": "Boosts speed attribute"
     },
     {
       "Key": "effect.lifetap",
       "Value": "Life Tap"
     },
     {
+      "Key": "effect.lifetap.description",
+      "Value": "Periodically steals HP from a target with the Life Drain debuff"
+    },
+    {
       "Key": "effect.manatap",
       "Value": "Mana Tap"
+    },
+    {
+      "Key": "effect.manatap.description",
+      "Value": "Periodically steals mana from a target with the Mana Drain debuff"
     },
     {
       "Key": "effect.regeneration",
       "Value": "Regeneration"
     },
     {
+      "Key": "effect.regeneration.description",
+      "Value": "Periodically increases your HP"
+    },
+    {
       "Key": "effect.strengthen",
-      "Value": "Strength"
+      "Value": "Strengthen"
+    },
+    {
+      "Key": "effect.strengthen.description",
+      "Value": "Boosts strength attribute"
+    },
+    {
+      "Key": "effect.surge",
+      "Value": "Surge"
+    },
+    {
+      "Key": "effect.surge.description",
+      "Value": "Boosts max energy"
+    },
+    {
+      "Key": "effect.endurance",
+      "Value": "Endurance"
+    },
+    {
+      "Key": "effect.endurance.description",
+      "Value": "Increases max stamina"
     },
 
 
@@ -121,28 +165,72 @@
       "Value": "Distract"
     },
     {
+      "Key": "effect.distract.description",
+      "Value": "Decreases max mana"
+    },
+    {
       "Key": "effect.fear",
       "Value": "Fear"
+    },
+    {
+      "Key": "effect.fear.description",
+      "Value": "Decreases max HP"
     },
     {
       "Key": "effect.lifedrain",
       "Value": "Life Drain"
     },
     {
+      "Key": "effect.lifedrain.description",
+      "Value": "Periodically steals HP to give to the originator"
+    },
+    {
       "Key": "effect.manadrain",
       "Value": "Mana Drain"
+    },
+    {
+      "Key": "effect.manadrain.description",
+      "Value": "Periodically steals mana to give to the originator"
     },
     {
       "Key": "effect.poison",
       "Value": "Poison"
     },
     {
+      "Key": "effect.poison.description",
+      "Value": "Periodically decreases your HP"
+    },
+    {
       "Key": "effect.slow",
       "Value": "Slow"
     },
     {
+      "Key": "effect.slow.description",
+      "Value": "Decreases speed attribute"
+    },
+    {
       "Key": "effect.weaken",
       "Value": "Weakness"
+    },
+    {
+      "Key": "effect.weakness.description",
+      "Value": "Decreases strength attribute"
+    },
+    {
+      "Key": "effect.shortcircuit",
+      "Value": "Short Circuit"
+    },
+    {
+      "Key": "effect.shortcircuit.description",
+      "Value": "Decreases max energy"
+    },
+    {
+      "Key": "effect.lethargy",
+      "Value": "Lethargy"
+    },
+    {
+      "Key": "effect.lethargy.description",
+      "Value": "Decreases max stamina"
     },
 
 
@@ -151,158 +239,44 @@
       "Value": "Air"
     },
     {
-      "Key": "effect.earth",
-      "Value": "Earth"
-    },
-    {
-      "Key": "effect.fire",
-      "Value": "Fire"
-    },
-    {
-      "Key": "effect.ice",
-      "Value": "Ice"
-    },
-    {
-      "Key": "effect.lightning",
-      "Value": "Lightning"
-    },
-    {
-      "Key": "effect.water",
-      "Value": "Water"
-    },
-
-
-    {
-      "Key": "effect.absorb",
-      "Value": "Absorb"
-    },
-    {
-      "Key": "effect.deflect",
-      "Value": "Deflect"
-    },
-    {
-      "Key": "effect.heal",
-      "Value": "Heal"
-    },
-    {
-      "Key": "effect.hurt",
-      "Value": "Hurt"
-    },
-    {
-      "Key": "effect.reflect",
-      "Value": "Reflect"
-    },
-    {
-      "Key": "effect.soften",
-      "Value": "Soften"
-    },
-    {
-      "Key": "effect.summon",
-      "Value": "Summon"
-    },
-    {
-      "Key": "effect.float",
-      "Value": "Float"
-    },
-	
-	
-	{
-      "Key": "effect.attract",
-      "Value": "Attract"
-    },
-    {
-      "Key": "effect.blink",
-      "Value": "Blink"
-    },
-    {
-      "Key": "effect.launch",
-      "Value": "Launch"
-    },	
-	{
-      "Key": "effect.repel",
-      "Value": "Repel"
-    },
-	
-	
-	{
-      "Key": "effect.courage.description",
-      "Value": "Boosts max HP"
-    },
-    {
-      "Key": "effect.focus.description",
-      "Value": "Boosts max mana"
-    },
-    {
-      "Key": "effect.haste.description",
-      "Value": "Boosts speed attribute"
-    },
-    {
-      "Key": "effect.lifetap.description",
-      "Value": "Periodically steals HP from a target with the Life Drain debuff"
-    },
-    {
-      "Key": "effect.manatap.description",
-      "Value": "Periodically steals mana from a target with the Mana Drain debuff"
-    },
-    {
-      "Key": "effect.regeneration.description",
-      "Value": "Periodically increases your HP"
-    },
-    {
-      "Key": "effect.strength.description",
-      "Value": "Boosts strength attribute"
-    },
-
-
-    {
-      "Key": "effect.distract.description",
-      "Value": "Decreases max mana"
-    },
-    {
-      "Key": "effect.fear.description",
-      "Value": "Decreases max HP"
-    },
-    {
-      "Key": "effect.lifedrain.description",
-      "Value": "Periodically steals HP to give to the originator"
-    },
-    {
-      "Key": "effect.manadrain.description",
-      "Value": "Periodically steals mana to give to the originator"
-    },
-    {
-      "Key": "effect.poison.description",
-      "Value": "Periodically decreases your HP"
-    },
-    {
-      "Key": "effect.slow.description",
-      "Value": "Decreases speed attribute"
-    },
-    {
-      "Key": "effect.weakness.description",
-      "Value": "Decreases strength attribute"
-    },
-
-
-    {
       "Key": "effect.air.description",
       "Value": "Imbue with the Air element"
+    },
+    {
+      "Key": "effect.earth",
+      "Value": "Earth"
     },
     {
       "Key": "effect.earth.description",
       "Value": "Imbue with the Earth element"
     },
     {
+      "Key": "effect.fire",
+      "Value": "Fire"
+    },
+    {
       "Key": "effect.fire.description",
       "Value": "Imbue with the Fire element"
+    },
+    {
+      "Key": "effect.ice",
+      "Value": "Ice"
     },
     {
       "Key": "effect.ice.description",
       "Value": "Imbue with the Ice element"
     },
     {
+      "Key": "effect.lightning",
+      "Value": "Lightning"
+    },
+    {
       "Key": "effect.lightning.description",
       "Value": "Imbue with the Lightning element"
+    },
+    {
+      "Key": "effect.water",
+      "Value": "Water"
     },
     {
       "Key": "effect.water.description",
@@ -311,48 +285,104 @@
 
 
     {
+      "Key": "effect.absorb",
+      "Value": "Absorb"
+    },
+    {
       "Key": "effect.absorb.description",
       "Value": "Reduces damage taken from magic attacks"
+    },
+    {
+      "Key": "effect.deflect",
+      "Value": "Deflect"
     },
     {
       "Key": "effect.deflect.description",
       "Value": "Reduces damage taken from physical attacks"
     },
     {
+      "Key": "effect.heal",
+      "Value": "Heal"
+    },
+    {
       "Key": "effect.heal.description",
       "Value": "Restores some HP"
+    },
+    {
+      "Key": "effect.hurt",
+      "Value": "Hurt"
+    },
+    {
+      "Key": "effect.hurt.description",
+      "Value": "Removes some HP"
+    },
+    {
+      "Key": "effect.reflect",
+      "Value": "Reflect"
     },
     {
       "Key": "effect.reflect.description",
       "Value": "Reflect damage back at the attacker"
     },
     {
+      "Key": "effect.soften",
+      "Value": "Soften"
+    },
+    {
       "Key": "effect.soften.description",
       "Value": "Reduces fall damage"
+    },
+    {
+      "Key": "effect.summon",
+      "Value": "Summon"
     },
     {
       "Key": "effect.summon.description",
       "Value": "Summon entities to act as shields or weapons"
     },
-	
-	
+    {
+      "Key": "effect.float",
+      "Value": "Float"
+    },
+    {
+      "Key": "effect.float.description",
+      "Value": "Reduces fall damage"
+    },
+    
+    
+    {
+      "Key": "effect.attract",
+      "Value": "Attract"
+    },
     {
       "Key": "effect.attract.description",
       "Value": "Pulls a target towards the source"
+    },
+    {
+      "Key": "effect.blink",
+      "Value": "Blink"
     },
     {
       "Key": "effect.blink.description",
       "Value": "Instantly move from one place to another"
     },
     {
+      "Key": "effect.launch",
+      "Value": "Launch"
+    },
+    {
       "Key": "effect.launch.description",
       "Value": "Launch target into the air"
-    },	
-	{
+    },    
+    {
+      "Key": "effect.repel",
+      "Value": "Repel"
+    },
+    {
       "Key": "effect.repel.description",
       "Value": "Repels a target away from the source"
     },
-
+    
 
     {
       "Key": "shape.wall",
@@ -384,6 +414,6 @@
       "Key": "targeting.touch",
       "Value": "Touch"
     }
-	
+    
   ]
 }

@@ -68,6 +68,7 @@ namespace FullPotential.Core.UI.Admin
             ResetSliders();
             ResetToggles();
             _resultsText.text = null;
+            _itemNameText.text = null;
         }
 
         private void InstantiateAttributeControls()
@@ -263,7 +264,7 @@ namespace FullPotential.Core.UI.Admin
         public void DisplayResultsText()
         {
             var item = GetCraftableItem();
-            _resultsText.text = _resultFactory.GetItemDescription(item);
+            _resultsText.text = _resultFactory.GetItemDescription(item, true, _itemNameText.text);
         }
 
         // ReSharper disable once UnusedMember.Global

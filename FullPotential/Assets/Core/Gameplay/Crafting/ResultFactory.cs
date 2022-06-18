@@ -517,7 +517,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return _localizer.Translate(TranslationType.Attribute, suffix);
         }
 
-        public string GetItemDescription(ItemBase item, bool includeName = true)
+        public string GetItemDescription(ItemBase item, bool includeName = true, string itemName = null)
         {
             if (item == null)
             {
@@ -526,7 +526,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 
             var sb = new StringBuilder();
 
-            if (includeName) { sb.Append($"{GetAttributeTranslation(nameof(item.Name))}: {item.Name}\n"); }
+            if (includeName) { sb.Append(itemName.OrIfNullOrWhitespace($"{GetAttributeTranslation(nameof(item.Name))}: {item.Name}") + "\n"); }
             if (item.Attributes.IsAutomatic) { sb.Append(GetAttributeTranslation(nameof(item.Attributes.IsAutomatic)) + "\n"); }
             if (item.Attributes.IsSoulbound) { sb.Append(GetAttributeTranslation(nameof(item.Attributes.IsSoulbound)) + "\n"); }
             if (item.Attributes.ExtraAmmoPerShot > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.ExtraAmmoPerShot))}: {item.Attributes.ExtraAmmoPerShot}\n"); }
