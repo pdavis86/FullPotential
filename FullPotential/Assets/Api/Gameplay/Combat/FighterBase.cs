@@ -37,7 +37,6 @@ namespace FullPotential.Api.Gameplay.Combat
         public PositionTransforms Positions;
         public BodyPartTransforms BodyParts;
         [SerializeField] protected TextMeshProUGUI _nameTag;
-        [SerializeField] protected IStatSlider _healthSlider;
 
         // ReSharper enable UnassignedField.Global
         // ReSharper enable InconsistentNaming
@@ -92,6 +91,8 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public LivingEntityState AliveState { get; protected set; }
 
+        public abstract IStatSlider HealthStatSlider { get; }
+
         #endregion
 
         #region Unity Events Handlers
@@ -102,6 +103,8 @@ namespace FullPotential.Api.Gameplay.Combat
             _gameManager = ModHelper.GetGameManager();
             _rpcService = _gameManager.GetService<IRpcService>();
             _localizer = _gameManager.GetService<ILocalizer>();
+
+            _health.OnValueChanged += OnHealthChanged;
 
             if (IsServer)
             {
@@ -246,6 +249,15 @@ namespace FullPotential.Api.Gameplay.Combat
                 : HandStatusRight;
 
             leftOrRight.StopConsumingResources();
+        }
+
+        #endregion
+
+        #region NetworkVariable Event Handlers
+
+        private void OnHealthChanged(int previousValue, int newValue)
+        {
+            UpdateUiHealthAndDefenceValues();
         }
 
         #endregion
@@ -708,14 +720,14 @@ namespace FullPotential.Api.Gameplay.Combat
         {
             var statVariable = GetStatVariable(statEffect.StatToAffect);
 
-            var (change, duration) = AttributeCalculator.GetStatChangeAndExpiry(itemUsed.Attributes);
+            var (change, expiry) = AttributeCalculator.GetStatChangeAndExpiry(itemUsed.Attributes);
 
             if (statEffect.Affect is Affect.PeriodicDecrease or Affect.SingleDecrease or Affect.TemporaryMaxDecrease)
             {
                 change *= -1;
             }
 
-            AddOrUpdateEffect(statEffect, change, duration);
+            AddOrUpdateEffect(statEffect, change, expiry);
 
             if (statEffect.Affect == Affect.SingleDecrease && statEffect.StatToAffect == AffectableStat.Health)
             {
@@ -728,14 +740,14 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, Attributes attributes)
         {
-            var (change, duration) = AttributeCalculator.GetStatChangeAndExpiry(attributes);
+            var (change, expiry) = AttributeCalculator.GetStatChangeAndExpiry(attributes);
 
             if (statEffect.Affect is Affect.PeriodicDecrease or Affect.SingleDecrease or Affect.TemporaryMaxDecrease)
             {
                 change *= -1;
             }
 
-            AddOrUpdateEffect(statEffect, change, duration);
+            AddOrUpdateEffect(statEffect, change, expiry);
 
             var statVariable = GetStatVariable(statEffect.StatToAffect);
             statVariable.Value += change;
@@ -853,6 +865,20 @@ namespace FullPotential.Api.Gameplay.Combat
             }
 
             return true;
+        }
+
+        public void UpdateUiHealthAndDefenceValues()
+        {
+            if (!IsServer && IsOwner)
+            {
+                return;
+            }
+
+            var health = GetHealth();
+            var maxHealth = GetHealthMax();
+            var defence = _inventory.GetDefenseValue();
+            var values = HealthStatSlider.GetHealthValues(health, maxHealth, defence);
+            HealthStatSlider.SetValues(values);
         }
 
         #region Nested Classes

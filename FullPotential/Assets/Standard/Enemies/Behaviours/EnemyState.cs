@@ -1,4 +1,5 @@
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Ui.Components;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -7,6 +8,13 @@ namespace FullPotential.Standard.Enemies.Behaviours
 {
     public class EnemyState : FighterBase
     {
+        //todo: don't use core! Add it dynamically?
+        #region Inspector Variables
+#pragma warning disable CS0649
+        [SerializeField] private Core.Ui.Components.BarSlider _healthSlider;
+#pragma warning restore CS0649
+        #endregion
+
         #region Variables
 
         private string _enemyName;
@@ -23,15 +31,27 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
         public override string FighterName => _enemyName;
 
+        public override IStatSlider HealthStatSlider => _healthSlider;
+
         #endregion
-        
+
         #region Unity Event Handlers
 
-         protected override void Awake()
+        protected override void Awake()
         {
             base.Awake();
 
             _health.OnValueChanged += OnHealthChanged;
+
+            //todo: don't do this
+            _inventory = gameObject.AddComponent<Core.PlayerBehaviours.PlayerInventory>();
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+
+            UpdateUiHealthAndDefenceValues();
         }
 
         #endregion
@@ -40,12 +60,12 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
         private void OnHealthChanged(int previousValue, int newValue)
         {
-            var values = _healthSlider.GetHealthValues(newValue, GetHealthMax(), GetDefenseValue());
+            var values = _healthSlider.GetHealthValues(GetHealth(), GetHealthMax(), GetDefenseValue());
             _healthSlider.SetValues(values);
         }
 
         #endregion
-        
+
         public void SetName(string newName)
         {
             _enemyName = newName;

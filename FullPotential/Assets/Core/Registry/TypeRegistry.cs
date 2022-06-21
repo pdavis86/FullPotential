@@ -26,10 +26,15 @@ namespace FullPotential.Core.Registry
 
         public void FindAndRegisterAll()
         {
+            //todo: loop through installed mods
+
             foreach (var t in new Standard.Registration().GetRegisterables())
             {
                 ValidateAndRegister(t);
             }
+
+            //todo: register prefabs from each mod
+            //NetworkManager.AddNetworkPrefab(_enemyPrefab);
         }
 
         private void ValidateAndRegister(Type type)

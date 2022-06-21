@@ -7,6 +7,7 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Registry;
+using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
@@ -16,6 +17,7 @@ using FullPotential.Core.Gameplay.Data;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Registry;
+using FullPotential.Core.Ui.Components;
 using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.Helpers;
 using Unity.Netcode;
@@ -54,16 +56,15 @@ namespace FullPotential.Core.PlayerBehaviours
         #region Inspector Variables
         // ReSharper disable UnassignedField.Global
 #pragma warning disable 0649
-
         [SerializeField] private Behaviour[] _behavioursToDisable;
         [SerializeField] private Behaviour[] _behavioursForRespawn;
         [SerializeField] private GameObject[] _gameObjectsForPlayers;
         [SerializeField] private GameObject[] _gameObjectsForRespawn;
         [SerializeField] private Material _defaultMaterial;
         [SerializeField] private GameObject _playerCamera;
+        [SerializeField] private BarSlider _healthSlider;
         public GameObject InFrontOfPlayer;
         public Transform GraphicsTransform;
-
 #pragma warning restore 0649
         // ReSharper enable UnassignedField.Global
         #endregion
@@ -96,17 +97,20 @@ namespace FullPotential.Core.PlayerBehaviours
 
         public override string FighterName => Username;
 
+        public override IStatSlider HealthStatSlider => _healthSlider;
+
         #endregion
 
         #region Unity Event Handlers
 
         // ReSharper disable once UnusedMember.Local
+
         protected override void Awake()
         {
             base.Awake();
 
             //_stamina.OnValueChanged += OnStaminaChanged;
-            _health.OnValueChanged += OnHealthChanged;
+            //_health.OnValueChanged += OnHealthChanged;
             //_mana.OnValueChanged += OnManaChanged;
             //_energy.OnValueChanged += OnEnergyChanged;
 
@@ -206,15 +210,6 @@ namespace FullPotential.Core.PlayerBehaviours
             {
                 GameManager.Instance.SavePlayerData(_saveData);
             }
-        }
-
-        #endregion
-
-        #region NetworkVariable Event Handlers
-
-        private void OnHealthChanged(int previousValue, int newValue)
-        {
-            UpdateUiHealthAndDefenceValues();
         }
 
         #endregion
@@ -700,20 +695,6 @@ namespace FullPotential.Core.PlayerBehaviours
         }
 
         #region UI Updates
-
-        public void UpdateUiHealthAndDefenceValues()
-        {
-            if (IsOwner)
-            {
-                return;
-            }
-
-            var health = GetHealth();
-            var maxHealth = GetHealthMax();
-            var defence = Inventory.GetDefenseValue();
-            var values = _healthSlider.GetHealthValues(health, maxHealth, defence);
-            _healthSlider.SetValues(values);
-        }
 
         public void ShowAlertForItemsAddedToInventory(string alertText)
         {

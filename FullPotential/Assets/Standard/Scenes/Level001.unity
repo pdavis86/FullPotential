@@ -3207,7 +3207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c38032a77936014e9cb0fe64d22a255, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 145446360085616433, guid: 6d41a310c4a9c2340b060fd324410cc1,
+  _enemyPrefab: {fileID: 145446360085616433, guid: 6d41a310c4a9c2340b060fd324410cc1,
     type: 3}
   _spawnVariationMin: -4
   _spawnVariationMax: 4

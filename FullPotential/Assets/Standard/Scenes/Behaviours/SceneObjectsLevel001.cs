@@ -10,18 +10,16 @@ using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable once UnusedType.Global
 
 namespace FullPotential.Standard.Scenes.Behaviours
 {
     public class SceneObjectsLevel001 : NetworkBehaviour, ISceneBehaviour
     {
-        // ReSharper disable once UnassignedField.Global
-        // ReSharper disable once MemberCanBePrivate.Global
-        public GameObject EnemyPrefab;
-
+#pragma warning disable CS0649
+        [SerializeField] private GameObject _enemyPrefab;
         [SerializeField] private float _spawnVariationMin = -4f;
         [SerializeField] private float _spawnVariationMax = 4f;
+#pragma warning restore CS0649
 
         private List<Transform> _spawnPoints;
         private NetworkObject _enemyPrefabNetObj;
@@ -41,11 +39,6 @@ namespace FullPotential.Standard.Scenes.Behaviours
         private void Awake()
         {
             _spawnService = ModHelper.GetGameManager().GetService<ISpawnService>();
-
-            //todo: this may no longer be true
-            //Cannot currently add prefabs at runtime
-            //https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/1360
-            //So enemy prefab is part of FullPotential.Core
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -65,7 +58,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
         {
             base.OnNetworkSpawn();
 
-            _enemyPrefabNetObj = EnemyPrefab.GetComponent<NetworkObject>();
+            _enemyPrefabNetObj = _enemyPrefab.GetComponent<NetworkObject>();
 
             var spawnPointsParent = GameObjectHelper.GetObjectAtRoot(GameObjectNames.SpawnPoints).transform;
             _spawnPoints = new List<Transform>();

@@ -162,6 +162,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0e57d1b62b20be418143d92c23a408f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Positions:
+    LeftHand: {fileID: 0}
+    RightHand: {fileID: 0}
+    LeftHandInFront: {fileID: 0}
+    RightHandInFront: {fileID: 0}
+  BodyParts:
+    Head: {fileID: 0}
+    Body: {fileID: 0}
+    LeftArm: {fileID: 0}
+    RightArm: {fileID: 0}
   _nameTag: {fileID: 3612779855335603929}
   _healthSlider: {fileID: 2211276185775919372}
 --- !u!114 &2712974170162580787
@@ -206,7 +216,6 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
-  CanCommitToTransform: 0
 --- !u!1 &145446360235446707
 GameObject:
   m_ObjectHideFlags: 0
