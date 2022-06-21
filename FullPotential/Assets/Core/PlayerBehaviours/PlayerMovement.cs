@@ -65,19 +65,27 @@ namespace FullPotential.Core.PlayerBehaviours
             _isSprinting = false;
         }
 
-        // ReSharper disable once UnusedMember.Local
+        private void FixedUpdate()
+        {
+            MoveAndLook();
+        }
+
+        #endregion
+
+        #region Input Event Handlers
+        // ReSharper disable UnusedMember.Local
+#pragma warning disable IDE0051 // Remove unused private members
+
         private void OnMove(InputValue value)
         {
             _moveVal = value.Get<Vector2>().normalized;
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnLook(InputValue value)
         {
             _lookVal = value.Get<Vector2>();
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnJump()
         {
             if (IsOnSolidObject())
@@ -86,7 +94,6 @@ namespace FullPotential.Core.PlayerBehaviours
             }
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnSprintStart()
         {
             if (_playerState.GetStamina() >= _playerState.GetStaminaCost())
@@ -95,18 +102,13 @@ namespace FullPotential.Core.PlayerBehaviours
             }
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnSprintStop()
         {
             _isSprinting = false;
         }
 
-        // ReSharper disable once UnusedMember.Local
-        private void FixedUpdate()
-        {
-            MoveAndLook();
-        }
-
+        // ReSharper enable UnusedMember.Local
+#pragma warning restore IDE0051 // Remove unused private members
         #endregion
 
         private bool IsOnSolidObject()
@@ -188,6 +190,6 @@ namespace FullPotential.Core.PlayerBehaviours
                 _wasSprinting = _isSprinting;
             }
         }
-        
+
     }
 }

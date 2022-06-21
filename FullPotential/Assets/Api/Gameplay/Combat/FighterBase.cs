@@ -447,6 +447,11 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public void HandleDeath()
         {
+            if (AliveState == LivingEntityState.Dead)
+            {
+                return;
+            }
+
             AliveState = LivingEntityState.Dead;
 
             GetComponent<Collider>().enabled = false;

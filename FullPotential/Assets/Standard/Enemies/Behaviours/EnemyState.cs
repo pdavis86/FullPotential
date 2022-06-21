@@ -8,7 +8,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
 {
     public class EnemyState : FighterBase
     {
-        //todo: don't use core! Add it dynamically?
+        //todo: don't use core! Add it dynamically using the NameAndHealthCanvas prefab
         #region Inspector Variables
 #pragma warning disable CS0649
         [SerializeField] private Core.Ui.Components.BarSlider _healthSlider;
