@@ -105,7 +105,7 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 case Affect.PeriodicDecrease:
                 case Affect.PeriodicIncrease:
-                    targetFighter.ApplyPeriodicActionToStat(statEffect, itemUsed.Attributes);
+                    targetFighter.ApplyPeriodicActionToStat(statEffect, itemUsed, sourceFighter);
                     return;
 
                 case Affect.SingleDecrease:
@@ -115,7 +115,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 case Affect.TemporaryMaxDecrease:
                 case Affect.TemporaryMaxIncrease:
-                    targetFighter.ApplyTemporaryMaxActionToStat(statEffect, itemUsed.Attributes);
+                    targetFighter.ApplyTemporaryMaxActionToStat(statEffect, itemUsed, sourceFighter, position);
                     return;
 
                 default:

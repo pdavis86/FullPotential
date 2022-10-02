@@ -25,11 +25,11 @@ namespace FullPotential.Api.Gameplay.Combat
 
         void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes);
 
-        void ApplyPeriodicActionToStat(IStatEffect statEffect, Attributes attributes);
+        void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter);
 
         void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position);
 
-        void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, Attributes attributes);
+        void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position);
 
         void ApplyElementalEffect(IEffect elementalEffect, Attributes attributes);
 

@@ -31,10 +31,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
         public override void OnInteract(NetworkObject networkObject)
         {
-            //networkObject.GetComponent<PlayerActions>().ClaimLootServerRpc("justgimmieloot");
-
             var shopUiGameObject = GameObjectHelper.GetObjectAtRoot(GameObjectNames.SceneCanvas).transform.Find("ShopUi").gameObject;
-
             _gameManager.GetUserInterface().OpenCustomMenu(shopUiGameObject);
         }
 

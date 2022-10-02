@@ -394,10 +394,42 @@ namespace FullPotential.Api.Gameplay.Combat
         public int GetDefenseValue()
         {
             //todo: trait-based defense
-            return _inventory.GetDefenseValue();
+            return _inventory.GetDefenseValue() + GetAttributeAdjustment(AffectableAttribute.Strength);
         }
 
-        public void TakeDamage(IFighter sourceFighter,
+        private void ApplyEnergyChange(int change)
+        {
+            _energy.Value += change;
+        }
+
+        private void ApplyHealthChange(
+            int change,
+            IFighter sourceFighter,
+            ItemBase itemUsed,
+            Vector3? position)
+        {
+            if (change < 0)
+            {
+                TakeDamage(sourceFighter, itemUsed, position);
+                return;
+            }
+
+            //todo: what else do we do when we heal?
+            _health.Value += change;
+        }
+
+        private void ApplyManaChange(int change)
+        {
+            _mana.Value += change;
+        }
+
+        private void ApplyStaminaChange(int change)
+        {
+            _stamina.Value += change;
+        }
+
+        public void TakeDamage(
+            IFighter sourceFighter,
             ItemBase itemUsed,
             Vector3? position)
         {
@@ -651,8 +683,6 @@ namespace FullPotential.Api.Gameplay.Combat
 
         private ulong? UseRangedWeapon(Vector3 handPosition, Weapon weaponInHand)
         {
-            //todo: automatic weapons
-
             var range = weaponInHand.Attributes.GetProjectileRange();
             var endPos = Physics.Raycast(LookTransform.position, LookTransform.forward, out var rangedHit, range)
                 ? rangedHit.point
@@ -705,6 +735,15 @@ namespace FullPotential.Api.Gameplay.Combat
                 .Sum(x => x.Value.Change);
         }
 
+        private int GetAttributeAdjustment(AffectableAttribute attribute)
+        {
+            return _activeEffects
+                .Where(x =>
+                    x.Key is IAttributeEffect attributeEffect
+                    && attributeEffect.AttributeToAffect == attribute)
+                .Sum(x => x.Value.Change * (x.Key is IAttributeEffect attributeEffect && attributeEffect.TemporaryMaxIncrease ? 1 : -1));
+        }
+
         private void AddOrUpdateEffect(IEffect effect, int change, DateTime expiry)
         {
             if (_activeEffects.ContainsKey(effect))
@@ -716,63 +755,54 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes)
         {
-            //todo: AddAttributeModifier
-            throw new NotImplementedException();
+            var (change, expiry) = AttributeCalculator.GetAttributeChangeAndExpiry(attributeEffect, attributes);
+            AddOrUpdateEffect(attributeEffect, change, expiry);
         }
 
-        public void ApplyPeriodicActionToStat(IStatEffect statEffect, Attributes attributes)
+        public void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter)
         {
-            //todo: ApplyPeriodicActionToStat
-            throw new NotImplementedException();
+            var (change, expiry, delay) = AttributeCalculator.GetStatChangeExpiryAndDelay(statEffect, itemUsed.Attributes);
+            StartCoroutine(PeriodicActionToStatCoroutine(statEffect.StatToAffect, change, sourceFighter, itemUsed, delay, expiry));
+        }
+
+        private IEnumerator PeriodicActionToStatCoroutine(AffectableStat stat, int change, IFighter sourceFighter, ItemBase itemUsed, float delay, DateTime expiry)
+        {
+            do
+            {
+                ApplyStatChange(stat, change, sourceFighter, itemUsed, transform.position);
+                yield return new WaitForSeconds(delay);
+
+            } while (DateTime.Now < expiry);
         }
 
         public void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
-            var statVariable = GetStatVariable(statEffect.StatToAffect);
-
             var (change, expiry) = AttributeCalculator.GetStatChangeAndExpiry(statEffect, itemUsed.Attributes);
 
-            if (statEffect.Affect is Affect.PeriodicDecrease or Affect.SingleDecrease or Affect.TemporaryMaxDecrease)
-            {
-                change *= -1;
-            }
-
             AddOrUpdateEffect(statEffect, change, expiry);
 
-            if (statEffect.Affect == Affect.SingleDecrease && statEffect.StatToAffect == AffectableStat.Health)
-            {
-                TakeDamage(sourceFighter, itemUsed, position);
-                return;
-            }
-
-            statVariable.Value += change;
+            ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, itemUsed, position);
         }
 
-        public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, Attributes attributes)
+        public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
-            var (change, expiry) = AttributeCalculator.GetStatChangeAndExpiry(statEffect, attributes);
-
-            if (statEffect.Affect is Affect.PeriodicDecrease or Affect.SingleDecrease or Affect.TemporaryMaxDecrease)
-            {
-                change *= -1;
-            }
+            var (change, expiry) = AttributeCalculator.GetStatChangeAndExpiry(statEffect, itemUsed.Attributes);
 
             AddOrUpdateEffect(statEffect, change, expiry);
 
-            var statVariable = GetStatVariable(statEffect.StatToAffect);
-            statVariable.Value += change;
+            ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, itemUsed, position);
         }
 
         public void ApplyElementalEffect(IEffect elementalEffect, Attributes attributes)
         {
             //todo: ApplyElementalEffect
-            throw new NotImplementedException();
+            Debug.LogWarning("Not yet implemented elemental effects");
         }
 
         public void BeginMaintainDistanceOn(GameObject targetGameObject)
         {
             //todo: BeginMaintainDistanceOn
-            throw new NotImplementedException();
+            Debug.LogWarning("Not yet implemented BeginMaintainDistanceOn");
         }
 
         public Dictionary<IEffect, (DateTime Expiry, int Change)> GetActiveEffects()
@@ -789,14 +819,31 @@ namespace FullPotential.Api.Gameplay.Combat
             return _activeEffects;
         }
 
-        private NetworkVariable<int> GetStatVariable(AffectableStat stat)
+        private void ApplyStatChange(
+            AffectableStat stat,
+            int change,
+            IFighter sourceFighter,
+            ItemBase itemUsed,
+            Vector3? position)
         {
             switch (stat)
             {
-                case AffectableStat.Energy: return _energy;
-                case AffectableStat.Health: return _health;
-                case AffectableStat.Mana: return _mana;
-                case AffectableStat.Stamina: return _stamina;
+                case AffectableStat.Energy:
+                    ApplyEnergyChange(change);
+                    return;
+
+                case AffectableStat.Health:
+                    ApplyHealthChange(change, sourceFighter, itemUsed, position);
+                    return;
+
+                case AffectableStat.Mana:
+                    ApplyManaChange(change);
+                    return;
+
+                case AffectableStat.Stamina:
+                    ApplyStaminaChange(change);
+                    return;
+
                 default:
                     throw new ArgumentException("Unexpected AffectableStat: " + stat);
             }
