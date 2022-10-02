@@ -8,18 +8,20 @@ namespace FullPotential.Core.UI.Behaviours
 {
     public class ActiveEffect : MonoBehaviour
     {
-        // ReSharper disable MemberCanBePrivate.Global
-        // ReSharper disable UnassignedField.Global
-        public Image Image;
-        public Text Text;
-        // ReSharper restore UnassignedField.Global
-        // ReSharper restore MemberCanBePrivate.Global
+        #region Inspector Variables
+        // ReSharper disable UnassignedField.Compiler
+
+        [SerializeField] private Image _image;
+        [SerializeField] private Text _text;
+
+        // ReSharper restore UnassignedField.Compiler
+        #endregion
 
         public IEffect Effect { get; private set; }
 
         private bool _isDestroySet;
 
-        public void SetEffect(IEffect effect, string effectTranslation, float timeToLive)
+        public void SetEffect(IEffect effect, string effectTranslation, float timeToLive, Color color)
         {
             if (_isDestroySet)
             {
@@ -28,9 +30,9 @@ namespace FullPotential.Core.UI.Behaviours
 
             Effect = effect;
 
-            //todo: activeEffectScript.Image = 
+            _image.color = color;
 
-            Text.text = effectTranslation;
+            _text.text = effectTranslation + $" ({timeToLive}s)";
 
             Invoke(nameof(DestroyMe), timeToLive);
             _isDestroySet = true;

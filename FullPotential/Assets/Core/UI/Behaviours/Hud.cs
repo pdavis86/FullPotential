@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
@@ -172,8 +173,25 @@ namespace FullPotential.Core.Ui.Behaviours
                     : Instantiate(_activeEffectPrefab, _activeEffectsContainer.transform);
 
                 var activeEffectScript = activeEffectObj.GetComponent<ActiveEffect>();
-                activeEffectScript.SetEffect(effect, _localizer.GetTranslatedTypeName(effect), (float)(details.Expiry - DateTime.Now).TotalSeconds);
+                activeEffectScript.SetEffect(effect, _localizer.GetTranslatedTypeName(effect), (float)(details.Expiry - DateTime.Now).TotalSeconds, GetEffectColor(effect));
             }
+        }
+
+        private Color GetEffectColor(IEffect effect)
+        {
+            if (effect is IStatEffect statEffect)
+            {
+                if (statEffect.Affect == Affect.SingleIncrease
+                    || statEffect.Affect == Affect.PeriodicIncrease
+                    || statEffect.Affect == Affect.TemporaryMaxIncrease)
+                {
+                    return Color.green;
+                }
+
+                return Color.red;
+            }
+
+            return Color.yellow;
         }
 
         private Dictionary<Type, GameObject> GetActiveEffectGameObjects()

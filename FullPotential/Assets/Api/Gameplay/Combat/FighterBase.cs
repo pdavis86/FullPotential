@@ -730,7 +730,7 @@ namespace FullPotential.Api.Gameplay.Combat
         {
             var statVariable = GetStatVariable(statEffect.StatToAffect);
 
-            var (change, expiry) = AttributeCalculator.GetStatChangeAndExpiry(itemUsed.Attributes);
+            var (change, expiry) = AttributeCalculator.GetStatChangeAndExpiry(statEffect, itemUsed.Attributes);
 
             if (statEffect.Affect is Affect.PeriodicDecrease or Affect.SingleDecrease or Affect.TemporaryMaxDecrease)
             {
@@ -750,7 +750,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, Attributes attributes)
         {
-            var (change, expiry) = AttributeCalculator.GetStatChangeAndExpiry(attributes);
+            var (change, expiry) = AttributeCalculator.GetStatChangeAndExpiry(statEffect, attributes);
 
             if (statEffect.Affect is Affect.PeriodicDecrease or Affect.SingleDecrease or Affect.TemporaryMaxDecrease)
             {

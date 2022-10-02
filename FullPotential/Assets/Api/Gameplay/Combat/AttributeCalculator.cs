@@ -1,5 +1,6 @@
 ﻿using System;
 using FullPotential.Api.Registry;
+using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Api.Gameplay.Combat
 {
@@ -25,11 +26,14 @@ namespace FullPotential.Api.Gameplay.Combat
             return 100f;
         }
 
-        public static (int Change, DateTime Expiry) GetStatChangeAndExpiry(Attributes attributes)
+        public static (int Change, DateTime Expiry) GetStatChangeAndExpiry(IStatEffect statEffect, Attributes attributes)
         {
-            //const float displayTimeForSingleChangeToStat = 2f;
+            var timeToLive = statEffect.Affect == Affect.SingleIncrease || statEffect.Affect == Affect.SingleDecrease
+                ? 2f
+                : 5f;
+
             //todo: attribute-based change and duration values
-            return (10, DateTime.Now.AddSeconds(5f));
+            return (10, DateTime.Now.AddSeconds(timeToLive));
         }
     }
 }
