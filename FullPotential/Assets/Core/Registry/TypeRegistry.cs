@@ -7,6 +7,7 @@ using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Registry.SpellsAndGadgets;
+using Unity.Netcode;
 using UnityEngine.AddressableAssets;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -24,17 +25,23 @@ namespace FullPotential.Core.Registry
         private readonly List<ITargeting> _targeting = new List<ITargeting>();
         private readonly Dictionary<string, UnityEngine.GameObject> _loadedAddressables = new Dictionary<string, UnityEngine.GameObject>();
 
-        public void FindAndRegisterAll()
+        public void FindAndRegisterAll(List<string> modPrefixes)
         {
-            //todo: loop through installed mods
+            //todo: load mod script from specifically named GameObject
+            var installedMods = new IMod[] { new Standard.Registration() };
 
-            foreach (var t in new Standard.Registration().GetRegisterables())
+            foreach (var mod in installedMods)
             {
-                ValidateAndRegister(t);
-            }
+                foreach (var t in mod.GetRegisterableTypes())
+                {
+                    ValidateAndRegister(t);
+                }
 
-            //todo: register prefabs from each mod
-            //NetworkManager.AddNetworkPrefab(_enemyPrefab);
+                foreach (var p in mod.GetNetworkPrefabs())
+                {
+                    NetworkManager.Singleton.AddNetworkPrefab(p);
+                }
+            }
         }
 
         private void ValidateAndRegister(Type type)

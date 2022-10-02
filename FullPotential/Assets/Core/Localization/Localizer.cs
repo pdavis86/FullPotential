@@ -44,26 +44,8 @@ namespace FullPotential.Core.Localization
         }
 
         // ReSharper disable once UnusedMethodReturnValue.Global
-        public async Task<bool> LoadAvailableCulturesAsync()
+        public async Task LoadAvailableCulturesAsync(Dictionary<string, List<string>> localisationAddresses)
         {
-            var localisationAddresses = new Dictionary<string, List<string>>();
-
-            foreach (var rl in Addressables.ResourceLocators)
-            {
-                var addresses = rl.Keys
-                    .OfType<string>()
-                    .Where(x => x.Contains("/Localization/") && x.EndsWith(".json"));
-
-                if (addresses.Any())
-                {
-                    var groups = addresses.GroupBy(System.IO.Path.GetFileNameWithoutExtension);
-                    foreach (var grouping in groups)
-                    {
-                        localisationAddresses.Add(grouping.Key, grouping.ToList());
-                    }
-                }
-            }
-
             _availableCultures = new List<CultureAddressables>();
             foreach (var kvp in localisationAddresses)
             {
@@ -75,12 +57,10 @@ namespace FullPotential.Core.Localization
                     Addresses = kvp.Value
                 });
             }
-
-            return true;
         }
 
         // ReSharper disable once UnusedMethodReturnValue.Global
-        public async Task<bool> LoadLocalizationFilesAsync(string culture)
+        public async Task LoadLocalizationFilesAsync(string culture)
         {
             _translations = new Dictionary<string, string>();
 
@@ -106,8 +86,6 @@ namespace FullPotential.Core.Localization
                     }
                 }
             }
-
-            return true;
         }
 
         public Dictionary<string, string> GetAvailableCultures()

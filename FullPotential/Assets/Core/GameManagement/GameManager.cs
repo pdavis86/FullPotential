@@ -58,6 +58,7 @@ namespace FullPotential.Core.GameManagement
         //Services
         private UserRegistry _userRegistry;
         private ILocalizer _localizer;
+        private AddressablesManager _addressablesManager;
 
         //Variables
         private bool _isSaving;
@@ -90,14 +91,15 @@ namespace FullPotential.Core.GameManagement
             EnsureAppOptionsLoaded();
 
             await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
+            _addressablesManager = new AddressablesManager();
 
             var typeRegistry = (TypeRegistry)GetService<ITypeRegistry>();
-            typeRegistry.FindAndRegisterAll();
+            typeRegistry.FindAndRegisterAll(_addressablesManager.ModPrefixes);
 
             _userRegistry = GetService<UserRegistry>();
 
             _localizer = GetService<ILocalizer>();
-            await _localizer.LoadAvailableCulturesAsync();
+            await _localizer.LoadAvailableCulturesAsync(_addressablesManager.LocalisationAddresses);
             await _localizer.LoadLocalizationFilesAsync(AppOptions.Culture);
 
             Prefabs = GetComponent<Prefabs>();

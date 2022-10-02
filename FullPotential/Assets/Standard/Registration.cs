@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using FullPotential.Api.Registry;
+using UnityEngine;
 
 namespace FullPotential.Standard
 {
-    public class Registration : IRegistrationSteps
+    public class Registration : IMod
     {
-        public IEnumerable<Type> GetRegisterables()
+        public IEnumerable<Type> GetRegisterableTypes()
         {
             return new[]
             {
@@ -80,6 +81,11 @@ namespace FullPotential.Standard
                 typeof(Effects.Support.Float),
                 typeof(Effects.Support.Summon),
             };
+        }
+
+        public IEnumerable<GameObject> GetNetworkPrefabs()
+        {
+            return Array.Empty<GameObject>();
         }
     }
 }
