@@ -25,11 +25,11 @@ namespace FullPotential.Core.PlayerBehaviours
 {
     public class PlayerBehaviour : NetworkBehaviour, IPlayerBehaviour
     {
-#pragma warning disable CS0649
+#pragma warning disable 0649
         [SerializeField] private Camera _playerCamera;
         [SerializeField] private Camera _inFrontOfPlayerCamera;
         [SerializeField] private GameObject _hitTextPrefab;
-#pragma warning restore CS0649
+#pragma warning restore 0649
 
         //Services
         private ResultFactory _resultFactory;
@@ -310,10 +310,11 @@ namespace FullPotential.Core.PlayerBehaviours
             }
         }
 
-        //todo: make access to admin-only methods permission-based
         [ServerRpc]
         public void CraftItemAsAdminServerRpc(string serialisedLoot, string categoryName, string craftableTypeName, bool isTwoHanded, string itemName)
         {
+            GameManager.Instance.CheckIsAdmin();
+
             var loot = JsonUtility.FromJson<Loot>(serialisedLoot);
             loot.Id = Guid.NewGuid().ToMinimisedString();
 

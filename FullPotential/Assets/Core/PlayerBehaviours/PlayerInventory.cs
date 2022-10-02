@@ -727,9 +727,10 @@ namespace FullPotential.Core.PlayerBehaviours
                 });
         }
 
-        //todo: make access to admin-only methods permission-based
         public void AddItemAsAdmin(ItemBase item)
         {
+            GameManager.Instance.CheckIsAdmin();
+
             FillTypesFromIds(item);
             _items.Add(item.Id, item);
         }

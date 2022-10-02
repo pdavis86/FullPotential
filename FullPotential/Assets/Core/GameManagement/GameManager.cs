@@ -365,6 +365,15 @@ namespace FullPotential.Core.GameManagement
             _serviceRegistry.Register<IEffectService, EffectService>();
         }
 
+        public void CheckIsAdmin()
+        {
+            //Disabled while still building game
+            //if (!admin)
+            //{
+            //    throw new Exception("You are not an admin so cannot perform that action");
+            //}
+        }
+
         #region Methods for Mods
 
         private GameObject _sceneObjects;

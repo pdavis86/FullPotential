@@ -15,7 +15,7 @@ namespace FullPotential.Core.UI.Admin
 {
     public class AdminShopUi : MonoBehaviour
     {
-#pragma warning disable CS0649
+#pragma warning disable 0649
         [SerializeField] private CraftingSelector _craftingSelector;
         [SerializeField] private GameObject _nameAndTogglePrefab;
         [SerializeField] private GameObject _nameAndValueSliderPrefab;
@@ -25,7 +25,7 @@ namespace FullPotential.Core.UI.Admin
         [SerializeField] private GameObject _shapesScrollViewContentParent;
         [SerializeField] private Text _resultsText;
         [SerializeField] private Text _itemNameText;
-#pragma warning restore CS0649
+#pragma warning restore 0649
 
         private ResultFactory _resultFactory;
 

@@ -8,10 +8,10 @@ namespace FullPotential.Core.Ui.Components
 {
     public class EquippedSummary : MonoBehaviour
     {
-#pragma warning disable CS0649
+#pragma warning disable 0649
         [SerializeField] private Image _image;
         [SerializeField] private Text _text;
-#pragma warning restore CS0649
+#pragma warning restore 0649
 
         // ReSharper disable once UnusedMember.Local
         private void Start()

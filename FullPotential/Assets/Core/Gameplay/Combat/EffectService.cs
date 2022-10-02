@@ -46,6 +46,8 @@ namespace FullPotential.Core.Gameplay.Combat
                     return;
                 }
 
+                //Debug.Log($"Applying just damage (no effects) to {targetFighter.FighterName}");
+
                 targetFighter.TakeDamage(sourceFighter, itemUsed, position);
                 return;
             }
@@ -65,6 +67,8 @@ namespace FullPotential.Core.Gameplay.Combat
         private void ApplyEffect(IFighter sourceFighter, IEffect effect, ItemBase itemUsed, GameObject targetGameObject, Vector3? position)
         {
             var targetFighter = targetGameObject.GetComponent<IFighter>();
+
+            //Debug.Log($"Applying {effect.TypeName} to {targetFighter.FighterName}");
 
             switch (effect)
             {

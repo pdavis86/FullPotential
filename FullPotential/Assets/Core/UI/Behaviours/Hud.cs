@@ -132,7 +132,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateStaminaPercentage()
         {
-            var values = _staminaSlider.GetStaminaValues(_playerFighter.GetStamina(), _playerFighter.GetStaminaMax());
+            var values = GetStaminaValues(_playerFighter.GetStamina(), _playerFighter.GetStaminaMax());
             _staminaSlider.SetValues(values);
         }
 
@@ -142,19 +142,19 @@ namespace FullPotential.Core.Ui.Behaviours
             var maxHealth = _playerFighter.GetHealthMax();
             var defence = _playerFighter.GetDefenseValue();
 
-            var values = _healthSlider.GetHealthValues(health, maxHealth, defence);
+            var values = GetHealthValues(health, maxHealth, defence);
             _healthSlider.SetValues(values);
         }
 
         private void UpdateManaPercentage()
         {
-            var values = _manaSlider.GetManaValues(_playerFighter.GetMana(), _playerFighter.GetManaMax());
+            var values = GetManaValues(_playerFighter.GetMana(), _playerFighter.GetManaMax());
             _manaSlider.SetValues(values);
         }
 
         private void UpdateEnergyPercentage()
         {
-            var values = _energySlider.GetEnergyValues(_playerFighter.GetEnergy(), _playerFighter.GetEnergyMax());
+            var values = GetEnergyValues(_playerFighter.GetEnergy(), _playerFighter.GetEnergyMax());
             _energySlider.SetValues(values);
         }
 
@@ -220,6 +220,30 @@ namespace FullPotential.Core.Ui.Behaviours
         private Color ChangeColorAlpha(Color originalColor, float alpha)
         {
             return new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
+        }
+
+        public (float percent, string text) GetStaminaValues(int stamina, int maxStamina)
+        {
+            var newStamina = (float)stamina / maxStamina;
+            return (newStamina, $"S{stamina}");
+        }
+
+        public (float percent, string text) GetHealthValues(int health, int maxHealth, int defence)
+        {
+            var newHealth = (float)health / maxHealth;
+            return (newHealth, $"H{health} D{defence}");
+        }
+
+        public (float percent, string text) GetManaValues(int mana, int maxMana)
+        {
+            var newMana = (float)mana / maxMana;
+            return (newMana, $"M{mana}");
+        }
+
+        public (float percent, string text) GetEnergyValues(int energy, int maxEnergy)
+        {
+            var newEnergy = (float)energy / maxEnergy;
+            return (newEnergy, $"E{energy}");
         }
 
     }

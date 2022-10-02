@@ -15,11 +15,11 @@ namespace FullPotential.Standard.Scenes.Behaviours
 {
     public class SceneObjectsLevel001 : NetworkBehaviour, ISceneBehaviour
     {
-#pragma warning disable CS0649
+#pragma warning disable 0649
         [SerializeField] private GameObject _enemyPrefab;
         [SerializeField] private float _spawnVariationMin = -4f;
         [SerializeField] private float _spawnVariationMax = 4f;
-#pragma warning restore CS0649
+#pragma warning restore 0649
 
         private List<Transform> _spawnPoints;
         private NetworkObject _enemyPrefabNetObj;
@@ -27,7 +27,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
         private int _enemyCounter;
 
         [SerializeField] private SceneAttributes _attributes = new SceneAttributes();
-        
+
         public SceneAttributes Attributes
         {
             get => _attributes;
@@ -112,7 +112,10 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
         public void HandleEnemyDeath()
         {
-            SpawnEnemy();
+            if (NetworkManager.Singleton.IsServer)
+            {
+                SpawnEnemy();
+            }
         }
 
         public ISpawnService GetSpawnService()

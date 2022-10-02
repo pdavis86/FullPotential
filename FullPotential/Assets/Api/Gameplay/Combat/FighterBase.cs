@@ -192,7 +192,7 @@ namespace FullPotential.Api.Gameplay.Combat
         {
             if (TryToAttack(isLeftHand))
             {
-                var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, OwnerClientId);
+                var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, new[] { 0ul, OwnerClientId });
                 TryToAttackClientRpc(isLeftHand, nearbyClients);
             }
         }
@@ -206,7 +206,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
             StartCoroutine(ReloadCoroutine(leftOrRight));
 
-            var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, OwnerClientId);
+            var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, new[] { 0ul, OwnerClientId });
             ReloadingClientRpc(isLeftHand, nearbyClients);
         }
 
@@ -366,7 +366,6 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public int GetEnergy()
         {
-            //todo: Use a separate calculation for effective max so we can show the difference on the UI
             var energyMax = GetEnergyMax();
             if (_energy.Value > energyMax)
             {
@@ -669,6 +668,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
             if (IsServer)
             {
+                Debug.Log("Should only be called once on server");
                 _effectService.ApplyEffects(this, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
             }
 
@@ -887,7 +887,7 @@ namespace FullPotential.Api.Gameplay.Combat
             var health = GetHealth();
             var maxHealth = GetHealthMax();
             var defence = _inventory.GetDefenseValue();
-            var values = HealthStatSlider.GetHealthValues(health, maxHealth, defence);
+            var values = _gameManager.GetUserInterface().HudOverlay.GetHealthValues(health, maxHealth, defence);
             HealthStatSlider.SetValues(values);
         }
 

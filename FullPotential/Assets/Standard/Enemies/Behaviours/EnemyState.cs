@@ -44,7 +44,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
             _health.OnValueChanged += OnHealthChanged;
 
-            //todo: don't do this
+            //todo: don't do this on enemy. Make a new inventory parent class
             _inventory = gameObject.AddComponent<Core.PlayerBehaviours.PlayerInventory>();
 
             HealthStatSlider = _healthSliderParent.GetComponent<IStatSlider>();
@@ -63,7 +63,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
         private void OnHealthChanged(int previousValue, int newValue)
         {
-            var values = HealthStatSlider.GetHealthValues(GetHealth(), GetHealthMax(), GetDefenseValue());
+            var values = _gameManager.GetUserInterface().HudOverlay.GetHealthValues(GetHealth(), GetHealthMax(), GetDefenseValue());
             HealthStatSlider.SetValues(values);
         }
 
