@@ -29,8 +29,8 @@ namespace FullPotential.Core.GameManagement
         public GameObject DrawingPad;
         private GameObject _customMenu;
 
-        // ReSharper enable MemberCanBePrivate.Global
-        // ReSharper enable UnassignedField.Global
+        // ReSharper restore MemberCanBePrivate.Global
+        // ReSharper restore UnassignedField.Global
 
         //Behaviours
         private Hud _hud;

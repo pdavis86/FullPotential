@@ -30,7 +30,6 @@ namespace FullPotential.Api.Gameplay.Combat
         private const float SpellOrGadgetRangeLimit = 50f;
 
         #region Inspector Variables
-#pragma warning disable 0649
         // ReSharper disable UnassignedField.Global
         // ReSharper disable InconsistentNaming
 
@@ -38,9 +37,8 @@ namespace FullPotential.Api.Gameplay.Combat
         public BodyPartTransforms BodyParts;
         [SerializeField] protected TextMeshProUGUI _nameTag;
 
-        // ReSharper enable UnassignedField.Global
-        // ReSharper enable InconsistentNaming
-#pragma warning restore 0649
+        // ReSharper restore UnassignedField.Global
+        // ReSharper restore InconsistentNaming
         #endregion
 
         #region Other Variables
@@ -177,7 +175,7 @@ namespace FullPotential.Api.Gameplay.Combat
             ReplenishAndConsume();
         }
 
-        // ReSharper enable UnusedMemberHierarchy.Global
+        // ReSharper restore UnusedMemberHierarchy.Global
         #endregion
 
         #region ServerRpc calls
@@ -484,7 +482,7 @@ namespace FullPotential.Api.Gameplay.Combat
         {
             //Here for override only
         }
-        // ReSharper enable UnusedParameter.Global
+        // ReSharper restore UnusedParameter.Global
 
         public void CheckIfOffTheMap()
         {
@@ -907,7 +905,7 @@ namespace FullPotential.Api.Gameplay.Combat
             public Transform RightArm;
         }
 
-        // ReSharper enable UnassignedField.Global
+        // ReSharper restore UnassignedField.Global
         #endregion
 
     }

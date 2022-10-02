@@ -20,7 +20,7 @@ namespace FullPotential.Core.UI.Components
         public Dropdown TypeDropdown;
         public Dropdown SubTypeDropdown;
         public Dropdown HandednessDropdown;
-        // ReSharper enable UnassignedField.Global
+        // ReSharper restore UnassignedField.Global
 
         private List<string> _handednessOptions;
         private List<int?> _optionalTwoHandedWeaponIndexes;

@@ -66,7 +66,7 @@ namespace FullPotential.Core.PlayerBehaviours
         public GameObject InFrontOfPlayer;
         public Transform GraphicsTransform;
 #pragma warning restore 0649
-        // ReSharper enable UnassignedField.Global
+        // ReSharper restore UnassignedField.Global
         #endregion
 
         #region Properties

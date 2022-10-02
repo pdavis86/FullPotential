@@ -9,7 +9,7 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable UnassignedField.Global
         public GameObject Equipment;
         public GameObject Crafting;
-        // ReSharper enable UnassignedField.Global
+        // ReSharper restore UnassignedField.Global
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()

@@ -12,8 +12,8 @@ namespace FullPotential.Core.UI.Components
         // ReSharper disable UnassignedField.Global
         public Text Name;
         public Slider Slider;
-        // ReSharper enable MemberCanBePrivate.Global
-        // ReSharper enable UnassignedField.Global
+        // ReSharper restore MemberCanBePrivate.Global
+        // ReSharper restore UnassignedField.Global
 
 #pragma warning disable CS0649
         [SerializeField] private Text _value;

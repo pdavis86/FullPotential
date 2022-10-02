@@ -12,8 +12,8 @@ namespace FullPotential.Core.UI.Behaviours
         // ReSharper disable UnassignedField.Global
         public Image Image;
         public Text Text;
-        // ReSharper enable UnassignedField.Global
-        // ReSharper enable MemberCanBePrivate.Global
+        // ReSharper restore UnassignedField.Global
+        // ReSharper restore MemberCanBePrivate.Global
 
         public IEffect Effect { get; private set; }
 

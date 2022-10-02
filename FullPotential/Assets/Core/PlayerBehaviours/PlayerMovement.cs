@@ -107,7 +107,7 @@ namespace FullPotential.Core.PlayerBehaviours
             _isSprinting = false;
         }
 
-        // ReSharper enable UnusedMember.Local
+        // ReSharper restore UnusedMember.Local
 #pragma warning restore IDE0051 // Remove unused private members
         #endregion
 
