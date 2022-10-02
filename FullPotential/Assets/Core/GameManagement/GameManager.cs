@@ -133,20 +133,19 @@ namespace FullPotential.Core.GameManagement
             }
         }
 
-        private void OnApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
+        private void OnApprovalCheck(NetworkManager.ConnectionApprovalRequest approvalRequest, NetworkManager.ConnectionApprovalResponse approvalResponse)
         {
-            if (clientId == NetworkManager.Singleton.LocalClientId)
+            if (approvalRequest.ClientNetworkId == NetworkManager.Singleton.LocalClientId)
             {
-                callback(false, null, true, null, null);
+                approvalResponse.Approved = true;
                 return;
             }
 
-            var payload = System.Text.Encoding.UTF8.GetString(connectionData);
+            var payload = System.Text.Encoding.UTF8.GetString(approvalRequest.Payload);
             var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
             if (!_userRegistry.ValidateToken(connectionPayload.PlayerToken))
             {
                 Debug.LogWarning("Someone tried to connect with an invalid Player token");
-                callback(false, null, false, null, null);
                 return;
             }
 
@@ -155,12 +154,12 @@ namespace FullPotential.Core.GameManagement
             if (serverVersion.Major != clientVersion.Major || serverVersion.Minor != clientVersion.Minor)
             {
                 Debug.LogWarning("Client tried to connect with an incompatible version");
-                SendServerToClientSetDisconnectReason(clientId, ConnectStatus.VersionMismatch);
-                StartCoroutine(WaitToDisconnect(clientId));
+                SendServerToClientSetDisconnectReason(approvalRequest.ClientNetworkId, ConnectStatus.VersionMismatch);
+                StartCoroutine(WaitToDisconnect(approvalRequest.ClientNetworkId));
                 return;
             }
 
-            callback(false, null, true, null, null);
+            approvalResponse.Approved = true;
         }
 
 #pragma warning disable UNT0006 // Incorrect message signature
@@ -243,7 +242,11 @@ namespace FullPotential.Core.GameManagement
         public void Quit()
         {
             SaveAppOptions();
-            SavePlayerData(true);
+
+            if (NetworkManager.Singleton.IsServer)
+            {
+                SavePlayerData(true);
+            }
 
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;

@@ -204,7 +204,7 @@ namespace FullPotential.Core.PlayerBehaviours
             _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
         }
 
-        public override void OnDestroy()
+        public override void OnNetworkDespawn()
         {
             if (IsServer)
             {
