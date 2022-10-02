@@ -97,7 +97,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
         public override string FighterName => Username;
 
-        public override IStatSlider HealthStatSlider => _healthSlider;
+        public override IStatSlider HealthStatSlider { get; protected set; }
 
         #endregion
 
@@ -121,6 +121,8 @@ namespace FullPotential.Core.PlayerBehaviours
             _userRegistry = GameManager.Instance.GetService<UserRegistry>();
             _typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
             _effectService = GameManager.Instance.GetService<IEffectService>();
+
+            HealthStatSlider = _healthSlider;
         }
 
         // ReSharper disable once UnusedMember.Local

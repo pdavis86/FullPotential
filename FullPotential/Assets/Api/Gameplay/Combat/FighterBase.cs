@@ -41,13 +41,9 @@ namespace FullPotential.Api.Gameplay.Combat
         // ReSharper restore InconsistentNaming
         #endregion
 
-        #region Other Variables
+        #region Protected variables
+        // ReSharper disable InconsistentNaming
 
-        private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
-        private readonly Dictionary<IEffect, (DateTime Expiry, int Change)> _activeEffects = new Dictionary<IEffect, (DateTime Expiry, int Change)>();
-
-        private Rigidbody _rb;
-        private bool _isSprinting;
         protected string _lastDamageSourceName;
         protected string _lastDamageItemName;
 
@@ -60,12 +56,23 @@ namespace FullPotential.Api.Gameplay.Combat
         protected readonly NetworkVariable<int> _mana = new NetworkVariable<int>(100);
         protected readonly NetworkVariable<int> _stamina = new NetworkVariable<int>(100);
 
-        public readonly HandStatus HandStatusLeft = new HandStatus();
-        public readonly HandStatus HandStatusRight = new HandStatus();
-
         protected IInventory _inventory;
         protected IEffectService _effectService;
         protected ITypeRegistry _typeRegistry;
+
+        // ReSharper restore InconsistentNaming
+        #endregion
+
+        #region Other Variables
+
+        private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
+        private readonly Dictionary<IEffect, (DateTime Expiry, int Change)> _activeEffects = new Dictionary<IEffect, (DateTime Expiry, int Change)>();
+
+        private Rigidbody _rb;
+        private bool _isSprinting;
+
+        public readonly HandStatus HandStatusLeft = new HandStatus();
+        public readonly HandStatus HandStatusRight = new HandStatus();
 
         //Action-related
         private DelayedAction _replenishStamina;
@@ -89,7 +96,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public LivingEntityState AliveState { get; protected set; }
 
-        public abstract IStatSlider HealthStatSlider { get; }
+        public abstract IStatSlider HealthStatSlider { get; protected set; }
 
         #endregion
 

@@ -870,7 +870,6 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
-  CanCommitToTransform: 1
 --- !u!1 &7392779647605690763
 GameObject:
   m_ObjectHideFlags: 0
@@ -1040,6 +1039,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 848d0c980b57f4f4dac3298eaf9f7d11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Positions:
+    LeftHand: {fileID: 3462865541722136237}
+    RightHand: {fileID: 4535721041638513647}
+    LeftHandInFront: {fileID: 8103993405689920857}
+    RightHandInFront: {fileID: 1380344505649988731}
+  BodyParts:
+    Head: {fileID: 7392779648629048435}
+    Body: {fileID: 5211505158142024633}
+    LeftArm: {fileID: 7392779647843419198}
+    RightArm: {fileID: 7392779647605690760}
+  _nameTag: {fileID: 6250991307057261387}
   _behavioursToDisable:
   - {fileID: 1201570389013236167}
   - {fileID: 7556515380981010776}
@@ -1059,25 +1069,11 @@ MonoBehaviour:
   - {fileID: 1367944321400830439}
   _gameObjectsForRespawn:
   - {fileID: 3124563880166737475}
-  Positions:
-    LeftHand: {fileID: 3462865541722136237}
-    RightHand: {fileID: 4535721041638513647}
-    LeftHandInFront: {fileID: 8103993405689920857}
-    RightHandInFront: {fileID: 1380344505649988731}
-  BodyParts:
-    Head: {fileID: 7392779648629048435}
-    Body: {fileID: 5211505158142024633}
-    LeftArm: {fileID: 7392779647843419198}
-    RightArm: {fileID: 7392779647605690760}
-  _nameTag: {fileID: 6250991307057261387}
-  _healthSlider: {fileID: 155634429994666516}
-  _head: {fileID: 7392779648629048435}
   _defaultMaterial: {fileID: 2100000, guid: f941e4a9ae20e994198b523fce8b6ab3, type: 2}
   _playerCamera: {fileID: 7392779647204144590}
+  _healthSlider: {fileID: 155634429994666516}
   InFrontOfPlayer: {fileID: 3124563880166737475}
   GraphicsTransform: {fileID: 7392779646582606286}
-  PlayerToken: 
-  Username: 
 --- !u!114 &3593277776525206365
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1209,7 +1205,6 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
-  CanCommitToTransform: 1
 --- !u!1 &7392779647843419169
 GameObject:
   m_ObjectHideFlags: 0
