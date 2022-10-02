@@ -620,10 +620,10 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             PlayerSpawnStateChangeBothSides(AliveState, Vector3.zero, Quaternion.identity);
 
-            if (killerName == Username)
-            {
-                killerName = _localizer.Translate("ui.alert.suicide");
-            }
+            //if (killerName == Username)
+            //{
+            //    killerName = _localizer.Translate("ui.alert.suicide");
+            //}
 
             //todo: why was I passing killerName and itemName into PlayerSpawnStateChangeClientRpc?
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);

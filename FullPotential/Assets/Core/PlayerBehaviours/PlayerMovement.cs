@@ -65,6 +65,7 @@ namespace FullPotential.Core.PlayerBehaviours
             _isSprinting = false;
         }
 
+        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             MoveAndLook();

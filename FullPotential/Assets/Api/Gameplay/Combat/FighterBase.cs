@@ -294,7 +294,7 @@ namespace FullPotential.Api.Gameplay.Combat
         public int GetHealthMax()
         {
             //todo: trait-based health max
-            return 100 + GetStatMaxAdjustment(AffectableStat.Health); ;
+            return 100 + GetStatMaxAdjustment(AffectableStat.Health);
         }
 
         public int GetStamina()
@@ -315,7 +315,7 @@ namespace FullPotential.Api.Gameplay.Combat
         public int GetStaminaMax()
         {
             //todo: trait-based stamina max
-            return 100 + GetStatMaxAdjustment(AffectableStat.Stamina); ;
+            return 100 + GetStatMaxAdjustment(AffectableStat.Stamina);
         }
 
         public int GetStaminaCost()
@@ -376,7 +376,7 @@ namespace FullPotential.Api.Gameplay.Combat
         public int GetEnergyMax()
         {
             //todo: trait-based energy max
-            return 100 + GetStatMaxAdjustment(AffectableStat.Energy); ;
+            return 100 + GetStatMaxAdjustment(AffectableStat.Energy);
         }
 
         private int GetEnergyCost(Gadget gadget)
