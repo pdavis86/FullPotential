@@ -70,9 +70,14 @@ namespace FullPotential.Standard
                 typeof(Effects.Elements.Water),
 
                 typeof(Effects.Movement.Attract),
-                typeof(Effects.Movement.Blink),
+                typeof(Effects.Movement.Hold),
                 typeof(Effects.Movement.Launch),
+                typeof(Effects.Movement.Lunge),
+                typeof(Effects.Movement.Plummet),
                 typeof(Effects.Movement.Repel),
+                typeof(Effects.Movement.ShoveLeft),
+                typeof(Effects.Movement.ShoveRight),
+                typeof(Effects.Movement.StepBack),
 
                 typeof(Effects.Support.Conjure),
                 typeof(Effects.Support.Heal),

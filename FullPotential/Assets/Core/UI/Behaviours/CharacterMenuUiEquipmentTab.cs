@@ -78,6 +78,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void SetSlot(GameObject slot, ItemBase item)
         {
+            //todo: is there a way of avoiding using .Find() ?
             var slotImage = slot.transform.Find("Image").GetComponent<Image>();
             slotImage.color = item != null ? Color.white : Color.clear;
 

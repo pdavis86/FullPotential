@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Registry.Effects;
+﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace FullPotential.Core.UI.Behaviours
 {
-    public class ActiveEffect : MonoBehaviour
+    public class ActiveEffectUi : MonoBehaviour
     {
         #region Inspector Variables
         // ReSharper disable UnassignedField.Compiler
@@ -17,22 +17,22 @@ namespace FullPotential.Core.UI.Behaviours
         // ReSharper restore UnassignedField.Compiler
         #endregion
 
-        public IEffect Effect { get; private set; }
+        public Guid Id { get; private set; }
 
         private bool _isDestroySet;
 
-        public void SetEffect(IEffect effect, string effectTranslation, float timeToLive, Color color)
+        public void SetEffect(Guid id, string effectTranslation, float timeToLive, Color color)
         {
             if (_isDestroySet)
             {
                 CancelInvoke(nameof(DestroyMe));
             }
 
-            Effect = effect;
+            Id = id;
 
             _image.color = color;
 
-            _text.text = effectTranslation + $" ({timeToLive}s)";
+            _text.text = effectTranslation + $" ({timeToLive:F1}s)";
 
             Invoke(nameof(DestroyMe), timeToLive);
             _isDestroySet = true;

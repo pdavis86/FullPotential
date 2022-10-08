@@ -11,7 +11,6 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
     public class SogSelfBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
         // ReSharper disable once InconsistentNaming
-        private const float _distanceBeforeReturning = 8f;
 
         public SpellOrGadgetItemBase SpellOrGadget;
         public IFighter SourceFighter;
@@ -20,6 +19,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         private IEffectService _effectService;
 
         private float _castSpeed;
+        private float _distanceBeforeReturning;
         private Rigidbody _rigidBody;
         private bool _returningToPlayer;
 
@@ -40,6 +40,8 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             {
                 _castSpeed = 0.5f;
             }
+
+            _distanceBeforeReturning = (101 - SpellOrGadget.Attributes.Range) / 100f * 6;
 
             _rigidBody = GetComponent<Rigidbody>();
             _rigidBody.AddForce(_castSpeed * 20f * ForwardDirection, ForceMode.VelocityChange);

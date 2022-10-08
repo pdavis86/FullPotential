@@ -52,7 +52,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _localizer = GameManager.Instance.GetService<ILocalizer>();
             _reloadingTranslation = _localizer.Translate("ui.hub.reloading");
 
-            _activeEffectPrefab = _activeEffectsContainer.GetComponent<ActiveEffects>().ActiveEffectPrefab;
+            _activeEffectPrefab = _activeEffectsContainer.GetComponent<ActiveEffectsUi>().ActiveEffectPrefab;
 
             _equippedLeftHandBackground = _equippedLeftHand.GetComponent<Image>();
             _equippedLeftHandSummary = _equippedLeftHand.GetComponent<EquippedSummary>();
@@ -95,6 +95,8 @@ namespace FullPotential.Core.Ui.Behaviours
             }
 
             var alert = Instantiate(_alertPrefab, _alertsContainer.transform);
+            
+            //todo: make a method on the prefab to set the text
             alert.transform.Find("Text").GetComponent<Text>().text = alertText;
         }
 
@@ -164,16 +166,29 @@ namespace FullPotential.Core.Ui.Behaviours
 
             var activeEffects = _playerFighter.GetActiveEffects();
 
-            foreach (var (effect, details) in activeEffects)
+            if (activeEffects.Count == 0 && existingObjects.Count > 0)
             {
-                var effectType = effect.GetType();
+                foreach (var kvp in existingObjects)
+                {
+                    Destroy(kvp.Value);
+                }
 
-                var activeEffectObj = existingObjects.ContainsKey(effectType)
-                    ? existingObjects[effectType]
+                existingObjects.Clear();
+                return;
+            }
+
+            foreach (var activeEffect in activeEffects)
+            {
+                var activeEffectObj = existingObjects.ContainsKey(activeEffect.Id)
+                    ? existingObjects[activeEffect.Id]
                     : Instantiate(_activeEffectPrefab, _activeEffectsContainer.transform);
 
-                var activeEffectScript = activeEffectObj.GetComponent<ActiveEffect>();
-                activeEffectScript.SetEffect(effect, _localizer.GetTranslatedTypeName(effect), (float)(details.Expiry - DateTime.Now).TotalSeconds, GetEffectColor(effect));
+                var activeEffectScript = activeEffectObj.GetComponent<ActiveEffectUi>();
+                activeEffectScript.SetEffect(
+                    activeEffect.Id,
+                    _localizer.GetTranslatedTypeName(activeEffect.Effect),
+                    (float)(activeEffect.Expiry - DateTime.Now).TotalSeconds,
+                    GetEffectColor(activeEffect.Effect));
             }
         }
 
@@ -194,12 +209,12 @@ namespace FullPotential.Core.Ui.Behaviours
             return Color.yellow;
         }
 
-        private Dictionary<Type, GameObject> GetActiveEffectGameObjects()
+        private Dictionary<Guid, GameObject> GetActiveEffectGameObjects()
         {
-            var results = new Dictionary<Type, GameObject>();
+            var results = new Dictionary<Guid, GameObject>();
             foreach (Transform child in _activeEffectsContainer.transform)
             {
-                results.Add(child.gameObject.GetComponent<ActiveEffect>().Effect.GetType(), child.gameObject);
+                results.Add(child.gameObject.GetComponent<ActiveEffectUi>().Id, child.gameObject);
             }
             return results;
         }

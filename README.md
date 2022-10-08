@@ -27,7 +27,12 @@ Inspired by the Minecraft mod Ars Magica 2, Skyrim, the Borderlands series, Fina
 
 See the [Project Trello Board](https://trello.com/b/biH6NdE0/oasis "Go to Trello") for a better depiction of where the game currently stands.
 
-My next target is to improve the battle system and implement spell effects.
+- [x] v0.1 Core Gameplay (Basics)
+- [x] v0.2 Core Gameplay (Additional)
+- [x] v0.3 Playable PoC
+- [ ] v0.4 Battle Improvements
+- [ ] v0.5 Playable Demo
+- [ ] v0.x Zones, planets, and sectors
 
 
 ## Credit

@@ -359,12 +359,12 @@
       "Value": "Pulls a target towards the source"
     },
     {
-      "Key": "effect.blink",
-      "Value": "Blink"
+      "Key": "effect.hold",
+      "Value": "Hold"
     },
     {
-      "Key": "effect.blink.description",
-      "Value": "Instantly move from one place to another"
+      "Key": "effect.hold.description",
+      "Value": "Holds the target a set distance away"
     },
     {
       "Key": "effect.launch",
@@ -373,7 +373,23 @@
     {
       "Key": "effect.launch.description",
       "Value": "Launch target into the air"
-    },    
+    },
+    {
+      "Key": "effect.lunge",
+      "Value": "Lunge"
+    },
+    {
+      "Key": "effect.lunge.description",
+      "Value": "Moves the target forwards"
+    },
+    {
+      "Key": "effect.plummet",
+      "Value": "Plummet"
+    },
+    {
+      "Key": "effect.plummet.description",
+      "Value": "Causes the target to fall rapidly"
+    },
     {
       "Key": "effect.repel",
       "Value": "Repel"
@@ -381,6 +397,30 @@
     {
       "Key": "effect.repel.description",
       "Value": "Repels a target away from the source"
+    },
+    {
+      "Key": "effect.shoveleft",
+      "Value": "Shove Left"
+    },
+    {
+      "Key": "effect.shoveleft.description",
+      "Value": "Move a target to their left"
+    },
+    {
+      "Key": "effect.shoveright",
+      "Value": "Shove Right"
+    },
+    {
+      "Key": "effect.shoveright.description",
+      "Value": "Move a target to their right"
+    },
+    {
+      "Key": "effect.stepback",
+      "Value": "Step Back"
+    },
+    {
+      "Key": "effect.stepback.description",
+      "Value": "Causes your target to move backwards"
     },
     
 

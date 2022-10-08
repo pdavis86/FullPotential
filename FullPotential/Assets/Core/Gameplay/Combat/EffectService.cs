@@ -134,7 +134,9 @@ namespace FullPotential.Core.Gameplay.Combat
                 return;
             }
 
-            var force = AttributeCalculator.GetForceValue(attributes);
+            var adjustForGravity = movementEffect.Direction == MovementDirection.Up 
+                                   || movementEffect.Direction == MovementDirection.Down;
+            var force = AttributeCalculator.GetForceValue(attributes, adjustForGravity);
 
             switch (movementEffect.Direction)
             {
@@ -154,31 +156,38 @@ namespace FullPotential.Core.Gameplay.Combat
                         ? targetPosition - sourcePosition
                         : sourcePosition - targetPosition;
 
+                    //If targeting self
+                    if (vector == Vector3.zero)
+                    {
+                        vector = -sourceFighter.RigidBody.transform.forward;
+                    }
+
                     targetRigidBody.AddForce(vector * force, ForceMode.Acceleration);
                     return;
 
                 case MovementDirection.Backwards:
-                    targetRigidBody.AddForce(-sourceFighter.Transform.forward * force, ForceMode.Acceleration);
+                    targetRigidBody.AddForce(-targetGameObject.transform.forward * force, ForceMode.Acceleration);
                     return;
 
                 case MovementDirection.Forwards:
-                    targetRigidBody.AddForce(sourceFighter.Transform.forward * force, ForceMode.Acceleration);
+                    targetRigidBody.AddForce(targetGameObject.transform.forward * force, ForceMode.Acceleration);
                     return;
 
                 case MovementDirection.Down:
-                    targetRigidBody.AddForce(-sourceFighter.Transform.up * force, ForceMode.Acceleration);
+                    //todo: implement fall damage
+                    targetRigidBody.AddForce(-targetGameObject.transform.up * force, ForceMode.Acceleration);
                     return;
 
                 case MovementDirection.Up:
-                    targetRigidBody.AddForce(sourceFighter.Transform.up * force, ForceMode.Acceleration);
+                    targetRigidBody.AddForce(targetGameObject.transform.up * force, ForceMode.Acceleration);
                     return;
 
                 case MovementDirection.Left:
-                    targetRigidBody.AddForce(-sourceFighter.Transform.right * force, ForceMode.Acceleration);
+                    targetRigidBody.AddForce(-targetGameObject.transform.right * force, ForceMode.Acceleration);
                     return;
 
                 case MovementDirection.Right:
-                    targetRigidBody.AddForce(sourceFighter.Transform.right * force, ForceMode.Acceleration);
+                    targetRigidBody.AddForce(targetGameObject.transform.right * force, ForceMode.Acceleration);
                     return;
 
                 case MovementDirection.MaintainDistance:

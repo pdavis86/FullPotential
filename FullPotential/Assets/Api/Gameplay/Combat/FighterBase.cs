@@ -66,7 +66,7 @@ namespace FullPotential.Api.Gameplay.Combat
         #region Other Variables
 
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
-        private readonly Dictionary<IEffect, (DateTime Expiry, int Change)> _activeEffects = new Dictionary<IEffect, (DateTime Expiry, int Change)>();
+        private readonly List<ActiveEffect> _activeEffects = new List<ActiveEffect>();
 
         private Rigidbody _rb;
         private bool _isSprinting;
@@ -111,7 +111,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
             _health.OnValueChanged += OnHealthChanged;
 
-            if (IsServer)
+            if (!NetworkManager.Singleton.IsConnectedClient || IsServer)
             {
                 InvokeRepeating(nameof(CheckIfOffTheMap), 1, 1);
             }
@@ -180,6 +180,7 @@ namespace FullPotential.Api.Gameplay.Combat
         protected virtual void FixedUpdate()
         {
             ReplenishAndConsume();
+            RemoveExpiredEffects();
         }
 
         // ReSharper restore UnusedMemberHierarchy.Global
@@ -391,10 +392,22 @@ namespace FullPotential.Api.Gameplay.Combat
             return 20;
         }
 
+        private int GetAttributeValue(AffectableAttribute attribute)
+        {
+            //todo: trait-based attributes
+            switch (attribute)
+            {
+                case AffectableAttribute.Strength:
+                    return 0 + GetAttributeAdjustment(AffectableAttribute.Strength);
+
+                default:
+                    throw new Exception("Not yet implemented GetAttributeValue() for " + attribute);
+            }
+        }
+
         public int GetDefenseValue()
         {
-            //todo: trait-based defense
-            return _inventory.GetDefenseValue() + GetAttributeAdjustment(AffectableAttribute.Strength);
+            return _inventory.GetDefenseValue() + GetAttributeValue(AffectableAttribute.Strength);
         }
 
         private void ApplyEnergyChange(int change)
@@ -410,11 +423,11 @@ namespace FullPotential.Api.Gameplay.Combat
         {
             if (change < 0)
             {
-                TakeDamage(sourceFighter, itemUsed, position);
+                TakeDamageInternal(sourceFighter, itemUsed, position, change * -1);
                 return;
             }
 
-            //todo: what else do we do when we heal?
+            //todo: what else do we do when we heal? e.g. green damage number?
             _health.Value += change;
         }
 
@@ -428,22 +441,22 @@ namespace FullPotential.Api.Gameplay.Combat
             _stamina.Value += change;
         }
 
-        public void TakeDamage(
+        public void TakeDamageInternal(
             IFighter sourceFighter,
             ItemBase itemUsed,
-            Vector3? position)
+            Vector3? position,
+            int damageDealt)
         {
             _lastDamageSourceName = sourceFighter != null ? sourceFighter.FighterName : null;
             _lastDamageItemName = itemUsed?.Name ?? _localizer.Translate("ui.alert.attack.noitem");
 
             var sourceIsPlayer = sourceFighter != null && sourceFighter.GameObject.CompareTag(Tags.Player);
 
-            var damageDealt = AttributeCalculator.GetAttackValue(itemUsed?.Attributes, GetDefenseValue());
 
             var sourceNetworkObject = sourceFighter != null ? sourceFighter.GameObject.GetComponent<NetworkObject>() : null;
             var sourceClientId = sourceNetworkObject != null ? (ulong?)sourceNetworkObject.OwnerClientId : null;
 
-            if (sourceClientId != null)
+            if (sourceClientId != null && OwnerClientId != sourceClientId.Value)
             {
                 if (_damageTaken.ContainsKey(sourceClientId.Value))
                 {
@@ -481,6 +494,15 @@ namespace FullPotential.Api.Gameplay.Combat
             _health.Value -= damageDealt;
         }
 
+        public void TakeDamage(
+            IFighter sourceFighter,
+            ItemBase itemUsed,
+            Vector3? position)
+        {
+            var damageDealt = AttributeCalculator.GetAttackValue(itemUsed?.Attributes, GetDefenseValue());
+            TakeDamageInternal(sourceFighter, itemUsed, position, damageDealt);
+        }
+
         public void HandleDeath()
         {
             if (AliveState == LivingEntityState.Dead)
@@ -512,6 +534,9 @@ namespace FullPotential.Api.Gameplay.Combat
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(deathMessage, nearbyClients);
 
+            StopAllCoroutines();
+            _activeEffects.Clear();
+
             HandleDeathAfter(_lastDamageSourceName, _lastDamageItemName);
         }
 
@@ -527,6 +552,7 @@ namespace FullPotential.Api.Gameplay.Combat
             if (AliveState != LivingEntityState.Dead
                 && transform.position.y < _gameManager.GetSceneBehaviour().Attributes.LowestYValue)
             {
+                //todo: give credit to previous _lastDamageSourceName
                 _lastDamageSourceName = _localizer.Translate("ui.alert.falldamage");
                 _lastDamageItemName = null;
                 HandleDeath();
@@ -729,28 +755,49 @@ namespace FullPotential.Api.Gameplay.Combat
         {
             return _activeEffects
                 .Where(x =>
-                    x.Key is IStatEffect statEffect
+                    x.Effect is IStatEffect statEffect
                     && statEffect.StatToAffect == affectableStat
                     && statEffect.Affect is Affect.TemporaryMaxIncrease or Affect.TemporaryMaxDecrease)
-                .Sum(x => x.Value.Change);
+                .Sum(x => x.Change);
         }
 
         private int GetAttributeAdjustment(AffectableAttribute attribute)
         {
             return _activeEffects
                 .Where(x =>
-                    x.Key is IAttributeEffect attributeEffect
+                    x.Effect is IAttributeEffect attributeEffect
                     && attributeEffect.AttributeToAffect == attribute)
-                .Sum(x => x.Value.Change * (x.Key is IAttributeEffect attributeEffect && attributeEffect.TemporaryMaxIncrease ? 1 : -1));
+                .Sum(x => x.Change * (x.Effect is IAttributeEffect attributeEffect && attributeEffect.TemporaryMaxIncrease ? 1 : -1));
+        }
+
+        private bool IsAffectStackable(Affect affect)
+        {
+            return affect == Affect.TemporaryMaxIncrease || affect == Affect.TemporaryMaxDecrease;
         }
 
         private void AddOrUpdateEffect(IEffect effect, int change, DateTime expiry)
         {
-            if (_activeEffects.ContainsKey(effect))
+            var effectMatch = _activeEffects.FirstOrDefault(x => x.Effect == effect);
+
+            if (effectMatch != null)
             {
-                _activeEffects.Remove(effect);
+                if (effect is IStatEffect statEffect && IsAffectStackable(statEffect.Affect))
+                {
+                    //Do not remove it
+                }
+                else
+                {
+                    _activeEffects.Remove(effectMatch);
+                }
             }
-            _activeEffects.Add(effect, (expiry, change));
+
+            _activeEffects.Add(new ActiveEffect
+            {
+                Id = Guid.NewGuid(),
+                Effect = effect,
+                Change = change,
+                Expiry = expiry
+            });
         }
 
         public void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes)
@@ -762,6 +809,7 @@ namespace FullPotential.Api.Gameplay.Combat
         public void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter)
         {
             var (change, expiry, delay) = AttributeCalculator.GetStatChangeExpiryAndDelay(statEffect, itemUsed.Attributes);
+            AddOrUpdateEffect(statEffect, change, expiry);
             StartCoroutine(PeriodicActionToStatCoroutine(statEffect.StatToAffect, change, sourceFighter, itemUsed, delay, expiry));
         }
 
@@ -791,6 +839,8 @@ namespace FullPotential.Api.Gameplay.Combat
             AddOrUpdateEffect(statEffect, change, expiry);
 
             ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, itemUsed, position);
+
+            Debug.Log("New max health is: " + GetHealthMax());
         }
 
         public void ApplyElementalEffect(IEffect elementalEffect, Attributes attributes)
@@ -805,17 +855,8 @@ namespace FullPotential.Api.Gameplay.Combat
             Debug.LogWarning("Not yet implemented BeginMaintainDistanceOn");
         }
 
-        public Dictionary<IEffect, (DateTime Expiry, int Change)> GetActiveEffects()
+        public List<ActiveEffect> GetActiveEffects()
         {
-            var expiredEffects = _activeEffects
-                .Where(x => x.Value.Expiry < DateTime.Now)
-                .ToList();
-
-            foreach (var kvp in expiredEffects)
-            {
-                _activeEffects.Remove(kvp.Key);
-            }
-
             return _activeEffects;
         }
 
@@ -891,6 +932,19 @@ namespace FullPotential.Api.Gameplay.Combat
 
             _consumeStamina.TryPerformAction();
             _consumeResource.TryPerformAction();
+        }
+
+        private void RemoveExpiredEffects()
+        {
+            //Note: .ToList() needed to avoid the "Collection was modified" exception
+            var expiredEffects = _activeEffects
+                .Where(x => x.Expiry < DateTime.Now)
+                .ToList();
+
+            foreach (var activeEffect in expiredEffects)
+            {
+                _activeEffects.Remove(activeEffect);
+            }
         }
 
         private bool ConsumeResource(SpellOrGadgetItemBase spellOrGadget, bool slowDrain = false, bool isTest = false)

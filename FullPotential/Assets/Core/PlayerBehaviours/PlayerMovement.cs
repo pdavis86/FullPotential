@@ -1,4 +1,5 @@
-﻿using FullPotential.Core.Networking;
+﻿using FullPotential.Core.GameManagement;
+using FullPotential.Core.Networking;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -89,7 +90,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
         private void OnJump()
         {
-            if (IsOnSolidObject())
+            if (!GameManager.Instance.UserInterface.IsAnyMenuOpen() && IsOnSolidObject())
             {
                 _jumpForce = Vector3.up * _jumpForceMultiplier;
             }

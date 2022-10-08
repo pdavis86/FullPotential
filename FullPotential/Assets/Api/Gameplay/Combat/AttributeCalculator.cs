@@ -20,10 +20,12 @@ namespace FullPotential.Api.Gameplay.Combat
             return (int)Math.Ceiling(damageDealtBasic / multiplier) + adder;
         }
 
-        public static float GetForceValue(Attributes attributes)
+        public static float GetForceValue(Attributes attributes, bool adjustForGravity)
         {
             //todo: attribute-based force value
-            return 1000f;
+            return adjustForGravity
+                ? 1000f
+                : 300f;
         }
 
         public static (int Change, DateTime Expiry) GetStatChangeAndExpiry(IStatEffect statEffect, Attributes attributes)

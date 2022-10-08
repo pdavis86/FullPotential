@@ -52,6 +52,8 @@ namespace FullPotential.Core.Ui.Components
                 }
 
                 var row = Instantiate(rowPrefab, componentsContainer.transform);
+
+                //todo: make a method on the prefab to set the text
                 row.transform.Find("ItemName").GetComponent<Text>().text = item.Name;
 
                 if (isEquipped)

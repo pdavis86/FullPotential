@@ -4,7 +4,7 @@
 
 namespace FullPotential.Core.UI.Behaviours
 {
-    public class ActiveEffects : MonoBehaviour
+    public class ActiveEffectsUi : MonoBehaviour
     {
         // ReSharper disable UnassignedField.Global
         public GameObject ActiveEffectPrefab;

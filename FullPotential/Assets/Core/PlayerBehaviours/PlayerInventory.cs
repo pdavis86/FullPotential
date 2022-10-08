@@ -9,6 +9,7 @@ using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Helpers;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
@@ -24,6 +25,7 @@ using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -242,18 +244,37 @@ namespace FullPotential.Core.PlayerBehaviours
                 return _items.Select(x => x.Value);
             }
 
+            IEnumerable<KeyValuePair<string, ItemBase>> itemsForSlot;
+
             if (gearCategory == IGear.GearCategory.Hand)
             {
-                return _items
-                    .Where(x => x.Value is Weapon or Spell or Gadget)
-                    .Select(x => x.Value);
+                itemsForSlot = _items
+                    .Where(x => x.Value is Weapon or Spell or Gadget);
             }
-
-            return _items
+            else
+            {
+                itemsForSlot = _items
                 .Where(x =>
                     (x.Value is Accessory acc && (int)((IGearAccessory)acc.RegistryType).Category == (int)gearCategory)
-                    || (x.Value is Armor armor && (int)((IGearArmor)armor.RegistryType).Category == (int)gearCategory))
-                .Select(x => x.Value);
+                    || (x.Value is Armor armor && (int)((IGearArmor)armor.RegistryType).Category == (int)gearCategory));
+            }
+
+            //todo: group by item type translation then by item name
+
+            ////todo: don't do this here
+            //var localizer = GameManager.Instance.GetService<ILocalizer>();
+
+            ////todo: cache the crafting category
+            //var test = localizer.Translate(TranslationType.CraftingCategory, item.GetType().Name);
+
+            ////todo: make a method on the prefab to set the text
+            //row.transform.Find("ItemName").GetComponent<Text>().text = gearCategory == IGear.GearCategory.Hand
+            //    ? item.GetType().Name + " - " + item.Name
+            //    : item.Name;
+
+            return itemsForSlot
+                .Select(x => x.Value)
+                .OrderBy(x => x.Name);
         }
 
         public int GetDefenseValue()
