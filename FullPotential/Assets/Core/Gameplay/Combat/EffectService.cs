@@ -61,7 +61,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     continue;
                 }
 
-                Debug.Log($"Applying effect {effect.TypeName} to {target.name}");
+                //Debug.Log($"Applying effect {effect.TypeName} to {target.name}");
 
                 ApplyEffect(sourceFighter, effect, itemUsed, target, position);
 
@@ -91,7 +91,19 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private void ApplyEffect(IFighter sourceFighter, IEffect effect, ItemBase itemUsed, GameObject targetGameObject, Vector3? position)
         {
+            if (effect is IMovementEffect movementEffect)
+            {
+                ApplyMovementEffect(targetGameObject, movementEffect, itemUsed.Attributes, sourceFighter);
+                return;
+            }
+
             var targetFighter = targetGameObject.GetComponent<IFighter>();
+
+            if (targetFighter == null)
+            {
+                Debug.LogWarning($"Not applying {effect.TypeName} to {targetGameObject.name} because they are not an IFighter");
+                return;
+            }
 
             //Debug.Log($"Applying {effect.TypeName} to {targetFighter.FighterName}");
 
@@ -101,27 +113,18 @@ namespace FullPotential.Core.Gameplay.Combat
                     ApplyStatEffect(targetFighter, statEffect, itemUsed, sourceFighter, position);
                     return;
 
-                case IMovementEffect movementEffect:
-                    ApplyMovementEffect(targetGameObject, movementEffect, itemUsed.Attributes, sourceFighter);
-                    return;
-
                 case IAttributeEffect attributeEffect:
                     ApplyAttributeEffect(targetFighter, attributeEffect, itemUsed.Attributes);
                     return;
 
                 case IElement elementalEffect:
-                    ApplyElementalEffect(targetFighter, elementalEffect, itemUsed.Attributes);
+                    ApplyElementalEffect(targetFighter, elementalEffect, itemUsed, sourceFighter, position);
                     return;
 
                 default:
                     Debug.LogError($"Not implemented handling for effect {effect}");
                     return;
             }
-        }
-
-        private void ApplyAttributeEffect(IFighter targetFighter, IAttributeEffect attributeEffect, Attributes attributes)
-        {
-            targetFighter.AddAttributeModifier(attributeEffect, attributes);
         }
 
         private void ApplyStatEffect(IFighter targetFighter, IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
@@ -147,6 +150,16 @@ namespace FullPotential.Core.Gameplay.Combat
                     Debug.LogError($"Not implemented handling for affect {statEffect.Affect}");
                     return;
             }
+        }
+
+        private void ApplyAttributeEffect(IFighter targetFighter, IAttributeEffect attributeEffect, Attributes attributes)
+        {
+            targetFighter.AddAttributeModifier(attributeEffect, attributes);
+        }
+
+        private void ApplyElementalEffect(IFighter targetFighter, IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
+        {
+            targetFighter.ApplyElementalEffect(elementalEffect, itemUsed, sourceFighter, position);
         }
 
         private void ApplyMovementEffect(GameObject targetGameObject, IMovementEffect movementEffect, Attributes attributes, IFighter sourceFighter)
@@ -228,11 +241,6 @@ namespace FullPotential.Core.Gameplay.Combat
                     Debug.LogError($"Not implemented handling for movement direction {movementEffect.Direction}");
                     return;
             }
-        }
-
-        private void ApplyElementalEffect(IFighter targetFighter, IEffect elementalEffect, Attributes attributes)
-        {
-            targetFighter.ApplyElementalEffect(elementalEffect, attributes);
         }
 
     }

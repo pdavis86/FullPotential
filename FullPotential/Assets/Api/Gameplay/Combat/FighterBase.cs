@@ -842,8 +842,10 @@ namespace FullPotential.Api.Gameplay.Combat
             Debug.Log("New max health is: " + GetHealthMax());
         }
 
-        public void ApplyElementalEffect(IEffect elementalEffect, Attributes attributes)
+        public void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
+            TakeDamage(sourceFighter, itemUsed, position);
+
             //todo: ApplyElementalEffect
             Debug.LogWarning("Not yet implemented elemental effects");
         }
