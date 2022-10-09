@@ -189,6 +189,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 }
 
                 _equippedItems[previouslyInSlot.Value].Item = null;
+                SetEquippedItem(null, slotGameObjectName);
             }
 
             var wasEquipped = false;
