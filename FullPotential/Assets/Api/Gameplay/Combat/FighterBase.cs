@@ -646,11 +646,6 @@ namespace FullPotential.Api.Gameplay.Combat
                 return false;
             }
 
-            if (!ConsumeResource(spellOrGadget, isTest: true))
-            {
-                return false;
-            }
-
             var leftOrRight = isLeftHand
                 ? HandStatusLeft
                 : HandStatusRight;
@@ -659,6 +654,11 @@ namespace FullPotential.Api.Gameplay.Combat
             {
                 //Return true as the action also needs performing on the server
                 return true;
+            }
+
+            if (!ConsumeResource(spellOrGadget, isTest: true))
+            {
+                return false;
             }
 
             var targetDirection = GetAttackDirection(handPosition, SpellOrGadgetRangeLimit);

@@ -1,5 +1,5 @@
 # Full Potential
-Inspired by the Minecraft mod Ars Magica 2, Skyrim, the Borderlands series, Final Fantasy 12 and the Oasis from the book Ready Player One, this game allows the player to explore their abilities in a new way.
+This game allows the player to explore their abilities in a new way have drawn inspiration from the Ars Magica 2 Minecraft mod, Skyrim, the Borderlands series, Final Fantasy 12, and the Oasis from the book Ready Player One.
 
 
 ## Key Features
