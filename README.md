@@ -20,7 +20,7 @@ Inspired by the Minecraft mod Ars Magica 2, Skyrim, the Borderlands series, Fina
 ## Code Structure
 - API is the code required for any third-party development to be compliant with the game 
 - Core is the code fundamental to the game working 
-- Standard is my implementation using the API to add Accessories, Armor, Effects, Enemies, Loot, Scenes, Spells, and Weapons to the game 
+- Standard is my implementation using the API to add Scenes, Accessories, Armor, Effects, Enemies, Loot, Spells, Gadgets, and Weapons to the game 
 
 
 ## Product Roadmap

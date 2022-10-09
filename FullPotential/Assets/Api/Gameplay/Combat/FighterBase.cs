@@ -441,7 +441,7 @@ namespace FullPotential.Api.Gameplay.Combat
             _stamina.Value += change;
         }
 
-        public void TakeDamageInternal(
+        protected void TakeDamageInternal(
             IFighter sourceFighter,
             ItemBase itemUsed,
             Vector3? position,
@@ -451,7 +451,6 @@ namespace FullPotential.Api.Gameplay.Combat
             _lastDamageItemName = itemUsed?.Name ?? _localizer.Translate("ui.alert.attack.noitem");
 
             var sourceIsPlayer = sourceFighter != null && sourceFighter.GameObject.CompareTag(Tags.Player);
-
 
             var sourceNetworkObject = sourceFighter != null ? sourceFighter.GameObject.GetComponent<NetworkObject>() : null;
             var sourceClientId = sourceNetworkObject != null ? (ulong?)sourceNetworkObject.OwnerClientId : null;
@@ -802,13 +801,13 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes)
         {
-            var (change, expiry) = AttributeCalculator.GetAttributeChangeAndExpiry(attributeEffect, attributes);
+            var (change, expiry) = attributes.GetAttributeChangeAndExpiry(attributeEffect);
             AddOrUpdateEffect(attributeEffect, change, expiry);
         }
 
         public void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter)
         {
-            var (change, expiry, delay) = AttributeCalculator.GetStatChangeExpiryAndDelay(statEffect, itemUsed.Attributes);
+            var (change, expiry, delay) = itemUsed.Attributes.GetStatChangeExpiryAndDelay(statEffect);
             AddOrUpdateEffect(statEffect, change, expiry);
             StartCoroutine(PeriodicActionToStatCoroutine(statEffect.StatToAffect, change, sourceFighter, itemUsed, delay, expiry));
         }
@@ -825,7 +824,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
-            var (change, expiry) = AttributeCalculator.GetStatChangeAndExpiry(statEffect, itemUsed.Attributes);
+            var (change, expiry) = itemUsed.Attributes.GetStatChangeAndExpiry(statEffect);
 
             AddOrUpdateEffect(statEffect, change, expiry);
 
@@ -834,7 +833,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
-            var (change, expiry) = AttributeCalculator.GetStatChangeAndExpiry(statEffect, itemUsed.Attributes);
+            var (change, expiry) = itemUsed.Attributes.GetStatChangeAndExpiry(statEffect);
 
             AddOrUpdateEffect(statEffect, change, expiry);
 
@@ -847,12 +846,6 @@ namespace FullPotential.Api.Gameplay.Combat
         {
             //todo: ApplyElementalEffect
             Debug.LogWarning("Not yet implemented elemental effects");
-        }
-
-        public void BeginMaintainDistanceOn(GameObject targetGameObject)
-        {
-            //todo: BeginMaintainDistanceOn
-            Debug.LogWarning("Not yet implemented BeginMaintainDistanceOn");
         }
 
         public List<ActiveEffect> GetActiveEffects()

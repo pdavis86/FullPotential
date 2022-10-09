@@ -21,7 +21,6 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
         private IEffectService _effectService;
 
-        //private GameObject _sourcePlayer;
         private Transform _cylinderParentTransform;
         private Transform _cylinderTransform;
         private RaycastHit _hit;
@@ -48,15 +47,6 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             }
 
             _maxBeamLength = SpellOrGadget.Attributes.GetContinuousRange();
-
-            //_sourcePlayer = GameObjectHelper.ClosestParentWithTag(gameObject, Tags.Player);
-
-            //if (_sourcePlayer == null)
-            //{
-            //    Debug.LogError("No player found in parents");
-            //    Destroy(gameObject);
-            //    return;
-            //}
 
             PerformGraphicsAdjustments();
 
@@ -105,12 +95,6 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         public void OnDestroy()
         {
             Destroy(_cylinderParentTransform.gameObject);
-        }
-
-        // ReSharper disable once UnusedMember.Global
-        public void StartCasting()
-        {
-            //Nothing here
         }
 
         public void Stop()

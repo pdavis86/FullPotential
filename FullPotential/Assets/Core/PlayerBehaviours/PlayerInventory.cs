@@ -9,7 +9,6 @@ using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Helpers;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
@@ -25,7 +24,6 @@ using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UI;
 
 // ReSharper disable ClassNeverInstantiated.Global
 

@@ -2,9 +2,10 @@
 {
     public enum TranslationType
     {
+        Attribute,
         CraftingCategory,
-        CraftingNamePrefix,
         CraftingHandedness,
-        Attribute
+        CraftingNamePrefix,
+        Item,
     }
 }

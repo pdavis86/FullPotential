@@ -4,6 +4,8 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
+using FullPotential.Api.Registry.SpellsAndGadgets;
+using FullPotential.Api.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -54,6 +56,13 @@ namespace FullPotential.Core.Gameplay.Combat
 
             foreach (var effect in itemUsed.Effects)
             {
+                if (!IsEffectAllowed(itemUsed, target, effect))
+                {
+                    continue;
+                }
+
+                Debug.Log($"Applying effect {effect.TypeName} to {target.name}");
+
                 ApplyEffect(sourceFighter, effect, itemUsed, target, position);
 
                 if (sourceFighter != null && effect is IHasSideEffect withSideEffect)
@@ -62,6 +71,22 @@ namespace FullPotential.Core.Gameplay.Combat
                     ApplyEffect(null, sideEffect, itemUsed, sourceFighter.GameObject, position);
                 }
             }
+        }
+
+        private bool IsEffectAllowed(ItemBase itemUsed, GameObject target, IEffect effect)
+        {
+            if (itemUsed is SpellOrGadgetItemBase sog
+                && sog.Targeting.IsContinuous)
+            {
+                if (effect is IMovementEffect movementEffect
+                    && movementEffect.Direction == MovementDirection.MaintainDistance)
+                {
+                    return target.GetComponent<MaintainDistance>() == null
+                        && target.GetComponent<PlayerBehaviours.PlayerState>() == null;
+                }
+            }
+
+            return true;
         }
 
         private void ApplyEffect(IFighter sourceFighter, IEffect effect, ItemBase itemUsed, GameObject targetGameObject, Vector3? position)
@@ -134,9 +159,8 @@ namespace FullPotential.Core.Gameplay.Combat
                 return;
             }
 
-            var adjustForGravity = movementEffect.Direction == MovementDirection.Up 
-                                   || movementEffect.Direction == MovementDirection.Down;
-            var force = AttributeCalculator.GetForceValue(attributes, adjustForGravity);
+            var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
+            var force = attributes.GetForceValue(adjustForGravity);
 
             switch (movementEffect.Direction)
             {
@@ -162,7 +186,9 @@ namespace FullPotential.Core.Gameplay.Combat
                         vector = -sourceFighter.RigidBody.transform.forward;
                     }
 
-                    targetRigidBody.AddForce(vector * force, ForceMode.Acceleration);
+                    //Debug.Log($"Applying {force} force to {targetGameObject.name}");
+
+                    targetRigidBody.AddForce(vector.normalized * force, ForceMode.Acceleration);
                     return;
 
                 case MovementDirection.Backwards:
@@ -191,7 +217,11 @@ namespace FullPotential.Core.Gameplay.Combat
                     return;
 
                 case MovementDirection.MaintainDistance:
-                    sourceFighter.BeginMaintainDistanceOn(targetGameObject);
+                    //todo: make this only work with continuous spell or gadget
+                    var comp = targetGameObject.AddComponent<MaintainDistance>();
+                    comp.SourceFighter = sourceFighter;
+                    comp.Distance = (targetGameObject.transform.position - sourceFighter.Transform.position).magnitude;
+                    comp.Duration = attributes.GetDuration();
                     return;
 
                 default:

@@ -22,6 +22,15 @@
       "Key": "crafting.category.gadget",
       "Value": "Gadget"
     },
+	
+	{
+      "Key": "item.name",
+      "Value": "Name"
+    },
+    {
+      "Key": "item.registrytype",
+      "Value": "Type"
+    },
 
 
     {
