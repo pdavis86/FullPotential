@@ -101,12 +101,12 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
             _spawnService.AdjustPositionToBeAboveGround(chosenSpawnPoint.Position, enemyNetObj.transform);
 
-            _enemyCounter++;
-
             enemyNetObj.Spawn(true);
 
+            //Must re-parent after spawn
             enemyNetObj.transform.parent = transform;
 
+            _enemyCounter++;
             enemyNetObj.GetComponent<EnemyState>().SetName("Enemy " + _enemyCounter);
         }
 

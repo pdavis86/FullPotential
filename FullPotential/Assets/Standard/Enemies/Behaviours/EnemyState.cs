@@ -16,12 +16,6 @@ namespace FullPotential.Standard.Enemies.Behaviours
         // ReSharper restore UnassignedField.Compiler
         #endregion
 
-        #region Variables
-
-        private string _enemyName;
-
-        #endregion
-
         #region Properties
 
         public override Transform Transform => transform;
@@ -29,8 +23,6 @@ namespace FullPotential.Standard.Enemies.Behaviours
         public override GameObject GameObject => gameObject;
 
         public override Transform LookTransform => transform;
-
-        public override string FighterName => _enemyName;
 
         public override IStatSlider HealthStatSlider { get; protected set; }
 
@@ -68,18 +60,6 @@ namespace FullPotential.Standard.Enemies.Behaviours
         }
 
         #endregion
-
-        public void SetName(string newName)
-        {
-            _enemyName = newName;
-
-            var displayName = string.IsNullOrWhiteSpace(_enemyName)
-                ? "Enemy ID " + NetworkObjectId
-                : _enemyName;
-
-            gameObject.name = displayName;
-            _nameTag.text = displayName;
-        }
 
         protected override void HandleDeathAfter(string killerName, string itemName)
         {

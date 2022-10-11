@@ -19,6 +19,7 @@ using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -51,6 +52,7 @@ namespace FullPotential.Api.Gameplay.Combat
         protected IRpcService _rpcService;
         protected ILocalizer _localizer;
 
+        protected readonly NetworkVariable<FixedString32Bytes> _fighterName = new NetworkVariable<FixedString32Bytes>();
         protected readonly NetworkVariable<int> _energy = new NetworkVariable<int>(100);
         protected readonly NetworkVariable<int> _health = new NetworkVariable<int>(100);
         protected readonly NetworkVariable<int> _mana = new NetworkVariable<int>(100);
@@ -84,19 +86,20 @@ namespace FullPotential.Api.Gameplay.Combat
         #endregion
 
         #region Properties
+
         public abstract Transform Transform { get; }
-
-        public abstract GameObject GameObject { get; }
-
-        public Rigidbody RigidBody => _rb == null ? _rb = GetComponent<Rigidbody>() : _rb;
 
         public abstract Transform LookTransform { get; }
 
-        public abstract string FighterName { get; }
-
-        public LivingEntityState AliveState { get; protected set; }
+        public abstract GameObject GameObject { get; }
 
         public abstract IStatSlider HealthStatSlider { get; protected set; }
+
+        public Rigidbody RigidBody => _rb == null ? _rb = GetComponent<Rigidbody>() : _rb;
+
+        public string FighterName { get; protected set; }
+
+        public LivingEntityState AliveState { get; protected set; }
 
         #endregion
 
@@ -109,6 +112,7 @@ namespace FullPotential.Api.Gameplay.Combat
             _rpcService = _gameManager.GetService<IRpcService>();
             _localizer = _gameManager.GetService<ILocalizer>();
 
+            _fighterName.OnValueChanged += OnNameChanged;
             _health.OnValueChanged += OnHealthChanged;
             _stamina.OnValueChanged += OnStaminaChanged;
             _energy.OnValueChanged += OnEnergyChanged;
@@ -178,6 +182,13 @@ namespace FullPotential.Api.Gameplay.Combat
                     StopCastingClientRpc(false, _rpcService.ForNearbyPlayers(transform.position));
                 }
             });
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+
+            UpdateNameOnUi();
         }
 
         protected virtual void FixedUpdate()
@@ -272,21 +283,14 @@ namespace FullPotential.Api.Gameplay.Combat
 
         #endregion
 
-        public IEnumerator ReloadCoroutine(HandStatus handStatus)
+        #region NetworkVariable Handlers
+
+        private void OnNameChanged(FixedString32Bytes previousValue, FixedString32Bytes newValue)
         {
-            if (handStatus.EquippedWeapon == null)
-            {
-                yield break;
-            }
-
-            handStatus.IsReloading = true;
-
-            yield return new WaitForSeconds(handStatus.EquippedWeapon.Attributes.GetReloadTime());
-
-            handStatus.EquippedWeapon.Ammo = handStatus.EquippedWeapon.Attributes.GetAmmoMax();
-
-            handStatus.IsReloading = false;
+            UpdateNameOnUi();
         }
+
+        #endregion
 
         #region Health
 
@@ -466,6 +470,46 @@ namespace FullPotential.Api.Gameplay.Combat
         }
 
         #endregion
+
+        public void SetName(string newName)
+        {
+            if (!IsServer)
+            {
+                Debug.LogWarning("Client tried to set fighter name");
+                return;
+            }
+
+            _fighterName.Value = newName;
+        }
+
+        private void UpdateNameOnUi()
+        {
+            var fighterName = _fighterName.Value.ToString();
+
+            var displayName = string.IsNullOrWhiteSpace(fighterName)
+                ? "Fighter " + NetworkObjectId
+                : fighterName;
+
+            FighterName = displayName;
+            gameObject.name = displayName;
+            _nameTag.text = displayName;
+        }
+
+        public IEnumerator ReloadCoroutine(HandStatus handStatus)
+        {
+            if (handStatus.EquippedWeapon == null)
+            {
+                yield break;
+            }
+
+            handStatus.IsReloading = true;
+
+            yield return new WaitForSeconds(handStatus.EquippedWeapon.Attributes.GetReloadTime());
+
+            handStatus.EquippedWeapon.Ammo = handStatus.EquippedWeapon.Attributes.GetAmmoMax();
+
+            handStatus.IsReloading = false;
+        }
 
         private int GetAttributeValue(AffectableAttribute attribute)
         {
@@ -847,6 +891,11 @@ namespace FullPotential.Api.Gameplay.Combat
                 Change = change,
                 Expiry = expiry
             });
+
+            if (OwnerClientId != NetworkManager.Singleton.LocalClientId)
+            {
+                //todo: AddOrUpdateEffectClientRpc(effect.TypeId.ToString(), change, expiry, _rpcService.ForPlayer(OwnerClientId));
+            }
         }
 
         public void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes)

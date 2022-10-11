@@ -95,8 +95,6 @@ namespace FullPotential.Core.PlayerBehaviours
 
         public override Transform LookTransform => _playerCamera.transform;
 
-        public override string FighterName => Username;
-
         public override IStatSlider HealthStatSlider { get; protected set; }
 
         #endregion
@@ -284,8 +282,6 @@ namespace FullPotential.Core.PlayerBehaviours
 
             var playerData = JsonUtility.FromJson<PlayerData>(_loadPlayerDataReconstructor.Reconstruct(fragmentedMessage.GroupId));
             LoadFromPlayerData(playerData);
-
-            SetName();
 
             StartCoroutine(SetTexture());
         }
@@ -490,10 +486,9 @@ namespace FullPotential.Core.PlayerBehaviours
             Username = playerData.Username;
             TextureUrl = playerData.Settings.TextureUrl;
 
-            SetName();
-
             if (IsServer)
             {
+                _fighterName.Value = Username;
                 _energy.Value = playerData.Consumables.Energy;
                 _health.Value = playerData.Consumables.Health > 0 ? playerData.Consumables.Health : GetHealthMax();
                 _mana.Value = playerData.Consumables.Mana;
@@ -524,22 +519,6 @@ namespace FullPotential.Core.PlayerBehaviours
             {
                 UpdatePlayerSettingsServerRpc(playerSettings);
             }
-        }
-
-        private void SetName()
-        {
-            var displayName = string.IsNullOrWhiteSpace(Username)
-                ? "Player " + NetworkObjectId
-                : Username;
-
-            gameObject.name = displayName;
-
-            if (IsOwner)
-            {
-                return;
-            }
-
-            _nameTag.text = displayName;
         }
 
         private IEnumerator SetTexture()
