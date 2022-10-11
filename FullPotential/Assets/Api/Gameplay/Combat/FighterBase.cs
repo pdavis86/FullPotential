@@ -281,6 +281,16 @@ namespace FullPotential.Api.Gameplay.Combat
             leftOrRight.StopConsumingResources();
         }
 
+        // ReSharper disable once UnusedParameter.Local
+        [ClientRpc]
+        private void AddOrUpdateEffectClientRpc(string effectTypeId, int change, DateTime expiry, ClientRpcParams clientRpcParams)
+        {
+            Debug.Log("AddOrUpdateEffectClientRpc called with typeId: " + effectTypeId);
+            
+            var effect = _typeRegistry.GetEffect(new Guid(effectTypeId));
+            AddOrUpdateEffect(effect, change, expiry);
+        }
+
         #endregion
 
         #region NetworkVariable Handlers
@@ -894,7 +904,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
             if (OwnerClientId != NetworkManager.Singleton.LocalClientId)
             {
-                //todo: AddOrUpdateEffectClientRpc(effect.TypeId.ToString(), change, expiry, _rpcService.ForPlayer(OwnerClientId));
+                AddOrUpdateEffectClientRpc(effect.TypeId.ToString(), change, expiry, _rpcService.ForPlayer(OwnerClientId));
             }
         }
 
