@@ -119,6 +119,7 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
+            //todo: these need resetting if log in as server then as client
             _periodicSave = new DelayedAction(15f, () => SavePlayerData(), false);
             _asapSaveUsernames = new List<string>();
         }

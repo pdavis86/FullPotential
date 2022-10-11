@@ -272,44 +272,6 @@ namespace FullPotential.Api.Gameplay.Combat
 
         #endregion
 
-        #region NetworkVariable Event Handlers
-
-        private void OnHealthChanged(int previousValue, int newValue)
-        {
-            UpdateUiHealthAndDefenceValues();
-
-            if (_health.Value <= 0)
-            {
-                HandleDeath();
-            }
-        }
-
-        private void OnStaminaChanged(int previousValue, int newValue)
-        {
-            if (_stamina.Value <= 0)
-            {
-                //todo: handle no stamina
-            }
-        }
-
-        private void OnEnergyChanged(int previousValue, int newValue)
-        {
-            if (_energy.Value <= 0)
-            {
-                //todo: handle no energy
-            }
-        }
-
-        private void OnManaChanged(int previousValue, int newValue)
-        {
-            if (_mana.Value <= 0)
-            {
-                //todo: handle no mana
-            }
-        }
-
-        #endregion
-
         public IEnumerator ReloadCoroutine(HandStatus handStatus)
         {
             if (handStatus.EquippedWeapon == null)
@@ -326,120 +288,7 @@ namespace FullPotential.Api.Gameplay.Combat
             handStatus.IsReloading = false;
         }
 
-        public int GetHealth()
-        {
-            var healthMax = GetHealthMax();
-            if (_health.Value > healthMax)
-            {
-                _health.Value = healthMax;
-            }
-
-            return _health.Value;
-        }
-
-        public int GetHealthMax()
-        {
-            //todo: trait-based health max
-            return 100 + GetStatMaxAdjustment(AffectableStat.Health);
-        }
-
-        public int GetStamina()
-        {
-            var staminaMax = GetStaminaMax();
-            if (_stamina.Value > staminaMax)
-            {
-                _stamina.Value = staminaMax;
-            }
-
-            return _stamina.Value;
-        }
-
-        public int GetStaminaMax()
-        {
-            //todo: trait-based stamina max
-            return 100 + GetStatMaxAdjustment(AffectableStat.Stamina);
-        }
-
-        public int GetStaminaCost()
-        {
-            //todo: trait-based stamina cost
-            return 10;
-        }
-
-        public float GetSprintSpeed()
-        {
-            //todo: trait-based sprint speed
-            return 2.5f;
-        }
-
-        public int GetEnergy()
-        {
-            var energyMax = GetEnergyMax();
-            if (_energy.Value > energyMax)
-            {
-                _energy.Value = energyMax;
-            }
-
-            return _energy.Value;
-        }
-
-        public int GetEnergyMax()
-        {
-            //todo: trait-based energy max
-            return 100 + GetStatMaxAdjustment(AffectableStat.Energy);
-        }
-
-        private int GetEnergyCost(Gadget gadget)
-        {
-            //todo: trait-based energy cost
-            return 20;
-        }
-
-        public int GetMana()
-        {
-            var manaMax = GetManaMax();
-            if (_mana.Value > manaMax)
-            {
-                _mana.Value = manaMax;
-            }
-
-            return _mana.Value;
-        }
-
-        public int GetManaMax()
-        {
-            //todo: trait-based mana max
-            return 100 + GetStatMaxAdjustment(AffectableStat.Mana);
-        }
-
-        private int GetManaCost(Spell spell)
-        {
-            //todo: trait-based mana cost
-            return 20;
-        }
-
-        private int GetAttributeValue(AffectableAttribute attribute)
-        {
-            //todo: trait-based attributes
-            switch (attribute)
-            {
-                case AffectableAttribute.Strength:
-                    return 0 + GetAttributeAdjustment(AffectableAttribute.Strength);
-
-                default:
-                    throw new Exception("Not yet implemented GetAttributeValue() for " + attribute);
-            }
-        }
-
-        public int GetDefenseValue()
-        {
-            return _inventory.GetDefenseValue() + GetAttributeValue(AffectableAttribute.Strength);
-        }
-
-        private void ApplyEnergyChange(int change)
-        {
-            _energy.Value += change;
-        }
+        #region Health
 
         private void ApplyHealthChange(
             int change,
@@ -457,14 +306,189 @@ namespace FullPotential.Api.Gameplay.Combat
             _health.Value += change;
         }
 
+        private void OnHealthChanged(int previousValue, int newValue)
+        {
+            UpdateUiHealthAndDefenceValues();
+
+            if (IsServer)
+            {
+                if (_health.Value <= 0)
+                {
+                    HandleDeath();
+                }
+
+                var healthMax = GetHealthMax();
+                if (_health.Value > healthMax)
+                {
+                    _health.Value = healthMax;
+                }
+            }
+        }
+
+        public int GetHealth()
+        {
+            return _health.Value;
+        }
+
+        public int GetHealthMax()
+        {
+            //todo: trait-based health max
+            return 100 + GetStatMaxAdjustment(AffectableStat.Health);
+        }
+
+        #endregion
+
+        #region Stamina
+
+        private void ApplyStaminaChange(int change)
+        {
+            _stamina.Value += change;
+        }
+
+        private void OnStaminaChanged(int previousValue, int newValue)
+        {
+            if (_stamina.Value <= 0)
+            {
+                //todo: handle no stamina
+            }
+
+            if (IsServer)
+            {
+                var staminaMax = GetStaminaMax();
+                if (_stamina.Value > staminaMax)
+                {
+                    _stamina.Value = staminaMax;
+                }
+            }
+        }
+
+        public int GetStamina()
+        {
+            return _stamina.Value;
+        }
+
+        public int GetStaminaMax()
+        {
+            //todo: trait-based stamina max
+            return 100 + GetStatMaxAdjustment(AffectableStat.Stamina);
+        }
+
+        public int GetStaminaCost()
+        {
+            //todo: trait-based stamina cost
+            return 10;
+        }
+
+        #endregion
+
+        #region Energy
+
+        private void ApplyEnergyChange(int change)
+        {
+            _energy.Value += change;
+        }
+
+        private void OnEnergyChanged(int previousValue, int newValue)
+        {
+            if (_energy.Value <= 0)
+            {
+                //todo: handle no energy
+            }
+
+            if (IsServer)
+            {
+                var energyMax = GetEnergyMax();
+                if (_energy.Value > energyMax)
+                {
+                    _energy.Value = energyMax;
+                }
+            }
+        }
+
+        public int GetEnergy()
+        {
+            return _energy.Value;
+        }
+
+        public int GetEnergyMax()
+        {
+            //todo: trait-based energy max
+            return 100 + GetStatMaxAdjustment(AffectableStat.Energy);
+        }
+
+        private int GetEnergyCost(Gadget gadget)
+        {
+            //todo: trait-based energy cost
+            return 20;
+        }
+
+        #endregion
+
+        #region Mana
+
         private void ApplyManaChange(int change)
         {
             _mana.Value += change;
         }
 
-        private void ApplyStaminaChange(int change)
+        private void OnManaChanged(int previousValue, int newValue)
         {
-            _stamina.Value += change;
+            if (_mana.Value <= 0)
+            {
+                //todo: handle no mana
+            }
+
+            if (IsServer)
+            {
+                var manaMax = GetManaMax();
+                if (_mana.Value > manaMax)
+                {
+                    _mana.Value = manaMax;
+                }
+            }
+        }
+
+        public int GetMana()
+        {
+            return _mana.Value;
+        }
+
+        public int GetManaMax()
+        {
+            //todo: trait-based mana max
+            return 100 + GetStatMaxAdjustment(AffectableStat.Mana);
+        }
+
+        private int GetManaCost(Spell spell)
+        {
+            //todo: trait-based mana cost
+            return 20;
+        }
+
+        #endregion
+
+        private int GetAttributeValue(AffectableAttribute attribute)
+        {
+            //todo: trait-based attributes
+            switch (attribute)
+            {
+                case AffectableAttribute.Strength:
+                    return 0 + GetAttributeAdjustment(AffectableAttribute.Strength);
+
+                default:
+                    throw new Exception("Not yet implemented GetAttributeValue() for " + attribute);
+            }
+        }
+
+        public float GetSprintSpeed()
+        {
+            //todo: trait-based sprint speed
+            return 2.5f;
+        }
+
+        public int GetDefenseValue()
+        {
+            return _inventory.GetDefenseValue() + GetAttributeValue(AffectableAttribute.Strength);
         }
 
         protected void TakeDamageInternal(
