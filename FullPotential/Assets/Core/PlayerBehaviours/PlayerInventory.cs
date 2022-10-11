@@ -76,11 +76,6 @@ namespace FullPotential.Core.PlayerBehaviours
         [ServerRpc]
         public void EquipItemServerRpc(string itemId, SlotGameObjectName slotGameObjectName)
         {
-            if (OwnerClientId == 0)
-            {
-                return;
-            }
-
             var item = _items[itemId];
 
             var slotChange = HandleSlotChange(item, slotGameObjectName);
@@ -188,8 +183,12 @@ namespace FullPotential.Core.PlayerBehaviours
                     slotsToSend.Add(previouslyInSlot.Value.ToString());
                 }
 
-                _equippedItems[previouslyInSlot.Value].Item = null;
-                SetEquippedItem(null, slotGameObjectName);
+                //Do not unequip if the server (we only just equipped it in the client code)
+                if (!IsServer)
+                {
+                    _equippedItems[previouslyInSlot.Value].Item = null;
+                    SetEquippedItem(null, slotGameObjectName);
+                }
             }
 
             var wasEquipped = false;

@@ -285,7 +285,7 @@ namespace FullPotential.Core.GameManagement
                 return;
             }
 
-            //Debug.Log("Checking if anything to save");
+            //Debug.Log("Checking if anything to save. allData: " + allData);
 
             var playerDataCollection = new List<PlayerData>();
             foreach (var kvp in NetworkManager.Singleton.ConnectedClients)

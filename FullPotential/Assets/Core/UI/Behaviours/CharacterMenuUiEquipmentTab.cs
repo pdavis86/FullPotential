@@ -177,6 +177,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 {
                     playerInventory.SpawnEquippedObject(null, Enum.Parse<SlotGameObjectName>(slotString));
                 }
+
                 ResetEquipmentUi(true);
 
                 playerInventory.EquipItemServerRpc(item.Id, slotGameObjectName);
