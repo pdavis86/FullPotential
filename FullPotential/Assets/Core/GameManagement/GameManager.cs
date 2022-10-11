@@ -66,6 +66,7 @@ namespace FullPotential.Core.GameManagement
         private DelayedAction _periodicSave;
         private List<string> _asapSaveUsernames;
         private bool _serverHasBeenStarted;
+        private Transform _playersParentTransform;
 
         //Singleton
         public static GameManager Instance { get; private set; }
@@ -405,6 +406,25 @@ namespace FullPotential.Core.GameManagement
             return LocalGameDataStore.PlayerGameObject;
         }
 
+        private Transform GetPlayersParentTransform()
+        {
+            if (_playersParentTransform != null)
+            {
+                return _playersParentTransform;
+            }
+
+            const string playersGameObjectName = "Players";
+            var parentObject = GameObjectHelper.GetObjectAtRoot(playersGameObjectName);
+            if (parentObject == null)
+            {
+                parentObject = new GameObject(playersGameObjectName);
+            }
+
+            _playersParentTransform = parentObject.transform;
+
+            return _playersParentTransform;
+        }
+
         public void SpawnPlayerNetworkObject(string playerToken, Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default)
         {
             if (!NetworkManager.Singleton.IsServer)
@@ -413,7 +433,7 @@ namespace FullPotential.Core.GameManagement
                 return;
             }
 
-            var playerNetObj = Instantiate(_playerPrefabNetObj, position, rotation);
+            var playerNetObj = Instantiate(_playerPrefabNetObj, position, rotation, GetPlayersParentTransform());
 
             var playerState = playerNetObj.GetComponent<PlayerState>();
             playerState.PlayerToken = playerToken;
