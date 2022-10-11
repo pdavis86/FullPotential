@@ -110,6 +110,9 @@ namespace FullPotential.Api.Gameplay.Combat
             _localizer = _gameManager.GetService<ILocalizer>();
 
             _health.OnValueChanged += OnHealthChanged;
+            _stamina.OnValueChanged += OnStaminaChanged;
+            _energy.OnValueChanged += OnEnergyChanged;
+            _mana.OnValueChanged += OnManaChanged;
 
             if (!NetworkManager.Singleton.IsConnectedClient || IsServer)
             {
@@ -181,6 +184,16 @@ namespace FullPotential.Api.Gameplay.Combat
         {
             ReplenishAndConsume();
             RemoveExpiredEffects();
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            _health.OnValueChanged -= OnHealthChanged;
+            _stamina.OnValueChanged -= OnStaminaChanged;
+            _energy.OnValueChanged -= OnEnergyChanged;
+            _mana.OnValueChanged -= OnManaChanged;
         }
 
         // ReSharper restore UnusedMemberHierarchy.Global
@@ -264,6 +277,35 @@ namespace FullPotential.Api.Gameplay.Combat
         private void OnHealthChanged(int previousValue, int newValue)
         {
             UpdateUiHealthAndDefenceValues();
+
+            if (_health.Value <= 0)
+            {
+                HandleDeath();
+            }
+        }
+
+        private void OnStaminaChanged(int previousValue, int newValue)
+        {
+            if (_stamina.Value <= 0)
+            {
+                //todo: handle no stamina
+            }
+        }
+
+        private void OnEnergyChanged(int previousValue, int newValue)
+        {
+            if (_energy.Value <= 0)
+            {
+                //todo: handle no energy
+            }
+        }
+
+        private void OnManaChanged(int previousValue, int newValue)
+        {
+            if (_mana.Value <= 0)
+            {
+                //todo: handle no mana
+            }
         }
 
         #endregion
@@ -291,10 +333,6 @@ namespace FullPotential.Api.Gameplay.Combat
             {
                 _health.Value = healthMax;
             }
-            else if (_health.Value <= 0)
-            {
-                HandleDeath();
-            }
 
             return _health.Value;
         }
@@ -311,10 +349,6 @@ namespace FullPotential.Api.Gameplay.Combat
             if (_stamina.Value > staminaMax)
             {
                 _stamina.Value = staminaMax;
-            }
-            else if (_stamina.Value <= 0)
-            {
-                //todo: handle no stamina
             }
 
             return _stamina.Value;
@@ -338,43 +372,12 @@ namespace FullPotential.Api.Gameplay.Combat
             return 2.5f;
         }
 
-        public int GetMana()
-        {
-            var manaMax = GetManaMax();
-            if (_mana.Value > manaMax)
-            {
-                _mana.Value = manaMax;
-            }
-            else if (_mana.Value <= 0)
-            {
-                //todo: handle no mana
-            }
-
-            return _mana.Value;
-        }
-
-        public int GetManaMax()
-        {
-            //todo: trait-based mana max
-            return 100 + GetStatMaxAdjustment(AffectableStat.Mana);
-        }
-
-        private int GetManaCost(Spell spell)
-        {
-            //todo: trait-based mana cost
-            return 20;
-        }
-
         public int GetEnergy()
         {
             var energyMax = GetEnergyMax();
             if (_energy.Value > energyMax)
             {
                 _energy.Value = energyMax;
-            }
-            else if (_energy.Value <= 0)
-            {
-                //todo: handle no energy
             }
 
             return _energy.Value;
@@ -389,6 +392,29 @@ namespace FullPotential.Api.Gameplay.Combat
         private int GetEnergyCost(Gadget gadget)
         {
             //todo: trait-based energy cost
+            return 20;
+        }
+
+        public int GetMana()
+        {
+            var manaMax = GetManaMax();
+            if (_mana.Value > manaMax)
+            {
+                _mana.Value = manaMax;
+            }
+
+            return _mana.Value;
+        }
+
+        public int GetManaMax()
+        {
+            //todo: trait-based mana max
+            return 100 + GetStatMaxAdjustment(AffectableStat.Mana);
+        }
+
+        private int GetManaCost(Spell spell)
+        {
+            //todo: trait-based mana cost
             return 20;
         }
 
