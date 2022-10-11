@@ -19,6 +19,8 @@ namespace FullPotential.Standard.Scenes.Behaviours
         private void Awake()
         {
             _gameManager = ModHelper.GetGameManager();
+
+            RequiresServerCheck = false;
         }
 
         public override void OnFocus()
