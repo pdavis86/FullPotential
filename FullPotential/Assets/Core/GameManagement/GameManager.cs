@@ -237,7 +237,10 @@ namespace FullPotential.Core.GameManagement
 
         public void Disconnect()
         {
-            SavePlayerData(true);
+            if (NetworkManager.Singleton.IsServer)
+            {
+                SavePlayerData(true);
+            }
 
             NetworkManager.Singleton.Shutdown();
             SceneManager.LoadSceneAsync(1);
