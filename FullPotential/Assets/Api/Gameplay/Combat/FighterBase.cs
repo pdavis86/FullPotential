@@ -481,7 +481,7 @@ namespace FullPotential.Api.Gameplay.Combat
             var sourceNetworkObject = sourceFighter != null ? sourceFighter.GameObject.GetComponent<NetworkObject>() : null;
             var sourceClientId = sourceNetworkObject != null ? (ulong?)sourceNetworkObject.OwnerClientId : null;
 
-            if (sourceClientId != null && OwnerClientId != sourceClientId.Value)
+            if (sourceClientId != null && !sourceFighter.Equals(this))
             {
                 if (_damageTaken.ContainsKey(sourceClientId.Value))
                 {
@@ -749,7 +749,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
             if (IsServer)
             {
-                Debug.Log("Should only be called once on server");
+                //Debug.Log("Should only be called once on server");
                 _effectService.ApplyEffects(this, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
             }
 
@@ -864,8 +864,6 @@ namespace FullPotential.Api.Gameplay.Combat
             AddOrUpdateEffect(statEffect, change, expiry);
 
             ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, itemUsed, position);
-
-            Debug.Log("New max health is: " + GetHealthMax());
         }
 
         public void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
