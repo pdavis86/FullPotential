@@ -32,13 +32,13 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>();
             _resultFactory = GameManager.Instance.GetService<ResultFactory>();
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
+            _playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>();
             ResetEquipmentUi(true);
         }
 
@@ -170,16 +170,6 @@ namespace FullPotential.Core.Ui.Behaviours
                 }
 
                 var playerInventory = (PlayerInventory)_playerState.Inventory;
-
-                var changeResult = playerInventory.HandleSlotChange(item, slotGameObjectName);
-                playerInventory.SpawnEquippedObject(changeResult.WasEquipped ? item : null, slotGameObjectName);
-                foreach (var slotString in changeResult.SlotsToSend.Where(x => x != slotGameObjectName.ToString()))
-                {
-                    playerInventory.SpawnEquippedObject(null, Enum.Parse<SlotGameObjectName>(slotString));
-                }
-
-                ResetEquipmentUi(true);
-
                 playerInventory.EquipItemServerRpc(item.Id, slotGameObjectName);
             });
         }

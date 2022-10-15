@@ -94,7 +94,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 InventoryDataHelper.PopulateInventoryChangesWithItem(invChange, item);
             }
 
-            var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, OwnerClientId);
+            var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             foreach (var message in FragmentedMessageReconstructor.GetFragmentedMessages(invChange))
             {
                 ApplyEquipChangeClientRpc(message, nearbyClients);
@@ -183,12 +183,8 @@ namespace FullPotential.Core.PlayerBehaviours
                     slotsToSend.Add(previouslyInSlot.Value.ToString());
                 }
 
-                //Do not unequip if the server (we only just equipped it in the client code)
-                if (!IsServer)
-                {
-                    _equippedItems[previouslyInSlot.Value].Item = null;
-                    SetEquippedItem(null, slotGameObjectName);
-                }
+                _equippedItems[previouslyInSlot.Value].Item = null;
+                SetEquippedItem(null, slotGameObjectName);
             }
 
             var wasEquipped = false;
