@@ -62,6 +62,8 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             }
 
             ApplyEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
+
+            Destroy(gameObject);
         }
 
         public void Stop()
@@ -118,8 +120,6 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                     Debug.LogError($"Unexpected secondary effect for spell {SpellOrGadget.Id} '{SpellOrGadget.Name}'");
                 }
             }
-
-            Destroy(gameObject);
         }
 
     }
