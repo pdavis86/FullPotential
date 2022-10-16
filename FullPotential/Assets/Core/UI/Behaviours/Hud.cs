@@ -4,6 +4,7 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
@@ -116,7 +117,9 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateHandAmmo(Text ammoText, HandStatus handStatus)
         {
-            if (handStatus == null || handStatus.EquippedWeapon == null)
+            if (handStatus == null 
+                || handStatus.EquippedWeapon == null
+                || ((handStatus.EquippedWeapon.RegistryType is IGearWeapon gearWeapon) && gearWeapon.Category is not IGearWeapon.WeaponCategory.Ranged))
             {
                 ammoText.gameObject.SetActive(false);
                 return;
