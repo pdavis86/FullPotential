@@ -678,23 +678,6 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public bool TryToAttack(bool isLeftHand)
         {
-            var handStatus = isLeftHand
-                ? HandStatusLeft
-                : HandStatusRight;
-
-            if (handStatus.EquippedWeapon != null)
-            {
-                if (handStatus.EquippedWeapon.Ammo == 0 || handStatus.IsReloading)
-                {
-                    return false;
-                }
-
-                if (handStatus.EquippedWeapon.Ammo > 0)
-                {
-                    handStatus.EquippedWeapon.Ammo -= 1 + handStatus.EquippedWeapon.Attributes.ExtraAmmoPerShot;
-                }
-            }
-
             var itemInHand = isLeftHand
                 ? _inventory.GetItemInSlot(SlotGameObjectName.LeftHand)
                 : _inventory.GetItemInSlot(SlotGameObjectName.RightHand);
@@ -713,7 +696,7 @@ namespace FullPotential.Api.Gameplay.Combat
                     return UseSpellOrGadget(isLeftHand, handPosition, itemInHand as SpellOrGadgetItemBase);
 
                 case Weapon weaponInHand:
-                    return UseWeapon(handPosition, weaponInHand) != null;
+                    return UseWeapon(isLeftHand, handPosition, weaponInHand) != null;
 
                 default:
                     Debug.LogWarning("Not implemented attack for " + itemInHand.Name + " yet");
@@ -801,17 +784,43 @@ namespace FullPotential.Api.Gameplay.Combat
             return true;
         }
 
-        private ulong? UseWeapon(Vector3 handPosition, Weapon weaponInHand)
+        private ulong? UseWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand)
         {
             var registryType = (IGearWeapon)weaponInHand.RegistryType;
 
-            return registryType.Category == IGearWeapon.WeaponCategory.Ranged
-                ? UseRangedWeapon(handPosition, weaponInHand)
-                : UseMeleeWeapon(weaponInHand);
+            var isRanged = registryType.Category == IGearWeapon.WeaponCategory.Ranged;
+
+            var handStatus = isLeftHand
+                ? HandStatusLeft
+                : HandStatusRight;
+
+            if (!isRanged || handStatus.EquippedWeapon == null)
+            {
+                return UseMeleeWeapon(weaponInHand);
+            }
+
+            if (handStatus.EquippedWeapon.Ammo == 0 || handStatus.IsReloading)
+            {
+                return null;
+            }
+
+            var requiredAmmo = 1 + handStatus.EquippedWeapon.Attributes.ExtraAmmoPerShot;
+
+            if (handStatus.EquippedWeapon.Ammo >= requiredAmmo)
+            {
+                handStatus.EquippedWeapon.Ammo -= requiredAmmo;
+                return UseRangedWeapon(handPosition, weaponInHand, requiredAmmo);
+            }
+
+            var ammoUsed = handStatus.EquippedWeapon.Ammo;
+            handStatus.EquippedWeapon.Ammo = 0;
+            return UseRangedWeapon(handPosition, weaponInHand, ammoUsed);
         }
 
-        private ulong? UseRangedWeapon(Vector3 handPosition, Weapon weaponInHand)
+        private ulong? UseRangedWeapon(Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
         {
+            //todo: handle multiple shots 
+
             var range = weaponInHand.Attributes.GetProjectileRange();
             var endPos = Physics.Raycast(LookTransform.position, LookTransform.forward, out var rangedHit, range)
                 ? rangedHit.point
