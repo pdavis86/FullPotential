@@ -439,12 +439,12 @@ namespace FullPotential.Core.GameManagement
 
             var playerNetObj = Instantiate(_playerPrefabNetObj, position, rotation, GetPlayersParentTransform());
 
+            GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, playerNetObj.transform);
+
             var playerState = playerNetObj.GetComponent<PlayerState>();
             playerState.PlayerToken = playerToken;
 
             playerNetObj.SpawnAsPlayerObject(serverRpcParams.Receive.SenderClientId);
-
-            GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, playerNetObj.transform);
         }
 
         #endregion
