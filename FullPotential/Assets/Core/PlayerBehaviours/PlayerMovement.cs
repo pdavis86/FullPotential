@@ -1,5 +1,4 @@
 ﻿using FullPotential.Core.GameManagement;
-using FullPotential.Core.Networking;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -30,7 +29,6 @@ namespace FullPotential.Core.PlayerBehaviours
         private Vector3 _jumpForce;
 
         //Variables for maintaining state
-        private ClientNetworkTransform _playerCameraNetworkTransform;
         private Vector2 _smoothLook;
         private float _currentCameraRotationX;
         private float _maxDistanceToBeStanding;
@@ -47,14 +45,6 @@ namespace FullPotential.Core.PlayerBehaviours
             _playerState = GetComponent<PlayerState>();
 
             _maxDistanceToBeStanding = gameObject.GetComponent<Collider>().bounds.extents.y + 0.1f;
-
-            _playerCameraNetworkTransform = _playerCamera.GetComponent<ClientNetworkTransform>();
-
-            if (!IsServer)
-            {
-                //Prevent head spinning
-                _playerCameraNetworkTransform.enabled = false;
-            }
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -148,11 +138,6 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (_lookVal != Vector2.zero)
             {
-                if (!_playerCameraNetworkTransform.isActiveAndEnabled)
-                {
-                    _playerCameraNetworkTransform.enabled = true;
-                }
-
                 var lookInput = new Vector2(_lookVal.x, _lookVal.y);
                 lookInput = Vector2.Scale(lookInput, new Vector2(_lookSensitivity.x * _lookSmoothness.x, _lookSensitivity.y * _lookSmoothness.y));
 

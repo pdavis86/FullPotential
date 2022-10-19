@@ -34,7 +34,7 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
             bool isClientOnly = IsClient && !IsServer;
             if (!IsOwner && isClientOnly)
             {
-                Destroy(this);
+                enabled = false;
                 return;
             }
 
