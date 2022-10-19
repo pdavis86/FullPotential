@@ -6,7 +6,9 @@ using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
+using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
+using FullPotential.Core.PlayerBehaviours;
 using FullPotential.Core.UI.Components;
 using UnityEngine;
 using UnityEngine.UI;
@@ -60,6 +62,14 @@ namespace FullPotential.Core.UI.Admin
         // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
+            var playerState = GameManager.Instance.GetLocalPlayerGameObject().GetComponent<PlayerState>();
+
+            if (playerState.Inventory.IsInventoryFull())
+            {
+                playerState.AlertInventoryIsFull();
+                GameManager.Instance.UserInterface.HideAllMenus();
+            }
+
             ResetUi();
         }
 
@@ -115,7 +125,7 @@ namespace FullPotential.Core.UI.Admin
 
             ResetSliders();
         }
-        
+
         private void InstantiateEffectControls()
         {
             _effectToggleBehaviours = new List<NameAndToggle>();
@@ -226,14 +236,14 @@ namespace FullPotential.Core.UI.Admin
         private ITargeting GetTargeting()
         {
             var firstToggle = _targetingToggleBehaviours.FirstOrDefault(x => x.Toggle.isOn);
-            var typeName = firstToggle != null ? firstToggle.Name.text: null;
+            var typeName = firstToggle != null ? firstToggle.Name.text : null;
             return _registeredTargetingOptions.FirstOrDefault(x => x.TypeName == typeName);
         }
 
         private IShape GetShape()
         {
             var firstToggle = _shapeToggleBehaviours.FirstOrDefault(x => x.Toggle.isOn);
-            var typeName = firstToggle != null ? firstToggle.Name.text: null;
+            var typeName = firstToggle != null ? firstToggle.Name.text : null;
             return _registeredShapes.FirstOrDefault(x => x.TypeName == typeName);
         }
 

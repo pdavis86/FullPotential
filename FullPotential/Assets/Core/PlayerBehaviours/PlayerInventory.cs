@@ -296,6 +296,11 @@ namespace FullPotential.Core.PlayerBehaviours
             return (int)Math.Floor((float)defenseSum / _armorSlotCount);
         }
 
+        public bool IsInventoryFull()
+        {
+            return _items.Count >= _maxItems;
+        }
+
         public void ApplyInventoryChanges(InventoryChanges changes)
         {
             if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
@@ -307,7 +312,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 _playerState.AlertOfInventoryRemovals(changes.IdsToRemove.Length);
             }
 
-            if (_items.Count >= _maxItems)
+            if (IsInventoryFull())
             {
                 _playerState.AlertInventoryIsFull();
                 return;
