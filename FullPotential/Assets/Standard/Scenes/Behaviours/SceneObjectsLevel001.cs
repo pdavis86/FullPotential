@@ -10,6 +10,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable once UnusedType.Global
 
 namespace FullPotential.Standard.Scenes.Behaviours
 {

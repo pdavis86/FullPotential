@@ -149,7 +149,9 @@ namespace FullPotential.Core.PlayerBehaviours
                 }
             }
 
-            gameObject.name = "Player ID " + NetworkObjectId;
+            gameObject.name = IsServer
+                ? Username 
+                : "Player ID " + NetworkObjectId;
 
             if (IsServer)
             {

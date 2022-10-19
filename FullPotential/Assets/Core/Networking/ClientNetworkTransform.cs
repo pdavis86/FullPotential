@@ -12,7 +12,7 @@ namespace FullPotential.Core.Networking
     [DisallowMultipleComponent]
     public class ClientNetworkTransform : NetworkTransform
     {
-        public bool IsServerAuthoritative { get; set; } = false;
+        public bool IsServerAuthoritative { get; set; }
 
         /// <summary>
         /// Used to determine who can write to this transform. Owner client only.

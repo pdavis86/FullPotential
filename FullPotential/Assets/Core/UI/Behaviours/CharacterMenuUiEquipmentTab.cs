@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
