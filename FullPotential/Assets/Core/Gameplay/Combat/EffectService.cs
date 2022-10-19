@@ -58,6 +58,7 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 if (!IsEffectAllowed(itemUsed, target, effect))
                 {
+                    Debug.Log($"Effect {effect.TypeName} is not permitted against target {target}");
                     continue;
                 }
 

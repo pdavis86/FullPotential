@@ -285,8 +285,8 @@ namespace FullPotential.Api.Gameplay.Combat
         [ClientRpc]
         private void AddOrUpdateEffectClientRpc(string effectTypeId, int change, DateTime expiry, ClientRpcParams clientRpcParams)
         {
-            Debug.Log("AddOrUpdateEffectClientRpc called with typeId: " + effectTypeId);
-            
+            //Debug.Log("AddOrUpdateEffectClientRpc called with typeId: " + effectTypeId);
+
             var effect = _typeRegistry.GetEffect(new Guid(effectTypeId));
             AddOrUpdateEffect(effect, change, expiry);
         }
@@ -320,10 +320,8 @@ namespace FullPotential.Api.Gameplay.Combat
             _health.Value += change;
         }
 
-        private void OnHealthChanged(int previousValue, int newValue)
+        private void CheckHealth()
         {
-            UpdateUiHealthAndDefenceValues();
-
             if (IsServer)
             {
                 if (_health.Value <= 0)
@@ -339,8 +337,15 @@ namespace FullPotential.Api.Gameplay.Combat
             }
         }
 
+        private void OnHealthChanged(int previousValue, int newValue)
+        {
+            UpdateUiHealthAndDefenceValues();
+            CheckHealth();
+        }
+
         public int GetHealth()
         {
+            CheckHealth();
             return _health.Value;
         }
 
@@ -359,15 +364,15 @@ namespace FullPotential.Api.Gameplay.Combat
             _stamina.Value += change;
         }
 
-        private void OnStaminaChanged(int previousValue, int newValue)
+        private void CheckStamina()
         {
-            if (_stamina.Value <= 0)
-            {
-                //todo: handle no stamina
-            }
-
             if (IsServer)
             {
+                if (_stamina.Value <= 0)
+                {
+                    //todo: handle no stamina
+                }
+
                 var staminaMax = GetStaminaMax();
                 if (_stamina.Value > staminaMax)
                 {
@@ -376,8 +381,14 @@ namespace FullPotential.Api.Gameplay.Combat
             }
         }
 
+        private void OnStaminaChanged(int previousValue, int newValue)
+        {
+            CheckStamina();
+        }
+
         public int GetStamina()
         {
+            CheckStamina();
             return _stamina.Value;
         }
 
@@ -402,15 +413,15 @@ namespace FullPotential.Api.Gameplay.Combat
             _energy.Value += change;
         }
 
-        private void OnEnergyChanged(int previousValue, int newValue)
+        private void CheckEnergy()
         {
-            if (_energy.Value <= 0)
-            {
-                //todo: handle no energy
-            }
-
             if (IsServer)
             {
+                if (_energy.Value <= 0)
+                {
+                    //todo: handle no energy
+                }
+
                 var energyMax = GetEnergyMax();
                 if (_energy.Value > energyMax)
                 {
@@ -419,8 +430,14 @@ namespace FullPotential.Api.Gameplay.Combat
             }
         }
 
+        private void OnEnergyChanged(int previousValue, int newValue)
+        {
+            CheckEnergy();
+        }
+
         public int GetEnergy()
         {
+            CheckEnergy();
             return _energy.Value;
         }
 
@@ -445,15 +462,15 @@ namespace FullPotential.Api.Gameplay.Combat
             _mana.Value += change;
         }
 
-        private void OnManaChanged(int previousValue, int newValue)
+        private void CheckMana()
         {
-            if (_mana.Value <= 0)
-            {
-                //todo: handle no mana
-            }
-
             if (IsServer)
             {
+                if (_mana.Value <= 0)
+                {
+                    //todo: handle no mana
+                }
+
                 var manaMax = GetManaMax();
                 if (_mana.Value > manaMax)
                 {
@@ -461,9 +478,14 @@ namespace FullPotential.Api.Gameplay.Combat
                 }
             }
         }
+        private void OnManaChanged(int previousValue, int newValue)
+        {
+            CheckMana();
+        }
 
         public int GetMana()
         {
+            CheckMana();
             return _mana.Value;
         }
 
@@ -860,7 +882,14 @@ namespace FullPotential.Api.Gameplay.Combat
                 _effectService.ApplyEffects(this, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
             }
 
-            return meleeHit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId;
+            var hitNetworkObject = meleeHit.transform.gameObject.GetComponent<NetworkObject>();
+
+            if (hitNetworkObject == null)
+            {
+                return null;
+            }
+
+            return hitNetworkObject.NetworkObjectId;
         }
 
         private int GetStatMaxAdjustment(AffectableStat affectableStat)
@@ -882,34 +911,47 @@ namespace FullPotential.Api.Gameplay.Combat
                 .Sum(x => x.Change * (x.Effect is IAttributeEffect attributeEffect && attributeEffect.TemporaryMaxIncrease ? 1 : -1));
         }
 
-        private bool IsAffectStackable(Affect affect)
+        private bool AllowMultiple(Affect affect)
         {
-            return affect == Affect.TemporaryMaxIncrease || affect == Affect.TemporaryMaxDecrease;
+            return affect == Affect.TemporaryMaxIncrease
+                || affect == Affect.TemporaryMaxDecrease;
         }
 
         private void AddOrUpdateEffect(IEffect effect, int change, DateTime expiry)
         {
+            var multipleAllowed = (effect is IStatEffect statEffect && AllowMultiple(statEffect.Affect))
+                || effect is IAttributeEffect;
+
             var effectMatch = _activeEffects.FirstOrDefault(x => x.Effect == effect);
 
             if (effectMatch != null)
             {
-                if (effect is IStatEffect statEffect && IsAffectStackable(statEffect.Affect))
+                if (multipleAllowed)
                 {
-                    //Do not remove it
+                    _activeEffects.Add(new ActiveEffect
+                    {
+                        Id = Guid.NewGuid(),
+                        Effect = effect,
+                        Change = change,
+                        Expiry = expiry
+                    });
                 }
                 else
                 {
-                    _activeEffects.Remove(effectMatch);
+                    effectMatch.Change = change;
+                    effectMatch.Expiry = expiry;
                 }
             }
-
-            _activeEffects.Add(new ActiveEffect
+            else
             {
-                Id = Guid.NewGuid(),
-                Effect = effect,
-                Change = change,
-                Expiry = expiry
-            });
+                _activeEffects.Add(new ActiveEffect
+                {
+                    Id = Guid.NewGuid(),
+                    Effect = effect,
+                    Change = change,
+                    Expiry = expiry
+                });
+            }
 
             if (OwnerClientId != NetworkManager.Singleton.LocalClientId)
             {
