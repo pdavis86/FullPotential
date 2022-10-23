@@ -284,7 +284,7 @@ namespace FullPotential.Core.UI.Admin
             var componentJson = JsonUtility.ToJson(component);
             var category = _craftingSelector.GetCraftingCategory().Key.Name;
 
-            ModHelper.GetGameManager().GetLocalPlayerGameObject().GetComponent<PlayerBehaviours.PlayerBehaviour>().CraftItemAsAdminServerRpc(
+            ModHelper.GetGameManager().GetLocalPlayerGameObject().GetComponent<PlayerBehaviour>().CraftItemAsAdminServerRpc(
                 componentJson,
                 category,
                 _craftingSelector.GetCraftableTypeName(category),

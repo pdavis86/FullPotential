@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Inventory;
@@ -23,9 +23,9 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace FullPotential.Api.Gameplay.Combat
+namespace FullPotential.Api.Gameplay.Behaviours
 {
-    public abstract class FighterBase : NetworkBehaviour, IFighter
+    public abstract class FighterBase : LivingEntityBase, IFighter
     {
         private const int MeleeRangeLimit = 8;
         private const float SpellOrGadgetRangeLimit = 50f;
@@ -70,7 +70,7 @@ namespace FullPotential.Api.Gameplay.Combat
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
         private readonly List<ActiveEffect> _activeEffects = new List<ActiveEffect>();
 
-        private Rigidbody _rb;
+        //private Rigidbody _rb;
         private bool _isSprinting;
 
         public readonly HandStatus HandStatusLeft = new HandStatus();
@@ -95,7 +95,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public abstract IStatSlider HealthStatSlider { get; protected set; }
 
-        public Rigidbody RigidBody => _rb == null ? _rb = GetComponent<Rigidbody>() : _rb;
+        //public Rigidbody RigidBody => _rb == null ? _rb = GetComponent<Rigidbody>() : _rb;
 
         public string FighterName { get; protected set; }
 
@@ -191,8 +191,10 @@ namespace FullPotential.Api.Gameplay.Combat
             UpdateNameOnUi();
         }
 
-        protected virtual void FixedUpdate()
+        protected override void FixedUpdate()
         {
+            base.FixedUpdate();
+
             ReplenishAndConsume();
             RemoveExpiredEffects();
         }

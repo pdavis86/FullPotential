@@ -1,4 +1,4 @@
-using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Ui.Components;
 using UnityEngine;
 

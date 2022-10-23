@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Gameplay.Combat;
+﻿using FullPotential.Api.Gameplay.Behaviours;
 
 namespace FullPotential.Api.Ui
 {

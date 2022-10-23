@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Effects;
