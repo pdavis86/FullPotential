@@ -36,8 +36,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
             _health.OnValueChanged += OnHealthChanged;
 
-            //todo: don't do this on enemy. Make a new inventory parent class
-            _inventory = gameObject.AddComponent<Core.PlayerBehaviours.PlayerInventory>();
+            _inventory = gameObject.AddComponent<EnemyInventory>();
 
             HealthStatSlider = _healthSliderParent.GetComponent<IStatSlider>();
         }

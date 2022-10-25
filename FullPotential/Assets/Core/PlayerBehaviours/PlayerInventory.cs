@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Inventory;
@@ -28,7 +27,7 @@ using UnityEngine;
 
 namespace FullPotential.Core.PlayerBehaviours
 {
-    public class PlayerInventory : NetworkBehaviour, IPlayerInventory
+    public class PlayerInventory : InventoryBase, IPlayerInventory
     {
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
         // ReSharper disable once ConvertToConstant.Local
@@ -42,20 +41,17 @@ namespace FullPotential.Core.PlayerBehaviours
         private IInventoryDataService _inventoryDataService;
 
         private PlayerState _playerState;
-        private Dictionary<string, ItemBase> _items;
-        private Dictionary<SlotGameObjectName, EquippedItem> _equippedItems;
-        private int _armorSlotCount;
         private int _maxItems;
 
         private readonly FragmentedMessageReconstructor _inventoryChangesReconstructor = new FragmentedMessageReconstructor();
 
-        //todo: separate UI updates from this class
-
         #region Unity Events Handlers
 
         // ReSharper disable once UnusedMember.Local
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             _playerState = GetComponent<PlayerState>();
 
             _typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
@@ -63,11 +59,6 @@ namespace FullPotential.Core.PlayerBehaviours
             _localizer = GameManager.Instance.GetService<ILocalizer>();
             _resultFactory = GameManager.Instance.GetService<IResultFactory>();
             _inventoryDataService = GameManager.Instance.GetService<IInventoryDataService>();
-
-            _items = new Dictionary<string, ItemBase>();
-            _equippedItems = new Dictionary<SlotGameObjectName, EquippedItem>();
-
-            _armorSlotCount = Enum.GetNames(typeof(IGearArmor.ArmorCategory)).Length;
         }
 
         #endregion
@@ -255,14 +246,11 @@ namespace FullPotential.Core.PlayerBehaviours
             }
 
             //todo: group by item type translation then by item name
+            
+            //_localizer = GameManager.Instance.GetService<ILocalizer>();
+            //_categoryCache.GetOrAdd(item.GetType().Name, () => _localizer.Translate(TranslationType.CraftingCategory);
 
-            ////todo: don't do this here
-            //var localizer = GameManager.Instance.GetService<ILocalizer>();
-
-            ////todo: cache the crafting category
-            //var test = localizer.Translate(TranslationType.CraftingCategory, item.GetType().Name);
-
-            ////todo: make a method on the prefab to set the text
+            //make a method on the prefab to set the text
             //row.transform.Find("ItemName").GetComponent<Text>().text = gearCategory == IGear.GearCategory.Hand
             //    ? item.GetType().Name + " - " + item.Name
             //    : item.Name;
@@ -270,31 +258,6 @@ namespace FullPotential.Core.PlayerBehaviours
             return itemsForSlot
                 .Select(x => x.Value)
                 .OrderBy(x => x.Name);
-        }
-
-        public int GetDefenseValue()
-        {
-            var defenseSum = 0;
-
-            foreach (SlotGameObjectName slotGameObjectName in Enum.GetValues(typeof(SlotGameObjectName)))
-            {
-                var equippedItemId = _equippedItems.ContainsKey(slotGameObjectName)
-                    ? _equippedItems[slotGameObjectName].Item?.Id
-                    : null;
-
-                if (equippedItemId.IsNullOrWhiteSpace())
-                {
-                    continue;
-                }
-
-                var item = GetItemWithId<ItemBase>(equippedItemId);
-                if (item is IDefensible defensibleItem)
-                {
-                    defenseSum += defensibleItem.GetDefenseValue();
-                }
-            }
-
-            return (int)Math.Floor((float)defenseSum / _armorSlotCount);
         }
 
         public bool IsInventoryFull()
@@ -418,14 +381,11 @@ namespace FullPotential.Core.PlayerBehaviours
             }
         }
 
-        //todo: why is this static?
-        private static void FillTypesFromIds(ItemBase item)
+        private void FillTypesFromIds(ItemBase item)
         {
-            var typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
-
             if (!string.IsNullOrWhiteSpace(item.RegistryTypeId) && item.RegistryType == null)
             {
-                item.RegistryType = typeRegistry.GetRegisteredForItem(item);
+                item.RegistryType = _typeRegistry.GetRegisteredForItem(item);
             }
 
             if (item is SpellOrGadgetItemBase magicalItem)
@@ -443,7 +403,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (item.EffectIds != null && item.EffectIds.Length > 0 && item.Effects == null)
             {
-                item.Effects = item.EffectIds.Select(x => typeRegistry.GetEffect(new Guid(x))).ToList();
+                item.Effects = item.EffectIds.Select(x => _typeRegistry.GetEffect(new Guid(x))).ToList();
             }
         }
 
@@ -470,34 +430,6 @@ namespace FullPotential.Core.PlayerBehaviours
                 Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
                 EquippedItems = equippedItems.ToArray()
             };
-        }
-
-        public T GetItemWithId<T>(string id, bool logIfNotFound = true) where T : ItemBase
-        {
-            var item = _items.FirstOrDefault(x => x.Value.Id == id).Value;
-
-            if (item == null)
-            {
-                if (logIfNotFound)
-                {
-                    Debug.LogError($"Could not find the item with ID '{id}'");
-                }
-                return null;
-            }
-
-            if (item is not T castAsType)
-            {
-                throw new Exception($"Item '{id}' was not of the correct type: {typeof(T).Name}");
-            }
-
-            return castAsType;
-        }
-
-        public ItemBase GetItemInSlot(SlotGameObjectName slotGameObjectName)
-        {
-            return _equippedItems.ContainsKey(slotGameObjectName)
-                ? _equippedItems[slotGameObjectName].Item
-                : null;
         }
 
         public KeyValuePair<SlotGameObjectName, EquippedItem>? GetEquippedWithItemId(string itemId)
