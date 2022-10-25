@@ -4,7 +4,6 @@ using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities;
-using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.SpellsAndGadgets.Shapes;
 using Unity.Netcode;
 using UnityEngine;
@@ -20,6 +19,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         public Vector3 ForwardDirection;
 
         private IEffectService _effectService;
+        private IValueCalculator _valueCalculator;
 
         private Type _shapeType;
 
@@ -38,6 +38,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             Physics.IgnoreCollision(GetComponent<Collider>(), SourceFighter.GameObject.GetComponent<Collider>());
 
             _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
+            _valueCalculator = ModHelper.GetGameManager().GetService<IValueCalculator>();
 
             var affectedByGravity = SpellOrGadget.Shape != null;
 
@@ -45,7 +46,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             var rigidBody = GetComponent<Rigidbody>();
 
-            rigidBody.AddForce(20f * SpellOrGadget.Attributes.GetProjectileSpeed() * ForwardDirection, ForceMode.VelocityChange);
+            rigidBody.AddForce(20f * _valueCalculator.GetProjectileSpeed(SpellOrGadget.Attributes) * ForwardDirection, ForceMode.VelocityChange);
 
             if (affectedByGravity)
             {

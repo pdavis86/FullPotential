@@ -6,7 +6,6 @@ using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Registry.SpellsAndGadgets;
-using FullPotential.Api.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -17,11 +16,14 @@ namespace FullPotential.Core.Gameplay.Combat
     public class EffectService : IEffectService
     {
         private readonly ITypeRegistry _typeRegistry;
+        private readonly IValueCalculator _valueCalculator;
 
         public EffectService(
-            ITypeRegistry typeRegistry)
+            ITypeRegistry typeRegistry,
+            IValueCalculator valueCalculator)
         {
             _typeRegistry = typeRegistry;
+            _valueCalculator = valueCalculator;
         }
 
         public void ApplyEffects(
@@ -182,7 +184,7 @@ namespace FullPotential.Core.Gameplay.Combat
             }
 
             var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
-            var force = attributes.GetForceValue(adjustForGravity);
+            var force = _valueCalculator.GetForceValue(attributes, adjustForGravity);
 
             switch (movementEffect.Direction)
             {
@@ -242,7 +244,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     var comp = targetGameObject.AddComponent<MaintainDistance>();
                     comp.SourceFighter = sourceFighter;
                     comp.Distance = (targetGameObject.transform.position - sourceFighter.Transform.position).magnitude;
-                    comp.Duration = attributes.GetDuration();
+                    comp.Duration = _valueCalculator.GetDuration(attributes);
                     return;
 
                 default:

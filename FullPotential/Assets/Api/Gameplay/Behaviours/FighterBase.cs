@@ -10,7 +10,6 @@ using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
-using FullPotential.Api.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -190,9 +189,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             handStatus.IsReloading = true;
 
-            yield return new WaitForSeconds(handStatus.EquippedWeapon.Attributes.GetReloadTime());
+            yield return new WaitForSeconds(_valueCalculator.GetReloadTime(handStatus.EquippedWeapon.Attributes));
 
-            handStatus.EquippedWeapon.Ammo = handStatus.EquippedWeapon.Attributes.GetAmmoMax();
+            handStatus.EquippedWeapon.Ammo = _valueCalculator.GetAmmoMax(handStatus.EquippedWeapon.Attributes);
 
             handStatus.IsReloading = false;
         }
@@ -368,7 +367,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             //todo: handle multiple shots 
 
-            var range = weaponInHand.Attributes.GetProjectileRange();
+            var range = _valueCalculator.GetProjectileRange(weaponInHand.Attributes);
             var endPos = Physics.Raycast(LookTransform.position, LookTransform.forward, out var rangedHit, range)
                 ? rangedHit.point
                 : handPosition + LookTransform.forward * range;

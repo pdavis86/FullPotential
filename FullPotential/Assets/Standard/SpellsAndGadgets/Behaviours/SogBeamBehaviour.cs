@@ -1,7 +1,6 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
-using FullPotential.Api.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -20,6 +19,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 #pragma warning restore 0649
 
         private IEffectService _effectService;
+        private IValueCalculator _valueCalculator;
 
         private Transform _cylinderParentTransform;
         private Transform _cylinderTransform;
@@ -34,6 +34,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             _cylinderTransform = _cylinderParentTransform.GetChild(0);
 
             _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
+            _valueCalculator = ModHelper.GetGameManager().GetService<IValueCalculator>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -46,7 +47,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _maxBeamLength = SpellOrGadget.Attributes.GetContinuousRange();
+            _maxBeamLength = _valueCalculator.GetContinuousRange(SpellOrGadget.Attributes);
 
             PerformGraphicsAdjustments();
 
@@ -55,7 +56,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            var effectsDelay = SpellOrGadget.Attributes.GetTimeBetweenEffects();
+            var effectsDelay = _valueCalculator.GetTimeBetweenEffects(SpellOrGadget.Attributes);
             _applyEffectsAction = new DelayedAction(effectsDelay, () => ApplyEffects(_hit.transform.gameObject, _hit.point));
         }
 

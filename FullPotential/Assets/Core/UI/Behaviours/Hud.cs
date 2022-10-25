@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Ui;
-using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.UI.Behaviours;
 using FullPotential.Core.Ui.Components;
@@ -34,6 +34,8 @@ namespace FullPotential.Core.Ui.Behaviours
 #pragma warning restore 0649
 
         private ILocalizer _localizer;
+        private IValueCalculator _valueCalculator;
+
         private string _reloadingTranslation;
 
         private GameObject _activeEffectPrefab;
@@ -51,6 +53,8 @@ namespace FullPotential.Core.Ui.Behaviours
         private void Awake()
         {
             _localizer = GameManager.Instance.GetService<ILocalizer>();
+            _valueCalculator = GameManager.Instance.GetService<IValueCalculator>();
+
             _reloadingTranslation = _localizer.Translate("ui.hub.reloading");
 
             _activeEffectPrefab = _activeEffectsContainer.GetComponent<ActiveEffectsUi>().ActiveEffectPrefab;
@@ -132,7 +136,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
             ammoText.text = handStatus.IsReloading
                 ? _reloadingTranslation
-                : $"{handStatus.EquippedWeapon.Ammo}/{handStatus.EquippedWeapon.Attributes.GetAmmoMax()}";
+                : $"{handStatus.EquippedWeapon.Ammo}/{_valueCalculator.GetAmmoMax(handStatus.EquippedWeapon.Attributes)}";
         }
 
         private void UpdateStaminaPercentage()

@@ -28,15 +28,21 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private readonly TypeRegistry _typeRegistry;
         private readonly ILocalizer _localizer;
+        private readonly IValueCalculator _valueCalculator;
+
         private readonly List<ILoot> _lootTypes;
         private readonly List<IEffect> _effectsForLoot;
         private readonly List<ITargeting> _targetingOptions;
         private readonly List<IShape> _shapeOptions;
 
-        public ResultFactory(ITypeRegistry typeRegistry, ILocalizer localizer)
+        public ResultFactory(
+            ITypeRegistry typeRegistry, 
+            ILocalizer localizer,
+            IValueCalculator valueCalculator)
         {
             _typeRegistry = (TypeRegistry)typeRegistry;
             _localizer = localizer;
+            _valueCalculator = valueCalculator;
 
             _lootTypes = _typeRegistry.GetRegisteredTypes<ILoot>().ToList();
             _effectsForLoot = _typeRegistry.GetLootPossibilities();
@@ -400,7 +406,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 Effects = GetEffects(nameof(Weapon), components)
             };
             weapon.Name = GetItemName(true, weapon);
-            weapon.Ammo = weapon.Attributes.GetAmmoMax();
+            weapon.Ammo = _valueCalculator.GetAmmoMax(weapon.Attributes);
             return weapon;
         }
 
