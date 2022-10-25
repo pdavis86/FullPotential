@@ -28,7 +28,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private PlayerState _playerState;
         private PlayerBehaviour _playerBehaviour;
-        private ResultFactory _resultFactory;
+        private IResultFactory _resultFactory;
         private List<ItemBase> _components;
 
         // ReSharper disable once UnusedMember.Local
@@ -39,7 +39,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>();
             _playerBehaviour = _playerState.gameObject.GetComponent<PlayerBehaviour>();
 
-            _resultFactory = GameManager.Instance.GetService<ResultFactory>();
+            _resultFactory = GameManager.Instance.GetService<IResultFactory>();
 
             _craftButton.onClick.AddListener(CraftButtonOnClick);
 

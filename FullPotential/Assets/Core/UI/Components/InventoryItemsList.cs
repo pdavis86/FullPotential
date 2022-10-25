@@ -26,7 +26,7 @@ namespace FullPotential.Core.Ui.Components
             bool showEquippedItems = true
         )
         {
-            var resultFactory = GameManager.Instance.GetService<ResultFactory>();
+            var resultFactory = GameManager.Instance.GetService<IResultFactory>();
 
             componentsContainer.SetActive(true);
             componentsContainer.transform.DestroyChildren();

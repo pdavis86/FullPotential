@@ -6,7 +6,7 @@ using Random = System.Random;
 
 namespace FullPotential.Api.Gameplay.Combat
 {
-    public class ValueCalculator
+    public class ValueCalculator : IValueCalculator
     {
         public static readonly Random Random = new Random();
 

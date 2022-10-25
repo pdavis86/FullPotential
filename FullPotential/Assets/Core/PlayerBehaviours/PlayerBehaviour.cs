@@ -5,7 +5,6 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Enums;
-using FullPotential.Api.Gameplay.Helpers;
 using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
@@ -33,8 +32,8 @@ namespace FullPotential.Core.PlayerBehaviours
 #pragma warning restore 0649
 
         //Services
-        private ResultFactory _resultFactory;
-        private InventoryDataHelper _inventoryDataHelper;
+        private IResultFactory _resultFactory;
+        private IInventoryDataService _inventoryDataService;
 
         private bool _hasMenuOpen;
         private UserInterface _userInterface;
@@ -56,8 +55,8 @@ namespace FullPotential.Core.PlayerBehaviours
             _playerState = GetComponent<PlayerState>();
             _playerMovement = GetComponent<PlayerMovement>();
 
-            _resultFactory = GameManager.Instance.GetService<ResultFactory>();
-            _inventoryDataHelper = GameManager.Instance.GetService<InventoryDataHelper>();
+            _resultFactory = GameManager.Instance.GetService<IResultFactory>();
+            _inventoryDataService = GameManager.Instance.GetService<IInventoryDataService>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -300,7 +299,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 IdsToRemove = componentIdArray
             };
 
-            _inventoryDataHelper.PopulateInventoryChangesWithItem(invChange, craftedItem);
+            _inventoryDataService.PopulateInventoryChangesWithItem(invChange, craftedItem);
 
             ApplyInventoryChanges(invChange);
 

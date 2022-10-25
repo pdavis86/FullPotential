@@ -6,7 +6,6 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Enums;
-using FullPotential.Api.Gameplay.Helpers;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
@@ -39,8 +38,8 @@ namespace FullPotential.Core.PlayerBehaviours
         private ITypeRegistry _typeRegistry;
         private IRpcService _rpcService;
         private ILocalizer _localizer;
-        private ResultFactory _resultFactory;
-        private InventoryDataHelper _inventoryDataHelper;
+        private IResultFactory _resultFactory;
+        private IInventoryDataService _inventoryDataService;
 
         private PlayerState _playerState;
         private Dictionary<string, ItemBase> _items;
@@ -62,8 +61,8 @@ namespace FullPotential.Core.PlayerBehaviours
             _typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
             _rpcService = GameManager.Instance.GetService<IRpcService>();
             _localizer = GameManager.Instance.GetService<ILocalizer>();
-            _resultFactory = GameManager.Instance.GetService<ResultFactory>();
-            _inventoryDataHelper = GameManager.Instance.GetService<InventoryDataHelper>();
+            _resultFactory = GameManager.Instance.GetService<IResultFactory>();
+            _inventoryDataService = GameManager.Instance.GetService<IInventoryDataService>();
 
             _items = new Dictionary<string, ItemBase>();
             _equippedItems = new Dictionary<SlotGameObjectName, EquippedItem>();
@@ -93,7 +92,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (slotChange.WasEquipped)
             {
-                _inventoryDataHelper.PopulateInventoryChangesWithItem(invChange, item);
+                _inventoryDataService.PopulateInventoryChangesWithItem(invChange, item);
             }
 
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
@@ -419,6 +418,7 @@ namespace FullPotential.Core.PlayerBehaviours
             }
         }
 
+        //todo: why is this static?
         private static void FillTypesFromIds(ItemBase item)
         {
             var typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
@@ -430,7 +430,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (item is SpellOrGadgetItemBase magicalItem)
             {
-                var resultFactory = GameManager.Instance.GetService<ResultFactory>();
+                var resultFactory = GameManager.Instance.GetService<IResultFactory>();
                 if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeName))
                 {
                     magicalItem.Shape = resultFactory.GetShape(magicalItem.ShapeTypeName);

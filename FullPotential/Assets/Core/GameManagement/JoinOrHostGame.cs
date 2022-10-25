@@ -30,7 +30,7 @@ namespace FullPotential.Core.GameManagement
         [SerializeField] private GameObject _joiningMessage;
 #pragma warning restore 0649
 
-        private UserRegistry _userRegistry;
+        private IUserRegistry _userRegistry;
         private ILocalizer _localizer;
 
         private NetworkManager _networkManager;
@@ -52,7 +52,7 @@ namespace FullPotential.Core.GameManagement
 
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
 
-            _userRegistry = GameManager.Instance.GetService<UserRegistry>();
+            _userRegistry = GameManager.Instance.GetService<IUserRegistry>();
             _localizer = GameManager.Instance.GetService<ILocalizer>();
         }
 

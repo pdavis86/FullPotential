@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace FullPotential.Core.Registry
 {
-    public class UserRegistry
+    public class UserRegistry : IUserRegistry
     {
         private readonly bool _isDebugBuild;
         private readonly string _persistentDataPath;

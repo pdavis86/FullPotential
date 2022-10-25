@@ -46,7 +46,7 @@ namespace FullPotential.Core.PlayerBehaviours
         private ActionQueue<bool> _aliveStateChanges;
 
         //Registered Services
-        private UserRegistry _userRegistry;
+        private IUserRegistry _userRegistry;
 
         //Data
         private PlayerData _saveData;
@@ -116,7 +116,7 @@ namespace FullPotential.Core.PlayerBehaviours
             _inventory = Inventory;
             _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
 
-            _userRegistry = GameManager.Instance.GetService<UserRegistry>();
+            _userRegistry = GameManager.Instance.GetService<IUserRegistry>();
 
             HealthStatSlider = _healthSlider;
         }

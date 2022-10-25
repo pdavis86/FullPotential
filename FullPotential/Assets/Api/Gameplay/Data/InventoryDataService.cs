@@ -1,11 +1,10 @@
-﻿using FullPotential.Api.Gameplay.Data;
-using FullPotential.Api.Registry.Base;
+﻿using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 
-namespace FullPotential.Api.Gameplay.Helpers
+namespace FullPotential.Api.Gameplay.Data
 {
-    public class InventoryDataHelper
+    public class InventoryDataService : IInventoryDataService
     {
         public void PopulateInventoryChangesWithItem(InventoryChanges invChanges, ItemBase item)
         {

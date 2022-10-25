@@ -29,7 +29,7 @@ namespace FullPotential.Core.UI.Admin
         [SerializeField] private Text _itemNameText;
 #pragma warning restore 0649
 
-        private ResultFactory _resultFactory;
+        private IResultFactory _resultFactory;
 
         private List<IEffect> _registeredEffects;
         private List<ITargeting> _registeredTargetingOptions;
@@ -46,7 +46,7 @@ namespace FullPotential.Core.UI.Admin
         {
             var gameManager = ModHelper.GetGameManager();
 
-            _resultFactory = gameManager.GetService<ResultFactory>();
+            _resultFactory = gameManager.GetService<IResultFactory>();
 
             var typeRegistry = gameManager.GetService<ITypeRegistry>();
             _registeredEffects = typeRegistry.GetRegisteredTypes<IEffect>().ToList();

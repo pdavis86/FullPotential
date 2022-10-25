@@ -26,12 +26,12 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private GameObject _lastClickedSlot;
         private PlayerState _playerState;
-        private ResultFactory _resultFactory;
+        private IResultFactory _resultFactory;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _resultFactory = GameManager.Instance.GetService<ResultFactory>();
+            _resultFactory = GameManager.Instance.GetService<IResultFactory>();
         }
 
         // ReSharper disable once UnusedMember.Local

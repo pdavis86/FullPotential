@@ -8,7 +8,7 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.GameManagement.Constants;
 using FullPotential.Api.GameManagement.Data;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Helpers;
+using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Scenes;
@@ -57,9 +57,8 @@ namespace FullPotential.Core.GameManagement
         public readonly LocalGameData LocalGameDataStore = new LocalGameData();
 
         //Services
-        private UserRegistry _userRegistry;
+        private IUserRegistry _userRegistry;
         private ILocalizer _localizer;
-        private AddressablesManager _addressablesManager;
 
         //Variables
         private bool _isSaving;
@@ -93,15 +92,15 @@ namespace FullPotential.Core.GameManagement
             EnsureAppOptionsLoaded();
 
             await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
-            _addressablesManager = new AddressablesManager();
+            var addressablesManager = new AddressablesManager();
 
             var typeRegistry = (TypeRegistry)GetService<ITypeRegistry>();
-            typeRegistry.FindAndRegisterAll(_addressablesManager.ModPrefixes);
+            typeRegistry.FindAndRegisterAll(addressablesManager.ModPrefixes);
 
-            _userRegistry = GetService<UserRegistry>();
+            _userRegistry = GetService<IUserRegistry>();
 
             _localizer = GetService<ILocalizer>();
-            await _localizer.LoadAvailableCulturesAsync(_addressablesManager.LocalisationAddresses);
+            await _localizer.LoadAvailableCulturesAsync(addressablesManager.LocalisationAddresses);
             await _localizer.LoadLocalizationFilesAsync(AppOptions.Culture);
 
             Prefabs = GetComponent<Prefabs>();
@@ -365,12 +364,10 @@ namespace FullPotential.Core.GameManagement
 
         private void RegisterServices()
         {
-            //todo: make interfaces
-            _serviceRegistry.Register<UserRegistry>();
-            _serviceRegistry.Register<ResultFactory>();
-            _serviceRegistry.Register<InventoryDataHelper>();
-            _serviceRegistry.Register<ValueCalculator>();
-
+            _serviceRegistry.Register<IUserRegistry, UserRegistry>();
+            _serviceRegistry.Register<IResultFactory, ResultFactory>();
+            _serviceRegistry.Register<IInventoryDataService, InventoryDataService>();
+            _serviceRegistry.Register<IValueCalculator, ValueCalculator>();
             _serviceRegistry.Register<ILocalizer, Localizer>();
             _serviceRegistry.Register<ITypeRegistry, TypeRegistry>();
             _serviceRegistry.Register<ISpawnService, SpawnService>(true);

@@ -22,7 +22,7 @@ using FullPotential.Core.Utilities.Helpers;
 
 namespace FullPotential.Core.Gameplay.Crafting
 {
-    public class ResultFactory
+    public class ResultFactory : IResultFactory
     {
         public const int MaxExtraAmmo = 3;
 

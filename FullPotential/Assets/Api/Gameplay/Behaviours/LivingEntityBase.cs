@@ -50,7 +50,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected ILocalizer _localizer;
         protected ITypeRegistry _typeRegistry;
         protected IEffectService _effectService;
-        protected ValueCalculator _valueCalculator;
+        protected IValueCalculator _valueCalculator;
 
         protected readonly NetworkVariable<FixedString32Bytes> _entityName = new NetworkVariable<FixedString32Bytes>();
         protected readonly NetworkVariable<int> _energy = new NetworkVariable<int>(100);
@@ -98,7 +98,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _localizer = _gameManager.GetService<ILocalizer>();
             _typeRegistry = _gameManager.GetService<ITypeRegistry>();
             _effectService = _gameManager.GetService<IEffectService>();
-            _valueCalculator = _gameManager.GetService<ValueCalculator>();
+            _valueCalculator = _gameManager.GetService<IValueCalculator>();
 
             _entityName.OnValueChanged += OnNameChanged;
             _health.OnValueChanged += OnHealthChanged;
