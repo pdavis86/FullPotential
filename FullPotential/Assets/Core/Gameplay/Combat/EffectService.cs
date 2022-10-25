@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
@@ -50,7 +51,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 //Debug.Log($"Applying just damage (no effects) to {targetFighter.FighterName}");
 
-                targetFighter.TakeDamage(sourceFighter, itemUsed, position);
+                targetFighter.TakeDamageFromFighter(sourceFighter, itemUsed, position);
                 return;
             }
 
@@ -173,6 +174,13 @@ namespace FullPotential.Core.Gameplay.Combat
                 return;
             }
 
+            var targetLivingEntity = targetGameObject.GetComponent<LivingEntityBase>();
+
+            if (targetLivingEntity != null)
+            {
+                targetLivingEntity.SetLastMover(sourceFighter);
+            }
+
             var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
             var force = attributes.GetForceValue(adjustForGravity);
 
@@ -214,7 +222,6 @@ namespace FullPotential.Core.Gameplay.Combat
                     return;
 
                 case MovementDirection.Down:
-                    //todo: implement fall damage
                     targetRigidBody.AddForce(-targetGameObject.transform.up * force, ForceMode.Acceleration);
                     return;
 

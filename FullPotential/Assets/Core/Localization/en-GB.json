@@ -337,6 +337,10 @@
       "Value": "fall damage"
     },
     {
+      "Key": "ui.alert.environmentaldamage",
+      "Value": "environmental damage"
+    },
+    {
       "Key": "ui.alert.suicide",
       "Value": "Yourself"
     },

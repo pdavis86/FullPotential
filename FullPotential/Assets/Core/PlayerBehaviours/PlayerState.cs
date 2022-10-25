@@ -7,7 +7,6 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Inventory;
-using FullPotential.Api.Registry;
 using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities;
@@ -118,8 +117,6 @@ namespace FullPotential.Core.PlayerBehaviours
             _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
 
             _userRegistry = GameManager.Instance.GetService<UserRegistry>();
-            _typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
-            _effectService = GameManager.Instance.GetService<IEffectService>();
 
             HealthStatSlider = _healthSlider;
         }
@@ -491,7 +488,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (IsServer)
             {
-                _fighterName.Value = Username;
+                _entityName.Value = Username;
                 _energy.Value = playerData.Consumables.Energy;
                 _health.Value = playerData.Consumables.Health > 0 ? playerData.Consumables.Health : GetHealthMax();
                 _mana.Value = playerData.Consumables.Mana;

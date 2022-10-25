@@ -8,6 +8,7 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.GameManagement.Constants;
 using FullPotential.Api.GameManagement.Data;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Helpers;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Scenes;
@@ -364,8 +365,11 @@ namespace FullPotential.Core.GameManagement
 
         private void RegisterServices()
         {
+            //todo: make interfaces
             _serviceRegistry.Register<UserRegistry>();
             _serviceRegistry.Register<ResultFactory>();
+            _serviceRegistry.Register<InventoryDataHelper>();
+            _serviceRegistry.Register<ValueCalculator>();
 
             _serviceRegistry.Register<ILocalizer, Localizer>();
             _serviceRegistry.Register<ITypeRegistry, TypeRegistry>();

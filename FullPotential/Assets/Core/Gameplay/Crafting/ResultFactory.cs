@@ -195,24 +195,24 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private bool IsSuccess(int percentageChance)
         {
-            return AttributeCalculator.Random.Next(1, 101) <= percentageChance;
+            return ValueCalculator.Random.Next(1, 101) <= percentageChance;
         }
 
         private int GetAttributeValue(int percentageChance)
         {
-            return IsSuccess(percentageChance) ? AttributeCalculator.Random.Next(1, 100) : 0;
+            return IsSuccess(percentageChance) ? ValueCalculator.Random.Next(1, 100) : 0;
         }
 
         private IEffect GetRandomEffect()
         {
-            return _effectsForLoot.ElementAt(AttributeCalculator.Random.Next(0, _effectsForLoot.Count));
+            return _effectsForLoot.ElementAt(ValueCalculator.Random.Next(0, _effectsForLoot.Count));
         }
 
         private ITargeting GetRandomTargetingOrNone()
         {
             if (IsSuccess(50))
             {
-                return _targetingOptions.ElementAt(AttributeCalculator.Random.Next(0, _targetingOptions.Count));
+                return _targetingOptions.ElementAt(ValueCalculator.Random.Next(0, _targetingOptions.Count));
             }
             return null;
         }
@@ -221,7 +221,7 @@ namespace FullPotential.Core.Gameplay.Crafting
         {
             if (IsSuccess(10))
             {
-                return _shapeOptions.ElementAt(AttributeCalculator.Random.Next(0, _shapeOptions.Count));
+                return _shapeOptions.ElementAt(ValueCalculator.Random.Next(0, _shapeOptions.Count));
             }
             return null;
         }
@@ -235,7 +235,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 {
                     IsAutomatic = IsSuccess(50),
                     IsSoulbound = IsSuccess(10),
-                    ExtraAmmoPerShot = IsSuccess(20) ? Convert.ToByte(AttributeCalculator.Random.Next(1, MaxExtraAmmo + 1)) : (byte)0,
+                    ExtraAmmoPerShot = IsSuccess(20) ? Convert.ToByte(ValueCalculator.Random.Next(1, MaxExtraAmmo + 1)) : (byte)0,
                     Strength = GetAttributeValue(75),
                     Efficiency = GetAttributeValue(75),
                     Range = GetAttributeValue(75),
@@ -255,11 +255,11 @@ namespace FullPotential.Core.Gameplay.Crafting
             {
                 // ReSharper disable once UnusedParameter.Local
                 lootDrop.RegistryType = magicalLootTypes
-                    .OrderBy(x => AttributeCalculator.Random.Next())
+                    .OrderBy(x => ValueCalculator.Random.Next())
                     .First();
 
                 var effects = new List<IEffect>();
-                var numberOfEffects = MathsHelper.GetMinBiasedNumber(1, Math.Min(4, _effectsForLoot.Count), AttributeCalculator.Random);
+                var numberOfEffects = MathsHelper.GetMinBiasedNumber(1, Math.Min(4, _effectsForLoot.Count), ValueCalculator.Random);
                 for (var i = 1; i <= numberOfEffects; i++)
                 {
                     IEffect effect;
@@ -287,7 +287,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             {
                 // ReSharper disable once UnusedParameter.Local
                 lootDrop.RegistryType = techLootTypes
-                    .OrderBy(x => AttributeCalculator.Random.Next())
+                    .OrderBy(x => ValueCalculator.Random.Next())
                     .First();
             }
 

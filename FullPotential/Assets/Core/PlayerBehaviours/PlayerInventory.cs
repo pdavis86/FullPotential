@@ -40,6 +40,7 @@ namespace FullPotential.Core.PlayerBehaviours
         private IRpcService _rpcService;
         private ILocalizer _localizer;
         private ResultFactory _resultFactory;
+        private InventoryDataHelper _inventoryDataHelper;
 
         private PlayerState _playerState;
         private Dictionary<string, ItemBase> _items;
@@ -62,6 +63,7 @@ namespace FullPotential.Core.PlayerBehaviours
             _rpcService = GameManager.Instance.GetService<IRpcService>();
             _localizer = GameManager.Instance.GetService<ILocalizer>();
             _resultFactory = GameManager.Instance.GetService<ResultFactory>();
+            _inventoryDataHelper = GameManager.Instance.GetService<InventoryDataHelper>();
 
             _items = new Dictionary<string, ItemBase>();
             _equippedItems = new Dictionary<SlotGameObjectName, EquippedItem>();
@@ -91,7 +93,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (slotChange.WasEquipped)
             {
-                InventoryDataHelper.PopulateInventoryChangesWithItem(invChange, item);
+                _inventoryDataHelper.PopulateInventoryChangesWithItem(invChange, item);
             }
 
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
@@ -33,6 +34,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
         //Services
         private ResultFactory _resultFactory;
+        private InventoryDataHelper _inventoryDataHelper;
 
         private bool _hasMenuOpen;
         private UserInterface _userInterface;
@@ -55,6 +57,7 @@ namespace FullPotential.Core.PlayerBehaviours
             _playerMovement = GetComponent<PlayerMovement>();
 
             _resultFactory = GameManager.Instance.GetService<ResultFactory>();
+            _inventoryDataHelper = GameManager.Instance.GetService<InventoryDataHelper>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -297,7 +300,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 IdsToRemove = componentIdArray
             };
 
-            InventoryDataHelper.PopulateInventoryChangesWithItem(invChange, craftedItem);
+            _inventoryDataHelper.PopulateInventoryChangesWithItem(invChange, craftedItem);
 
             ApplyInventoryChanges(invChange);
 
@@ -370,19 +373,25 @@ namespace FullPotential.Core.PlayerBehaviours
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void ShowDamageClientRpc(Vector3 position, string damage, ClientRpcParams clientRpcParams)
+        public void ShowHealthChangeClientRpc(Vector3 position, int change, ClientRpcParams clientRpcParams)
         {
-            var offsetX = (float)AttributeCalculator.Random.Next(-9, 10) / 100;
-            var offsetY = (float)AttributeCalculator.Random.Next(-9, 10) / 100;
-            var offsetZ = (float)AttributeCalculator.Random.Next(-9, 10) / 100;
+            var offsetX = (float)ValueCalculator.Random.Next(-9, 10) / 100;
+            var offsetY = (float)ValueCalculator.Random.Next(-9, 10) / 100;
+            var offsetZ = (float)ValueCalculator.Random.Next(-9, 10) / 100;
             var adjustedPosition = position + new Vector3(offsetX, offsetY, offsetZ);
 
             var hit = Instantiate(_hitTextPrefab);
             hit.transform.SetParent(GameManager.Instance.UserInterface.HitNumberContainer.transform, false);
-            hit.SetActive(true);
 
             var hitText = hit.GetComponent<TextMeshProUGUI>();
-            hitText.text = damage;
+
+            hitText.text = change < 0
+                ? (change * -1).ToString(CultureInfo.InvariantCulture)
+                : change.ToString(CultureInfo.InvariantCulture);
+
+            hitText.color = change < 0
+                ? Color.red
+                : Color.green;
 
             const int maxDistanceForMinFontSize = 40;
             var distance = Vector3.Distance(Camera.main.transform.position, adjustedPosition);
@@ -393,6 +402,8 @@ namespace FullPotential.Core.PlayerBehaviours
 
             var sticky = hit.GetComponent<StickUiToWorldPosition>();
             sticky.WorldPosition = adjustedPosition;
+
+            hit.SetActive(true);
 
             Destroy(hit, 1f);
         }

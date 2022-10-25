@@ -5,6 +5,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 {
     public interface IPlayerBehaviour
     {
-        void ShowDamageClientRpc(Vector3 position, string damage, ClientRpcParams clientRpcParams);
+        void ShowHealthChangeClientRpc(Vector3 position, int change, ClientRpcParams clientRpcParams);
     }
 }

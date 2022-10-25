@@ -5,9 +5,9 @@ using FullPotential.Api.Registry.SpellsAndGadgets;
 
 namespace FullPotential.Api.Gameplay.Helpers
 {
-    public static class InventoryDataHelper
+    public class InventoryDataHelper
     {
-        public static void PopulateInventoryChangesWithItem(InventoryChanges invChanges, ItemBase item)
+        public void PopulateInventoryChangesWithItem(InventoryChanges invChanges, ItemBase item)
         {
             var itemType = item.GetType();
             invChanges.Accessories = itemType == typeof(Accessory) ? new[] { item as Accessory } : null;

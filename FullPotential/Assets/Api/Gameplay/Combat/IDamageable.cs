@@ -14,7 +14,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
         int GetHealth();
 
-        void TakeDamage(IFighter sourceFighter,
+        void TakeDamageFromFighter(IFighter sourceFighter,
             ItemBase itemUsed,
             Vector3? position);
 

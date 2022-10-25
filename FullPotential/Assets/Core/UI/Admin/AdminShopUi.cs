@@ -173,7 +173,7 @@ namespace FullPotential.Core.UI.Admin
             foreach (var behaviour in _attributeSliderBehaviours)
             {
                 behaviour.Slider.value = Mathf.Approximately(behaviour.Slider.maxValue, 100)
-                    ? AttributeCalculator.Random.Next(1, 101)
+                    ? ValueCalculator.Random.Next(1, 101)
                     : 0;
             }
         }
