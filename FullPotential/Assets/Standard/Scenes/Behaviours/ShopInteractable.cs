@@ -7,7 +7,7 @@ using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 
-// ReSharper disable once UnusedType.Global
+// ReSharper disable UnusedType.Global
 
 namespace FullPotential.Standard.Scenes.Behaviours
 {

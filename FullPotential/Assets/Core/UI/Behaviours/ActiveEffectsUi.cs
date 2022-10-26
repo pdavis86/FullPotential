@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.UI.Behaviours
 {

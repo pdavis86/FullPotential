@@ -4,7 +4,7 @@ using FullPotential.Api.GameManagement;
 using Unity.Netcode;
 using UnityEngine;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Networking
 {

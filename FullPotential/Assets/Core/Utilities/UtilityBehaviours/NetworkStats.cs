@@ -16,9 +16,11 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
         // The client receives that pong response and stops its time.
         // The RPC value is using a moving average, so we don't have a value that moves too much, but is still reactive to RTT changes.
 
+        // ReSharper disable FieldCanBeMadeReadOnly.Local
         [SerializeField]
         [Tooltip("The interval to send ping RPCs to calculate the RTT. The bigger the number, the less reactive the stat will be to RTT changes")]
-        float _pingIntervalSeconds = 0.1f;
+        private float _pingIntervalSeconds = 0.1f;
+        // ReSharper restore FieldCanBeMadeReadOnly.Local
 
         public float LastRtt { get; private set; }
 

@@ -3,7 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable UnusedParameter.Global
-// ReSharper disable once UnusedMemberInSuper.Global
+// ReSharper disable UnusedMemberInSuper.Global
 
 namespace FullPotential.Api.GameManagement
 {

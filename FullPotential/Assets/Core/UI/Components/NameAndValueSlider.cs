@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace FullPotential.Core.UI.Components
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
+    // ReSharper disable ClassNeverInstantiated.Global
 
     public class NameAndValueSlider : MonoBehaviour
     {

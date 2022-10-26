@@ -1,5 +1,7 @@
 ﻿using FullPotential.Api.Gameplay.Behaviours;
 
+// ReSharper disable UnusedMemberInSuper.Global
+
 namespace FullPotential.Api.Ui
 {
     public interface IHud

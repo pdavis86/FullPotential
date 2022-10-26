@@ -2,6 +2,8 @@
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 
+// ReSharper disable ClassNeverInstantiated.Global
+
 namespace FullPotential.Api.Gameplay.Data
 {
     public class InventoryDataService : IInventoryDataService

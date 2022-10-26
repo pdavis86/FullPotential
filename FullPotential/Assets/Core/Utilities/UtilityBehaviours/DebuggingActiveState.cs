@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace FullPotential.Core.Utilities.UtilityBehaviours
 {
-    // ReSharper disable once UnusedType.Global
+    // ReSharper disable UnusedType.Global
 
     public class DebuggingActiveState : MonoBehaviour
     {

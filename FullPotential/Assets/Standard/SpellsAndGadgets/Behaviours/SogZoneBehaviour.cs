@@ -12,8 +12,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
     public class SogZoneBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
-        // ReSharper disable once InconsistentNaming
-        private const float _distanceFromGround = 1f;
+        private const float DistanceFromGround = 1f;
 
         public SpellOrGadgetItemBase SpellOrGadget;
         public IFighter SourceFighter;
@@ -79,7 +78,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            var adjustedPosition = position + new Vector3(0, _distanceFromGround);
+            var adjustedPosition = position + new Vector3(0, DistanceFromGround);
             _effectService.ApplyEffects(SourceFighter, SpellOrGadget, target, adjustedPosition);
         }
     }

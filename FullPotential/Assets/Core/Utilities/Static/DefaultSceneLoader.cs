@@ -4,7 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// ReSharper disable once UnusedType.Global
+// ReSharper disable UnusedType.Global
 
 namespace FullPotential.Core.Utilities.Static
 {

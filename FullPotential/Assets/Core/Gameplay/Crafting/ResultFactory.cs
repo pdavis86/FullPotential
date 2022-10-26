@@ -18,7 +18,7 @@ using FullPotential.Core.Registry;
 using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.Helpers;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Gameplay.Crafting
 {
@@ -259,9 +259,8 @@ namespace FullPotential.Core.Gameplay.Crafting
             var isMagical = magicalLootTypes.Any() && IsSuccess(50);
             if (isMagical)
             {
-                // ReSharper disable once UnusedParameter.Local
                 lootDrop.RegistryType = magicalLootTypes
-                    .OrderBy(x => ValueCalculator.Random.Next())
+                    .OrderBy(_ => ValueCalculator.Random.Next())
                     .First();
 
                 var effects = new List<IEffect>();
@@ -291,9 +290,8 @@ namespace FullPotential.Core.Gameplay.Crafting
             }
             else
             {
-                // ReSharper disable once UnusedParameter.Local
                 lootDrop.RegistryType = techLootTypes
-                    .OrderBy(x => ValueCalculator.Random.Next())
+                    .OrderBy(_ => ValueCalculator.Random.Next())
                     .First();
             }
 

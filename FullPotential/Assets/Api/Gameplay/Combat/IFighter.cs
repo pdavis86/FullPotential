@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using FullPotential.Api.Registry;
+﻿using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
 using UnityEngine;
@@ -19,8 +18,6 @@ namespace FullPotential.Api.Gameplay.Combat
         string FighterName { get; }
 
         ulong OwnerClientId { get; }
-
-        List<ActiveEffect> GetActiveEffects();
 
         void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes);
 

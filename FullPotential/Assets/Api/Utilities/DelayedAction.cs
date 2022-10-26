@@ -1,6 +1,9 @@
 ﻿using System;
 using UnityEngine;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMethodReturnValue.Global
+
 namespace FullPotential.Api.Utilities
 {
     public class DelayedAction
@@ -18,13 +21,12 @@ namespace FullPotential.Api.Utilities
             _actionToDo = actionToDo;
         }
 
-        // ReSharper disable once UnusedMember.Global
+        
         public void SetTimeBetweenEffects(float delay)
         {
             _timeBetweenActions = delay;
         }
 
-        // ReSharper disable once UnusedMethodReturnValue.Global
         public bool TryPerformAction()
         {
             if (_timeSinceLastAction < _timeBetweenActions)

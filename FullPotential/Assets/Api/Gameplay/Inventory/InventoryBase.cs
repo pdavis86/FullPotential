@@ -10,6 +10,8 @@ using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
+// ReSharper disable UnusedMemberHierarchy.Global
+
 namespace FullPotential.Api.Gameplay.Inventory
 {
     public abstract class InventoryBase : NetworkBehaviour, IInventory

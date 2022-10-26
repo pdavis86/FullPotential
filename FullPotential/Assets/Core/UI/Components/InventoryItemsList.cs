@@ -70,8 +70,7 @@ namespace FullPotential.Core.Ui.Components
                 var tooltip = row.GetComponent<Tooltip>();
                 tooltip.ClearHandlers();
 
-                // ReSharper disable once UnusedParameter.Local
-                tooltip.OnPointerEnterForTooltip += pointerEventData =>
+                tooltip.OnPointerEnterForTooltip += _ =>
                 {
                     Tooltips.ShowTooltip(resultFactory.GetItemDescription(item, false));
                 };

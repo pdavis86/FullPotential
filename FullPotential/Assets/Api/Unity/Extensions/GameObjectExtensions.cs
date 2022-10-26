@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+// ReSharper disable UnusedMember.Global
+
 namespace FullPotential.Api.Unity.Extensions
 {
     public static class GameObjectExtensions

@@ -80,7 +80,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Properties
 
-        public abstract IStatSlider HealthStatSlider { get; protected set; }
+        protected abstract IStatSlider HealthStatSlider { get; set; }
 
         public Rigidbody RigidBody => _rb == null ? _rb = GetComponent<Rigidbody>() : _rb;
 
@@ -120,7 +120,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (!_isSprinting && _stamina.Value < GetStaminaMax())
                 {
-                    //todo: trait-based stamina recharge
+                    //todo: zzz v0.5 - trait-based stamina recharge
                     _stamina.Value += 1;
                 }
             });
@@ -129,7 +129,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (!IsConsumingMana() && _mana.Value < GetManaMax())
                 {
-                    //todo: trait-based mana recharge
+                    //todo: zzz v0.5 - trait-based mana recharge
                     _mana.Value += 1;
                 }
             });
@@ -138,7 +138,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (!IsConsumingEnergy() && _energy.Value < GetEnergyMax())
                 {
-                    //todo: trait-based energy recharge
+                    //todo: zzz v0.5 - trait-based energy recharge
                     _energy.Value += 1;
                 }
             });
@@ -172,12 +172,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            //RecordVelocity();
             ReplenishAndConsume();
             RemoveExpiredEffects();
         }
 
-        protected virtual void OnCollisionEnter(Collision collision)
+        // ReSharper disable once UnusedMember.Local
+        private void OnCollisionEnter(Collision collision)
         {
             HandleCollision(collision);
         }
@@ -287,7 +287,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public int GetHealthMax()
         {
-            //todo: trait-based health max
+            //todo: zzz v0.5 - trait-based health max
             return 100 + GetStatMaxAdjustment(AffectableStat.Health);
         }
 
@@ -330,13 +330,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public int GetStaminaMax()
         {
-            //todo: trait-based stamina max
+            //todo: zzz v0.5 - trait-based stamina max
             return 100 + GetStatMaxAdjustment(AffectableStat.Stamina);
         }
 
         public int GetStaminaCost()
         {
-            //todo: trait-based stamina cost
+            //todo: zzz v0.5 - trait-based stamina cost
             return 10;
         }
 
@@ -379,17 +379,17 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public int GetEnergyMax()
         {
-            //todo: trait-based energy max
+            //todo: zzz v0.5 - trait-based energy max
             return 100 + GetStatMaxAdjustment(AffectableStat.Energy);
         }
 
         protected int GetEnergyCost(Gadget gadget)
         {
-            //todo: trait-based energy cost
+            //todo: zzz v0.5 - trait-based energy cost
             return 20;
         }
 
-        public abstract bool IsConsumingEnergy();
+        protected abstract bool IsConsumingEnergy();
 
         #endregion
 
@@ -429,17 +429,17 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public int GetManaMax()
         {
-            //todo: trait-based mana max
+            //todo: zzz v0.5 - trait-based mana max
             return 100 + GetStatMaxAdjustment(AffectableStat.Mana);
         }
 
         protected int GetManaCost(Spell spell)
         {
-            //todo: trait-based mana cost
+            //todo: zzz v0.5 - trait-based mana cost
             return 20;
         }
 
-        public abstract bool IsConsumingMana();
+        protected abstract bool IsConsumingMana();
 
         #endregion
 
@@ -488,7 +488,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public float GetSprintSpeed()
         {
-            //todo: trait-based sprint speed
+            //todo: zzz v0.5 - trait-based sprint speed
             return 2.5f;
         }
 

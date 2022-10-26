@@ -10,8 +10,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
     public class SogTouchBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
-        // ReSharper disable once InconsistentNaming
-        private const int _maxDistance = 3;
+        private const int MaxDistance = 3;
 
         public SpellOrGadgetItemBase SpellOrGadget;
         public IFighter SourceFighter;
@@ -32,7 +31,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
 
-            if (Physics.Raycast(StartPosition, ForwardDirection, out var hit, maxDistance: _maxDistance))
+            if (Physics.Raycast(StartPosition, ForwardDirection, out var hit, maxDistance: MaxDistance))
             {
                 ApplyEffects(hit.transform.gameObject, hit.point);
             }

@@ -61,8 +61,8 @@ namespace FullPotential.Core.Gameplay.Combat
         private void CreateNewJoint()
         {
             _targetPositionGameObject = new GameObject("MaintainDistanceTarget", typeof(Rigidbody));
-            _targetPositionGameObject.transform.parent = GameManager.Instance.GetSceneBehaviour().GetTransform();
             _targetPositionGameObject.GetComponent<Rigidbody>().isKinematic = true;
+            _targetPositionGameObject.transform.parent = GameManager.Instance.GetSceneBehaviour().GetTransform();
             _targetPositionGameObject.transform.position = gameObject.transform.position;
 
             _joint = gameObject.AddComponent<FixedJoint>();

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using FullPotential.Api.Registry;
 using UnityEngine;
 
+// ReSharper disable UnusedType.Global
+
 namespace FullPotential.Standard
 {
     public class Registration : MonoBehaviour, IMod

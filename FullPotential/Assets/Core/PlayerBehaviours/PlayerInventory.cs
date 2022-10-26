@@ -29,9 +29,9 @@ namespace FullPotential.Core.PlayerBehaviours
 {
     public class PlayerInventory : InventoryBase, IPlayerInventory
     {
-        // ReSharper disable once FieldCanBeMadeReadOnly.Local
-        // ReSharper disable once ConvertToConstant.Local
+        // ReSharper disable FieldCanBeMadeReadOnly.Local
         [SerializeField] private float _amuletForwardMultiplier = 0.2f;
+        // ReSharper restore FieldCanBeMadeReadOnly.Local
 
         //Services
         private ITypeRegistry _typeRegistry;
@@ -244,16 +244,6 @@ namespace FullPotential.Core.PlayerBehaviours
                     (x.Value is Accessory acc && (int)((IGearAccessory)acc.RegistryType).Category == (int)gearCategory)
                     || (x.Value is Armor armor && (int)((IGearArmor)armor.RegistryType).Category == (int)gearCategory));
             }
-
-            //todo: group by item type translation then by item name
-            
-            //_localizer = GameManager.Instance.GetService<ILocalizer>();
-            //_categoryCache.GetOrAdd(item.GetType().Name, () => _localizer.Translate(TranslationType.CraftingCategory);
-
-            //make a method on the prefab to set the text
-            //row.transform.Find("ItemName").GetComponent<Text>().text = gearCategory == IGear.GearCategory.Hand
-            //    ? item.GetType().Name + " - " + item.Name
-            //    : item.Name;
 
             return itemsForSlot
                 .Select(x => x.Value)

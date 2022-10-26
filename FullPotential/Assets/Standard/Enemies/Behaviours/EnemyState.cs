@@ -24,7 +24,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
         public override Transform LookTransform => transform;
 
-        public override IStatSlider HealthStatSlider { get; protected set; }
+        protected override IStatSlider HealthStatSlider { get; set; }
 
         #endregion
 

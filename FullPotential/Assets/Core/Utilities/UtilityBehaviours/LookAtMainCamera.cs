@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable once UnusedType.Global
+// ReSharper disable UnusedType.Global
 
 namespace FullPotential.Core.Utilities.UtilityBehaviours
 {

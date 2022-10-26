@@ -87,8 +87,7 @@ namespace FullPotential.Core.Ui.Behaviours
             {
                 tooltip.ClearHandlers();
 
-                // ReSharper disable once UnusedParameter.Local
-                tooltip.OnPointerEnterForTooltip += pointerEventData =>
+                tooltip.OnPointerEnterForTooltip += _ =>
                 {
                     Tooltips.ShowTooltip(_resultFactory.GetItemDescription(item));
                 };
@@ -157,8 +156,7 @@ namespace FullPotential.Core.Ui.Behaviours
         {
             var toggle = row.GetComponent<Toggle>();
 
-            // ReSharper disable once UnusedParameter.Local
-            toggle.onValueChanged.AddListener(isOn =>
+            toggle.onValueChanged.AddListener(_ =>
             {
                 Tooltips.HideTooltip();
 

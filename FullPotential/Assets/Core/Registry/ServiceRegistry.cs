@@ -21,16 +21,16 @@ namespace FullPotential.Core.Registry
             }
         }
 
-        public void Register<TClass>(bool doNotCache = false)
-            where TClass : class
-        {
-            _registry.Add(typeof(TClass), typeof(TClass));
+        //public void Register<TClass>(bool doNotCache = false)
+        //    where TClass : class
+        //{
+        //    _registry.Add(typeof(TClass), typeof(TClass));
 
-            if (doNotCache)
-            {
-                _doNotCache.Add(typeof(TClass));
-            }
-        }
+        //    if (doNotCache)
+        //    {
+        //        _doNotCache.Add(typeof(TClass));
+        //    }
+        //}
 
         public T GetService<T>()
         {

@@ -3,6 +3,8 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using UnityEngine;
 
+// ReSharper disable UnusedMemberInSuper.Global
+
 namespace FullPotential.Api.Gameplay.Combat
 {
     public interface IValueCalculator

@@ -9,7 +9,7 @@ using FullPotential.Api.Registry.SpellsAndGadgets;
 using Unity.Netcode;
 using UnityEngine;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Gameplay.Combat
 {
@@ -97,6 +97,12 @@ namespace FullPotential.Core.Gameplay.Combat
         {
             if (effect is IMovementEffect movementEffect)
             {
+                if (movementEffect.Direction == MovementDirection.MaintainDistance)
+                {
+                    ApplyMaintainDistance(itemUsed, targetGameObject, sourceFighter, itemUsed.Attributes);
+                    return;
+                }
+
                 ApplyMovementEffect(targetGameObject, movementEffect, itemUsed.Attributes, sourceFighter);
                 return;
             }
@@ -164,6 +170,19 @@ namespace FullPotential.Core.Gameplay.Combat
         private void ApplyElementalEffect(IFighter targetFighter, IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
             targetFighter.ApplyElementalEffect(elementalEffect, itemUsed, sourceFighter, position);
+        }
+
+        private void ApplyMaintainDistance(ItemBase itemUsed, GameObject targetGameObject, IFighter sourceFighter, Attributes attributes)
+        {
+            if (itemUsed is not SpellOrGadgetItemBase sog || !sog.Targeting.IsContinuous)
+            {
+                Debug.LogWarning("MaintainDistance has been applied to an invalid item");
+            }
+
+            var comp = targetGameObject.AddComponent<MaintainDistance>();
+            comp.SourceFighter = sourceFighter;
+            comp.Distance = (targetGameObject.transform.position - sourceFighter.Transform.position).magnitude;
+            comp.Duration = _valueCalculator.GetDuration(attributes);
         }
 
         private void ApplyMovementEffect(GameObject targetGameObject, IMovementEffect movementEffect, Attributes attributes, IFighter sourceFighter)
@@ -237,14 +256,6 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 case MovementDirection.Right:
                     targetRigidBody.AddForce(targetGameObject.transform.right * force, ForceMode.Acceleration);
-                    return;
-
-                case MovementDirection.MaintainDistance:
-                    //todo: make this only work with continuous spell or gadget
-                    var comp = targetGameObject.AddComponent<MaintainDistance>();
-                    comp.SourceFighter = sourceFighter;
-                    comp.Distance = (targetGameObject.transform.position - sourceFighter.Transform.position).magnitude;
-                    comp.Duration = _valueCalculator.GetDuration(attributes);
                     return;
 
                 default:

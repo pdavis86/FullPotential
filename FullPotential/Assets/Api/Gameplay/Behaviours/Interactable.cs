@@ -8,8 +8,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
 {
     public abstract class Interactable : MonoBehaviour
     {
+        // ReSharper disable FieldCanBeMadeReadOnly.Global
         public float Radius = 3f;
         public bool RequiresServerCheck = true;
+        // ReSharper restore FieldCanBeMadeReadOnly.Global
 
         // ReSharper disable once InconsistentNaming
         protected TMPro.TextMeshProUGUI _interactionBubble;

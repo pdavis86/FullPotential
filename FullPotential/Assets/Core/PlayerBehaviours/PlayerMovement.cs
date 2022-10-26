@@ -11,6 +11,7 @@ namespace FullPotential.Core.PlayerBehaviours
     public class PlayerMovement : NetworkBehaviour
     {
 #pragma warning disable 0649
+        // ReSharper disable FieldCanBeMadeReadOnly.Local
         private readonly Vector2 _lookSensitivity = new Vector2(0.2f, 0.2f);
         private readonly Vector2 _lookSmoothness = new Vector2(3f, 3f);
         private readonly int _sprintStoppingFactor = 65;
@@ -18,6 +19,7 @@ namespace FullPotential.Core.PlayerBehaviours
         [SerializeField] private float _speed = 5f;
         [SerializeField] private float _cameraRotationLimit = 85f;
         [SerializeField] private float _jumpForceMultiplier = 10500f;
+        // ReSharper restore FieldCanBeMadeReadOnly.Local
 #pragma warning restore 0649
 
         private Rigidbody _rb;

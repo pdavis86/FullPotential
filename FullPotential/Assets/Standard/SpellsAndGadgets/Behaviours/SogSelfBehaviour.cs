@@ -10,8 +10,6 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
     public class SogSelfBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
-        // ReSharper disable once InconsistentNaming
-
         public SpellOrGadgetItemBase SpellOrGadget;
         public IFighter SourceFighter;
         public Vector3 ForwardDirection;

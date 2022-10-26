@@ -95,14 +95,13 @@ namespace FullPotential.Core.PlayerBehaviours
 
         public override Transform LookTransform => _playerCamera.transform;
 
-        public override IStatSlider HealthStatSlider { get; protected set; }
+        protected override IStatSlider HealthStatSlider { get; set; }
 
         #endregion
 
         #region Unity Event Handlers
 
         // ReSharper disable once UnusedMember.Local
-
         protected override void Awake()
         {
             base.Awake();

@@ -5,7 +5,7 @@ using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Unity.Helpers;
 using UnityEngine;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Spawning
 {

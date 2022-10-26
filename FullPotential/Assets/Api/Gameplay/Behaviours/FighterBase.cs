@@ -170,12 +170,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #endregion
 
-        public override bool IsConsumingEnergy()
+        protected override bool IsConsumingEnergy()
         {
             return HandStatusLeft.IsConsumingEnergy() || HandStatusRight.IsConsumingEnergy();
         }
 
-        public override bool IsConsumingMana()
+        protected override bool IsConsumingMana()
         {
             return HandStatusLeft.IsConsumingMana() || HandStatusRight.IsConsumingMana();
         }
@@ -198,7 +198,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private int GetAttributeValue(AffectableAttribute attribute)
         {
-            //todo: trait-based attributes
+            //todo: zzz v0.5 - trait-based attributes
             switch (attribute)
             {
                 case AffectableAttribute.Strength:

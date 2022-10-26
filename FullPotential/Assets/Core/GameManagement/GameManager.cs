@@ -182,8 +182,7 @@ namespace FullPotential.Core.GameManagement
 
         #endregion
 
-        // ReSharper disable once MemberCanBePrivate.Global
-        public void SendServerToClientSetDisconnectReason(ulong clientId, ConnectStatus status)
+        private void SendServerToClientSetDisconnectReason(ulong clientId, ConnectStatus status)
         {
             var writer = new FastBufferWriter(sizeof(ConnectStatus), Allocator.Temp);
             writer.WriteValueSafe(status);
@@ -264,8 +263,7 @@ namespace FullPotential.Core.GameManagement
 #endif
         }
 
-        // ReSharper disable once MemberCanBePrivate.Global
-        public static void SaveAppOptions()
+        private static void SaveAppOptions()
         {
             System.IO.File.WriteAllText(GetAppOptionsPath(), JsonUtility.ToJson(Instance.AppOptions));
         }

@@ -3,7 +3,7 @@ using FullPotential.Api.Gameplay.Data;
 using FullPotential.Core.Gameplay.Data;
 using UnityEngine;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Registry
 {

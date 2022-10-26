@@ -5,7 +5,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using Random = System.Random;
 
-// ReSharper disable once ClassNeverInstantiated.Global
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Api.Gameplay.Combat
 {

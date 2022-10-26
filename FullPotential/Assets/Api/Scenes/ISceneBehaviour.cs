@@ -2,6 +2,8 @@
 using Unity.Netcode;
 using UnityEngine;
 
+// ReSharper disable UnusedParameter.Global
+
 namespace FullPotential.Api.Scenes
 {
     public interface ISceneBehaviour
@@ -16,7 +18,6 @@ namespace FullPotential.Api.Scenes
 
         void HandleEnemyDeath();
 
-        // ReSharper disable once UnusedParameter.Global
         void MakeAnnouncementClientRpc(string announcement, ClientRpcParams clientRpcParams);
     }
 }

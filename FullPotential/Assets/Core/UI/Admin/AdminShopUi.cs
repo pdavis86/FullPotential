@@ -13,6 +13,8 @@ using FullPotential.Core.UI.Components;
 using UnityEngine;
 using UnityEngine.UI;
 
+// ReSharper disable UnusedType.Global
+
 namespace FullPotential.Core.UI.Admin
 {
     public class AdminShopUi : MonoBehaviour

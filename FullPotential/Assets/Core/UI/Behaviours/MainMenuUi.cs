@@ -2,7 +2,7 @@ using FullPotential.Core.GameManagement;
 using FullPotential.Core.PlayerBehaviours;
 using UnityEngine;
 
-// ReSharper disable once UnusedType.Global
+// ReSharper disable UnusedType.Global
 
 namespace FullPotential.Core.Ui.Behaviours
 {
