@@ -8,6 +8,7 @@ using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -23,24 +24,44 @@ namespace FullPotential.Core.Registry
         private readonly List<IEffect> _effects = new List<IEffect>();
         private readonly List<IShape> _shapes = new List<IShape>();
         private readonly List<ITargeting> _targeting = new List<ITargeting>();
-        private readonly Dictionary<string, UnityEngine.GameObject> _loadedAddressables = new Dictionary<string, UnityEngine.GameObject>();
+        private readonly Dictionary<string, GameObject> _loadedAddressables = new Dictionary<string, GameObject>();
 
         public void FindAndRegisterAll(List<string> modPrefixes)
         {
-            //todo: load mod script from specifically named GameObject
-            var installedMods = new IMod[] { new Standard.Registration() };
-
-            foreach (var mod in installedMods)
+            foreach (var modPrefix in modPrefixes)
             {
-                foreach (var t in mod.GetRegisterableTypes())
+                var asyncOp = Addressables.LoadAssetAsync<GameObject>($"Assets/{modPrefix}/Registration");
+                asyncOp.Completed += opHandle =>
                 {
-                    ValidateAndRegister(t);
-                }
+                    if (opHandle.Result == null)
+                    {
+                        Debug.LogWarning($"Failed to find registration GameObject for Mod '{modPrefix}'");
+                        return;
+                    }
 
-                foreach (var p in mod.GetNetworkPrefabs())
-                {
-                    NetworkManager.Singleton.AddNetworkPrefab(p);
-                }
+                    var mod = opHandle.Result.GetComponent<IMod>();
+
+                    if (mod == null)
+                    {
+                        Debug.LogWarning($"Failed to find IMod implementation for Mod '{modPrefix}'");
+                        return;
+                    }
+
+                    HandleModRegistration(mod);
+                };
+            }
+        }
+
+        private void HandleModRegistration(IMod mod)
+        {
+            foreach (var t in mod.GetRegisterableTypes())
+            {
+                ValidateAndRegister(t);
+            }
+
+            foreach (var p in mod.GetNetworkPrefabs())
+            {
+                NetworkManager.Singleton.AddNetworkPrefab(p);
             }
         }
 
@@ -48,7 +69,7 @@ namespace FullPotential.Core.Registry
         {
             if (!typeof(IRegisterable).IsAssignableFrom(type))
             {
-                UnityEngine.Debug.LogError($"{type.Name} does not implement {nameof(IRegisterable)}");
+                Debug.LogError($"{type.Name} does not implement {nameof(IRegisterable)}");
                 return;
             }
 
@@ -91,7 +112,7 @@ namespace FullPotential.Core.Registry
                 return;
             }
 
-            UnityEngine.Debug.LogError($"{type.Name} does not implement any of the valid interfaces");
+            Debug.LogError($"{type.Name} does not implement any of the valid interfaces");
         }
 
         private void Register<T>(List<T> list, T item) where T : IRegisterable
@@ -99,7 +120,7 @@ namespace FullPotential.Core.Registry
             var match = list.FirstOrDefault(x => x.TypeId == item.TypeId);
             if (match != null)
             {
-                UnityEngine.Debug.LogError($"A type with name '{item.TypeId}' has already been registered");
+                Debug.LogError($"A type with name '{item.TypeId}' has already been registered");
                 return;
             }
 
@@ -185,7 +206,7 @@ namespace FullPotential.Core.Registry
             return _effects.FirstOrDefault(x => x.GetType() == type);
         }
 
-        public void LoadAddessable(string address, Action<UnityEngine.GameObject> action)
+        public void LoadAddessable(string address, Action<GameObject> action)
         {
             //Addressables.ReleaseInstance(go) : Destroys objects created by Addressables.InstantiateAsync(address)
             //Addressables.Release(opHandle) : Remove the addressable from memory
@@ -196,7 +217,7 @@ namespace FullPotential.Core.Registry
             }
             else
             {
-                var asyncOp = Addressables.LoadAssetAsync<UnityEngine.GameObject>(address);
+                var asyncOp = Addressables.LoadAssetAsync<GameObject>(address);
                 asyncOp.Completed += opHandle =>
                 {
                     var prefab = opHandle.Result;

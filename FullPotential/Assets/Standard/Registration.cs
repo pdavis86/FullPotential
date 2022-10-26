@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace FullPotential.Standard
 {
-    public class Registration : IMod
+    public class Registration : MonoBehaviour, IMod
     {
         public IEnumerable<Type> GetRegisterableTypes()
         {
