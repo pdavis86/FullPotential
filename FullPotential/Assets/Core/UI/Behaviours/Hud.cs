@@ -101,8 +101,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
             var alert = Instantiate(_alertPrefab, _alertsContainer.transform);
             
-            //todo: make a method on the prefab to set the text
-            alert.transform.Find("Text").GetComponent<Text>().text = alertText;
+            alert.GetComponent<SlideOutAlert>().Text.text = alertText;
         }
 
         private void UpdateHandOverlays()

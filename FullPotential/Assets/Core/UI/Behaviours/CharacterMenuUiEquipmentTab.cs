@@ -7,6 +7,7 @@ using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.PlayerBehaviours;
+using FullPotential.Core.UI.Behaviours;
 using FullPotential.Core.Ui.Components;
 using UnityEngine;
 using UnityEngine.UI;
@@ -77,8 +78,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void SetSlot(GameObject slot, ItemBase item)
         {
-            //todo: is there a way of avoiding using .Find() ?
-            var slotImage = slot.transform.Find("Image").GetComponent<Image>();
+            var slotImage = slot.GetComponent<InventoryUiSlot>().Image;
 
             slotImage.color = item != null ? Color.grey : Color.clear;
 

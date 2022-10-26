@@ -7,6 +7,7 @@ using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Gameplay.Tooltips;
+using FullPotential.Core.UI.Behaviours;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -53,8 +54,7 @@ namespace FullPotential.Core.Ui.Components
 
                 var row = Instantiate(rowPrefab, componentsContainer.transform);
 
-                //todo: make a method on the prefab to set the text
-                row.transform.Find("ItemName").GetComponent<Text>().text = item.Name;
+                row.GetComponent<InventoryUiRow>().Text.text = item.Name;
 
                 if (isEquipped)
                 {

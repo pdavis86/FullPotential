@@ -28,6 +28,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7103037938070245472}
   m_RootOrder: 0
@@ -88,6 +89,7 @@ GameObject:
   - component: {fileID: 7103037938070245475}
   - component: {fileID: 7103037938070245485}
   - component: {fileID: -1444978649407532298}
+  - component: {fileID: 6968447528214052316}
   m_Layer: 5
   m_Name: EquipmentSlot
   m_TagString: Untagged
@@ -105,6 +107,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5358100555734119075}
   - {fileID: 7103037939726304186}
@@ -222,6 +225,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74d2b459a4d28c94db40a06e873172f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6968447528214052316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7103037938070245473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1134ac799da672f40b5aee5a5127dadc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Image: {fileID: 7103037939726304197}
 --- !u!1 &7103037939726304187
 GameObject:
   m_ObjectHideFlags: 0
@@ -250,6 +266,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7103037938070245472}
   m_RootOrder: 1
