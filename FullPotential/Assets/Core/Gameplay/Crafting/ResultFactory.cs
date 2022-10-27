@@ -35,8 +35,11 @@ namespace FullPotential.Core.Gameplay.Crafting
         private readonly List<ITargeting> _targetingOptions;
         private readonly List<IShape> _shapeOptions;
 
+        //Cover Names
+        private Dictionary<string, string> _coverNamesSog;
+
         public ResultFactory(
-            ITypeRegistry typeRegistry, 
+            ITypeRegistry typeRegistry,
             ILocalizer localizer,
             IValueCalculator valueCalculator)
         {
@@ -139,7 +142,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                         {
                             return other;
                         }
-                        
+
                         switch (statEffect.Affect)
                         {
                             case Affect.PeriodicIncrease:
@@ -516,14 +519,30 @@ namespace FullPotential.Core.Gameplay.Crafting
             }
         }
 
+        private string GetItemTranslation(string suffix)
+        {
+            return _localizer.Translate(TranslationType.Item, suffix);
+        }
+
         private string GetAttributeTranslation(string suffix)
         {
             return _localizer.Translate(TranslationType.Attribute, suffix);
         }
 
-        private string GetItemTranslation(string suffix)
+        private void Append(StringBuilder builder, bool attributeValue, string attributeName)
         {
-            return _localizer.Translate(TranslationType.Item, suffix);
+            if (attributeValue)
+            {
+                builder.Append(GetAttributeTranslation(attributeName) + "\n");
+            }
+        }
+
+        private void Append(StringBuilder builder, int attributeValue, string attributeName)
+        {
+            if (attributeValue > 0)
+            {
+                builder.Append($"{GetAttributeTranslation(attributeName)}: {attributeValue}\n");
+            }
         }
 
         public string GetItemDescription(ItemBase item, bool includeNameAndType = true, string itemName = null)
@@ -537,16 +556,12 @@ namespace FullPotential.Core.Gameplay.Crafting
 
             if (includeNameAndType) { sb.Append($"{GetItemTranslation(nameof(item.Name))}: {itemName.OrIfNullOrWhitespace(item.Name)}" + "\n"); }
             if (includeNameAndType) { sb.Append($"{GetItemTranslation(nameof(item.RegistryType))}: {item.GetType().Name}" + "\n"); }
-            if (item.Attributes.IsAutomatic) { sb.Append(GetAttributeTranslation(nameof(item.Attributes.IsAutomatic)) + "\n"); }
-            if (item.Attributes.IsSoulbound) { sb.Append(GetAttributeTranslation(nameof(item.Attributes.IsSoulbound)) + "\n"); }
-            if (item.Attributes.ExtraAmmoPerShot > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.ExtraAmmoPerShot))}: {item.Attributes.ExtraAmmoPerShot}\n"); }
-            if (item.Attributes.Strength > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.Strength))}: {item.Attributes.Strength}\n"); }
-            if (item.Attributes.Efficiency > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.Efficiency))}: {item.Attributes.Efficiency}\n"); }
-            if (item.Attributes.Range > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.Range))}: {item.Attributes.Range}\n"); }
-            if (item.Attributes.Accuracy > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.Accuracy))}: {item.Attributes.Accuracy}\n"); }
-            if (item.Attributes.Speed > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.Speed))}: {item.Attributes.Speed}\n"); }
-            if (item.Attributes.Recovery > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.Recovery))}: {item.Attributes.Recovery}\n"); }
-            if (item.Attributes.Duration > 0) { sb.Append($"{GetAttributeTranslation(nameof(item.Attributes.Duration))}: {item.Attributes.Duration}\n"); }
+
+            if (item is ISpellOrGadget spellOrGadget)
+            {
+                if (spellOrGadget.Targeting != null) { sb.Append($"{GetAttributeTranslation(nameof(spellOrGadget.Targeting))}: {_localizer.GetTranslatedTypeName(spellOrGadget.Targeting)}\n"); }
+                if (spellOrGadget.Shape != null) { sb.Append($"{GetAttributeTranslation(nameof(spellOrGadget.Shape))}: {_localizer.GetTranslatedTypeName(spellOrGadget.Shape)}\n"); }
+            }
 
             if (item.Effects != null && item.Effects.Count > 0)
             {
@@ -554,11 +569,17 @@ namespace FullPotential.Core.Gameplay.Crafting
                 sb.Append($"{GetAttributeTranslation(nameof(item.Effects))}: {string.Join(", ", localisedEffects)}\n");
             }
 
-            if (item is ISpellOrGadget spellOrGadget)
-            {
-                if (spellOrGadget.Targeting != null) { sb.Append($"{GetAttributeTranslation(nameof(spellOrGadget.Targeting))}: {_localizer.GetTranslatedTypeName(spellOrGadget.Targeting)}\n"); }
-                if (spellOrGadget.Shape != null) { sb.Append($"{GetAttributeTranslation(nameof(spellOrGadget.Shape))}: {_localizer.GetTranslatedTypeName(spellOrGadget.Shape)}\n"); }
-            }
+            Append(sb, item.Attributes.IsAutomatic, nameof(item.Attributes.IsAutomatic));
+            Append(sb, item.Attributes.IsSoulbound, nameof(item.Attributes.IsSoulbound));
+
+            Append(sb, item.Attributes.ExtraAmmoPerShot, nameof(item.Attributes.ExtraAmmoPerShot));
+            Append(sb, item.Attributes.Strength, nameof(item.Attributes.Strength));
+            Append(sb, item.Attributes.Efficiency, nameof(item.Attributes.Efficiency));
+            Append(sb, item.Attributes.Range, nameof(item.Attributes.Range));
+            Append(sb, item.Attributes.Accuracy, nameof(item.Attributes.Accuracy));
+            Append(sb, item.Attributes.Speed, nameof(item.Attributes.Speed));
+            Append(sb, item.Attributes.Recovery, nameof(item.Attributes.Recovery));
+            Append(sb, item.Attributes.Duration, nameof(item.Attributes.Duration));
 
             return sb.ToString();
         }
