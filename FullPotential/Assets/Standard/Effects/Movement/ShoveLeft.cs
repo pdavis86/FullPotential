@@ -9,6 +9,6 @@ namespace FullPotential.Standard.Effects.Movement
 
         public string TypeName => nameof(ShoveLeft);
 
-        public MovementDirection Direction => MovementDirection.Left;
+        public MovementDirection Direction => MovementDirection.LeftFromSource;
     }
 }

@@ -209,6 +209,8 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 case MovementDirection.AwayFromSource:
                 case MovementDirection.TowardSource:
+                case MovementDirection.LeftFromSource:
+                case MovementDirection.RightFromSource:
 
                     if (sourceFighter == null)
                     {
@@ -216,23 +218,35 @@ namespace FullPotential.Core.Gameplay.Combat
                         return;
                     }
 
-                    var sourcePosition = sourceFighter.RigidBody.transform.position;
-                    var targetPosition = targetRigidBody.transform.position;
-
-                    var vector = movementEffect.Direction == MovementDirection.AwayFromSource
-                        ? targetPosition - sourcePosition
-                        : sourcePosition - targetPosition;
-
-                    //If targeting self
-                    if (vector == Vector3.zero)
+                    if (movementEffect.Direction is MovementDirection.AwayFromSource or MovementDirection.TowardSource)
                     {
-                        vector = -sourceFighter.RigidBody.transform.forward;
+                        var sourcePosition = sourceFighter.RigidBody.transform.position;
+                        var targetPosition = targetRigidBody.transform.position;
+
+                        var forwardsBackwardsDirection = movementEffect.Direction == MovementDirection.AwayFromSource
+                            ? targetPosition - sourcePosition
+                            : sourcePosition - targetPosition;
+
+                        //If targeting self
+                        if (forwardsBackwardsDirection == Vector3.zero)
+                        {
+                            forwardsBackwardsDirection = -sourceFighter.RigidBody.transform.forward;
+                        }
+
+                        //Debug.Log($"Applying {force} force to {targetGameObject.name}");
+
+                        targetRigidBody.AddForce(forwardsBackwardsDirection.normalized * force, ForceMode.Acceleration);
+                        return;
                     }
+                    else
+                    {
+                        var leftRightDirection = movementEffect.Direction == MovementDirection.LeftFromSource
+                            ? -sourceFighter.RigidBody.transform.right
+                            : sourceFighter.RigidBody.transform.right;
 
-                    //Debug.Log($"Applying {force} force to {targetGameObject.name}");
-
-                    targetRigidBody.AddForce(vector.normalized * force, ForceMode.Acceleration);
-                    return;
+                        targetRigidBody.AddForce(leftRightDirection * force, ForceMode.Acceleration);
+                        return;
+                    }
 
                 case MovementDirection.Backwards:
                     targetRigidBody.AddForce(-targetGameObject.transform.forward * force, ForceMode.Acceleration);
@@ -248,14 +262,6 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 case MovementDirection.Up:
                     targetRigidBody.AddForce(targetGameObject.transform.up * force, ForceMode.Acceleration);
-                    return;
-
-                case MovementDirection.Left:
-                    targetRigidBody.AddForce(-targetGameObject.transform.right * force, ForceMode.Acceleration);
-                    return;
-
-                case MovementDirection.Right:
-                    targetRigidBody.AddForce(targetGameObject.transform.right * force, ForceMode.Acceleration);
                     return;
 
                 default:

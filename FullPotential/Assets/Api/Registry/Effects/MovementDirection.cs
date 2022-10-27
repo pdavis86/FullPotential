@@ -2,8 +2,8 @@
 {
     public enum MovementDirection
     {
-        Left,
-        Right,
+        LeftFromSource,
+        RightFromSource,
         Up,
         Down,
         Forwards,

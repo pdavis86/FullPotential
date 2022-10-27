@@ -100,16 +100,15 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public float GetForceValue(Attributes attributes, bool adjustForGravity)
         {
-            //todo: attribute-based force value
+            var force = 4f * attributes.Strength;
+
             return adjustForGravity
-                ? 800f
-                : 300f;
+                ? force * 1.2f
+                : force;
         }
 
         public (int Change, DateTime Expiry) GetStatChangeAndExpiry(Attributes attributes, IStatEffect statEffect)
         {
-            //todo: attribute-based change and duration values
-
             var change = AddVariationToValue(attributes.Strength / 5f);
 
             if (statEffect.Affect is Affect.PeriodicDecrease or Affect.SingleDecrease or Affect.TemporaryMaxDecrease)
@@ -118,16 +117,14 @@ namespace FullPotential.Api.Gameplay.Combat
             }
 
             var timeToLive = statEffect.Affect == Affect.SingleIncrease || statEffect.Affect == Affect.SingleDecrease
-                ? 2f
-                : 5f;
+                ? math.ceil(attributes.Duration / 50f)
+                : math.ceil(attributes.Duration / 20f);
 
             return (change, DateTime.Now.AddSeconds(timeToLive));
         }
 
         public (int Change, DateTime Expiry, float delay) GetStatChangeExpiryAndDelay(Attributes attributes, IStatEffect statEffect)
         {
-            //todo: attribute-based delay value
-
             var (change, expiry) = GetStatChangeAndExpiry(attributes, statEffect);
 
             var delay = attributes.Recovery / 10;
@@ -137,8 +134,6 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public (int Change, DateTime Expiry) GetAttributeChangeAndExpiry(Attributes attributes, IAttributeEffect attributeEffect)
         {
-            //todo: attribute-based change and duration values
-
             var change = AddVariationToValue(attributes.Strength / 5f);
 
             if (!attributeEffect.TemporaryMaxIncrease)
