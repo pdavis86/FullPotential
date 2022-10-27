@@ -176,6 +176,18 @@ namespace FullPotential.Core.PlayerBehaviours
         }
 
         // ReSharper disable once UnusedMember.Local
+        private void OnChargeLeft()
+        {
+            OnCharge(true);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnChargeRight()
+        {
+            OnCharge(false);
+        }
+
+        // ReSharper disable once UnusedMember.Local
         private void OnAttackLeft()
         {
             OnAttack(true);
@@ -492,6 +504,19 @@ namespace FullPotential.Core.PlayerBehaviours
             {
                 _focusedInteractable.OnBlur();
                 _focusedInteractable = null;
+            }
+        }
+
+        private void OnCharge(bool isLeftHand)
+        {
+            if (_hasMenuOpen || _playerState.AliveState != LivingEntityState.Alive)
+            {
+                return;
+            }
+
+            if (IsServer || _playerState.TryToCharge(isLeftHand))
+            {
+                _playerState.TryToChargeServerRpc(isLeftHand);
             }
         }
 

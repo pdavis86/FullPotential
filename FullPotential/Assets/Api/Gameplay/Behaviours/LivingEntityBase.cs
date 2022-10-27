@@ -243,7 +243,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
             else
             {
-                Debug.Log($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
+                //Debug.Log($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
 
                 if (change < 0)
                 {
@@ -537,7 +537,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             //Debug.Log($"{name} collided with {collision.gameObject.name} at velocity {collision.relativeVelocity} with cause {cause}");
 
-            var healthChange = _valueCalculator.GetVelocityDamage(collision.relativeVelocity);
+            var healthChange = _valueCalculator.GetDamageValueFromVelocity(collision.relativeVelocity);
             var position = collision.GetContact(0).point;
 
             _lastDamageItemName = null;
@@ -565,7 +565,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _lastDamageSourceName = sourceFighter != null ? sourceFighter.FighterName : null;
             _lastDamageItemName = itemUsed?.Name ?? _localizer.Translate("ui.alert.attack.noitem");
 
-            var damageDealt = _valueCalculator.GetDamageValue(itemUsed, GetDefenseValue()) * -1;
+            var damageDealt = _valueCalculator.GetDamageValueFromAttack(itemUsed, GetDefenseValue()) * -1;
             ApplyHealthChange(damageDealt, sourceFighter, itemUsed, position);
         }
 
@@ -701,7 +701,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (statEffect.StatToAffect == AffectableStat.Health)
             {
-                change = _valueCalculator.GetDamageValue(itemUsed, GetDefenseValue()) * -1;
+                change = _valueCalculator.GetDamageValueFromAttack(itemUsed, GetDefenseValue()) * -1;
             }
 
             AddOrUpdateEffect(statEffect, change, expiry);

@@ -10,6 +10,8 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
     public class SogBeamBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
+        //todo: hold down click to cast
+
         public SpellOrGadgetItemBase SpellOrGadget;
         public IFighter SourceFighter;
         public bool IsLeftHand;
@@ -47,7 +49,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _maxBeamLength = _valueCalculator.GetContinuousRange(SpellOrGadget.Attributes);
+            _maxBeamLength = _valueCalculator.GetSogContinuousRange(SpellOrGadget.Attributes);
 
             PerformGraphicsAdjustments();
 
@@ -56,7 +58,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            var effectsDelay = _valueCalculator.GetTimeBetweenEffects(SpellOrGadget.Attributes);
+            var effectsDelay = _valueCalculator.GetEffectTimeBetween(SpellOrGadget.Attributes);
             _applyEffectsAction = new DelayedAction(effectsDelay, () => ApplyEffects(_hit.transform.gameObject, _hit.point));
         }
 

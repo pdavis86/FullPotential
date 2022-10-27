@@ -106,6 +106,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
         #region ServerRpc calls
 
         [ServerRpc]
+        public void TryToChargeServerRpc(bool isLeftHand)
+        {
+            TryToCharge(isLeftHand);
+        }
+
+        [ServerRpc]
         public void TryToAttackServerRpc(bool isLeftHand)
         {
             if (TryToAttack(isLeftHand))
@@ -189,9 +195,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             handStatus.IsReloading = true;
 
-            yield return new WaitForSeconds(_valueCalculator.GetReloadTime(handStatus.EquippedWeapon.Attributes));
+            yield return new WaitForSeconds(_valueCalculator.GetWeaponReloadTime(handStatus.EquippedWeapon.Attributes));
 
-            handStatus.EquippedWeapon.Ammo = _valueCalculator.GetAmmoMax(handStatus.EquippedWeapon.Attributes);
+            handStatus.EquippedWeapon.Ammo = _valueCalculator.GetWeaponAmmoMax(handStatus.EquippedWeapon.Attributes);
 
             handStatus.IsReloading = false;
         }
@@ -220,6 +226,49 @@ namespace FullPotential.Api.Gameplay.Behaviours
             HandStatusRight.StopConsumingResources();
 
             base.HandleDeath();
+        }
+
+        public bool TryToCharge(bool isLeftHand)
+        {
+            var itemInHand = isLeftHand
+                ? _inventory.GetItemInSlot(SlotGameObjectName.LeftHand)
+                : _inventory.GetItemInSlot(SlotGameObjectName.RightHand);
+
+            var spellOrGadget = itemInHand as SpellOrGadgetItemBase;
+            if (spellOrGadget == null)
+            {
+                Debug.LogWarning("Trying to charge an item that is not a Spell or Gadget");
+                return false;
+            }
+
+            if (!ConsumeResource(spellOrGadget, isTest: true))
+            {
+                return false;
+            }
+
+            var leftOrRight = isLeftHand
+                ? HandStatusLeft
+                : HandStatusRight;
+
+            var timeToCharge = _valueCalculator.GetSogChargeTime(leftOrRight.EquippedSpellOrGadget.Attributes);
+            leftOrRight.ChargeEnumerator = ChargeCountdown(leftOrRight, DateTime.Now.AddSeconds(timeToCharge));
+            StartCoroutine(leftOrRight.ChargeEnumerator);
+
+            return true;
+        }
+
+        private IEnumerator ChargeCountdown(HandStatus handStatus, DateTime deadline)
+        {
+            var millisecondsUntilDone = (deadline - DateTime.Now).TotalMilliseconds;
+            handStatus.ChargeCountdown = 100;
+
+            while (handStatus.ChargeCountdown > 0)
+            {
+                yield return new WaitForSeconds(0.01F);
+                var millisecondsRemaining = (deadline - DateTime.Now).TotalMilliseconds;
+                handStatus.ChargeCountdown = (int)(millisecondsRemaining / millisecondsUntilDone * 100);
+                Debug.Log(handStatus.ChargeCountdown);
+            }
         }
 
         public bool TryToAttack(bool isLeftHand)
@@ -294,6 +343,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 //Return true as the action also needs performing on the server
                 return true;
+            }
+
+            if (leftOrRight.ChargeCountdown > 0)
+            {
+                Debug.Log("Still charging");
             }
 
             if (!ConsumeResource(spellOrGadget, isTest: true))
@@ -374,7 +428,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             //todo: handle multiple shots 
 
-            var range = _valueCalculator.GetProjectileRange(weaponInHand.Attributes);
+            var range = _valueCalculator.GetSogProjectileRange(weaponInHand.Attributes);
             var endPos = Physics.Raycast(LookTransform.position, LookTransform.forward, out var rangedHit, range)
                 ? rangedHit.point
                 : handPosition + LookTransform.forward * range;

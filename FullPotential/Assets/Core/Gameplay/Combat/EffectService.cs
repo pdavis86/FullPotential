@@ -182,7 +182,7 @@ namespace FullPotential.Core.Gameplay.Combat
             var comp = targetGameObject.AddComponent<MaintainDistance>();
             comp.SourceFighter = sourceFighter;
             comp.Distance = (targetGameObject.transform.position - sourceFighter.Transform.position).magnitude;
-            comp.Duration = _valueCalculator.GetDuration(attributes);
+            comp.Duration = _valueCalculator.GetEffectDuration(attributes);
         }
 
         private void ApplyMovementEffect(GameObject targetGameObject, IMovementEffect movementEffect, Attributes attributes, IFighter sourceFighter)
@@ -203,7 +203,7 @@ namespace FullPotential.Core.Gameplay.Combat
             }
 
             var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
-            var force = _valueCalculator.GetForceValue(attributes, adjustForGravity);
+            var force = _valueCalculator.GetMovementForceValue(attributes, adjustForGravity);
 
             switch (movementEffect.Direction)
             {

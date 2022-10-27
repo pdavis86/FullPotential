@@ -135,7 +135,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
             ammoText.text = handStatus.IsReloading
                 ? _reloadingTranslation
-                : $"{handStatus.EquippedWeapon.Ammo}/{_valueCalculator.GetAmmoMax(handStatus.EquippedWeapon.Attributes)}";
+                : $"{handStatus.EquippedWeapon.Ammo}/{_valueCalculator.GetWeaponAmmoMax(handStatus.EquippedWeapon.Attributes)}";
         }
 
         private void UpdateStaminaPercentage()

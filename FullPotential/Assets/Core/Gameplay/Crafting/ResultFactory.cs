@@ -407,7 +407,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 Effects = GetEffects(nameof(Weapon), components)
             };
             weapon.Name = GetItemName(true, weapon);
-            weapon.Ammo = _valueCalculator.GetAmmoMax(weapon.Attributes);
+            weapon.Ammo = _valueCalculator.GetWeaponAmmoMax(weapon.Attributes);
             return weapon;
         }
 

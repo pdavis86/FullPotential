@@ -139,6 +139,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ChargeLeft",
+                    "type": "Button",
+                    "id": "ea72a802-1f50-42e7-8b37-c3b1ff9c7962",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ChargeRight",
+                    "type": "Button",
+                    "id": "c7d8554a-f191-41b4-bdac-d53116682867",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -256,7 +274,7 @@
                     "name": "",
                     "id": "930b91fe-ef5b-4942-b230-e5a5a1e6ab48",
                     "path": "<Mouse>/leftButton",
-                    "interactions": "",
+                    "interactions": "Press(behavior=1)",
                     "processors": "",
                     "groups": "Keyboard and Mouse",
                     "action": "AttackLeft",
@@ -267,7 +285,7 @@
                     "name": "",
                     "id": "443a47d7-6407-4439-8c16-ce1bb48e45e1",
                     "path": "<Mouse>/rightButton",
-                    "interactions": "",
+                    "interactions": "Press(behavior=1)",
                     "processors": "",
                     "groups": "Keyboard and Mouse",
                     "action": "AttackRight",
@@ -348,6 +366,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "ReloadRight",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d80428bb-3829-4d20-94c7-00e0104f73b0",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "Hold",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "ChargeLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d606c90f-5be5-427b-adce-44de9ef69f78",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "Hold",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ChargeRight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

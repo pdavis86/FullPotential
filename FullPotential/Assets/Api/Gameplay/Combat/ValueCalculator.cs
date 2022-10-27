@@ -22,7 +22,7 @@ namespace FullPotential.Api.Gameplay.Combat
             return (int)Math.Ceiling(basicValue / multiplier) + adder;
         }
 
-        public int GetDamageValue(ItemBase itemUsed, int targetDefense)
+        public int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense)
         {
             //Even a small attack can still do damage
             var attackStrength = itemUsed?.Attributes.Strength ?? 1;
@@ -42,34 +42,20 @@ namespace FullPotential.Api.Gameplay.Combat
             return AddVariationToValue(damageDealtBasic);
         }
 
-        public int GetVelocityDamage(Vector3 velocity)
+        public int GetDamageValueFromVelocity(Vector3 velocity)
         {
             var basicDamage = math.pow(velocity.magnitude, 1.9) * -1;
             return AddVariationToValue(basicDamage);
         }
 
-        public float GetReloadTime(Attributes attributes)
+        public float GetWeaponReloadTime(Attributes attributes)
         {
             var returnValue = (101 - attributes.Recovery) / 50f + 0.5f;
             //Debug.Log("GetReloadTime: " + returnValue);
             return returnValue;
         }
 
-        public float GetProjectileRange(Attributes attributes)
-        {
-            var returnValue = attributes.Range / 100f * 15 + 15;
-            //Debug.Log("GetProjectileRange: " + returnValue);
-            return returnValue;
-        }
-
-        public float GetContinuousRange(Attributes attributes)
-        {
-            var returnValue = attributes.Range / 100f * 10;
-            //Debug.Log("GetContinuousRange: " + returnValue);
-            return returnValue;
-        }
-
-        public int GetAmmoMax(Attributes attributes)
+        public int GetWeaponAmmoMax(Attributes attributes)
         {
             var ammoCap = attributes.IsAutomatic ? 100 : 20;
             var returnValue = (int)(attributes.Efficiency / 100f * ammoCap);
@@ -77,17 +63,21 @@ namespace FullPotential.Api.Gameplay.Combat
             return returnValue;
         }
 
-        public float GetTimeBetweenEffects(Attributes attributes, float min = 0.5f, float max = 1.5f)
+        public float GetSogContinuousRange(Attributes attributes)
         {
-            //return 2 - (attributes.Duration / 100f);
-            //return (101 - attributes.Recovery) / 200f + 0.5f;
-
-            var returnValue = (101 - attributes.Speed) / 100f * (max - min) + min;
-            //Debug.Log("GetTimeBetweenEffects: " + returnValue);
+            var returnValue = attributes.Range / 100f * 10;
+            //Debug.Log("GetContinuousRange: " + returnValue);
             return returnValue;
         }
 
-        public float GetProjectileSpeed(Attributes attributes)
+        public float GetSogProjectileRange(Attributes attributes)
+        {
+            var returnValue = attributes.Range / 100f * 15 + 15;
+            //Debug.Log("GetProjectileRange: " + returnValue);
+            return returnValue;
+        }
+
+        public float GetSogProjectileSpeed(Attributes attributes)
         {
             var castSpeed = attributes.Speed / 50f;
             var returnValue = castSpeed < 0.5
@@ -97,21 +87,35 @@ namespace FullPotential.Api.Gameplay.Combat
             return returnValue;
         }
 
-        public float GetShapeLifetime(Attributes attributes)
+        public float GetSogChargeTime(Attributes attributes)
         {
-            var returnValue = attributes.Duration / 10f;
-            //Debug.Log("GetShapeLifetime: " + returnValue);
+            var returnValue = (101 - attributes.Efficiency) / 100f * 3;
+            //Debug.Log("GetSogChargeTime: " + returnValue);
             return returnValue;
         }
 
-        public float GetDuration(Attributes attributes)
+        public float GetSogCooldownTime(Attributes attributes)
+        {
+            var returnValue = (101 - attributes.Recovery) / 100f;
+            //Debug.Log("GetSogChargeTime: " + returnValue);
+            return returnValue;
+        }
+
+        public float GetEffectTimeBetween(Attributes attributes, float min = 0.5f, float max = 1.5f)
+        {
+            var returnValue = (101 - attributes.Speed) / 100f * (max - min) + min;
+            //Debug.Log("GetTimeBetweenEffects: " + returnValue);
+            return returnValue;
+        }
+
+        public float GetEffectDuration(Attributes attributes)
         {
             var returnValue = attributes.Duration / 10f;
             //Debug.Log("GetDuration: " + returnValue);
             return returnValue;
         }
 
-        public float GetForceValue(Attributes attributes, bool adjustForGravity)
+        public float GetMovementForceValue(Attributes attributes, bool adjustForGravity)
         {
             var force = 4f * attributes.Strength;
 

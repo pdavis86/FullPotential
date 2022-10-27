@@ -46,7 +46,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             var rigidBody = GetComponent<Rigidbody>();
 
-            rigidBody.AddForce(20f * _valueCalculator.GetProjectileSpeed(SpellOrGadget.Attributes) * ForwardDirection, ForceMode.VelocityChange);
+            rigidBody.AddForce(20f * _valueCalculator.GetSogProjectileSpeed(SpellOrGadget.Attributes) * ForwardDirection, ForceMode.VelocityChange);
 
             if (affectedByGravity)
             {

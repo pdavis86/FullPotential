@@ -11,17 +11,18 @@ namespace FullPotential.Api.Gameplay.Combat
     public interface IValueCalculator
     {
         int AddVariationToValue(double basicValue);
-        int GetDamageValue(ItemBase itemUsed, int targetDefense);
-        float GetReloadTime(Attributes attributes);
-        int GetVelocityDamage(Vector3 velocity);
-        float GetProjectileRange(Attributes attributes);
-        float GetContinuousRange(Attributes attributes);
-        int GetAmmoMax(Attributes attributes);
-        float GetTimeBetweenEffects(Attributes attributes, float min = 0.5f, float max = 1.5f);
-        float GetProjectileSpeed(Attributes attributes);
-        float GetShapeLifetime(Attributes attributes);
-        float GetDuration(Attributes attributes);
-        float GetForceValue(Attributes attributes, bool adjustForGravity);
+        int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense);
+        int GetDamageValueFromVelocity(Vector3 velocity);
+        float GetWeaponReloadTime(Attributes attributes);
+        int GetWeaponAmmoMax(Attributes attributes);
+        float GetSogContinuousRange(Attributes attributes);
+        float GetSogProjectileRange(Attributes attributes);
+        float GetSogProjectileSpeed(Attributes attributes);
+        float GetSogChargeTime(Attributes attributes);
+        float GetSogCooldownTime(Attributes attributes);
+        float GetEffectTimeBetween(Attributes attributes, float min = 0.5f, float max = 1.5f);
+        float GetEffectDuration(Attributes attributes);
+        float GetMovementForceValue(Attributes attributes, bool adjustForGravity);
         (int Change, DateTime Expiry) GetStatChangeAndExpiry(Attributes attributes, IStatEffect statEffect);
         (int Change, DateTime Expiry, float delay) GetStatChangeExpiryAndDelay(Attributes attributes, IStatEffect statEffect);
         (int Change, DateTime Expiry) GetAttributeChangeAndExpiry(Attributes attributes, IAttributeEffect attributeEffect);
