@@ -388,7 +388,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 ? (change * -1).ToString(CultureInfo.InvariantCulture)
                 : change.ToString(CultureInfo.InvariantCulture);
 
-            hitText.color = change < 0
+            hitText.color = change <= 0
                 ? Color.red
                 : Color.green;
 

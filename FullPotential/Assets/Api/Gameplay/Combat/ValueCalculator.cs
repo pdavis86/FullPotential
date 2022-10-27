@@ -1,6 +1,8 @@
 ﻿using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using System;
+using FullPotential.Api.Registry.Base;
+using FullPotential.Api.Registry.Gear;
 using Unity.Mathematics;
 using UnityEngine;
 using Random = System.Random;
@@ -20,11 +22,22 @@ namespace FullPotential.Api.Gameplay.Combat
             return (int)Math.Ceiling(basicValue / multiplier) + adder;
         }
 
-        public int GetAttackValue(Attributes? attributes, int targetDefense)
+        public int GetDamageValue(ItemBase itemUsed, int targetDefense)
         {
             //Even a small attack can still do damage
-            var attackStrength = attributes?.Strength ?? 1;
-            var damageDealtBasic = attackStrength * 100f / (100 + targetDefense);
+            var attackStrength = itemUsed?.Attributes.Strength ?? 1;
+            var defenceRatio = 100f / (100 + targetDefense);
+            var damageDealtBasic = Math.Ceiling(attackStrength * defenceRatio / 4f);
+
+            if (itemUsed is Weapon weapon)
+            {
+                damageDealtBasic *= 2;
+
+                if (weapon.IsTwoHanded)
+                {
+                    damageDealtBasic *= 2;
+                }
+            }
 
             return AddVariationToValue(damageDealtBasic);
         }

@@ -269,7 +269,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 _effectService.ApplyEffects(this, null, hit.transform.gameObject, hit.point);
             }
 
-            return hit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId;
+            var hitNetworkObject = hit.transform.gameObject.GetComponent<NetworkObject>();
+
+            if (hitNetworkObject == null)
+            {
+                return null;
+            }
+
+            return hitNetworkObject.NetworkObjectId;
         }
 
         private bool UseSpellOrGadget(bool isLeftHand, Vector3 handPosition, SpellOrGadgetItemBase spellOrGadget)

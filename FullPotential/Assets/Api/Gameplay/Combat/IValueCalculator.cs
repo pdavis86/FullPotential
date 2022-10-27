@@ -1,5 +1,6 @@
 ﻿using System;
 using FullPotential.Api.Registry;
+using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace FullPotential.Api.Gameplay.Combat
     public interface IValueCalculator
     {
         int AddVariationToValue(double basicValue);
-        int GetAttackValue(Attributes? attributes, int targetDefense);
+        int GetDamageValue(ItemBase itemUsed, int targetDefense);
         float GetReloadTime(Attributes attributes);
         int GetVelocityDamage(Vector3 velocity);
         float GetProjectileRange(Attributes attributes);

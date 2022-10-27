@@ -243,6 +243,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
             else
             {
+                Debug.Log($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
+
                 if (change < 0)
                 {
                     RecordDamageDealt(change * -1, sourceFighter);
@@ -563,7 +565,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _lastDamageSourceName = sourceFighter != null ? sourceFighter.FighterName : null;
             _lastDamageItemName = itemUsed?.Name ?? _localizer.Translate("ui.alert.attack.noitem");
 
-            var damageDealt = _valueCalculator.GetAttackValue(itemUsed?.Attributes, GetDefenseValue()) * -1;
+            var damageDealt = _valueCalculator.GetDamageValue(itemUsed, GetDefenseValue()) * -1;
             ApplyHealthChange(damageDealt, sourceFighter, itemUsed, position);
         }
 
@@ -696,6 +698,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
             var (change, expiry) = _valueCalculator.GetStatChangeAndExpiry(itemUsed.Attributes, statEffect);
+
+            if (statEffect.StatToAffect == AffectableStat.Health)
+            {
+                change = _valueCalculator.GetDamageValue(itemUsed, GetDefenseValue()) * -1;
+            }
 
             AddOrUpdateEffect(statEffect, change, expiry);
 
