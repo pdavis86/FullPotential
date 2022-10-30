@@ -22,8 +22,8 @@
       "Key": "crafting.category.gadget",
       "Value": "Gadget"
     },
-	
-	{
+    
+    {
       "Key": "item.name",
       "Value": "Name"
     },
@@ -98,10 +98,6 @@
       "Value": "Efficiency"
     },
     {
-      "Key": "attribute.efficiency.tooltip",
-      "Value": "Used in mana, energy, and ammo calculations"
-    },
-    {
       "Key": "attribute.range",
       "Value": "Range"
     },
@@ -118,16 +114,8 @@
       "Value": "Recovery"
     },
     {
-      "Key": "attribute.recovery.tooltip",
-      "Value": "Used in cooldown and reload timing calculations"
-    },
-    {
       "Key": "attribute.duration",
       "Value": "Duration"
-    },
-    {
-      "Key": "attribute.duration.tooltip",
-      "Value": "Used in lifetime calculations"
     },
     {
       "Key": "attribute.effects",
@@ -140,6 +128,30 @@
     {
       "Key": "attribute.shape",
       "Value": "Shape"
+    },
+    
+    
+    {
+      "Key": "attribute.alias.spell.speed",
+      "Value": "Charge Time"
+    },
+    {
+      "Key": "attribute.alias.spell.recovery",
+      "Value": "Cooldown"
+    },
+    {
+      "Key": "attribute.alias.weapon.efficiency",
+      "Value": "Max. Ammo"
+    },
+    {
+      "Key": "attribute.alias.weapon.recovery",
+      "Value": "Reload Time"
+    },
+    
+    
+    {
+      "Key": "attribute.units.time",
+      "Value": "s"
     },
 
 
@@ -278,7 +290,7 @@
       "Key": "ui.settings.appsettings",
       "Value": "Application Settings"
     },
-	{
+    {
       "Key": "ui.settings.resolution",
       "Value": "Resolution"
     },
@@ -344,17 +356,17 @@
       "Key": "ui.alert.suicide",
       "Value": "Yourself"
     },
-	
-	
-	{
+    
+    
+    {
       "Key": "ui.alert.playerjoined",
       "Value": "'{0}' joined the game"
     },
-	{
+    {
       "Key": "ui.alert.attack.noitem",
       "Value": "their fist"
     },
-	{
+    {
       "Key": "ui.alert.attack.youwerekilledby",
       "Value": "You were killed by '{0}'"
     },
@@ -380,8 +392,8 @@
       "Key": "ui.respawn.respawn",
       "Value": "Respawn"
     },
-	
-	
+    
+    
     {
       "Key": "ui.hub.reloading",
       "Value": "Reloading..."

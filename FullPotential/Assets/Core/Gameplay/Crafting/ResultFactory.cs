@@ -553,6 +553,19 @@ namespace FullPotential.Core.Gameplay.Crafting
             }
         }
 
+        private void AppendWithAlias(StringBuilder builder, int attributeValue, string attributeName, string aliasSegment, string aliasValue, UnitsType? unitsType = null)
+        {
+            if (attributeValue == 0)
+            {
+                return;
+            }
+
+            var aliasTranslation = _localizer.Translate(TranslationType.AttributeAlias, aliasSegment + "." + attributeName);
+            var aliasUnits = unitsType == null ? null : _localizer.Translate(TranslationType.AttributeUnits, unitsType.ToString());
+            var originalTranslation = GetAttributeTranslation(attributeName);
+            builder.Append($"{aliasTranslation}: {aliasValue}{aliasUnits} <- ({originalTranslation}: {attributeValue})\n");
+        }
+
         public string GetItemDescription(ItemBase item, bool includeNameAndType = true, string itemName = null)
         {
             if (item == null)
@@ -579,17 +592,80 @@ namespace FullPotential.Core.Gameplay.Crafting
 
             Append(sb, item.Attributes.IsAutomatic, nameof(item.Attributes.IsAutomatic));
             Append(sb, item.Attributes.IsSoulbound, nameof(item.Attributes.IsSoulbound));
-
             Append(sb, item.Attributes.ExtraAmmoPerShot, nameof(item.Attributes.ExtraAmmoPerShot));
+
+            if (item is ISpellOrGadget)
+            {
+                AppendSpellOrGadgetAttributes(sb, item);
+            }
+            else if (item is Weapon)
+            {
+                AppendWeaponAttributes(sb, item);
+            }
+            else
+            {
+                Append(sb, item.Attributes.Strength, nameof(item.Attributes.Strength));
+                Append(sb, item.Attributes.Efficiency, nameof(item.Attributes.Efficiency));
+                Append(sb, item.Attributes.Range, nameof(item.Attributes.Range));
+                Append(sb, item.Attributes.Accuracy, nameof(item.Attributes.Accuracy));
+                Append(sb, item.Attributes.Speed, nameof(item.Attributes.Speed));
+                Append(sb, item.Attributes.Recovery, nameof(item.Attributes.Recovery));
+                Append(sb, item.Attributes.Duration, nameof(item.Attributes.Duration));
+            }
+
+            return sb.ToString();
+        }
+
+        private void AppendSpellOrGadgetAttributes(StringBuilder sb, ItemBase item)
+        {
             Append(sb, item.Attributes.Strength, nameof(item.Attributes.Strength));
             Append(sb, item.Attributes.Efficiency, nameof(item.Attributes.Efficiency));
             Append(sb, item.Attributes.Range, nameof(item.Attributes.Range));
             Append(sb, item.Attributes.Accuracy, nameof(item.Attributes.Accuracy));
-            Append(sb, item.Attributes.Speed, nameof(item.Attributes.Speed));
-            Append(sb, item.Attributes.Recovery, nameof(item.Attributes.Recovery));
-            Append(sb, item.Attributes.Duration, nameof(item.Attributes.Duration));
 
-            return sb.ToString();
+            AppendWithAlias(
+                sb,
+                item.Attributes.Speed,
+                nameof(item.Attributes.Speed),
+                nameof(Spell),
+                _valueCalculator.GetSogChargeTime(item.Attributes).ToString(CultureInfo.InvariantCulture),
+                UnitsType.Time);
+
+            AppendWithAlias(
+                sb,
+                item.Attributes.Recovery,
+                nameof(item.Attributes.Recovery),
+                nameof(Spell),
+                _valueCalculator.GetSogCooldownTime(item.Attributes).ToString(CultureInfo.InvariantCulture),
+                UnitsType.Time);
+
+            Append(sb, item.Attributes.Duration, nameof(item.Attributes.Duration));
+        }
+
+        private void AppendWeaponAttributes(StringBuilder sb, ItemBase item)
+        {
+            Append(sb, item.Attributes.Strength, nameof(item.Attributes.Strength));
+
+            AppendWithAlias(
+                sb,
+                item.Attributes.Efficiency,
+                nameof(item.Attributes.Efficiency),
+                nameof(Weapon),
+                _valueCalculator.GetWeaponAmmoMax(item.Attributes).ToString(CultureInfo.InvariantCulture));
+
+            Append(sb, item.Attributes.Range, nameof(item.Attributes.Range));
+            Append(sb, item.Attributes.Accuracy, nameof(item.Attributes.Accuracy));
+            Append(sb, item.Attributes.Speed, nameof(item.Attributes.Speed));
+
+            AppendWithAlias(
+                sb,
+                item.Attributes.Recovery,
+                nameof(item.Attributes.Recovery),
+                nameof(Weapon),
+                _valueCalculator.GetWeaponReloadTime(item.Attributes).ToString(CultureInfo.InvariantCulture),
+                UnitsType.Time);
+
+            Append(sb, item.Attributes.Duration, nameof(item.Attributes.Duration));
         }
 
     }

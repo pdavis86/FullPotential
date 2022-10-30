@@ -1,6 +1,7 @@
 ﻿using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using System;
+using System.Collections.Generic;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using Unity.Mathematics;
@@ -56,7 +57,6 @@ namespace FullPotential.Api.Gameplay.Combat
         public float GetWeaponReloadTime(Attributes attributes)
         {
             var returnValue = GetTimeBetweenMaxAndMin(attributes.Recovery, 0.5f, 5);
-            //var returnValue = (101 - attributes.Recovery) / 50f + 0.5f;
             //Debug.Log("GetReloadTime: " + returnValue);
             return returnValue;
         }
@@ -95,8 +95,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public float GetSogChargeTime(Attributes attributes)
         {
-            var returnValue = GetTimeBetweenMaxAndMin(attributes.Efficiency, 0, 2);
-            //var returnValue = (101 - attributes.Efficiency) / 100f * 3;
+            var returnValue = GetTimeBetweenMaxAndMin(attributes.Speed, 0, 2);
             //Debug.Log("GetSogChargeTime: " + returnValue);
             return returnValue;
         }
@@ -104,7 +103,6 @@ namespace FullPotential.Api.Gameplay.Combat
         public float GetSogCooldownTime(Attributes attributes)
         {
             var returnValue = GetTimeBetweenMaxAndMin(attributes.Recovery, 0, 2);
-            //var returnValue = (101 - attributes.Recovery) / 100f;
             //Debug.Log("GetSogChargeTime: " + returnValue);
             return returnValue;
         }
@@ -112,7 +110,6 @@ namespace FullPotential.Api.Gameplay.Combat
         public float GetEffectTimeBetween(Attributes attributes, float min = 0.5f, float max = 1.5f)
         {
             var returnValue = GetTimeBetweenMaxAndMin(attributes.Speed, min, max);
-            //var returnValue = (101 - attributes.Speed) / 100f * (max - min) + min;
             //Debug.Log("GetTimeBetweenEffects: " + returnValue);
             return returnValue;
         }

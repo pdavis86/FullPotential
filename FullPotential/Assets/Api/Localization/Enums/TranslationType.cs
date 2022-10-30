@@ -3,6 +3,8 @@
     public enum TranslationType
     {
         Attribute,
+        AttributeAlias,
+        AttributeUnits,
         CraftingCategory,
         CraftingHandedness,
         CraftingNamePrefix,
