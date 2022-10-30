@@ -22,6 +22,11 @@ namespace FullPotential.Api.Gameplay.Combat
             return (int)Math.Ceiling(basicValue / multiplier) + adder;
         }
 
+        private float GetTimeBetweenMaxAndMin(int attributeValue, float min, float max)
+        {
+            return (101 - attributeValue) / 100f * (max - min) + min;
+        }
+
         public int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense)
         {
             //Even a small attack can still do damage
@@ -50,7 +55,8 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public float GetWeaponReloadTime(Attributes attributes)
         {
-            var returnValue = (101 - attributes.Recovery) / 50f + 0.5f;
+            var returnValue = GetTimeBetweenMaxAndMin(attributes.Recovery, 0.5f, 5);
+            //var returnValue = (101 - attributes.Recovery) / 50f + 0.5f;
             //Debug.Log("GetReloadTime: " + returnValue);
             return returnValue;
         }
@@ -89,21 +95,24 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public float GetSogChargeTime(Attributes attributes)
         {
-            var returnValue = (101 - attributes.Efficiency) / 100f * 3;
+            var returnValue = GetTimeBetweenMaxAndMin(attributes.Efficiency, 0, 2);
+            //var returnValue = (101 - attributes.Efficiency) / 100f * 3;
             //Debug.Log("GetSogChargeTime: " + returnValue);
             return returnValue;
         }
 
         public float GetSogCooldownTime(Attributes attributes)
         {
-            var returnValue = (101 - attributes.Recovery) / 100f;
+            var returnValue = GetTimeBetweenMaxAndMin(attributes.Recovery, 0, 2);
+            //var returnValue = (101 - attributes.Recovery) / 100f;
             //Debug.Log("GetSogChargeTime: " + returnValue);
             return returnValue;
         }
 
         public float GetEffectTimeBetween(Attributes attributes, float min = 0.5f, float max = 1.5f)
         {
-            var returnValue = (101 - attributes.Speed) / 100f * (max - min) + min;
+            var returnValue = GetTimeBetweenMaxAndMin(attributes.Speed, min, max);
+            //var returnValue = (101 - attributes.Speed) / 100f * (max - min) + min;
             //Debug.Log("GetTimeBetweenEffects: " + returnValue);
             return returnValue;
         }

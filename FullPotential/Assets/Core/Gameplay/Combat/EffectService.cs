@@ -61,7 +61,7 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 if (!IsEffectAllowed(itemUsed, target, effect))
                 {
-                    Debug.Log($"Effect {effect.TypeName} is not permitted against target {target}");
+                    //Debug.Log($"Effect {effect.TypeName} is not permitted against target {target}");
                     continue;
                 }
 
@@ -85,8 +85,17 @@ namespace FullPotential.Core.Gameplay.Combat
                 if (effect is IMovementEffect movementEffect
                     && movementEffect.Direction == MovementDirection.MaintainDistance)
                 {
-                    return target.GetComponent<MaintainDistance>() == null
-                        && target.GetComponent<PlayerBehaviours.PlayerState>() == null;
+                    if (target.GetComponent<MaintainDistance>() != null)
+                    {
+                        //Debug.Log("Continuing to hold target");
+                        return false;
+                    }
+
+                    if (target.GetComponent<PlayerBehaviours.PlayerState>() != null)
+                    {
+                        //Debug.Log("Cannot target players");
+                        return false;
+                    }
                 }
             }
 

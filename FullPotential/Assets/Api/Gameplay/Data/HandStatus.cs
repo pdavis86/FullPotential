@@ -2,7 +2,6 @@
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.SpellsAndGadgets;
-using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Data
 {
@@ -12,9 +11,9 @@ namespace FullPotential.Api.Gameplay.Data
 
         #region Weapons
 
-        public bool IsReloading { get; set; }
-
         public Weapon EquippedWeapon { get; private set; }
+
+        public bool IsReloading { get; set; }
 
         #endregion
 
@@ -22,13 +21,9 @@ namespace FullPotential.Api.Gameplay.Data
 
         public SpellOrGadgetItemBase EquippedSpellOrGadget { get; private set; }
 
-        public GameObject ActiveSpellOrGadgetGameObject { get; set; }
-
-        public int ChargeCountdown { get; set; }
-
         public IEnumerator ChargeEnumerator { get; set; }
 
-        public int CooldownCountdown { get; set; }
+        public ISpellOrGadgetBehaviour ActiveSpellOrGadgetBehaviour { get; set; }
 
         public IEnumerator CooldownEnumerator { get; set; }
 
@@ -36,6 +31,12 @@ namespace FullPotential.Api.Gameplay.Data
 
         public void SetEquippedItem(ItemBase item, string description)
         {
+            if (ActiveSpellOrGadgetBehaviour != null)
+            {
+                ActiveSpellOrGadgetBehaviour.Stop();
+                ActiveSpellOrGadgetBehaviour = null;
+            }
+
             EquippedItemDescription = description;
 
             switch (item)
@@ -59,32 +60,12 @@ namespace FullPotential.Api.Gameplay.Data
 
         public bool IsConsumingMana()
         {
-            return EquippedSpellOrGadget is Spell && ActiveSpellOrGadgetGameObject != null;
+            return EquippedSpellOrGadget is Spell && ActiveSpellOrGadgetBehaviour != null;
         }
 
         public bool IsConsumingEnergy()
         {
-            return EquippedSpellOrGadget is Gadget && ActiveSpellOrGadgetGameObject != null;
-        }
-
-        public bool StopConsumingResources()
-        {
-            if (ActiveSpellOrGadgetGameObject == null)
-            {
-                return false;
-            }
-
-            var behaviour = ActiveSpellOrGadgetGameObject.GetComponent<ISpellOrGadgetBehaviour>();
-
-            if (behaviour == null)
-            {
-                return false;
-            }
-
-            behaviour.Stop();
-            ActiveSpellOrGadgetGameObject = null;
-
-            return true;
+            return EquippedSpellOrGadget is Gadget && ActiveSpellOrGadgetBehaviour != null;
         }
     }
 }

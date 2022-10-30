@@ -11,6 +11,8 @@ namespace FullPotential.Api.Registry.SpellsAndGadgets
 
         public ResourceConsumptionType ResourceConsumptionType { get; protected set; }
 
+        public int ChargePercentage { get; set; }
+
         private ITargeting _targeting;
         public ITargeting Targeting
         {

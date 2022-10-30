@@ -31,6 +31,8 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private BarSlider _energySlider;
         [SerializeField] private Text _ammoLeft;
         [SerializeField] private Text _ammoRight;
+        [SerializeField] private ProgressWheel _chargeLeft;
+        [SerializeField] private ProgressWheel _chargeRight;
 #pragma warning restore 0649
 
         private ILocalizer _localizer;
@@ -100,7 +102,7 @@ namespace FullPotential.Core.Ui.Behaviours
             }
 
             var alert = Instantiate(_alertPrefab, _alertsContainer.transform);
-            
+
             alert.GetComponent<SlideOutAlert>().Text.text = alertText;
         }
 
@@ -108,9 +110,11 @@ namespace FullPotential.Core.Ui.Behaviours
         {
             UpdateHandDescription(_equippedLeftHandSummary, _playerFighter.HandStatusLeft);
             UpdateHandAmmo(_ammoLeft, _playerFighter.HandStatusLeft);
+            UpdateHandCharge(_chargeLeft, _playerFighter.HandStatusLeft);
 
             UpdateHandDescription(_equippedRightHandSummary, _playerFighter.HandStatusRight);
             UpdateHandAmmo(_ammoRight, _playerFighter.HandStatusRight);
+            UpdateHandCharge(_chargeRight, _playerFighter.HandStatusRight);
         }
 
         private void UpdateHandDescription(EquippedSummary equippedSummary, HandStatus handStatus)
@@ -120,7 +124,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateHandAmmo(Text ammoText, HandStatus handStatus)
         {
-            if (handStatus == null 
+            if (handStatus == null
                 || handStatus.EquippedWeapon == null
                 || ((handStatus.EquippedWeapon.RegistryType is IGearWeapon gearWeapon) && gearWeapon.Category is not IGearWeapon.WeaponCategory.Ranged))
             {
@@ -136,6 +140,22 @@ namespace FullPotential.Core.Ui.Behaviours
             ammoText.text = handStatus.IsReloading
                 ? _reloadingTranslation
                 : $"{handStatus.EquippedWeapon.Ammo}/{_valueCalculator.GetWeaponAmmoMax(handStatus.EquippedWeapon.Attributes)}";
+        }
+
+        private void UpdateHandCharge(ProgressWheel chargeWheel, HandStatus handStatus)
+        {
+            if (handStatus == null || handStatus.EquippedSpellOrGadget == null)
+            {
+                chargeWheel.gameObject.SetActive(false);
+                return;
+            }
+
+            if (!chargeWheel.gameObject.activeInHierarchy)
+            {
+                chargeWheel.gameObject.SetActive(true);
+            }
+
+            chargeWheel.Slider.value = handStatus.EquippedSpellOrGadget.ChargePercentage / 100f;
         }
 
         private void UpdateStaminaPercentage()

@@ -77,17 +77,17 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             _consumeResource = new DelayedAction(.5f, () =>
             {
-                if (HandStatusLeft.ActiveSpellOrGadgetGameObject != null
+                if (HandStatusLeft.ActiveSpellOrGadgetBehaviour != null
                     && !ConsumeResource(HandStatusLeft.EquippedSpellOrGadget, HandStatusLeft.EquippedSpellOrGadget.Targeting.IsContinuous))
                 {
-                    HandStatusLeft.StopConsumingResources();
+                    StopActiveSpellOrGadgetBehaviour(HandStatusLeft);
                     StopCastingClientRpc(true, _rpcService.ForNearbyPlayers(transform.position));
                 }
 
-                if (HandStatusRight.ActiveSpellOrGadgetGameObject != null
+                if (HandStatusRight.ActiveSpellOrGadgetBehaviour != null
                     && !ConsumeResource(HandStatusRight.EquippedSpellOrGadget, HandStatusRight.EquippedSpellOrGadget.Targeting.IsContinuous))
                 {
-                    HandStatusRight.StopConsumingResources();
+                    StopActiveSpellOrGadgetBehaviour(HandStatusRight);
                     StopCastingClientRpc(false, _rpcService.ForNearbyPlayers(transform.position));
                 }
             });
@@ -171,7 +171,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ? HandStatusLeft
                 : HandStatusRight;
 
-            leftOrRight.StopConsumingResources();
+            StopActiveSpellOrGadgetBehaviour(leftOrRight);
         }
 
         #endregion
@@ -222,8 +222,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public override void HandleDeath()
         {
-            HandStatusLeft.StopConsumingResources();
-            HandStatusRight.StopConsumingResources();
+            StopActiveSpellOrGadgetBehaviour(HandStatusLeft);
+            StopActiveSpellOrGadgetBehaviour(HandStatusRight);
 
             base.HandleDeath();
         }
@@ -251,24 +251,46 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : HandStatusRight;
 
             var timeToCharge = _valueCalculator.GetSogChargeTime(leftOrRight.EquippedSpellOrGadget.Attributes);
-            leftOrRight.ChargeEnumerator = ChargeCountdown(leftOrRight, DateTime.Now.AddSeconds(timeToCharge));
+            leftOrRight.ChargeEnumerator = ChargeCoroutine(leftOrRight, DateTime.Now.AddSeconds(timeToCharge));
             StartCoroutine(leftOrRight.ChargeEnumerator);
 
             return true;
         }
 
-        private IEnumerator ChargeCountdown(HandStatus handStatus, DateTime deadline)
+        private IEnumerator ChargeCoroutine(HandStatus handStatus, DateTime deadline)
         {
             var millisecondsUntilDone = (deadline - DateTime.Now).TotalMilliseconds;
-            handStatus.ChargeCountdown = 100;
 
-            while (handStatus.ChargeCountdown > 0)
+            //var sw = System.Diagnostics.Stopwatch.StartNew();
+
+            while (handStatus.EquippedSpellOrGadget.ChargePercentage < 100)
             {
                 yield return new WaitForSeconds(0.01F);
                 var millisecondsRemaining = (deadline - DateTime.Now).TotalMilliseconds;
-                handStatus.ChargeCountdown = (int)(millisecondsRemaining / millisecondsUntilDone * 100);
-                Debug.Log(handStatus.ChargeCountdown);
+                handStatus.EquippedSpellOrGadget.ChargePercentage = 100 - (int)(millisecondsRemaining / millisecondsUntilDone * 100);
             }
+
+            //Debug.Log("Charged in: " + sw.ElapsedMilliseconds + "ms");
+
+            handStatus.ChargeEnumerator = null;
+        }
+
+        private IEnumerator CooldownCoroutine(HandStatus handStatus, int startPercentage, DateTime deadline)
+        {
+            var millisecondsUntilDone = (deadline - DateTime.Now).TotalMilliseconds;
+
+            //var sw = System.Diagnostics.Stopwatch.StartNew();
+
+            while (handStatus.EquippedSpellOrGadget.ChargePercentage > 0)
+            {
+                yield return new WaitForSeconds(0.01F);
+                var millisecondsRemaining = (deadline - DateTime.Now).TotalMilliseconds;
+                handStatus.EquippedSpellOrGadget.ChargePercentage = (int)(startPercentage * millisecondsRemaining / millisecondsUntilDone);
+            }
+
+            //Debug.Log("Cooled in: " + sw.ElapsedMilliseconds + "ms");
+
+            handStatus.CooldownEnumerator = null;
         }
 
         public bool TryToAttack(bool isLeftHand)
@@ -328,6 +350,28 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return hitNetworkObject.NetworkObjectId;
         }
 
+        private bool StopActiveSpellOrGadgetBehaviour(HandStatus handStatus)
+        {
+            if (handStatus.ActiveSpellOrGadgetBehaviour == null)
+            {
+                return false;
+            }
+
+            StartCooldown(handStatus);
+
+            handStatus.ActiveSpellOrGadgetBehaviour.Stop();
+            handStatus.ActiveSpellOrGadgetBehaviour = null;
+
+            return true;
+        }
+
+        private void StartCooldown(HandStatus handStatus)
+        {
+            var timeToCooldown = handStatus.EquippedSpellOrGadget.ChargePercentage / 100f * _valueCalculator.GetSogCooldownTime(handStatus.EquippedSpellOrGadget.Attributes);
+            handStatus.CooldownEnumerator = CooldownCoroutine(handStatus, handStatus.EquippedSpellOrGadget.ChargePercentage, DateTime.Now.AddSeconds(timeToCooldown));
+            StartCoroutine(handStatus.CooldownEnumerator);
+        }
+
         private bool UseSpellOrGadget(bool isLeftHand, Vector3 handPosition, SpellOrGadgetItemBase spellOrGadget)
         {
             if (spellOrGadget == null)
@@ -339,15 +383,29 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ? HandStatusLeft
                 : HandStatusRight;
 
-            if (leftOrRight.StopConsumingResources())
+            if (StopActiveSpellOrGadgetBehaviour(leftOrRight))
             {
                 //Return true as the action also needs performing on the server
                 return true;
             }
 
-            if (leftOrRight.ChargeCountdown > 0)
+            if (leftOrRight.EquippedSpellOrGadget.ChargePercentage < 100)
             {
-                Debug.Log("Still charging");
+                //Debug.Log("Charge was not finished");
+
+                if (leftOrRight.ChargeEnumerator != null)
+                {
+                    StopCoroutine(leftOrRight.ChargeEnumerator);
+                    StartCooldown(leftOrRight);
+                }
+
+                return false;
+            }
+
+            if (leftOrRight.CooldownEnumerator != null)
+            {
+                //Debug.Log("Still cooling down");
+                return false;
             }
 
             if (!ConsumeResource(spellOrGadget, isTest: true))
@@ -355,33 +413,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return false;
             }
 
-            var targetDirection = GetAttackDirection(handPosition, SpellOrGadgetRangeLimit);
-
-            var parentTransform = spellOrGadget.Targeting.IsParentedToSource
-                ? transform
-                : _gameManager.GetSceneBehaviour().GetTransform();
-
             _typeRegistry.LoadAddessable(
                 spellOrGadget.Targeting.PrefabAddress,
-                prefab =>
-                {
-                    var spellOrGadgetGameObject = Instantiate(prefab, handPosition, Quaternion.identity);
-
-                    spellOrGadget.Targeting.SetBehaviourVariables(spellOrGadgetGameObject, spellOrGadget, this, handPosition, targetDirection, isLeftHand);
-
-                    spellOrGadgetGameObject.transform.parent = parentTransform;
-
-                    if (spellOrGadget.Targeting.IsContinuous)
-                    {
-                        leftOrRight.ActiveSpellOrGadgetGameObject = spellOrGadgetGameObject;
-                    }
-
-                    if (IsServer)
-                    {
-                        ConsumeResource(spellOrGadget);
-                    }
-                }
-            );
+                prefab => InstantiateSpell(leftOrRight, isLeftHand, handPosition, spellOrGadget, prefab));
 
             if (spellOrGadget.Targeting.IsServerSideOnly && IsServer)
             {
@@ -389,6 +423,40 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             return true;
+        }
+
+        private void InstantiateSpell(
+            HandStatus leftOrRight,
+            bool isLeftHand,
+            Vector3 handPosition,
+            SpellOrGadgetItemBase spellOrGadget,
+            GameObject prefab)
+        {
+            var targetDirection = GetAttackDirection(handPosition, SpellOrGadgetRangeLimit);
+
+            var parentTransform = spellOrGadget.Targeting.IsParentedToSource
+                ? transform
+                : _gameManager.GetSceneBehaviour().GetTransform();
+
+            var spellOrGadgetGameObject = Instantiate(prefab, handPosition, Quaternion.identity);
+
+            spellOrGadget.Targeting.SetBehaviourVariables(spellOrGadgetGameObject, spellOrGadget, this, handPosition, targetDirection, isLeftHand);
+
+            spellOrGadgetGameObject.transform.parent = parentTransform;
+
+            if (spellOrGadget.Targeting.IsContinuous)
+            {
+                leftOrRight.ActiveSpellOrGadgetBehaviour = spellOrGadgetGameObject.GetComponent<ISpellOrGadgetBehaviour>();
+            }
+            else
+            {
+                StartCooldown(leftOrRight);
+            }
+
+            if (IsServer)
+            {
+                ConsumeResource(spellOrGadget);
+            }
         }
 
         private ulong? UseWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand)
