@@ -1,5 +1,5 @@
-﻿using System;
-using FullPotential.Api.Gameplay.Combat;
+﻿using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Networking;
 using UnityEngine;
@@ -13,54 +13,40 @@ namespace FullPotential.Core.Gameplay.Combat
         // ReSharper disable UnassignedField.Global
         public IFighter SourceFighter;
         public float Distance;
-        public float Duration;
+        public SpellOrGadgetItemBase ItemUsed;
         // ReSharper restore UnassignedField.Global
 
         private GameObject _targetPositionGameObject;
         private FixedJoint _joint;
-        private Rigidbody _rb;
         private ClientNetworkTransform _cnt;
-        private DateTime _startTime;
 
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             CreateNewJoint();
 
-            _rb = gameObject.GetComponent<Rigidbody>();
-            _rb.useGravity = false;
-            _rb.drag = 1;
-
             _cnt = gameObject.GetComponent<ClientNetworkTransform>();
             if (_cnt != null)
             {
                 _cnt.IsServerAuthoritative = true;
             }
-
-            _startTime = DateTime.Now;
         }
 
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            if ((DateTime.Now - _startTime).TotalSeconds >= Duration)
+            if (ItemUsed.ChargePercentage != 100)
             {
                 Cleanup();
                 return;
             }
 
-            var targetPosition = SourceFighter.Transform.position + (SourceFighter.LookTransform.forward * Distance);
-
-            //var vectorToTargetPosition = targetPosition - gameObject.transform.position;
-            //var distanceToTargetPosition = vectorToTargetPosition.magnitude;
-            //Debug.Log($"targetPosition: {targetPosition}, distance to position: {distanceToTargetPosition}");
-
-            _targetPositionGameObject.transform.position = targetPosition;
+            _targetPositionGameObject.transform.position = SourceFighter.Transform.position + (SourceFighter.LookTransform.forward * Distance);
         }
 
         private void CreateNewJoint()
         {
-            _targetPositionGameObject = new GameObject("MaintainDistanceTarget", typeof(Rigidbody));
+            _targetPositionGameObject = new GameObject("MaintainDistanceFromSource", typeof(Rigidbody));
             _targetPositionGameObject.GetComponent<Rigidbody>().isKinematic = true;
             _targetPositionGameObject.transform.parent = GameManager.Instance.GetSceneBehaviour().GetTransform();
             _targetPositionGameObject.transform.position = gameObject.transform.position;
@@ -71,16 +57,13 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private void Cleanup()
         {
-            _rb.useGravity = true;
-            _rb.drag = 0;
-
             if (_cnt != null)
             {
                 _cnt.IsServerAuthoritative = false;
             }
 
-            Destroy(_joint);
             Destroy(_targetPositionGameObject);
+            Destroy(_joint);
             Destroy(this);
         }
     }

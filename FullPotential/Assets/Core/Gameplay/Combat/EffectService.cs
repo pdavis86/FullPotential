@@ -106,13 +106,7 @@ namespace FullPotential.Core.Gameplay.Combat
         {
             if (effect is IMovementEffect movementEffect)
             {
-                if (movementEffect.Direction == MovementDirection.MaintainDistance)
-                {
-                    ApplyMaintainDistance(itemUsed, targetGameObject, sourceFighter, itemUsed.Attributes);
-                    return;
-                }
-
-                ApplyMovementEffect(targetGameObject, movementEffect, itemUsed.Attributes, sourceFighter);
+                ApplyMovementEffect(targetGameObject, movementEffect, itemUsed, sourceFighter);
                 return;
             }
 
@@ -181,20 +175,21 @@ namespace FullPotential.Core.Gameplay.Combat
             targetFighter.ApplyElementalEffect(elementalEffect, itemUsed, sourceFighter, position);
         }
 
-        private void ApplyMaintainDistance(ItemBase itemUsed, GameObject targetGameObject, IFighter sourceFighter, Attributes attributes)
+        private void ApplyMaintainDistance(ItemBase itemUsed, GameObject targetGameObject, IFighter sourceFighter)
         {
             if (itemUsed is not SpellOrGadgetItemBase sog || !sog.Targeting.IsContinuous)
             {
-                Debug.LogWarning("MaintainDistance has been applied to an invalid item");
+                Debug.LogWarning("MaintainDistance has been incorrectly applied to an item");
+                return;
             }
 
             var comp = targetGameObject.AddComponent<MaintainDistance>();
             comp.SourceFighter = sourceFighter;
             comp.Distance = (targetGameObject.transform.position - sourceFighter.Transform.position).magnitude;
-            comp.Duration = _valueCalculator.GetEffectDuration(attributes);
+            comp.ItemUsed = sog;
         }
 
-        private void ApplyMovementEffect(GameObject targetGameObject, IMovementEffect movementEffect, Attributes attributes, IFighter sourceFighter)
+        private void ApplyMovementEffect(GameObject targetGameObject, IMovementEffect movementEffect, ItemBase itemUsed, IFighter sourceFighter)
         {
             var targetRigidBody = targetGameObject.GetComponent<Rigidbody>();
 
@@ -211,8 +206,14 @@ namespace FullPotential.Core.Gameplay.Combat
                 targetLivingEntity.SetLastMover(sourceFighter);
             }
 
+            if (movementEffect.Direction == MovementDirection.MaintainDistance)
+            {
+                ApplyMaintainDistance(itemUsed, targetGameObject, sourceFighter);
+                return;
+            }
+
             var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
-            var force = _valueCalculator.GetMovementForceValue(attributes, adjustForGravity);
+            var force = _valueCalculator.GetMovementForceValue(itemUsed.Attributes, adjustForGravity);
 
             switch (movementEffect.Direction)
             {

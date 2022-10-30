@@ -114,7 +114,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return _shapeOptions.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
         }
 
-        private List<IEffect> GetEffects(string craftingType, IEnumerable<ItemBase> components)
+        private List<IEffect> GetEffects(string craftingType, IEnumerable<ItemBase> components, ITargeting targeting = null)
         {
             const string buff = "Buff";
             const string debuff = "Debuff";
@@ -197,6 +197,14 @@ namespace FullPotential.Core.Gameplay.Crafting
                     .Where(x =>
                         effectTypeLookup[x] != debuff
                         && x is not IElement);
+            }
+
+            if (targeting != null && !targeting.IsContinuous)
+            {
+                effects = effects
+                    .Where(x =>
+                        x is not IMovementEffect movementEffect
+                        || movementEffect.Direction != MovementDirection.MaintainDistance);
             }
 
             return effects.ToList();
@@ -335,7 +343,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 Recovery = ComputeAttribute(components, x => x.Attributes.Recovery),
                 Duration = ComputeAttribute(components, x => x.Attributes.Duration)
             };
-            spellOrGadget.Effects = GetEffects(categoryName, components);
+            spellOrGadget.Effects = GetEffects(categoryName, components, targeting);
 
             var suffix = _localizer.Translate(TranslationType.CraftingCategory, categoryName);
 
