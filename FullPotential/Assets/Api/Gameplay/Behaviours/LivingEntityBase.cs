@@ -699,7 +699,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             var (change, expiry) = _valueCalculator.GetStatChangeAndExpiry(itemUsed.Attributes, statEffect);
 
-            if (statEffect.StatToAffect == AffectableStat.Health)
+            if (statEffect.StatToAffect == AffectableStat.Health && statEffect.Affect == Affect.SingleDecrease)
             {
                 change = _valueCalculator.GetDamageValueFromAttack(itemUsed, GetDefenseValue()) * -1;
             }
