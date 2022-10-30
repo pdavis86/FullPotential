@@ -163,7 +163,7 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""ChargeLeft"",
+                    ""name"": ""AttackHoldLeft"",
                     ""type"": ""Button"",
                     ""id"": ""ea72a802-1f50-42e7-8b37-c3b1ff9c7962"",
                     ""expectedControlType"": ""Button"",
@@ -172,7 +172,7 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""ChargeRight"",
+                    ""name"": ""AttackHoldRight"",
                     ""type"": ""Button"",
                     ""id"": ""c7d8554a-f191-41b4-bdac-d53116682867"",
                     ""expectedControlType"": ""Button"",
@@ -398,7 +398,7 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                     ""interactions"": ""Hold"",
                     ""processors"": """",
                     ""groups"": ""Keyboard and Mouse"",
-                    ""action"": ""ChargeLeft"",
+                    ""action"": ""AttackHoldLeft"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -409,7 +409,7 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                     ""interactions"": ""Hold"",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""ChargeRight"",
+                    ""action"": ""AttackHoldRight"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -452,8 +452,8 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
         m_Player_ShowCursorStop = m_Player.FindAction("ShowCursorStop", throwIfNotFound: true);
         m_Player_ReloadLeft = m_Player.FindAction("ReloadLeft", throwIfNotFound: true);
         m_Player_ReloadRight = m_Player.FindAction("ReloadRight", throwIfNotFound: true);
-        m_Player_ChargeLeft = m_Player.FindAction("ChargeLeft", throwIfNotFound: true);
-        m_Player_ChargeRight = m_Player.FindAction("ChargeRight", throwIfNotFound: true);
+        m_Player_AttackHoldLeft = m_Player.FindAction("AttackHoldLeft", throwIfNotFound: true);
+        m_Player_AttackHoldRight = m_Player.FindAction("AttackHoldRight", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -528,8 +528,8 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_ShowCursorStop;
     private readonly InputAction m_Player_ReloadLeft;
     private readonly InputAction m_Player_ReloadRight;
-    private readonly InputAction m_Player_ChargeLeft;
-    private readonly InputAction m_Player_ChargeRight;
+    private readonly InputAction m_Player_AttackHoldLeft;
+    private readonly InputAction m_Player_AttackHoldRight;
     public struct PlayerActions
     {
         private @DefaultInputActions m_Wrapper;
@@ -549,8 +549,8 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
         public InputAction @ShowCursorStop => m_Wrapper.m_Player_ShowCursorStop;
         public InputAction @ReloadLeft => m_Wrapper.m_Player_ReloadLeft;
         public InputAction @ReloadRight => m_Wrapper.m_Player_ReloadRight;
-        public InputAction @ChargeLeft => m_Wrapper.m_Player_ChargeLeft;
-        public InputAction @ChargeRight => m_Wrapper.m_Player_ChargeRight;
+        public InputAction @AttackHoldLeft => m_Wrapper.m_Player_AttackHoldLeft;
+        public InputAction @AttackHoldRight => m_Wrapper.m_Player_AttackHoldRight;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -605,12 +605,12 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                 @ReloadRight.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReloadRight;
                 @ReloadRight.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReloadRight;
                 @ReloadRight.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReloadRight;
-                @ChargeLeft.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnChargeLeft;
-                @ChargeLeft.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnChargeLeft;
-                @ChargeLeft.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnChargeLeft;
-                @ChargeRight.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnChargeRight;
-                @ChargeRight.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnChargeRight;
-                @ChargeRight.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnChargeRight;
+                @AttackHoldLeft.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttackHoldLeft;
+                @AttackHoldLeft.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttackHoldLeft;
+                @AttackHoldLeft.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttackHoldLeft;
+                @AttackHoldRight.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttackHoldRight;
+                @AttackHoldRight.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttackHoldRight;
+                @AttackHoldRight.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttackHoldRight;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -660,12 +660,12 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
                 @ReloadRight.started += instance.OnReloadRight;
                 @ReloadRight.performed += instance.OnReloadRight;
                 @ReloadRight.canceled += instance.OnReloadRight;
-                @ChargeLeft.started += instance.OnChargeLeft;
-                @ChargeLeft.performed += instance.OnChargeLeft;
-                @ChargeLeft.canceled += instance.OnChargeLeft;
-                @ChargeRight.started += instance.OnChargeRight;
-                @ChargeRight.performed += instance.OnChargeRight;
-                @ChargeRight.canceled += instance.OnChargeRight;
+                @AttackHoldLeft.started += instance.OnAttackHoldLeft;
+                @AttackHoldLeft.performed += instance.OnAttackHoldLeft;
+                @AttackHoldLeft.canceled += instance.OnAttackHoldLeft;
+                @AttackHoldRight.started += instance.OnAttackHoldRight;
+                @AttackHoldRight.performed += instance.OnAttackHoldRight;
+                @AttackHoldRight.canceled += instance.OnAttackHoldRight;
             }
         }
     }
@@ -696,7 +696,7 @@ public partial class @DefaultInputActions : IInputActionCollection2, IDisposable
         void OnShowCursorStop(InputAction.CallbackContext context);
         void OnReloadLeft(InputAction.CallbackContext context);
         void OnReloadRight(InputAction.CallbackContext context);
-        void OnChargeLeft(InputAction.CallbackContext context);
-        void OnChargeRight(InputAction.CallbackContext context);
+        void OnAttackHoldLeft(InputAction.CallbackContext context);
+        void OnAttackHoldRight(InputAction.CallbackContext context);
     }
 }

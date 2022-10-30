@@ -1,7 +1,6 @@
 ﻿using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using System;
-using System.Collections.Generic;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using Unity.Mathematics;
@@ -23,7 +22,12 @@ namespace FullPotential.Api.Gameplay.Combat
             return (int)Math.Ceiling(basicValue / multiplier) + adder;
         }
 
-        private float GetTimeBetweenMaxAndMin(int attributeValue, float min, float max)
+        //private float GetValueInRange(int attributeValue, float min, float max)
+        //{
+        //    return attributeValue / 100f * (max - min) + min;
+        //}
+        
+        private float GetValueInRangeHighLow(int attributeValue, float min, float max)
         {
             return (101 - attributeValue) / 100f * (max - min) + min;
         }
@@ -56,7 +60,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public float GetWeaponReloadTime(Attributes attributes)
         {
-            var returnValue = GetTimeBetweenMaxAndMin(attributes.Recovery, 0.5f, 5);
+            var returnValue = GetValueInRangeHighLow(attributes.Recovery, 0.5f, 5);
             //Debug.Log("GetReloadTime: " + returnValue);
             return returnValue;
         }
@@ -66,6 +70,13 @@ namespace FullPotential.Api.Gameplay.Combat
             var ammoCap = attributes.IsAutomatic ? 100 : 20;
             var returnValue = (int)(attributes.Efficiency / 100f * ammoCap);
             //Debug.Log("GetAmmoMax: " + returnValue);
+            return returnValue;
+        }
+
+        public float GetWeaponFireRate(Attributes attributes)
+        {
+            var returnValue = GetValueInRangeHighLow(attributes.Speed, 0.5f, 3f);
+            Debug.Log("GetWeaponFireRate: " + returnValue);
             return returnValue;
         }
 
@@ -95,21 +106,21 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public float GetSogChargeTime(Attributes attributes)
         {
-            var returnValue = GetTimeBetweenMaxAndMin(attributes.Speed, 0, 2);
+            var returnValue = GetValueInRangeHighLow(attributes.Speed, 0, 2);
             //Debug.Log("GetSogChargeTime: " + returnValue);
             return returnValue;
         }
 
         public float GetSogCooldownTime(Attributes attributes)
         {
-            var returnValue = GetTimeBetweenMaxAndMin(attributes.Recovery, 0, 2);
+            var returnValue = GetValueInRangeHighLow(attributes.Recovery, 0, 2);
             //Debug.Log("GetSogChargeTime: " + returnValue);
             return returnValue;
         }
 
         public float GetEffectTimeBetween(Attributes attributes, float min = 0.5f, float max = 1.5f)
         {
-            var returnValue = GetTimeBetweenMaxAndMin(attributes.Speed, min, max);
+            var returnValue = GetValueInRangeHighLow(attributes.Speed, min, max);
             //Debug.Log("GetTimeBetweenEffects: " + returnValue);
             return returnValue;
         }

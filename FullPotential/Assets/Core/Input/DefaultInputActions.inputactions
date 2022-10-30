@@ -141,7 +141,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ChargeLeft",
+                    "name": "AttackHoldLeft",
                     "type": "Button",
                     "id": "ea72a802-1f50-42e7-8b37-c3b1ff9c7962",
                     "expectedControlType": "Button",
@@ -150,7 +150,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ChargeRight",
+                    "name": "AttackHoldRight",
                     "type": "Button",
                     "id": "c7d8554a-f191-41b4-bdac-d53116682867",
                     "expectedControlType": "Button",
@@ -376,7 +376,7 @@
                     "interactions": "Hold",
                     "processors": "",
                     "groups": "Keyboard and Mouse",
-                    "action": "ChargeLeft",
+                    "action": "AttackHoldLeft",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -387,7 +387,7 @@
                     "interactions": "Hold",
                     "processors": "",
                     "groups": "",
-                    "action": "ChargeRight",
+                    "action": "AttackHoldRight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

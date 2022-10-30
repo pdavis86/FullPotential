@@ -15,6 +15,8 @@ namespace FullPotential.Api.Gameplay.Combat
         int GetDamageValueFromVelocity(Vector3 velocity);
         float GetWeaponReloadTime(Attributes attributes);
         int GetWeaponAmmoMax(Attributes attributes);
+
+        float GetWeaponFireRate(Attributes attributes);
         float GetRangedWeaponRange(Attributes attributes);
         float GetSogContinuousRange(Attributes attributes);
         float GetSogProjectileSpeed(Attributes attributes);

@@ -176,15 +176,15 @@ namespace FullPotential.Core.PlayerBehaviours
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void OnChargeLeft()
+        private void OnAttackHoldLeft()
         {
-            OnCharge(true);
+            OnAttackHold(true);
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void OnChargeRight()
+        private void OnAttackHoldRight()
         {
-            OnCharge(false);
+            OnAttackHold(false);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -507,16 +507,16 @@ namespace FullPotential.Core.PlayerBehaviours
             }
         }
 
-        private void OnCharge(bool isLeftHand)
+        private void OnAttackHold(bool isLeftHand)
         {
             if (_hasMenuOpen || _playerState.AliveState != LivingEntityState.Alive)
             {
                 return;
             }
 
-            if (IsServer || _playerState.TryToCharge(isLeftHand))
+            if (IsServer || _playerState.TryToAttackHold(isLeftHand))
             {
-                _playerState.TryToChargeServerRpc(isLeftHand);
+                _playerState.TryToAttackHoldServerRpc(isLeftHand);
             }
         }
 

@@ -106,9 +106,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
         #region ServerRpc calls
 
         [ServerRpc]
-        public void TryToChargeServerRpc(bool isLeftHand)
+        public void TryToAttackHoldServerRpc(bool isLeftHand)
         {
-            TryToCharge(isLeftHand);
+            TryToAttackHold(isLeftHand);
         }
 
         [ServerRpc]
@@ -228,33 +228,36 @@ namespace FullPotential.Api.Gameplay.Behaviours
             base.HandleDeath();
         }
 
-        public bool TryToCharge(bool isLeftHand)
+        public bool TryToAttackHold(bool isLeftHand)
         {
-            var itemInHand = isLeftHand
-                ? _inventory.GetItemInSlot(SlotGameObjectName.LeftHand)
-                : _inventory.GetItemInSlot(SlotGameObjectName.RightHand);
-
-            var spellOrGadget = itemInHand as SpellOrGadgetItemBase;
-            if (spellOrGadget == null)
-            {
-                Debug.LogWarning("Trying to charge an item that is not a Spell or Gadget");
-                return false;
-            }
-
-            if (!ConsumeResource(spellOrGadget, isTest: true))
-            {
-                return false;
-            }
-
             var leftOrRight = isLeftHand
                 ? HandStatusLeft
                 : HandStatusRight;
 
-            var timeToCharge = _valueCalculator.GetSogChargeTime(leftOrRight.EquippedSpellOrGadget.Attributes);
-            leftOrRight.ChargeEnumerator = ChargeCoroutine(leftOrRight, DateTime.Now.AddSeconds(timeToCharge));
-            StartCoroutine(leftOrRight.ChargeEnumerator);
+            if (leftOrRight.EquippedSpellOrGadget != null)
+            {
+                if (!ConsumeResource(leftOrRight.EquippedSpellOrGadget, isTest: true))
+                {
+                    return false;
+                }
 
-            return true;
+                var timeToCharge = _valueCalculator.GetSogChargeTime(leftOrRight.EquippedSpellOrGadget.Attributes);
+                leftOrRight.ChargeEnumerator = ChargeCoroutine(leftOrRight, DateTime.Now.AddSeconds(timeToCharge));
+                StartCoroutine(leftOrRight.ChargeEnumerator);
+
+                return true;
+            }
+            else if(leftOrRight.EquippedWeapon != null)
+            {
+                if (leftOrRight.EquippedWeapon.Attributes.IsAutomatic)
+                {
+                    _valueCalculator.GetWeaponFireRate(leftOrRight.EquippedWeapon.Attributes);
+                    //todo: fire then cooldown
+                }
+            }
+
+            Debug.LogWarning("Trying to attack hold an item that is not compatible");
+            return false;
         }
 
         private IEnumerator ChargeCoroutine(HandStatus handStatus, DateTime deadline)
