@@ -494,9 +494,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private ulong? UseRangedWeapon(Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
         {
-            //todo: handle multiple shots 
-
-            var range = _valueCalculator.GetSogProjectileRange(weaponInHand.Attributes);
+            var range = _valueCalculator.GetRangedWeaponRange(weaponInHand.Attributes);
             var endPos = Physics.Raycast(LookTransform.position, LookTransform.forward, out var rangedHit, range)
                 ? rangedHit.point
                 : handPosition + LookTransform.forward * range;
@@ -512,7 +510,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
             if (IsServer)
             {
                 //Debug.Log("Should only be called once on server");
-                _effectService.ApplyEffects(this, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
+                for (var i = 0; i < ammoUsed; i++)
+                {
+                    _effectService.ApplyEffects(this, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
+                }
             }
 
             var rangedHitNetworkObject = rangedHit.transform.gameObject.GetComponent<NetworkObject>();

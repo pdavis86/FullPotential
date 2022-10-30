@@ -69,17 +69,17 @@ namespace FullPotential.Api.Gameplay.Combat
             return returnValue;
         }
 
+        public float GetRangedWeaponRange(Attributes attributes)
+        {
+            var returnValue = attributes.Range / 100f * 15 + 15;
+            //Debug.Log("GetProjectileRange: " + returnValue);
+            return returnValue;
+        }
+
         public float GetSogContinuousRange(Attributes attributes)
         {
             var returnValue = attributes.Range / 100f * 10;
             //Debug.Log("GetContinuousRange: " + returnValue);
-            return returnValue;
-        }
-
-        public float GetSogProjectileRange(Attributes attributes)
-        {
-            var returnValue = attributes.Range / 100f * 15 + 15;
-            //Debug.Log("GetProjectileRange: " + returnValue);
             return returnValue;
         }
 

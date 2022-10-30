@@ -10,8 +10,6 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
     public class SogBeamBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
-        //todo: hold down click to cast
-
         public SpellOrGadgetItemBase SpellOrGadget;
         public IFighter SourceFighter;
         public bool IsLeftHand;
