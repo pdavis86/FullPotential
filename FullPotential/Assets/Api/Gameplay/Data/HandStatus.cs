@@ -15,6 +15,8 @@ namespace FullPotential.Api.Gameplay.Data
 
         public bool IsReloading { get; set; }
 
+        public IEnumerator RapidFireEnumerator { get; set; }
+
         #endregion
 
         #region SpellOrGadget

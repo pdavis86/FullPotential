@@ -242,25 +242,25 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
 
                 var timeToCharge = leftOrRight.EquippedSpellOrGadget.GetChargeTime();
-                leftOrRight.ChargeEnumerator = ChargeCoroutine(leftOrRight, DateTime.Now.AddSeconds(timeToCharge));
+                leftOrRight.ChargeEnumerator = SpellOrGadgetChargeCoroutine(leftOrRight, DateTime.Now.AddSeconds(timeToCharge));
                 StartCoroutine(leftOrRight.ChargeEnumerator);
 
                 return true;
             }
-            else if(leftOrRight.EquippedWeapon != null)
+
+            if (leftOrRight.EquippedWeapon != null
+                && leftOrRight.EquippedWeapon.Attributes.IsAutomatic)
             {
-                if (leftOrRight.EquippedWeapon.Attributes.IsAutomatic)
-                {
-                    //leftOrRight.EquippedWeapon.GetFireRate();
-                    //todo: fire then cooldown
-                }
+                leftOrRight.RapidFireEnumerator = AutomaticWeaponFire(leftOrRight, leftOrRight.EquippedWeapon.GetFireRate(), isLeftHand);
+                StartCoroutine(leftOrRight.RapidFireEnumerator);
+                return true;
             }
 
             Debug.LogWarning("Trying to attack hold an item that is not compatible");
             return false;
         }
 
-        private IEnumerator ChargeCoroutine(HandStatus handStatus, DateTime deadline)
+        private IEnumerator SpellOrGadgetChargeCoroutine(HandStatus handStatus, DateTime deadline)
         {
             var millisecondsUntilDone = (deadline - DateTime.Now).TotalMilliseconds;
 
@@ -278,7 +278,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             handStatus.ChargeEnumerator = null;
         }
 
-        private IEnumerator CooldownCoroutine(HandStatus handStatus, int startPercentage, DateTime deadline)
+        private IEnumerator SpellOrGadgetCooldownCoroutine(HandStatus handStatus, int startPercentage, DateTime deadline)
         {
             var millisecondsUntilDone = (deadline - DateTime.Now).TotalMilliseconds;
 
@@ -296,7 +296,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
             handStatus.CooldownEnumerator = null;
         }
 
-        public bool TryToAttack(bool isLeftHand)
+        private IEnumerator AutomaticWeaponFire(HandStatus handStatus, float delay, bool isLeftHand)
+        {
+            while (handStatus.EquippedWeapon.Ammo > 0)
+            {
+                TryToAttack(isLeftHand, true);
+                yield return new WaitForSeconds(delay);
+            }
+        }
+
+        public bool TryToAttack(bool isLeftHand, bool isAutoFire = false)
         {
             var itemInHand = isLeftHand
                 ? _inventory.GetItemInSlot(SlotGameObjectName.LeftHand)
@@ -309,14 +318,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
             switch (itemInHand)
             {
                 case null:
-                    return Punch() != null;
+                    return Punch();
 
                 case Gadget:
                 case Spell:
                     return UseSpellOrGadget(isLeftHand, handPosition, itemInHand as SpellOrGadgetItemBase);
 
                 case Weapon weaponInHand:
-                    return UseWeapon(isLeftHand, handPosition, weaponInHand) != null;
+                    return UseWeapon(isLeftHand, handPosition, weaponInHand, isAutoFire);
 
                 default:
                     Debug.LogWarning("Not implemented attack for " + itemInHand.Name + " yet");
@@ -326,16 +335,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private Vector3 GetAttackDirection(Vector3 handPosition, float maxDistance)
         {
-            return Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, maxDistance: maxDistance)
+            return Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, maxDistance)
                 ? (hit.point - handPosition).normalized
                 : LookTransform.forward;
         }
 
-        private ulong? Punch()
+        private bool Punch()
         {
             if (!Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, MeleeRangeLimit))
             {
-                return null;
+                return false;
             }
 
             if (IsServer)
@@ -345,12 +354,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var hitNetworkObject = hit.transform.gameObject.GetComponent<NetworkObject>();
 
-            if (hitNetworkObject == null)
-            {
-                return null;
-            }
-
-            return hitNetworkObject.NetworkObjectId;
+            return hitNetworkObject != null;
         }
 
         private bool StopActiveSpellOrGadgetBehaviour(HandStatus handStatus)
@@ -360,7 +364,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return false;
             }
 
-            StartCooldown(handStatus);
+            StartSpellOrGadgetCooldown(handStatus);
 
             handStatus.ActiveSpellOrGadgetBehaviour.Stop();
             handStatus.ActiveSpellOrGadgetBehaviour = null;
@@ -368,10 +372,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return true;
         }
 
-        private void StartCooldown(HandStatus handStatus)
+        private void StartSpellOrGadgetCooldown(HandStatus handStatus)
         {
             var timeToCooldown = handStatus.EquippedSpellOrGadget.ChargePercentage / 100f * handStatus.EquippedSpellOrGadget.GetCooldownTime();
-            handStatus.CooldownEnumerator = CooldownCoroutine(handStatus, handStatus.EquippedSpellOrGadget.ChargePercentage, DateTime.Now.AddSeconds(timeToCooldown));
+            handStatus.CooldownEnumerator = SpellOrGadgetCooldownCoroutine(handStatus, handStatus.EquippedSpellOrGadget.ChargePercentage, DateTime.Now.AddSeconds(timeToCooldown));
             StartCoroutine(handStatus.CooldownEnumerator);
         }
 
@@ -399,7 +403,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 if (leftOrRight.ChargeEnumerator != null)
                 {
                     StopCoroutine(leftOrRight.ChargeEnumerator);
-                    StartCooldown(leftOrRight);
+                    StartSpellOrGadgetCooldown(leftOrRight);
                 }
 
                 return false;
@@ -453,7 +457,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
             else
             {
-                StartCooldown(leftOrRight);
+                StartSpellOrGadgetCooldown(leftOrRight);
             }
 
             if (IsServer)
@@ -462,7 +466,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        private ulong? UseWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand)
+        private bool UseWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand, bool isAutoFire)
         {
             var registryType = (IGearWeapon)weaponInHand.RegistryType;
 
@@ -472,6 +476,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ? HandStatusLeft
                 : HandStatusRight;
 
+            if (!isAutoFire && handStatus.RapidFireEnumerator != null)
+            {
+                StopCoroutine(handStatus.RapidFireEnumerator);
+                handStatus.RapidFireEnumerator = null;
+                return true;
+            }
+
             if (!isRanged || handStatus.EquippedWeapon == null)
             {
                 return UseMeleeWeapon(weaponInHand);
@@ -479,7 +490,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (handStatus.EquippedWeapon.Ammo == 0 || handStatus.IsReloading)
             {
-                return null;
+                return false;
             }
 
             var requiredAmmo = 1 + handStatus.EquippedWeapon.Attributes.ExtraAmmoPerShot;
@@ -495,8 +506,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return UseRangedWeapon(handPosition, weaponInHand, ammoUsed);
         }
 
-        private ulong? UseRangedWeapon(Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
+        private bool UseRangedWeapon(Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
         {
+            //todo: apply fire rate limiting to non-autos
+
             var range = weaponInHand.GetRange();
             var endPos = Physics.Raycast(LookTransform.position, LookTransform.forward, out var rangedHit, range)
                 ? rangedHit.point
@@ -507,7 +520,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (rangedHit.transform == null)
             {
-                return null;
+                return false;
             }
 
             if (IsServer)
@@ -519,11 +532,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            var rangedHitNetworkObject = rangedHit.transform.gameObject.GetComponent<NetworkObject>();
-            return rangedHitNetworkObject != null ? rangedHitNetworkObject.NetworkObjectId : null;
+            var hitNetworkObject = rangedHit.transform.gameObject.GetComponent<NetworkObject>();
+
+            return hitNetworkObject != null;
         }
 
-        private ulong? UseMeleeWeapon(Weapon weaponInHand)
+        private bool UseMeleeWeapon(Weapon weaponInHand)
         {
             var meleeRange = weaponInHand.IsTwoHanded
                 ? MeleeRangeLimit
@@ -531,7 +545,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (!Physics.Raycast(LookTransform.position, LookTransform.forward, out var meleeHit, maxDistance: meleeRange))
             {
-                return null;
+                return false;
             }
 
             if (IsServer)
@@ -541,12 +555,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var hitNetworkObject = meleeHit.transform.gameObject.GetComponent<NetworkObject>();
 
-            if (hitNetworkObject == null)
-            {
-                return null;
-            }
-
-            return hitNetworkObject.NetworkObjectId;
+            return hitNetworkObject != null;
         }
 
         private (NetworkVariable<int> Variable, int? Cost)? GetResourceVariableAndCost(SpellOrGadgetItemBase spellOrGadget)

@@ -29,14 +29,14 @@ namespace FullPotential.Api.Registry.Gear
 
         public float GetFireRate()
         {
-            var returnValue = GetValueInRangeHighLow(Attributes.Speed, 0.5f, 3f);
+            var returnValue = GetValueInRangeHighLow(Attributes.Speed, 0.05f, 0.5f);
             //Debug.Log("GetWeaponFireRate: " + returnValue);
             return returnValue;
         }
 
         public float GetRange()
         {
-            var returnValue = Attributes.Range / 100f * 15 + 15;
+            var returnValue = Attributes.Range / 100f * 15 + 5;
             //Debug.Log("GetProjectileRange: " + returnValue);
             return returnValue;
         }
@@ -110,7 +110,7 @@ namespace FullPotential.Api.Registry.Gear
                 Attributes.Speed,
                 nameof(Attributes.Speed),
                 nameof(Weapon),
-                RoundFloatForDisplay(GetFireRate()),
+                RoundFloatForDisplay(1 / GetFireRate(), 2),
                 UnitsType.UnitPerTime);
 
             AppendToDescription(

@@ -24,12 +24,21 @@ namespace FullPotential.Api.Gameplay.Combat
 
         public int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense)
         {
+            var weapon = itemUsed as Weapon;
+            var weaponCategory = (weapon?.RegistryType as IGearWeapon)?.Category;
+
             //Even a small attack can still do damage
-            var attackStrength = itemUsed?.Attributes.Strength ?? 1;
+            float attackStrength = itemUsed?.Attributes.Strength ?? 1;
+
+            if (weaponCategory == IGearWeapon.WeaponCategory.Ranged && weapon.Attributes.IsAutomatic)
+            {
+                attackStrength *= weapon.GetFireRate();
+            }
+
             var defenceRatio = 100f / (100 + targetDefense);
             var damageDealtBasic = Math.Ceiling(attackStrength * defenceRatio / 4f);
 
-            if (itemUsed is Weapon weapon)
+            if (weaponCategory == IGearWeapon.WeaponCategory.Melee)
             {
                 damageDealtBasic *= 2;
 
