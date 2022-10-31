@@ -21,6 +21,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable VirtualMemberNeverOverridden.Global
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
@@ -388,7 +389,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected int GetEnergyCost(Gadget gadget)
         {
             //todo: zzz v0.5 - trait-based energy cost
-            return 20;
+            return gadget.GetResourceCost();
         }
 
         protected abstract bool IsConsumingEnergy();
@@ -438,7 +439,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected int GetManaCost(Spell spell)
         {
             //todo: zzz v0.5 - trait-based mana cost
-            return 20;
+            return spell.GetResourceCost();
         }
 
         protected abstract bool IsConsumingMana();
@@ -600,10 +601,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
             StopAllCoroutines();
             _activeEffects.Clear();
 
-            HandleDeathAfter(_lastDamageSourceName, _lastDamageItemName);
+            HandleDeathAfter();
         }
 
-        protected abstract void HandleDeathAfter(string killerName, string itemName);
+        protected abstract void HandleDeathAfter();
 
         private string GetDeathMessage(bool isOwner, string victimName)
         {

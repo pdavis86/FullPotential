@@ -37,7 +37,6 @@ namespace FullPotential.Core.PlayerBehaviours
         private ITypeRegistry _typeRegistry;
         private IRpcService _rpcService;
         private ILocalizer _localizer;
-        private IResultFactory _resultFactory;
         private IInventoryDataService _inventoryDataService;
 
         private PlayerState _playerState;
@@ -57,7 +56,6 @@ namespace FullPotential.Core.PlayerBehaviours
             _typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
             _rpcService = GameManager.Instance.GetService<IRpcService>();
             _localizer = GameManager.Instance.GetService<ILocalizer>();
-            _resultFactory = GameManager.Instance.GetService<IResultFactory>();
             _inventoryDataService = GameManager.Instance.GetService<IInventoryDataService>();
         }
 
@@ -159,6 +157,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
         #endregion
 
+        //todo: generalise for use in LivingEntityBase
         public (bool WasEquipped, List<string> SlotsToSend) HandleSlotChange(ItemBase item, SlotGameObjectName slotGameObjectName)
         {
             var slotsToSend = new List<string> { slotGameObjectName.ToString() };
@@ -363,11 +362,11 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (slotGameObjectName == SlotGameObjectName.LeftHand)
             {
-                _playerState.HandStatusLeft.SetEquippedItem(item, _resultFactory.GetItemDescription(item));
+                _playerState.HandStatusLeft.SetEquippedItem(item, item.GetDescription(_localizer));
             }
             else if (slotGameObjectName == SlotGameObjectName.RightHand)
             {
-                _playerState.HandStatusRight.SetEquippedItem(item, _resultFactory.GetItemDescription(item));
+                _playerState.HandStatusRight.SetEquippedItem(item, item.GetDescription(_localizer));
             }
         }
 
@@ -494,6 +493,7 @@ namespace FullPotential.Core.PlayerBehaviours
             _equippedItems[slotGameObjectName].GameObject = null;
         }
 
+        //todo: generalise for use in LivingEntityBase
         public void SpawnEquippedObject(ItemBase item, SlotGameObjectName slotGameObjectName)
         {
             DespawnEquippedObject(slotGameObjectName);

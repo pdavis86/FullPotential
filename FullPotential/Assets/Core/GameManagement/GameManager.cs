@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -44,9 +45,10 @@ namespace FullPotential.Core.GameManagement
         [SerializeField] private GameObject _mainCanvas;
 #pragma warning restore 0649
 
-        //Components
+        //Non-editor properties
         public Prefabs Prefabs { get; private set; }
         public UserInterface UserInterface { get; private set; }
+        public CultureInfo CurrentCulture { get; private set; }
 
         //Input
         public DefaultInputActions InputActions { get; private set; }
@@ -205,6 +207,7 @@ namespace FullPotential.Core.GameManagement
 
             EnsureAppOptionsLoaded();
             AppOptions.Culture = culture;
+            CurrentCulture = new CultureInfo(culture);
         }
 
         private static string GetAppOptionsPath()

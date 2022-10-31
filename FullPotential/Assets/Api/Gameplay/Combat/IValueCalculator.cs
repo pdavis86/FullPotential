@@ -13,15 +13,6 @@ namespace FullPotential.Api.Gameplay.Combat
         int AddVariationToValue(double basicValue);
         int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense);
         int GetDamageValueFromVelocity(Vector3 velocity);
-        float GetWeaponReloadTime(Attributes attributes);
-        int GetWeaponAmmoMax(Attributes attributes);
-
-        float GetWeaponFireRate(Attributes attributes);
-        float GetRangedWeaponRange(Attributes attributes);
-        float GetSogContinuousRange(Attributes attributes);
-        float GetSogProjectileSpeed(Attributes attributes);
-        float GetSogChargeTime(Attributes attributes);
-        float GetSogCooldownTime(Attributes attributes);
         float GetEffectTimeBetween(Attributes attributes, float min = 0.5f, float max = 1.5f);
         float GetEffectDuration(Attributes attributes);
         float GetMovementForceValue(Attributes attributes, bool adjustForGravity);

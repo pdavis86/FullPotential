@@ -589,7 +589,7 @@ namespace FullPotential.Core.PlayerBehaviours
             ApplyMaterial(newMat);
         }
 
-        protected override void HandleDeathAfter(string killerName, string itemName)
+        protected override void HandleDeathAfter()
         {
             PlayerSpawnStateChange(AliveState, Vector3.zero, Quaternion.identity);
 

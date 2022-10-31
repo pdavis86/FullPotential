@@ -195,9 +195,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             handStatus.IsReloading = true;
 
-            yield return new WaitForSeconds(_valueCalculator.GetWeaponReloadTime(handStatus.EquippedWeapon.Attributes));
+            yield return new WaitForSeconds(handStatus.EquippedWeapon.GetReloadTime());
 
-            handStatus.EquippedWeapon.Ammo = _valueCalculator.GetWeaponAmmoMax(handStatus.EquippedWeapon.Attributes);
+            handStatus.EquippedWeapon.Ammo = handStatus.EquippedWeapon.GetAmmoMax();
 
             handStatus.IsReloading = false;
         }
@@ -241,7 +241,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     return false;
                 }
 
-                var timeToCharge = _valueCalculator.GetSogChargeTime(leftOrRight.EquippedSpellOrGadget.Attributes);
+                var timeToCharge = leftOrRight.EquippedSpellOrGadget.GetChargeTime();
                 leftOrRight.ChargeEnumerator = ChargeCoroutine(leftOrRight, DateTime.Now.AddSeconds(timeToCharge));
                 StartCoroutine(leftOrRight.ChargeEnumerator);
 
@@ -251,7 +251,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (leftOrRight.EquippedWeapon.Attributes.IsAutomatic)
                 {
-                    _valueCalculator.GetWeaponFireRate(leftOrRight.EquippedWeapon.Attributes);
+                    //leftOrRight.EquippedWeapon.GetFireRate();
                     //todo: fire then cooldown
                 }
             }
@@ -370,7 +370,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void StartCooldown(HandStatus handStatus)
         {
-            var timeToCooldown = handStatus.EquippedSpellOrGadget.ChargePercentage / 100f * _valueCalculator.GetSogCooldownTime(handStatus.EquippedSpellOrGadget.Attributes);
+            var timeToCooldown = handStatus.EquippedSpellOrGadget.ChargePercentage / 100f * handStatus.EquippedSpellOrGadget.GetCooldownTime();
             handStatus.CooldownEnumerator = CooldownCoroutine(handStatus, handStatus.EquippedSpellOrGadget.ChargePercentage, DateTime.Now.AddSeconds(timeToCooldown));
             StartCoroutine(handStatus.CooldownEnumerator);
         }
@@ -497,7 +497,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private ulong? UseRangedWeapon(Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
         {
-            var range = _valueCalculator.GetRangedWeaponRange(weaponInHand.Attributes);
+            var range = weaponInHand.GetRange();
             var endPos = Physics.Raycast(LookTransform.position, LookTransform.forward, out var rangedHit, range)
                 ? rangedHit.point
                 : handPosition + LookTransform.forward * range;

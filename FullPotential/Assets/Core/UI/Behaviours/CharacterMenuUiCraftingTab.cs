@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
@@ -26,10 +27,12 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private GameObject _inventoryRowPrefab;
 #pragma warning restore 0649
 
+        private List<ItemBase> _components;
         private PlayerState _playerState;
         private PlayerBehaviour _playerBehaviour;
+
         private IResultFactory _resultFactory;
-        private List<ItemBase> _components;
+        private ILocalizer _localizer;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -40,6 +43,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _playerBehaviour = _playerState.gameObject.GetComponent<PlayerBehaviour>();
 
             _resultFactory = GameManager.Instance.GetService<IResultFactory>();
+            _localizer = GameManager.Instance.GetService<ILocalizer>();
 
             _craftButton.onClick.AddListener(CraftButtonOnClick);
 
@@ -193,7 +197,7 @@ namespace FullPotential.Core.Ui.Behaviours
             }
 
             _craftButton.interactable = true;
-            _outputText.text = _resultFactory.GetItemDescription(craftedItem, false);
+            _outputText.text = craftedItem.GetDescription(_localizer, false);
         }
 
     }

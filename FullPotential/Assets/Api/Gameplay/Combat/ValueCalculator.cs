@@ -22,16 +22,6 @@ namespace FullPotential.Api.Gameplay.Combat
             return (int)Math.Ceiling(basicValue / multiplier) + adder;
         }
 
-        //private float GetValueInRange(int attributeValue, float min, float max)
-        //{
-        //    return attributeValue / 100f * (max - min) + min;
-        //}
-        
-        private float GetValueInRangeHighLow(int attributeValue, float min, float max)
-        {
-            return (101 - attributeValue) / 100f * (max - min) + min;
-        }
-
         public int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense)
         {
             //Even a small attack can still do damage
@@ -58,69 +48,9 @@ namespace FullPotential.Api.Gameplay.Combat
             return AddVariationToValue(basicDamage);
         }
 
-        public float GetWeaponReloadTime(Attributes attributes)
-        {
-            var returnValue = GetValueInRangeHighLow(attributes.Recovery, 0.5f, 5);
-            //Debug.Log("GetReloadTime: " + returnValue);
-            return returnValue;
-        }
-
-        public int GetWeaponAmmoMax(Attributes attributes)
-        {
-            var ammoCap = attributes.IsAutomatic ? 100 : 20;
-            var returnValue = (int)(attributes.Efficiency / 100f * ammoCap);
-            //Debug.Log("GetAmmoMax: " + returnValue);
-            return returnValue;
-        }
-
-        public float GetWeaponFireRate(Attributes attributes)
-        {
-            var returnValue = GetValueInRangeHighLow(attributes.Speed, 0.5f, 3f);
-            Debug.Log("GetWeaponFireRate: " + returnValue);
-            return returnValue;
-        }
-
-        public float GetRangedWeaponRange(Attributes attributes)
-        {
-            var returnValue = attributes.Range / 100f * 15 + 15;
-            //Debug.Log("GetProjectileRange: " + returnValue);
-            return returnValue;
-        }
-
-        public float GetSogContinuousRange(Attributes attributes)
-        {
-            var returnValue = attributes.Range / 100f * 10;
-            //Debug.Log("GetContinuousRange: " + returnValue);
-            return returnValue;
-        }
-
-        public float GetSogProjectileSpeed(Attributes attributes)
-        {
-            var castSpeed = attributes.Speed / 50f;
-            var returnValue = castSpeed < 0.5
-                ? 0.5f
-                : castSpeed;
-            //Debug.Log("GetProjectileSpeed: " + returnValue);
-            return returnValue;
-        }
-
-        public float GetSogChargeTime(Attributes attributes)
-        {
-            var returnValue = GetValueInRangeHighLow(attributes.Speed, 0, 2);
-            //Debug.Log("GetSogChargeTime: " + returnValue);
-            return returnValue;
-        }
-
-        public float GetSogCooldownTime(Attributes attributes)
-        {
-            var returnValue = GetValueInRangeHighLow(attributes.Recovery, 0, 2);
-            //Debug.Log("GetSogChargeTime: " + returnValue);
-            return returnValue;
-        }
-
         public float GetEffectTimeBetween(Attributes attributes, float min = 0.5f, float max = 1.5f)
         {
-            var returnValue = GetValueInRangeHighLow(attributes.Speed, min, max);
+            var returnValue = ItemBase.GetValueInRangeHighLow(attributes.Speed, min, max);
             //Debug.Log("GetTimeBetweenEffects: " + returnValue);
             return returnValue;
         }

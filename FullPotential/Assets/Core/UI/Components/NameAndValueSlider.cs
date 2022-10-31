@@ -1,4 +1,4 @@
-using System.Globalization;
+using FullPotential.Core.GameManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,7 +27,7 @@ namespace FullPotential.Core.UI.Components
 
         private void SliderOnValueChanged(float newValue)
         {
-            _value.text = newValue.ToString(CultureInfo.InvariantCulture);
+            _value.text = newValue.ToString(GameManager.Instance.CurrentCulture);
         }
     }
 }

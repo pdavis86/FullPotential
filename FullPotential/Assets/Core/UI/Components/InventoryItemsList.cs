@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.UI.Behaviours;
 using UnityEngine;
@@ -27,7 +27,7 @@ namespace FullPotential.Core.Ui.Components
             bool showEquippedItems = true
         )
         {
-            var resultFactory = GameManager.Instance.GetService<IResultFactory>();
+            var localizer = GameManager.Instance.GetService<ILocalizer>();
 
             componentsContainer.SetActive(true);
             componentsContainer.transform.DestroyChildren();
@@ -72,7 +72,7 @@ namespace FullPotential.Core.Ui.Components
 
                 tooltip.OnPointerEnterForTooltip += _ =>
                 {
-                    Tooltips.ShowTooltip(resultFactory.GetItemDescription(item, false));
+                    Tooltips.ShowTooltip(item.GetDescription(localizer, false));
                 };
 
                 rowCounter++;

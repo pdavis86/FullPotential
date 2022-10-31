@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
@@ -13,7 +11,7 @@ using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Registry.SpellsAndGadgets;
-using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Core.GameManagement;
 using FullPotential.Core.Registry;
 using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.Helpers;
@@ -28,7 +26,6 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private readonly TypeRegistry _typeRegistry;
         private readonly ILocalizer _localizer;
-        private readonly IValueCalculator _valueCalculator;
 
         private readonly List<ILoot> _lootTypes;
         private readonly List<IEffect> _effectsForLoot;
@@ -40,12 +37,10 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         public ResultFactory(
             ITypeRegistry typeRegistry,
-            ILocalizer localizer,
-            IValueCalculator valueCalculator)
+            ILocalizer localizer)
         {
             _typeRegistry = (TypeRegistry)typeRegistry;
             _localizer = localizer;
-            _valueCalculator = valueCalculator;
 
             _lootTypes = _typeRegistry.GetRegisteredTypes<ILoot>().ToList();
             _effectsForLoot = _typeRegistry.GetLootPossibilities();
@@ -307,8 +302,9 @@ namespace FullPotential.Core.Gameplay.Crafting
             }
 
             var typeTranslation = _localizer.Translate("crafting.loot.type");
-            var suffix = int.Parse(lootDrop.GetHashCode().ToString().TrimStart('-').Substring(5));
-            lootDrop.Name = $"{_localizer.GetTranslatedTypeName(lootDrop.RegistryType)} ({typeTranslation} #{suffix.ToString("D5", CultureInfo.InvariantCulture)})";
+            var suffix = int.Parse(lootDrop.GetNameHash().ToString().TrimStart('-').Substring(5));
+
+            lootDrop.Name = $"{_localizer.GetTranslatedTypeName(lootDrop.RegistryType)} ({typeTranslation} #{suffix.ToString("D5", GameManager.Instance.CurrentCulture)})";
 
             return lootDrop;
         }
@@ -402,8 +398,8 @@ namespace FullPotential.Core.Gameplay.Crafting
                 IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
                 Attributes = new Attributes
                 {
-                    IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
                     IsAutomatic = craftableType.AllowAutomatic && components.Any(x => x.Attributes.IsAutomatic),
+                    IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
                     ExtraAmmoPerShot = components.FirstOrDefault(x => x.Attributes.ExtraAmmoPerShot > 0)?.Attributes.ExtraAmmoPerShot ?? 0,
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
                     Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
@@ -415,7 +411,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 Effects = GetEffects(nameof(Weapon), components)
             };
             weapon.Name = GetItemName(true, weapon);
-            weapon.Ammo = _valueCalculator.GetWeaponAmmoMax(weapon.Attributes);
+            weapon.Ammo = weapon.GetAmmoMax();
             return weapon;
         }
 
@@ -525,147 +521,6 @@ namespace FullPotential.Core.Gameplay.Crafting
                 default:
                     throw new Exception($"Unexpected craftable category '{categoryName}'");
             }
-        }
-
-        private string GetItemTranslation(string suffix)
-        {
-            return _localizer.Translate(TranslationType.Item, suffix);
-        }
-
-        private string GetAttributeTranslation(string suffix)
-        {
-            return _localizer.Translate(TranslationType.Attribute, suffix);
-        }
-
-        private void Append(StringBuilder builder, bool attributeValue, string attributeName)
-        {
-            if (attributeValue)
-            {
-                builder.Append(GetAttributeTranslation(attributeName) + "\n");
-            }
-        }
-
-        private void Append(StringBuilder builder, int attributeValue, string attributeName)
-        {
-            if (attributeValue > 0)
-            {
-                builder.Append($"{GetAttributeTranslation(attributeName)}: {attributeValue}\n");
-            }
-        }
-
-        private void AppendWithAlias(StringBuilder builder, int attributeValue, string attributeName, string aliasSegment, string aliasValue, UnitsType? unitsType = null)
-        {
-            if (attributeValue == 0)
-            {
-                return;
-            }
-
-            var aliasTranslation = _localizer.Translate(TranslationType.AttributeAlias, aliasSegment + "." + attributeName);
-            var aliasUnits = unitsType == null ? null : _localizer.Translate(TranslationType.AttributeUnits, unitsType.ToString());
-            var originalTranslation = GetAttributeTranslation(attributeName);
-            builder.Append($"{aliasTranslation}: {aliasValue}{aliasUnits} <- ({originalTranslation}: {attributeValue})\n");
-        }
-
-        public string GetItemDescription(ItemBase item, bool includeNameAndType = true, string itemName = null)
-        {
-            if (item == null)
-            {
-                return null;
-            }
-
-            var sb = new StringBuilder();
-
-            if (includeNameAndType) { sb.Append($"{GetItemTranslation(nameof(item.Name))}: {itemName.OrIfNullOrWhitespace(item.Name)}" + "\n"); }
-            if (includeNameAndType) { sb.Append($"{GetItemTranslation(nameof(item.RegistryType))}: {item.GetType().Name}" + "\n"); }
-
-            if (item is ISpellOrGadget spellOrGadget)
-            {
-                if (spellOrGadget.Targeting != null) { sb.Append($"{GetAttributeTranslation(nameof(spellOrGadget.Targeting))}: {_localizer.GetTranslatedTypeName(spellOrGadget.Targeting)}\n"); }
-                if (spellOrGadget.Shape != null) { sb.Append($"{GetAttributeTranslation(nameof(spellOrGadget.Shape))}: {_localizer.GetTranslatedTypeName(spellOrGadget.Shape)}\n"); }
-            }
-
-            if (item.Effects != null && item.Effects.Count > 0)
-            {
-                var localisedEffects = item.Effects.Select(x => _localizer.GetTranslatedTypeName(x));
-                sb.Append($"{GetAttributeTranslation(nameof(item.Effects))}: {string.Join(", ", localisedEffects)}\n");
-            }
-
-            Append(sb, item.Attributes.IsAutomatic, nameof(item.Attributes.IsAutomatic));
-            Append(sb, item.Attributes.IsSoulbound, nameof(item.Attributes.IsSoulbound));
-            Append(sb, item.Attributes.ExtraAmmoPerShot, nameof(item.Attributes.ExtraAmmoPerShot));
-
-            if (item is ISpellOrGadget)
-            {
-                AppendSpellOrGadgetAttributes(sb, item);
-            }
-            else if (item is Weapon)
-            {
-                AppendWeaponAttributes(sb, item);
-            }
-            else
-            {
-                Append(sb, item.Attributes.Strength, nameof(item.Attributes.Strength));
-                Append(sb, item.Attributes.Efficiency, nameof(item.Attributes.Efficiency));
-                Append(sb, item.Attributes.Range, nameof(item.Attributes.Range));
-                Append(sb, item.Attributes.Accuracy, nameof(item.Attributes.Accuracy));
-                Append(sb, item.Attributes.Speed, nameof(item.Attributes.Speed));
-                Append(sb, item.Attributes.Recovery, nameof(item.Attributes.Recovery));
-                Append(sb, item.Attributes.Duration, nameof(item.Attributes.Duration));
-            }
-
-            return sb.ToString();
-        }
-
-        private void AppendSpellOrGadgetAttributes(StringBuilder sb, ItemBase item)
-        {
-            Append(sb, item.Attributes.Strength, nameof(item.Attributes.Strength));
-            Append(sb, item.Attributes.Efficiency, nameof(item.Attributes.Efficiency));
-            Append(sb, item.Attributes.Range, nameof(item.Attributes.Range));
-            Append(sb, item.Attributes.Accuracy, nameof(item.Attributes.Accuracy));
-
-            AppendWithAlias(
-                sb,
-                item.Attributes.Speed,
-                nameof(item.Attributes.Speed),
-                nameof(Spell),
-                _valueCalculator.GetSogChargeTime(item.Attributes).ToString(CultureInfo.InvariantCulture),
-                UnitsType.Time);
-
-            AppendWithAlias(
-                sb,
-                item.Attributes.Recovery,
-                nameof(item.Attributes.Recovery),
-                nameof(Spell),
-                _valueCalculator.GetSogCooldownTime(item.Attributes).ToString(CultureInfo.InvariantCulture),
-                UnitsType.Time);
-
-            Append(sb, item.Attributes.Duration, nameof(item.Attributes.Duration));
-        }
-
-        private void AppendWeaponAttributes(StringBuilder sb, ItemBase item)
-        {
-            Append(sb, item.Attributes.Strength, nameof(item.Attributes.Strength));
-
-            AppendWithAlias(
-                sb,
-                item.Attributes.Efficiency,
-                nameof(item.Attributes.Efficiency),
-                nameof(Weapon),
-                _valueCalculator.GetWeaponAmmoMax(item.Attributes).ToString(CultureInfo.InvariantCulture));
-
-            Append(sb, item.Attributes.Range, nameof(item.Attributes.Range));
-            Append(sb, item.Attributes.Accuracy, nameof(item.Attributes.Accuracy));
-            Append(sb, item.Attributes.Speed, nameof(item.Attributes.Speed));
-
-            AppendWithAlias(
-                sb,
-                item.Attributes.Recovery,
-                nameof(item.Attributes.Recovery),
-                nameof(Weapon),
-                _valueCalculator.GetWeaponReloadTime(item.Attributes).ToString(CultureInfo.InvariantCulture),
-                UnitsType.Time);
-
-            Append(sb, item.Attributes.Duration, nameof(item.Attributes.Duration));
         }
 
     }

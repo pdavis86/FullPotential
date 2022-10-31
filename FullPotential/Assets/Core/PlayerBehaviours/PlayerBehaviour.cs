@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
@@ -397,8 +396,8 @@ namespace FullPotential.Core.PlayerBehaviours
             var hitText = hit.GetComponent<TextMeshProUGUI>();
 
             hitText.text = change < 0
-                ? (change * -1).ToString(CultureInfo.InvariantCulture)
-                : change.ToString(CultureInfo.InvariantCulture);
+                ? (change * -1).ToString()
+                : change.ToString();
 
             hitText.color = change <= 0
                 ? Color.red

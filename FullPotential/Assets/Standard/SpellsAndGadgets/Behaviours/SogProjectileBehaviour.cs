@@ -19,7 +19,6 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         public Vector3 ForwardDirection;
 
         private IEffectService _effectService;
-        private IValueCalculator _valueCalculator;
 
         private Type _shapeType;
 
@@ -38,7 +37,6 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             Physics.IgnoreCollision(GetComponent<Collider>(), SourceFighter.GameObject.GetComponent<Collider>());
 
             _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
-            _valueCalculator = ModHelper.GetGameManager().GetService<IValueCalculator>();
 
             var affectedByGravity = SpellOrGadget.Shape != null;
 
@@ -46,7 +44,9 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             var rigidBody = GetComponent<Rigidbody>();
 
-            rigidBody.AddForce(20f * _valueCalculator.GetSogProjectileSpeed(SpellOrGadget.Attributes) * ForwardDirection, ForceMode.VelocityChange);
+            //todo: take item accuracy into account
+
+            rigidBody.AddForce(20f * SpellOrGadget.GetProjectileSpeed() * ForwardDirection, ForceMode.VelocityChange);
 
             if (affectedByGravity)
             {

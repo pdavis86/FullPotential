@@ -147,11 +147,19 @@
       "Key": "attribute.alias.weapon.recovery",
       "Value": "Reload Time"
     },
+    {
+      "Key": "attribute.alias.weapon.speed",
+      "Value": "Fire Rate"
+    },
     
     
     {
       "Key": "attribute.units.time",
       "Value": "s"
+    },
+    {
+      "Key": "attribute.units.unitpertime",
+      "Value": "/s"
     },
 
 

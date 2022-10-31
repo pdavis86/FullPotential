@@ -16,12 +16,11 @@
         public int Duration;
         public int Luck;
 
-        // ReSharper disable NonReadonlyMemberInGetHashCode
-        public override int GetHashCode()
+        public int GetNameHash()
         {
             unchecked
             {
-                int hash = 101;
+                var hash = 101;
                 hash = hash * 103 + IsAutomatic.GetHashCode();
                 hash = hash * 107 + IsSoulbound.GetHashCode();
                 hash = hash * 109 + ExtraAmmoPerShot.GetHashCode();

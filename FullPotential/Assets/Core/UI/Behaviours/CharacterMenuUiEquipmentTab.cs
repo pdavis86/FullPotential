@@ -1,10 +1,10 @@
 ﻿using System;
 using FullPotential.Api.Gameplay.Enums;
+using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.PlayerBehaviours;
 using FullPotential.Core.UI.Behaviours;
@@ -27,12 +27,12 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private GameObject _lastClickedSlot;
         private PlayerState _playerState;
-        private IResultFactory _resultFactory;
+        private ILocalizer _localizer;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _resultFactory = GameManager.Instance.GetService<IResultFactory>();
+            _localizer = GameManager.Instance.GetService<ILocalizer>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -87,10 +87,13 @@ namespace FullPotential.Core.Ui.Behaviours
             {
                 tooltip.ClearHandlers();
 
-                tooltip.OnPointerEnterForTooltip += _ =>
+                if (item != null)
                 {
-                    Tooltips.ShowTooltip(_resultFactory.GetItemDescription(item));
-                };
+                    tooltip.OnPointerEnterForTooltip += _ =>
+                    {
+                        Tooltips.ShowTooltip(item.GetDescription(_localizer));
+                    };
+                }
             }
         }
 

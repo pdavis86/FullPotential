@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
@@ -32,6 +33,7 @@ namespace FullPotential.Core.UI.Admin
 #pragma warning restore 0649
 
         private IResultFactory _resultFactory;
+        private ILocalizer _localizer;
 
         private List<IEffect> _registeredEffects;
         private List<ITargeting> _registeredTargetingOptions;
@@ -49,6 +51,7 @@ namespace FullPotential.Core.UI.Admin
             var gameManager = ModHelper.GetGameManager();
 
             _resultFactory = gameManager.GetService<IResultFactory>();
+            _localizer = gameManager.GetService<ILocalizer>();
 
             var typeRegistry = gameManager.GetService<ITypeRegistry>();
             _registeredEffects = typeRegistry.GetRegisteredTypes<IEffect>().ToList();
@@ -276,7 +279,7 @@ namespace FullPotential.Core.UI.Admin
         public void DisplayResultsText()
         {
             var item = GetCraftableItem();
-            _resultsText.text = _resultFactory.GetItemDescription(item, true, _itemNameText.text);
+            _resultsText.text = item.GetDescription(_localizer, true, _itemNameText.text);
         }
 
         // ReSharper disable once UnusedMember.Global

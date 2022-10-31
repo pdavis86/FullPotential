@@ -60,7 +60,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
         #endregion
 
-        protected override void HandleDeathAfter(string killerName, string itemName)
+        protected override void HandleDeathAfter()
         {
             Destroy(gameObject);
             _gameManager.GetSceneBehaviour().HandleEnemyDeath();

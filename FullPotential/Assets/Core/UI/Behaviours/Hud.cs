@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Effects;
@@ -36,7 +35,6 @@ namespace FullPotential.Core.Ui.Behaviours
 #pragma warning restore 0649
 
         private ILocalizer _localizer;
-        private IValueCalculator _valueCalculator;
 
         private string _reloadingTranslation;
 
@@ -55,7 +53,6 @@ namespace FullPotential.Core.Ui.Behaviours
         private void Awake()
         {
             _localizer = GameManager.Instance.GetService<ILocalizer>();
-            _valueCalculator = GameManager.Instance.GetService<IValueCalculator>();
 
             _reloadingTranslation = _localizer.Translate("ui.hub.reloading");
 
@@ -139,7 +136,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
             ammoText.text = handStatus.IsReloading
                 ? _reloadingTranslation
-                : $"{handStatus.EquippedWeapon.Ammo}/{_valueCalculator.GetWeaponAmmoMax(handStatus.EquippedWeapon.Attributes)}";
+                : $"{handStatus.EquippedWeapon.Ammo}/{handStatus.EquippedWeapon.GetAmmoMax()}";
         }
 
         private void UpdateHandCharge(ProgressWheel chargeWheel, HandStatus handStatus)

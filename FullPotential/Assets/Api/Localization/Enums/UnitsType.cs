@@ -2,6 +2,7 @@
 {
     public enum UnitsType
     {
-        Time
+        Time,
+        UnitPerTime
     }
 }
