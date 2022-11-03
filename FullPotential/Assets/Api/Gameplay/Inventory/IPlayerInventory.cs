@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Data;
-using FullPotential.Api.Gameplay.Enums;
-using FullPotential.Api.Registry.Base;
-using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Items.Base;
+using FullPotential.Api.Registry.Crafting;
 
 namespace FullPotential.Api.Gameplay.Inventory
 {

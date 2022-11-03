@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using FullPotential.Api.GameManagement.Constants;
+using FullPotential.Api.GameManagement;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Spawning;
 using FullPotential.Api.Unity.Helpers;

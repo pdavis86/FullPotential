@@ -2,10 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using FullPotential.Api.GameManagement.Constants;
+using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Helpers;

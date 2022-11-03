@@ -4,14 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Data;
-using FullPotential.Api.Gameplay.Enums;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Items;
+using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items.SpellsAndGadgets;
+using FullPotential.Api.Items.Weapons;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Registry;
-using FullPotential.Api.Registry.Base;
-using FullPotential.Api.Registry.Gear;
-using FullPotential.Api.Registry.Loot;
-using FullPotential.Api.Registry.SpellsAndGadgets;
+using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities.Extensions;
@@ -191,7 +190,7 @@ namespace FullPotential.Core.PlayerBehaviours
                     ? SlotGameObjectName.RightHand
                     : SlotGameObjectName.LeftHand;
 
-                if (item is Weapon weapon && weapon.IsTwoHanded)
+                if (item is WeaponItemBase weapon && weapon.IsTwoHanded)
                 {
                     SetEquippedItem(null, otherHandSlot);
                     slotsToSend.Add(otherHandSlot.ToString());
@@ -199,7 +198,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 else
                 {
                     var itemInOtherHand = GetItemInSlot(otherHandSlot);
-                    if (itemInOtherHand is Weapon otherWeapon && otherWeapon.IsTwoHanded)
+                    if (itemInOtherHand is WeaponItemBase otherWeapon && otherWeapon.IsTwoHanded)
                     {
                         SetEquippedItem(null, otherHandSlot);
                         slotsToSend.Add(otherHandSlot.ToString());
@@ -234,7 +233,7 @@ namespace FullPotential.Core.PlayerBehaviours
             if (gearCategory == IGear.GearCategory.Hand)
             {
                 itemsForSlot = _items
-                    .Where(x => x.Value is Weapon or Spell or Gadget);
+                    .Where(x => x.Value is WeaponItemBase or Spell or Gadget);
             }
             else
             {
@@ -377,7 +376,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 item.RegistryType = _typeRegistry.GetRegisteredForItem(item);
             }
 
-            if (item is SpellOrGadgetItemBase magicalItem)
+            if (item is IHasTargetingAndShape magicalItem)
             {
                 var resultFactory = GameManager.Instance.GetService<IResultFactory>();
                 if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeName))
@@ -416,7 +415,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
                 Gadgets = groupedItems.FirstOrDefault(x => x.Key == typeof(Gadget))?.Select(x => x as Gadget).ToArray(),
                 Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray(),
-                Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
+                Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(WeaponItemBase))?.Select(x => x as WeaponItemBase).ToArray(),
                 EquippedItems = equippedItems.ToArray()
             };
         }
@@ -459,7 +458,7 @@ namespace FullPotential.Core.PlayerBehaviours
                     errors.Add(_localizer.Translate("crafting.error.spellmissingeffect"));
                 }
             }
-            else if (itemToCraft is Weapon weapon)
+            else if (itemToCraft is WeaponItemBase weapon)
             {
                 if (components.Count > 8)
                 {
@@ -555,7 +554,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             switch (item)
             {
-                case Weapon weapon:
+                case WeaponItemBase weapon:
                     if (item.RegistryType is not IGearWeapon weaponRegistryType)
                     {
                         Debug.LogError("Item is not a weapon");

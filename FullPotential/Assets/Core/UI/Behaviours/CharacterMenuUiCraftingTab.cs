@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;

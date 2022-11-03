@@ -1,4 +1,6 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Items.SpellsAndGadgets;
+using FullPotential.Api.Registry.Crafting;
 using UnityEngine;
 
 namespace FullPotential.Api.Registry.SpellsAndGadgets

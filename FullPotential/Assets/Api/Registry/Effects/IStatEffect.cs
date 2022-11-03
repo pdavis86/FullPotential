@@ -1,4 +1,6 @@
-﻿namespace FullPotential.Api.Registry.Effects
+﻿using FullPotential.Api.Gameplay.Effects;
+
+namespace FullPotential.Api.Registry.Effects
 {
     public interface IStatEffect : IEffect
     {

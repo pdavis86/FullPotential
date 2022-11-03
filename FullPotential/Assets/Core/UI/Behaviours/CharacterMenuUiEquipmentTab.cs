@@ -1,8 +1,9 @@
 ﻿using System;
-using FullPotential.Api.Gameplay.Enums;
+using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items.Weapons;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Registry.Base;
-using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Tooltips;
@@ -130,7 +131,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
                     SetSlot(GetSlotGameObject(slotName), item);
 
-                    if (item is Weapon weapon && weapon.IsTwoHanded)
+                    if (item is WeaponItemBase weapon && weapon.IsTwoHanded)
                     {
                         var otherSlotName = slotGameObjectName == SlotGameObjectName.LeftHand
                             ? SlotGameObjectName.RightHand.ToString()

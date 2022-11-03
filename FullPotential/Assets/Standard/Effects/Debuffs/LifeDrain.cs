@@ -1,4 +1,5 @@
 ﻿using System;
+using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Standard.Effects.Buffs;
 

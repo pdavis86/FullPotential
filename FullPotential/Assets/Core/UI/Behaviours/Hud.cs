@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Data;
+using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Ui;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.UI.Behaviours;

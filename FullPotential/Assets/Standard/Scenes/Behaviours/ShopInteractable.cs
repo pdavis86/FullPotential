@@ -1,5 +1,4 @@
 ﻿using FullPotential.Api.GameManagement;
-using FullPotential.Api.GameManagement.Constants;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Unity.Helpers;

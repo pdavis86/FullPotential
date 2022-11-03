@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.GameManagement.Constants;
+﻿using FullPotential.Api.GameManagement;
 using FullPotential.Api.Spawning;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;

@@ -1,4 +1,6 @@
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Items.SpellsAndGadgets;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;

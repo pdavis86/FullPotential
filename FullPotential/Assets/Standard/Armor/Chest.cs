@@ -1,5 +1,5 @@
 ﻿using System;
-using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Crafting;
 
 namespace FullPotential.Standard.Armor
 {

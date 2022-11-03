@@ -1,5 +1,5 @@
-﻿using FullPotential.Api.Registry;
-using FullPotential.Api.Registry.Base;
+﻿using FullPotential.Api.Items;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.Effects;
 using UnityEngine;
 

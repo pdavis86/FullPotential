@@ -1,11 +1,14 @@
 ﻿using System.Linq;
+using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Registry;
-using FullPotential.Api.Registry.Base;
+using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Items;
+using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items.SpellsAndGadgets;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
-using FullPotential.Api.Registry.SpellsAndGadgets;
 using Unity.Netcode;
 using UnityEngine;
 

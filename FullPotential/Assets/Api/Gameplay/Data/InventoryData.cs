@@ -1,6 +1,6 @@
-﻿using FullPotential.Api.Registry.Gear;
-using FullPotential.Api.Registry.Loot;
-using FullPotential.Api.Registry.SpellsAndGadgets;
+﻿using FullPotential.Api.Items;
+using FullPotential.Api.Items.SpellsAndGadgets;
+using FullPotential.Api.Items.Weapons;
 using FullPotential.Api.Utilities.Data;
 
 namespace FullPotential.Api.Gameplay.Data
@@ -15,7 +15,7 @@ namespace FullPotential.Api.Gameplay.Data
         public Armor[] Armor;
         public Gadget[] Gadgets;
         public Spell[] Spells;
-        public Weapon[] Weapons;
+        public WeaponItemBase[] Weapons;
 
         public KeyValuePair<string, string>[] EquippedItems;
     }

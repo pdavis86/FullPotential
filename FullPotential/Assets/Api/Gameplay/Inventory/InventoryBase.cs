@@ -1,12 +1,11 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Data;
-using FullPotential.Api.Gameplay.Enums;
-using FullPotential.Api.Registry.Base;
-using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Utilities.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Items.Base;
+using FullPotential.Api.Registry.Crafting;
 using Unity.Netcode;
 using UnityEngine;
 

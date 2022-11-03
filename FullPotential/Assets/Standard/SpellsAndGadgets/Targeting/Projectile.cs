@@ -1,5 +1,6 @@
 ﻿using System;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Items.SpellsAndGadgets;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Standard.SpellsAndGadgets.Behaviours;
 using UnityEngine;

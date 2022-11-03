@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FullPotential.Api.Registry.Base;
+using FullPotential.Api.GameManagement;
+using FullPotential.Api.Items;
+using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items.Weapons;
+using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Registry.Gear;
-using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using Unity.Netcode;
 using UnityEngine;
@@ -180,7 +182,7 @@ namespace FullPotential.Core.Registry
                     return GetRegisteredById<IGearAccessory>(item.RegistryTypeId);
                 case Armor:
                     return GetRegisteredById<IGearArmor>(item.RegistryTypeId);
-                case Weapon:
+                case WeaponItemBase:
                     return GetRegisteredById<IGearWeapon>(item.RegistryTypeId);
                 case Loot:
                     return GetRegisteredById<ILoot>(item.RegistryTypeId);

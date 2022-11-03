@@ -1,6 +1,7 @@
 ﻿using System;
+using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Registry;
+using FullPotential.Api.Items.SpellsAndGadgets;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
 using FullPotential.Standard.SpellsAndGadgets.Behaviours;

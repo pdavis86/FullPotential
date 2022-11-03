@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Items;
+using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items.SpellsAndGadgets;
+using FullPotential.Api.Items.Weapons;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
-using FullPotential.Api.Registry;
-using FullPotential.Api.Registry.Base;
+using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
-using FullPotential.Api.Registry.Gear;
-using FullPotential.Api.Registry.Loot;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Registry;
@@ -73,7 +76,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return _targetingOptions.First(x => x.TypeName == typeName);
         }
 
-        private ITargeting GetTargeting(IEnumerable<ISpellOrGadget> components)
+        private ITargeting GetTargeting(IEnumerable<IHasTargetingAndShape> components)
         {
             //Exactly one targeting option
             var targetingComponent = components.FirstOrDefault(x => x.Targeting != null);
@@ -91,7 +94,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return _shapeOptions.First(x => x.TypeName == typeName);
         }
 
-        private IShape GetShapeOrNone(ITargeting targeting, IEnumerable<ISpellOrGadget> components)
+        private IShape GetShapeOrNone(ITargeting targeting, IEnumerable<IHasTargetingAndShape> components)
         {
             //Only one shape, if any
             if (!targeting.HasShape)
@@ -172,7 +175,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     .ToList();
             }
 
-            if (craftingType == nameof(Weapon))
+            if (craftingType == nameof(WeaponItemBase))
             {
                 return effects
                     .Where(x =>
@@ -311,7 +314,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private SpellOrGadgetItemBase GetSpellOrGadget(string categoryName, IEnumerable<ItemBase> components)
         {
-            var relevantComponents = components.OfType<ISpellOrGadget>();
+            var relevantComponents = components.OfType<IHasTargetingAndShape>();
 
             var targeting = GetTargeting(relevantComponents);
 
@@ -369,9 +372,9 @@ namespace FullPotential.Core.Gameplay.Crafting
             return $"{GetItemNamePrefix(isAttack)} {item.Attributes.Strength} {suffix}";
         }
 
-        private Weapon GetMeleeWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
+        private WeaponItemBase GetMeleeWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
-            var weapon = new Weapon
+            var weapon = new MeleeWeapon
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),
@@ -383,15 +386,15 @@ namespace FullPotential.Core.Gameplay.Crafting
                     Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed)
                 },
-                Effects = GetEffects(nameof(Weapon), components)
+                Effects = GetEffects(nameof(WeaponItemBase), components)
             };
             weapon.Name = GetItemName(true, weapon);
             return weapon;
         }
 
-        private Weapon GetRangedWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
+        private WeaponItemBase GetRangedWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
-            var weapon = new Weapon
+            var weapon = new RangedWeapon
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),
@@ -408,16 +411,16 @@ namespace FullPotential.Core.Gameplay.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(nameof(Weapon), components)
+                Effects = GetEffects(nameof(WeaponItemBase), components)
             };
             weapon.Name = GetItemName(true, weapon);
             weapon.Ammo = weapon.GetAmmoMax();
             return weapon;
         }
 
-        private Weapon GetDefensiveWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
+        private WeaponItemBase GetDefensiveWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
-            var weapon = new Weapon
+            var weapon = new DefensiveWeapon
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),
@@ -429,7 +432,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(nameof(Weapon), components)
+                Effects = GetEffects(nameof(WeaponItemBase), components)
             };
             weapon.Name = GetItemName(false, weapon);
             return weapon;
@@ -498,7 +501,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 
             switch (categoryName)
             {
-                case nameof(Weapon):
+                case nameof(WeaponItemBase):
                     var craftableWeapon = _typeRegistry.GetRegisteredByTypeName<IGearWeapon>(typeName);
                     switch (craftableWeapon.Category)
                     {

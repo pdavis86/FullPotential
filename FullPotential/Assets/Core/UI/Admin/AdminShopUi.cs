@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Items;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Registry;
-using FullPotential.Api.Registry.Base;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
@@ -252,9 +253,9 @@ namespace FullPotential.Core.UI.Admin
             return _registeredShapes.FirstOrDefault(x => x.TypeName == typeName);
         }
 
-        private Api.Registry.Loot.Loot GetLootFromChoices()
+        private Loot GetLootFromChoices()
         {
-            return new Api.Registry.Loot.Loot
+            return new Loot
             {
                 Attributes = GetAttributes(),
                 Effects = GetEffects(),

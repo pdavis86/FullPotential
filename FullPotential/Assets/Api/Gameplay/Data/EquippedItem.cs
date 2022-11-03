@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Registry.Base;
+﻿using FullPotential.Api.Items.Base;
 using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Data

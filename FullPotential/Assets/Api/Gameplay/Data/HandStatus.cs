@@ -1,6 +1,7 @@
 ﻿using System.Collections;
-using FullPotential.Api.Registry.Base;
-using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items.SpellsAndGadgets;
+using FullPotential.Api.Items.Weapons;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 
 namespace FullPotential.Api.Gameplay.Data
@@ -11,7 +12,7 @@ namespace FullPotential.Api.Gameplay.Data
 
         #region Weapons
 
-        public Weapon EquippedWeapon { get; private set; }
+        public WeaponItemBase EquippedWeapon { get; private set; }
 
         public bool IsReloading { get; set; }
 
@@ -43,7 +44,7 @@ namespace FullPotential.Api.Gameplay.Data
 
             switch (item)
             {
-                case Weapon weapon:
+                case WeaponItemBase weapon:
                     EquippedWeapon = weapon;
                     EquippedSpellOrGadget = null;
                     break;

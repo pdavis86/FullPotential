@@ -3,11 +3,13 @@ using System.Collections;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Data;
-using FullPotential.Api.Gameplay.Enums;
+using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Items.SpellsAndGadgets;
+using FullPotential.Api.Items.Weapons;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
 using Unity.Netcode;
@@ -324,7 +326,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 case Spell:
                     return UseSpellOrGadget(isLeftHand, handPosition, itemInHand as SpellOrGadgetItemBase);
 
-                case Weapon weaponInHand:
+                case WeaponItemBase weaponInHand:
                     return UseWeapon(isLeftHand, handPosition, weaponInHand, isAutoFire);
 
                 default:
@@ -466,7 +468,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        private bool UseWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand, bool isAutoFire)
+        private bool UseWeapon(bool isLeftHand, Vector3 handPosition, WeaponItemBase weaponInHand, bool isAutoFire)
         {
             var registryType = (IGearWeapon)weaponInHand.RegistryType;
 
@@ -506,7 +508,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return UseRangedWeapon(handPosition, weaponInHand, ammoUsed);
         }
 
-        private bool UseRangedWeapon(Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
+        private bool UseRangedWeapon(Vector3 handPosition, WeaponItemBase weaponInHand, int ammoUsed)
         {
             //todo: apply fire rate limiting to non-autos
 
@@ -537,7 +539,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return hitNetworkObject != null;
         }
 
-        private bool UseMeleeWeapon(Weapon weaponInHand)
+        private bool UseMeleeWeapon(WeaponItemBase weaponInHand)
         {
             var meleeRange = weaponInHand.IsTwoHanded
                 ? MeleeRangeLimit
