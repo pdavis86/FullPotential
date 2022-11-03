@@ -5,7 +5,7 @@
 namespace FullPotential.Api.Items.Base
 {
     [System.Serializable]
-    public abstract class GearBase : ItemBase
+    public abstract class ItemWithHealthBase : ItemBase
     {
         public int Health;
     }

@@ -12,7 +12,7 @@ namespace FullPotential.Api.Gameplay.Data
 
         #region Weapons
 
-        public WeaponItemBase EquippedWeapon { get; private set; }
+        public Weapon EquippedWeapon { get; private set; }
 
         public bool IsReloading { get; set; }
 
@@ -44,7 +44,7 @@ namespace FullPotential.Api.Gameplay.Data
 
             switch (item)
             {
-                case WeaponItemBase weapon:
+                case Weapon weapon:
                     EquippedWeapon = weapon;
                     EquippedSpellOrGadget = null;
                     break;

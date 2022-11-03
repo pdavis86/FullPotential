@@ -11,7 +11,7 @@ namespace FullPotential.Api.Gameplay.Items
     public interface IValueCalculator
     {
         int AddVariationToValue(double basicValue);
-        int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense);
+        int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense, bool addVariation = true);
         int GetDamageValueFromVelocity(Vector3 velocity);
         float GetEffectTimeBetween(Attributes attributes, float min = 0.5f, float max = 1.5f);
         float GetEffectDuration(Attributes attributes);

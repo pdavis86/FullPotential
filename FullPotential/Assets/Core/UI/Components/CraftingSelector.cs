@@ -38,7 +38,7 @@ namespace FullPotential.Core.UI.Components
 
             _craftingCategories = new Dictionary<Type, string>
             {
-                { typeof(WeaponItemBase), localizer.Translate(TranslationType.CraftingCategory, nameof(WeaponItemBase)) },
+                { typeof(Weapon), localizer.Translate(TranslationType.CraftingCategory, nameof(Weapon)) },
                 { typeof(Armor), localizer.Translate(TranslationType.CraftingCategory, nameof(Armor)) },
                 { typeof(Accessory), localizer.Translate(TranslationType.CraftingCategory, nameof(Accessory)) },
                 { typeof(Spell), localizer.Translate(TranslationType.CraftingCategory, nameof(Spell)) },
@@ -95,7 +95,7 @@ namespace FullPotential.Core.UI.Components
 
         private void SetHandednessDropDownVisibility()
         {
-            HandednessDropdown.gameObject.SetActive(GetCraftingCategory().Key == typeof(WeaponItemBase) && _optionalTwoHandedWeaponIndexes.Contains(SubTypeDropdown.value));
+            HandednessDropdown.gameObject.SetActive(GetCraftingCategory().Key == typeof(Weapon) && _optionalTwoHandedWeaponIndexes.Contains(SubTypeDropdown.value));
         }
 
         private void UpdateSecondaryDropDowns()
@@ -107,7 +107,7 @@ namespace FullPotential.Core.UI.Components
             var craftingCategory = GetCraftingCategory();
             switch (craftingCategory.Key.Name)
             {
-                case nameof(WeaponItemBase): SubTypeDropdown.AddOptions(_weaponTypes.Select(x => x.Value).ToList()); break;
+                case nameof(Weapon): SubTypeDropdown.AddOptions(_weaponTypes.Select(x => x.Value).ToList()); break;
                 case nameof(Armor): SubTypeDropdown.AddOptions(_armorTypes.Select(x => x.Value).ToList()); break;
                 case nameof(Accessory): SubTypeDropdown.AddOptions(_accessoryTypes.Select(x => x.Value).ToList()); break;
 
@@ -142,7 +142,7 @@ namespace FullPotential.Core.UI.Components
         {
             switch (craftingCategory)
             {
-                case nameof(WeaponItemBase): return _weaponTypes.ElementAt(SubTypeDropdown.value).Key.TypeName;
+                case nameof(Weapon): return _weaponTypes.ElementAt(SubTypeDropdown.value).Key.TypeName;
                 case nameof(Armor): return _armorTypes.ElementAt(SubTypeDropdown.value).Key.TypeName;
                 case nameof(Accessory): return _accessoryTypes.ElementAt(SubTypeDropdown.value).Key.TypeName;
 

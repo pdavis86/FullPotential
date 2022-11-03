@@ -182,7 +182,7 @@ namespace FullPotential.Core.Registry
                     return GetRegisteredById<IGearAccessory>(item.RegistryTypeId);
                 case Armor:
                     return GetRegisteredById<IGearArmor>(item.RegistryTypeId);
-                case WeaponItemBase:
+                case Weapon:
                     return GetRegisteredById<IGearWeapon>(item.RegistryTypeId);
                 case Loot:
                     return GetRegisteredById<ILoot>(item.RegistryTypeId);

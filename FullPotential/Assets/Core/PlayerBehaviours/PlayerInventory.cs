@@ -190,7 +190,7 @@ namespace FullPotential.Core.PlayerBehaviours
                     ? SlotGameObjectName.RightHand
                     : SlotGameObjectName.LeftHand;
 
-                if (item is WeaponItemBase weapon && weapon.IsTwoHanded)
+                if (item is Weapon weapon && weapon.IsTwoHanded)
                 {
                     SetEquippedItem(null, otherHandSlot);
                     slotsToSend.Add(otherHandSlot.ToString());
@@ -198,7 +198,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 else
                 {
                     var itemInOtherHand = GetItemInSlot(otherHandSlot);
-                    if (itemInOtherHand is WeaponItemBase otherWeapon && otherWeapon.IsTwoHanded)
+                    if (itemInOtherHand is Weapon otherWeapon && otherWeapon.IsTwoHanded)
                     {
                         SetEquippedItem(null, otherHandSlot);
                         slotsToSend.Add(otherHandSlot.ToString());
@@ -233,7 +233,7 @@ namespace FullPotential.Core.PlayerBehaviours
             if (gearCategory == IGear.GearCategory.Hand)
             {
                 itemsForSlot = _items
-                    .Where(x => x.Value is WeaponItemBase or Spell or Gadget);
+                    .Where(x => x.Value is Weapon or Spell or Gadget);
             }
             else
             {
@@ -415,7 +415,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
                 Gadgets = groupedItems.FirstOrDefault(x => x.Key == typeof(Gadget))?.Select(x => x as Gadget).ToArray(),
                 Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray(),
-                Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(WeaponItemBase))?.Select(x => x as WeaponItemBase).ToArray(),
+                Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
                 EquippedItems = equippedItems.ToArray()
             };
         }
@@ -458,7 +458,7 @@ namespace FullPotential.Core.PlayerBehaviours
                     errors.Add(_localizer.Translate("crafting.error.spellmissingeffect"));
                 }
             }
-            else if (itemToCraft is WeaponItemBase weapon)
+            else if (itemToCraft is Weapon weapon)
             {
                 if (components.Count > 8)
                 {
@@ -554,7 +554,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
             switch (item)
             {
-                case WeaponItemBase weapon:
+                case Weapon weapon:
                     if (item.RegistryType is not IGearWeapon weaponRegistryType)
                     {
                         Debug.LogError("Item is not a weapon");

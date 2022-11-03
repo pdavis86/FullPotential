@@ -3,6 +3,7 @@
     public enum UnitsType
     {
         Time,
-        UnitPerTime
+        UnitPerTime,
+        Percent
     }
 }

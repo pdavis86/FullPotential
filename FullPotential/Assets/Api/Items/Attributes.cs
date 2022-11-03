@@ -3,8 +3,8 @@
     [System.Serializable]
     public struct Attributes
     {
-        public bool IsAutomatic;
         public bool IsSoulbound;
+        public bool IsAutomatic;
         public byte ExtraAmmoPerShot;
 
         public int Strength;
@@ -21,8 +21,8 @@
             unchecked
             {
                 var hash = 101;
-                hash = hash * 103 + IsAutomatic.GetHashCode();
-                hash = hash * 107 + IsSoulbound.GetHashCode();
+                hash = hash * 103 + IsSoulbound.GetHashCode();
+                hash = hash * 107 + IsAutomatic.GetHashCode();
                 hash = hash * 109 + ExtraAmmoPerShot.GetHashCode();
 
                 hash = hash * 113 + Strength.GetHashCode();

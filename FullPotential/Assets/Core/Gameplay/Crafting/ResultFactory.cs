@@ -175,7 +175,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     .ToList();
             }
 
-            if (craftingType == nameof(WeaponItemBase))
+            if (craftingType == nameof(Weapon))
             {
                 return effects
                     .Where(x =>
@@ -248,8 +248,8 @@ namespace FullPotential.Core.Gameplay.Crafting
                 Id = Guid.NewGuid().ToMinimisedString(),
                 Attributes = new Attributes
                 {
-                    IsAutomatic = IsSuccess(50),
                     IsSoulbound = IsSuccess(10),
+                    IsAutomatic = IsSuccess(50),
                     ExtraAmmoPerShot = IsSuccess(20) ? Convert.ToByte(ValueCalculator.Random.Next(1, MaxExtraAmmo + 1)) : (byte)0,
                     Strength = GetAttributeValue(75),
                     Efficiency = GetAttributeValue(75),
@@ -372,9 +372,9 @@ namespace FullPotential.Core.Gameplay.Crafting
             return $"{GetItemNamePrefix(isAttack)} {item.Attributes.Strength} {suffix}";
         }
 
-        private WeaponItemBase GetMeleeWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
+        private Weapon GetMeleeWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
-            var weapon = new MeleeWeapon
+            var weapon = new Weapon
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),
@@ -383,26 +383,26 @@ namespace FullPotential.Core.Gameplay.Crafting
                 {
                     IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                    Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
-                    Speed = ComputeAttribute(components, x => x.Attributes.Speed)
+                    Speed = ComputeAttribute(components, x => x.Attributes.Speed),
+                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(nameof(WeaponItemBase), components)
+                Effects = GetEffects(nameof(Weapon), components)
             };
             weapon.Name = GetItemName(true, weapon);
             return weapon;
         }
 
-        private WeaponItemBase GetRangedWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
+        private Weapon GetRangedWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
-            var weapon = new RangedWeapon
+            var weapon = new Weapon
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),
                 IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
                 Attributes = new Attributes
                 {
-                    IsAutomatic = craftableType.AllowAutomatic && components.Any(x => x.Attributes.IsAutomatic),
                     IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
+                    IsAutomatic = craftableType.AllowAutomatic && components.Any(x => x.Attributes.IsAutomatic),
                     ExtraAmmoPerShot = components.FirstOrDefault(x => x.Attributes.ExtraAmmoPerShot > 0)?.Attributes.ExtraAmmoPerShot ?? 0,
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
                     Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
@@ -411,16 +411,16 @@ namespace FullPotential.Core.Gameplay.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(nameof(WeaponItemBase), components)
+                Effects = GetEffects(nameof(Weapon), components)
             };
             weapon.Name = GetItemName(true, weapon);
             weapon.Ammo = weapon.GetAmmoMax();
             return weapon;
         }
 
-        private WeaponItemBase GetDefensiveWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
+        private Weapon GetDefensiveWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
         {
-            var weapon = new DefensiveWeapon
+            var weapon = new Weapon
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),
@@ -432,7 +432,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(nameof(WeaponItemBase), components)
+                Effects = GetEffects(nameof(Weapon), components)
             };
             weapon.Name = GetItemName(false, weapon);
             return weapon;
@@ -501,7 +501,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 
             switch (categoryName)
             {
-                case nameof(WeaponItemBase):
+                case nameof(Weapon):
                     var craftableWeapon = _typeRegistry.GetRegisteredByTypeName<IGearWeapon>(typeName);
                     switch (craftableWeapon.Category)
                     {

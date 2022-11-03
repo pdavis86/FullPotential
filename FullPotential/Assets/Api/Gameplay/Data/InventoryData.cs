@@ -15,7 +15,7 @@ namespace FullPotential.Api.Gameplay.Data
         public Armor[] Armor;
         public Gadget[] Gadgets;
         public Spell[] Spells;
-        public WeaponItemBase[] Weapons;
+        public Weapon[] Weapons;
 
         public KeyValuePair<string, string>[] EquippedItems;
     }

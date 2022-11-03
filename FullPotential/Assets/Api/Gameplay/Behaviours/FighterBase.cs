@@ -326,7 +326,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 case Spell:
                     return UseSpellOrGadget(isLeftHand, handPosition, itemInHand as SpellOrGadgetItemBase);
 
-                case WeaponItemBase weaponInHand:
+                case Weapon weaponInHand:
                     return UseWeapon(isLeftHand, handPosition, weaponInHand, isAutoFire);
 
                 default:
@@ -468,7 +468,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        private bool UseWeapon(bool isLeftHand, Vector3 handPosition, WeaponItemBase weaponInHand, bool isAutoFire)
+        private bool UseWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand, bool isAutoFire)
         {
             var registryType = (IGearWeapon)weaponInHand.RegistryType;
 
@@ -508,9 +508,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return UseRangedWeapon(handPosition, weaponInHand, ammoUsed);
         }
 
-        private bool UseRangedWeapon(Vector3 handPosition, WeaponItemBase weaponInHand, int ammoUsed)
+        private bool UseRangedWeapon(Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
         {
             //todo: apply fire rate limiting to non-autos
+            //todo: apply accuracy
 
             var range = weaponInHand.GetRange();
             var endPos = Physics.Raycast(LookTransform.position, LookTransform.forward, out var rangedHit, range)
@@ -539,13 +540,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return hitNetworkObject != null;
         }
 
-        private bool UseMeleeWeapon(WeaponItemBase weaponInHand)
+        private bool UseMeleeWeapon(Weapon weaponInHand)
         {
+            //take speed and recovery into account
+
             var meleeRange = weaponInHand.IsTwoHanded
                 ? MeleeRangeLimit
                 : MeleeRangeLimit / 2;
 
-            if (!Physics.Raycast(LookTransform.position, LookTransform.forward, out var meleeHit, maxDistance: meleeRange))
+            if (!Physics.Raycast(LookTransform.position, LookTransform.forward, out var meleeHit, meleeRange))
             {
                 return false;
             }

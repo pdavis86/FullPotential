@@ -24,9 +24,9 @@ namespace FullPotential.Api.Gameplay.Items
             return (int)Math.Ceiling(basicValue / multiplier) + adder;
         }
 
-        public int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense)
+        public int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense, bool addVariation = true)
         {
-            var weapon = itemUsed as WeaponItemBase;
+            var weapon = itemUsed as Weapon;
             var weaponCategory = (weapon?.RegistryType as IGearWeapon)?.Category;
 
             //Even a small attack can still do damage
@@ -48,6 +48,11 @@ namespace FullPotential.Api.Gameplay.Items
                 {
                     damageDealtBasic *= 2;
                 }
+            }
+
+            if (!addVariation)
+            {
+                return (int)damageDealtBasic;
             }
 
             return AddVariationToValue(damageDealtBasic);

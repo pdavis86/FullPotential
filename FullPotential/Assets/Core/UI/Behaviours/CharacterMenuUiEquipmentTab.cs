@@ -131,7 +131,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
                     SetSlot(GetSlotGameObject(slotName), item);
 
-                    if (item is WeaponItemBase weapon && weapon.IsTwoHanded)
+                    if (item is Weapon weapon && weapon.IsTwoHanded)
                     {
                         var otherSlotName = slotGameObjectName == SlotGameObjectName.LeftHand
                             ? SlotGameObjectName.RightHand.ToString()

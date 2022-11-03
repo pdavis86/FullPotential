@@ -78,12 +78,12 @@
       "Value": "Name"
     },
     {
-      "Key": "attribute.isautomatic",
-      "Value": "Automatic"
-    },
-    {
       "Key": "attribute.issoulbound",
       "Value": "Soulbound"
+    },
+    {
+      "Key": "attribute.isautomatic",
+      "Value": "Automatic"
     },
     {
       "Key": "attribute.extraammopershot",
@@ -129,6 +129,10 @@
       "Key": "attribute.shape",
       "Value": "Shape"
     },
+    {
+      "Key": "attribute.luck",
+      "Value": "Luck"
+    },
     
     
     {
@@ -137,19 +141,51 @@
     },
     {
       "Key": "attribute.alias.spell.recovery",
-      "Value": "Cooldown"
+      "Value": "Cooldown Time"
+    },
+	
+	
+    {
+      "Key": "attribute.alias.weapon.strength",
+      "Value": "Est. DPS"
     },
     {
-      "Key": "attribute.alias.weapon.efficiency",
+      "Key": "attribute.alias.weapon.range",
+      "Value": "Range"
+    },
+    {
+      "Key": "attribute.alias.weapon.accuracy",
+      "Value": "Accuracy"
+    },
+	
+	
+    {
+      "Key": "attribute.alias.rangedweapon.efficiency",
       "Value": "Max. Ammo"
     },
     {
-      "Key": "attribute.alias.weapon.recovery",
+      "Key": "attribute.alias.rangedweapon.recovery",
       "Value": "Reload Time"
     },
     {
-      "Key": "attribute.alias.weapon.speed",
+      "Key": "attribute.alias.rangedweapon.speed",
       "Value": "Fire Rate"
+    },
+	
+	
+    {
+      "Key": "attribute.alias.meleeweapon.speed",
+      "Value": "Wind Up Time"
+    },
+    {
+      "Key": "attribute.alias.meleeweapon.recovery",
+      "Value": "Cooldown Time"
+    },
+	
+	
+    {
+      "Key": "attribute.alias.defensiveweapon.strength",
+      "Value": "Defence"
     },
     
     
@@ -160,6 +196,10 @@
     {
       "Key": "attribute.units.unitpertime",
       "Value": "/s"
+    },
+    {
+      "Key": "attribute.units.percent",
+      "Value": "%"
     },
 
 
