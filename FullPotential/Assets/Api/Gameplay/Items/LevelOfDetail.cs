@@ -1,4 +1,6 @@
-﻿namespace FullPotential.Api.Gameplay.Items
+﻿// ReSharper disable UnusedMember.Global
+
+namespace FullPotential.Api.Gameplay.Items
 {
     public enum LevelOfDetail
     {

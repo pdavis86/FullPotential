@@ -22,7 +22,7 @@ namespace FullPotential.Api.Items.Base
         {
             //todo: scale up with number of effects
 
-            var returnValue = GetValueInRangeHighLow(Attributes.Efficiency, 5, 50);
+            var returnValue = GetHighInLowOutInRange(Attributes.Efficiency, 5, 50);
             //Debug.Log("GetResourceCost: " + returnValue);
             return (int)returnValue;
         }
@@ -46,7 +46,7 @@ namespace FullPotential.Api.Items.Base
 
         public float GetChargeTime()
         {
-            var returnValue = GetValueInRangeHighLow(Attributes.Speed, 0, 2);
+            var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0, 2);
             //Debug.Log("GetSogChargeTime: " + returnValue);
             return returnValue;
         }

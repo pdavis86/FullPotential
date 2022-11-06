@@ -66,20 +66,27 @@ namespace FullPotential.Api.Items.Base
             _valueCalculator = _gameManager.GetService<IValueCalculator>();
         }
 
-        public static float GetValueInRange(int attributeValue, float min, float max)
-        {
-            return attributeValue / 100f * (max - min) + min;
-        }
+        //public float GetHighInHighOutInRange(int attributeValue, float min, float max)
+        //{
+        //    return attributeValue / 100f * (max - min) + min;
+        //}
 
-        public static float GetValueInRangeHighLow(int attributeValue, float min, float max)
+        public float GetHighInLowOutInRange(int attributeValue, float min, float max)
         {
             return (101 - attributeValue) / 100f * (max - min) + min;
         }
 
-        public static string RoundFloatForDisplay(float input, int decimalPlaces = 1)
+        public string RoundFloatForDisplay(float input, int decimalPlaces = 1)
         {
             var rounded = Math.Round(input, decimalPlaces);
             return rounded.ToString(ModHelper.GetGameManager().CurrentCulture);
+        }
+
+        public int AddVariationToValue(double basicValue)
+        {
+            var multiplier = ValueCalculator.Random.Next(90, 111) / 100f;
+            var adder = ValueCalculator.Random.Next(0, 6);
+            return (int)Math.Ceiling(basicValue / multiplier) + adder;
         }
 
         public int GetNameHash()
@@ -94,20 +101,6 @@ namespace FullPotential.Api.Items.Base
                 hash = hash * 127 + (EffectIds != null ? string.Join(null, EffectIds) : string.Empty).GetHashCode();
                 return hash;
             }
-        }
-
-        public virtual float GetRange()
-        {
-            var returnValue = Attributes.Range / 100f * 15 + 5;
-            //Debug.Log("GetProjectileRange: " + returnValue);
-            return returnValue;
-        }
-
-        public virtual float GetAccuracy()
-        {
-            var returnValue = Attributes.Accuracy;
-            //Debug.Log("GetAccuracy: " + returnValue);
-            return returnValue;
         }
 
         protected void AppendToDescription(StringBuilder builder, ILocalizer localizer, bool attributeValue, string attributeName)
@@ -171,20 +164,6 @@ namespace FullPotential.Api.Items.Base
             return sb.ToString();
         }
 
-        public int AddVariationToValue(double basicValue)
-        {
-            var multiplier = ValueCalculator.Random.Next(90, 111) / 100f;
-            var adder = ValueCalculator.Random.Next(0, 6);
-            return (int)Math.Ceiling(basicValue / multiplier) + adder;
-        }
-
-        public float GetEffectTimeBetween(float min = 0.5f, float max = 1.5f)
-        {
-            var returnValue = ItemBase.GetValueInRangeHighLow(Attributes.Speed, min, max);
-            //Debug.Log("GetTimeBetweenEffects: " + returnValue);
-            return returnValue;
-        }
-
         public float GetMovementForceValue(bool adjustForGravity)
         {
             var force = 4f * Attributes.Strength;
@@ -192,6 +171,27 @@ namespace FullPotential.Api.Items.Base
             return adjustForGravity
                 ? force * 1.2f
                 : force;
+        }
+
+        public virtual float GetRange()
+        {
+            var returnValue = Attributes.Range / 100f * 15 + 5;
+            //Debug.Log("GetProjectileRange: " + returnValue);
+            return returnValue;
+        }
+
+        public virtual float GetAccuracy()
+        {
+            var returnValue = Attributes.Accuracy;
+            //Debug.Log("GetAccuracy: " + returnValue);
+            return returnValue;
+        }
+
+        public float GetEffectTimeBetween(float min = 0.5f, float max = 1.5f)
+        {
+            var returnValue = GetHighInLowOutInRange(Attributes.Speed, min, max);
+            //Debug.Log("GetTimeBetweenEffects: " + returnValue);
+            return returnValue;
         }
 
         public (int Change, DateTime Expiry) GetStatChangeAndExpiry(IStatEffect statEffect)
@@ -214,7 +214,7 @@ namespace FullPotential.Api.Items.Base
         {
             var (change, expiry) = GetStatChangeAndExpiry(statEffect);
 
-            var delay = (101 - Attributes.Recovery) / 20f;
+            var delay = GetHighInLowOutInRange(Attributes.Recovery, 0.5f, 3);
 
             return (change, expiry, delay);
         }

@@ -29,28 +29,28 @@ namespace FullPotential.Api.Items.Types
 
         public float GetMeleeRecoveryTime()
         {
-            var returnValue = GetValueInRangeHighLow(Attributes.Recovery, 0.5f, 5);
+            var returnValue = GetHighInLowOutInRange(Attributes.Recovery, 0.5f, 5);
             //Debug.Log("GetMeleeRecoveryTime: " + returnValue);
             return returnValue;
         }
 
         public float GetReloadTime()
         {
-            var returnValue = GetValueInRangeHighLow(Attributes.Recovery, 0.5f, 5);
+            var returnValue = GetHighInLowOutInRange(Attributes.Recovery, 0.5f, 5);
             //Debug.Log("GetReloadTime: " + returnValue);
             return returnValue;
         }
 
         public float GetMeleeWindUpTime()
         {
-            var returnValue = GetValueInRangeHighLow(Attributes.Speed, 0.05f, 0.5f);
+            var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0.05f, 0.5f);
             //Debug.Log("GetMeleeWindUpTime: " + returnValue);
             return returnValue;
         }
 
         public float GetFireRate()
         {
-            var returnValue = GetValueInRangeHighLow(Attributes.Speed, 0.05f, 0.5f);
+            var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0.05f, 0.5f);
             //Debug.Log("GetWeaponFireRate: " + returnValue);
             return returnValue;
         }

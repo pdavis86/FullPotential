@@ -32,7 +32,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
 
-            if (Physics.Raycast(StartPosition, ForwardDirection, out var hit, maxDistance: MaxDistance))
+            if (Physics.Raycast(StartPosition, ForwardDirection, out var hit, MaxDistance))
             {
                 ApplyEffects(hit.transform.gameObject, hit.point);
             }
