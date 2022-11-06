@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
@@ -10,6 +11,7 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
+using Unity.Mathematics;
 
 namespace FullPotential.Api.Items.Base
 {
@@ -167,6 +169,68 @@ namespace FullPotential.Api.Items.Base
             AppendToDescription(sb, localizer, Attributes.Luck, nameof(Attributes.Luck));
 
             return sb.ToString();
+        }
+
+        public int AddVariationToValue(double basicValue)
+        {
+            var multiplier = ValueCalculator.Random.Next(90, 111) / 100f;
+            var adder = ValueCalculator.Random.Next(0, 6);
+            return (int)Math.Ceiling(basicValue / multiplier) + adder;
+        }
+
+        public float GetEffectTimeBetween(float min = 0.5f, float max = 1.5f)
+        {
+            var returnValue = ItemBase.GetValueInRangeHighLow(Attributes.Speed, min, max);
+            //Debug.Log("GetTimeBetweenEffects: " + returnValue);
+            return returnValue;
+        }
+
+        public float GetMovementForceValue(bool adjustForGravity)
+        {
+            var force = 4f * Attributes.Strength;
+
+            return adjustForGravity
+                ? force * 1.2f
+                : force;
+        }
+
+        public (int Change, DateTime Expiry) GetStatChangeAndExpiry(IStatEffect statEffect)
+        {
+            var change = AddVariationToValue(Attributes.Strength / 5f);
+
+            if (statEffect.Affect is Affect.PeriodicDecrease or Affect.SingleDecrease or Affect.TemporaryMaxDecrease)
+            {
+                change *= -1;
+            }
+
+            var timeToLive = statEffect.Affect == Affect.SingleIncrease || statEffect.Affect == Affect.SingleDecrease
+                ? math.ceil(Attributes.Duration / 50f)
+                : math.ceil(Attributes.Duration / 20f);
+
+            return (change, DateTime.Now.AddSeconds(timeToLive));
+        }
+
+        public (int Change, DateTime Expiry, float delay) GetPeriodicStatChangeExpiryAndDelay(IStatEffect statEffect)
+        {
+            var (change, expiry) = GetStatChangeAndExpiry(statEffect);
+
+            var delay = (101 - Attributes.Recovery) / 20f;
+
+            return (change, expiry, delay);
+        }
+
+        public (int Change, DateTime Expiry) GetAttributeChangeAndExpiry(IAttributeEffect attributeEffect)
+        {
+            var change = AddVariationToValue(Attributes.Strength / 5f);
+
+            if (!attributeEffect.TemporaryMaxIncrease)
+            {
+                change *= -1;
+            }
+
+            var timeToLive = Attributes.Duration / 2f;
+
+            return (change, DateTime.Now.AddSeconds(timeToLive));
         }
 
     }

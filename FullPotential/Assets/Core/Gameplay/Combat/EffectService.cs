@@ -3,7 +3,6 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
@@ -17,14 +16,11 @@ namespace FullPotential.Core.Gameplay.Combat
     public class EffectService : IEffectService
     {
         private readonly ITypeRegistry _typeRegistry;
-        private readonly IValueCalculator _valueCalculator;
 
         public EffectService(
-            ITypeRegistry typeRegistry,
-            IValueCalculator valueCalculator)
+            ITypeRegistry typeRegistry)
         {
             _typeRegistry = typeRegistry;
-            _valueCalculator = valueCalculator;
         }
 
         public void ApplyEffects(
@@ -68,6 +64,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 //Debug.Log($"Applying effect {effect.TypeName} to {target.name}");
 
+                //todo: scale down by number of effects
                 ApplyEffect(sourceFighter, effect, itemUsed, target, position);
 
                 if (sourceFighter != null && effect is IHasSideEffect withSideEffect)
@@ -214,7 +211,7 @@ namespace FullPotential.Core.Gameplay.Combat
             }
 
             var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
-            var force = _valueCalculator.GetMovementForceValue(itemUsed, adjustForGravity);
+            var force = itemUsed.GetMovementForceValue(adjustForGravity);
 
             switch (movementEffect.Direction)
             {

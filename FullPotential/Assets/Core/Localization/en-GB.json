@@ -161,6 +161,10 @@
       "Key": "attribute.alias.sog.recovery",
       "Value": "Cooldown Time"
     },
+    {
+      "Key": "attribute.alias.sog.duration",
+      "Value": "Effect duration"
+    },
 	
 	
     {

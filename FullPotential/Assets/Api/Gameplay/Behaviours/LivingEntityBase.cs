@@ -538,13 +538,19 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             //Debug.Log($"{name} collided with {collision.gameObject.name} at velocity {collision.relativeVelocity} with cause {cause}");
 
-            var healthChange = _valueCalculator.GetDamageValueFromVelocity(collision.relativeVelocity);
+            var healthChange = GetDamageValueFromVelocity(collision.relativeVelocity);
             var position = collision.GetContact(0).point;
 
             _lastDamageItemName = null;
             _lastDamageSourceName = cause;
 
             ApplyHealthChange(healthChange, _fighterWhoMovedMeLast, null, position);
+        }
+
+        private int GetDamageValueFromVelocity(Vector3 velocity)
+        {
+            var basicDamage = math.pow(velocity.magnitude, 1.9) * -1;
+            return _valueCalculator.AddVariationToValue(basicDamage);
         }
 
         #endregion
@@ -675,13 +681,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void AddAttributeModifier(IAttributeEffect attributeEffect, ItemBase itemUsed)
         {
-            var (change, expiry) = _valueCalculator.GetAttributeChangeAndExpiry(itemUsed, attributeEffect);
+            var (change, expiry) = itemUsed.GetAttributeChangeAndExpiry(attributeEffect);
             AddOrUpdateEffect(attributeEffect, change, expiry);
         }
 
         public void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter)
         {
-            var (change, expiry, delay) = _valueCalculator.GetStatChangeExpiryAndDelay(itemUsed, statEffect);
+            var (change, expiry, delay) = itemUsed.GetPeriodicStatChangeExpiryAndDelay(statEffect);
             AddOrUpdateEffect(statEffect, change, expiry);
             StartCoroutine(PeriodicActionToStatCoroutine(statEffect.StatToAffect, change, sourceFighter, itemUsed, delay, expiry));
         }
@@ -698,7 +704,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
-            var (change, expiry) = _valueCalculator.GetStatChangeAndExpiry(itemUsed, statEffect);
+            var (change, expiry) = itemUsed.GetStatChangeAndExpiry(statEffect);
 
             if (statEffect.StatToAffect == AffectableStat.Health && statEffect.Affect == Affect.SingleDecrease)
             {
@@ -712,7 +718,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
-            var (change, expiry) = _valueCalculator.GetStatChangeAndExpiry(itemUsed, statEffect);
+            var (change, expiry) = itemUsed.GetStatChangeAndExpiry(statEffect);
 
             AddOrUpdateEffect(statEffect, change, expiry);
 

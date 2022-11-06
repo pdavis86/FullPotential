@@ -1,5 +1,4 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
@@ -21,7 +20,6 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 #pragma warning restore 0649
 
         private IEffectService _effectService;
-        private IValueCalculator _valueCalculator;
 
         private Transform _cylinderParentTransform;
         private Transform _cylinderTransform;
@@ -36,7 +34,6 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             _cylinderTransform = _cylinderParentTransform.GetChild(0);
 
             _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
-            _valueCalculator = ModHelper.GetGameManager().GetService<IValueCalculator>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -58,7 +55,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            var effectsDelay = _valueCalculator.GetEffectTimeBetween(SpellOrGadget);
+            var effectsDelay = SpellOrGadget.GetEffectTimeBetween();
             _applyEffectsAction = new DelayedAction(effectsDelay, () => ApplyEffects(_hit.transform.gameObject, _hit.point));
         }
 

@@ -1,5 +1,4 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
@@ -20,7 +19,6 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         public IFighter SourceFighter;
 
         private IEffectService _effectService;
-        private IValueCalculator _valueCalculator;
 
         private float _timeSinceLastEffective;
         private float _timeBetweenEffects;
@@ -35,12 +33,11 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            Destroy(gameObject, _valueCalculator.GetEffectDuration(SpellOrGadget));
+            Destroy(gameObject, SpellOrGadget.GetEffectDuration());
 
             _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
-            _valueCalculator = ModHelper.GetGameManager().GetService<IValueCalculator>();
 
-            _timeBetweenEffects = _valueCalculator.GetEffectTimeBetween(SpellOrGadget);
+            _timeBetweenEffects = SpellOrGadget.GetEffectTimeBetween();
             _timeSinceLastEffective = _timeBetweenEffects;
         }
 

@@ -130,6 +130,12 @@ namespace FullPotential.Api.Items.Types
 
             AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
 
+            //todo: what does speed do for a defensive weapon?
+            AppendToDescription(sb, localizer, Attributes.Speed, nameof(Attributes.Speed));
+
+            //todo: what does speed do for a defensive weapon?
+            AppendToDescription(sb, localizer, Attributes.Recovery, nameof(Attributes.Recovery));
+
             AppendToDescription(
                 sb,
                 localizer,
@@ -146,12 +152,6 @@ namespace FullPotential.Api.Items.Types
                 AliasSegmentItem,
                 RoundFloatForDisplay(GetMeleeDps()),
                 UnitsType.UnitPerTime);
-
-            //todo: what does speed do for a defensive weapon?
-            AppendToDescription(sb, localizer, Attributes.Speed, nameof(Attributes.Speed));
-
-            //todo: what does speed do for a defensive weapon?
-            AppendToDescription(sb, localizer, Attributes.Recovery, nameof(Attributes.Recovery));
 
             return sb.ToString();
         }
@@ -177,15 +177,6 @@ namespace FullPotential.Api.Items.Types
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.Strength,
-                nameof(Attributes.Strength),
-                AliasSegmentItem,
-                RoundFloatForDisplay(GetMeleeDps()),
-                UnitsType.UnitPerTime);
-
-            AppendToDescription(
-                sb,
-                localizer,
                 Attributes.Speed,
                 nameof(Attributes.Speed),
                 AliasSegmentMelee,
@@ -199,6 +190,15 @@ namespace FullPotential.Api.Items.Types
                 nameof(Attributes.Recovery),
                 AliasSegmentMelee,
                 RoundFloatForDisplay(GetMeleeRecoveryTime()),
+                UnitsType.UnitPerTime);
+
+            AppendToDescription(
+                sb,
+                localizer,
+                Attributes.Strength,
+                nameof(Attributes.Strength),
+                AliasSegmentItem,
+                RoundFloatForDisplay(GetMeleeDps()),
                 UnitsType.UnitPerTime);
 
             return sb.ToString();
@@ -223,15 +223,6 @@ namespace FullPotential.Api.Items.Types
             AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
             AppendToDescription(sb, localizer, Attributes.IsAutomatic, nameof(Attributes.IsAutomatic));
             AppendToDescription(sb, localizer, Attributes.ExtraAmmoPerShot, nameof(Attributes.ExtraAmmoPerShot));
-
-            AppendToDescription(
-                sb,
-                localizer,
-                Attributes.Strength,
-                nameof(Attributes.Strength),
-                AliasSegmentItem,
-                RoundFloatForDisplay(GetRangedDps()),
-                UnitsType.UnitPerTime);
 
             if (levelOfDetail >= LevelOfDetail.Intermediate)
             {
@@ -278,6 +269,15 @@ namespace FullPotential.Api.Items.Types
                 AliasSegmentRanged,
                 RoundFloatForDisplay(GetReloadTime()),
                 UnitsType.Time);
+
+            AppendToDescription(
+                sb,
+                localizer,
+                Attributes.Strength,
+                nameof(Attributes.Strength),
+                AliasSegmentItem,
+                RoundFloatForDisplay(GetRangedDps()),
+                UnitsType.UnitPerTime);
 
             return sb.ToString();
         }
