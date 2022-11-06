@@ -361,11 +361,11 @@ namespace FullPotential.Core.PlayerBehaviours
 
             if (slotGameObjectName == SlotGameObjectName.LeftHand)
             {
-                _playerState.HandStatusLeft.SetEquippedItem(item, item.GetDescription(_localizer));
+                _playerState.HandStatusLeft.SetEquippedItem(item, item?.GetDescription(_localizer));
             }
             else if (slotGameObjectName == SlotGameObjectName.RightHand)
             {
-                _playerState.HandStatusRight.SetEquippedItem(item, item.GetDescription(_localizer));
+                _playerState.HandStatusRight.SetEquippedItem(item, item?.GetDescription(_localizer));
             }
         }
 
@@ -451,11 +451,11 @@ namespace FullPotential.Core.PlayerBehaviours
             var components = GetComponentsFromIds(componentIds);
 
             var errors = new List<string>();
-            if (itemToCraft is Spell spell)
+            if (itemToCraft is SpellOrGadgetItemBase spellOrGadgetItem)
             {
-                if (spell.EffectIds.Length == 0)
+                if (spellOrGadgetItem.EffectIds.Length == 0)
                 {
-                    errors.Add(_localizer.Translate("crafting.error.spellmissingeffect"));
+                    errors.Add(_localizer.Translate("crafting.error.missingeffect"));
                 }
             }
             else if (itemToCraft is Weapon weapon)

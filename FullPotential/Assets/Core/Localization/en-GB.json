@@ -60,8 +60,8 @@
 
 
     {
-      "Key": "crafting.error.spellmissingeffect",
-      "Value": "A spell needs at least one effect"
+      "Key": "crafting.error.missingeffect",
+      "Value": "At least one effect must be included"
     },
     {
       "Key": "crafting.error.toomanycomponents",

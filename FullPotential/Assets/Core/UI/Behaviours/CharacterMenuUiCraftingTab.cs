@@ -197,7 +197,7 @@ namespace FullPotential.Core.Ui.Behaviours
             }
 
             _craftButton.interactable = true;
-            _outputText.text = craftedItem.GetDescription(_localizer, false);
+            _outputText.text = craftedItem.GetDescription(_localizer, LevelOfDetail.Intermediate);
         }
 
     }

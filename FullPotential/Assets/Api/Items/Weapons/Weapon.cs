@@ -33,10 +33,10 @@ namespace FullPotential.Api.Items.Weapons
 
         public int GetAmmoMax()
         {
-            var ammoCap = Attributes.IsAutomatic ? 100 : 20;
+            const int ammoCap = 100;
             var returnValue = (int)(Attributes.Efficiency / 100f * ammoCap);
             //Debug.Log("GetAmmoMax: " + returnValue);
-         return returnValue;
+            return returnValue;
         }
 
         public float GetMeleeRecoveryTime()
@@ -113,7 +113,7 @@ namespace FullPotential.Api.Items.Weapons
             return damage * ammoMax / (ammoMax / bulletsPerSecond + GetReloadTime());
         }
 
-        public override string GetDescription(ILocalizer localizer, bool showExtendedDetails = true, string itemName = null)
+        public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
         {
             if (RegistryType is not IGearWeapon weaponType)
             {
@@ -124,13 +124,13 @@ namespace FullPotential.Api.Items.Weapons
             switch (weaponType.Category)
             {
                 case IGearWeapon.WeaponCategory.Defensive:
-                    return GetDefensiveWeaponDescription(localizer, showExtendedDetails, itemName);
+                    return GetDefensiveWeaponDescription(localizer, levelOfDetail, itemName);
 
                 case IGearWeapon.WeaponCategory.Melee:
-                    return GetMeleeWeaponDescription(localizer, showExtendedDetails, itemName);
+                    return GetMeleeWeaponDescription(localizer, levelOfDetail, itemName);
 
                 case IGearWeapon.WeaponCategory.Ranged:
-                    return GetRangedWeaponDescription(localizer, showExtendedDetails, itemName);
+                    return GetRangedWeaponDescription(localizer, levelOfDetail, itemName);
 
                 default:
                     Debug.LogError($"Unexpected weaponType.Category on item '{Name}' with ID '{Id}'");
@@ -138,11 +138,11 @@ namespace FullPotential.Api.Items.Weapons
             }
         }
 
-        public string GetDefensiveWeaponDescription(ILocalizer localizer, bool showExtendedDetails = true, string itemName = null)
+        public string GetDefensiveWeaponDescription(ILocalizer localizer, LevelOfDetail levelOfDetail, string itemName = null)
         {
             var sb = new StringBuilder();
 
-            if (showExtendedDetails)
+            if (levelOfDetail == LevelOfDetail.Full)
             {
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(Name))}: {itemName.OrIfNullOrWhitespace(Name)}" + "\n");
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {GetType().Name}" + "\n");
@@ -182,11 +182,11 @@ namespace FullPotential.Api.Items.Weapons
             return sb.ToString();
         }
 
-        public string GetMeleeWeaponDescription(ILocalizer localizer, bool showExtendedDetails = true, string itemName = null)
+        public string GetMeleeWeaponDescription(ILocalizer localizer, LevelOfDetail levelOfDetail, string itemName = null)
         {
             var sb = new StringBuilder();
 
-            if (showExtendedDetails)
+            if (levelOfDetail == LevelOfDetail.Full)
             {
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(Name))}: {itemName.OrIfNullOrWhitespace(Name)}" + "\n");
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {GetType().Name}" + "\n");
@@ -230,11 +230,11 @@ namespace FullPotential.Api.Items.Weapons
             return sb.ToString();
         }
 
-        public string GetRangedWeaponDescription(ILocalizer localizer, bool showExtendedDetails = true, string itemName = null)
+        public string GetRangedWeaponDescription(ILocalizer localizer, LevelOfDetail levelOfDetail, string itemName = null)
         {
             var sb = new StringBuilder();
 
-            if (showExtendedDetails)
+            if (levelOfDetail == LevelOfDetail.Full)
             {
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(Name))}: {itemName.OrIfNullOrWhitespace(Name)}" + "\n");
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {GetType().Name}" + "\n");
@@ -259,7 +259,7 @@ namespace FullPotential.Api.Items.Weapons
                 RoundFloatForDisplay(GetRangedDps()),
                 UnitsType.UnitPerTime);
 
-            if (showExtendedDetails)
+            if (levelOfDetail >= LevelOfDetail.Intermediate)
             {
                 AppendToDescription(
                     sb,

@@ -108,11 +108,11 @@ namespace FullPotential.Api.Items.Base
             builder.Append($"{aliasTranslation}: {aliasValue}{aliasUnits} ({originalTranslation}: {attributeValue})\n");
         }
 
-        public virtual string GetDescription(ILocalizer localizer, bool showExtendedDetails = true, string itemName = null)
+        public virtual string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
         {
             var sb = new StringBuilder();
 
-            if (showExtendedDetails)
+            if (levelOfDetail == LevelOfDetail.Full)
             {
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(Name))}: {itemName.OrIfNullOrWhitespace(Name)}" + "\n");
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {GetType().Name}" + "\n");

@@ -72,7 +72,7 @@ namespace FullPotential.Core.Ui.Components
 
                 tooltip.OnPointerEnterForTooltip += _ =>
                 {
-                    Tooltips.ShowTooltip(item.GetDescription(localizer, false));
+                    Tooltips.ShowTooltip(item.GetDescription(localizer, LevelOfDetail.Intermediate));
                 };
 
                 rowCounter++;

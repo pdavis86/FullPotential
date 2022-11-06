@@ -280,7 +280,7 @@ namespace FullPotential.Core.UI.Admin
         public void DisplayResultsText()
         {
             var item = GetCraftableItem();
-            _resultsText.text = item.GetDescription(_localizer, true, _itemNameText.text);
+            _resultsText.text = item.GetDescription(_localizer, LevelOfDetail.Full, _itemNameText.text);
         }
 
         // ReSharper disable once UnusedMember.Global

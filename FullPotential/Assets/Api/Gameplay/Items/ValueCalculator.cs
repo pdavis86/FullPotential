@@ -29,25 +29,26 @@ namespace FullPotential.Api.Gameplay.Items
             var weapon = itemUsed as Weapon;
             var weaponCategory = (weapon?.RegistryType as IGearWeapon)?.Category;
 
-            //Even a small attack can still do damage
             float attackStrength = itemUsed?.Attributes.Strength ?? 1;
-
-            if (weaponCategory == IGearWeapon.WeaponCategory.Ranged && weapon.Attributes.IsAutomatic)
+            var defenceRatio = 100f / (100 + targetDefense);
+            
+            //todo: review
+            if (weaponCategory == IGearWeapon.WeaponCategory.Ranged)
             {
                 attackStrength *= weapon.GetFireRate();
             }
 
-            var defenceRatio = 100f / (100 + targetDefense);
+            //Even a small attack can still do damage
             var damageDealtBasic = Math.Ceiling(attackStrength * defenceRatio / 4f);
+
+            if (weapon != null && weapon.IsTwoHanded)
+            {
+                damageDealtBasic *= 2;
+            }
 
             if (weaponCategory == IGearWeapon.WeaponCategory.Melee)
             {
                 damageDealtBasic *= 2;
-
-                if (weapon.IsTwoHanded)
-                {
-                    damageDealtBasic *= 2;
-                }
             }
 
             if (!addVariation)

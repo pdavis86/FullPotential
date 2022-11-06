@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Text;
 using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Utilities.Extensions;
@@ -16,11 +17,11 @@ namespace FullPotential.Api.Items.SpellsAndGadgets
         }
 
         //todo: add energy consumption
-        public override string GetDescription(ILocalizer localizer, bool showExtendedDetails = true, string itemName = null)
+        public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
         {
             var sb = new StringBuilder();
 
-            if (showExtendedDetails)
+            if (levelOfDetail == LevelOfDetail.Full)
             {
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(Name))}: {itemName.OrIfNullOrWhitespace(Name)}" + "\n");
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {GetType().Name}" + "\n");
