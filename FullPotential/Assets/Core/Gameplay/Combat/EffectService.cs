@@ -4,7 +4,6 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Items;
-using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.SpellsAndGadgets;
 using FullPotential.Api.Registry.Effects;
@@ -130,7 +129,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     return;
 
                 case IAttributeEffect attributeEffect:
-                    ApplyAttributeEffect(targetFighter, attributeEffect, itemUsed.Attributes);
+                    ApplyAttributeEffect(targetFighter, attributeEffect, itemUsed);
                     return;
 
                 case IElement elementalEffect:
@@ -168,9 +167,9 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private void ApplyAttributeEffect(IFighter targetFighter, IAttributeEffect attributeEffect, Attributes attributes)
+        private void ApplyAttributeEffect(IFighter targetFighter, IAttributeEffect attributeEffect, ItemBase itemUsed)
         {
-            targetFighter.AddAttributeModifier(attributeEffect, attributes);
+            targetFighter.AddAttributeModifier(attributeEffect, itemUsed);
         }
 
         private void ApplyElementalEffect(IFighter targetFighter, IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
@@ -216,7 +215,7 @@ namespace FullPotential.Core.Gameplay.Combat
             }
 
             var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
-            var force = _valueCalculator.GetMovementForceValue(itemUsed.Attributes, adjustForGravity);
+            var force = _valueCalculator.GetMovementForceValue(itemUsed, adjustForGravity);
 
             switch (movementEffect.Direction)
             {

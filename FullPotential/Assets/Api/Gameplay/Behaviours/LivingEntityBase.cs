@@ -6,7 +6,6 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Items;
-using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.SpellsAndGadgets;
 using FullPotential.Api.Localization;
@@ -674,15 +673,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Effect-related methods
 
-        public void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes)
+        public void AddAttributeModifier(IAttributeEffect attributeEffect, ItemBase itemUsed)
         {
-            var (change, expiry) = _valueCalculator.GetAttributeChangeAndExpiry(attributes, attributeEffect);
+            var (change, expiry) = _valueCalculator.GetAttributeChangeAndExpiry(itemUsed, attributeEffect);
             AddOrUpdateEffect(attributeEffect, change, expiry);
         }
 
         public void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter)
         {
-            var (change, expiry, delay) = _valueCalculator.GetStatChangeExpiryAndDelay(itemUsed.Attributes, statEffect);
+            var (change, expiry, delay) = _valueCalculator.GetStatChangeExpiryAndDelay(itemUsed, statEffect);
             AddOrUpdateEffect(statEffect, change, expiry);
             StartCoroutine(PeriodicActionToStatCoroutine(statEffect.StatToAffect, change, sourceFighter, itemUsed, delay, expiry));
         }
@@ -699,7 +698,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
-            var (change, expiry) = _valueCalculator.GetStatChangeAndExpiry(itemUsed.Attributes, statEffect);
+            var (change, expiry) = _valueCalculator.GetStatChangeAndExpiry(itemUsed, statEffect);
 
             if (statEffect.StatToAffect == AffectableStat.Health && statEffect.Affect == Affect.SingleDecrease)
             {
@@ -713,7 +712,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
-            var (change, expiry) = _valueCalculator.GetStatChangeAndExpiry(itemUsed.Attributes, statEffect);
+            var (change, expiry) = _valueCalculator.GetStatChangeAndExpiry(itemUsed, statEffect);
 
             AddOrUpdateEffect(statEffect, change, expiry);
 

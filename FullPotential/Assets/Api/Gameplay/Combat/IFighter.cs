@@ -1,5 +1,4 @@
-﻿using FullPotential.Api.Items;
-using FullPotential.Api.Items.Base;
+﻿using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.Effects;
 using UnityEngine;
 
@@ -19,7 +18,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
         ulong OwnerClientId { get; }
 
-        void AddAttributeModifier(IAttributeEffect attributeEffect, Attributes attributes);
+        void AddAttributeModifier(IAttributeEffect attributeEffect, ItemBase itemUsed);
 
         void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter);
 

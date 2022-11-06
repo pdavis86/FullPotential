@@ -33,12 +33,12 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            Destroy(gameObject, _valueCalculator.GetEffectDuration(SpellOrGadget.Attributes));
+            Destroy(gameObject, _valueCalculator.GetEffectDuration(SpellOrGadget));
 
             _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
             _valueCalculator = ModHelper.GetGameManager().GetService<IValueCalculator>();
 
-            _timeBetweenEffects = _valueCalculator.GetEffectTimeBetween(SpellOrGadget.Attributes);
+            _timeBetweenEffects = _valueCalculator.GetEffectTimeBetween(SpellOrGadget);
             _timeSinceLastEffective = _timeBetweenEffects;
         }
 

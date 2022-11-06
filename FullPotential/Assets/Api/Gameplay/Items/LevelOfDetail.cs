@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Items.Base
+﻿namespace FullPotential.Api.Gameplay.Items
 {
     public enum LevelOfDetail
     {

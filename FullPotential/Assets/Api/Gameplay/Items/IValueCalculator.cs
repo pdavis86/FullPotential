@@ -1,5 +1,4 @@
 ﻿using System;
-using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.Effects;
 using UnityEngine;
@@ -13,11 +12,11 @@ namespace FullPotential.Api.Gameplay.Items
         int AddVariationToValue(double basicValue);
         int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense, bool addVariation = true);
         int GetDamageValueFromVelocity(Vector3 velocity);
-        float GetEffectTimeBetween(Attributes attributes, float min = 0.5f, float max = 1.5f);
-        float GetEffectDuration(Attributes attributes);
-        float GetMovementForceValue(Attributes attributes, bool adjustForGravity);
-        (int Change, DateTime Expiry) GetStatChangeAndExpiry(Attributes attributes, IStatEffect statEffect);
-        (int Change, DateTime Expiry, float delay) GetStatChangeExpiryAndDelay(Attributes attributes, IStatEffect statEffect);
-        (int Change, DateTime Expiry) GetAttributeChangeAndExpiry(Attributes attributes, IAttributeEffect attributeEffect);
+        float GetEffectTimeBetween(ItemBase itemUsed, float min = 0.5f, float max = 1.5f);
+        float GetEffectDuration(ItemBase itemUsed);
+        float GetMovementForceValue(ItemBase itemUsed, bool adjustForGravity);
+        (int Change, DateTime Expiry) GetStatChangeAndExpiry(ItemBase itemUsed, IStatEffect statEffect);
+        (int Change, DateTime Expiry, float delay) GetStatChangeExpiryAndDelay(ItemBase itemUsed, IStatEffect statEffect);
+        (int Change, DateTime Expiry) GetAttributeChangeAndExpiry(ItemBase itemUsed, IAttributeEffect attributeEffect);
     }
 }

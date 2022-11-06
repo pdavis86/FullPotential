@@ -133,29 +133,33 @@
       "Key": "attribute.luck",
       "Value": "Luck"
     },
-    
-    
-    {
-      "Key": "attribute.alias.spell.speed",
-      "Value": "Charge Time"
-    },
-    {
-      "Key": "attribute.alias.spell.recovery",
-      "Value": "Cooldown Time"
-    },
 	
 	
     {
-      "Key": "attribute.alias.weapon.strength",
+      "Key": "attribute.alias.itembase.strength",
       "Value": "Est. DPS"
     },
     {
-      "Key": "attribute.alias.weapon.range",
+      "Key": "attribute.alias.itembase.range",
       "Value": "Range"
     },
     {
-      "Key": "attribute.alias.weapon.accuracy",
+      "Key": "attribute.alias.itembase.accuracy",
       "Value": "Accuracy"
+    },
+    
+    
+    {
+      "Key": "attribute.alias.sog.efficiency",
+      "Value": "Resource cost"
+    },
+    {
+      "Key": "attribute.alias.sog.speed",
+      "Value": "Charge Time"
+    },
+    {
+      "Key": "attribute.alias.sog.recovery",
+      "Value": "Cooldown Time"
     },
 	
 	

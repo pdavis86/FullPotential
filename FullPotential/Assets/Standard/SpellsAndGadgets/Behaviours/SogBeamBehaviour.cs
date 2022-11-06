@@ -58,7 +58,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            var effectsDelay = _valueCalculator.GetEffectTimeBetween(SpellOrGadget.Attributes);
+            var effectsDelay = _valueCalculator.GetEffectTimeBetween(SpellOrGadget);
             _applyEffectsAction = new DelayedAction(effectsDelay, () => ApplyEffects(_hit.transform.gameObject, _hit.point));
         }
 

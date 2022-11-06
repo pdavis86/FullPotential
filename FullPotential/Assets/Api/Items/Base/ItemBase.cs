@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry;
@@ -14,6 +16,11 @@ namespace FullPotential.Api.Items.Base
     [Serializable]
     public abstract class ItemBase
     {
+        // ReSharper disable InconsistentNaming
+        protected IGameManager _gameManager;
+        protected IValueCalculator _valueCalculator;
+        // ReSharper restore InconsistentNaming
+
         public string Id;
         public string RegistryTypeId;
         public string Name;
@@ -49,6 +56,12 @@ namespace FullPotential.Api.Items.Base
             }
         }
 
+        protected ItemBase()
+        {
+            _gameManager = ModHelper.GetGameManager();
+            _valueCalculator = _gameManager.GetService<IValueCalculator>();
+        }
+
         public static float GetValueInRange(int attributeValue, float min, float max)
         {
             return attributeValue / 100f * (max - min) + min;
@@ -77,6 +90,20 @@ namespace FullPotential.Api.Items.Base
                 hash = hash * 127 + (EffectIds != null ? string.Join(null, EffectIds) : string.Empty).GetHashCode();
                 return hash;
             }
+        }
+
+        public virtual float GetRange()
+        {
+            var returnValue = Attributes.Range / 100f * 15 + 5;
+            //Debug.Log("GetProjectileRange: " + returnValue);
+            return returnValue;
+        }
+
+        public virtual float GetAccuracy()
+        {
+            var returnValue = Attributes.Accuracy;
+            //Debug.Log("GetAccuracy: " + returnValue);
+            return returnValue;
         }
 
         protected void AppendToDescription(StringBuilder builder, ILocalizer localizer, bool attributeValue, string attributeName)

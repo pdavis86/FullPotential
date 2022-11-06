@@ -1,6 +1,5 @@
 ﻿using System;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Weapons;
 using FullPotential.Api.Registry.Crafting;
@@ -65,32 +64,32 @@ namespace FullPotential.Api.Gameplay.Items
             return AddVariationToValue(basicDamage);
         }
 
-        public float GetEffectTimeBetween(Attributes attributes, float min = 0.5f, float max = 1.5f)
+        public float GetEffectTimeBetween(ItemBase itemUsed, float min = 0.5f, float max = 1.5f)
         {
-            var returnValue = ItemBase.GetValueInRangeHighLow(attributes.Speed, min, max);
+            var returnValue = ItemBase.GetValueInRangeHighLow(itemUsed.Attributes.Speed, min, max);
             //Debug.Log("GetTimeBetweenEffects: " + returnValue);
             return returnValue;
         }
 
-        public float GetEffectDuration(Attributes attributes)
+        public float GetEffectDuration(ItemBase itemUsed)
         {
-            var returnValue = attributes.Duration / 10f;
+            var returnValue = itemUsed.Attributes.Duration / 10f;
             //Debug.Log("GetDuration: " + returnValue);
             return returnValue;
         }
 
-        public float GetMovementForceValue(Attributes attributes, bool adjustForGravity)
+        public float GetMovementForceValue(ItemBase itemUsed, bool adjustForGravity)
         {
-            var force = 4f * attributes.Strength;
+            var force = 4f * itemUsed.Attributes.Strength;
 
             return adjustForGravity
                 ? force * 1.2f
                 : force;
         }
 
-        public (int Change, DateTime Expiry) GetStatChangeAndExpiry(Attributes attributes, IStatEffect statEffect)
+        public (int Change, DateTime Expiry) GetStatChangeAndExpiry(ItemBase itemUsed, IStatEffect statEffect)
         {
-            var change = AddVariationToValue(attributes.Strength / 5f);
+            var change = AddVariationToValue(itemUsed.Attributes.Strength / 5f);
 
             if (statEffect.Affect is Affect.PeriodicDecrease or Affect.SingleDecrease or Affect.TemporaryMaxDecrease)
             {
@@ -98,31 +97,31 @@ namespace FullPotential.Api.Gameplay.Items
             }
 
             var timeToLive = statEffect.Affect == Affect.SingleIncrease || statEffect.Affect == Affect.SingleDecrease
-                ? math.ceil(attributes.Duration / 50f)
-                : math.ceil(attributes.Duration / 20f);
+                ? math.ceil(itemUsed.Attributes.Duration / 50f)
+                : math.ceil(itemUsed.Attributes.Duration / 20f);
 
             return (change, DateTime.Now.AddSeconds(timeToLive));
         }
 
-        public (int Change, DateTime Expiry, float delay) GetStatChangeExpiryAndDelay(Attributes attributes, IStatEffect statEffect)
+        public (int Change, DateTime Expiry, float delay) GetStatChangeExpiryAndDelay(ItemBase itemUsed, IStatEffect statEffect)
         {
-            var (change, expiry) = GetStatChangeAndExpiry(attributes, statEffect);
+            var (change, expiry) = GetStatChangeAndExpiry(itemUsed, statEffect);
 
-            var delay = attributes.Recovery / 10;
+            var delay = itemUsed.Attributes.Recovery / 10;
 
             return (change, expiry, delay);
         }
 
-        public (int Change, DateTime Expiry) GetAttributeChangeAndExpiry(Attributes attributes, IAttributeEffect attributeEffect)
+        public (int Change, DateTime Expiry) GetAttributeChangeAndExpiry(ItemBase itemUsed, IAttributeEffect attributeEffect)
         {
-            var change = AddVariationToValue(attributes.Strength / 5f);
+            var change = AddVariationToValue(itemUsed.Attributes.Strength / 5f);
 
             if (!attributeEffect.TemporaryMaxIncrease)
             {
                 change *= -1;
             }
 
-            var timeToLive = attributes.Duration / 2;
+            var timeToLive = itemUsed.Attributes.Duration / 2;
 
             return (change, DateTime.Now.AddSeconds(timeToLive));
         }

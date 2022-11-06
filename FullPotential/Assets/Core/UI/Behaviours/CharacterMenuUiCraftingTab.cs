@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Unity.Extensions;

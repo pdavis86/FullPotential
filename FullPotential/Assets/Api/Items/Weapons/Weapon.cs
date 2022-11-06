@@ -1,12 +1,10 @@
 ﻿using System.Linq;
 using System.Text;
-using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry.Crafting;
-using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 
@@ -20,16 +18,7 @@ namespace FullPotential.Api.Items.Weapons
         private const string AliasSegmentRanged = "RangedWeapon";
         private const string AliasSegmentDefensive = "DefensiveWeapon";
 
-        private IGameManager _gameManager;
-        private IValueCalculator _valueCalculator;
-
         public int Ammo;
-
-        public Weapon()
-        {
-            _gameManager = ModHelper.GetGameManager();
-            _valueCalculator = _gameManager.GetService<IValueCalculator>();
-        }
 
         public int GetAmmoMax()
         {
@@ -64,20 +53,6 @@ namespace FullPotential.Api.Items.Weapons
         {
             var returnValue = GetValueInRangeHighLow(Attributes.Speed, 0.05f, 0.5f);
             //Debug.Log("GetWeaponFireRate: " + returnValue);
-            return returnValue;
-        }
-
-        public float GetRange()
-        {
-            var returnValue = Attributes.Range / 100f * 15 + 5;
-            //Debug.Log("GetProjectileRange: " + returnValue);
-            return returnValue;
-        }
-
-        public float GetAccuracy()
-        {
-            var returnValue = Attributes.Accuracy;
-            //Debug.Log("GetAccuracy: " + returnValue);
             return returnValue;
         }
 
