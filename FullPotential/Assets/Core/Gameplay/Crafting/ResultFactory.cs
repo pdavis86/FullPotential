@@ -6,8 +6,7 @@ using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.SpellsAndGadgets;
-using FullPotential.Api.Items.Weapons;
+using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry.Crafting;
@@ -71,7 +70,13 @@ namespace FullPotential.Core.Gameplay.Crafting
             return result == 0 ? 1 : result;
         }
 
-        public ITargeting GetTargeting(string typeName)
+        public ITargeting GetTargeting(string typeId)
+        {
+            return _targetingOptions.First(x => x.TypeId.ToString() == typeId);
+        }
+
+        [Obsolete("Use the overload that takes an ID instead")]
+        public ITargeting GetTargetingFromTypeName(string typeName)
         {
             return _targetingOptions.First(x => x.TypeName == typeName);
         }
@@ -89,7 +94,13 @@ namespace FullPotential.Core.Gameplay.Crafting
             return targetingComponent.Targeting;
         }
 
-        public IShape GetShape(string typeName)
+        public IShape GetShape(string typeId)
+        {
+            return _shapeOptions.First(x => x.TypeId.ToString() == typeId);
+        }
+
+        [Obsolete("Use the overload that takes an ID instead")]
+        public IShape GetShapeFromTypeName(string typeName)
         {
             return _shapeOptions.First(x => x.TypeName == typeName);
         }

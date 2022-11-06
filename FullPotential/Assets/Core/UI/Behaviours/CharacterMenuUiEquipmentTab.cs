@@ -1,7 +1,7 @@
 ﻿using System;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.Weapons;
+using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Unity.Extensions;

@@ -8,12 +8,11 @@ using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 
-namespace FullPotential.Api.Items.Weapons
+namespace FullPotential.Api.Items.Types
 {
     [System.Serializable]
     public class Weapon : ItemWithHealthBase
     {
-        private const string AliasSegmentWeapon = "Weapon";
         private const string AliasSegmentMelee = "MeleeWeapon";
         private const string AliasSegmentRanged = "RangedWeapon";
         private const string AliasSegmentDefensive = "DefensiveWeapon";
@@ -144,7 +143,7 @@ namespace FullPotential.Api.Items.Weapons
                 localizer,
                 Attributes.Strength,
                 nameof(Attributes.Strength),
-                AliasSegmentWeapon,
+                AliasSegmentItem,
                 RoundFloatForDisplay(GetMeleeDps()),
                 UnitsType.UnitPerTime);
 
@@ -180,7 +179,7 @@ namespace FullPotential.Api.Items.Weapons
                 localizer,
                 Attributes.Strength,
                 nameof(Attributes.Strength),
-                AliasSegmentWeapon,
+                AliasSegmentItem,
                 RoundFloatForDisplay(GetMeleeDps()),
                 UnitsType.UnitPerTime);
 
@@ -230,7 +229,7 @@ namespace FullPotential.Api.Items.Weapons
                 localizer,
                 Attributes.Strength,
                 nameof(Attributes.Strength),
-                AliasSegmentWeapon,
+                AliasSegmentItem,
                 RoundFloatForDisplay(GetRangedDps()),
                 UnitsType.UnitPerTime);
 
@@ -250,7 +249,7 @@ namespace FullPotential.Api.Items.Weapons
                 localizer,
                 Attributes.Range,
                 nameof(Attributes.Range),
-                AliasSegmentWeapon,
+                AliasSegmentItem,
                 RoundFloatForDisplay(GetRange()));
 
             AppendToDescription(
@@ -258,7 +257,7 @@ namespace FullPotential.Api.Items.Weapons
                 localizer,
                 Attributes.Accuracy,
                 nameof(Attributes.Accuracy),
-                AliasSegmentWeapon,
+                AliasSegmentItem,
                 RoundFloatForDisplay(GetAccuracy()),
                 UnitsType.Percent);
 

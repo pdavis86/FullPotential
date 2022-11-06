@@ -1,47 +1,16 @@
 ﻿using FullPotential.Api.Gameplay.Items;
-using FullPotential.Api.Items.Base;
-using FullPotential.Api.Registry.SpellsAndGadgets;
 
-namespace FullPotential.Api.Items.SpellsAndGadgets
+namespace FullPotential.Api.Items.Base
 {
     [System.Serializable]
-    public abstract class SpellOrGadgetItemBase : ItemBase, IHasTargetingAndShape
+    public abstract class SpellOrGadgetItemBase : ItemWithTargetingAndShapeBase
     {
+        public const string AliasSegmentSog = "sog";
+
         public ResourceConsumptionType ResourceConsumptionType { get; protected set; }
 
         public int ChargePercentage { get; set; }
 
-        private ITargeting _targeting;
-        public ITargeting Targeting
-        {
-            get
-            {
-                return _targeting;
-            }
-            set
-            {
-                _targeting = value;
-                TargetingTypeName = _targeting?.TypeName;
-            }
-        }
-
-        public string TargetingTypeName { get; set; }
-
-        private IShape _shape;
-        public IShape Shape
-        {
-            get
-            {
-                return _shape;
-            }
-            set
-            {
-                _shape = value;
-                ShapeTypeName = _shape?.TypeName;
-            }
-        }
-
-        public string ShapeTypeName { get; set; }
 
         public int GetResourceCost()
         {

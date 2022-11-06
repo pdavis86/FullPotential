@@ -1,21 +1,22 @@
 ﻿using System.Linq;
 using System.Text;
 using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Utilities.Extensions;
 
-namespace FullPotential.Api.Items.SpellsAndGadgets
+namespace FullPotential.Api.Items.Types
 {
     [System.Serializable]
-    public class Spell : SpellOrGadgetItemBase
+    public class Gadget : SpellOrGadgetItemBase
     {
-        public Spell()
+        public Gadget()
         {
-            ResourceConsumptionType = ResourceConsumptionType.Mana;
+            ResourceConsumptionType = ResourceConsumptionType.Energy;
         }
 
-        //todo: add mana consumption
+        //todo: add energy consumption
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
         {
             var sb = new StringBuilder();
@@ -46,7 +47,7 @@ namespace FullPotential.Api.Items.SpellsAndGadgets
                 localizer,
                 Attributes.Speed,
                 nameof(Attributes.Speed),
-                nameof(Spell),
+                AliasSegmentSog,
                 RoundFloatForDisplay(GetChargeTime()),
                 UnitsType.Time);
 
@@ -55,7 +56,7 @@ namespace FullPotential.Api.Items.SpellsAndGadgets
                 localizer,
                 Attributes.Recovery,
                 nameof(Attributes.Recovery),
-                nameof(Spell),
+                AliasSegmentSog,
                 RoundFloatForDisplay(GetCooldownTime()),
                 UnitsType.Time);
 

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.SpellsAndGadgets;
-using FullPotential.Api.Items.Weapons;
+using FullPotential.Api.Items.Types;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 
 namespace FullPotential.Api.Gameplay.Data

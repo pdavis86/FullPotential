@@ -6,10 +6,6 @@ namespace FullPotential.Api.Items
     {
         ITargeting Targeting { get; set; }
 
-        public string TargetingTypeName { get; }
-
         IShape Shape { get; set; }
-
-        public string ShapeTypeName { get; }
     }
 }

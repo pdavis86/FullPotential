@@ -7,7 +7,7 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.SpellsAndGadgets;
+using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Ui.Components;

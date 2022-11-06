@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.GameManagement;
-using FullPotential.Api.Items;
-using FullPotential.Api.Items.SpellsAndGadgets;
-using FullPotential.Api.Items.Weapons;
+using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry.Crafting;

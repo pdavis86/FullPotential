@@ -16,6 +16,8 @@ namespace FullPotential.Api.Items.Base
     [Serializable]
     public abstract class ItemBase
     {
+        public const string AliasSegmentItem = "item";
+
         // ReSharper disable InconsistentNaming
         protected IGameManager _gameManager;
         protected IValueCalculator _valueCalculator;

@@ -1,6 +1,4 @@
-﻿using FullPotential.Api.Items;
-using FullPotential.Api.Items.SpellsAndGadgets;
-using FullPotential.Api.Items.Weapons;
+﻿using FullPotential.Api.Items.Types;
 using FullPotential.Api.Utilities.Data;
 
 namespace FullPotential.Api.Gameplay.Data

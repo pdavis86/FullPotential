@@ -1,7 +1,5 @@
-﻿using FullPotential.Api.Items;
-using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.SpellsAndGadgets;
-using FullPotential.Api.Items.Weapons;
+﻿using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items.Types;
 
 // ReSharper disable ClassNeverInstantiated.Global
 

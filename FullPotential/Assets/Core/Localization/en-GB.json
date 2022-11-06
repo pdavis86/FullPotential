@@ -136,15 +136,15 @@
 	
 	
     {
-      "Key": "attribute.alias.itembase.strength",
+      "Key": "attribute.alias.item.strength",
       "Value": "Est. DPS"
     },
     {
-      "Key": "attribute.alias.itembase.range",
+      "Key": "attribute.alias.item.range",
       "Value": "Range"
     },
     {
-      "Key": "attribute.alias.itembase.accuracy",
+      "Key": "attribute.alias.item.accuracy",
       "Value": "Accuracy"
     },
     

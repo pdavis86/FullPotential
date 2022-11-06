@@ -4,6 +4,7 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.SpellsAndGadgets;

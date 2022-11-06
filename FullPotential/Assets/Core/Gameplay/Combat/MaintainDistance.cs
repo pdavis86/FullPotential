@@ -1,5 +1,5 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Items.SpellsAndGadgets;
+using FullPotential.Api.Items.Base;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Networking;
 using UnityEngine;

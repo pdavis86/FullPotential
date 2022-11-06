@@ -5,10 +5,8 @@ using System.Linq;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Inventory;
-using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.SpellsAndGadgets;
-using FullPotential.Api.Items.Weapons;
+using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Unity.Constants;
@@ -37,6 +35,7 @@ namespace FullPotential.Core.PlayerBehaviours
         private IRpcService _rpcService;
         private ILocalizer _localizer;
         private IInventoryDataService _inventoryDataService;
+        private IResultFactory _resultFactory;
 
         private PlayerState _playerState;
         private int _maxItems;
@@ -56,6 +55,7 @@ namespace FullPotential.Core.PlayerBehaviours
             _rpcService = GameManager.Instance.GetService<IRpcService>();
             _localizer = GameManager.Instance.GetService<ILocalizer>();
             _inventoryDataService = GameManager.Instance.GetService<IInventoryDataService>();
+            _resultFactory = GameManager.Instance.GetService<IResultFactory>();
         }
 
         #endregion
@@ -376,16 +376,33 @@ namespace FullPotential.Core.PlayerBehaviours
                 item.RegistryType = _typeRegistry.GetRegisteredForItem(item);
             }
 
-            if (item is IHasTargetingAndShape magicalItem)
+            if (item is ItemWithTargetingAndShapeBase magicalItem)
             {
-                var resultFactory = GameManager.Instance.GetService<IResultFactory>();
-                if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeName))
+                if (!string.IsNullOrWhiteSpace(magicalItem.TargetingTypeId))
                 {
-                    magicalItem.Shape = resultFactory.GetShape(magicalItem.ShapeTypeName);
+                    magicalItem.Targeting = _resultFactory.GetTargeting(magicalItem.TargetingTypeId);
                 }
-                if (!string.IsNullOrWhiteSpace(magicalItem.TargetingTypeName))
+
+                //Here for backwards-compatibility
+                if (magicalItem.Targeting == null && !string.IsNullOrWhiteSpace(magicalItem.TargetingTypeName))
                 {
-                    magicalItem.Targeting = resultFactory.GetTargeting(magicalItem.TargetingTypeName);
+                    magicalItem.Targeting = _resultFactory.GetTargetingFromTypeName(magicalItem.TargetingTypeName);
+                }
+
+                if (item is SpellOrGadgetItemBase && magicalItem.Targeting == null)
+                {
+                    Debug.LogWarning($"Item '{item.Id}' is missing a Targeting ID");
+                }
+
+                if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeId))
+                {
+                    magicalItem.Shape = _resultFactory.GetShape(magicalItem.ShapeTypeId);
+                }
+
+                //Here for backwards-compatibility
+                if (magicalItem.Shape == null && !string.IsNullOrWhiteSpace(magicalItem.ShapeTypeName))
+                {
+                    magicalItem.Shape = _resultFactory.GetShapeFromTypeName(magicalItem.ShapeTypeName);
                 }
             }
 
