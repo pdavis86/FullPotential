@@ -291,6 +291,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 yield return new WaitForSeconds(0.01F);
                 var millisecondsRemaining = (deadline - DateTime.Now).TotalMilliseconds;
                 handStatus.EquippedSpellOrGadget.ChargePercentage = (int)(startPercentage * millisecondsRemaining / millisecondsUntilDone);
+
+                //Safety to stop charge and cooldown at the same time
+                if (handStatus.ChargeEnumerator != null)
+                {
+                    StopCoroutine(handStatus.ChargeEnumerator);
+                    handStatus.ChargeEnumerator = null;
+                }
             }
 
             //Debug.Log("Cooled in: " + sw.ElapsedMilliseconds + "ms");
