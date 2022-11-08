@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
@@ -6,8 +7,11 @@ using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
+using FullPotential.Api.Unity.Helpers;
+using FullPotential.Core.GameManagement;
 using Unity.Netcode;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -44,7 +48,10 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 if (targetFighter == null)
                 {
-                    Debug.LogWarning("Target is not an IFighter. Target was: " + target);
+                    //Debug.LogWarning("Target is not an IFighter. Target was: " + target);
+
+                    SpawnBulletHole(target, position);
+
                     return;
                 }
 
@@ -73,6 +80,54 @@ namespace FullPotential.Core.Gameplay.Combat
                     ApplyEffect(null, sideEffect, itemUsed, sourceFighter.GameObject, position);
                 }
             }
+        }
+
+        private void SpawnBulletHole(
+            GameObject target,
+            Vector3? position)
+        {
+            //NOTE: Only works for box colliders that line up with the X and Z alias
+
+            if (!position.HasValue)
+            {
+                return;
+            }
+
+            var vertices = GameObjectHelper.GetBoxColliderVertices(target.GetComponent<BoxCollider>());
+
+            var matchesX = vertices.Where(v => Mathf.Approximately(v.x, position.Value.x)).ToList();
+            var matchesZ = vertices.Where(v => Mathf.Approximately(v.z, position.Value.z)).ToList();
+
+            var points = matchesX.Count > 0
+                ? matchesX
+                : matchesZ;
+
+            //Debug.DrawRay(points[0], Vector3.up, Color.cyan, 5);
+            //Debug.DrawRay(points[1], Vector3.up, Color.cyan, 5);
+
+            var vec1 = points[0] - position.Value;
+            var vec2 = points[1] - position.Value;
+
+            var norm = Vector3.Cross(vec1, vec2).normalized;
+
+            var otherPoints = matchesX.Count > 0
+                ? vertices.Where(v => Math.Abs(v.x - position.Value.x) > 0.1).ToList()
+                : vertices.Where(v => Math.Abs(v.z - position.Value.z) > 0.1).ToList();
+
+            var directionCheck = points[0] - otherPoints[0];
+
+            if ((matchesX.Count > 0 && directionCheck.x > 0)
+                || (matchesZ.Count > 0 && directionCheck.z > 0))
+            {
+                norm *= -1;
+            }
+
+            //Debug.DrawRay(position.Value, norm, Color.cyan, 5);
+
+            var rotation = Quaternion.FromToRotation(-Vector3.forward, norm);
+
+            var bulletHole = Object.Instantiate(GameManager.Instance.Prefabs.Combat.BulletHole, position.Value, rotation);
+            Object.Destroy(bulletHole, 5);
         }
 
         private bool IsEffectAllowed(ItemBase itemUsed, GameObject target, IEffect effect)

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
@@ -37,6 +38,23 @@ namespace FullPotential.Api.Unity.Helpers
             } while (current != null && !current.CompareTag(tag));
 
             return current == null ? null : current.gameObject;
+        }
+
+        public static Vector3[] GetBoxColliderVertices(BoxCollider collider)
+        {
+            var bounds = collider.bounds;
+
+            return new[]
+            {
+                new Vector3(bounds.min.x, bounds.min.y, bounds.min.z),
+                new Vector3(bounds.min.x, bounds.min.y, bounds.max.z),
+                new Vector3(bounds.min.x, bounds.max.y, bounds.min.z),
+                new Vector3(bounds.min.x, bounds.max.y, bounds.max.z),
+                new Vector3(bounds.max.x, bounds.min.y, bounds.min.z),
+                new Vector3(bounds.max.x, bounds.min.y, bounds.max.z),
+                new Vector3(bounds.max.x, bounds.max.y, bounds.min.z),
+                new Vector3(bounds.max.x, bounds.max.y, bounds.max.z),
+            };
         }
 
     }
