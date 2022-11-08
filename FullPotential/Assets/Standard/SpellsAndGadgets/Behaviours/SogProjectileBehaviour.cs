@@ -45,9 +45,9 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             var rigidBody = GetComponent<Rigidbody>();
 
-            //todo: take item accuracy into account
+            var shotDirection = SpellOrGadget.GetShotDirection(ForwardDirection);
 
-            rigidBody.AddForce(20f * SpellOrGadget.GetProjectileSpeed() * ForwardDirection, ForceMode.VelocityChange);
+            rigidBody.AddForce(20f * SpellOrGadget.GetProjectileSpeed() * shotDirection, ForceMode.VelocityChange);
 
             if (affectedByGravity)
             {

@@ -12,12 +12,15 @@ using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace FullPotential.Api.Items.Base
 {
     [Serializable]
     public abstract class ItemBase
     {
+        private const float MaximumAccuracyAngleDeviation = 4;
+
         public const string AliasSegmentItem = "item";
 
         // ReSharper disable InconsistentNaming
@@ -231,6 +234,12 @@ namespace FullPotential.Api.Items.Base
             var timeToLive = Attributes.Duration / 2f;
 
             return (change, DateTime.Now.AddSeconds(timeToLive));
+        }
+
+        public Vector3 GetShotDirection(Vector3 lookDirection)
+        {
+            var maxAccuracyAngleDeviation = (101 - GetAccuracy()) / 100f * MaximumAccuracyAngleDeviation;
+            return lookDirection.AddNoiseOnAngle(-maxAccuracyAngleDeviation, maxAccuracyAngleDeviation);
         }
 
     }

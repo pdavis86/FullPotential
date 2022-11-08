@@ -229,13 +229,14 @@ namespace FullPotential.Api.Items.Types
                     RoundFloatForDisplay(GetAmmoMax()));
             }
 
-            AppendToDescription(
-                sb,
-                localizer,
-                Attributes.Range,
-                nameof(Attributes.Range),
-                AliasSegmentItem,
-                RoundFloatForDisplay(GetRange()));
+            //All ranged weapons have maximum range
+            //AppendToDescription(
+            //    sb,
+            //    localizer,
+            //    Attributes.Range,
+            //    nameof(Attributes.Range),
+            //    AliasSegmentItem,
+            //    RoundFloatForDisplay(GetRange()));
 
             AppendToDescription(
                 sb,

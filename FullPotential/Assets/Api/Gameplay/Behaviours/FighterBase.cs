@@ -20,7 +20,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
     public abstract class FighterBase : LivingEntityBase, IFighter
     {
         private const int MeleeRangeLimit = 8;
-        private const float SpellOrGadgetRangeLimit = 50f;
+        private const int SpellOrGadgetRangeLimit = 50;
+        private const int MaximumRange = 100;
 
         #region Inspector Variables
         // ReSharper disable UnassignedField.Global
@@ -518,12 +519,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private bool UseRangedWeapon(Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
         {
             //todo: apply fire rate limiting to non-autos
-            //todo: apply accuracy
 
-            var range = weaponInHand.GetRange();
-            var endPos = Physics.Raycast(LookTransform.position, LookTransform.forward, out var rangedHit, range)
+            var shotDirection = weaponInHand.GetShotDirection(LookTransform.forward);
+
+            var endPos = Physics.Raycast(LookTransform.position, shotDirection, out var rangedHit, MaximumRange)
                 ? rangedHit.point
-                : handPosition + LookTransform.forward * range;
+                : handPosition + shotDirection * MaximumRange;
 
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             UsedWeaponClientRpc(handPosition, endPos, nearbyClients);
