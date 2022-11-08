@@ -156,7 +156,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
         #endregion
 
-        //todo: generalise for use in LivingEntityBase
+        //todo: zzz v0.5 - generalise for use in LivingEntityBase
         public (bool WasEquipped, List<string> SlotsToSend) HandleSlotChange(ItemBase item, SlotGameObjectName slotGameObjectName)
         {
             var slotsToSend = new List<string> { slotGameObjectName.ToString() };
@@ -509,7 +509,7 @@ namespace FullPotential.Core.PlayerBehaviours
             _equippedItems[slotGameObjectName].GameObject = null;
         }
 
-        //todo: generalise for use in LivingEntityBase
+        //todo: zzz v0.5 - generalise for use in LivingEntityBase
         public void SpawnEquippedObject(ItemBase item, SlotGameObjectName slotGameObjectName)
         {
             DespawnEquippedObject(slotGameObjectName);

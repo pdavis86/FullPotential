@@ -4,7 +4,7 @@ namespace FullPotential.Api.Items.Base
 {
     public abstract class ItemWithTargetingAndShapeBase : ItemBase, IHasTargetingAndShape
     {
-        //todo: obsolete but left in until data is fixed
+        //todo: zzz v0.5 - remove these now data is fixed
         public string TargetingTypeName;
         public string ShapeTypeName;
 

@@ -729,7 +729,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             TakeDamageFromFighter(sourceFighter, itemUsed, position);
 
-            //todo: ApplyElementalEffect
+            //todo: zzz v0.4.1 - ApplyElementalEffect
             //Debug.LogWarning("Not yet implemented elemental effects");
         }
 

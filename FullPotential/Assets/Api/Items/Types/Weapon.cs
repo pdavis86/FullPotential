@@ -64,12 +64,6 @@ namespace FullPotential.Api.Items.Types
 
         public float GetMeleeDps()
         {
-            //todo: zzz v0.5 - remove this when data is in a database
-            if (Attributes.Recovery == 0)
-            {
-                Attributes.Recovery = 1;
-            }
-
             var damage = _valueCalculator.GetDamageValueFromAttack(this, 0, false);
 
             var windUp = GetMeleeWindUpTime();
@@ -130,10 +124,10 @@ namespace FullPotential.Api.Items.Types
 
             AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
 
-            //todo: what does speed do for a defensive weapon?
+            //todo: what does Speed do for a defensive weapon?
             AppendToDescription(sb, localizer, Attributes.Speed, nameof(Attributes.Speed));
 
-            //todo: what does speed do for a defensive weapon?
+            //todo: what does Recovery do for a defensive weapon?
             AppendToDescription(sb, localizer, Attributes.Recovery, nameof(Attributes.Recovery));
 
             AppendToDescription(
