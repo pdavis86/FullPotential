@@ -254,7 +254,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             if (leftOrRight.EquippedWeapon != null
                 && leftOrRight.EquippedWeapon.Attributes.IsAutomatic)
             {
-                leftOrRight.RapidFireEnumerator = AutomaticWeaponFire(leftOrRight, leftOrRight.EquippedWeapon.GetFireRate(), isLeftHand);
+                leftOrRight.RapidFireEnumerator = AutomaticWeaponFire(leftOrRight, leftOrRight.EquippedWeapon.GetDelayBetweenShots(), isLeftHand);
                 StartCoroutine(leftOrRight.RapidFireEnumerator);
                 return true;
             }

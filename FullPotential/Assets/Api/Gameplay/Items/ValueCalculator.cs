@@ -30,7 +30,7 @@ namespace FullPotential.Api.Gameplay.Items
             //todo: review
             if (weaponCategory == IGearWeapon.WeaponCategory.Ranged)
             {
-                attackStrength *= weapon.GetFireRate();
+                attackStrength *= weapon.GetDelayBetweenShots();
             }
 
             //Even a small attack can still do damage

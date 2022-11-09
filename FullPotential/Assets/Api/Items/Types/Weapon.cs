@@ -47,11 +47,17 @@ namespace FullPotential.Api.Items.Types
             return returnValue;
         }
 
-        public float GetFireRate()
+        public float GetDelayBetweenShots()
         {
-            var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0.05f, 0.5f);
+            var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0.07f, 0.4f);
             //Debug.Log("GetWeaponFireRate: " + returnValue);
             return returnValue;
+        }
+
+        public float GetBulletsPerSecond()
+        {
+            //Roughly 2-6 bullets per second
+            return 1 / GetDelayBetweenShots();
         }
 
         public int GetDefenseValue()
@@ -75,7 +81,7 @@ namespace FullPotential.Api.Items.Types
         {
             var damage = _valueCalculator.GetDamageValueFromAttack(this, 0, false);
             var ammoMax = GetAmmoMax();
-            var bulletsPerSecond = 1 / GetFireRate();
+            var bulletsPerSecond = GetBulletsPerSecond();
 
             return damage * ammoMax / (ammoMax / bulletsPerSecond + GetReloadTime());
         }
@@ -253,7 +259,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Speed,
                 nameof(Attributes.Speed),
                 AliasSegmentRanged,
-                RoundFloatForDisplay(1 / GetFireRate()),
+                RoundFloatForDisplay(GetBulletsPerSecond()),
                 UnitsType.UnitPerTime);
 
             AppendToDescription(

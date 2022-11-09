@@ -105,6 +105,11 @@ namespace FullPotential.Core.Gameplay.Combat
             //Debug.DrawRay(points[0], Vector3.up, Color.cyan, 5);
             //Debug.DrawRay(points[1], Vector3.up, Color.cyan, 5);
 
+            if (points.Count == 0)
+            {
+                return;
+            }
+
             var vec1 = points[0] - position.Value;
             var vec2 = points[1] - position.Value;
 
