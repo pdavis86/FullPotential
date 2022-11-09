@@ -15,7 +15,6 @@ namespace FullPotential.Api.Items.Types
     {
         private const string AliasSegmentMelee = "MeleeWeapon";
         private const string AliasSegmentRanged = "RangedWeapon";
-        private const string AliasSegmentDefensive = "DefensiveWeapon";
 
         public int Ammo;
 
@@ -124,11 +123,11 @@ namespace FullPotential.Api.Items.Types
 
             AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
 
-            //todo: what does Speed do for a defensive weapon?
-            AppendToDescription(sb, localizer, Attributes.Speed, nameof(Attributes.Speed));
+            //todo: zzz v0.4.1 - what does Speed do for a defensive weapon?
+            //AppendToDescription(sb, localizer, Attributes.Speed, nameof(Attributes.Speed));
 
-            //todo: what does Recovery do for a defensive weapon?
-            AppendToDescription(sb, localizer, Attributes.Recovery, nameof(Attributes.Recovery));
+            //todo: zzz v0.4.1 - what does Recovery do for a defensive weapon?
+            //AppendToDescription(sb, localizer, Attributes.Recovery, nameof(Attributes.Recovery));
 
             AppendToDescription(
                 sb,
@@ -138,14 +137,15 @@ namespace FullPotential.Api.Items.Types
                 AliasSegmentDefensive,
                 GetDefenseValue().ToString(_gameManager.CurrentCulture));
 
-            AppendToDescription(
-                sb,
-                localizer,
-                Attributes.Strength,
-                nameof(Attributes.Strength),
-                AliasSegmentItem,
-                RoundFloatForDisplay(GetMeleeDps()),
-                UnitsType.UnitPerTime);
+            //todo: zzz v0.4.1 - Implement melee with a sheild
+            //AppendToDescription(
+            //    sb,
+            //    localizer,
+            //    Attributes.Strength,
+            //    nameof(Attributes.Strength),
+            //    AliasSegmentItem,
+            //    RoundFloatForDisplay(GetMeleeDps()),
+            //    UnitsType.UnitPerTime);
 
             return sb.ToString();
         }
@@ -171,8 +171,8 @@ namespace FullPotential.Api.Items.Types
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.Speed,
-                nameof(Attributes.Speed),
+                Attributes.Efficiency,
+                nameof(Attributes.Efficiency),
                 AliasSegmentMelee,
                 RoundFloatForDisplay(GetMeleeWindUpTime()),
                 UnitsType.UnitPerTime);

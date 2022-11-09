@@ -22,6 +22,7 @@ namespace FullPotential.Api.Items.Base
         private const float MaximumAccuracyAngleDeviation = 4;
 
         public const string AliasSegmentItem = "item";
+        public const string AliasSegmentDefensive = "defensiveitem";
 
         // ReSharper disable InconsistentNaming
         protected IGameManager _gameManager;
@@ -69,10 +70,10 @@ namespace FullPotential.Api.Items.Base
             _valueCalculator = _gameManager.GetService<IValueCalculator>();
         }
 
-        //public float GetHighInHighOutInRange(int attributeValue, float min, float max)
-        //{
-        //    return attributeValue / 100f * (max - min) + min;
-        //}
+        public float GetHighInHighOutInRange(int attributeValue, float min, float max)
+        {
+            return attributeValue / 100f * (max - min) + min;
+        }
 
         public float GetHighInLowOutInRange(int attributeValue, float min, float max)
         {

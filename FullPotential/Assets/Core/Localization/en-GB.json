@@ -147,6 +147,12 @@
       "Key": "attribute.alias.item.accuracy",
       "Value": "Accuracy"
     },
+	
+	
+    {
+      "Key": "attribute.alias.defensiveitem.strength",
+      "Value": "Defence"
+    },
     
     
     {
@@ -172,17 +178,17 @@
       "Value": "Max. Ammo"
     },
     {
-      "Key": "attribute.alias.rangedweapon.recovery",
-      "Value": "Reload Time"
-    },
-    {
       "Key": "attribute.alias.rangedweapon.speed",
       "Value": "Fire Rate"
     },
+    {
+      "Key": "attribute.alias.rangedweapon.recovery",
+      "Value": "Reload Time"
+    },
 	
 	
     {
-      "Key": "attribute.alias.meleeweapon.speed",
+      "Key": "attribute.alias.meleeweapon.efficiency",
       "Value": "Wind Up Time"
     },
     {
@@ -192,8 +198,12 @@
 	
 	
     {
-      "Key": "attribute.alias.defensiveweapon.strength",
-      "Value": "Defence"
+      "Key": "attribute.alias.barrier.speed",
+      "Value": "Recharge Delay"
+    },
+    {
+      "Key": "attribute.alias.barrier.recovery",
+      "Value": "Recharge Rate"
     },
     
     
