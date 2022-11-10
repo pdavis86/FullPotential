@@ -281,30 +281,31 @@ namespace FullPotential.Api.Gameplay.Behaviours
             handStatus.ChargeEnumerator = null;
         }
 
-        private IEnumerator SpellOrGadgetCooldownCoroutine(HandStatus handStatus, int startPercentage, DateTime deadline)
-        {
-            var millisecondsUntilDone = (deadline - DateTime.Now).TotalMilliseconds;
+        //todo: zzz v0.4.1 - remove SoG cooldown if not necessary
+        //private IEnumerator SpellOrGadgetCooldownCoroutine(HandStatus handStatus, int startPercentage, DateTime deadline)
+        //{
+        //    var millisecondsUntilDone = (deadline - DateTime.Now).TotalMilliseconds;
 
-            //var sw = System.Diagnostics.Stopwatch.StartNew();
+        //    //var sw = System.Diagnostics.Stopwatch.StartNew();
 
-            while (handStatus.EquippedSpellOrGadget.ChargePercentage > 0)
-            {
-                yield return new WaitForSeconds(0.01F);
-                var millisecondsRemaining = (deadline - DateTime.Now).TotalMilliseconds;
-                handStatus.EquippedSpellOrGadget.ChargePercentage = (int)(startPercentage * millisecondsRemaining / millisecondsUntilDone);
+        //    while (handStatus.EquippedSpellOrGadget.ChargePercentage > 0)
+        //    {
+        //        yield return new WaitForSeconds(0.01F);
+        //        var millisecondsRemaining = (deadline - DateTime.Now).TotalMilliseconds;
+        //        handStatus.EquippedSpellOrGadget.ChargePercentage = (int)(startPercentage * millisecondsRemaining / millisecondsUntilDone);
 
-                //Safety to stop charge and cooldown at the same time
-                if (handStatus.ChargeEnumerator != null)
-                {
-                    StopCoroutine(handStatus.ChargeEnumerator);
-                    handStatus.ChargeEnumerator = null;
-                }
-            }
+        //        //Safety to stop charge and cooldown at the same time
+        //        if (handStatus.ChargeEnumerator != null)
+        //        {
+        //            StopCoroutine(handStatus.ChargeEnumerator);
+        //            handStatus.ChargeEnumerator = null;
+        //        }
+        //    }
 
-            //Debug.Log("Cooled in: " + sw.ElapsedMilliseconds + "ms");
+        //    //Debug.Log("Cooled in: " + sw.ElapsedMilliseconds + "ms");
 
-            handStatus.CooldownEnumerator = null;
-        }
+        //    handStatus.CooldownEnumerator = null;
+        //}
 
         private IEnumerator AutomaticWeaponFire(HandStatus handStatus, float delay, bool isLeftHand)
         {
@@ -382,11 +383,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return true;
         }
 
+        //todo: zzz v0.4.1 - remove SoG cooldown if not necessary
         private void StartSpellOrGadgetCooldown(HandStatus handStatus)
         {
-            var timeToCooldown = handStatus.EquippedSpellOrGadget.ChargePercentage / 100f * handStatus.EquippedSpellOrGadget.GetCooldownTime();
-            handStatus.CooldownEnumerator = SpellOrGadgetCooldownCoroutine(handStatus, handStatus.EquippedSpellOrGadget.ChargePercentage, DateTime.Now.AddSeconds(timeToCooldown));
-            StartCoroutine(handStatus.CooldownEnumerator);
+            handStatus.EquippedSpellOrGadget.ChargePercentage = 0;
+
+            //var timeToCooldown = handStatus.EquippedSpellOrGadget.ChargePercentage / 100f * handStatus.EquippedSpellOrGadget.GetCooldownTime();
+            //handStatus.CooldownEnumerator = SpellOrGadgetCooldownCoroutine(handStatus, handStatus.EquippedSpellOrGadget.ChargePercentage, DateTime.Now.AddSeconds(timeToCooldown));
+            //StartCoroutine(handStatus.CooldownEnumerator);
         }
 
         private bool UseSpellOrGadget(bool isLeftHand, Vector3 handPosition, SpellOrGadgetItemBase spellOrGadget)
@@ -518,8 +522,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private bool UseRangedWeapon(Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
         {
-            //todo: apply fire rate limiting to non-autos
-
             var shotDirection = weaponInHand.GetShotDirection(LookTransform.forward);
 
             var endPos = Physics.Raycast(LookTransform.position, shotDirection, out var rangedHit, MaximumRange)

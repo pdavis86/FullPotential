@@ -27,10 +27,10 @@ namespace FullPotential.Api.Gameplay.Items
             float attackStrength = itemUsed?.Attributes.Strength ?? 1;
             var defenceRatio = 100f / (100 + targetDefense);
             
-            //todo: review
+            //todo: review damage reduction for ranged weapons
             if (weaponCategory == IGearWeapon.WeaponCategory.Ranged)
             {
-                attackStrength *= weapon.GetDelayBetweenShots();
+                attackStrength /= weapon.GetBulletsPerSecond();
             }
 
             //Even a small attack can still do damage

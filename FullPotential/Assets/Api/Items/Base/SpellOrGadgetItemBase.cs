@@ -51,14 +51,13 @@ namespace FullPotential.Api.Items.Base
             return returnValue;
         }
 
-        public float GetCooldownTime()
-        {
-            //todo: cooldown or charge but not both
-            //var returnValue = GetValueInRangeHighLow(Attributes.Recovery, 0, 2);
-            ////Debug.Log("GetSogChargeTime: " + returnValue);
-            //return returnValue;
-            return 0;
-        }
+        //todo: zzz v0.4.1 - remove SoG cooldown if not necessary
+        //public float GetCooldownTime()
+        //{
+        //    var returnValue = GetHighInLowOutInRange(Attributes.Recovery, 0, 2);
+        //    //Debug.Log("GetSogChargeTime: " + returnValue);
+        //    return returnValue;
+        //}
 
         public float GetEffectDuration()
         {
