@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FullPotential.Api.GameManagement;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Spawning;
 using FullPotential.Api.Unity.Helpers;
@@ -24,9 +25,11 @@ namespace FullPotential.Standard.Scenes.Behaviours
         // ReSharper restore FieldCanBeMadeReadOnly.Local
 #pragma warning restore 0649
 
+        private IGameManager _gameManager;
+        private ISpawnService _spawnService;
+
         private List<Transform> _spawnPoints;
         private NetworkObject _enemyPrefabNetObj;
-        private ISpawnService _spawnService;
         private int _enemyCounter;
 
         [SerializeField] private SceneAttributes _attributes = new SceneAttributes();
@@ -42,7 +45,8 @@ namespace FullPotential.Standard.Scenes.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _spawnService = ModHelper.GetGameManager().GetService<ISpawnService>();
+            _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
+            _spawnService = DependenciesContext.Dependencies.GetService<ISpawnService>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -74,7 +78,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
                 }
             }
 
-            var playerToken = ModHelper.GetGameManager().GetLocalPlayerToken();
+            var playerToken = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager().GetLocalPlayerToken();
             var chosenSpawnPoint = GetSpawnPoint();
             HereAreMyJoiningDetailsServerRpc(playerToken, chosenSpawnPoint.Position, chosenSpawnPoint.Rotation);
         }
@@ -82,7 +86,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
         [ServerRpc(RequireOwnership = false)]
         private void HereAreMyJoiningDetailsServerRpc(string playerToken, Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default)
         {
-            ModHelper.GetGameManager().SpawnPlayerNetworkObject(playerToken, position, rotation, serverRpcParams);
+            _gameManager.SpawnPlayerNetworkObject(playerToken, position, rotation, serverRpcParams);
         }
 
         // ReSharper disable once UnusedParameter.Global
@@ -94,7 +98,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
                 return;
             }
 
-            ModHelper.GetGameManager().GetUserInterface().HudOverlay.ShowAlert(announcement);
+            _gameManager.GetUserInterface().HudOverlay.ShowAlert(announcement);
         }
 
         private void SpawnEnemy()

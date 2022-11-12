@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
@@ -50,12 +52,10 @@ namespace FullPotential.Core.UI.Admin
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            var gameManager = ModHelper.GetGameManager();
+            _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
 
-            _resultFactory = gameManager.GetService<IResultFactory>();
-            _localizer = gameManager.GetService<ILocalizer>();
-
-            var typeRegistry = gameManager.GetService<ITypeRegistry>();
+            var typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _registeredEffects = typeRegistry.GetRegisteredTypes<IEffect>().ToList();
             _registeredTargetingOptions = typeRegistry.GetRegisteredTypes<ITargeting>().ToList();
             _registeredShapes = typeRegistry.GetRegisteredTypes<IShape>().ToList();
@@ -291,7 +291,7 @@ namespace FullPotential.Core.UI.Admin
             var componentJson = JsonUtility.ToJson(component);
             var category = _craftingSelector.GetCraftingCategory().Key.Name;
 
-            ModHelper.GetGameManager().GetLocalPlayerGameObject().GetComponent<PlayerBehaviour>().CraftItemAsAdminServerRpc(
+            DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager().GetLocalPlayerGameObject().GetComponent<PlayerBehaviour>().CraftItemAsAdminServerRpc(
                 componentJson,
                 category,
                 _craftingSelector.GetCraftableTypeName(category),

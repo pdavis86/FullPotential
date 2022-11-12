@@ -2,13 +2,14 @@
 using System.Linq;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
@@ -54,8 +55,8 @@ namespace FullPotential.Core.PlayerBehaviours
             _playerState = GetComponent<PlayerState>();
             _playerMovement = GetComponent<PlayerMovement>();
 
-            _resultFactory = GameManager.Instance.GetService<IResultFactory>();
-            _inventoryDataService = GameManager.Instance.GetService<IInventoryDataService>();
+            _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
+            _inventoryDataService = DependenciesContext.Dependencies.GetService<IInventoryDataService>();
         }
 
         // ReSharper disable once UnusedMember.Local

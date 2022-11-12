@@ -6,6 +6,7 @@ using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
@@ -69,9 +70,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             base.Awake();
 
-            _gameManager = ModHelper.GetGameManager();
-            _rpcService = _gameManager.GetService<IRpcService>();
-            _localizer = _gameManager.GetService<ILocalizer>();
+            _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
+            _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
         }
 
         protected override void Start()

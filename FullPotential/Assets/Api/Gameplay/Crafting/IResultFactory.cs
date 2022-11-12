@@ -2,7 +2,7 @@
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 
-namespace FullPotential.Core.Gameplay.Crafting
+namespace FullPotential.Api.Gameplay.Crafting
 {
     public interface IResultFactory
     {

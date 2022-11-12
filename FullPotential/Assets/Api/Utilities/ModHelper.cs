@@ -2,13 +2,12 @@
 
 namespace FullPotential.Api.Utilities
 {
-    public static class ModHelper
+    public class ModHelper : IModHelper
     {
-        private static IGameManager _gameManager;
-
-        public static IGameManager GetGameManager()
+        public virtual IGameManager GetGameManager()
         {
-            return _gameManager ??= UnityEngine.GameObject.Find("GameManager").GetComponent<IGameManager>();
+            return UnityEngine.GameObject.Find("GameManager").GetComponent<IGameManager>();
         }
     }
+
 }

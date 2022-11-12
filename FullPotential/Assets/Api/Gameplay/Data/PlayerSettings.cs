@@ -1,6 +1,6 @@
 ﻿using Unity.Netcode;
 
-namespace FullPotential.Core.Gameplay.Data
+namespace FullPotential.Api.Gameplay.Data
 {
     [System.Serializable]
     public class PlayerSettings : INetworkSerializable

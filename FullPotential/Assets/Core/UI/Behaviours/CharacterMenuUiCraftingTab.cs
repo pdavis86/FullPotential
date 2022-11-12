@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.PlayerBehaviours;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.UI.Components;
@@ -43,8 +44,8 @@ namespace FullPotential.Core.Ui.Behaviours
             _playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>();
             _playerBehaviour = _playerState.gameObject.GetComponent<PlayerBehaviour>();
 
-            _resultFactory = GameManager.Instance.GetService<IResultFactory>();
-            _localizer = GameManager.Instance.GetService<ILocalizer>();
+            _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
 
             _craftButton.onClick.AddListener(CraftButtonOnClick);
 

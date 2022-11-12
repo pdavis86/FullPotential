@@ -1,5 +1,6 @@
 ﻿using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities;
@@ -17,14 +18,14 @@ namespace FullPotential.Standard.Scenes.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _gameManager = ModHelper.GetGameManager();
+            _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
 
             RequiresServerCheck = false;
         }
 
         public override void OnFocus()
         {
-            var translation = _gameManager.GetService<ILocalizer>().Translate("ui.interact.shop");
+            var translation = DependenciesContext.Dependencies.GetService<ILocalizer>().Translate("ui.interact.shop");
             var interactInputName = _gameManager.InputActions.Player.Interact.GetBindingDisplayString();
             _interactionBubble.text = string.Format(translation, interactInputName);
             _interactionBubble.gameObject.SetActive(true);

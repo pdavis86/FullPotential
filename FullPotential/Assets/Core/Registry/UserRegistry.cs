@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using FullPotential.Api.Gameplay.Data;
-using FullPotential.Core.Gameplay.Data;
+using FullPotential.Api.Registry;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global

@@ -10,8 +10,6 @@ namespace FullPotential.Api.GameManagement
     {
         DefaultInputActions InputActions { get; }
 
-        T GetService<T>();
-
         ISceneBehaviour GetSceneBehaviour();
 
         IUserInterface GetUserInterface();

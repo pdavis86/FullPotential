@@ -6,6 +6,7 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
@@ -94,12 +95,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected virtual void Awake()
         {
-            _gameManager = ModHelper.GetGameManager();
-            _rpcService = _gameManager.GetService<IRpcService>();
-            _localizer = _gameManager.GetService<ILocalizer>();
-            _typeRegistry = _gameManager.GetService<ITypeRegistry>();
-            _effectService = _gameManager.GetService<IEffectService>();
-            _valueCalculator = _gameManager.GetService<IValueCalculator>();
+            _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
+            _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+            _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
+            _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
+            _valueCalculator = DependenciesContext.Dependencies.GetService<IValueCalculator>();
 
             _entityName.OnValueChanged += OnNameChanged;
             _health.OnValueChanged += OnHealthChanged;

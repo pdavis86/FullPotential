@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement.Enums;
 using FullPotential.Core.Networking.Data;
-using FullPotential.Core.Registry;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UNET;
 using UnityEngine;
@@ -52,8 +53,8 @@ namespace FullPotential.Core.GameManagement
 
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
 
-            _userRegistry = GameManager.Instance.GetService<IUserRegistry>();
-            _localizer = GameManager.Instance.GetService<ILocalizer>();
+            _userRegistry = DependenciesContext.Dependencies.GetService<IUserRegistry>();
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
         }
 
         // ReSharper disable once UnusedMember.Local

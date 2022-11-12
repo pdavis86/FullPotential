@@ -1,7 +1,6 @@
 ﻿using System;
-using FullPotential.Api.Gameplay.Data;
 
-namespace FullPotential.Core.Gameplay.Data
+namespace FullPotential.Api.Gameplay.Data
 {
     [Serializable]
     public class PlayerData

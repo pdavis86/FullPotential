@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
@@ -13,7 +15,6 @@ using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Utilities.Extensions;
@@ -51,11 +52,11 @@ namespace FullPotential.Core.PlayerBehaviours
 
             _playerState = GetComponent<PlayerState>();
 
-            _typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
-            _rpcService = GameManager.Instance.GetService<IRpcService>();
-            _localizer = GameManager.Instance.GetService<ILocalizer>();
-            _inventoryDataService = GameManager.Instance.GetService<IInventoryDataService>();
-            _resultFactory = GameManager.Instance.GetService<IResultFactory>();
+            _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
+            _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+            _inventoryDataService = DependenciesContext.Dependencies.GetService<IInventoryDataService>();
+            _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
         }
 
         #endregion

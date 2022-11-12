@@ -1,9 +1,9 @@
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
-using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -33,7 +33,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             Destroy(gameObject, SpellOrGadget.GetEffectDuration());
 
-            _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
+            _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
 
             _timeBetweenEffects = SpellOrGadget.GetEffectTimeBetween();
             _timeSinceLastEffective = _timeBetweenEffects;

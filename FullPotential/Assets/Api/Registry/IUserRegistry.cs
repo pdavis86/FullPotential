@@ -1,6 +1,6 @@
-﻿using FullPotential.Core.Gameplay.Data;
+﻿using FullPotential.Api.Gameplay.Data;
 
-namespace FullPotential.Core.Registry
+namespace FullPotential.Api.Registry
 {
     public interface IUserRegistry
     {

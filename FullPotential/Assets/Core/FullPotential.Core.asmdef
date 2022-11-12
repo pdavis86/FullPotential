@@ -1,0 +1,23 @@
+{
+    "name": "FullPotential.Core",
+    "rootNamespace": "FullPotential",
+    "references": [
+        "Unity.Netcode.Components",
+        "Unity.Netcode.Runtime",
+        "Unity.Addressables",
+        "Unity.Collections",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "Unity.ResourceManager",
+        "FullPotential.Api"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

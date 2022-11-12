@@ -5,6 +5,7 @@ using System.Text;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry;
@@ -66,8 +67,8 @@ namespace FullPotential.Api.Items.Base
 
         protected ItemBase()
         {
-            _gameManager = ModHelper.GetGameManager();
-            _valueCalculator = _gameManager.GetService<IValueCalculator>();
+            _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
+            _valueCalculator = DependenciesContext.Dependencies.GetService<IValueCalculator>();
         }
 
         public float GetHighInHighOutInRange(int attributeValue, float min, float max)
@@ -83,7 +84,7 @@ namespace FullPotential.Api.Items.Base
         public string RoundFloatForDisplay(float input, int decimalPlaces = 1)
         {
             var rounded = Math.Round(input, decimalPlaces);
-            return rounded.ToString(ModHelper.GetGameManager().CurrentCulture);
+            return rounded.ToString(_gameManager.CurrentCulture);
         }
 
         public int AddVariationToValue(double basicValue)

@@ -1,6 +1,6 @@
-﻿using FullPotential.Api.Localization;
+﻿using FullPotential.Api.Ioc;
+using FullPotential.Api.Localization;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Core.GameManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,7 +21,7 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
         private void Awake()
         {
             _textComponent = GetComponent<Text>();
-            _localizer = GameManager.Instance.GetService<ILocalizer>();
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
         }
 
         // ReSharper disable once UnusedMember.Local

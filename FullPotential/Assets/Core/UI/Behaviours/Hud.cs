@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Ui;
-using FullPotential.Core.GameManagement;
 using FullPotential.Core.UI.Behaviours;
 using FullPotential.Core.Ui.Components;
 using UnityEngine;
@@ -53,7 +53,7 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _localizer = GameManager.Instance.GetService<ILocalizer>();
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
 
             _reloadingTranslation = _localizer.Translate("ui.hub.reloading");
 

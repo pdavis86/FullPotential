@@ -5,17 +5,18 @@ using System.Linq;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Ioc;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Environment;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Gameplay.Data;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
-using FullPotential.Core.Registry;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.Helpers;
@@ -114,7 +115,7 @@ namespace FullPotential.Core.PlayerBehaviours
             _inventory = Inventory;
             _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
 
-            _userRegistry = GameManager.Instance.GetService<IUserRegistry>();
+            _userRegistry = DependenciesContext.Dependencies.GetService<IUserRegistry>();
 
             HealthStatSlider = _healthSlider;
         }

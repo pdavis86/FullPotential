@@ -7,9 +7,12 @@ using System.Reflection;
 using System.Threading.Tasks;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Spawning;
 using FullPotential.Api.Ui;
@@ -20,7 +23,6 @@ using FullPotential.Core.GameManagement.Data;
 using FullPotential.Core.GameManagement.Enums;
 using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Crafting;
-using FullPotential.Core.Gameplay.Data;
 using FullPotential.Core.Localization;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
@@ -94,12 +96,12 @@ namespace FullPotential.Core.GameManagement
             await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
             var addressablesManager = new AddressablesManager();
 
-            var typeRegistry = (TypeRegistry)GetService<ITypeRegistry>();
+            var typeRegistry = (TypeRegistry)DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             typeRegistry.FindAndRegisterAll(addressablesManager.ModPrefixes);
 
-            _userRegistry = GetService<IUserRegistry>();
+            _userRegistry = DependenciesContext.Dependencies.GetService<IUserRegistry>();
 
-            _localizer = GetService<ILocalizer>();
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             await _localizer.LoadAvailableCulturesAsync(addressablesManager.LocalisationAddresses);
             await _localizer.LoadLocalizationFilesAsync(AppOptions.Culture);
 
@@ -355,23 +357,18 @@ namespace FullPotential.Core.GameManagement
             _asapSaveUsernames.Remove(playerData.Username);
         }
 
-        private readonly ServiceRegistry _serviceRegistry = new ServiceRegistry();
-        public T GetService<T>()
-        {
-            return _serviceRegistry.GetService<T>();
-        }
-
         private void RegisterServices()
         {
-            _serviceRegistry.Register<IUserRegistry, UserRegistry>();
-            _serviceRegistry.Register<IResultFactory, ResultFactory>();
-            _serviceRegistry.Register<IInventoryDataService, InventoryDataService>();
-            _serviceRegistry.Register<IValueCalculator, ValueCalculator>();
-            _serviceRegistry.Register<ILocalizer, Localizer>();
-            _serviceRegistry.Register<ITypeRegistry, TypeRegistry>();
-            _serviceRegistry.Register<ISpawnService, SpawnService>(true);
-            _serviceRegistry.Register<IRpcService, RpcService>();
-            _serviceRegistry.Register<IEffectService, EffectService>();
+            DependenciesContext.Dependencies.Register<IUserRegistry, UserRegistry>();
+            DependenciesContext.Dependencies.Register<IResultFactory, ResultFactory>();
+            DependenciesContext.Dependencies.Register<IInventoryDataService, InventoryDataService>();
+            DependenciesContext.Dependencies.Register<IValueCalculator, ValueCalculator>();
+            DependenciesContext.Dependencies.Register<ILocalizer, Localizer>();
+            DependenciesContext.Dependencies.Register<ITypeRegistry, TypeRegistry>();
+            DependenciesContext.Dependencies.Register<ISpawnService, SpawnService>(true);
+            DependenciesContext.Dependencies.Register<IRpcService, RpcService>();
+            DependenciesContext.Dependencies.Register<IEffectService, EffectService>();
+            DependenciesContext.Dependencies.Register<IModHelper, ModHelper>();
         }
 
         public void CheckIsAdmin()

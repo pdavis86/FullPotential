@@ -1,7 +1,7 @@
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.SpellsAndGadgets;
-using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -32,7 +32,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
+            _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
 
             _castSpeed = SpellOrGadget.Attributes.Speed / 50f;
             if (_castSpeed < 0.5)

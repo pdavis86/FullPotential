@@ -1,4 +1,5 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
@@ -33,7 +34,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             _cylinderParentTransform = transform.GetChild(0);
             _cylinderTransform = _cylinderParentTransform.GetChild(0);
 
-            _effectService = ModHelper.GetGameManager().GetService<IEffectService>();
+            _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
         }
 
         // ReSharper disable once UnusedMember.Local

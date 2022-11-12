@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.GameManagement;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry.Crafting;
-using FullPotential.Core.GameManagement;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -32,7 +32,7 @@ namespace FullPotential.Core.UI.Components
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            var localizer = GameManager.Instance.GetService<ILocalizer>();
+            var localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
 
             _craftingCategories = new Dictionary<Type, string>
             {
@@ -48,7 +48,7 @@ namespace FullPotential.Core.UI.Components
                 localizer.Translate(TranslationType.CraftingHandedness, "two")
             };
 
-            var typeRegistry = GameManager.Instance.GetService<ITypeRegistry>();
+            var typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
 
             _armorTypes = typeRegistry.GetRegisteredTypes<IGearArmor>()
                 .ToDictionary(x => x, x => localizer.GetTranslatedTypeName(x))

@@ -1,5 +1,6 @@
 ﻿using System;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
@@ -33,7 +34,7 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _localizer = GameManager.Instance.GetService<ILocalizer>();
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
         }
 
         // ReSharper disable once UnusedMember.Local

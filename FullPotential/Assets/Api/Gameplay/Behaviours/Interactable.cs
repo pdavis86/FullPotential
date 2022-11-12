@@ -1,4 +1,5 @@
-﻿using FullPotential.Api.Utilities;
+﻿using FullPotential.Api.Ioc;
+using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -19,7 +20,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            _interactionBubble = ModHelper.GetGameManager().GetUserInterface().InteractionBubbleOverlay.GetComponent<TMPro.TextMeshProUGUI>();
+            _interactionBubble = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager().GetUserInterface().InteractionBubbleOverlay.GetComponent<TMPro.TextMeshProUGUI>();
         }
 
         // ReSharper disable once UnusedMember.Local
