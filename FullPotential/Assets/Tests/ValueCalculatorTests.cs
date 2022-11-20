@@ -58,6 +58,7 @@ namespace FullPotential.Tests
         [Test]
         public void GetDamageValueFromAttack_GivenItemsWithAttributesAll50_SameBaseDamage()
         {
+            //Calc is Math.Ceiling(attackStrength * defenceRatio / 4f);
             const float expectedBaseDamage = 13f;
 
             var allFifty = new Attributes
@@ -72,23 +73,35 @@ namespace FullPotential.Tests
                 Luck = 50
             };
 
-            var meleeOneHandedWeapon = GetMeleeWeapon(false, allFifty);
-            Assert.AreEqual(expectedBaseDamage * 2, GetDamage(meleeOneHandedWeapon));
-
-            var meleeTwoHandedWeapon = GetMeleeWeapon(true, allFifty);
-            Assert.AreEqual(expectedBaseDamage * 4, GetDamage(meleeTwoHandedWeapon));
+            var gadget = new Gadget { Attributes = allFifty, Effects = new List<IEffect> { _singleDamageEffect } };
+            Assert.AreEqual((int)expectedBaseDamage, GetDamage(gadget));
 
             var spell = new Spell { Attributes = allFifty, Effects = new List<IEffect> { _singleDamageEffect } };
-            Assert.AreEqual(expectedBaseDamage, GetDamage(spell));
+            Assert.AreEqual((int)expectedBaseDamage, GetDamage(spell));
 
-            var gadget = new Gadget { Attributes = allFifty, Effects = new List<IEffect> { _singleDamageEffect } };
-            Assert.AreEqual(expectedBaseDamage, GetDamage(gadget));
+            //todo: test multiple effects
+            //todo: test periodic damage
 
-            //todo: multiple effects
-            //todo: plus periodic damage
+            var meleeOneHandedWeapon = GetMeleeWeapon(false, allFifty);
+            Assert.AreEqual((int)(expectedBaseDamage * 2), GetDamage(meleeOneHandedWeapon));
+
+            var meleeTwoHandedWeapon = GetMeleeWeapon(true, allFifty);
+            Assert.AreEqual((int)(expectedBaseDamage * 4), GetDamage(meleeTwoHandedWeapon));
+
+            var rangedOneHandedWeapon = GetRangedWeapon(false, allFifty);
+            Assert.AreEqual((int)(expectedBaseDamage / rangedOneHandedWeapon.GetBulletsPerSecond()), GetDamage(rangedOneHandedWeapon));
+
+            var rangedTwoHandedWeapon = GetRangedWeapon(true, allFifty);
+            Assert.AreEqual((int)(expectedBaseDamage * 2 / rangedTwoHandedWeapon.GetBulletsPerSecond()), GetDamage(rangedTwoHandedWeapon));
         }
 
-        private float GetDamage(ItemBase item)
+        [Test]
+        public void GetDefenceValue_GivenItemsWithAttributesAll50_SameBaseDefence()
+        {
+            //todo: GetDefenceValue_GivenItemsWithAttributesAll50_SameBaseDefence()
+        }
+
+        private int GetDamage(ItemBase item)
         {
             return _valueCalculator.GetDamageValueFromAttack(item, 0, false);
         }
@@ -98,6 +111,16 @@ namespace FullPotential.Tests
             return new Weapon
             {
                 RegistryType = new TestWeaponType(IGearWeapon.WeaponCategory.Melee),
+                Attributes = attributes,
+                IsTwoHanded = isTwoHanded
+            };
+        }
+
+        private Weapon GetRangedWeapon(bool isTwoHanded, Attributes attributes)
+        {
+            return new Weapon
+            {
+                RegistryType = new TestWeaponType(IGearWeapon.WeaponCategory.Ranged),
                 Attributes = attributes,
                 IsTwoHanded = isTwoHanded
             };
@@ -117,6 +140,8 @@ namespace FullPotential.Tests
 
     public class TestWeaponType : IGearWeapon
     {
+        // ReSharper disable UnassignedGetOnlyAutoProperty
+
         public TestWeaponType(IGearWeapon.WeaponCategory category)
         {
             Category = category;
