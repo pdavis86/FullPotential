@@ -8,11 +8,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>FullPotential.Tests</RootNamespace>
-    <ProjectGuid>{9E2C288F-B29A-90B6-0EA8-6052519AD989}</ProjectGuid>
+    <RootNamespace>FullPotential.Api.Tests</RootNamespace>
+    <ProjectGuid>{B0B02D91-C3AD-031B-84F3-3AC93048CF89}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>FullPotential.Tests</AssemblyName>
+    <AssemblyName>FullPotential.Api.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -56,8 +56,10 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Api.Tests\IocTests.cs" />
-    <Compile Include="Assets\Api.Tests\ValueCalculatorTests.cs" />
+    <Compile Include="Assets\Api.Tests\Ioc\DependenciesCollectionTests.cs" />
+    <Compile Include="Assets\Api.Tests\Gameplay\Items\ValueCalculatorTests.cs" />
+    <Compile Include="Assets\Api.Tests\Ioc\MethodInjectionExample.cs" />
+    <Compile Include="Assets\Api.Tests\Ioc\ConstructorInjectionExample.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Api.Tests\EditModeTests.asmdef" />

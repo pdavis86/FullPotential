@@ -1,6 +1,6 @@
 {
-    "name": "FullPotential.Tests",
-    "rootNamespace": "FullPotential.Tests",
+    "name": "FullPotential.Api.Tests",
+    "rootNamespace": "FullPotential.Api.Tests",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",

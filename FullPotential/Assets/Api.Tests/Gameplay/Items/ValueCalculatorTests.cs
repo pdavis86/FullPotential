@@ -14,7 +14,7 @@ using FullPotential.Api.Utilities;
 using Moq;
 using NUnit.Framework;
 
-namespace FullPotential.Tests
+namespace FullPotential.Api.Tests.Gameplay.Items
 {
     public class ValueCalculatorTests
     {

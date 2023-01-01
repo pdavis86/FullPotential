@@ -158,7 +158,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 _cylinderTransform.gameObject.SetActive(true);
             }
 
-            //todo: draw a ball that will hit the end when GetTimeBetweenEffects is up
+            //todo: zzz v0.4.1 - draw a ball that will hit the end when GetTimeBetweenEffects is up
         }
 
     }

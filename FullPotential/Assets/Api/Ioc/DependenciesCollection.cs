@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
@@ -8,6 +9,8 @@ namespace FullPotential.Api.Ioc
 {
     public class DependenciesCollection
     {
+        private const string InjectionMethodName = "InjectDependencies";
+
         private readonly List<Type> _doNotCache = new List<Type>();
         private readonly Dictionary<Type, Type> _registry = new Dictionary<Type, Type>();
         private readonly Dictionary<Type, object> _singletons = new Dictionary<Type, object>();
@@ -40,11 +43,6 @@ namespace FullPotential.Api.Ioc
         }
 
         public T GetService<T>()
-        {
-            return (T)GetServiceInternal(typeof(T));
-        }
-
-        public T GetService<T>(T type)
         {
             return (T)GetServiceInternal(typeof(T));
         }
@@ -85,15 +83,34 @@ namespace FullPotential.Api.Ioc
 
         private object CreateInstance(Type serviceType)
         {
+            var injectionMethod = serviceType.GetMethod(InjectionMethodName);
+            if (injectionMethod != null)
+            {
+                return MethodInjection(serviceType, injectionMethod);
+            }
+
+            return ConstructorInjection(serviceType);
+        }
+
+        private object ConstructorInjection(Type serviceType)
+        {
             object newInstance;
 
-            var ctor = serviceType.GetConstructors()[0];
+            var constructors = serviceType.GetConstructors();
+
+            if (constructors.Length > 1)
+            {
+                Debug.LogError($"'{serviceType}' has more than one constructor");
+                return null;
+            }
+
+            var ctor = constructors[0];
             var parameters = ctor.GetParameters();
 
             if (parameters.Length > 0)
             {
                 var args = new List<object>();
-                foreach (var param in ctor.GetParameters())
+                foreach (var param in parameters)
                 {
                     if (!_registry.ContainsKey(param.ParameterType))
                     {
@@ -107,6 +124,30 @@ namespace FullPotential.Api.Ioc
             else
             {
                 newInstance = Activator.CreateInstance(serviceType);
+            }
+
+            return newInstance;
+        }
+
+        private object MethodInjection(Type serviceType, MethodInfo injectionMethod)
+        {
+            var newInstance = Activator.CreateInstance(serviceType);
+
+            var parameters = injectionMethod.GetParameters();
+
+            if (parameters.Length > 0)
+            {
+                var args = new List<object>();
+                foreach (var param in parameters)
+                {
+                    if (!_registry.ContainsKey(param.ParameterType))
+                    {
+                        Debug.LogError($"'{serviceType}' takes a parameter of '{param.ParameterType}' but this type is not registered");
+                    }
+                    args.Add(GetServiceInternal(param.ParameterType));
+                }
+
+                injectionMethod.Invoke(newInstance, args.ToArray());
             }
 
             return newInstance;
