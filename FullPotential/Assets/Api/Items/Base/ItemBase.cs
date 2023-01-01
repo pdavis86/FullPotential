@@ -12,7 +12,6 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace FullPotential.Api.Items.Base
@@ -87,12 +86,12 @@ namespace FullPotential.Api.Items.Base
             return rounded.ToString(_gameManager.CurrentCulture);
         }
 
-        public int AddVariationToValue(double basicValue)
-        {
-            var multiplier = ValueCalculator.Random.Next(90, 111) / 100f;
-            var adder = ValueCalculator.Random.Next(0, 6);
-            return (int)Math.Ceiling(basicValue / multiplier) + adder;
-        }
+        //public int AddVariationToValue(double basicValue)
+        //{
+        //    var multiplier = ValueCalculator.Random.Next(90, 111) / 100f;
+        //    var adder = ValueCalculator.Random.Next(0, 6);
+        //    return (int)Math.Ceiling(basicValue / multiplier) + adder;
+        //}
 
         public int GetNameHash()
         {
@@ -192,48 +191,65 @@ namespace FullPotential.Api.Items.Base
             return returnValue;
         }
 
-        public float GetEffectTimeBetween(float min = 0.5f, float max = 1.5f)
+        public float GetEffectDuration()
         {
-            var returnValue = GetHighInLowOutInRange(Attributes.Speed, min, max);
-            //Debug.Log("GetTimeBetweenEffects: " + returnValue);
+            var returnValue = Attributes.Duration / 10f;
+            //Debug.Log("GetDuration: " + returnValue);
             return returnValue;
         }
 
-        public (int Change, DateTime Expiry) GetStatChangeAndExpiry(IStatEffect statEffect)
+        public float GetEffectTimeBetween()
         {
-            var change = AddVariationToValue(Attributes.Strength / 5f);
+            var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0.5f, 1.5f);
+            return returnValue;
+        }
+
+        private int GetAdjustedStrength()
+        {
+            return (int) Math.Ceiling(Attributes.Strength / 5f);
+        }
+
+        public int GetStatChange(IStatEffect statEffect)
+        {
+            var change = GetAdjustedStrength();
 
             if (statEffect.Affect is Affect.PeriodicDecrease or Affect.SingleDecrease or Affect.TemporaryMaxDecrease)
             {
                 change *= -1;
             }
 
-            var timeToLive = statEffect.Affect == Affect.SingleIncrease || statEffect.Affect == Affect.SingleDecrease
-                ? math.ceil(Attributes.Duration / 50f)
-                : math.ceil(Attributes.Duration / 20f);
+            return change;
+        }
+
+        public (int Change, DateTime Expiry) GetStatChangeAndExpiry(IStatEffect statEffect)
+        {
+            var change = GetStatChange(statEffect);
+            var timeToLive = GetEffectDuration();
 
             return (change, DateTime.Now.AddSeconds(timeToLive));
         }
 
         public (int Change, DateTime Expiry, float delay) GetPeriodicStatChangeExpiryAndDelay(IStatEffect statEffect)
         {
-            var (change, expiry) = GetStatChangeAndExpiry(statEffect);
+            var change = GetStatChange(statEffect);
+            var timeToLive = GetEffectDuration();
+            var delay = GetEffectTimeBetween();
 
-            var delay = GetHighInLowOutInRange(Attributes.Recovery, 0.5f, 3);
+            var changeOverTime = (int)Mathf.Ceil(change / (timeToLive / delay));
 
-            return (change, expiry, delay);
+            return (changeOverTime, DateTime.Now.AddSeconds(timeToLive), delay);
         }
 
         public (int Change, DateTime Expiry) GetAttributeChangeAndExpiry(IAttributeEffect attributeEffect)
         {
-            var change = AddVariationToValue(Attributes.Strength / 5f);
+            var change = GetAdjustedStrength();
 
             if (!attributeEffect.TemporaryMaxIncrease)
             {
                 change *= -1;
             }
 
-            var timeToLive = Attributes.Duration / 2f;
+            var timeToLive = GetEffectDuration();
 
             return (change, DateTime.Now.AddSeconds(timeToLive));
         }

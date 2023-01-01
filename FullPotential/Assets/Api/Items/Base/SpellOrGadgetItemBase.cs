@@ -13,6 +13,7 @@ namespace FullPotential.Api.Items.Base
     public abstract class SpellOrGadgetItemBase : ItemWithTargetingAndShapeBase
     {
         public const string AliasSegmentSog = "sog";
+        public const string AliasSegmentEffects = "effects";
 
         public ResourceConsumptionType ResourceConsumptionType { get; protected set; }
 
@@ -58,13 +59,6 @@ namespace FullPotential.Api.Items.Base
         //    //Debug.Log("GetSogChargeTime: " + returnValue);
         //    return returnValue;
         //}
-
-        public float GetEffectDuration()
-        {
-            var returnValue = Attributes.Duration / 10f;
-            //Debug.Log("GetDuration: " + returnValue);
-            return returnValue;
-        }
 
         public float GetDps()
         {
@@ -147,7 +141,7 @@ namespace FullPotential.Api.Items.Base
                 RoundFloatForDisplay(GetChargeTime()),
                 UnitsType.Time);
 
-            //Commented out until I decide what to do with cooldown
+            //todo: zzz v0.4.1 - Commented out until I decide what to do with cooldown
             //AppendToDescription(
             //    sb,
             //    localizer,
@@ -164,6 +158,15 @@ namespace FullPotential.Api.Items.Base
                 nameof(Attributes.Duration),
                 AliasSegmentSog,
                 RoundFloatForDisplay(GetEffectDuration()),
+                UnitsType.Time);
+
+            AppendToDescription(
+                sb,
+                localizer,
+                Attributes.Speed,
+                nameof(Attributes.Speed),
+                AliasSegmentEffects,
+                RoundFloatForDisplay(GetEffectTimeBetween()),
                 UnitsType.Time);
 
             AppendToDescription(

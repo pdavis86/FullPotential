@@ -239,11 +239,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             Vector3? position)
         {
 
-            if (sourceFighter == null)
-            {
-                Debug.LogWarning("Attack source not found. Did they sign out?");
-            }
-            else
+            if (sourceFighter != null)
             {
                 //Debug.Log($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
 
@@ -254,6 +250,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
 
                 ShowHealthChangeToSourceFighter(sourceFighter, position, change);
+            }
+            else
+            {
+                Debug.Log("No source fighter found when trying to apply health change. Did they sign out?");
             }
 
             //Do this last to ensure the entity does not die before recording the cause
@@ -518,6 +518,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void HandleCollision(Collision collision)
         {
+            if (!IsServer)
+            {
+                return;
+            }
+
             if (collision.relativeVelocity.magnitude < VelocityThreshold)
             {
                 _fighterWhoMovedMeLast = null;
@@ -705,14 +710,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
-            var (change, expiry) = itemUsed.GetStatChangeAndExpiry(statEffect);
+            var change = itemUsed.GetStatChange(statEffect);
 
             if (statEffect.StatToAffect == AffectableStat.Health && statEffect.Affect == Affect.SingleDecrease)
             {
                 change = _valueCalculator.GetDamageValueFromAttack(itemUsed, GetDefenseValue()) * -1;
             }
 
-            AddOrUpdateEffect(statEffect, change, expiry);
+            //todo: zzz v0.4.1 - allow expiry to be hidden as it was a one-off effect
+            AddOrUpdateEffect(statEffect, change, DateTime.Now.AddSeconds(3));
 
             ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, itemUsed, position);
         }
