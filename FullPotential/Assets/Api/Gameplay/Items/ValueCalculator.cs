@@ -33,7 +33,7 @@ namespace FullPotential.Api.Gameplay.Items
             }
 
             //Even a small attack can still do damage
-            var damageDealtBasic = Math.Ceiling(attackStrength * defenceRatio / 4f);
+            var damageDealtBasic = Math.Ceiling(attackStrength * defenceRatio / ItemBase.StrengthDivisor);
 
             if (weapon != null && weapon.IsTwoHanded)
             {

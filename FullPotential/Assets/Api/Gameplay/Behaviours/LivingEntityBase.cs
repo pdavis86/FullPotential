@@ -67,10 +67,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
         private readonly List<ActiveEffect> _activeEffects = new List<ActiveEffect>();
-        private IFighter _fighterWhoMovedMeLast;
 
+        private IFighter _fighterWhoMovedMeLast;
         private Rigidbody _rb;
-        private bool _isSprinting;
 
         //Action-related
         private DelayedAction _replenishStamina;
@@ -87,6 +86,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public Rigidbody RigidBody => _rb == null ? _rb = GetComponent<Rigidbody>() : _rb;
 
         public LivingEntityState AliveState { get; protected set; }
+
+        public bool IsSprinting { get; set; }
 
         #endregion
 
@@ -120,7 +121,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             _replenishStamina = new DelayedAction(.01f, () =>
             {
-                if (!_isSprinting && _stamina.Value < GetStaminaMax())
+                if (!IsConsumingStamina() && _stamina.Value < GetStaminaMax())
                 {
                     //todo: zzz v0.5 - trait-based stamina recharge
                     _stamina.Value += 1;
@@ -147,7 +148,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             _consumeStamina = new DelayedAction(.05f, () =>
             {
-                if (!_isSprinting)
+                if (!IsConsumingStamina())
                 {
                     return;
                 }
@@ -195,16 +196,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         }
 
         // ReSharper restore UnusedMemberHierarchy.Global
-        #endregion
-
-        #region ServerRpc calls
-
-        [ServerRpc]
-        public void UpdateSprintingServerRpc(bool isSprinting)
-        {
-            _isSprinting = isSprinting;
-        }
-
         #endregion
 
         #region ClientRpc calls
@@ -342,6 +333,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             //todo: zzz v0.5 - trait-based stamina cost
             return 10;
+        }
+
+        protected virtual bool IsConsumingStamina()
+        {
+            if (IsSprinting && GetStamina() < GetStaminaCost())
+            {
+                IsSprinting = false;
+            }
+
+            return IsSprinting;
         }
 
         #endregion

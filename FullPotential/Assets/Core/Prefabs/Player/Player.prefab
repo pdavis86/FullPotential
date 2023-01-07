@@ -943,7 +943,6 @@ GameObject:
   - component: {fileID: 7556515380981010776}
   - component: {fileID: 3593277776525206365}
   - component: {fileID: 7867810801410850028}
-  - component: {fileID: 1804965897092273251}
   - component: {fileID: -1896055761977199681}
   m_Layer: 0
   m_Name: Player
@@ -1028,6 +1027,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 848d0c980b57f4f4dac3298eaf9f7d11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _nameTag: {fileID: 6250991307057261387}
   Positions:
     LeftHand: {fileID: 3462865541722136237}
     RightHand: {fileID: 4535721041638513647}
@@ -1038,7 +1038,6 @@ MonoBehaviour:
     Body: {fileID: 5211505158142024633}
     LeftArm: {fileID: 7392779647843419198}
     RightArm: {fileID: 7392779647605690760}
-  _nameTag: {fileID: 6250991307057261387}
   _behavioursToDisable:
   - {fileID: 1201570389013236167}
   - {fileID: 7556515380981010776}
@@ -1136,32 +1135,6 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &1804965897092273251
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7392779647718654627}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b20b0fbc6bfc0634e95ef2ec63f1e0e1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 0
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 0
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  InLocalSpace: 0
-  Interpolate: 1
 --- !u!114 &-1896055761977199681
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1269,7 +1242,6 @@ GameObject:
   - component: {fileID: 7392779648629048435}
   - component: {fileID: 7392779648629048399}
   - component: {fileID: 7392779648629048398}
-  - component: {fileID: 312065340690262503}
   m_Layer: 0
   m_Name: Head
   m_TagString: Untagged
@@ -1284,7 +1256,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7392779648629048434}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.667, z: 0}
   m_LocalScale: {x: 1, y: 0.3, z: 0.5}
   m_ConstrainProportionsScale: 0
@@ -1344,32 +1316,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &312065340690262503
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7392779648629048434}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b20b0fbc6bfc0634e95ef2ec63f1e0e1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  InLocalSpace: 0
-  Interpolate: 1
 --- !u!1 &8043526927454790535
 GameObject:
   m_ObjectHideFlags: 0

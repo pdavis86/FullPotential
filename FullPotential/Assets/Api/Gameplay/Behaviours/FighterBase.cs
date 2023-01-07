@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
-    public abstract class FighterBase : LivingEntityBase, IFighter
+    public abstract class FighterBase : LivingEntityBase, IFighter, IMoveable
     {
         private const int MeleeRangeLimit = 8;
         private const int SpellOrGadgetRangeLimit = 50;
@@ -176,6 +176,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : HandStatusRight;
 
             StopActiveSpellOrGadgetBehaviour(leftOrRight);
+        }
+
+        [ClientRpc]
+        public void ApplyMovementForceClientRpc(Vector3 force, ForceMode forceMode, ClientRpcParams clientRpcParams)
+        {
+            var targetRigidBody = GetComponent<Rigidbody>();
+            targetRigidBody.AddForce(force, forceMode);
         }
 
         #endregion
@@ -405,34 +412,37 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ? HandStatusLeft
                 : HandStatusRight;
 
-            if (StopActiveSpellOrGadgetBehaviour(leftOrRight))
+            if (IsServer || NetworkManager.LocalClientId == OwnerClientId)
             {
-                //Return true as the action also needs performing on the server
-                return true;
-            }
-
-            if (leftOrRight.EquippedSpellOrGadget.ChargePercentage < 100)
-            {
-                //Debug.Log("Charge was not finished");
-
-                if (leftOrRight.ChargeEnumerator != null)
+                if (StopActiveSpellOrGadgetBehaviour(leftOrRight))
                 {
-                    StopCoroutine(leftOrRight.ChargeEnumerator);
-                    StartSpellOrGadgetCooldown(leftOrRight);
+                    //Return true as the action also needs performing on the server
+                    return true;
                 }
 
-                return false;
-            }
+                if (leftOrRight.EquippedSpellOrGadget.ChargePercentage < 100)
+                {
+                    //Debug.Log("Charge was not finished");
 
-            if (leftOrRight.CooldownEnumerator != null)
-            {
-                //Debug.Log("Still cooling down");
-                return false;
-            }
+                    if (leftOrRight.ChargeEnumerator != null)
+                    {
+                        StopCoroutine(leftOrRight.ChargeEnumerator);
+                        StartSpellOrGadgetCooldown(leftOrRight);
+                    }
 
-            if (!ConsumeResource(spellOrGadget, isTest: true))
-            {
-                return false;
+                    return false;
+                }
+
+                if (leftOrRight.CooldownEnumerator != null)
+                {
+                    //Debug.Log("Still cooling down");
+                    return false;
+                }
+
+                if (!ConsumeResource(spellOrGadget, isTest: true))
+                {
+                    return false;
+                }
             }
 
             _typeRegistry.LoadAddessable(

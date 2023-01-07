@@ -1,4 +1,6 @@
-﻿using FullPotential.Core.GameManagement;
+﻿using FullPotential.Api.GameManagement;
+using FullPotential.Api.Ioc;
+using FullPotential.Core.GameManagement;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,6 +14,7 @@ namespace FullPotential.Core.PlayerBehaviours
     {
 #pragma warning disable 0649
         // ReSharper disable FieldCanBeMadeReadOnly.Local
+        // ReSharper disable ConvertToConstant.Local
         private readonly Vector2 _lookSensitivity = new Vector2(0.2f, 0.2f);
         private readonly Vector2 _lookSmoothness = new Vector2(3f, 3f);
         private readonly int _sprintStoppingFactor = 65;
@@ -20,23 +23,27 @@ namespace FullPotential.Core.PlayerBehaviours
         [SerializeField] private float _cameraRotationLimit = 85f;
         [SerializeField] private float _jumpForceMultiplier = 10500f;
         // ReSharper restore FieldCanBeMadeReadOnly.Local
+        // ReSharper restore ConvertToConstant.Local
 #pragma warning restore 0649
 
         private Rigidbody _rb;
         private PlayerState _playerState;
 
-        //Variables for passing values
+        //Variables for capturing input
         private Vector2 _moveVal;
         private Vector2 _lookVal;
-        private Vector3 _jumpForce;
+        private bool _isTryingToJump;
+        private bool _isTryingToSprint;
 
         //Variables for maintaining state
         private Vector2 _smoothLook;
         private float _currentCameraRotationX;
         private float _maxDistanceToBeStanding;
-        private bool _isJumping;
-        private bool _isSprinting;
-        private bool _wasSprinting;
+        private bool _isMidJump;
+        private Vector3 _previousPosition;
+        private Quaternion _previousRotation;
+
+        private IRpcService _rpcService;
 
         #region Unity Event Handlers 
 
@@ -47,6 +54,8 @@ namespace FullPotential.Core.PlayerBehaviours
             _playerState = GetComponent<PlayerState>();
 
             _maxDistanceToBeStanding = gameObject.GetComponent<Collider>().bounds.extents.y + 0.1f;
+
+            _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -54,14 +63,23 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             _smoothLook = Vector2.zero;
             _currentCameraRotationX = 0;
-            _isJumping = false;
-            _isSprinting = false;
+            _isMidJump = false;
+            _previousPosition = transform.position;
+            _previousRotation = transform.rotation;
         }
 
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            MoveAndLook();
+            if (!IsServer)
+            {
+                MoveAndLook(_moveVal, _lookVal, _isTryingToSprint);
+                Jump(_isTryingToJump);
+            }
+
+            ApplyMovementServerRpc(_moveVal, _lookVal, _isTryingToSprint, _isTryingToJump);
+
+            _isTryingToJump = false;
         }
 
         #endregion
@@ -84,7 +102,7 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             if (!GameManager.Instance.UserInterface.IsAnyMenuOpen() && IsOnSolidObject())
             {
-                _jumpForce = Vector3.up * _jumpForceMultiplier;
+                _isTryingToJump = true;
             }
         }
 
@@ -92,41 +110,76 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             if (_playerState.GetStamina() >= _playerState.GetStaminaCost())
             {
-                _isSprinting = true;
+                _isTryingToSprint = true;
             }
         }
 
         private void OnSprintStop()
         {
-            _isSprinting = false;
+            _isTryingToSprint = false;
         }
 
         // ReSharper restore UnusedMember.Local
 #pragma warning restore IDE0051 // Remove unused private members
         #endregion
 
+        [ServerRpc]
+        private void ApplyMovementServerRpc(Vector2 moveVal, Vector2 lookVal, bool isTryingToSprint, bool isTryingToJump)
+        {
+            var startingPosition = transform.position;
+            var startingRotation = transform.rotation;
+
+            MoveAndLook(moveVal, lookVal, isTryingToSprint);
+            Jump(isTryingToJump);
+
+            var positionDiff = Mathf.Abs((_previousPosition - transform.position).magnitude);
+            var rotationDiff = Mathf.Abs((_previousRotation * Quaternion.Inverse(transform.rotation)).y);
+
+            if (positionDiff > 0.001 || rotationDiff > 0.005 || isTryingToSprint || isTryingToJump)
+            {
+                var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, new[] { 0ul, OwnerClientId });
+                ApplyMovementClientRpc(startingPosition, startingRotation, _playerCamera.transform.localEulerAngles, isTryingToJump, nearbyClients);
+
+                _previousPosition = transform.position;
+                _previousRotation = transform.rotation;
+            }
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        [ClientRpc]
+        private void ApplyMovementClientRpc(Vector3 position, Quaternion rotation, Vector3 lookDirection, bool isTryingToJump, ClientRpcParams clientRpcParams)
+        {
+            transform.position = position;
+            transform.rotation = rotation;
+
+            _playerCamera.transform.localEulerAngles = lookDirection;
+
+            Jump(isTryingToJump);
+        }
+
         private bool IsOnSolidObject()
         {
             return Physics.Raycast(transform.position, -Vector3.up, _maxDistanceToBeStanding);
         }
 
-        private void MoveAndLook()
+        private void MoveAndLook(Vector2 moveVal, Vector2 lookVal, bool isTryingToSprint)
         {
-            if (!_isJumping && _moveVal != Vector2.zero)
+            if (!_isMidJump && moveVal != Vector2.zero)
             {
-                if (_isSprinting && _playerState.GetStamina() < _playerState.GetStaminaCost())
+                if (_playerState.IsSprinting && !isTryingToSprint)
                 {
-                    _isSprinting = false;
+                    _playerState.IsSprinting = false;
                 }
 
-                var moveForwards = transform.forward * _moveVal.y;
-                var moveSideways = transform.right * _moveVal.x;
+                var moveForwards = transform.forward * moveVal.y;
+                var moveSideways = transform.right * moveVal.x;
 
-                if (_isSprinting)
+                if (isTryingToSprint && _playerState.GetStamina() >= _playerState.GetStaminaCost())
                 {
                     var sprintSpeed = _playerState.GetSprintSpeed();
-                    moveForwards *= _moveVal.y > 0 ? sprintSpeed : sprintSpeed / 2;
+                    moveForwards *= moveVal.y > 0 ? sprintSpeed : sprintSpeed / 2;
                     moveSideways *= sprintSpeed / 2;
+                    _playerState.IsSprinting = true;
                 }
 
                 var velocity = _speed * (moveForwards + moveSideways);
@@ -138,9 +191,9 @@ namespace FullPotential.Core.PlayerBehaviours
                 _rb.AddForce(_sprintStoppingFactor * Time.fixedDeltaTime * velocity, ForceMode.Acceleration);
             }
 
-            if (_lookVal != Vector2.zero)
+            if (lookVal != Vector2.zero)
             {
-                var lookInput = new Vector2(_lookVal.x, _lookVal.y);
+                var lookInput = new Vector2(lookVal.x, lookVal.y);
                 lookInput = Vector2.Scale(lookInput, new Vector2(_lookSensitivity.x * _lookSmoothness.x, _lookSensitivity.y * _lookSmoothness.y));
 
                 _smoothLook.x = Mathf.Lerp(_smoothLook.x, lookInput.x, 1f / _lookSmoothness.x);
@@ -155,28 +208,24 @@ namespace FullPotential.Core.PlayerBehaviours
                 var cameraRotation = new Vector3(_currentCameraRotationX, 0f, 0f);
                 _playerCamera.transform.localEulerAngles = cameraRotation;
             }
+        }
 
-            if (_isJumping)
+        private void Jump(bool isTryingToJump)
+        {
+            if (_isMidJump)
             {
                 if (IsOnSolidObject())
                 {
-                    _isJumping = false;
+                    _isMidJump = false;
                 }
             }
-            else if (_jumpForce != Vector3.zero)
+            else if (isTryingToJump)
             {
                 if (IsOnSolidObject())
                 {
-                    _isJumping = true;
-                    _rb.AddForce(_jumpForce * Time.fixedDeltaTime, ForceMode.Acceleration);
-                    _jumpForce = Vector3.zero;
+                    _isMidJump = true;
+                    _rb.AddForce(Vector3.up * _jumpForceMultiplier * Time.fixedDeltaTime, ForceMode.Acceleration);
                 }
-            }
-
-            if (_wasSprinting != _isSprinting)
-            {
-                _playerState.UpdateSprintingServerRpc(_isSprinting);
-                _wasSprinting = _isSprinting;
             }
         }
 
