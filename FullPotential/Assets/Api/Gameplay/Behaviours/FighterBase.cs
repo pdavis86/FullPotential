@@ -447,7 +447,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             _typeRegistry.LoadAddessable(
                 spellOrGadget.Targeting.PrefabAddress,
-                prefab => InstantiateSpell(leftOrRight, isLeftHand, handPosition, spellOrGadget, prefab));
+                prefab => InstantiateSogGameObject(leftOrRight, isLeftHand, handPosition, spellOrGadget, prefab));
 
             if (spellOrGadget.Targeting.IsServerSideOnly && IsServer)
             {
@@ -457,7 +457,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return true;
         }
 
-        private void InstantiateSpell(
+        private void InstantiateSogGameObject(
             HandStatus leftOrRight,
             bool isLeftHand,
             Vector3 handPosition,

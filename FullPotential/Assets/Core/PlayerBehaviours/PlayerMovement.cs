@@ -42,6 +42,7 @@ namespace FullPotential.Core.PlayerBehaviours
         private bool _isMidJump;
         private Vector3 _previousPosition;
         private Quaternion _previousRotation;
+        private Vector3 _previousLook;
 
         private IRpcService _rpcService;
 
@@ -66,6 +67,7 @@ namespace FullPotential.Core.PlayerBehaviours
             _isMidJump = false;
             _previousPosition = transform.position;
             _previousRotation = transform.rotation;
+            _previousLook = _playerCamera.transform.localEulerAngles;
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -134,14 +136,20 @@ namespace FullPotential.Core.PlayerBehaviours
 
             var positionDiff = Mathf.Abs((_previousPosition - transform.position).magnitude);
             var rotationDiff = Mathf.Abs((_previousRotation * Quaternion.Inverse(transform.rotation)).y);
+            var lookDiff = Mathf.Abs((_previousLook - _playerCamera.transform.localEulerAngles).magnitude);
 
-            if (positionDiff > 0.001 || rotationDiff > 0.005 || isTryingToSprint || isTryingToJump)
+            if (positionDiff > 0.001 
+                || rotationDiff > 0.005 
+                || lookDiff > 0.001
+                || isTryingToSprint 
+                || isTryingToJump)
             {
                 var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, new[] { 0ul, OwnerClientId });
                 ApplyMovementClientRpc(startingPosition, startingRotation, _playerCamera.transform.localEulerAngles, isTryingToJump, nearbyClients);
 
                 _previousPosition = transform.position;
                 _previousRotation = transform.rotation;
+                _previousLook = _playerCamera.transform.localEulerAngles;
             }
         }
 
