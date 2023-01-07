@@ -356,7 +356,9 @@ namespace FullPotential.Core.Gameplay.Crafting
             };
             spellOrGadget.Effects = GetEffects(categoryName, components, targeting);
 
-            var suffix = _localizer.Translate(TranslationType.CraftingCategory, categoryName);
+            var suffix = _localizer.GetTranslatedTypeName(spellOrGadget.Targeting)
+                + " "
+                + _localizer.Translate(TranslationType.CraftingCategory, categoryName);
 
             if (spellOrGadget.Effects.Count > 0)
             {
@@ -364,8 +366,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             }
             else
             {
-                var customSuffix = _localizer.GetTranslatedTypeName(spellOrGadget.Targeting) + " " + suffix;
-                spellOrGadget.Name = GetItemName(true, spellOrGadget, customSuffix);
+                spellOrGadget.Name = GetItemName(true, spellOrGadget, suffix);
             }
 
             return spellOrGadget;
