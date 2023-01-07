@@ -625,7 +625,7 @@ namespace FullPotential.Core.PlayerBehaviours
 
         private void ClearExpiredLoot()
         {
-            var expiredLoot = _unclaimedLoot.Where(x => x.Value < DateTime.UtcNow);
+            var expiredLoot = _unclaimedLoot.Where(x => x.Value < DateTime.UtcNow).ToList();
 
             if (!expiredLoot.Any())
             {

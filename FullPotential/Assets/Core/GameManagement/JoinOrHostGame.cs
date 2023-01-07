@@ -290,7 +290,7 @@ namespace FullPotential.Core.GameManagement
         {
             reader.ReadValueSafe(out ConnectStatus status);
             Debug.LogWarning($"Server refused connection with status {status}");
-            _gameDetailsError.text = _localizer.Translate("ui.connect.joinrejected");
+            _gameDetailsError.text = _localizer.Translate("ui.connect.joinrejected") + $": {status}";
             _gameDetailsError.gameObject.SetActive(true);
             _joiningMessage.SetActive(false);
             _gameDetailsContainer.SetActive(true);

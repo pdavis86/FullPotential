@@ -5,6 +5,6 @@
         //Success,
         VersionMismatch,
         //ServerFull,
-        //LoggedInAgain,
+        LoggedInAgain,
     }
 }

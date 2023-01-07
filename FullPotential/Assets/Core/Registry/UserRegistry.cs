@@ -27,13 +27,15 @@ namespace FullPotential.Core.Registry
             return token;
         }
 
-        public bool ValidateToken(string token)
+        public string GetUsernameFromToken(string token)
         {
-            return true;
+            //todo: zzz v0.5 - Username and token are never the same
+            return token;
         }
 
         public PlayerData Load(string token, string username, bool reduced)
         {
+            //todo: zzz v0.5 - Username and token are never the same
             if (string.IsNullOrWhiteSpace(username))
             {
                 username = token;
