@@ -21,7 +21,7 @@ namespace FullPotential.Core.UI.Behaviours
 
         private bool _isDestroySet;
 
-        public void SetEffect(Guid id, string effectTranslation, float timeToLive, Color color)
+        public void SetEffect(Guid id, string effectTranslation, float timeToLive, Color color, bool showExpiry)
         {
             if (_isDestroySet)
             {
@@ -32,7 +32,14 @@ namespace FullPotential.Core.UI.Behaviours
 
             _image.color = color;
 
-            _text.text = effectTranslation + $" ({timeToLive:F1}s)";
+            if (showExpiry)
+            {
+                _text.text = effectTranslation + $" ({timeToLive:F1}s)";
+            }
+            else
+            {
+                _text.text = effectTranslation;
+            }
 
             Invoke(nameof(DestroyMe), timeToLive);
             _isDestroySet = true;

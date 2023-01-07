@@ -718,7 +718,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 change = _valueCalculator.GetDamageValueFromAttack(itemUsed, GetDefenseValue()) * -1;
             }
 
-            //todo: zzz v0.4.1 - allow expiry to be hidden as it was a one-off effect
             AddOrUpdateEffect(statEffect, change, DateTime.Now.AddSeconds(3));
 
             ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, itemUsed, position);
@@ -773,13 +772,19 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void AddOrUpdateEffect(IEffect effect, int change, DateTime expiry)
         {
-            var multipleAllowed = (effect is IStatEffect statEffect && DoesAffectAllowMultiple(statEffect.Affect))
-                || effect is IAttributeEffect;
+            var statEffect = effect as IStatEffect;
+
+            var showExpiry = !(statEffect != null 
+                && statEffect.Affect is Affect.SingleDecrease or Affect.SingleIncrease);
 
             var effectMatch = _activeEffects.FirstOrDefault(x => x.Effect == effect);
 
             if (effectMatch != null)
             {
+                var multipleAllowed = 
+                    (statEffect != null && DoesAffectAllowMultiple(statEffect.Affect))
+                    || effect is IAttributeEffect;
+
                 if (multipleAllowed)
                 {
                     _activeEffects.Add(new ActiveEffect
@@ -787,7 +792,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                         Id = Guid.NewGuid(),
                         Effect = effect,
                         Change = change,
-                        Expiry = expiry
+                        Expiry = expiry,
+                        ShowExpiry = showExpiry
                     });
                 }
                 else
@@ -803,7 +809,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     Id = Guid.NewGuid(),
                     Effect = effect,
                     Change = change,
-                    Expiry = expiry
+                    Expiry = expiry,
+                    ShowExpiry = showExpiry
                 });
             }
 

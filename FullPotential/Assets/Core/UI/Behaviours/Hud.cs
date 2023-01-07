@@ -212,7 +212,8 @@ namespace FullPotential.Core.Ui.Behaviours
                     activeEffect.Id,
                     _localizer.GetTranslatedTypeName(activeEffect.Effect),
                     (float)(activeEffect.Expiry - DateTime.Now).TotalSeconds,
-                    GetEffectColor(activeEffect.Effect));
+                    GetEffectColor(activeEffect.Effect),
+                    activeEffect.ShowExpiry);
             }
         }
 
