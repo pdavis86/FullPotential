@@ -44,6 +44,7 @@ namespace FullPotential.Core.PlayerBehaviours
         private Quaternion _previousRotation;
         private Vector3 _previousLook;
 
+        //Services
         private IRpcService _rpcService;
 
         #region Unity Event Handlers 
@@ -73,15 +74,7 @@ namespace FullPotential.Core.PlayerBehaviours
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            if (!IsServer)
-            {
-                MoveAndLook(_moveVal, _lookVal, _isTryingToSprint);
-                Jump(_isTryingToJump);
-            }
-
-            ApplyMovementServerRpc(_moveVal, _lookVal, _isTryingToSprint, _isTryingToJump);
-
-            _isTryingToJump = false;
+            ApplyMovementFromInputs();
         }
 
         #endregion
@@ -102,18 +95,12 @@ namespace FullPotential.Core.PlayerBehaviours
 
         private void OnJump()
         {
-            if (!GameManager.Instance.UserInterface.IsAnyMenuOpen() && IsOnSolidObject())
-            {
-                _isTryingToJump = true;
-            }
+            _isTryingToJump = true;
         }
 
         private void OnSprintStart()
         {
-            if (_playerState.GetStamina() >= _playerState.GetStaminaCost())
-            {
-                _isTryingToSprint = true;
-            }
+            _isTryingToSprint = true;
         }
 
         private void OnSprintStop()
@@ -125,37 +112,29 @@ namespace FullPotential.Core.PlayerBehaviours
 #pragma warning restore IDE0051 // Remove unused private members
         #endregion
 
+        #region RPC Methods
+
         [ServerRpc]
-        private void ApplyMovementServerRpc(Vector2 moveVal, Vector2 lookVal, bool isTryingToSprint, bool isTryingToJump)
+        private void ApplyMovementServerRpc(Vector3 position, Quaternion rotation, Vector3 lookDirection, bool isTryingToJump)
         {
-            var startingPosition = transform.position;
-            var startingRotation = transform.rotation;
+            ApplyMovementToLocalObject(position, rotation, lookDirection, isTryingToJump);
 
-            MoveAndLook(moveVal, lookVal, isTryingToSprint);
-            Jump(isTryingToJump);
+            //todo: zzz v0.5 - check players are not cheating their movement values
 
-            var positionDiff = Mathf.Abs((_previousPosition - transform.position).magnitude);
-            var rotationDiff = Mathf.Abs((_previousRotation * Quaternion.Inverse(transform.rotation)).y);
-            var lookDiff = Mathf.Abs((_previousLook - _playerCamera.transform.localEulerAngles).magnitude);
-
-            if (positionDiff > 0.001 
-                || rotationDiff > 0.005 
-                || lookDiff > 0.001
-                || isTryingToSprint 
-                || isTryingToJump)
-            {
-                var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, new[] { 0ul, OwnerClientId });
-                ApplyMovementClientRpc(startingPosition, startingRotation, _playerCamera.transform.localEulerAngles, isTryingToJump, nearbyClients);
-
-                _previousPosition = transform.position;
-                _previousRotation = transform.rotation;
-                _previousLook = _playerCamera.transform.localEulerAngles;
-            }
+            var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, new[] { 0ul, OwnerClientId });
+            ApplyMovementClientRpc(position, rotation, lookDirection, isTryingToJump, nearbyClients);
         }
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
         private void ApplyMovementClientRpc(Vector3 position, Quaternion rotation, Vector3 lookDirection, bool isTryingToJump, ClientRpcParams clientRpcParams)
+        {
+            ApplyMovementToLocalObject(position, rotation, lookDirection, isTryingToJump);
+        }
+
+        #endregion
+
+        private void ApplyMovementToLocalObject(Vector3 position, Quaternion rotation, Vector3 lookDirection, bool isTryingToJump)
         {
             transform.position = position;
             transform.rotation = rotation;
@@ -234,6 +213,43 @@ namespace FullPotential.Core.PlayerBehaviours
                     _isMidJump = true;
                     _rb.AddForce(Vector3.up * _jumpForceMultiplier * Time.fixedDeltaTime, ForceMode.Acceleration);
                 }
+            }
+        }
+
+        private void ApplyMovementFromInputs()
+        {
+            const float positionThreshold = 0.001f;
+            const float rotationThreshold = 0.001f;
+
+            var initiateAJump = !GameManager.Instance.UserInterface.IsAnyMenuOpen()
+                && IsOnSolidObject()
+                && _isTryingToJump;
+
+            _isTryingToJump = false;
+
+            MoveAndLook(_moveVal, _lookVal, _isTryingToSprint);
+            Jump(initiateAJump);
+
+            if (IsHost)
+            {
+                return;
+            }
+
+            var positionDiff = Mathf.Abs((_previousPosition - transform.position).magnitude);
+            var rotationDiff = Mathf.Abs((_previousRotation * Quaternion.Inverse(transform.rotation)).y);
+            var lookDiff = Mathf.Abs((_previousLook - _playerCamera.transform.localEulerAngles).magnitude);
+
+            if (positionDiff > positionThreshold
+                || rotationDiff > rotationThreshold
+                || lookDiff > rotationThreshold
+                || _isTryingToSprint
+                || initiateAJump)
+            {
+                ApplyMovementServerRpc(transform.position, transform.rotation, _playerCamera.transform.localEulerAngles, initiateAJump);
+
+                _previousPosition = transform.position;
+                _previousRotation = transform.rotation;
+                _previousLook = _playerCamera.transform.localEulerAngles;
             }
         }
 
