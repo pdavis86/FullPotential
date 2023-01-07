@@ -19,10 +19,11 @@ namespace FullPotential.Api.Items.Base
     [Serializable]
     public abstract class ItemBase
     {
-        private const float MaximumAccuracyAngleDeviation = 4;
-
+        public const float StrengthDivisor = 4;
         public const string AliasSegmentItem = "item";
         public const string AliasSegmentDefensive = "defensiveitem";
+
+        private const float MaximumAccuracyAngleDeviation = 4;
 
         // ReSharper disable InconsistentNaming
         protected IGameManager _gameManager;
@@ -206,7 +207,7 @@ namespace FullPotential.Api.Items.Base
 
         private int GetAdjustedStrength()
         {
-            return (int) Math.Ceiling(Attributes.Strength / 5f);
+            return (int)Math.Ceiling(Attributes.Strength / StrengthDivisor);
         }
 
         public int GetStatChange(IStatEffect statEffect)
@@ -229,13 +230,46 @@ namespace FullPotential.Api.Items.Base
             return (change, DateTime.Now.AddSeconds(timeToLive));
         }
 
+        public float GetDamagePerSecond(float damagePerItem, int numberOfItems, float itemsPerSecond, float reloadTime)
+        {
+            //https://www.reddit.com/r/Overwatch/comments/6x5q59/what_dps_is_and_how_to_calculate_it/
+
+            return (damagePerItem * numberOfItems) / (numberOfItems / itemsPerSecond + reloadTime);
+        }
+
+        public float GetPeriodicStatDamagePerSecond(IStatEffect statEffect)
+        {
+            return GetPeriodicStatDamagePerSecond(GetStatChange(statEffect));
+        }
+
+        private float GetPeriodicStatDamagePerSecond(int change)
+        {
+            var effectDuration = GetEffectDuration();
+            var timeBetweenEffects = GetEffectTimeBetween();
+            var maxNumberOfTimes = (int)Mathf.Ceil(effectDuration / timeBetweenEffects);
+            var minNumberOfTimes = (int)Mathf.Floor(effectDuration / timeBetweenEffects);
+            var effectsPerSecond = 1 / timeBetweenEffects;
+
+            if (minNumberOfTimes == 0)
+            {
+                minNumberOfTimes = 1;
+            }
+
+            return GetDamagePerSecond((float)change / maxNumberOfTimes, minNumberOfTimes, effectsPerSecond, 0);
+        }
+
         public (int Change, DateTime Expiry, float delay) GetPeriodicStatChangeExpiryAndDelay(IStatEffect statEffect)
         {
-            var change = GetStatChange(statEffect);
+            return GetPeriodicStatChangeExpiryAndDelay(GetStatChange(statEffect));
+        }
+
+        public (int Change, DateTime Expiry, float delay) GetPeriodicStatChangeExpiryAndDelay(int change)
+        {
             var timeToLive = GetEffectDuration();
             var delay = GetEffectTimeBetween();
 
-            var changeOverTime = (int)Mathf.Ceil(change / (timeToLive / delay));
+            var changeOverTimeRaw = GetPeriodicStatDamagePerSecond(change);
+            var changeOverTime = Math.Sign(changeOverTimeRaw) * (int)Mathf.Ceil(Mathf.Abs(changeOverTimeRaw));
 
             return (changeOverTime, DateTime.Now.AddSeconds(timeToLive), delay);
         }

@@ -20,11 +20,14 @@ namespace FullPotential.Core.Gameplay.Combat
     public class EffectService : IEffectService
     {
         private readonly ITypeRegistry _typeRegistry;
+        private readonly IRpcService _rpcService;
 
         public EffectService(
-            ITypeRegistry typeRegistry)
+            ITypeRegistry typeRegistry,
+            IRpcService rpcService)
         {
             _typeRegistry = typeRegistry;
+            _rpcService = rpcService;
         }
 
         public void ApplyEffects(
@@ -132,6 +135,7 @@ namespace FullPotential.Core.Gameplay.Combat
             var rotation = Quaternion.FromToRotation(-Vector3.forward, norm);
 
             var bulletHole = Object.Instantiate(GameManager.Instance.Prefabs.Combat.BulletHole, position.Value, rotation);
+            bulletHole.GetComponent<NetworkObject>().Spawn();
             Object.Destroy(bulletHole, 5);
         }
 
@@ -241,6 +245,8 @@ namespace FullPotential.Core.Gameplay.Combat
                 return;
             }
 
+            //todo: handle networking
+
             var comp = targetGameObject.AddComponent<MaintainDistance>();
             comp.SourceFighter = sourceFighter;
             comp.Distance = (targetGameObject.transform.position - sourceFighter.Transform.position).magnitude;
@@ -257,6 +263,26 @@ namespace FullPotential.Core.Gameplay.Combat
                 return;
             }
 
+            if (movementEffect.Direction == MovementDirection.MaintainDistance)
+            {
+                ApplyMaintainDistance(itemUsed, targetGameObject, sourceFighter);
+                return;
+            }
+
+            if (targetGameObject.GetComponent<NetworkObject>() == null)
+            {
+                Debug.LogWarning($"Cannot apply a movement effect to target '{targetGameObject.name}' as it does not have a NetworkObject component");
+                return;
+            }
+
+            var targetMoveable = targetGameObject.GetComponent<IMoveable>();
+
+            if (targetMoveable == null)
+            {
+                Debug.LogWarning($"Cannot apply a movement effect to target '{targetGameObject.name}' as it has no components that implement {nameof(IMoveable)}");
+                return;
+            }
+
             var targetLivingEntity = targetGameObject.GetComponent<LivingEntityBase>();
 
             if (targetLivingEntity != null)
@@ -264,14 +290,10 @@ namespace FullPotential.Core.Gameplay.Combat
                 targetLivingEntity.SetLastMover(sourceFighter);
             }
 
-            if (movementEffect.Direction == MovementDirection.MaintainDistance)
-            {
-                ApplyMaintainDistance(itemUsed, targetGameObject, sourceFighter);
-                return;
-            }
-
             var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
             var force = itemUsed.GetMovementForceValue(adjustForGravity);
+
+            Vector3 forceToApply;
 
             switch (movementEffect.Direction)
             {
@@ -303,8 +325,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
                         //Debug.Log($"Applying {force} force to {targetGameObject.name}");
 
-                        targetRigidBody.AddForce(forwardsBackwardsDirection.normalized * force, ForceMode.Acceleration);
-                        return;
+                        forceToApply = forwardsBackwardsDirection.normalized * force;
                     }
                     else
                     {
@@ -312,30 +333,36 @@ namespace FullPotential.Core.Gameplay.Combat
                             ? -sourceFighter.RigidBody.transform.right
                             : sourceFighter.RigidBody.transform.right;
 
-                        targetRigidBody.AddForce(leftRightDirection * force, ForceMode.Acceleration);
-                        return;
+                        forceToApply = leftRightDirection * force;
                     }
 
+                    break;
+
                 case MovementDirection.Backwards:
-                    targetRigidBody.AddForce(-targetGameObject.transform.forward * force, ForceMode.Acceleration);
-                    return;
+                    forceToApply = -targetGameObject.transform.forward * force;
+                    break;
 
                 case MovementDirection.Forwards:
-                    targetRigidBody.AddForce(targetGameObject.transform.forward * force, ForceMode.Acceleration);
-                    return;
+                    forceToApply = targetGameObject.transform.forward * force;
+                    break;
 
                 case MovementDirection.Down:
-                    targetRigidBody.AddForce(-targetGameObject.transform.up * force, ForceMode.Acceleration);
-                    return;
+                    forceToApply = -targetGameObject.transform.up * force;
+                    break;
 
                 case MovementDirection.Up:
-                    targetRigidBody.AddForce(targetGameObject.transform.up * force, ForceMode.Acceleration);
-                    return;
+                    forceToApply = targetGameObject.transform.up * force;
+                    break;
 
                 default:
                     Debug.LogError($"Not implemented handling for movement direction {movementEffect.Direction}");
                     return;
             }
+
+            targetRigidBody.AddForce(forceToApply, ForceMode.Acceleration);
+
+            var nearbyClients = _rpcService.ForNearbyPlayersExcept(targetGameObject.transform.position, 0);
+            targetMoveable.ApplyMovementForceClientRpc(forceToApply, ForceMode.Acceleration, nearbyClients);
         }
 
     }

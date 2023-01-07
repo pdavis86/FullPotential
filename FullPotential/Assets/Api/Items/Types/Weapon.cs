@@ -49,14 +49,13 @@ namespace FullPotential.Api.Items.Types
 
         public float GetDelayBetweenShots()
         {
+            //Roughly 2-6 bullets per second
             var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0.07f, 0.4f);
-            //Debug.Log("GetWeaponFireRate: " + returnValue);
             return returnValue;
         }
 
         public float GetBulletsPerSecond()
         {
-            //Roughly 2-6 bullets per second
             return 1 / GetDelayBetweenShots();
         }
 
@@ -80,10 +79,7 @@ namespace FullPotential.Api.Items.Types
         public float GetRangedDps()
         {
             var damage = _valueCalculator.GetDamageValueFromAttack(this, 0, false);
-            var ammoMax = GetAmmoMax();
-            var bulletsPerSecond = GetBulletsPerSecond();
-
-            return damage * ammoMax / (ammoMax / bulletsPerSecond + GetReloadTime());
+            return GetDamagePerSecond(damage, GetAmmoMax(), GetBulletsPerSecond(), GetReloadTime());
         }
 
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)

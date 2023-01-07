@@ -69,20 +69,13 @@ namespace FullPotential.Api.Items.Base
                 .Select(e => (IStatEffect)e)
                 .ToList();
             
-            var single = healthEffects.Where(se => se.Affect == Affect.SingleDecrease);
+            var single = healthEffects.Where(se => se.Affect == Affect.SingleDecrease || se.Affect == Affect.SingleIncrease);
             var singleDamage = single.Count() * itemDamage;
 
-            var chargeTime = GetChargeTime();
-            var effectDuration = GetEffectDuration();
-            var timeBetweenEffects = GetEffectTimeBetween();
-            var maxNumberOfTimes = effectDuration / timeBetweenEffects;
-            var periodicDamageEach = itemDamage * maxNumberOfTimes / (maxNumberOfTimes / timeBetweenEffects + chargeTime);
-
-            var periodic = healthEffects.Where(se => se.Affect == Affect.PeriodicDecrease);
-            var periodicDamage = periodic.Count() * periodicDamageEach;
+            var periodic = healthEffects.Where(se => se.Affect == Affect.PeriodicDecrease || se.Affect == Affect.PeriodicIncrease);
+            var periodicDamage = periodic.Sum(GetPeriodicStatDamagePerSecond) * -1;
 
             return singleDamage + periodicDamage;
-            //return damage * ammoMax / (ammoMax / bulletsPerSecond + GetReloadTime());
         }
 
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
@@ -112,8 +105,7 @@ namespace FullPotential.Api.Items.Base
                 Attributes.Efficiency,
                 nameof(Attributes.Efficiency),
                 AliasSegmentSog,
-                RoundFloatForDisplay(GetResourceCost()),
-                UnitsType.Time);
+                RoundFloatForDisplay(GetResourceCost()));
 
             AppendToDescription(
                 sb,

@@ -110,6 +110,7 @@
     <Compile Include="Assets\Api\Scenes\SceneAttributes.cs" />
     <Compile Include="Assets\Api\Gameplay\Data\InventoryDataService.cs" />
     <Compile Include="Assets\Api\Unity\Helpers\GameObjectHelper.cs" />
+    <Compile Include="Assets\Api\Gameplay\Behaviours\IMoveable.cs" />
     <Compile Include="Assets\Api\Items\Types\Loot.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IMovementEffect.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\MovementDirection.cs" />

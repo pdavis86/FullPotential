@@ -65,6 +65,5 @@ namespace FullPotential.Standard.Enemies.Behaviours
             Destroy(gameObject);
             _gameManager.GetSceneBehaviour().HandleEnemyDeath();
         }
-
     }
 }
