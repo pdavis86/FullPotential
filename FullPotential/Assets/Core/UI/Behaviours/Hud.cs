@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Effects;
@@ -188,7 +189,8 @@ namespace FullPotential.Core.Ui.Behaviours
         {
             var existingObjects = GetActiveEffectGameObjects();
 
-            var activeEffects = _playerFighter.GetActiveEffects();
+            var activeEffects = _playerFighter.GetActiveEffects()
+                .Where(e => e.Expiry > DateTime.Now);
 
             foreach (var activeEffect in activeEffects)
             {
