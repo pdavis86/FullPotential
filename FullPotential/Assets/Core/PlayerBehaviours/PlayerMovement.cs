@@ -230,11 +230,6 @@ namespace FullPotential.Core.PlayerBehaviours
             MoveAndLook(_moveVal, _lookVal, _isTryingToSprint);
             Jump(initiateAJump);
 
-            if (IsHost)
-            {
-                return;
-            }
-
             var positionDiff = Mathf.Abs((_previousPosition - transform.position).magnitude);
             var rotationDiff = Mathf.Abs((_previousRotation * Quaternion.Inverse(transform.rotation)).y);
             var lookDiff = Mathf.Abs((_previousLook - _playerCamera.transform.localEulerAngles).magnitude);
