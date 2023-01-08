@@ -45,6 +45,13 @@ namespace FullPotential.Core.GameManagement
         private DateTime _joinAttempt;
 
         // ReSharper disable once UnusedMember.Local
+        private void Awake()
+        {
+            _userRegistry = DependenciesContext.Dependencies.GetService<IUserRegistry>();
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+        }
+
+        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             _networkManager = NetworkManager.Singleton;
@@ -52,9 +59,6 @@ namespace FullPotential.Core.GameManagement
             _scene2Name = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(2));
 
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
-
-            _userRegistry = DependenciesContext.Dependencies.GetService<IUserRegistry>();
-            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
         }
 
         // ReSharper disable once UnusedMember.Local
