@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -158,9 +159,11 @@ namespace FullPotential.Core.GameManagement
 
             if (GameDataStore.ClientIdToUsername.ContainsValue(playerUsername))
             {
+                //Approve so we can send a disconnect reason
                 Debug.LogWarning("Client is already connected");
                 SendServerToClientSetDisconnectReason(approvalRequest.ClientNetworkId, ConnectStatus.LoggedInAgain);
-                //StartCoroutine(WaitToDisconnect(approvalRequest.ClientNetworkId));
+                approvalResponse.Approved = true;
+                StartCoroutine(WaitToDisconnect(approvalRequest.ClientNetworkId));
                 return;
             }
 
@@ -168,9 +171,11 @@ namespace FullPotential.Core.GameManagement
             var clientVersion = new Version(connectionPayload.GameVersion);
             if (serverVersion.Major != clientVersion.Major || serverVersion.Minor != clientVersion.Minor)
             {
+                //Approve so we can send a disconnect reason
                 Debug.LogWarning("Client tried to connect with an incompatible version");
                 SendServerToClientSetDisconnectReason(approvalRequest.ClientNetworkId, ConnectStatus.VersionMismatch);
-                //StartCoroutine(WaitToDisconnect(approvalRequest.ClientNetworkId));
+                approvalResponse.Approved = true;
+                StartCoroutine(WaitToDisconnect(approvalRequest.ClientNetworkId));
                 return;
             }
 
@@ -201,11 +206,11 @@ namespace FullPotential.Core.GameManagement
             NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(nameof(JoinOrHostGame.SetDisconnectReasonClientCustomMessage), clientId, writer);
         }
 
-        //private IEnumerator WaitToDisconnect(ulong clientId)
-        //{
-        //    yield return new WaitForSeconds(0.5f);
-        //    NetworkManager.Singleton.DisconnectClient(clientId);
-        //}
+        private IEnumerator WaitToDisconnect(ulong clientId)
+        {
+            yield return new WaitForSeconds(0.5f);
+            NetworkManager.Singleton.DisconnectClient(clientId);
+        }
 
         public async Task SetCultureAsync(string culture)
         {

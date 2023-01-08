@@ -185,7 +185,7 @@ namespace FullPotential.Core.GameManagement
                 _gameDetailsContainer.SetActive(true);
                 _joiningMessage.SetActive(false);
 
-                _gameDetailsError.text = _localizer?.Translate("ui.connect.disconnected") ?? "The server disconnected you";
+                _gameDetailsError.text = _localizer.Translate("ui.connect.disconnected");
                 _gameDetailsError.gameObject.SetActive(true);
             }
         }
