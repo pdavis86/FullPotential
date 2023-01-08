@@ -261,25 +261,25 @@ namespace FullPotential.Core.Ui.Behaviours
         public (float percent, string text) GetStaminaValues(int stamina, int maxStamina)
         {
             var newStamina = (float)stamina / maxStamina;
-            return (newStamina, $"S{stamina}");
+            return (newStamina, $"{stamina}/{maxStamina}");
         }
 
         public (float percent, string text) GetHealthValues(int health, int maxHealth, int defence)
         {
             var newHealth = (float)health / maxHealth;
-            return (newHealth, $"H{health} D{defence}");
+            return (newHealth, $"{health}/{maxHealth} (D{defence})");
         }
 
         public (float percent, string text) GetManaValues(int mana, int maxMana)
         {
             var newMana = (float)mana / maxMana;
-            return (newMana, $"M{mana}");
+            return (newMana, $"{mana}/{maxMana}");
         }
 
         public (float percent, string text) GetEnergyValues(int energy, int maxEnergy)
         {
             var newEnergy = (float)energy / maxEnergy;
-            return (newEnergy, $"E{energy}");
+            return (newEnergy, $"{energy}/{maxEnergy}");
         }
 
     }
