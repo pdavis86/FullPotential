@@ -190,30 +190,26 @@ namespace FullPotential.Core.Ui.Behaviours
 
             var activeEffects = _playerFighter.GetActiveEffects();
 
-            if (activeEffects.Count == 0 && existingObjects.Count > 0)
-            {
-                foreach (var kvp in existingObjects)
-                {
-                    Destroy(kvp.Value);
-                }
-
-                existingObjects.Clear();
-                return;
-            }
-
             foreach (var activeEffect in activeEffects)
             {
-                var activeEffectObj = existingObjects.ContainsKey(activeEffect.Id)
-                    ? existingObjects[activeEffect.Id]
-                    : Instantiate(_activeEffectPrefab, _activeEffectsContainer.transform);
 
-                var activeEffectScript = activeEffectObj.GetComponent<ActiveEffectUi>();
-                activeEffectScript.SetEffect(
-                    activeEffect.Id,
-                    _localizer.GetTranslatedTypeName(activeEffect.Effect),
-                    (float)(activeEffect.Expiry - DateTime.Now).TotalSeconds,
-                    GetEffectColor(activeEffect.Effect),
-                    activeEffect.ShowExpiry);
+                if (existingObjects.ContainsKey(activeEffect.Id))
+                {
+                    var existingEffectObj = existingObjects[activeEffect.Id];
+                    var existingEffectScript = existingEffectObj.GetComponent<ActiveEffectUi>();
+                    existingEffectScript.UpdateEffect(activeEffect.Expiry);
+                }
+                else
+                {
+                    var activeEffectObj = Instantiate(_activeEffectPrefab, _activeEffectsContainer.transform);
+                    var activeEffectScript = activeEffectObj.GetComponent<ActiveEffectUi>();
+                    activeEffectScript.SetEffect(
+                        activeEffect.Id,
+                        GetEffectColor(activeEffect.Effect),
+                        _localizer.GetTranslatedTypeName(activeEffect.Effect),
+                        activeEffect.ShowExpiry,
+                        activeEffect.Expiry);
+                }
             }
         }
 

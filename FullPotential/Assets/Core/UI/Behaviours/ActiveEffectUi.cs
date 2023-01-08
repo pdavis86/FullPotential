@@ -19,26 +19,46 @@ namespace FullPotential.Core.UI.Behaviours
 
         public Guid Id { get; private set; }
 
+        private string _effectTranslation;
+        private bool _showExpiry;
         private bool _isDestroySet;
+        private DateTime _expiry;
 
-        public void SetEffect(Guid id, string effectTranslation, float timeToLive, Color color, bool showExpiry)
+        public void SetEffect(Guid id, Color color, string effectTranslation, bool showExpiry, DateTime expiry)
+        {
+            Id = id;
+            _image.color = color;
+            _effectTranslation = effectTranslation;
+            _showExpiry = showExpiry;
+
+            UpdateEffect(_expiry);
+        }
+
+        public void UpdateEffect(DateTime expiry)
+        {
+            var secondsRemaining = (float)(expiry - DateTime.Now).TotalSeconds;
+
+            if (expiry != _expiry)
+            {
+                _expiry = expiry;
+                DestroyAfter(Math.Max(secondsRemaining, 2));
+            }
+
+            if (_showExpiry)
+            {
+                _text.text = _effectTranslation + $" ({secondsRemaining:F1}s)";
+            }
+            else
+            {
+                _text.text = _effectTranslation;
+            }
+        }
+
+        private void DestroyAfter(float timeToLive)
         {
             if (_isDestroySet)
             {
                 CancelInvoke(nameof(DestroyMe));
-            }
-
-            Id = id;
-
-            _image.color = color;
-
-            if (showExpiry)
-            {
-                _text.text = effectTranslation + $" ({timeToLive:F1}s)";
-            }
-            else
-            {
-                _text.text = effectTranslation;
             }
 
             Invoke(nameof(DestroyMe), timeToLive);
