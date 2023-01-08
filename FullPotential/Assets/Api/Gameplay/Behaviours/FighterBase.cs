@@ -101,6 +101,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             base.FixedUpdate();
 
+            if (!IsServer)
+            {
+                return;
+            }
+
             _consumeResource.TryPerformAction();
         }
 
