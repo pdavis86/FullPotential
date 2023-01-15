@@ -501,6 +501,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 74179415}
+  - component: {fileID: 74179417}
+  - component: {fileID: 74179416}
   m_Layer: 5
   m_Name: DrawingPad
   m_TagString: Untagged
@@ -523,11 +525,32 @@ RectTransform:
   m_Father: {fileID: 1711951092375246250}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: -1, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &74179416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74179414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9294efce939dd5a46a52b250d2c3a1f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _drawMaterial: {fileID: 2100000, guid: 987d14bac6d28564f8588092a4544e6a, type: 2}
+--- !u!222 &74179417
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74179414}
+  m_CullTransparentMesh: 1
 --- !u!1 &79794992
 GameObject:
   m_ObjectHideFlags: 0
@@ -15611,7 +15634,7 @@ GameObject:
   - component: {fileID: 7011060654755292107}
   - component: {fileID: 7011060654755292106}
   m_Layer: 5
-  m_Name: Crosshair
+  m_Name: Crosshairs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15745,6 +15768,7 @@ MonoBehaviour:
     type: 3}
   _equippedLeftHand: {fileID: 2002564663}
   _equippedRightHand: {fileID: 1888452148}
+  _crosshairs: {fileID: 7011060654755292104}
   _staminaSlider: {fileID: 1672944698}
   _healthSlider: {fileID: 2107654877}
   _manaSlider: {fileID: 1809368271}

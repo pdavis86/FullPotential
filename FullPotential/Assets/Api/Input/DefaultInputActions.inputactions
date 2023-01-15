@@ -60,24 +60,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "AttackLeft",
-                    "type": "Button",
-                    "id": "230e98f7-4efe-4afe-9f23-7da36c1da81d",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "AttackRight",
-                    "type": "Button",
-                    "id": "3ca23353-87c5-4063-a6c0-aba3637af680",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Pointer",
                     "type": "Value",
                     "id": "383f1ec7-05c9-4ef2-bd04-7c16efae4855",
@@ -141,6 +123,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "AttackDownLeft",
+                    "type": "Button",
+                    "id": "877448d7-aa5b-4693-8989-bde28fd893d8",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "AttackHoldLeft",
                     "type": "Button",
                     "id": "ea72a802-1f50-42e7-8b37-c3b1ff9c7962",
@@ -150,9 +141,36 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "AttackReleaseLeft",
+                    "type": "Button",
+                    "id": "230e98f7-4efe-4afe-9f23-7da36c1da81d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AttackDownRight",
+                    "type": "Button",
+                    "id": "d9b3ea8e-4dae-471c-a8f4-eab9f24c4df1",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "AttackHoldRight",
                     "type": "Button",
                     "id": "c7d8554a-f191-41b4-bdac-d53116682867",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AttackReleaseRight",
+                    "type": "Button",
+                    "id": "3ca23353-87c5-4063-a6c0-aba3637af680",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -272,28 +290,6 @@
                 },
                 {
                     "name": "",
-                    "id": "930b91fe-ef5b-4942-b230-e5a5a1e6ab48",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "Press(behavior=1)",
-                    "processors": "",
-                    "groups": "Keyboard and Mouse",
-                    "action": "AttackLeft",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "443a47d7-6407-4439-8c16-ce1bb48e45e1",
-                    "path": "<Mouse>/rightButton",
-                    "interactions": "Press(behavior=1)",
-                    "processors": "",
-                    "groups": "Keyboard and Mouse",
-                    "action": "AttackRight",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "bded04b1-98c5-4a04-85cb-36ca47642b73",
                     "path": "<Mouse>/position",
                     "interactions": "",
@@ -371,12 +367,56 @@
                 },
                 {
                     "name": "",
+                    "id": "930b91fe-ef5b-4942-b230-e5a5a1e6ab48",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "AttackReleaseLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "443a47d7-6407-4439-8c16-ce1bb48e45e1",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "AttackReleaseRight",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a7816f4d-e0d2-4844-af0f-a174eaaee7db",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "Keyboard and Mouse",
+                    "action": "AttackDownLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "d80428bb-3829-4d20-94c7-00e0104f73b0",
                     "path": "<Mouse>/leftButton",
                     "interactions": "Hold",
                     "processors": "",
                     "groups": "Keyboard and Mouse",
                     "action": "AttackHoldLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "87442cbc-b54f-47ca-98ca-b09c2f9a5f54",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AttackDownRight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
