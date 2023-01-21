@@ -147,7 +147,7 @@ namespace FullPotential.Core.PlayerBehaviours
             }
 
             gameObject.name = IsServer
-                ? Username 
+                ? Username
                 : "Player ID " + NetworkObjectId;
 
             if (IsServer)
@@ -565,9 +565,15 @@ namespace FullPotential.Core.PlayerBehaviours
 
             Material newMat;
 
-            if (filePath == null || !System.IO.File.Exists(filePath))
+            var isFilePathEmpty = string.IsNullOrWhiteSpace(filePath);
+            var doesFileExist = System.IO.File.Exists(filePath);
+
+            if (isFilePathEmpty || !doesFileExist)
             {
-                Debug.LogWarning("Not applying player texture because the file does not exist");
+                if (!isFilePathEmpty)
+                {
+                    Debug.LogWarning("Not applying player texture because the file does not exist");
+                }
 
                 ColorUtility.TryParseHtmlString("#2ADB72", out var color);
                 newMat = new Material(_bodyMeshRenderer.material.shader)
