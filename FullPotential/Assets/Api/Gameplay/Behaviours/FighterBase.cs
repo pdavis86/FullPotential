@@ -322,7 +322,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private IEnumerator AutomaticWeaponFire(HandStatus handStatus, float delay, bool isLeftHand)
         {
-            while (handStatus.EquippedWeapon.Ammo > 0)
+            while (handStatus?.EquippedWeapon != null && handStatus.EquippedWeapon.Ammo > 0)
             {
                 TryToAttack(isLeftHand, true);
                 yield return new WaitForSeconds(delay);
