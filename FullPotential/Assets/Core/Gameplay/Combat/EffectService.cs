@@ -89,14 +89,21 @@ namespace FullPotential.Core.Gameplay.Combat
             GameObject target,
             Vector3? position)
         {
-            //NOTE: Only works for box colliders that line up with the X and Z alias
+            //todo: v0.6 - SpawnBulletHole only works for box colliders that line up with the X and Z alias
 
             if (!position.HasValue)
             {
                 return;
             }
 
-            var vertices = GameObjectHelper.GetBoxColliderVertices(target.GetComponent<BoxCollider>());
+            var targetCollider = target.GetComponent<BoxCollider>();
+
+            if (targetCollider == null)
+            {
+                return;
+            }
+
+            var vertices = GameObjectHelper.GetBoxColliderVertices(targetCollider);
 
             var matchesX = vertices.Where(v => Mathf.Approximately(v.x, position.Value.x)).ToList();
             var matchesZ = vertices.Where(v => Mathf.Approximately(v.z, position.Value.z)).ToList();
