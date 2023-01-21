@@ -565,16 +565,8 @@ namespace FullPotential.Core.PlayerBehaviours
 
             Material newMat;
 
-            var isFilePathEmpty = string.IsNullOrWhiteSpace(filePath);
-            var doesFileExist = System.IO.File.Exists(filePath);
-
-            if (isFilePathEmpty || !doesFileExist)
+            if (string.IsNullOrWhiteSpace(filePath) || !System.IO.File.Exists(filePath))
             {
-                if (!isFilePathEmpty)
-                {
-                    Debug.LogWarning("Not applying player texture because the file does not exist");
-                }
-
                 ColorUtility.TryParseHtmlString("#2ADB72", out var color);
                 newMat = new Material(_bodyMeshRenderer.material.shader)
                 {
