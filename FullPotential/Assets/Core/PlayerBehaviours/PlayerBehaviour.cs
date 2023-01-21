@@ -182,7 +182,7 @@ namespace FullPotential.Core.PlayerBehaviours
         // ReSharper disable once UnusedMember.Local
         private void OnAttackDownLeft()
         {
-            if (_hasMenuOpen)
+            if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
                 _drawingPadUi.StartDrawing();
             }
@@ -197,14 +197,18 @@ namespace FullPotential.Core.PlayerBehaviours
         // ReSharper disable once UnusedMember.Local
         private void OnAttackReleaseLeft()
         {
-            _drawingPadUi.StopDrawing();
+            if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
+            {
+                _drawingPadUi.StopDrawing();
+            }
+
             OnAttack(true);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnAttackDownRight()
         {
-            if (_hasMenuOpen)
+            if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
                 _drawingPadUi.StartDrawing();
             }
@@ -219,7 +223,11 @@ namespace FullPotential.Core.PlayerBehaviours
         // ReSharper disable once UnusedMember.Local
         private void OnAttackReleaseRight()
         {
-            _drawingPadUi.StopDrawing();
+            if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
+            {
+                _drawingPadUi.StopDrawing();
+            }
+
             OnAttack(false);
         }
 
