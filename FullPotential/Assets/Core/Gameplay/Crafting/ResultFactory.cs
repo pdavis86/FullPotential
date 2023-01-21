@@ -51,9 +51,9 @@ namespace FullPotential.Core.Gameplay.Crafting
             _shapeOptions = _typeRegistry.GetRegisteredTypes<IShape>().ToList();
         }
 
-        private int ComputeAttribute(IEnumerable<ItemBase> components, Func<ItemBase, int> getProp, bool allowMax = true)
+        private int ComputeAttribute(IList<ItemBase> components, Func<ItemBase, int> getProp, bool allowMax = true)
         {
-            var withValue = components.Where(x => getProp(x) > 0);
+            var withValue = components.Where(x => getProp(x) > 0).ToList();
 
             if (!withValue.Any())
             {
@@ -82,7 +82,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return _targetingOptions.First(x => x.TypeName == typeName);
         }
 
-        private ITargeting GetTargeting(IEnumerable<IHasTargetingAndShape> components)
+        private ITargeting GetTargeting(IList<IHasTargetingAndShape> components)
         {
             //Exactly one targeting option
             var targetingComponent = components.FirstOrDefault(x => x.Targeting != null);
@@ -106,7 +106,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return _shapeOptions.First(x => x.TypeName == typeName);
         }
 
-        private IShape GetShapeOrNone(ITargeting targeting, IEnumerable<IHasTargetingAndShape> components)
+        private IShape GetShapeOrNone(ITargeting targeting, IList<IHasTargetingAndShape> components)
         {
             //Only one shape, if any
             if (!targeting.HasShape)
@@ -124,7 +124,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return _shapeOptions.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
         }
 
-        private List<IEffect> GetEffects(string craftingType, IEnumerable<ItemBase> components, ITargeting targeting = null)
+        private List<IEffect> GetEffects(string craftingType, IList<ItemBase> components, ITargeting targeting = null)
         {
             const string buff = "Buff";
             const string debuff = "Debuff";
@@ -274,8 +274,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 }
             };
 
-            var magicalLootTypes = _lootTypes.Where(x => x.Category == ILoot.LootCategory.Magic);
-            var techLootTypes = _lootTypes.Where(x => x.Category == ILoot.LootCategory.Technology);
+            var magicalLootTypes = _lootTypes.Where(x => x.Category == ILoot.LootCategory.Magic).ToList();
 
             var isMagical = magicalLootTypes.Any() && IsSuccess(50);
             if (isMagical)
@@ -311,7 +310,8 @@ namespace FullPotential.Core.Gameplay.Crafting
             }
             else
             {
-                lootDrop.RegistryType = techLootTypes
+                lootDrop.RegistryType = _lootTypes
+                    .Where(x => x.Category == ILoot.LootCategory.Technology)
                     .OrderBy(_ => ValueCalculator.Random.Next())
                     .First();
             }
@@ -324,9 +324,9 @@ namespace FullPotential.Core.Gameplay.Crafting
             return lootDrop;
         }
 
-        private SpellOrGadgetItemBase GetSpellOrGadget(string categoryName, IEnumerable<ItemBase> components)
+        private SpellOrGadgetItemBase GetSpellOrGadget(string categoryName, IList<ItemBase> components)
         {
-            var relevantComponents = components.OfType<IHasTargetingAndShape>();
+            var relevantComponents = components.OfType<IHasTargetingAndShape>().ToList();
 
             var targeting = GetTargeting(relevantComponents);
 
@@ -385,7 +385,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return $"{GetItemNamePrefix(isAttack)} {item.Attributes.Strength} {suffix}";
         }
 
-        private Weapon GetMeleeWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
+        private Weapon GetMeleeWeapon(IGearWeapon craftableType, IList<ItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon
             {
@@ -405,7 +405,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Weapon GetRangedWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
+        private Weapon GetRangedWeapon(IGearWeapon craftableType, IList<ItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon
             {
@@ -431,7 +431,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Weapon GetDefensiveWeapon(IGearWeapon craftableType, IEnumerable<ItemBase> components, bool isTwoHanded)
+        private Weapon GetDefensiveWeapon(IGearWeapon craftableType, IList<ItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon
             {
@@ -451,7 +451,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Armor GetArmor(IGearArmor craftableType, IEnumerable<ItemBase> components)
+        private Armor GetArmor(IGearArmor craftableType, IList<ItemBase> components)
         {
             var armor = new Armor
             {
@@ -468,7 +468,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return armor;
         }
 
-        private Armor GetBarrier(IGearArmor craftableType, IEnumerable<ItemBase> components)
+        private Armor GetBarrier(IGearArmor craftableType, IList<ItemBase> components)
         {
             var armor = new Armor
             {
@@ -488,7 +488,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return armor;
         }
 
-        private Accessory GetAccessory(IGearAccessory craftableType, IEnumerable<ItemBase> components)
+        private Accessory GetAccessory(IGearAccessory craftableType, IList<ItemBase> components)
         {
             var accessory = new Accessory
             {
@@ -505,7 +505,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return accessory;
         }
 
-        public ItemBase GetCraftedItem(string categoryName, string typeName, bool isTwoHanded, IEnumerable<ItemBase> components)
+        public ItemBase GetCraftedItem(string categoryName, string typeName, bool isTwoHanded, IList<ItemBase> components)
         {
             if (categoryName == nameof(Spell) || categoryName == nameof(Gadget))
             {

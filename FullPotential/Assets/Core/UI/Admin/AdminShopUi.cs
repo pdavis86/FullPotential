@@ -274,7 +274,7 @@ namespace FullPotential.Core.UI.Admin
                 category,
                 _craftingSelector.GetCraftableTypeName(category),
                 _craftingSelector.IsTwoHandedSelected(),
-                new[] { component });
+                new List<ItemBase> { component });
         }
 
         // ReSharper disable once UnusedMember.Global

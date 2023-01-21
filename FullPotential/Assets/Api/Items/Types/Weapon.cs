@@ -139,7 +139,7 @@ namespace FullPotential.Api.Items.Types
                 AliasSegmentDefensive,
                 GetDefenseValue().ToString(_gameManager.CurrentCulture));
 
-            //todo: zzz v0.4.1 - Implement melee with a sheild
+            //todo: zzz v0.4.1 - Implement melee with a shield
             //AppendToDescription(
             //    sb,
             //    localizer,

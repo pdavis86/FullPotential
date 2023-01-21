@@ -5,6 +5,7 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items.Types;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Unity.Helpers;
@@ -44,8 +45,9 @@ namespace FullPotential.Core.Gameplay.Combat
             }
 
             var itemHasEffects = itemUsed?.Effects != null && itemUsed.Effects.Any();
+            var itemIsWeapon = itemUsed is Weapon;
 
-            if (!itemHasEffects)
+            if (!itemHasEffects || itemIsWeapon)
             {
                 var targetFighter = target.GetComponent<IFighter>();
 
@@ -61,7 +63,11 @@ namespace FullPotential.Core.Gameplay.Combat
                 //Debug.Log($"Applying just damage (no effects) to {targetFighter.FighterName}");
 
                 targetFighter.TakeDamageFromFighter(sourceFighter, itemUsed, position);
-                return;
+
+                if (!itemIsWeapon)
+                {
+                    return;
+                }
             }
 
             foreach (var effect in itemUsed.Effects)
