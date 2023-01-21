@@ -89,7 +89,7 @@ namespace FullPotential.Core.Gameplay.Combat
             GameObject target,
             Vector3? position)
         {
-            //todo: v0.6 - SpawnBulletHole only works for box colliders that line up with the X and Z alias
+            //todo: zzz v0.6 - SpawnBulletHole only works for box colliders that line up with the X and Z alias
 
             if (!position.HasValue)
             {
