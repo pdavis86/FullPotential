@@ -301,7 +301,7 @@
     },
     {
       "Key": "ui.connect.joinrejected",
-      "Value": "Version incompatible"
+      "Value": "The server rejected your connection with reason: {0}"
     },
 
 
