@@ -366,19 +366,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private bool Punch()
         {
-            if (!Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, MeleeRangeLimit))
-            {
-                return false;
-            }
-
             if (IsServer)
             {
+                Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, MeleeRangeLimit);
                 _effectService.ApplyEffects(this, null, hit.transform.gameObject, hit.point);
             }
 
-            var hitNetworkObject = hit.transform.gameObject.GetComponent<NetworkObject>();
-
-            return hitNetworkObject != null;
+            return true;
         }
 
         private bool StopActiveSpellOrGadgetBehaviour(HandStatus handStatus)
@@ -561,32 +555,24 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            var hitNetworkObject = rangedHit.transform.gameObject.GetComponent<NetworkObject>();
-
-            return hitNetworkObject != null;
+            return true;
         }
 
         private bool UseMeleeWeapon(Weapon weaponInHand)
         {
-            //take speed and recovery into account
-
-            var meleeRange = weaponInHand.IsTwoHanded
-                ? MeleeRangeLimit
-                : MeleeRangeLimit / 2;
-
-            if (!Physics.Raycast(LookTransform.position, LookTransform.forward, out var meleeHit, meleeRange))
-            {
-                return false;
-            }
+            //todo: take speed and recovery into account
 
             if (IsServer)
             {
+                var meleeRange = weaponInHand.IsTwoHanded
+                    ? MeleeRangeLimit
+                    : MeleeRangeLimit / 2;
+
+                Physics.Raycast(LookTransform.position, LookTransform.forward, out var meleeHit, meleeRange);
                 _effectService.ApplyEffects(this, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
             }
 
-            var hitNetworkObject = meleeHit.transform.gameObject.GetComponent<NetworkObject>();
-
-            return hitNetworkObject != null;
+            return true;
         }
 
         private (NetworkVariable<int> Variable, int? Cost)? GetResourceVariableAndCost(SpellOrGadgetItemBase spellOrGadget)
