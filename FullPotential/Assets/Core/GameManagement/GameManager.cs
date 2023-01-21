@@ -194,6 +194,10 @@ namespace FullPotential.Core.GameManagement
                     SceneManager.LoadSceneAsync(1);
                 }
             }
+            else
+            {
+                GameDataStore.ClientIdToUsername.Remove(clientId);
+            }
         }
 #pragma warning restore UNT0006 // Incorrect message signature
 
