@@ -119,7 +119,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             AliveState = LivingEntityState.Alive;
 
-            _replenishStamina = new DelayedAction(.01f, () =>
+            _replenishStamina = new DelayedAction(.2f, () =>
             {
                 if (!IsConsumingStamina() && _stamina.Value < GetStaminaMax())
                 {

@@ -120,31 +120,33 @@ namespace FullPotential.Core.PlayerBehaviours
         #region RPC Methods
 
         [ServerRpc]
-        private void ApplyMovementServerRpc(Vector3 position, Quaternion rotation, Vector3 lookDirection, bool isTryingToJump)
+        private void ApplyMovementServerRpc(Vector3 position, Quaternion rotation, Vector3 lookDirection, bool isTryingToJump, bool isTryingToSprint)
         {
-            ApplyMovementToLocalObject(position, rotation, lookDirection, isTryingToJump);
+            ApplyMovementToLocalObject(position, rotation, lookDirection, isTryingToJump, isTryingToSprint);
 
             //todo: zzz v0.5 - check players are not cheating their movement values
 
             var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, new[] { 0ul, OwnerClientId });
-            ApplyMovementClientRpc(position, rotation, lookDirection, isTryingToJump, nearbyClients);
+            ApplyMovementClientRpc(position, rotation, lookDirection, isTryingToJump, isTryingToSprint, nearbyClients);
         }
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        private void ApplyMovementClientRpc(Vector3 position, Quaternion rotation, Vector3 lookDirection, bool isTryingToJump, ClientRpcParams clientRpcParams)
+        private void ApplyMovementClientRpc(Vector3 position, Quaternion rotation, Vector3 lookDirection, bool isTryingToJump, bool isTryingToSprint, ClientRpcParams clientRpcParams)
         {
-            ApplyMovementToLocalObject(position, rotation, lookDirection, isTryingToJump);
+            ApplyMovementToLocalObject(position, rotation, lookDirection, isTryingToJump, isTryingToSprint);
         }
 
         #endregion
 
-        private void ApplyMovementToLocalObject(Vector3 position, Quaternion rotation, Vector3 lookDirection, bool isTryingToJump)
+        private void ApplyMovementToLocalObject(Vector3 position, Quaternion rotation, Vector3 lookDirection, bool isTryingToJump, bool isTryingToSprint)
         {
             transform.position = position;
             transform.rotation = rotation;
 
             _playerCamera.transform.localEulerAngles = lookDirection;
+
+            UpdateSprintingState(isTryingToSprint);
 
             Jump(isTryingToJump);
         }
@@ -154,24 +156,33 @@ namespace FullPotential.Core.PlayerBehaviours
             return Physics.Raycast(transform.position, -Vector3.up, _maxDistanceToBeStanding);
         }
 
+        private void UpdateSprintingState(bool isTryingToSprint)
+        {
+            if (_playerState.IsSprinting && !isTryingToSprint)
+            {
+                _playerState.IsSprinting = false;
+            }
+
+            if (isTryingToSprint && _playerState.GetStamina() >= _playerState.GetStaminaCost())
+            {
+                _playerState.IsSprinting = true;
+            }
+        }
+
         private void MoveAndLook(Vector2 moveVal, Vector2 lookVal, bool isTryingToSprint)
         {
             if (!_isMidJump && moveVal != Vector2.zero)
             {
-                if (_playerState.IsSprinting && !isTryingToSprint)
-                {
-                    _playerState.IsSprinting = false;
-                }
-
                 var moveForwards = transform.forward * moveVal.y;
                 var moveSideways = transform.right * moveVal.x;
 
-                if (isTryingToSprint && _playerState.GetStamina() >= _playerState.GetStaminaCost())
+                UpdateSprintingState(isTryingToSprint);
+
+                if (_playerState.IsSprinting)
                 {
                     var sprintSpeed = _playerState.GetSprintSpeed();
                     moveForwards *= moveVal.y > 0 ? sprintSpeed : sprintSpeed / 2;
                     moveSideways *= sprintSpeed / 2;
-                    _playerState.IsSprinting = true;
                 }
 
                 var velocity = _speed * (moveForwards + moveSideways);
@@ -250,7 +261,7 @@ namespace FullPotential.Core.PlayerBehaviours
                 || _isTryingToSprint
                 || initiateAJump)
             {
-                ApplyMovementServerRpc(transform.position, transform.rotation, _playerCamera.transform.localEulerAngles, initiateAJump);
+                ApplyMovementServerRpc(transform.position, transform.rotation, _playerCamera.transform.localEulerAngles, _isTryingToJump, _isTryingToSprint);
 
                 _previousPosition = transform.position;
                 _previousRotation = transform.rotation;
