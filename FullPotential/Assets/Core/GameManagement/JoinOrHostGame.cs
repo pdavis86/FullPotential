@@ -205,27 +205,37 @@ namespace FullPotential.Core.GameManagement
             }
         }
 
-        private void SetNetworkAddressAndPort()
+        private void SetNetworkAddressAndPort(bool isHosting = false)
         {
             _networkTransport.ConnectAddress = !string.IsNullOrWhiteSpace(_networkAddress)
                 ? _networkAddress
                 : "127.0.0.1";
 
-            _networkTransport.ConnectPort = int.TryParse(_networkPort, out var port)
+            var desiredPort = int.TryParse(_networkPort, out var port)
                 ? port
                 : 7777;
+
+            if (isHosting)
+            {
+                _networkTransport.ServerListenPort = desiredPort;
+            }
+            else
+            {
+                _networkTransport.ConnectPort = desiredPort;
+            }
+            
         }
 
         private void HostGameInternal()
         {
-            _signinError.gameObject.SetActive(false);
+            _gameDetailsError.gameObject.SetActive(false);
 
-            SetNetworkAddressAndPort();
+            SetNetworkAddressAndPort(true);
 
-            if (!IsPortFree())
+            if (!IsPortFree(_networkTransport.ServerListenPort))
             {
-                _signinError.text = _localizer.Translate("ui.connect.portnotfree");
-                _signinError.gameObject.SetActive(true);
+                _gameDetailsError.text = _localizer.Translate("ui.connect.portnotfree");
+                _gameDetailsError.gameObject.SetActive(true);
                 return;
             }
 
@@ -239,10 +249,10 @@ namespace FullPotential.Core.GameManagement
             NetworkManager.Singleton.SceneManager.LoadScene(_onlineSceneName, LoadSceneMode.Single);
         }
 
-        private bool IsPortFree()
+        private bool IsPortFree(int port)
         {
             var ipEndpoints = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().GetActiveUdpListeners();
-            return ipEndpoints.All(ipEndpoint => ipEndpoint.Port != _networkTransport.ConnectPort);
+            return ipEndpoints.All(ipEndpoint => ipEndpoint.Port != port);
         }
 
         private void JoinGameInternal()
