@@ -159,11 +159,13 @@ namespace FullPotential.Core.GameManagement
 
             if (GameDataStore.ClientIdToUsername.ContainsValue(playerUsername))
             {
-                //Approve so we can send a disconnect reason
-                Debug.LogWarning("Client is already connected");
-                SendServerToClientSetDisconnectReason(approvalRequest.ClientNetworkId, ConnectStatus.LoggedInAgain);
+                Debug.LogWarning($"User {playerUsername} is already connected");
+
+                //todo: reject reason does not seem to work yet. Approve so we can send a disconnect reason
                 approvalResponse.Approved = true;
+                SendServerToClientSetDisconnectReason(approvalRequest.ClientNetworkId, ConnectStatus.LoggedInAgain);
                 StartCoroutine(WaitToDisconnect(approvalRequest.ClientNetworkId));
+
                 return;
             }
 
@@ -171,21 +173,26 @@ namespace FullPotential.Core.GameManagement
             var clientVersion = new Version(connectionPayload.GameVersion);
             if (serverVersion.Major != clientVersion.Major || serverVersion.Minor != clientVersion.Minor)
             {
-                //Approve so we can send a disconnect reason
                 Debug.LogWarning("Client tried to connect with an incompatible version");
-                SendServerToClientSetDisconnectReason(approvalRequest.ClientNetworkId, ConnectStatus.VersionMismatch);
+
+                //todo: zzz v0.5 - reject reason does not seem to work yet. Approve so we can send a disconnect reason
                 approvalResponse.Approved = true;
+                SendServerToClientSetDisconnectReason(approvalRequest.ClientNetworkId, ConnectStatus.VersionMismatch);
                 StartCoroutine(WaitToDisconnect(approvalRequest.ClientNetworkId));
+
                 return;
             }
 
             approvalResponse.Approved = true;
         }
 
-#pragma warning disable UNT0006 // Incorrect message signature
         private void OnDisconnectedFromServer(ulong clientId)
         {
-            if (!NetworkManager.Singleton.IsServer)
+            if (NetworkManager.Singleton.IsServer)
+            {
+                GameDataStore.ClientIdToUsername.Remove(clientId);
+            }
+            else
             {
                 LocalGameDataStore.HasDisconnected = true;
 
@@ -194,12 +201,7 @@ namespace FullPotential.Core.GameManagement
                     SceneManager.LoadSceneAsync(1);
                 }
             }
-            else
-            {
-                GameDataStore.ClientIdToUsername.Remove(clientId);
-            }
         }
-#pragma warning restore UNT0006 // Incorrect message signature
 
         #endregion
 

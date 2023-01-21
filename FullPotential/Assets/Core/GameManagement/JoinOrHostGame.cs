@@ -37,7 +37,7 @@ namespace FullPotential.Core.GameManagement
         private NetworkManager _networkManager;
         private UNetTransport _networkTransport;
 
-        private string _scene2Name;
+        private string _onlineSceneName;
         private string _username;
         private string _password;
         private string _networkAddress;
@@ -56,7 +56,7 @@ namespace FullPotential.Core.GameManagement
         {
             _networkManager = NetworkManager.Singleton;
             _networkTransport = _networkManager.GetComponent<UNetTransport>();
-            _scene2Name = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(2));
+            _onlineSceneName = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(2));
 
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
         }
@@ -189,7 +189,18 @@ namespace FullPotential.Core.GameManagement
                 _gameDetailsContainer.SetActive(true);
                 _joiningMessage.SetActive(false);
 
-                _gameDetailsError.text = _localizer.Translate("ui.connect.disconnected");
+                var disconnectReason = GameManager.Instance.LocalGameDataStore.DisconnectReason;
+
+                if (!string.IsNullOrWhiteSpace(disconnectReason))
+                {
+                    Debug.LogWarning($"Server refused connection with status {disconnectReason}");
+                    _gameDetailsError.text = string.Format(_localizer.Translate("ui.connect.joinrejected"), disconnectReason);
+                }
+                else
+                {
+                    _gameDetailsError.text = _localizer.Translate("ui.connect.disconnected");
+                }
+
                 _gameDetailsError.gameObject.SetActive(true);
             }
         }
@@ -225,7 +236,7 @@ namespace FullPotential.Core.GameManagement
             _gameDetailsContainer.SetActive(false);
             _joiningMessage.SetActive(true);
 
-            NetworkManager.Singleton.SceneManager.LoadScene(_scene2Name, LoadSceneMode.Single);
+            NetworkManager.Singleton.SceneManager.LoadScene(_onlineSceneName, LoadSceneMode.Single);
         }
 
         private bool IsPortFree()
@@ -293,11 +304,10 @@ namespace FullPotential.Core.GameManagement
         public void SetDisconnectReasonClientCustomMessage(ulong clientId, FastBufferReader reader)
         {
             reader.ReadValueSafe(out ConnectStatus status);
+
             Debug.LogWarning($"Server refused connection with status {status}");
-            _gameDetailsError.text = string.Format(_localizer.Translate("ui.connect.joinrejected"), status);
-            _gameDetailsError.gameObject.SetActive(true);
-            _joiningMessage.SetActive(false);
-            _gameDetailsContainer.SetActive(true);
+            
+            GameManager.Instance.LocalGameDataStore.DisconnectReason = status.ToString();
         }
 
     }
