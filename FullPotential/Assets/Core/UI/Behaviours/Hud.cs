@@ -26,6 +26,7 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private GameObject _alertPrefab;
         [SerializeField] private GameObject _equippedLeftHand;
         [SerializeField] private GameObject _equippedRightHand;
+        [SerializeField] private GameObject _crosshairs;
         [SerializeField] private BarSlider _staminaSlider;
         [SerializeField] private BarSlider _healthSlider;
         [SerializeField] private BarSlider _manaSlider;
@@ -242,8 +243,10 @@ namespace FullPotential.Core.Ui.Behaviours
             return results;
         }
 
-        public void ToggleCursorCapture(bool isOn)
+        public void ToggleDrawingMode(bool isOn)
         {
+            _crosshairs.SetActive(!isOn);
+
             var newAlpha = isOn ? 1 : 0.5f;
 
             _equippedLeftHandBackground.color = ChangeColorAlpha(_equippedLeftHandBackground.color, newAlpha);

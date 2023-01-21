@@ -10,7 +10,7 @@ namespace FullPotential.Api.Ui
 
         void ShowAlert(string content);
 
-        void ToggleCursorCapture(bool isOn);
+        void ToggleDrawingMode(bool isOn);
 
         (float percent, string text) GetStaminaValues(int stamina, int maxStamina);
 

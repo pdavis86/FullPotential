@@ -47,6 +47,9 @@ namespace FullPotential.Core.PlayerBehaviours
         //Services
         private IRpcService _rpcService;
 
+        //Others
+        private UserInterface _userInterface;
+
         #region Unity Event Handlers 
 
         // ReSharper disable once UnusedMember.Local
@@ -58,6 +61,8 @@ namespace FullPotential.Core.PlayerBehaviours
             _maxDistanceToBeStanding = gameObject.GetComponent<Collider>().bounds.extents.y + 0.1f;
 
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
+
+            _userInterface = GameManager.Instance.UserInterface;
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -220,6 +225,11 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             const float positionThreshold = 0.001f;
             const float rotationThreshold = 0.001f;
+
+            if (_userInterface.IsAnyMenuOpen())
+            {
+                return;
+            }
 
             var initiateAJump = !GameManager.Instance.UserInterface.IsAnyMenuOpen()
                 && IsOnSolidObject()

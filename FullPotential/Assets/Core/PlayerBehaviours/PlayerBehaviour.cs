@@ -13,6 +13,7 @@ using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
+using FullPotential.Core.UI.Behaviours;
 using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.UtilityBehaviours;
 using TMPro;
@@ -44,6 +45,7 @@ namespace FullPotential.Core.PlayerBehaviours
         private Interactable _focusedInteractable;
         private Camera _sceneCamera;
         private ClientRpcParams _clientRpcParams;
+        private DrawingPadUi _drawingPadUi;
 
         private readonly FragmentedMessageReconstructor _inventoryChangesReconstructor = new FragmentedMessageReconstructor();
 
@@ -57,6 +59,8 @@ namespace FullPotential.Core.PlayerBehaviours
 
             _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
             _inventoryDataService = DependenciesContext.Dependencies.GetService<IInventoryDataService>();
+
+            _drawingPadUi = GameManager.Instance.UserInterface.DrawingPad.GetComponent<DrawingPadUi>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -176,9 +180,34 @@ namespace FullPotential.Core.PlayerBehaviours
         }
 
         // ReSharper disable once UnusedMember.Local
+        private void OnAttackDownLeft()
+        {
+            if (_hasMenuOpen)
+            {
+                _drawingPadUi.StartDrawing();
+            }
+        }
+
+        // ReSharper disable once UnusedMember.Local
         private void OnAttackHoldLeft()
         {
             OnAttackHold(true);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnAttackReleaseLeft()
+        {
+            _drawingPadUi.StopDrawing();
+            OnAttack(true);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnAttackDownRight()
+        {
+            if (_hasMenuOpen)
+            {
+                _drawingPadUi.StartDrawing();
+            }
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -188,14 +217,9 @@ namespace FullPotential.Core.PlayerBehaviours
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void OnAttackLeft()
+        private void OnAttackReleaseRight()
         {
-            OnAttack(true);
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void OnAttackRight()
-        {
+            _drawingPadUi.StopDrawing();
             OnAttack(false);
         }
 
@@ -207,15 +231,15 @@ namespace FullPotential.Core.PlayerBehaviours
                 return;
             }
 
+            GameManager.Instance.UserInterface.HudOverlay.ToggleDrawingMode(true);
             GameManager.Instance.UserInterface.DrawingPad.SetActive(true);
-            GameManager.Instance.UserInterface.HudOverlay.ToggleCursorCapture(true);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnShowCursorStop()
         {
+            GameManager.Instance.UserInterface.HudOverlay.ToggleDrawingMode(false);
             GameManager.Instance.UserInterface.DrawingPad.SetActive(false);
-            GameManager.Instance.UserInterface.HudOverlay.ToggleCursorCapture(false);
         }
 
         // ReSharper disable once UnusedMember.Local
