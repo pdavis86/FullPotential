@@ -223,8 +223,8 @@ namespace FullPotential.Core.PlayerBehaviours
 
         private void ApplyMovementFromInputs()
         {
-            const float positionThreshold = 0.001f;
-            const float rotationThreshold = 0.001f;
+            const float positionThreshold = 0.01f;
+            const float rotationThreshold = 0.01f;
 
             if (_userInterface.IsAnyMenuOpen())
             {
