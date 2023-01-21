@@ -118,10 +118,10 @@
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectUi.cs" />
     <Compile Include="Assets\Core\GameManagement\Enums\ConnectStatus.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\StickUiToWorldPosition.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\DrawingPadUi.cs" />
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsStartup.cs" />
     <Compile Include="Assets\Core\GameManagement\AddressablesManager.cs" />
     <Compile Include="Assets\Core\GameManagement\GameManager.cs" />
+    <Compile Include="Assets\Core\UI\Behaviours\DrawingPadUi.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Core\FullPotential.Core.asmdef" />
@@ -375,6 +375,9 @@
     </Reference>
     <Reference Include="UnityEditor.WindowsStandalone.Extensions">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.11f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.LinuxStandalone.Extensions">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.11f1\Editor\Data\PlaybackEngines\LinuxStandaloneSupport\UnityEditor.LinuxStandalone.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Collections.LowLevel.ILSupport">
       <HintPath>Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
