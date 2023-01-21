@@ -170,13 +170,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected virtual void FixedUpdate()
         {
+            RemoveExpiredEffects();
+
             if (!IsServer)
             {
                 return;
             }
 
             ReplenishAndConsume();
-            RemoveExpiredEffects();
         }
 
         // ReSharper disable once UnusedMember.Local
