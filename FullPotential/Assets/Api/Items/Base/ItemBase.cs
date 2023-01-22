@@ -171,7 +171,7 @@ namespace FullPotential.Api.Items.Base
 
         public float GetMovementForceValue(bool adjustForGravity)
         {
-            var force = 6f * Attributes.Strength;
+            var force = GetHighInHighOutInRange(Attributes.Strength, 200, 500);
 
             return adjustForGravity
                 ? force * 0.9f
