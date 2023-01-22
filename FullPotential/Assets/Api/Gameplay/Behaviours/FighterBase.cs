@@ -411,14 +411,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ? HandStatusLeft
                 : HandStatusRight;
 
+            if (StopActiveSpellOrGadgetBehaviour(leftOrRight))
+            {
+                //Return true as the action also needs performing on the server
+                return true;
+            }
+
             if (IsServer || NetworkManager.LocalClientId == OwnerClientId)
             {
-                if (StopActiveSpellOrGadgetBehaviour(leftOrRight))
-                {
-                    //Return true as the action also needs performing on the server
-                    return true;
-                }
-
                 if (leftOrRight.EquippedSpellOrGadget.ChargePercentage < 100)
                 {
                     //Debug.Log("Charge was not finished");
