@@ -373,8 +373,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             if (IsServer)
             {
-                Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, MeleeRangeLimit);
-                _effectService.ApplyEffects(this, null, hit.transform.gameObject, hit.point);
+                if (Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, MeleeRangeLimit))
+                {
+                    _effectService.ApplyEffects(this, null, hit.transform.gameObject, hit.point);
+                }
             }
 
             return true;
