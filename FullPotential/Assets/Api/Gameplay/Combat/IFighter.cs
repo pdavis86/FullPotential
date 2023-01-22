@@ -27,5 +27,7 @@ namespace FullPotential.Api.Gameplay.Combat
         void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position);
 
         void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position);
+
+        int GetStrength();
     }
 }

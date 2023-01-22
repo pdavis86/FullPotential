@@ -4,6 +4,7 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Registry.Effects;
@@ -22,6 +23,7 @@ namespace FullPotential.Core.Gameplay.Combat
     {
         private readonly ITypeRegistry _typeRegistry;
         private readonly IRpcService _rpcService;
+        private readonly Punch _punchEffect;
 
         public EffectService(
             ITypeRegistry typeRegistry,
@@ -29,6 +31,8 @@ namespace FullPotential.Core.Gameplay.Combat
         {
             _typeRegistry = typeRegistry;
             _rpcService = rpcService;
+
+            _punchEffect = new Punch();
         }
 
         public void ApplyEffects(
@@ -44,7 +48,13 @@ namespace FullPotential.Core.Gameplay.Combat
                 return;
             }
 
-            var itemHasEffects = itemUsed?.Effects != null && itemUsed.Effects.Any();
+            if (itemUsed == null)
+            {
+                itemUsed = new Loot { Attributes = new Attributes { Strength = sourceFighter.GetStrength() } };
+                ApplyEffect(sourceFighter, _punchEffect, itemUsed, target, position);
+            }
+
+            var itemHasEffects = itemUsed.Effects != null && itemUsed.Effects.Any();
             var itemIsWeapon = itemUsed is Weapon;
 
             if (!itemHasEffects || itemIsWeapon)

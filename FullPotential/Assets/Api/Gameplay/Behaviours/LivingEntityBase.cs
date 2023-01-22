@@ -227,7 +227,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private void ApplyHealthChange(
             int change,
             IFighter sourceFighter,
-            ItemBase itemUsed,
             Vector3? position)
         {
 
@@ -238,7 +237,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 if (change < 0)
                 {
                     RecordDamageDealt(change * -1, sourceFighter);
-                    ApplyPunchForce(sourceFighter, itemUsed, position);
                 }
 
                 ShowHealthChangeToSourceFighter(sourceFighter, position, change);
@@ -552,7 +550,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _lastDamageItemName = null;
             _lastDamageSourceName = cause;
 
-            ApplyHealthChange(healthChange, _fighterWhoMovedMeLast, null, position);
+            ApplyHealthChange(healthChange, _fighterWhoMovedMeLast, position);
         }
 
         private int GetDamageValueFromVelocity(Vector3 velocity)
@@ -578,10 +576,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
             Vector3? position)
         {
             _lastDamageSourceName = sourceFighter != null ? sourceFighter.FighterName : null;
-            _lastDamageItemName = itemUsed?.Name ?? _localizer.Translate("ui.alert.attack.noitem");
+            _lastDamageItemName = itemUsed?.Name.OrIfNullOrWhitespace(_localizer.Translate("ui.alert.attack.noitem"));
 
             var damageDealt = _valueCalculator.GetDamageValueFromAttack(itemUsed, GetDefenseValue()) * -1;
-            ApplyHealthChange(damageDealt, sourceFighter, itemUsed, position);
+            ApplyHealthChange(damageDealt, sourceFighter, position);
         }
 
         public virtual void HandleDeath()
@@ -652,21 +650,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        private void ApplyPunchForce(
-            IFighter sourceFighter,
-            ItemBase itemUsed,
-            Vector3? position)
-        {
-            if (itemUsed == null)
-            {
-                var targetRb = GetComponent<Rigidbody>();
-                if (targetRb != null && position.HasValue)
-                {
-                    targetRb.AddForceAtPosition(sourceFighter.Transform.forward * 150, position.Value);
-                }
-            }
-        }
-
         private void ShowHealthChangeToSourceFighter(
             IFighter sourceFighter,
             Vector3? position,
@@ -697,14 +680,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             var (change, expiry, delay) = itemUsed.GetPeriodicStatChangeExpiryAndDelay(statEffect);
             AddOrUpdateEffect(statEffect, change, expiry);
-            StartCoroutine(PeriodicActionToStatCoroutine(statEffect.StatToAffect, change, sourceFighter, itemUsed, delay, expiry));
+            StartCoroutine(PeriodicActionToStatCoroutine(statEffect.StatToAffect, change, sourceFighter, delay, expiry));
         }
 
-        private IEnumerator PeriodicActionToStatCoroutine(AffectableStat stat, int change, IFighter sourceFighter, ItemBase itemUsed, float delay, DateTime expiry)
+        private IEnumerator PeriodicActionToStatCoroutine(AffectableStat stat, int change, IFighter sourceFighter, float delay, DateTime expiry)
         {
             do
             {
-                ApplyStatChange(stat, change, sourceFighter, itemUsed, transform.position);
+                ApplyStatChange(stat, change, sourceFighter, transform.position);
                 yield return new WaitForSeconds(delay);
 
             } while (DateTime.Now < expiry);
@@ -721,7 +704,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             AddOrUpdateEffect(statEffect, change, DateTime.Now.AddSeconds(3));
 
-            ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, itemUsed, position);
+            ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, position);
         }
 
         public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
@@ -730,7 +713,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             AddOrUpdateEffect(statEffect, change, expiry);
 
-            ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, itemUsed, position);
+            ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, position);
         }
 
         public void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
@@ -825,7 +808,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             AffectableStat stat,
             int change,
             IFighter sourceFighter,
-            ItemBase itemUsed,
             Vector3? position)
         {
             switch (stat)
@@ -835,7 +817,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     return;
 
                 case AffectableStat.Health:
-                    ApplyHealthChange(change, sourceFighter, itemUsed, position);
+                    ApplyHealthChange(change, sourceFighter, position);
                     return;
 
                 case AffectableStat.Mana:

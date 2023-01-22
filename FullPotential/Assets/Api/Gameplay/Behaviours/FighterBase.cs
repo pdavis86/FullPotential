@@ -236,6 +236,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return _inventory.GetDefenseValue() + GetAttributeValue(AffectableAttribute.Strength);
         }
 
+        public int GetStrength()
+        {
+            //todo: zzz v0.5 - trait-based attributes
+            return 25 + GetAttributeValue(AffectableAttribute.Strength);
+        }
+
         public override void HandleDeath()
         {
             StopActiveSpellOrGadgetBehaviour(HandStatusLeft);
