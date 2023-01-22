@@ -213,8 +213,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             yield return new WaitForSeconds(handStatus.EquippedWeapon.GetReloadTime());
 
-            handStatus.EquippedWeapon.Ammo = handStatus.EquippedWeapon.GetAmmoMax();
+            //Fighter may have died during the wait
+            if (!handStatus.IsReloading)
+            {
+                yield break;
+            }
 
+            handStatus.EquippedWeapon.Ammo = handStatus.EquippedWeapon.GetAmmoMax();
             handStatus.IsReloading = false;
         }
 
@@ -244,6 +249,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public override void HandleDeath()
         {
+            HandStatusLeft.IsReloading = false;
+            HandStatusRight.IsReloading = false;
+
             StopActiveSpellOrGadgetBehaviour(HandStatusLeft);
             StopActiveSpellOrGadgetBehaviour(HandStatusRight);
 
