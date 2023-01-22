@@ -57,6 +57,11 @@ namespace FullPotential.Api.Gameplay.Data
                     EquippedWeapon = null;
                     EquippedSpellOrGadget = gadget;
                     break;
+
+                default:
+                    EquippedWeapon = null;
+                    EquippedSpellOrGadget = null;
+                    break;
             }
         }
 
