@@ -7,6 +7,7 @@ using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
+using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Unity.Helpers;
@@ -65,7 +66,13 @@ namespace FullPotential.Core.Gameplay.Combat
                 {
                     //Debug.LogWarning("Target is not an IFighter. Target was: " + target);
 
-                    SpawnBulletHole(target, position);
+                    //todo: move this, feels like the wrong place
+                    var registryType = (IGearWeapon)itemUsed.RegistryType;
+                    var isRanged = registryType?.Category == IGearWeapon.WeaponCategory.Ranged;
+                    if (isRanged)
+                    {
+                        SpawnBulletHole(target, position);
+                    }
 
                     return;
                 }
