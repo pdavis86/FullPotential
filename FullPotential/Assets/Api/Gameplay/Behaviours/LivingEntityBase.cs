@@ -611,7 +611,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             _damageTaken.Clear();
 
-            var deathMessage = GetDeathMessage(false, name);
+            var deathMessage = GetDeathMessage(name);
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(deathMessage, nearbyClients);
 
@@ -623,17 +623,31 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected abstract void HandleDeathAfter();
 
-        private string GetDeathMessage(bool isOwner, string victimName)
+        private string GetDeathMessage(string victimName)
         {
-            if (_lastDamageItemName.IsNullOrWhiteSpace())
+            if (gameObject == _gameManager.GetLocalPlayerGameObject())
             {
-                return isOwner
+                if (_lastDamageSourceName == victimName)
+                {
+                    return _lastDamageItemName.IsNullOrWhiteSpace()
+                        ? string.Format(_localizer.Translate("ui.alert.attack.youkilledyourself"))
+                        : string.Format(_localizer.Translate("ui.alert.attack.youkilledyourselfusing"), _lastDamageItemName);
+                }
+
+                return _lastDamageItemName.IsNullOrWhiteSpace()
                     ? string.Format(_localizer.Translate("ui.alert.attack.youwerekilledby"), _lastDamageSourceName)
-                    : string.Format(_localizer.Translate("ui.alert.attack.victimkilledby"), victimName, _lastDamageSourceName);
+                    : string.Format(_localizer.Translate("ui.alert.attack.youwerekilledbyusing"), _lastDamageSourceName, _lastDamageItemName);
             }
 
-            return isOwner
-                ? string.Format(_localizer.Translate("ui.alert.attack.youwerekilledbyusing"), _lastDamageSourceName, _lastDamageItemName)
+            if (_lastDamageSourceName == victimName)
+            {
+                return _lastDamageItemName.IsNullOrWhiteSpace()
+                    ? string.Format(_localizer.Translate("ui.alert.attack.victimsuicide"), victimName)
+                    : string.Format(_localizer.Translate("ui.alert.attack.victimsuicideusing"), victimName, _lastDamageItemName);
+            }
+
+            return _lastDamageItemName.IsNullOrWhiteSpace()
+                ? string.Format(_localizer.Translate("ui.alert.attack.victimkilledby"), victimName, _lastDamageSourceName)
                 : string.Format(_localizer.Translate("ui.alert.attack.victimkilledbyusing"), victimName, _lastDamageSourceName, _lastDamageItemName);
         }
 
@@ -731,6 +745,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public List<ActiveEffect> GetActiveEffects()
         {
+            if (AliveState != LivingEntityState.Alive)
+            {
+                return new List<ActiveEffect>();
+            }
+
             return _activeEffects;
         }
 

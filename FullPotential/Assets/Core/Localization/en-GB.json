@@ -413,6 +413,12 @@
       "Value": "Your inventory is at max"
     },
     {
+      "Key": "ui.alert.playerjoined",
+      "Value": "'{0}' joined the game"
+    },
+	
+	
+    {
       "Key": "ui.alert.unknownattacker",
       "Value": "someone"
     },
@@ -423,16 +429,6 @@
     {
       "Key": "ui.alert.environmentaldamage",
       "Value": "environmental damage"
-    },
-    {
-      "Key": "ui.alert.suicide",
-      "Value": "Yourself"
-    },
-    
-    
-    {
-      "Key": "ui.alert.playerjoined",
-      "Value": "'{0}' joined the game"
     },
     {
       "Key": "ui.alert.attack.noitem",
@@ -447,12 +443,28 @@
       "Value": "You were killed by '{0}' using '{1}'"
     },
     {
+      "Key": "ui.alert.attack.youkilledyourself",
+      "Value": "You killed yourself"
+    },
+    {
+      "Key": "ui.alert.attack.youkilledyourselfusing",
+      "Value": "You killed yourself using '{0}'"
+    },
+    {
       "Key": "ui.alert.attack.victimkilledby",
       "Value": "'{0}' was killed by '{1}'"
     },
     {
       "Key": "ui.alert.attack.victimkilledbyusing",
       "Value": "'{0}' was killed by '{1}' using '{2}'"
+    },
+    {
+      "Key": "ui.alert.attack.victimsuicide",
+      "Value": "'{0}' committed suicide"
+    },
+    {
+      "Key": "ui.alert.attack.victimsuicideusing",
+      "Value": "'{0}' committed suicide using '{1}'"
     },
 
 
