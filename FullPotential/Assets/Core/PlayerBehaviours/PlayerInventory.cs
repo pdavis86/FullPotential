@@ -226,7 +226,9 @@ namespace FullPotential.Core.PlayerBehaviours
         {
             if (gearCategory == null)
             {
-                return _items.Select(x => x.Value);
+                return _items
+                    .Select(x => x.Value)
+                    .OrderBy(x => x.Name);
             }
 
             IEnumerable<KeyValuePair<string, ItemBase>> itemsForSlot;

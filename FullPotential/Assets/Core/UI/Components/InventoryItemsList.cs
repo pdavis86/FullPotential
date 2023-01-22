@@ -36,7 +36,7 @@ namespace FullPotential.Core.Ui.Components
             var rowRectTransform = rowPrefab.GetComponent<RectTransform>();
             var rowCounter = 0;
 
-            var itemsForSlot = playerInventory.GetCompatibleItemsForSlot(gearCategory);
+            var itemsForSlot = playerInventory.GetCompatibleItemsForSlot(gearCategory).ToList();
 
             if (!itemsForSlot.Any())
             {
