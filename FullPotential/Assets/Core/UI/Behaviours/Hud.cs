@@ -191,11 +191,22 @@ namespace FullPotential.Core.Ui.Behaviours
             var existingObjects = GetActiveEffectGameObjects();
 
             var activeEffects = _playerFighter.GetActiveEffects()
-                .Where(e => e.Expiry > DateTime.Now);
+                .Where(e => e.Expiry > DateTime.Now)
+                .ToList();
+
+            if (activeEffects.Count == 0 && existingObjects.Count > 0)
+            {
+                foreach (var kvp in existingObjects)
+                {
+                    Destroy(kvp.Value);
+                }
+
+                existingObjects.Clear();
+                return;
+            }
 
             foreach (var activeEffect in activeEffects)
             {
-
                 if (existingObjects.ContainsKey(activeEffect.Id))
                 {
                     var existingEffectObj = existingObjects[activeEffect.Id];
