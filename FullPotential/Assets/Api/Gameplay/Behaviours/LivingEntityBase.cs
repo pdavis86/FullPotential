@@ -241,10 +241,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
                 ShowHealthChangeToSourceFighter(sourceFighter, position, change);
             }
-            else
-            {
-                Debug.Log("No source fighter found when trying to apply health change. Did they sign out?");
-            }
+            //else
+            //{
+            //    Debug.Log("No source fighter found when trying to apply health change. Did they sign out?");
+            //}
 
             //Do this last to ensure the entity does not die before recording the cause
             _health.Value += change;
@@ -555,8 +555,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private int GetDamageValueFromVelocity(Vector3 velocity)
         {
-            var basicDamage = math.pow(velocity.magnitude, 1.9) * -1;
-            return _valueCalculator.AddVariationToValue(basicDamage);
+            var horizontal = (velocity.x > VelocityThreshold ? velocity.x - VelocityThreshold : 0)
+                + (velocity.z > VelocityThreshold ? velocity.z - VelocityThreshold : 0);
+
+            var vertical = velocity.y > VelocityThreshold ? velocity.y - VelocityThreshold : 0;
+
+            var basicDamage = math.pow((horizontal + vertical) * 10, 1.3) * -1;
+            return (int)basicDamage;
         }
 
         #endregion
@@ -758,14 +763,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             var statEffect = effect as IStatEffect;
 
-            var showExpiry = !(statEffect != null 
+            var showExpiry = !(statEffect != null
                 && statEffect.Affect is Affect.SingleDecrease or Affect.SingleIncrease);
 
             var effectMatch = _activeEffects.FirstOrDefault(x => x.Effect == effect);
 
             if (effectMatch != null)
             {
-                var multipleAllowed = 
+                var multipleAllowed =
                     (statEffect != null && DoesAffectAllowMultiple(statEffect.Affect))
                     || effect is IAttributeEffect;
 

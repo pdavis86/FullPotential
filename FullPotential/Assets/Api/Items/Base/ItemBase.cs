@@ -174,7 +174,7 @@ namespace FullPotential.Api.Items.Base
             var force = GetHighInHighOutInRange(Attributes.Strength, 200, 500);
 
             return adjustForGravity
-                ? force * 0.9f
+                ? force * 2f
                 : force;
         }
 
