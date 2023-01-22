@@ -100,12 +100,18 @@ namespace FullPotential.Core.PlayerBehaviours
 
         private void OnJump()
         {
-            _isTryingToJump = true;
+            if (!GameManager.Instance.UserInterface.IsAnyMenuOpen() && IsOnSolidObject())
+            {
+                _isTryingToJump = true;
+            }
         }
 
         private void OnSprintStart()
         {
-            _isTryingToSprint = true;
+            if (!GameManager.Instance.UserInterface.IsAnyMenuOpen() && IsOnSolidObject())
+            {
+                _isTryingToSprint = true;
+            }
         }
 
         private void OnSprintStop()
