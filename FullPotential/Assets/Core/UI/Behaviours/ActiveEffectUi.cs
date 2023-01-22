@@ -31,7 +31,7 @@ namespace FullPotential.Core.UI.Behaviours
             _effectTranslation = effectTranslation;
             _showExpiry = showExpiry;
 
-            UpdateEffect(_expiry);
+            UpdateEffect(expiry);
         }
 
         public void UpdateEffect(DateTime expiry)
