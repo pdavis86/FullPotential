@@ -285,20 +285,20 @@
 
 
     {
-      "Key": "effect.absorb",
-      "Value": "Absorb"
+      "Key": "effect.conjure",
+      "Value": "WiP Conjure"
     },
     {
-      "Key": "effect.absorb.description",
-      "Value": "Reduces damage taken from magic attacks"
+      "Key": "effect.conjure.description",
+      "Value": "WiP"
     },
     {
-      "Key": "effect.deflect",
-      "Value": "Deflect"
+      "Key": "effect.float",
+      "Value": "WiP Float"
     },
     {
-      "Key": "effect.deflect.description",
-      "Value": "Reduces damage taken from physical attacks"
+      "Key": "effect.float.description",
+      "Value": "Reduces fall damage"
     },
     {
       "Key": "effect.heal",
@@ -318,35 +318,19 @@
     },
     {
       "Key": "effect.reflect",
-      "Value": "Reflect"
+      "Value": "WiP Reflect"
     },
     {
       "Key": "effect.reflect.description",
       "Value": "Reflect damage back at the attacker"
     },
     {
-      "Key": "effect.soften",
-      "Value": "Soften"
-    },
-    {
-      "Key": "effect.soften.description",
-      "Value": "Reduces fall damage"
-    },
-    {
       "Key": "effect.summon",
-      "Value": "Summon"
+      "Value": "WiP Summon"
     },
     {
       "Key": "effect.summon.description",
       "Value": "Summon entities to act as shields or weapons"
-    },
-    {
-      "Key": "effect.float",
-      "Value": "Float"
-    },
-    {
-      "Key": "effect.float.description",
-      "Value": "Reduces fall damage"
     },
     
     
