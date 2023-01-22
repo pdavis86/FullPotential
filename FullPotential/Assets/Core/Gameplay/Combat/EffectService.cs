@@ -70,6 +70,11 @@ namespace FullPotential.Core.Gameplay.Combat
                 }
             }
 
+            if (itemUsed.Effects == null)
+            {
+                return;
+            }
+
             foreach (var effect in itemUsed.Effects)
             {
                 if (!IsEffectAllowed(itemUsed, target, effect))
