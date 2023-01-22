@@ -159,14 +159,21 @@ namespace FullPotential.Core.GameManagement
 
             if (GameDataStore.ClientIdToUsername.ContainsValue(playerUsername))
             {
-                Debug.LogWarning($"User {playerUsername} is already connected");
+                var originalClientId = GameDataStore.ClientIdToUsername.First(x => x.Value == playerUsername).Key;
 
-                //todo: reject reason does not seem to work yet. Approve so we can send a disconnect reason
-                approvalResponse.Approved = true;
-                SendServerToClientSetDisconnectReason(approvalRequest.ClientNetworkId, ConnectStatus.LoggedInAgain);
-                StartCoroutine(WaitToDisconnect(approvalRequest.ClientNetworkId));
+                if (NetworkManager.Singleton.ConnectedClients.ContainsKey(originalClientId))
+                {
+                    Debug.LogWarning($"User {playerUsername} is already connected");
 
-                return;
+                    //todo: reject reason does not seem to work yet. Approve so we can send a disconnect reason
+                    approvalResponse.Approved = true;
+                    SendServerToClientSetDisconnectReason(approvalRequest.ClientNetworkId, ConnectStatus.LoggedInAgain);
+                    StartCoroutine(WaitToDisconnect(approvalRequest.ClientNetworkId));
+
+                    return;
+                }
+
+                GameDataStore.ClientIdToUsername.Remove(originalClientId);
             }
 
             var serverVersion = GetGameVersion();

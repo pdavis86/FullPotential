@@ -240,6 +240,7 @@ namespace FullPotential.Core.GameManagement
             }
 
             GameManager.Instance.LocalGameDataStore.HasDisconnected = false;
+            GameManager.Instance.GameDataStore.ClientIdToUsername.Clear();
 
             _networkManager.StartHost();
 
