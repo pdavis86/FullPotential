@@ -280,8 +280,6 @@ namespace FullPotential.Core.GameManagement
 
         public void Quit()
         {
-            SaveAppOptions();
-
             if (NetworkManager.Singleton.IsServer)
             {
                 SavePlayerData(true);
@@ -294,9 +292,9 @@ namespace FullPotential.Core.GameManagement
 #endif
         }
 
-        private static void SaveAppOptions()
+        public void SaveAppOptions()
         {
-            System.IO.File.WriteAllText(GetAppOptionsPath(), JsonUtility.ToJson(Instance.AppOptions));
+            System.IO.File.WriteAllText(GetAppOptionsPath(), JsonUtility.ToJson(AppOptions));
         }
 
         public static Version GetGameVersion()

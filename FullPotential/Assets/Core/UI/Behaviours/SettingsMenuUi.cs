@@ -115,6 +115,8 @@ namespace FullPotential.Core.Ui.Behaviours
             _isRevertRequired = false;
 
             GameManager.Instance.UserInterface.HideAllMenus();
+
+            GameManager.Instance.SaveAppOptions();
         }
 
         private string GetAspectRatio(int width, int height)

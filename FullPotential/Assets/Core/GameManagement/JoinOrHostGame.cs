@@ -169,8 +169,9 @@ namespace FullPotential.Core.GameManagement
             }
 
             GameManager.Instance.AppOptions.Username = _username;
+            GameManager.Instance.SaveAppOptions();
 
-            GameManager.Instance.LocalGameDataStore.PlayerToken = token;
+                GameManager.Instance.LocalGameDataStore.PlayerToken = token;
             _username = _password = null;
 
             _signinError.gameObject.SetActive(false);
