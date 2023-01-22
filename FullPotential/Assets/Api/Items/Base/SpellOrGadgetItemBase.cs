@@ -28,13 +28,6 @@ namespace FullPotential.Api.Items.Base
             return (int)returnValue;
         }
 
-        public float GetContinuousRange()
-        {
-            var returnValue = Attributes.Range / 100f * 10;
-            //Debug.Log("GetContinuousRange: " + returnValue);
-            return returnValue;
-        }
-
         public float GetProjectileSpeed()
         {
             var castSpeed = Attributes.Speed / 50f;
@@ -113,7 +106,7 @@ namespace FullPotential.Api.Items.Base
                 Attributes.Range,
                 nameof(Attributes.Range),
                 AliasSegmentItem,
-                RoundFloatForDisplay(GetRange()));
+                RoundFloatForDisplay(GetRangeForDisplay()));
 
             AppendToDescription(
                 sb,

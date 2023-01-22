@@ -185,6 +185,11 @@ namespace FullPotential.Api.Items.Base
             return returnValue;
         }
 
+        public virtual float GetRangeForDisplay()
+        {
+            return GetRange() * 0.6f;
+        }
+
         public virtual float GetAccuracy()
         {
             var returnValue = Attributes.Accuracy;

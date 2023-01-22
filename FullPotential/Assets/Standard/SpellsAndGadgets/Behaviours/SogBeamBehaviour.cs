@@ -47,7 +47,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _maxBeamLength = SpellOrGadget.GetContinuousRange();
+            _maxBeamLength = SpellOrGadget.GetRange();
 
             PerformGraphicsAdjustments();
 
