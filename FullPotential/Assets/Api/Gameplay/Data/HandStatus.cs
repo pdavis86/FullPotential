@@ -27,7 +27,7 @@ namespace FullPotential.Api.Gameplay.Data
 
         public ISpellOrGadgetBehaviour ActiveSpellOrGadgetBehaviour { get; set; }
 
-        public IEnumerator CooldownEnumerator { get; set; }
+        //public IEnumerator CooldownEnumerator { get; set; }
 
         #endregion
 

@@ -453,11 +453,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     return false;
                 }
 
-                if (leftOrRight.CooldownEnumerator != null)
-                {
-                    //Debug.Log("Still cooling down");
-                    return false;
-                }
+                //if (leftOrRight.CooldownEnumerator != null)
+                //{
+                //    //Debug.Log("Still cooling down");
+                //    return false;
+                //}
 
                 if (!ConsumeResource(spellOrGadget, isTest: true))
                 {
