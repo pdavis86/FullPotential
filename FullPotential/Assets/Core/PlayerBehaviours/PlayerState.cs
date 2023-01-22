@@ -306,6 +306,8 @@ namespace FullPotential.Core.PlayerBehaviours
         [ClientRpc]
         private void PlayerSpawnStateChangeClientRpc(LivingEntityState state, Vector3 position, Quaternion rotation, ClientRpcParams clientRpcParams)
         {
+            AliveState = state;
+
             PlayerSpawnStateChange(state, position, rotation);
 
             switch (state)

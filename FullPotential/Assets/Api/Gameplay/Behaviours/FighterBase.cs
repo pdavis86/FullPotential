@@ -331,6 +331,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public bool TryToAttack(bool isLeftHand, bool isAutoFire = false)
         {
+            if (AliveState != LivingEntityState.Alive)
+            {
+                return false;
+            }
+
             var itemInHand = isLeftHand
                 ? _inventory.GetItemInSlot(SlotGameObjectName.LeftHand)
                 : _inventory.GetItemInSlot(SlotGameObjectName.RightHand);
