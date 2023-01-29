@@ -1,5 +1,7 @@
 ﻿using FullPotential.Api.GameManagement;
 
+// ReSharper disable ClassNeverInstantiated.Global
+
 namespace FullPotential.Api.Utilities
 {
     public class ModHelper : IModHelper

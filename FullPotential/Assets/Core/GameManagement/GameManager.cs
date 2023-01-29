@@ -9,6 +9,7 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Data;
+using FullPotential.Api.Gameplay.Drawing;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
@@ -376,7 +377,7 @@ namespace FullPotential.Core.GameManagement
                 return;
             }
 
-            Debug.Log($"Saving player data for {playerData.Username}");
+            //Debug.Log($"Saving player data for {playerData.Username}");
 
             _userRegistry.Save(playerData);
 
@@ -395,6 +396,7 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<IRpcService, RpcService>();
             DependenciesContext.Dependencies.Register<IEffectService, EffectService>();
             DependenciesContext.Dependencies.Register<IModHelper, ModHelper>();
+            DependenciesContext.Dependencies.Register<IDrawingService, DrawingService>();
         }
 
         public void CheckIsAdmin()

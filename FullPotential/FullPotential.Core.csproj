@@ -67,6 +67,7 @@
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUi.cs" />
     <Compile Include="Assets\Core\UI\Components\EquippedSummary.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\DebuggingUi.cs" />
+    <Compile Include="Assets\Core\Gameplay\Combat\Punch.cs" />
     <Compile Include="Assets\Core\Localization\Localizer.cs" />
     <Compile Include="Assets\Core\Registry\UserRegistry.cs" />
     <Compile Include="Assets\Core\Utilities\Extensions\EnumerableExtensions.cs" />
@@ -122,7 +123,6 @@
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsStartup.cs" />
     <Compile Include="Assets\Core\GameManagement\AddressablesManager.cs" />
     <Compile Include="Assets\Core\GameManagement\GameManager.cs" />
-    <Compile Include="Assets\Core\Gameplay\Combat\Punch.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Core\FullPotential.Core.asmdef" />

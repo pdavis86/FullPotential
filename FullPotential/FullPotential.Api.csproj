@@ -154,6 +154,10 @@
     <Compile Include="Assets\Api\Registry\Elements\IElement.cs" />
     <Compile Include="Assets\Api\Gameplay\Data\InventoryChanges.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Tags.cs" />
+    <Compile Include="Assets\Api\Gameplay\Drawing\DrawShape.cs" />
+    <Compile Include="Assets\Api\Gameplay\Drawing\IDrawingService.cs" />
+    <Compile Include="Assets\Api\Gameplay\Drawing\DrawingService.cs" />
+    <Compile Include="Assets\Api\Utilities\Extensions\Vector2Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Api\FullPotential.Api.asmdef" />
