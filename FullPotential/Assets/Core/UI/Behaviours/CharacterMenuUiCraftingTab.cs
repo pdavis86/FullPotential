@@ -7,7 +7,7 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.PlayerBehaviours;
+using FullPotential.Core.Player;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.UI.Components;
 using UnityEngine;

@@ -12,6 +12,7 @@ using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.Player;
 using Unity.Netcode;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -188,7 +189,7 @@ namespace FullPotential.Core.Gameplay.Combat
                         return false;
                     }
 
-                    if (target.GetComponent<PlayerBehaviours.PlayerState>() != null)
+                    if (target.GetComponent<PlayerState>() != null)
                     {
                         //Debug.Log("Cannot target players");
                         return false;

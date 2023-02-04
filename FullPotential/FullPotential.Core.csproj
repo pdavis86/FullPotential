@@ -59,7 +59,7 @@
     <Compile Include="Assets\Core\Networking\RpcService.cs" />
     <Compile Include="Assets\Core\UI\Components\NameAndToggle.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\NetworkStats.cs" />
-    <Compile Include="Assets\Core\PlayerBehaviours\PlayerInventory.cs" />
+    <Compile Include="Assets\Core\Player\PlayerInventory.cs" />
     <Compile Include="Assets\Core\Utilities\Helpers\ShaderHelper.cs" />
     <Compile Include="Assets\Core\Gameplay\Crafting\ResultFactory.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\RespawnUi.cs" />
@@ -87,12 +87,12 @@
     <Compile Include="Assets\Core\UI\Components\SlideOutAlert.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DestroyOnTriggerEnter.cs" />
     <Compile Include="Assets\Core\UI\Components\InventoryItemsList.cs" />
-    <Compile Include="Assets\Core\PlayerBehaviours\PlayerBehaviour.cs" />
+    <Compile Include="Assets\Core\Player\PlayerBehaviour.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DontDestroy.cs" />
     <Compile Include="Assets\Core\Localization\Data\Localization.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\MaintainDistance.cs" />
     <Compile Include="Assets\Core\Utilities\Helpers\MathsHelper.cs" />
-    <Compile Include="Assets\Core\PlayerBehaviours\PlayerState.cs" />
+    <Compile Include="Assets\Core\Player\PlayerState.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltips.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiSlot.cs" />
     <Compile Include="Assets\Core\Networking\FragmentedMessageReconstructor.cs" />
@@ -115,7 +115,7 @@
     <Compile Include="Assets\Core\UI\Behaviours\Hud.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\LookAtMainCamera.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiRow.cs" />
-    <Compile Include="Assets\Core\PlayerBehaviours\PlayerMovement.cs" />
+    <Compile Include="Assets\Core\Player\PlayerMovement.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectUi.cs" />
     <Compile Include="Assets\Core\GameManagement\Enums\ConnectStatus.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\StickUiToWorldPosition.cs" />

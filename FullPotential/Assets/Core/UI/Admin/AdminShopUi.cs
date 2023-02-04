@@ -13,7 +13,7 @@ using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
-using FullPotential.Core.PlayerBehaviours;
+using FullPotential.Core.Player;
 using FullPotential.Core.UI.Components;
 using UnityEngine;
 using UnityEngine.UI;

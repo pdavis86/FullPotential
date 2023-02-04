@@ -27,7 +27,7 @@ using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Localization;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
-using FullPotential.Core.PlayerBehaviours;
+using FullPotential.Core.Player;
 using FullPotential.Core.Registry;
 using FullPotential.Core.Spawning;
 using Unity.Collections;

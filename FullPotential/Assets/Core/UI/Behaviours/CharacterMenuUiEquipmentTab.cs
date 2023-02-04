@@ -8,7 +8,7 @@ using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Tooltips;
-using FullPotential.Core.PlayerBehaviours;
+using FullPotential.Core.Player;
 using FullPotential.Core.UI.Behaviours;
 using FullPotential.Core.Ui.Components;
 using UnityEngine;

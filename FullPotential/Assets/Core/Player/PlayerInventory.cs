@@ -23,7 +23,7 @@ using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Core.PlayerBehaviours
+namespace FullPotential.Core.Player
 {
     public class PlayerInventory : InventoryBase, IPlayerInventory
     {

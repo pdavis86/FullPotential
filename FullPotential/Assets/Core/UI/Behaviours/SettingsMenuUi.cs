@@ -4,7 +4,7 @@ using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.PlayerBehaviours;
+using FullPotential.Core.Player;
 using UnityEngine;
 using UnityEngine.UI;
 

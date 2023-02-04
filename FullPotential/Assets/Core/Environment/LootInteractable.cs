@@ -2,7 +2,7 @@
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.PlayerBehaviours;
+using FullPotential.Core.Player;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 

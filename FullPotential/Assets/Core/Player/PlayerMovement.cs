@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Core.PlayerBehaviours
+namespace FullPotential.Core.Player
 {
     [RequireComponent(typeof(Rigidbody))]
     public class PlayerMovement : NetworkBehaviour

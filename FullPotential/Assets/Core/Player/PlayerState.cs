@@ -26,7 +26,7 @@ using UnityEngine.Networking;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Core.PlayerBehaviours
+namespace FullPotential.Core.Player
 {
     public class PlayerState : FighterBase, IPlayerFighter
     {
