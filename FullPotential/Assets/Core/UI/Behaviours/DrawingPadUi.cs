@@ -223,7 +223,6 @@ namespace FullPotential.Core.UI.Behaviours
 
             if (_currentShapeMarkers.Count < MinimumMarkers)
             {
-                Debug.Log("CreateMarker 1");
                 CreateMarker(rawMousePosition);
                 return;
             }
@@ -232,14 +231,12 @@ namespace FullPotential.Core.UI.Behaviours
             {
                 RecordShapeDrawn(DrawShape.Circle);
                 _isDrawingCircle = false;
+                CreateMarker(rawMousePosition);
                 return;
             }
 
-            //BUG: After drawing a circle, a marker is added in the PREVIOUS mouse position
-
             if (_isDrawingCircle)
             {
-                Debug.Log("CreateMarker 2");
                 CreateMarker(rawMousePosition);
                 return;
             }
@@ -266,7 +263,6 @@ namespace FullPotential.Core.UI.Behaviours
                 {
                     //Debug.Log("_isDrawingCircle = true");
                     _isDrawingCircle = true;
-                    Debug.Log("CreateMarker 3");
                     CreateMarker(rawMousePosition);
                     return;
                 }
@@ -287,7 +283,6 @@ namespace FullPotential.Core.UI.Behaviours
                 return;
             }
 
-            Debug.Log("CreateMarker 4");
             CreateMarker(rawMousePosition);
         }
 
