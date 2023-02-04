@@ -155,15 +155,15 @@ namespace FullPotential.Core.UI.Behaviours
                 {
                     RecordShapeDrawn(DrawShape.Line, _currentShapeMarkers.Last() - _currentShapeMarkers.First());
                 }
-                else
-                {
-                    Debug.Log("There was an uncompleted line");
-                }
+                //else
+                //{
+                //    Debug.Log("There was an uncompleted line");
+                //}
             }
-            else
-            {
-                Debug.Log("There was an uncompleted circle");
-            }
+            //else
+            //{
+            //    Debug.Log("There was an uncompleted circle");
+            //}
 
             _isDrawingCircle = false;
 
@@ -174,7 +174,7 @@ namespace FullPotential.Core.UI.Behaviours
                 return;
             }
 
-            Debug.Log("You drew: " + string.Join("-", _drawnShapes));
+            //Debug.Log("You drew: " + string.Join("-", _drawnShapes));
 
             _drawnShapes.Clear();
 
@@ -227,52 +227,54 @@ namespace FullPotential.Core.UI.Behaviours
                 return;
             }
 
-            if (_isDrawingCircle && (_currentShapeMarkers.First() - rawMousePosition).magnitude < DistanceTolerance)
-            {
-                RecordShapeDrawn(DrawShape.Circle);
-                _isDrawingCircle = false;
-                CreateMarker(rawMousePosition);
-                return;
-            }
+            //if (_isDrawingCircle)
+            //{
+            //    if ((_currentShapeMarkers.First() - rawMousePosition).magnitude < DistanceTolerance)
+            //    {
+            //        RecordShapeDrawn(DrawShape.Circle);
+            //        _isDrawingCircle = false;
+            //        CreateMarker(rawMousePosition);
+            //        return;
+            //    }
 
-            if (_isDrawingCircle)
-            {
-                CreateMarker(rawMousePosition);
-                return;
-            }
+            //    CreateMarker(rawMousePosition);
+            //    return;
+            //}
 
-            if (_currentShapeMarkers.Count == MinimumMarkers)
-            {
-                var angle1 = Vector2.Angle(Vector2.up, _currentShapeMarkers[1] - _currentShapeMarkers[0]);
-                var angle2 = Vector2.Angle(Vector2.up, _currentShapeMarkers[2] - _currentShapeMarkers[1]);
-                var angle3 = Vector2.Angle(Vector2.up, _currentShapeMarkers[3] - _currentShapeMarkers[2]);
+            //if (_currentShapeMarkers.Count == MinimumMarkers)
+            //{
+            //    var angle1 = Vector2.Angle(Vector2.up, _currentShapeMarkers[1] - _currentShapeMarkers[0]);
+            //    var angle2 = Vector2.Angle(Vector2.up, _currentShapeMarkers[2] - _currentShapeMarkers[1]);
+            //    var angle3 = Vector2.Angle(Vector2.up, _currentShapeMarkers[3] - _currentShapeMarkers[2]);
 
-                var diff1 = Mathf.Abs(angle1 - angle2);
-                var diff2 = Mathf.Abs(angle2 - angle3);
-                var diff3 = Mathf.Abs(angle1 - angle3);
+            //    var diff1 = Mathf.Abs(angle1 - angle2);
+            //    var diff2 = Mathf.Abs(angle2 - angle3);
+            //    var diff3 = Mathf.Abs(angle1 - angle3);
 
-                //Debug.Log($"diff1:{diff1}, diff2:{diff2}, diff3:{diff3}");
+            //    //Debug.Log($"diff1:{diff1}, diff2:{diff2}, diff3:{diff3}");
 
-                if (diff1 < _circleAngleTolerance
-                    && diff2 < _circleAngleTolerance
-                    && diff3 < _circleAngleTolerance)
-                {
-                    //Debug.Log("Line");
-                }
-                else
-                {
-                    //Debug.Log("_isDrawingCircle = true");
-                    _isDrawingCircle = true;
-                    CreateMarker(rawMousePosition);
-                    return;
-                }
-            }
+            //    if (diff1 < _circleAngleTolerance
+            //        && diff2 < _circleAngleTolerance
+            //        && diff3 < _circleAngleTolerance)
+            //    {
+            //        //Debug.Log("Line");
+            //    }
+            //    else
+            //    {
+            //        //Debug.Log("_isDrawingCircle = true");
+            //        _isDrawingCircle = true;
+            //        CreateMarker(rawMousePosition);
+            //        return;
+            //    }
+            //}
 
             var initialDirection = _currentShapeMarkers.ElementAt(1) - _currentShapeMarkers.First();
             var currentDirection = rawMousePosition - _currentShapeMarkers.ElementAt(_currentShapeMarkers.Count - 1);
 
-            var lineAngle = Vector2.SignedAngle(Vector2.up, initialDirection);
-            var markerAngle = Vector2.SignedAngle(Vector2.up, currentDirection);
+            //When going downwards, treat -175 and 175 the same
+            //When going upwards, treat -45 and 45 as different
+            var lineAngle = currentDirection.y < 0 ? Vector2.Angle(Vector2.up, initialDirection) : Vector2.SignedAngle(Vector2.up, initialDirection);
+            var markerAngle = currentDirection.y < 0 ? Vector2.Angle(Vector2.up, currentDirection) : Vector2.SignedAngle(Vector2.up, currentDirection);
 
             //Debug.Log($"lineAngle:{lineAngle}, markerAngle:{markerAngle}, diff:{Mathf.Abs(lineAngle - markerAngle)}");
 
@@ -296,7 +298,7 @@ namespace FullPotential.Core.UI.Behaviours
         {
             _drawnShapes.Add(_drawingService.GetDrawingCode(drawShape, direction));
 
-            Debug.Log("That was a " + _drawnShapes.Last());
+            //Debug.Log("That was a " + _drawnShapes.Last());
 
             ClearMarkers();
         }
