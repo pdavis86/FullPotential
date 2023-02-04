@@ -1,8 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Gameplay.Drawing;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Unity.Extensions;
+using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Core.UI.Events;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -13,6 +17,8 @@ namespace FullPotential.Core.UI.Behaviours
 {
     public class DrawingPadUi : MonoBehaviour
     {
+        public event EventHandler<OnDrawingStopEventArgs> OnDrawingStop;
+
         private const int MarkerSize = 6;
         private const int MinimumMarkers = 4;
         private const int DistanceTolerance = 20;
@@ -42,6 +48,9 @@ namespace FullPotential.Core.UI.Behaviours
         private List<Vector2> _currentShapeMarkers;
         private bool _isDrawingCircle;
         private List<string> _drawnShapes;
+        private string _eventSource;
+        private string _itemId;
+        private SlotGameObjectName? _slotGameObjectName;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -62,6 +71,28 @@ namespace FullPotential.Core.UI.Behaviours
         private void Update()
         {
             Draw();
+        }
+
+        public void InitialiseForAssign(string eventSource, string itemId)
+        {
+            if (!_eventSource.IsNullOrWhiteSpace())
+            {
+                return;
+            }
+
+            _eventSource = eventSource;
+            _itemId = itemId;
+        }
+
+        public void InitialiseForEquip(string eventSource, SlotGameObjectName slotGameObjectName)
+        {
+            if (!_eventSource.IsNullOrWhiteSpace())
+            {
+                return;
+            }
+
+            _eventSource = eventSource;
+            _slotGameObjectName = slotGameObjectName;
         }
 
         public void StartDrawing()
@@ -169,16 +200,14 @@ namespace FullPotential.Core.UI.Behaviours
 
             ClearMarkers();
 
-            if (!_drawnShapes.Any())
-            {
-                return;
-            }
+            var finalShape = string.Join("-", _drawnShapes);
 
-            //Debug.Log("You drew: " + string.Join("-", _drawnShapes));
+            OnDrawingStop?.Invoke(this, new OnDrawingStopEventArgs(_eventSource, finalShape, _itemId, _slotGameObjectName));
 
             _drawnShapes.Clear();
-
-            //todo: EquipMatchingItem
+            _eventSource = null;
+            _itemId = null;
+            _slotGameObjectName = null;
         }
 
         private void UpdateMesh()

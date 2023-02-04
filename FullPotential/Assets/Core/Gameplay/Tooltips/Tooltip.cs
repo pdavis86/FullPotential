@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -27,7 +26,8 @@ namespace FullPotential.Core.Gameplay.Tooltips
             {
                 return;
             }
-            foreach (Delegate d in OnPointerEnterForTooltip.GetInvocationList())
+
+            foreach (var d in OnPointerEnterForTooltip.GetInvocationList())
             {
                 OnPointerEnterForTooltip -= (PointerEnterEventDelegate)d;
             }

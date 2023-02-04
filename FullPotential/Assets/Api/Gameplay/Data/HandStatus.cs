@@ -7,6 +7,8 @@ namespace FullPotential.Api.Gameplay.Data
 {
     public class HandStatus
     {
+        public ItemBase EquippedItem{ get; private set; }
+
         public string EquippedItemDescription { get; private set; }
 
         #region Weapons
@@ -39,6 +41,7 @@ namespace FullPotential.Api.Gameplay.Data
                 ActiveSpellOrGadgetBehaviour = null;
             }
 
+            EquippedItem = item;
             EquippedItemDescription = description;
 
             switch (item)

@@ -41,6 +41,7 @@ namespace FullPotential.Core.Player
         private PlayerState _playerState;
         private int _maxItems;
 
+        private readonly Dictionary<string, string> _itemIdToShapeMapping = new Dictionary<string, string>();
         private readonly FragmentedMessageReconstructor _inventoryChangesReconstructor = new FragmentedMessageReconstructor();
 
         #region Unity Events Handlers
@@ -696,6 +697,46 @@ namespace FullPotential.Core.Player
 
             FillTypesFromIds(item);
             _items.Add(item.Id, item);
+        }
+
+        public string GetAssignedShape(string itemId)
+        {
+            if (!_itemIdToShapeMapping.ContainsKey(itemId))
+            {
+                return null;
+            }
+
+            return _itemIdToShapeMapping[itemId];
+        }
+
+        public bool SetAssignedShape(string itemId, string shape)
+        {
+            if (shape.IsNullOrWhiteSpace())
+            {
+                _itemIdToShapeMapping.Remove(itemId);
+                return true;
+            }
+
+            var conflict = _itemIdToShapeMapping.Any(x => x.Key != itemId && x.Value == shape);
+            if (conflict)
+            {
+                return false;
+            }
+
+            _itemIdToShapeMapping[itemId] = shape;
+            return true;
+        }
+
+        public ItemBase GetItemFromAssignedShape(string shape)
+        {
+            var match = _itemIdToShapeMapping.FirstOrDefault(x => x.Value == shape);
+
+            if (match.Key.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+
+            return GetItemWithId<ItemBase>(match.Key);
         }
     }
 }

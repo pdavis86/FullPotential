@@ -20,7 +20,7 @@ using UnityEngine.UI;
 
 // ReSharper disable UnusedType.Global
 
-namespace FullPotential.Core.UI.Admin
+namespace FullPotential.Core.UI.Behaviours
 {
     public class AdminShopUi : MonoBehaviour
     {

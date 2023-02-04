@@ -115,7 +115,7 @@ namespace FullPotential.Core.GameManagement
         {
             if (_characterMenuUiCraftingTab == null)
             {
-                _characterMenuUiCraftingTab = GetCharacterMenuUi().Crafting.GetComponent<CharacterMenuUiCraftingTab>();
+                _characterMenuUiCraftingTab = GetCharacterMenuUi().TabContents[1].GetComponent<CharacterMenuUiCraftingTab>();
             }
 
             return _characterMenuUiCraftingTab;
@@ -125,7 +125,7 @@ namespace FullPotential.Core.GameManagement
         {
             if (_characterMenuUiEquipmentTab == null)
             {
-                _characterMenuUiEquipmentTab = GetCharacterMenuUi().Equipment.GetComponent<CharacterMenuUiEquipmentTab>();
+                _characterMenuUiEquipmentTab = GetCharacterMenuUi().TabContents[0].GetComponent<CharacterMenuUiEquipmentTab>();
             }
 
             return _characterMenuUiEquipmentTab;

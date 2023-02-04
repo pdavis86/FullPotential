@@ -7,7 +7,6 @@ namespace FullPotential.Api.Gameplay.Inventory
 {
     public interface IPlayerInventory : IInventory
     {
-
         List<ItemBase> GetComponentsFromIds(string[] componentIds);
 
         List<string> ValidateIsCraftable(string[] componentIds, ItemBase itemToCraft);
@@ -19,5 +18,11 @@ namespace FullPotential.Api.Gameplay.Inventory
         InventoryData GetSaveData();
 
         bool IsInventoryFull();
+
+        string GetAssignedShape(string itemId);
+
+        bool SetAssignedShape(string itemId, string shape);
+
+        ItemBase GetItemFromAssignedShape(string shape);
     }
 }

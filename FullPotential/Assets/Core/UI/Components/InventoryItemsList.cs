@@ -7,6 +7,7 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Unity.Extensions;
+using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.UI.Behaviours;
 using UnityEngine;
@@ -18,6 +19,9 @@ namespace FullPotential.Core.Ui.Components
 {
     public class InventoryItemsList : MonoBehaviour
     {
+        public const string AssignedShapeNone = "-";
+        public const string AssignedShapeSet = "1";
+
         public static void LoadInventoryItems(
             GameObject slot,
             GameObject componentsContainer,
@@ -25,7 +29,8 @@ namespace FullPotential.Core.Ui.Components
             IPlayerInventory playerInventory,
             Action<GameObject, GameObject, ItemBase> toggleAction,
             IGear.GearCategory? gearCategory = null,
-            bool showEquippedItems = true
+            bool showEquippedItems = true,
+            Action<IPlayerInventory, string, InventoryUiRow> assignDrawingAction = null
         )
         {
             var localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
@@ -54,27 +59,40 @@ namespace FullPotential.Core.Ui.Components
                 }
 
                 var row = Instantiate(rowPrefab, componentsContainer.transform);
+                var rowScript = row.GetComponent<InventoryUiRow>();
 
-                row.GetComponent<InventoryUiRow>().Text.text = item.Name;
+                rowScript.Text.text = item.Name;
 
-                if (isEquipped)
+                if (toggleAction != null)
                 {
-                    var rowToggle = row.GetComponent<Toggle>();
-                    rowToggle.isOn = true;
+                    if (isEquipped)
+                    {
+                        var rowToggle = row.GetComponent<Toggle>();
+                        rowToggle.isOn = true;
 
-                    var rowImage = row.GetComponent<Image>();
-                    rowImage.color = Color.green;
+                        var rowImage = row.GetComponent<Image>();
+                        rowImage.color = Color.green;
+                    }
+
+                    toggleAction(row, slot, item);
                 }
-
-                toggleAction(row, slot, item);
 
                 var tooltip = row.GetComponent<Tooltip>();
                 tooltip.ClearHandlers();
-
                 tooltip.OnPointerEnterForTooltip += _ =>
                 {
                     Tooltips.ShowTooltip(item.GetDescription(localizer, LevelOfDetail.Intermediate));
                 };
+
+                rowScript.AssignedShapeText.text = playerInventory.GetAssignedShape(item.Id).IsNullOrWhiteSpace()
+                    ? AssignedShapeNone
+                    : AssignedShapeSet;
+
+                if (assignDrawingAction != null)
+                {
+                    rowScript.ToggleButton(true);
+                    rowScript.AssignedShapeButton.onClick.AddListener(() => assignDrawingAction(playerInventory, item.Id, rowScript));
+                }
 
                 rowCounter++;
             }

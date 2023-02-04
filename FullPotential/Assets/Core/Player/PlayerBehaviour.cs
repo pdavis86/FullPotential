@@ -4,9 +4,11 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Data;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
+using FullPotential.Api.Localization;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Core.GameManagement;
@@ -14,6 +16,7 @@ using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.UI.Behaviours;
+using FullPotential.Core.UI.Events;
 using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.UtilityBehaviours;
 using TMPro;
@@ -26,6 +29,8 @@ namespace FullPotential.Core.Player
 {
     public class PlayerBehaviour : NetworkBehaviour, IPlayerBehaviour
     {
+        private const string EventSource = nameof(PlayerBehaviour);
+
 #pragma warning disable 0649
         [SerializeField] private Camera _playerCamera;
         [SerializeField] private Camera _inFrontOfPlayerCamera;
@@ -35,6 +40,7 @@ namespace FullPotential.Core.Player
         //Services
         private IResultFactory _resultFactory;
         private IInventoryDataService _inventoryDataService;
+        private ILocalizer _localizer;
 
         private bool _hasMenuOpen;
         private UserInterface _userInterface;
@@ -59,8 +65,11 @@ namespace FullPotential.Core.Player
 
             _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
             _inventoryDataService = DependenciesContext.Dependencies.GetService<IInventoryDataService>();
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
 
             _drawingPadUi = GameManager.Instance.UserInterface.DrawingPad.GetComponent<DrawingPadUi>();
+
+            _drawingPadUi.OnDrawingStop += HandleOnDrawingStop;
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -184,6 +193,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
+                _drawingPadUi.InitialiseForEquip(EventSource, SlotGameObjectName.LeftHand);
                 _drawingPadUi.StartDrawing();
             }
         }
@@ -210,6 +220,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
+                _drawingPadUi.InitialiseForEquip(EventSource, SlotGameObjectName.RightHand);
                 _drawingPadUi.StartDrawing();
             }
         }
@@ -573,6 +584,31 @@ namespace FullPotential.Core.Player
             {
                 craftingUi.ResetUi();
             }
+        }
+
+        private void HandleOnDrawingStop(object sender, OnDrawingStopEventArgs e)
+        {
+            if (e.EventSource != EventSource)
+            {
+                return;
+            }
+
+            if (e.SlotGameObjectName == null)
+            {
+                Debug.LogError("No slot was set so cannot equip any item");
+                return;
+            }
+
+            var item = _playerState.Inventory.GetItemFromAssignedShape(e.DrawnShape);
+
+            if (item == null)
+            {
+                GameManager.Instance.GetUserInterface().HudOverlay.ShowAlert(_localizer.Translate("ui.drawingpad.nomatch"));
+                return;
+            }
+
+            var playerInventory = (PlayerInventory)_playerState.Inventory;
+            playerInventory.EquipItemServerRpc(item.Id, e.SlotGameObjectName.Value);
         }
 
     }

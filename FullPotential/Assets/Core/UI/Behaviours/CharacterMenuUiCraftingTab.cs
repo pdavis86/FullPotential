@@ -29,7 +29,8 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private GameObject _inventoryRowPrefab;
 #pragma warning restore 0649
 
-        private List<ItemBase> _components;
+        private readonly List<ItemBase> _components = new List<ItemBase>();
+
         private PlayerState _playerState;
         private PlayerBehaviour _playerBehaviour;
 
@@ -39,8 +40,6 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _components = new List<ItemBase>();
-
             _playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>();
             _playerBehaviour = _playerState.gameObject.GetComponent<PlayerBehaviour>();
 

@@ -7,15 +7,19 @@ namespace FullPotential.Core.Ui.Behaviours
     public class CharacterMenuUi : MonoBehaviour
     {
         // ReSharper disable UnassignedField.Global
-        public GameObject Equipment;
-        public GameObject Crafting;
+        // ReSharper disable MemberCanBePrivate.Global
+        public GameObject[] TabContents;
+        public GameObject DarkOverlay;
         // ReSharper restore UnassignedField.Global
+        // ReSharper restore MemberCanBePrivate.Global
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            Equipment.SetActive(false);
-            Crafting.SetActive(false);
+            foreach (var tabContent in TabContents)
+            {
+                tabContent.SetActive(false);
+            }
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -27,17 +31,9 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once MemberCanBePrivate.Global
         public void OnTabClick(int index)
         {
-            switch (index)
+            for (var i = 0; i < TabContents.Length; i++)
             {
-                case 0:
-                    Crafting.SetActive(false);
-                    Equipment.SetActive(true);
-                    break;
-
-                case 2:
-                    Equipment.SetActive(false);
-                    Crafting.SetActive(true);
-                    break;
+                TabContents[i].SetActive(i == index);
             }
         }
 
