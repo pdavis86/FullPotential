@@ -589,8 +589,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     ? MeleeRangeLimit
                     : MeleeRangeLimit / 2;
 
-                Physics.Raycast(LookTransform.position, LookTransform.forward, out var meleeHit, meleeRange);
-                _effectService.ApplyEffects(this, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
+                if (Physics.Raycast(LookTransform.position, LookTransform.forward, out var meleeHit, meleeRange))
+                {
+                    _effectService.ApplyEffects(this, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
+                }
             }
 
             return true;
