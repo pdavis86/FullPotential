@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
@@ -20,17 +22,19 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private Dropdown _languageDropDown;
         [SerializeField] private InputField _skinUrlInput;
         [SerializeField] private Slider _fovSlider;
+        [SerializeField] private InputField _lookSensitivityInput;
+        [SerializeField] private InputField _lookSmoothnessInput;
 #pragma warning restore 0649
 
         private Dictionary<string, string> _cultures;
         private int _newCultureIndex = -1;
         private Resolution[] _availableResolutions;
-        
+
         //Revert variables
         private bool _isRevertRequired;
-        private Resolution _revertResolution;
+        private Resolution? _revertResolution;
         private bool _revertFullScreen;
-        private float _revertFieldOfView;
+        private float? _revertFieldOfView;
 
         #region Unity Event handlers
 
@@ -97,26 +101,47 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Global
         public async void SaveAndClose()
         {
+            await SaveGameSettings();
+
+            SavePlayerSettings();
+
+            _isRevertRequired = false;
+
+            GameManager.Instance.UserInterface.HideAllMenus();
+        }
+
+        private async Task SaveGameSettings()
+        {
             if (_newCultureIndex > -1)
             {
                 var match = _cultures.ElementAt(_newCultureIndex);
                 await GameManager.Instance.SetCultureAsync(match.Key);
             }
 
-            GameManager.Instance.AppOptions.FieldOfView = Camera.main.fieldOfView;
+            GameManager.Instance.GameSettings.FieldOfView = Camera.main.fieldOfView;
+            
+            if (float.TryParse(_lookSensitivityInput.text, out var newSensitivity))
+            {
+                GameManager.Instance.GameSettings.LookSensitivity = newSensitivity;
+            }
 
+            if (float.TryParse(_lookSmoothnessInput.text, out var newSmoothness))
+            {
+                GameManager.Instance.GameSettings.LookSmoothness = newSmoothness;
+            }
+
+            GameManager.Instance.SaveGameSettings();
+        }
+
+        private void SavePlayerSettings()
+        {
             var playerSettings = new PlayerSettings
             {
                 TextureUrl = _skinUrlInput.text
             };
 
-            GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>().UpdatePlayerSettings(playerSettings);
-
-            _isRevertRequired = false;
-
-            GameManager.Instance.UserInterface.HideAllMenus();
-
-            GameManager.Instance.SaveAppOptions();
+            var playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>();
+            playerState.UpdatePlayerSettings(playerSettings);
         }
 
         private string GetAspectRatio(int width, int height)
@@ -159,7 +184,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _revertFieldOfView = Camera.main.fieldOfView;
             _fovSlider.value = Camera.main.fieldOfView;
 
-            var culture = GameManager.Instance.AppOptions.Culture;
+            var culture = GameManager.Instance.GameSettings.Culture;
             int i;
             for (i = 0; i < _cultures.Count; i++)
             {
@@ -169,6 +194,10 @@ namespace FullPotential.Core.Ui.Behaviours
                 }
             }
             _languageDropDown.value = i;
+
+            _lookSensitivityInput.text = GameManager.Instance.GameSettings.LookSensitivity.ToString(CultureInfo.InvariantCulture);
+
+            _lookSmoothnessInput.text = GameManager.Instance.GameSettings.LookSmoothness.ToString(CultureInfo.InvariantCulture);
         }
 
         private void LoadPlayerSettings()
@@ -185,10 +214,16 @@ namespace FullPotential.Core.Ui.Behaviours
             }
 
             //Application settings
-            Screen.SetResolution(_revertResolution.width, _revertResolution.height, _revertFullScreen);
+            if (_revertResolution.HasValue)
+            {
+                Screen.SetResolution(_revertResolution.Value.width, _revertResolution.Value.height, _revertFullScreen);
+            }
 
             //Game settings
-            Camera.main.fieldOfView = _revertFieldOfView;
+            if (Camera.main != null && _revertFieldOfView.HasValue)
+            {
+                Camera.main.fieldOfView = _revertFieldOfView.Value;
+            }
         }
 
     }

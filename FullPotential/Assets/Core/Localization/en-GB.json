@@ -391,6 +391,14 @@
       "Value": "Language"
     },
     {
+      "Key": "ui.settings.looksensitivity",
+      "Value": "Look Sensitivity"
+    },
+    {
+      "Key": "ui.settings.looksmoothness",
+      "Value": "Look Smoothness"
+    },
+    {
       "Key": "ui.settings.playersettings",
       "Value": "Skin URL"
     },

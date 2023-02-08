@@ -154,13 +154,13 @@ namespace FullPotential.Core.Player
             {
                 GetAndLoadPlayerData(false, null);
 
-                if (GameManager.Instance.GameDataStore.ClientIdToUsername.ContainsKey(OwnerClientId))
+                if (GameManager.Instance.ServerGameDataStore.ClientIdToUsername.ContainsKey(OwnerClientId))
                 {
-                    GameManager.Instance.GameDataStore.ClientIdToUsername[OwnerClientId] = Username;
+                    GameManager.Instance.ServerGameDataStore.ClientIdToUsername[OwnerClientId] = Username;
                 }
                 else
                 {
-                    GameManager.Instance.GameDataStore.ClientIdToUsername.Add(OwnerClientId, Username);
+                    GameManager.Instance.ServerGameDataStore.ClientIdToUsername.Add(OwnerClientId, Username);
                 }
             }
             else if (IsOwner)

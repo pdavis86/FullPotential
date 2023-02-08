@@ -104,7 +104,7 @@ namespace FullPotential.Core.Player
 
             if (IsClient)
             {
-                Camera.main.fieldOfView = GameManager.Instance.AppOptions.FieldOfView;
+                Camera.main.fieldOfView = GameManager.Instance.GameSettings.FieldOfView;
             }
         }
 

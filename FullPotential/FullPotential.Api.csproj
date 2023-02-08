@@ -138,7 +138,7 @@
     <Compile Include="Assets\Api\GameManagement\ITypeRegistry.cs" />
     <Compile Include="Assets\Api\Registry\SpellsAndGadgets\IShape.cs" />
     <Compile Include="Assets\Api\GameManagement\IRpcService.cs" />
-    <Compile Include="Assets\Api\GameManagement\AppOptions.cs" />
+    <Compile Include="Assets\Api\GameManagement\GameSettings.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\AffectableStat.cs" />
     <Compile Include="Assets\Api\Registry\Crafting\IGearArmor.cs" />
     <Compile Include="Assets\Api\Utilities\DelayedAction.cs" />

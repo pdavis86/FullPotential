@@ -22,6 +22,7 @@ using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement.Data;
 using FullPotential.Core.GameManagement.Enums;
+using FullPotential.Core.GameManagement.Events;
 using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Localization;
@@ -55,9 +56,12 @@ namespace FullPotential.Core.GameManagement
         public DefaultInputActions InputActions { get; private set; }
 
         //Data Stores
-        public AppOptions AppOptions { get; private set; }
-        public readonly GameData GameDataStore = new GameData();
+        public GameSettings GameSettings { get; private set; }
+        public readonly ServerGameData ServerGameDataStore = new ServerGameData();
         public readonly LocalGameData LocalGameDataStore = new LocalGameData();
+
+        //Events
+        public event EventHandler<GameSettingsUpdatedEventArgs> GameSettingsUpdated;
 
         //Services
         private IUserRegistry _userRegistry;
@@ -77,7 +81,7 @@ namespace FullPotential.Core.GameManagement
         #region Unity Event Handlers
 
         // ReSharper disable once UnusedMember.Local
-        private async void Awake()
+        private async Task Awake()
         {
             if (Instance != null && Instance != this)
             {
@@ -90,9 +94,9 @@ namespace FullPotential.Core.GameManagement
 
             RegisterServices();
 
-            GameDataStore.ClientIdToUsername = new Dictionary<ulong, string>();
+            ServerGameDataStore.ClientIdToUsername = new Dictionary<ulong, string>();
 
-            EnsureAppOptionsLoaded();
+            EnsureGameSettingsLoaded();
 
             await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
             var addressablesManager = new AddressablesManager();
@@ -104,7 +108,7 @@ namespace FullPotential.Core.GameManagement
 
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             await _localizer.LoadAvailableCulturesAsync(addressablesManager.LocalisationAddresses);
-            await _localizer.LoadLocalizationFilesAsync(AppOptions.Culture);
+            await _localizer.LoadLocalizationFilesAsync(GameSettings.Culture);
 
             Prefabs = GetComponent<Prefabs>();
             UserInterface = _mainCanvas.GetComponent<UserInterface>();
@@ -158,9 +162,9 @@ namespace FullPotential.Core.GameManagement
                 return;
             }
 
-            if (GameDataStore.ClientIdToUsername.ContainsValue(playerUsername))
+            if (ServerGameDataStore.ClientIdToUsername.ContainsValue(playerUsername))
             {
-                var originalClientId = GameDataStore.ClientIdToUsername.First(x => x.Value == playerUsername).Key;
+                var originalClientId = ServerGameDataStore.ClientIdToUsername.First(x => x.Value == playerUsername).Key;
 
                 if (NetworkManager.Singleton.ConnectedClients.ContainsKey(originalClientId))
                 {
@@ -174,7 +178,7 @@ namespace FullPotential.Core.GameManagement
                     return;
                 }
 
-                GameDataStore.ClientIdToUsername.Remove(originalClientId);
+                ServerGameDataStore.ClientIdToUsername.Remove(originalClientId);
             }
 
             var serverVersion = GetGameVersion();
@@ -198,7 +202,7 @@ namespace FullPotential.Core.GameManagement
         {
             if (NetworkManager.Singleton.IsServer)
             {
-                GameDataStore.ClientIdToUsername.Remove(clientId);
+                ServerGameDataStore.ClientIdToUsername.Remove(clientId);
             }
             else
             {
@@ -234,32 +238,54 @@ namespace FullPotential.Core.GameManagement
             UserInterface.DebuggingOverlay.SetActive(false);
             UserInterface.DebuggingOverlay.SetActive(true);
 
-            EnsureAppOptionsLoaded();
-            AppOptions.Culture = culture;
+            EnsureGameSettingsLoaded();
+            GameSettings.Culture = culture;
             CurrentCulture = new CultureInfo(culture);
         }
 
-        private static string GetAppOptionsPath()
+        private static string GetGameSettingsPath()
         {
             return Application.persistentDataPath + "/LoadOptions.json";
         }
 
-        private void EnsureAppOptionsLoaded()
+        private void EnsureGameSettingsLoaded()
         {
-            if (!(AppOptions?.Culture).IsNullOrWhiteSpace())
+            if (!(GameSettings?.Culture).IsNullOrWhiteSpace())
             {
                 return;
             }
 
-            var path = GetAppOptionsPath();
+            var path = GetGameSettingsPath();
 
             if (System.IO.File.Exists(path))
             {
-                AppOptions = JsonUtility.FromJson<AppOptions>(System.IO.File.ReadAllText(path));
+                GameSettings = JsonUtility.FromJson<GameSettings>(System.IO.File.ReadAllText(path));
+
+                //todo: zzz v0.5 - Remove GameSettings.Username backwards compat
+#pragma warning disable CS0618
+                if (!GameSettings.Username.IsNullOrWhiteSpace() &&
+                    GameSettings.LastSigninUsername.IsNullOrWhiteSpace())
+                {
+                    GameSettings.LastSigninUsername = GameSettings.Username;
+                    GameSettings.Username = null;
+                }
+#pragma warning restore CS0618
+
+                if (GameSettings.LookSensitivity == 0)
+                {
+                    GameSettings.LookSensitivity = 0.2f;
+                }
+
+                if (GameSettings.LookSmoothness == 0)
+                {
+                    GameSettings.LookSmoothness = 3;
+                }
+
+                GameSettingsUpdated?.Invoke(this, new GameSettingsUpdatedEventArgs(GameSettings));
                 return;
             }
 
-            AppOptions = new AppOptions
+            GameSettings = new GameSettings
             {
                 Culture = Localizer.DefaultCulture
             };
@@ -293,9 +319,10 @@ namespace FullPotential.Core.GameManagement
 #endif
         }
 
-        public void SaveAppOptions()
+        public void SaveGameSettings()
         {
-            System.IO.File.WriteAllText(GetAppOptionsPath(), JsonUtility.ToJson(AppOptions));
+            System.IO.File.WriteAllText(GetGameSettingsPath(), JsonUtility.ToJson(GameSettings));
+            GameSettingsUpdated?.Invoke(this, new GameSettingsUpdatedEventArgs(GameSettings));
         }
 
         public static Version GetGameVersion()
@@ -324,13 +351,13 @@ namespace FullPotential.Core.GameManagement
             var playerDataCollection = new List<PlayerData>();
             foreach (var kvp in NetworkManager.Singleton.ConnectedClients)
             {
-                if (!GameDataStore.ClientIdToUsername.ContainsKey(kvp.Key))
+                if (!ServerGameDataStore.ClientIdToUsername.ContainsKey(kvp.Key))
                 {
                     Debug.LogWarning($"Could not find username for client {kvp.Key}");
                     continue;
                 }
 
-                if (allData || _asapSaveUsernames.Contains(GameDataStore.ClientIdToUsername[kvp.Key]))
+                if (allData || _asapSaveUsernames.Contains(ServerGameDataStore.ClientIdToUsername[kvp.Key]))
                 {
                     playerDataCollection.Add(kvp.Value.PlayerObject.GetComponent<PlayerState>().UpdateAndReturnPlayerData());
                 }

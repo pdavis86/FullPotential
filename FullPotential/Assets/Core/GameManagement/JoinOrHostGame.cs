@@ -64,7 +64,7 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
-            _username = GameManager.Instance.AppOptions.Username;
+            _username = GameManager.Instance.GameSettings.LastSigninUsername;
             _signinFirstInput.text = _username;
 
             if (string.IsNullOrWhiteSpace(GameManager.Instance.LocalGameDataStore.PlayerToken))
@@ -168,8 +168,8 @@ namespace FullPotential.Core.GameManagement
                 return;
             }
 
-            GameManager.Instance.AppOptions.Username = _username;
-            GameManager.Instance.SaveAppOptions();
+            GameManager.Instance.GameSettings.LastSigninUsername = _username;
+            GameManager.Instance.SaveGameSettings();
 
                 GameManager.Instance.LocalGameDataStore.PlayerToken = token;
             _username = _password = null;
@@ -241,7 +241,7 @@ namespace FullPotential.Core.GameManagement
             }
 
             GameManager.Instance.LocalGameDataStore.HasDisconnected = false;
-            GameManager.Instance.GameDataStore.ClientIdToUsername.Clear();
+            GameManager.Instance.ServerGameDataStore.ClientIdToUsername.Clear();
 
             _networkManager.StartHost();
 

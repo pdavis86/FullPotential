@@ -2,7 +2,7 @@
 
 namespace FullPotential.Core.GameManagement.Data
 {
-    public class GameData
+    public class ServerGameData
     {
         public Dictionary<ulong, string> ClientIdToUsername { get; set; }
     }

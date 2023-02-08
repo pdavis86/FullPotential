@@ -1,6 +1,7 @@
 ﻿using FullPotential.Api.GameManagement;
 using FullPotential.Api.Ioc;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.GameManagement.Events;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,18 +13,17 @@ namespace FullPotential.Core.Player
     [RequireComponent(typeof(Rigidbody))]
     public class PlayerMovement : NetworkBehaviour
     {
+        private Vector2 _lookSensitivity = new Vector2(0.2f, 0.2f);
+        private Vector2 _lookSmoothness = new Vector2(3f, 3f);
+
 #pragma warning disable 0649
         // ReSharper disable FieldCanBeMadeReadOnly.Local
-        // ReSharper disable ConvertToConstant.Local
-        private readonly Vector2 _lookSensitivity = new Vector2(0.2f, 0.2f);
-        private readonly Vector2 _lookSmoothness = new Vector2(3f, 3f);
-        private readonly int _sprintStoppingFactor = 65;
         [SerializeField] private Camera _playerCamera;
         [SerializeField] private float _speed = 5f;
         [SerializeField] private float _cameraRotationLimit = 85f;
         [SerializeField] private float _jumpForceMultiplier = 10500f;
+        [SerializeField] private int _sprintStoppingFactor = 65;
         // ReSharper restore FieldCanBeMadeReadOnly.Local
-        // ReSharper restore ConvertToConstant.Local
 #pragma warning restore 0649
 
         private Rigidbody _rb;
@@ -63,6 +63,8 @@ namespace FullPotential.Core.Player
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
 
             _userInterface = GameManager.Instance.UserInterface;
+
+            GameManager.Instance.GameSettingsUpdated += OnGameSettingsUpdated;
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -80,6 +82,16 @@ namespace FullPotential.Core.Player
         private void FixedUpdate()
         {
             ApplyMovementFromInputs();
+        }
+
+        #endregion
+
+        #region GameManager Event Handlers
+
+        private void OnGameSettingsUpdated(object sender, GameSettingsUpdatedEventArgs eventArgs)
+        {
+            _lookSensitivity = new Vector2(eventArgs.UpdatedSettings.LookSensitivity, eventArgs.UpdatedSettings.LookSensitivity);
+            _lookSmoothness = new Vector2(eventArgs.UpdatedSettings.LookSmoothness, eventArgs.UpdatedSettings.LookSmoothness);
         }
 
         #endregion
