@@ -466,24 +466,38 @@ namespace FullPotential.Core.Player
 
         private void UpdateMenuStates()
         {
-            if (_toggleGameMenu || _toggleCharacterMenu)
+            if (_toggleGameMenu)
             {
                 if (_hasMenuOpen)
                 {
                     _userInterface.HideAllMenus();
                 }
-                else if (_toggleGameMenu)
+                else
                 {
                     _userInterface.HideOthersOpenThis(_userInterface.EscMenu);
                 }
-                else if (_toggleCharacterMenu)
+
+                Tooltips.HideTooltip();
+
+                _toggleGameMenu = false;
+            }
+
+            if (_toggleCharacterMenu)
+            {
+                if (_hasMenuOpen)
+                {
+                    if (_userInterface.CharacterMenu.activeInHierarchy)
+                    {
+                        _userInterface.HideAllMenus();
+                    }
+                }
+                else
                 {
                     _userInterface.HideOthersOpenThis(_userInterface.CharacterMenu);
                 }
 
                 Tooltips.HideTooltip();
 
-                _toggleGameMenu = false;
                 _toggleCharacterMenu = false;
             }
 
