@@ -1,8 +1,8 @@
 ﻿using FullPotential.Api.Gameplay.Data;
 
-namespace FullPotential.Api.Registry
+namespace FullPotential.Api.Persistence
 {
-    public interface IUserRegistry
+    public interface IUserRepository
     {
         string SignIn(string username, string password);
         string GetUsernameFromToken(string token);

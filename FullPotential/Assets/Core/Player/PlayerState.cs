@@ -8,7 +8,7 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Registry;
+using FullPotential.Api.Persistence;
 using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities;
@@ -46,7 +46,7 @@ namespace FullPotential.Core.Player
         private ActionQueue<bool> _aliveStateChanges;
 
         //Registered Services
-        private IUserRegistry _userRegistry;
+        private IUserRepository _userRepository;
 
         //Data
         private PlayerData _saveData;
@@ -115,7 +115,7 @@ namespace FullPotential.Core.Player
             _inventory = Inventory;
             _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
 
-            _userRegistry = DependenciesContext.Dependencies.GetService<IUserRegistry>();
+            _userRepository = DependenciesContext.Dependencies.GetService<IUserRepository>();
 
             HealthStatSlider = _healthSlider;
         }
@@ -443,7 +443,7 @@ namespace FullPotential.Core.Player
 
         private void GetAndLoadPlayerData(bool reduced, ulong? sendToClientId)
         {
-            var playerData = _userRegistry.Load(PlayerToken, null, reduced);
+            var playerData = _userRepository.Load(PlayerToken, null, reduced);
 
             if (sendToClientId.HasValue)
             {

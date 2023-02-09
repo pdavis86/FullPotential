@@ -4,6 +4,6 @@ namespace FullPotential.Api.Gameplay.Drawing
 {
     public interface IDrawingService
     {
-        string GetDrawingCode(DrawShape drawShape, Vector2 direction, int length);
+        string GetDrawingCode(Vector2 direction, int length);
     }
 }

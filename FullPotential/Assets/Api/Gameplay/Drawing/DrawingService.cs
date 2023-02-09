@@ -8,7 +8,7 @@ namespace FullPotential.Api.Gameplay.Drawing
 {
     public class DrawingService : IDrawingService
     {
-        public string GetDrawingCode(DrawShape drawShape, Vector2 direction, int length)
+        public string GetDrawingCode(Vector2 direction, int length)
         {
             var builder = new StringBuilder();
 

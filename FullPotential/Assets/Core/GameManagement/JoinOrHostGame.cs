@@ -3,7 +3,7 @@ using System.Collections;
 using System.Linq;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Registry;
+using FullPotential.Api.Persistence;
 using FullPotential.Api.Ui.Services;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement.Enums;
@@ -38,7 +38,7 @@ namespace FullPotential.Core.GameManagement
         // ReSharper restore UnassignedField.Global
         // ReSharper restore MemberCanBePrivate.Global
 
-        private IUserRegistry _userRegistry;
+        private IUserRepository _userRepository;
         private ILocalizer _localizer;
         private IUiAssistant _uiAssistant;
 
@@ -56,7 +56,7 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _userRegistry = DependenciesContext.Dependencies.GetService<IUserRegistry>();
+            _userRepository = DependenciesContext.Dependencies.GetService<IUserRepository>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _uiAssistant = DependenciesContext.Dependencies.GetService<IUiAssistant>();
         }
@@ -189,7 +189,7 @@ namespace FullPotential.Core.GameManagement
                 return;
             }
 
-            var token = _userRegistry.SignIn(_username, _password);
+            var token = _userRepository.SignIn(_username, _password);
 
             if (string.IsNullOrWhiteSpace(token))
             {

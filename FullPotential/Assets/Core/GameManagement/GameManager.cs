@@ -13,7 +13,7 @@ using FullPotential.Api.Gameplay.Drawing;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Registry;
+using FullPotential.Api.Persistence;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Spawning;
 using FullPotential.Api.Ui;
@@ -29,6 +29,7 @@ using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Localization;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
+using FullPotential.Core.Persistence;
 using FullPotential.Core.Player;
 using FullPotential.Core.Registry;
 using FullPotential.Core.Spawning;
@@ -65,7 +66,8 @@ namespace FullPotential.Core.GameManagement
         public event EventHandler<GameSettingsUpdatedEventArgs> GameSettingsUpdated;
 
         //Services
-        private IUserRegistry _userRegistry;
+        private IUserRepository _userRepository;
+        private ISettingsRepository _settingsRepository;
         private ILocalizer _localizer;
 
         //Variables
@@ -93,26 +95,27 @@ namespace FullPotential.Core.GameManagement
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
+            ServerGameDataStore.ClientIdToUsername = new Dictionary<ulong, string>();
+            Prefabs = GetComponent<Prefabs>();
+            UserInterface = _mainCanvas.GetComponent<UserInterface>();
+
             RegisterServices();
 
-            ServerGameDataStore.ClientIdToUsername = new Dictionary<ulong, string>();
-
-            EnsureGameSettingsLoaded();
+            _userRepository = DependenciesContext.Dependencies.GetService<IUserRepository>();
+            _settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
 
             await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
+
             var addressablesManager = new AddressablesManager();
 
             var typeRegistry = (TypeRegistry)DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             typeRegistry.FindAndRegisterAll(addressablesManager.ModPrefixes);
 
-            _userRegistry = DependenciesContext.Dependencies.GetService<IUserRegistry>();
+            EnsureGameSettingsLoaded();
 
-            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             await _localizer.LoadAvailableCulturesAsync(addressablesManager.LocalisationAddresses);
             await _localizer.LoadLocalizationFilesAsync(GameSettings.Culture);
-
-            Prefabs = GetComponent<Prefabs>();
-            UserInterface = _mainCanvas.GetComponent<UserInterface>();
 
             InputActions = new DefaultInputActions();
 
@@ -155,7 +158,7 @@ namespace FullPotential.Core.GameManagement
             var payload = System.Text.Encoding.UTF8.GetString(approvalRequest.Payload);
             var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
 
-            var playerUsername = _userRegistry.GetUsernameFromToken(connectionPayload.PlayerToken);
+            var playerUsername = _userRepository.GetUsernameFromToken(connectionPayload.PlayerToken);
 
             if (playerUsername == null)
             {
@@ -244,11 +247,6 @@ namespace FullPotential.Core.GameManagement
             CurrentCulture = new CultureInfo(culture);
         }
 
-        private static string GetGameSettingsPath()
-        {
-            return Application.persistentDataPath + "/LoadOptions.json";
-        }
-
         private void EnsureGameSettingsLoaded()
         {
             if (!(GameSettings?.Culture).IsNullOrWhiteSpace())
@@ -256,40 +254,9 @@ namespace FullPotential.Core.GameManagement
                 return;
             }
 
-            var path = GetGameSettingsPath();
+            GameSettings = _settingsRepository.Load();
 
-            if (System.IO.File.Exists(path))
-            {
-                GameSettings = JsonUtility.FromJson<GameSettings>(System.IO.File.ReadAllText(path));
-
-                //todo: zzz v0.5 - Remove GameSettings.Username backwards compat
-#pragma warning disable CS0618
-                if (!GameSettings.Username.IsNullOrWhiteSpace() &&
-                    GameSettings.LastSigninUsername.IsNullOrWhiteSpace())
-                {
-                    GameSettings.LastSigninUsername = GameSettings.Username;
-                    GameSettings.Username = null;
-                }
-#pragma warning restore CS0618
-
-                if (GameSettings.LookSensitivity == 0)
-                {
-                    GameSettings.LookSensitivity = 0.2f;
-                }
-
-                if (GameSettings.LookSmoothness == 0)
-                {
-                    GameSettings.LookSmoothness = 3;
-                }
-
-                GameSettingsUpdated?.Invoke(this, new GameSettingsUpdatedEventArgs(GameSettings));
-                return;
-            }
-
-            GameSettings = new GameSettings
-            {
-                Culture = Localizer.DefaultCulture
-            };
+            GameSettingsUpdated?.Invoke(this, new GameSettingsUpdatedEventArgs(GameSettings));
         }
 
         public void Disconnect()
@@ -322,7 +289,7 @@ namespace FullPotential.Core.GameManagement
 
         public void SaveGameSettings()
         {
-            System.IO.File.WriteAllText(GetGameSettingsPath(), JsonUtility.ToJson(GameSettings));
+            _settingsRepository.Save(GameSettings);
             GameSettingsUpdated?.Invoke(this, new GameSettingsUpdatedEventArgs(GameSettings));
         }
 
@@ -407,14 +374,14 @@ namespace FullPotential.Core.GameManagement
 
             //Debug.Log($"Saving player data for {playerData.Username}");
 
-            _userRegistry.Save(playerData);
+            _userRepository.Save(playerData);
 
             _asapSaveUsernames.Remove(playerData.Username);
         }
 
         private void RegisterServices()
         {
-            DependenciesContext.Dependencies.Register<IUserRegistry, UserRegistry>();
+            DependenciesContext.Dependencies.Register<IUserRepository, UserRepository>();
             DependenciesContext.Dependencies.Register<IResultFactory, ResultFactory>();
             DependenciesContext.Dependencies.Register<IInventoryDataService, InventoryDataService>();
             DependenciesContext.Dependencies.Register<IValueCalculator, ValueCalculator>();
@@ -426,6 +393,7 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<IModHelper, ModHelper>();
             DependenciesContext.Dependencies.Register<IDrawingService, DrawingService>();
             DependenciesContext.Dependencies.Register<IUiAssistant, UiAssistant>();
+            DependenciesContext.Dependencies.Register<ISettingsRepository, SettingsRepository>();
         }
 
         public void CheckIsAdmin()

@@ -1,18 +1,18 @@
 ﻿using System.Linq;
 using FullPotential.Api.Gameplay.Data;
-using FullPotential.Api.Registry;
+using FullPotential.Api.Persistence;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Core.Registry
+namespace FullPotential.Core.Persistence
 {
-    public class UserRegistry : IUserRegistry
+    public class UserRepository : IUserRepository
     {
         private readonly bool _isDebugBuild;
         private readonly string _persistentDataPath;
 
-        public UserRegistry()
+        public UserRepository()
         {
             _isDebugBuild = Debug.isDebugBuild;
             _persistentDataPath = Application.persistentDataPath;
