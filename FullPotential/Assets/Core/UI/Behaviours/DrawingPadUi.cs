@@ -184,7 +184,8 @@ namespace FullPotential.Core.UI.Behaviours
             {
                 if (_currentShapeMarkers.Count >= MinimumMarkers)
                 {
-                    RecordShapeDrawn(DrawShape.Line, _currentShapeMarkers.Last() - _currentShapeMarkers.First());
+                    var direction = _currentShapeMarkers.Last() - _currentShapeMarkers.First();
+                    RecordShapeDrawn(DrawShape.Line, direction, GetLength());
                 }
                 //else
                 //{
@@ -310,11 +311,16 @@ namespace FullPotential.Core.UI.Behaviours
             if (Mathf.Abs(lineAngle - markerAngle) > _directionAngleTolerance)
             {
                 //Debug.Log("Over DirectionAngleTolerance");
-                RecordShapeDrawn(DrawShape.Line, initialDirection);
+                RecordShapeDrawn(DrawShape.Line, initialDirection, GetLength());
                 return;
             }
 
             CreateMarker(rawMousePosition);
+        }
+
+        private int GetLength()
+        {
+            return (_currentShapeMarkers.Count - 1) * DistanceTolerance;
         }
 
         private void ClearMarkers()
@@ -323,9 +329,9 @@ namespace FullPotential.Core.UI.Behaviours
             gameObject.DeleteAllChildren();
         }
 
-        private void RecordShapeDrawn(DrawShape drawShape, Vector2? direction = null)
+        private void RecordShapeDrawn(DrawShape drawShape, Vector2 direction, int length)
         {
-            _drawnShapes.Add(_drawingService.GetDrawingCode(drawShape, direction));
+            _drawnShapes.Add(_drawingService.GetDrawingCode(drawShape, direction, length));
 
             //Debug.Log("That was a " + _drawnShapes.Last());
 

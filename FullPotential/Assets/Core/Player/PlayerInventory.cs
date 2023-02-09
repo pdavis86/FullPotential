@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Data;
@@ -347,6 +348,14 @@ namespace FullPotential.Core.Player
                     SpawnEquippedObject(item, slotGameObjectName);
                 }
             }
+
+            if (inventoryData.ShapeMapping != null)
+            {
+                foreach (var kvp in inventoryData.ShapeMapping)
+                {
+                    _itemIdToShapeMapping.Add(kvp.Key, kvp.Value);
+                }
+            }
         }
 
         private void SetEquippedItem(ItemBase item, SlotGameObjectName slotGameObjectName)
@@ -418,15 +427,18 @@ namespace FullPotential.Core.Player
 
         public InventoryData GetSaveData()
         {
+            var groupedItems = _items
+                .Select(x => x.Value)
+                .GroupBy(x => x.GetType());
+
             var equippedItems = _equippedItems
                 .Where(x => !(x.Value?.Item?.Id.IsNullOrWhiteSpace() ?? false))
                 .Select(x => new Api.Utilities.Data.KeyValuePair<string, string>(
                     Enum.GetName(typeof(SlotGameObjectName), x.Key),
                     x.Value.Item?.Id));
 
-            var groupedItems = _items
-                .Select(x => x.Value)
-                .GroupBy(x => x.GetType());
+            var shapeMapping = _itemIdToShapeMapping
+                .Select(x => new Api.Utilities.Data.KeyValuePair<string, string>(x.Key, x.Value));
 
             return new InventoryData
             {
@@ -437,7 +449,8 @@ namespace FullPotential.Core.Player
                 Gadgets = groupedItems.FirstOrDefault(x => x.Key == typeof(Gadget))?.Select(x => x as Gadget).ToArray(),
                 Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray(),
                 Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
-                EquippedItems = equippedItems.ToArray()
+                EquippedItems = equippedItems.ToArray(),
+                ShapeMapping = shapeMapping.ToArray()
             };
         }
 
@@ -727,9 +740,12 @@ namespace FullPotential.Core.Player
             return true;
         }
 
-        public ItemBase GetItemFromAssignedShape(string shape)
+        public ItemBase GetItemFromAssignedShape(string shapeCode)
         {
-            var match = _itemIdToShapeMapping.FirstOrDefault(x => x.Value == shape);
+            var comparisonShapeCode = GetShapeCodeWithoutLengths(shapeCode);
+
+            var match = _itemIdToShapeMapping
+                .FirstOrDefault(x => GetShapeCodeWithoutLengths(x.Value) == comparisonShapeCode);
 
             if (match.Key.IsNullOrWhiteSpace())
             {
@@ -737,6 +753,11 @@ namespace FullPotential.Core.Player
             }
 
             return GetItemWithId<ItemBase>(match.Key);
+        }
+
+        private string GetShapeCodeWithoutLengths(string shapeCode)
+        {
+            return Regex.Replace(shapeCode, "(:\\d+)", string.Empty);
         }
     }
 }

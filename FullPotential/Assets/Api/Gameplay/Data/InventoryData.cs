@@ -16,5 +16,6 @@ namespace FullPotential.Api.Gameplay.Data
         public Weapon[] Weapons;
 
         public KeyValuePair<string, string>[] EquippedItems;
+        public KeyValuePair<string, string>[] ShapeMapping;
     }
 }
