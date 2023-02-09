@@ -17,6 +17,7 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Spawning;
 using FullPotential.Api.Ui;
+using FullPotential.Api.Ui.Services;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
@@ -424,6 +425,7 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<IEffectService, EffectService>();
             DependenciesContext.Dependencies.Register<IModHelper, ModHelper>();
             DependenciesContext.Dependencies.Register<IDrawingService, DrawingService>();
+            DependenciesContext.Dependencies.Register<IUiAssistant, UiAssistant>();
         }
 
         public void CheckIsAdmin()

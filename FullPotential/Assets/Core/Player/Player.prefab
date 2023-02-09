@@ -1091,6 +1091,7 @@ MonoBehaviour:
   _speed: 5
   _cameraRotationLimit: 85
   _jumpForceMultiplier: 10500
+  _sprintStoppingFactor: 65
 --- !u!114 &3593277776525206365
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1118,7 +1119,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Actions: {fileID: -944628639613478452, guid: c63f02be18c04684fb95940c5194601f,
     type: 3}
-  m_NotificationBehavior: 1
+  m_NotificationBehavior: 0
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
     m_PersistentCalls:
@@ -1129,7 +1130,83 @@ MonoBehaviour:
   m_ControlsChangedEvent:
     m_PersistentCalls:
       m_Calls: []
-  m_ActionEvents: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 8289bb25-2c68-490f-a791-4005c62a9000
+    m_ActionName: Player/Look[/Mouse/delta]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: a83e53cd-9ebb-468f-b7c2-1a7b0b16ac07
+    m_ActionName: Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 678f0c82-a744-4f1d-831e-30c9ad8a0726
+    m_ActionName: Player/Jump[/Keyboard/space]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 3cafea86-b641-4062-9003-ef6df722819f
+    m_ActionName: Player/Interact[/Keyboard/r]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 56a60f89-c9c4-4cc7-9f3c-e34efd3291c7
+    m_ActionName: Player/Cancel[/Keyboard/escape]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 2c760578-4c23-4b5a-8f53-020d9e870699
+    m_ActionName: Player/OpenCharacterMenu[/Keyboard/tab]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 383f1ec7-05c9-4ef2-bd04-7c16efae4855
+    m_ActionName: Player/Pointer[/Mouse/position]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 06a053fb-6340-40f2-8c1c-fff457c3ca95
+    m_ActionName: Player/SprintStart[/Keyboard/leftShift]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 6e38d72c-a28b-4502-91b6-faec96ec7dbd
+    m_ActionName: Player/SprintStop[/Keyboard/leftShift]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 004e0517-c6bc-454f-bf81-fb2ca264fe5b
+    m_ActionName: Player/ShowCursorStart[/Keyboard/leftCtrl]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: dc0f2407-36f9-44eb-bd2c-f488d938c055
+    m_ActionName: Player/ShowCursorStop[/Keyboard/leftCtrl]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 9ba6aec8-c21a-49f9-b7c0-076a771875a7
+    m_ActionName: Player/ReloadLeft[/Keyboard/q]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 990555f7-2ddc-4f96-ac91-460c7ba1e885
+    m_ActionName: Player/ReloadRight[/Keyboard/e]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 877448d7-aa5b-4693-8989-bde28fd893d8
+    m_ActionName: Player/AttackDownLeft[/Mouse/leftButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: ea72a802-1f50-42e7-8b37-c3b1ff9c7962
+    m_ActionName: Player/AttackHoldLeft[/Mouse/leftButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 230e98f7-4efe-4afe-9f23-7da36c1da81d
+    m_ActionName: Player/AttackReleaseLeft[/Mouse/leftButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: d9b3ea8e-4dae-471c-a8f4-eab9f24c4df1
+    m_ActionName: Player/AttackDownRight[/Mouse/rightButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c7d8554a-f191-41b4-bdac-d53116682867
+    m_ActionName: Player/AttackHoldRight[/Mouse/rightButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 3ca23353-87c5-4063-a6c0-aba3637af680
+    m_ActionName: Player/AttackReleaseRight[/Mouse/rightButton]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player

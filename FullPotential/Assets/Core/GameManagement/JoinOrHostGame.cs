@@ -4,6 +4,7 @@ using System.Linq;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
+using FullPotential.Api.Ui.Services;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement.Enums;
 using FullPotential.Core.Networking.Data;
@@ -31,8 +32,15 @@ namespace FullPotential.Core.GameManagement
         [SerializeField] private GameObject _joiningMessage;
 #pragma warning restore 0649
 
+        // ReSharper disable MemberCanBePrivate.Global
+        // ReSharper disable UnassignedField.Global
+        public GameObject[] TabOrder;
+        // ReSharper restore UnassignedField.Global
+        // ReSharper restore MemberCanBePrivate.Global
+
         private IUserRegistry _userRegistry;
         private ILocalizer _localizer;
+        private IUiAssistant _uiAssistant;
 
         private NetworkManager _networkManager;
         private UNetTransport _networkTransport;
@@ -43,12 +51,14 @@ namespace FullPotential.Core.GameManagement
         private string _networkAddress;
         private string _networkPort;
         private DateTime _joinAttempt;
+        private bool _shiftTab;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _userRegistry = DependenciesContext.Dependencies.GetService<IUserRegistry>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+            _uiAssistant = DependenciesContext.Dependencies.GetService<IUiAssistant>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -96,6 +106,26 @@ namespace FullPotential.Core.GameManagement
             {
                 _networkManager.OnClientDisconnectCallback -= OnClientDisconnect;
             }
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnTabPress()
+        {
+            if (_shiftTab)
+            {
+                _shiftTab = false;
+                return;
+            }
+
+            _uiAssistant.SelectNextGameObject(TabOrder, true);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnShiftTabPress()
+        {
+            _shiftTab = true;
+
+            _uiAssistant.SelectNextGameObject(TabOrder, false);
         }
 
         private void OnClientDisconnect(ulong clientId)
