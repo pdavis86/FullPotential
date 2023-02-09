@@ -4,6 +4,7 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
@@ -15,7 +16,6 @@ using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
 using Unity.Netcode;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -25,14 +25,17 @@ namespace FullPotential.Core.Gameplay.Combat
     {
         private readonly ITypeRegistry _typeRegistry;
         private readonly IRpcService _rpcService;
+        private readonly IValueCalculator _valueCalculator;
         private readonly Punch _punchEffect;
 
         public EffectService(
             ITypeRegistry typeRegistry,
-            IRpcService rpcService)
+            IRpcService rpcService,
+            IValueCalculator valueCalculator)
         {
             _typeRegistry = typeRegistry;
             _rpcService = rpcService;
+            _valueCalculator = valueCalculator;
 
             _punchEffect = new Punch();
         }
@@ -52,7 +55,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (itemUsed == null)
             {
-                itemUsed = new Loot { Attributes = new Attributes { Strength = sourceFighter.GetStrength() } };
+                itemUsed = new Loot { Attributes = new Attributes { Strength = sourceFighter.GetAttributeValue(AffectableAttribute.Strength) } };
                 ApplyEffect(sourceFighter, _punchEffect, itemUsed, target, position);
             }
 
@@ -80,7 +83,20 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 //Debug.Log($"Applying just damage (no effects) to {targetFighter.FighterName}");
 
-                targetFighter.TakeDamageFromFighter(sourceFighter, itemUsed, position);
+                var damageDealt = _valueCalculator.GetDamageValueFromAttack(itemUsed, targetFighter.GetDefenseValue()) * -1;
+
+                var sourceFighterCriticalHitChance = sourceFighter.GetCriticalHitChance();
+                var critTestValue = ValueCalculator.Random.Next(0, 101);
+                var isCritical = critTestValue <= sourceFighterCriticalHitChance;
+
+                if (isCritical)
+                {
+                    //Debug.Log($"CRITICAL! Chance:{sourceFighterCriticalHitChance}, test:{critTestValue}");
+
+                    damageDealt *= 2;
+                }
+
+                targetFighter.TakeDamageFromFighter(sourceFighter, itemUsed, position, damageDealt, isCritical);
 
                 if (!itemIsWeapon)
                 {
@@ -170,9 +186,9 @@ namespace FullPotential.Core.Gameplay.Combat
 
             var rotation = Quaternion.FromToRotation(-Vector3.forward, norm);
 
-            var bulletHole = Object.Instantiate(GameManager.Instance.Prefabs.Combat.BulletHole, position.Value, rotation);
+            var bulletHole = UnityEngine.Object.Instantiate(GameManager.Instance.Prefabs.Combat.BulletHole, position.Value, rotation);
             bulletHole.GetComponent<NetworkObject>().Spawn();
-            Object.Destroy(bulletHole, 5);
+            UnityEngine.Object.Destroy(bulletHole, 5);
         }
 
         private bool IsEffectAllowed(ItemBase itemUsed, GameObject target, IEffect effect)
@@ -229,7 +245,8 @@ namespace FullPotential.Core.Gameplay.Combat
                     return;
 
                 case IElement elementalEffect:
-                    ApplyElementalEffect(targetFighter, elementalEffect, itemUsed, sourceFighter, position);
+                    var damageDealt = _valueCalculator.GetDamageValueFromAttack(itemUsed, targetFighter.GetDefenseValue()) * -1;
+                    ApplyElementalEffect(targetFighter, elementalEffect, itemUsed, sourceFighter, damageDealt, position);
                     return;
 
                 default:
@@ -249,7 +266,15 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 case Affect.SingleDecrease:
                 case Affect.SingleIncrease:
-                    targetFighter.ApplyStatValueChange(statEffect, itemUsed, sourceFighter, position);
+
+                    var change = itemUsed.GetStatChange(statEffect);
+
+                    if (statEffect.StatToAffect == AffectableStat.Health && statEffect.Affect == Affect.SingleDecrease)
+                    {
+                        change = _valueCalculator.GetDamageValueFromAttack(itemUsed, targetFighter.GetDefenseValue()) * -1;
+                    }
+
+                    targetFighter.ApplyStatValueChange(statEffect, itemUsed, sourceFighter, change, position);
                     return;
 
                 case Affect.TemporaryMaxDecrease:
@@ -268,9 +293,9 @@ namespace FullPotential.Core.Gameplay.Combat
             targetFighter.AddAttributeModifier(attributeEffect, itemUsed);
         }
 
-        private void ApplyElementalEffect(IFighter targetFighter, IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
+        private void ApplyElementalEffect(IFighter targetFighter, IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, int change, Vector3? position)
         {
-            targetFighter.ApplyElementalEffect(elementalEffect, itemUsed, sourceFighter, position);
+            targetFighter.ApplyElementalEffect(elementalEffect, itemUsed, sourceFighter, change, position);
         }
 
         private void ApplyMaintainDistance(ItemBase itemUsed, GameObject targetGameObject, IFighter sourceFighter)

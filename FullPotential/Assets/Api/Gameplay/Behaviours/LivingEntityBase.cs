@@ -5,7 +5,6 @@ using System.Linq;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
@@ -52,7 +51,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected ILocalizer _localizer;
         protected ITypeRegistry _typeRegistry;
         protected IEffectService _effectService;
-        protected IValueCalculator _valueCalculator;
 
         protected readonly NetworkVariable<FixedString32Bytes> _entityName = new NetworkVariable<FixedString32Bytes>();
         protected readonly NetworkVariable<int> _energy = new NetworkVariable<int>(100);
@@ -101,7 +99,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
-            _valueCalculator = DependenciesContext.Dependencies.GetService<IValueCalculator>();
 
             _entityName.OnValueChanged += OnNameChanged;
             _health.OnValueChanged += OnHealthChanged;
@@ -227,9 +224,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private void ApplyHealthChange(
             int change,
             IFighter sourceFighter,
-            Vector3? position)
+            Vector3? position,
+            bool isCritical)
         {
-
             if (sourceFighter != null)
             {
                 //Debug.Log($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
@@ -239,7 +236,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     RecordDamageDealt(change * -1, sourceFighter);
                 }
 
-                ShowHealthChangeToSourceFighter(sourceFighter, position, change);
+                ShowHealthChangeToSourceFighter(sourceFighter, position, change, isCritical);
             }
             //else
             //{
@@ -550,7 +547,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _lastDamageItemName = null;
             _lastDamageSourceName = cause;
 
-            ApplyHealthChange(healthChange, _fighterWhoMovedMeLast, position);
+            ApplyHealthChange(healthChange, _fighterWhoMovedMeLast, position, false);
         }
 
         private int GetDamageValueFromVelocity(Vector3 velocity)
@@ -578,13 +575,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public void TakeDamageFromFighter(
             IFighter sourceFighter,
             ItemBase itemUsed,
-            Vector3? position)
+            Vector3? position,
+            int damageDealt,
+            bool isCritical)
         {
             _lastDamageSourceName = sourceFighter != null ? sourceFighter.FighterName : null;
             _lastDamageItemName = itemUsed?.Name.OrIfNullOrWhitespace(_localizer.Translate("ui.alert.attack.noitem"));
-
-            var damageDealt = _valueCalculator.GetDamageValueFromAttack(itemUsed, GetDefenseValue()) * -1;
-            ApplyHealthChange(damageDealt, sourceFighter, position);
+            ApplyHealthChange(damageDealt, sourceFighter, position, isCritical);
         }
 
         public virtual void HandleDeath()
@@ -672,7 +669,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private void ShowHealthChangeToSourceFighter(
             IFighter sourceFighter,
             Vector3? position,
-            int change)
+            int change,
+            bool isCritical)
         {
             if (sourceFighter.GameObject.CompareTag(Tags.Player)
                 && position.HasValue
@@ -681,6 +679,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 sourceFighter.GameObject.GetComponent<IPlayerBehaviour>().ShowHealthChangeClientRpc(
                     position.Value,
                     change,
+                    isCritical,
                     _rpcService.ForPlayer(sourceFighter.OwnerClientId));
             }
         }
@@ -712,15 +711,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
             } while (DateTime.Now < expiry);
         }
 
-        public void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
+        public void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, int change, Vector3? position)
         {
-            var change = itemUsed.GetStatChange(statEffect);
-
-            if (statEffect.StatToAffect == AffectableStat.Health && statEffect.Affect == Affect.SingleDecrease)
-            {
-                change = _valueCalculator.GetDamageValueFromAttack(itemUsed, GetDefenseValue()) * -1;
-            }
-
             AddOrUpdateEffect(statEffect, change, DateTime.Now.AddSeconds(3));
 
             ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, position);
@@ -735,12 +727,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
             ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, position);
         }
 
-        public void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
+        public void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, int change, Vector3? position)
         {
-            TakeDamageFromFighter(sourceFighter, itemUsed, position);
-
             //todo: zzz v0.4.1 - ApplyElementalEffect
             //Debug.LogWarning("Not yet implemented elemental effects");
+            ApplyHealthChange(change, sourceFighter, position, false);
         }
 
         public List<ActiveEffect> GetActiveEffects()
@@ -841,7 +832,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     return;
 
                 case AffectableStat.Health:
-                    ApplyHealthChange(change, sourceFighter, position);
+                    ApplyHealthChange(change, sourceFighter, position, false);
                     return;
 
                 case AffectableStat.Mana:

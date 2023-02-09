@@ -223,28 +223,39 @@ namespace FullPotential.Api.Gameplay.Behaviours
             handStatus.IsReloading = false;
         }
 
-        private int GetAttributeValue(AffectableAttribute attribute)
+        public int GetAttributeValue(AffectableAttribute attribute)
         {
             //todo: zzz v0.5 - trait-based attributes
             switch (attribute)
             {
                 case AffectableAttribute.Strength:
-                    return 0 + GetAttributeAdjustment(AffectableAttribute.Strength);
+                    return 25 + GetAttributeAdjustment(AffectableAttribute.Strength);
+
+                case AffectableAttribute.Luck:
+                    return 50 + GetAttributeAdjustment(AffectableAttribute.Luck);
 
                 default:
                     throw new Exception("Not yet implemented GetAttributeValue() for " + attribute);
             }
         }
 
-        public override int GetDefenseValue()
+        public float GetCriticalHitChance()
         {
-            return _inventory.GetDefenseValue() + GetAttributeValue(AffectableAttribute.Strength);
+            var luckValue = GetAttributeValue(AffectableAttribute.Luck);
+
+            if (luckValue < 20)
+            {
+                return 0;
+            }
+
+            //e.g. 50 luck would mean a 50/5 = 10% chance
+            return luckValue / 5f;
         }
 
-        public int GetStrength()
+        public override int GetDefenseValue()
         {
-            //todo: zzz v0.5 - trait-based attributes
-            return 25 + GetAttributeValue(AffectableAttribute.Strength);
+            //todo: add barrier strength to defence strength
+            return _inventory.GetDefenseValue();
         }
 
         public override void HandleDeath()

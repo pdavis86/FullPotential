@@ -427,7 +427,7 @@ namespace FullPotential.Core.Player
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        public void ShowHealthChangeClientRpc(Vector3 position, int change, ClientRpcParams clientRpcParams)
+        public void ShowHealthChangeClientRpc(Vector3 position, int change, bool isCritical, ClientRpcParams clientRpcParams)
         {
             var offsetX = (float)ValueCalculator.Random.Next(-9, 10) / 100;
             var offsetY = (float)ValueCalculator.Random.Next(-9, 10) / 100;
@@ -439,9 +439,9 @@ namespace FullPotential.Core.Player
 
             var hitText = hit.GetComponent<TextMeshProUGUI>();
 
-            hitText.text = change < 0
-                ? (change * -1).ToString()
-                : change.ToString();
+            hitText.text = isCritical
+                ? _localizer.Translate("combat.attack.critical") + Math.Abs(change)
+                : Math.Abs(change).ToString();
 
             hitText.color = change <= 0
                 ? Color.red

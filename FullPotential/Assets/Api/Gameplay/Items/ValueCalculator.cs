@@ -12,13 +12,14 @@ namespace FullPotential.Api.Gameplay.Items
     {
         public static readonly Random Random = new Random();
 
-        public int AddVariationToValue(double basicValue)
+        private int AddVariationToValue(double basicValue)
         {
             var multiplier = (double)Random.Next(90, 111) / 100;
             var adder = Random.Next(0, 6);
             return (int)Math.Ceiling(basicValue / multiplier) + adder;
         }
 
+        //todo: merge into EffectService
         public int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense, bool addVariation = true)
         {
             var weapon = itemUsed as Weapon;

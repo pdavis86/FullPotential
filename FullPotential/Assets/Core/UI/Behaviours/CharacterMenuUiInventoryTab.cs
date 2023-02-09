@@ -93,7 +93,6 @@ namespace FullPotential.Core.UI.Behaviours
 
             if (!success)
             {
-                //todo: alert goes behind UI
                 GameManager.Instance.GetUserInterface().HudOverlay.ShowAlert(_localizer.Translate("ui.drawingpad.alreadyinuse"));
                 return;
             }

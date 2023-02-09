@@ -1,4 +1,5 @@
-﻿using FullPotential.Api.Items.Base;
+﻿using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.Effects;
 using UnityEngine;
 
@@ -22,12 +23,14 @@ namespace FullPotential.Api.Gameplay.Combat
 
         void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter);
 
-        void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position);
+        void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, int change, Vector3? position);
 
         void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position);
 
-        void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position);
+        void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, int change, Vector3? position);
 
-        int GetStrength();
+        int GetAttributeValue(AffectableAttribute attribute);
+
+        float GetCriticalHitChance();
     }
 }
