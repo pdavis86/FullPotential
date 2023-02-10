@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Api\Unity\Extensions\GameObjectExtensions.cs" />
+    <Compile Include="Assets\Api\Persistence\ISettingsRepository.cs" />
     <Compile Include="Assets\Api\Registry\Crafting\ILoot.cs" />
     <Compile Include="Assets\Api\Registry\IRegisterable.cs" />
     <Compile Include="Assets\Api\Gameplay\Items\ResourseConsumptionType.cs" />
@@ -81,7 +82,6 @@
     <Compile Include="Assets\Api\Ioc\DependenciesCollection.cs" />
     <Compile Include="Assets\Api\Registry\Effects\ICustomEffect.cs" />
     <Compile Include="Assets\Api\Gameplay\Items\LevelOfDetail.cs" />
-    <Compile Include="Assets\Api\Utilities\ModHelper.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\Affect.cs" />
     <Compile Include="Assets\Api\Items\Types\Accessory.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\IDamageable.cs" />
@@ -95,6 +95,7 @@
     <Compile Include="Assets\Api\Spawning\ISpawnService.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\StringExtensions.cs" />
     <Compile Include="Assets\Api\Gameplay\Data\InventoryData.cs" />
+    <Compile Include="Assets\Api\Ui\Services\UiAssistant.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IStatEffect.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\SlotGameObjectName.cs" />
     <Compile Include="Assets\Api\Items\Base\SpellOrGadgetItemBase.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="Assets\Api\Gameplay\Inventory\InventoryBase.cs" />
     <Compile Include="Assets\Api\GameManagement\GameObjectNames.cs" />
     <Compile Include="Assets\Api\Gameplay\Drawing\IDrawingService.cs" />
+    <Compile Include="Assets\Api\Utilities\Extensions\ArrayExtensions.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\LivingEntityBase.cs" />
     <Compile Include="Assets\Api\Persistence\IUserRepository.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemBase.cs" />
@@ -131,6 +133,7 @@
     <Compile Include="Assets\Api\Gameplay\Data\PlayerData.cs" />
     <Compile Include="Assets\Api\Gameplay\Data\EquippedItem.cs" />
     <Compile Include="Assets\Api\Gameplay\Data\IInventoryDataService.cs" />
+    <Compile Include="Assets\Api\Ui\Services\IUiAssistant.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemWithTargetingAndShapeBase.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IAttributeEffect.cs" />
     <Compile Include="Assets\Api\Ui\IUserInterface.cs" />
@@ -157,10 +160,6 @@
     <Compile Include="Assets\Api\Registry\Elements\IElement.cs" />
     <Compile Include="Assets\Api\Gameplay\Data\InventoryChanges.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Tags.cs" />
-    <Compile Include="Assets\Api\Utilities\Extensions\ArrayExtensions.cs" />
-    <Compile Include="Assets\Api\Ui\Services\UiAssistant.cs" />
-    <Compile Include="Assets\Api\Ui\Services\IUiAssistant.cs" />
-    <Compile Include="Assets\Api\Persistence\ISettingsRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Api\FullPotential.Api.asmdef" />

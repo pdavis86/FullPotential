@@ -14,18 +14,20 @@ namespace FullPotential.Standard.Scenes.Behaviours
     public class ShopInteractable : Interactable
     {
         private IGameManager _gameManager;
+        private ILocalizer _localizer;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
 
             RequiresServerCheck = false;
         }
 
         public override void OnFocus()
         {
-            var translation = DependenciesContext.Dependencies.GetService<ILocalizer>().Translate("ui.interact.shop");
+            var translation = _localizer.Translate("ui.interact.shop");
             var interactInputName = _gameManager.InputActions.Player.Interact.GetBindingDisplayString();
             _interactionBubble.text = string.Format(translation, interactInputName);
             _interactionBubble.gameObject.SetActive(true);

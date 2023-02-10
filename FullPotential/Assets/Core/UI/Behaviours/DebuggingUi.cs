@@ -17,10 +17,18 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private Text _pingText;
 #pragma warning restore 0649
 
+        private ILocalizer _localizer;
+
         private string _hostString;
         private string _framePerSecond;
         private GameObject _playerObj;
         private NetworkStats _networkStats;
+
+        // ReSharper disable once UnusedMember.Local
+        private void Awake()
+        {
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+        }
 
         // ReSharper disable once UnusedMember.Local
         private void Start()
@@ -30,7 +38,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 Destroy(gameObject);
             }
 
-            _hostString = DependenciesContext.Dependencies.GetService<ILocalizer>().Translate("ui.debugging.host");
+            _hostString = _localizer.Translate("ui.debugging.host");
             GetNetworkStats();
 
             GetFps();

@@ -20,7 +20,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            _interactionBubble = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager().GetUserInterface().InteractionBubbleOverlay.GetComponent<TMPro.TextMeshProUGUI>();
+            //Does not work in Awake, maybe because the class is abstract?
+            var modHelper = DependenciesContext.Dependencies.GetService<IModHelper>();
+
+            _interactionBubble = modHelper.GetGameManager().GetUserInterface().InteractionBubbleOverlay.GetComponent<TMPro.TextMeshProUGUI>();
         }
 
         // ReSharper disable once UnusedMember.Local

@@ -6,33 +6,21 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Data;
-using FullPotential.Api.Gameplay.Drawing;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Persistence;
 using FullPotential.Api.Scenes;
-using FullPotential.Api.Spawning;
 using FullPotential.Api.Ui;
-using FullPotential.Api.Ui.Services;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement.Data;
 using FullPotential.Core.GameManagement.Enums;
 using FullPotential.Core.GameManagement.Events;
-using FullPotential.Core.Gameplay.Combat;
-using FullPotential.Core.Gameplay.Crafting;
-using FullPotential.Core.Localization;
-using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
-using FullPotential.Core.Persistence;
 using FullPotential.Core.Player;
 using FullPotential.Core.Registry;
-using FullPotential.Core.Spawning;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -99,7 +87,7 @@ namespace FullPotential.Core.GameManagement
             Prefabs = GetComponent<Prefabs>();
             UserInterface = _mainCanvas.GetComponent<UserInterface>();
 
-            RegisterServices();
+            ServiceManager.RegisterServices();
 
             _userRepository = DependenciesContext.Dependencies.GetService<IUserRepository>();
             _settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
@@ -377,23 +365,6 @@ namespace FullPotential.Core.GameManagement
             _userRepository.Save(playerData);
 
             _asapSaveUsernames.Remove(playerData.Username);
-        }
-
-        private void RegisterServices()
-        {
-            DependenciesContext.Dependencies.Register<IUserRepository, UserRepository>();
-            DependenciesContext.Dependencies.Register<IResultFactory, ResultFactory>();
-            DependenciesContext.Dependencies.Register<IInventoryDataService, InventoryDataService>();
-            DependenciesContext.Dependencies.Register<IValueCalculator, ValueCalculator>();
-            DependenciesContext.Dependencies.Register<ILocalizer, Localizer>();
-            DependenciesContext.Dependencies.Register<ITypeRegistry, TypeRegistry>();
-            DependenciesContext.Dependencies.Register<ISpawnService, SpawnService>(true);
-            DependenciesContext.Dependencies.Register<IRpcService, RpcService>();
-            DependenciesContext.Dependencies.Register<IEffectService, EffectService>();
-            DependenciesContext.Dependencies.Register<IModHelper, ModHelper>();
-            DependenciesContext.Dependencies.Register<IDrawingService, DrawingService>();
-            DependenciesContext.Dependencies.Register<IUiAssistant, UiAssistant>();
-            DependenciesContext.Dependencies.Register<ISettingsRepository, SettingsRepository>();
         }
 
         public void CheckIsAdmin()

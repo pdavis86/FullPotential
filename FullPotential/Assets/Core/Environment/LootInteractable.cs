@@ -14,10 +14,14 @@ namespace FullPotential.Core.Environment
     {
         public string UnclaimedLootId;
 
+        private ILocalizer _localizer;
+
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             RequiresServerCheck = false;
+
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
         }
 
         public override void OnFocus()
@@ -26,7 +30,8 @@ namespace FullPotential.Core.Environment
             {
                 return;
             }
-            var translation = DependenciesContext.Dependencies.GetService<ILocalizer>().Translate("ui.interact.loot");
+
+            var translation = _localizer.Translate("ui.interact.loot");
             var interactInputName = GameManager.Instance.InputActions.Player.Interact.GetBindingDisplayString().ToUpper();
             _interactionBubble.text = string.Format(translation, interactInputName);
             _interactionBubble.gameObject.SetActive(true);

@@ -17,7 +17,7 @@ using UnityEngine.UI;
 
 namespace FullPotential.Core.Ui.Components
 {
-    public class InventoryItemsList : MonoBehaviour
+    public static class InventoryItemsList
     {
         public const string AssignedShapeNone = "-";
         public const string AssignedShapeSet = "1";
@@ -58,7 +58,7 @@ namespace FullPotential.Core.Ui.Components
                     continue;
                 }
 
-                var row = Instantiate(rowPrefab, componentsContainer.transform);
+                var row = UnityEngine.Object.Instantiate(rowPrefab, componentsContainer.transform);
                 var rowScript = row.GetComponent<InventoryUiRow>();
 
                 rowScript.Text.text = item.Name;

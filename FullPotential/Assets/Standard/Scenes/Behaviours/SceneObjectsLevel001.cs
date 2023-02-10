@@ -78,7 +78,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
                 }
             }
 
-            var playerToken = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager().GetLocalPlayerToken();
+            var playerToken = _gameManager.GetLocalPlayerToken();
             var chosenSpawnPoint = GetSpawnPoint();
             HereAreMyJoiningDetailsServerRpc(playerToken, chosenSpawnPoint.Position, chosenSpawnPoint.Rotation);
         }
