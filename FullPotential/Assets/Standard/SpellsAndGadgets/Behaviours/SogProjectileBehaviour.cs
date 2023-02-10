@@ -5,6 +5,7 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
+using FullPotential.Api.Utilities;
 using FullPotential.Standard.SpellsAndGadgets.Shapes;
 using Unity.Netcode;
 using UnityEngine;
@@ -15,13 +16,19 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
     public class SogProjectileBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
     {
+        private IEffectService _effectService;
+        private IModHelper _modHelper;
+
         public SpellOrGadgetItemBase SpellOrGadget;
         public IFighter SourceFighter;
         public Vector3 ForwardDirection;
 
-        private IEffectService _effectService;
-
-        private Type _shapeType;
+        // ReSharper disable once UnusedMember.Local
+        private void Awake()
+        {
+            _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
+            _modHelper = DependenciesContext.Dependencies.GetService<IModHelper>();
+        }
 
         // ReSharper disable once UnusedMember.Local
         private void Start()
@@ -37,11 +44,8 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             Physics.IgnoreCollision(GetComponent<Collider>(), SourceFighter.GameObject.GetComponent<Collider>());
 
-            _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
 
             var affectedByGravity = SpellOrGadget.Shape != null;
-
-            _shapeType = SpellOrGadget.Shape?.GetType();
 
             var rigidBody = GetComponent<Rigidbody>();
 
@@ -80,7 +84,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 throw new ArgumentException("Position Vector3 cannot be null for projectiles");
             }
 
-            if (_shapeType == null)
+            if (SpellOrGadget.Shape == null)
             {
                 if (!NetworkManager.Singleton.IsServer)
                 {
@@ -106,16 +110,16 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                         : position.Value;
                 }
 
-                if (_shapeType == typeof(Wall))
+                if (SpellOrGadget.Shape is Wall)
                 {
                     var rotation = Quaternion.LookRotation(ForwardDirection);
                     rotation.x = 0;
                     rotation.z = 0;
-                    SpellOrGadget.Shape.SpawnGameObject(SpellOrGadget, SourceFighter, spawnPosition, rotation);
+                    _modHelper.SpawnShapeGameObject<SogWallBehaviour>(SpellOrGadget, SourceFighter, spawnPosition, rotation);
                 }
-                else if (_shapeType == typeof(Zone))
+                else if (SpellOrGadget.Shape is Zone)
                 {
-                    SpellOrGadget.Shape.SpawnGameObject(SpellOrGadget, SourceFighter, spawnPosition, Quaternion.identity);
+                    _modHelper.SpawnShapeGameObject<SogZoneBehaviour>(SpellOrGadget, SourceFighter, spawnPosition, Quaternion.identity);
                 }
                 else
                 {

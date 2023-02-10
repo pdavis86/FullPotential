@@ -1,12 +1,5 @@
 ﻿using System;
-using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Ioc;
-using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.SpellsAndGadgets;
-using FullPotential.Api.Utilities;
-using FullPotential.Standard.SpellsAndGadgets.Behaviours;
-using UnityEngine;
 
 namespace FullPotential.Standard.SpellsAndGadgets.Shapes
 {
@@ -17,24 +10,5 @@ namespace FullPotential.Standard.SpellsAndGadgets.Shapes
         public string TypeName => nameof(Zone);
 
         public string PrefabAddress => "Standard/Prefabs/SpellOrGadget/Zone.prefab";
-
-        public void SpawnGameObject(SpellOrGadgetItemBase spellOrGadget, IFighter sourceFighter, Vector3 startPosition, Quaternion rotation)
-        {
-            var gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
-            DependenciesContext.Dependencies.GetService<ITypeRegistry>().LoadAddessable(
-                spellOrGadget.Shape.PrefabAddress,
-                prefab =>
-                {
-                    var spellObject = UnityEngine.Object.Instantiate(prefab, startPosition, rotation);
-                    gameManager.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(startPosition, spellObject.transform, false);
-
-                    var spellScript = spellObject.GetComponent<SogZoneBehaviour>();
-                    spellScript.SpellOrGadget = spellOrGadget;
-                    spellScript.SourceFighter = sourceFighter;
-
-                    spellObject.transform.parent = gameManager.GetSceneBehaviour().GetTransform();
-                }
-            );
-        }
     }
 }

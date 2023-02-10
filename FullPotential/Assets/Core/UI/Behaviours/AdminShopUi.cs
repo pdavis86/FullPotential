@@ -10,7 +10,6 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.SpellsAndGadgets;
-using FullPotential.Api.Utilities;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Player;

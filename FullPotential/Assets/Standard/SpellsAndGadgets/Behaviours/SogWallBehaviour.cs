@@ -11,10 +11,10 @@ using UnityEngine;
 
 namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
-    public class SogWallBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
+    public class SogWallBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour, IShapeBehaviour
     {
-        public SpellOrGadgetItemBase SpellOrGadget;
-        public IFighter SourceFighter;
+        public SpellOrGadgetItemBase SpellOrGadget { get; set; }
+        public IFighter SourceFighter { get; set; }
 
         private IEffectService _effectService;
 

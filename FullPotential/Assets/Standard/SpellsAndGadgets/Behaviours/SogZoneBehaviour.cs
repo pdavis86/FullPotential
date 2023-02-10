@@ -11,12 +11,12 @@ using UnityEngine;
 
 namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
-    public class SogZoneBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
+    public class SogZoneBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour, IShapeBehaviour
     {
         private const float DistanceFromGround = 1f;
 
-        public SpellOrGadgetItemBase SpellOrGadget;
-        public IFighter SourceFighter;
+        public SpellOrGadgetItemBase SpellOrGadget { get; set; }
+        public IFighter SourceFighter { get; set; }
 
         private IEffectService _effectService;
 

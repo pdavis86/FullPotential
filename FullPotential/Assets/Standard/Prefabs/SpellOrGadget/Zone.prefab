@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 1963866746874951432}
   - component: {fileID: 136593143774934595}
   - component: {fileID: 3747510227195225953}
-  - component: {fileID: 7531588592048074414}
   - component: {fileID: 9152139938995237201}
+  - component: {fileID: 7236671613998201943}
   m_Layer: 0
   m_Name: Zone
   m_TagString: Untagged
@@ -85,20 +85,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &7531588592048074414
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 585545506049340028}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!114 &9152139938995237201
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -111,5 +97,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78241c8f85c068f44a3b9048ea6ebf23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerClientId: 0
-  SpellId: 
+--- !u!64 &7236671613998201943
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 585545506049340028}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
