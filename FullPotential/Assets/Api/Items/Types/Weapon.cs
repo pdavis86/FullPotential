@@ -92,13 +92,13 @@ namespace FullPotential.Api.Items.Types
 
             switch (weaponType.Category)
             {
-                case IGearWeapon.WeaponCategory.Defensive:
+                case WeaponCategory.Defensive:
                     return GetDefensiveWeaponDescription(localizer, levelOfDetail, itemName);
 
-                case IGearWeapon.WeaponCategory.Melee:
+                case WeaponCategory.Melee:
                     return GetMeleeWeaponDescription(localizer, levelOfDetail, itemName);
 
-                case IGearWeapon.WeaponCategory.Ranged:
+                case WeaponCategory.Ranged:
                     return GetRangedWeaponDescription(localizer, levelOfDetail, itemName);
 
                 default:

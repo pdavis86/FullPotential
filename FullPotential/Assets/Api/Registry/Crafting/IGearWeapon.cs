@@ -2,13 +2,6 @@
 {
     public interface IGearWeapon : IGear
     {
-        public enum WeaponCategory
-        {
-            Melee,
-            Ranged,
-            Defensive
-        }
-
         /// <summary>
         /// The category of weapon
         /// </summary>

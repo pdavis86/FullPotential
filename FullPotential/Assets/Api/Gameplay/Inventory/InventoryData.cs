@@ -1,7 +1,7 @@
 ﻿using FullPotential.Api.Items.Types;
 using FullPotential.Api.Utilities.Data;
 
-namespace FullPotential.Api.Gameplay.Data
+namespace FullPotential.Api.Gameplay.Inventory
 {
     [System.Serializable]
     public class InventoryData

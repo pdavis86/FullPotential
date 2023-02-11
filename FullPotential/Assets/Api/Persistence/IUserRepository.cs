@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Gameplay.Data;
+﻿using FullPotential.Api.Gameplay.Player;
 
 namespace FullPotential.Api.Persistence
 {

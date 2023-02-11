@@ -1,4 +1,5 @@
 ﻿using System;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
 
 namespace FullPotential.Standard.Armor
@@ -9,7 +10,7 @@ namespace FullPotential.Standard.Armor
 
         public string TypeName => nameof(Barrier);
 
-        public IGearArmor.ArmorCategory Category => IGearArmor.ArmorCategory.Barrier;
+        public ArmorCategory Category => ArmorCategory.Barrier;
 
         public string PrefabAddress => "Standard/Prefabs/Armor/Barrier.prefab";
     }

@@ -8,6 +8,7 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Utilities;
@@ -110,7 +111,7 @@ namespace FullPotential.Api.Tests.Gameplay.Items
         {
             return new Weapon
             {
-                RegistryType = new TestWeaponType(IGearWeapon.WeaponCategory.Melee),
+                RegistryType = new TestWeaponType(WeaponCategory.Melee),
                 Attributes = attributes,
                 IsTwoHanded = isTwoHanded
             };
@@ -120,7 +121,7 @@ namespace FullPotential.Api.Tests.Gameplay.Items
         {
             return new Weapon
             {
-                RegistryType = new TestWeaponType(IGearWeapon.WeaponCategory.Ranged),
+                RegistryType = new TestWeaponType(WeaponCategory.Ranged),
                 Attributes = attributes,
                 IsTwoHanded = isTwoHanded
             };
@@ -142,7 +143,7 @@ namespace FullPotential.Api.Tests.Gameplay.Items
     {
         // ReSharper disable UnassignedGetOnlyAutoProperty
 
-        public TestWeaponType(IGearWeapon.WeaponCategory category)
+        public TestWeaponType(WeaponCategory category)
         {
             Category = category;
         }
@@ -150,7 +151,7 @@ namespace FullPotential.Api.Tests.Gameplay.Items
         public Guid TypeId { get; }
         public string TypeName { get; }
         public string PrefabAddress { get; }
-        public IGearWeapon.WeaponCategory Category { get; }
+        public WeaponCategory Category { get; }
         public bool AllowAutomatic { get; }
         public bool AllowTwoHanded { get; }
         public bool EnforceTwoHanded { get; }

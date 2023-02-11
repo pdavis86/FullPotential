@@ -1,5 +1,5 @@
 ﻿using System;
-using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Obsolete;
 
 namespace FullPotential.Core.UI.Events
 {

@@ -60,8 +60,9 @@
     <Compile Include="Assets\Api\Persistence\ISettingsRepository.cs" />
     <Compile Include="Assets\Api\Registry\Crafting\ILoot.cs" />
     <Compile Include="Assets\Api\Registry\IRegisterable.cs" />
-    <Compile Include="Assets\Api\Gameplay\Items\ResourseConsumptionType.cs" />
+    <Compile Include="Assets\Api\Obsolete\ResourseConsumptionType.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\Vector2Extensions.cs" />
+    <Compile Include="Assets\Api\Obsolete\GearCategory.cs" />
     <Compile Include="Assets\Api\Utilities\IModHelper.cs" />
     <Compile Include="Assets\Api\Items\Types\Spell.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\UnityExtensions.cs" />
@@ -74,7 +75,7 @@
     <Compile Include="Assets\Api\Registry\Crafting\IGearAccessory.cs" />
     <Compile Include="Assets\Api\Items\IHasTargetingAndShape.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IIsSideEffect.cs" />
-    <Compile Include="Assets\Api\Gameplay\Combat\LivingEntityState.cs" />
+    <Compile Include="Assets\Api\Obsolete\LivingEntityState.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesContext.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IInventory.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\IPlayerBehaviour.cs" />
@@ -88,16 +89,17 @@
     <Compile Include="Assets\Api\Gameplay\Effects\ActiveEffect.cs" />
     <Compile Include="Assets\Api\Input\DefaultInputActions.cs" />
     <Compile Include="Assets\Api\Items\Types\Gadget.cs" />
+    <Compile Include="Assets\Api\Registry\Crafting\WeaponCategory.cs" />
     <Compile Include="Assets\Api\Utilities\ActionQueue.cs" />
     <Compile Include="Assets\Api\Ui\IHud.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\IFighter.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Layers.cs" />
+    <Compile Include="Assets\Api\Registry\SpellsAndGadgets\IShapeBehaviour.cs" />
     <Compile Include="Assets\Api\Spawning\ISpawnService.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\StringExtensions.cs" />
-    <Compile Include="Assets\Api\Gameplay\Data\InventoryData.cs" />
     <Compile Include="Assets\Api\Ui\Services\UiAssistant.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IStatEffect.cs" />
-    <Compile Include="Assets\Api\Gameplay\Inventory\SlotGameObjectName.cs" />
+    <Compile Include="Assets\Api\Obsolete\SlotGameObjectName.cs" />
     <Compile Include="Assets\Api\Items\Base\SpellOrGadgetItemBase.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\IDefensible.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\InventoryBase.cs" />
@@ -112,7 +114,6 @@
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
     <Compile Include="Assets\Api\Registry\Crafting\IGear.cs" />
     <Compile Include="Assets\Api\Scenes\SceneAttributes.cs" />
-    <Compile Include="Assets\Api\Gameplay\Data\InventoryDataService.cs" />
     <Compile Include="Assets\Api\Unity\Helpers\GameObjectHelper.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\IMoveable.cs" />
     <Compile Include="Assets\Api\Items\Types\Loot.cs" />
@@ -121,7 +122,8 @@
     <Compile Include="Assets\Api\Localization\ILocalizer.cs" />
     <Compile Include="Assets\Api\Items\Types\Weapon.cs" />
     <Compile Include="Assets\Api\Localization\Enums\TranslationType.cs" />
-    <Compile Include="Assets\Api\Gameplay\Data\Consumables.cs" />
+    <Compile Include="Assets\Api\Obsolete\ResourceType.cs" />
+    <Compile Include="Assets\Api\Obsolete\AccessoryCategory.cs" />
     <Compile Include="Assets\Api\Utilities\Data\KeyValuePair.cs" />
     <Compile Include="Assets\Api\Ioc\Dependency.cs" />
     <Compile Include="Assets\Api\Registry\SpellsAndGadgets\ITargeting.cs" />
@@ -130,9 +132,8 @@
     <Compile Include="Assets\Api\Utilities\Extensions\Vector3Extensions.cs" />
     <Compile Include="Assets\Api\Registry\SpellsAndGadgets\ISpellOrGadgetBehaviour.cs" />
     <Compile Include="Assets\Api\Scenes\SpawnPoint.cs" />
-    <Compile Include="Assets\Api\Gameplay\Data\PlayerData.cs" />
-    <Compile Include="Assets\Api\Gameplay\Data\EquippedItem.cs" />
-    <Compile Include="Assets\Api\Gameplay\Data\IInventoryDataService.cs" />
+    <Compile Include="Assets\Api\Gameplay\Player\PlayerData.cs" />
+    <Compile Include="Assets\Api\Gameplay\Player\EquippedItem.cs" />
     <Compile Include="Assets\Api\Ui\Services\IUiAssistant.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemWithTargetingAndShapeBase.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IAttributeEffect.cs" />
@@ -141,7 +142,7 @@
     <Compile Include="Assets\Api\Registry\SpellsAndGadgets\IShape.cs" />
     <Compile Include="Assets\Api\GameManagement\IRpcService.cs" />
     <Compile Include="Assets\Api\GameManagement\GameSettings.cs" />
-    <Compile Include="Assets\Api\Gameplay\Effects\AffectableStat.cs" />
+    <Compile Include="Assets\Api\Obsolete\AffectableStat.cs" />
     <Compile Include="Assets\Api\Registry\Crafting\IGearArmor.cs" />
     <Compile Include="Assets\Api\Utilities\DelayedAction.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\FighterBase.cs" />
@@ -149,18 +150,19 @@
     <Compile Include="Assets\Api\Registry\Effects\IEffect.cs" />
     <Compile Include="Assets\Api\Localization\Enums\UnitsType.cs" />
     <Compile Include="Assets\Api\Gameplay\Drawing\DrawingService.cs" />
-    <Compile Include="Assets\Api\Gameplay\Data\HandStatus.cs" />
+    <Compile Include="Assets\Api\Obsolete\ArmorCategory.cs" />
+    <Compile Include="Assets\Api\Gameplay\Player\HandStatus.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemWithHealthBase.cs" />
+    <Compile Include="Assets\Api\Gameplay\Inventory\InventoryData.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IHasSideEffect.cs" />
     <Compile Include="Assets\Api\Gameplay\Crafting\IResultFactory.cs" />
     <Compile Include="Assets\Api\Registry\Crafting\ICraftable.cs" />
-    <Compile Include="Assets\Api\Gameplay\Data\PlayerSettings.cs" />
+    <Compile Include="Assets\Api\Gameplay\Player\PlayerSettings.cs" />
     <Compile Include="Assets\Api\Registry\IMod.cs" />
-    <Compile Include="Assets\Api\Gameplay\Effects\AffectableAttribute.cs" />
+    <Compile Include="Assets\Api\Obsolete\AffectableAttribute.cs" />
     <Compile Include="Assets\Api\Registry\Elements\IElement.cs" />
-    <Compile Include="Assets\Api\Gameplay\Data\InventoryChanges.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Tags.cs" />
-    <Compile Include="Assets\Api\Registry\SpellsAndGadgets\IShapeBehaviour.cs" />
+    <Compile Include="Assets\Api\Gameplay\Inventory\InventoryChanges.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Api\FullPotential.Api.asmdef" />

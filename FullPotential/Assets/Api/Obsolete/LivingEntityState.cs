@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Gameplay.Combat
+﻿namespace FullPotential.Api.Obsolete
 {
     public enum LivingEntityState
     {

@@ -1,4 +1,5 @@
 ﻿using System;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
 
 namespace FullPotential.Standard.Loot
@@ -9,6 +10,6 @@ namespace FullPotential.Standard.Loot
 
         public string TypeName => nameof(Scrap);
 
-        public ILoot.LootCategory Category => ILoot.LootCategory.Technology;
+        public ResourceConsumptionType ResourceConsumptionType => ResourceConsumptionType.Energy;
     }
 }

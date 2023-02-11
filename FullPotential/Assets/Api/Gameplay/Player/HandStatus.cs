@@ -3,7 +3,7 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 
-namespace FullPotential.Api.Gameplay.Data
+namespace FullPotential.Api.Gameplay.Player
 {
     public class HandStatus
     {

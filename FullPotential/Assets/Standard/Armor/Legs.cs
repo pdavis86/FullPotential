@@ -1,4 +1,5 @@
 ﻿using System;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
 
 namespace FullPotential.Standard.Armor
@@ -9,7 +10,7 @@ namespace FullPotential.Standard.Armor
 
         public string TypeName => nameof(Legs);
 
-        public IGearArmor.ArmorCategory Category => IGearArmor.ArmorCategory.Legs;
+        public ArmorCategory Category => ArmorCategory.Legs;
 
         public string PrefabAddress => "Standard/Prefabs/Armor/Legs.prefab";
     }

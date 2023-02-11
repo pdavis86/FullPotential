@@ -28,7 +28,7 @@ namespace FullPotential.Api.Gameplay.Items
             float attackStrength = itemUsed?.Attributes.Strength ?? 1;
             var defenceRatio = 100f / (100 + targetDefense);
             
-            if (weaponCategory == IGearWeapon.WeaponCategory.Ranged)
+            if (weaponCategory == WeaponCategory.Ranged)
             {
                 attackStrength /= weapon.GetBulletsPerSecond();
             }
@@ -41,7 +41,7 @@ namespace FullPotential.Api.Gameplay.Items
                 damageDealtBasic *= 2;
             }
 
-            if (weaponCategory == IGearWeapon.WeaponCategory.Melee)
+            if (weaponCategory == WeaponCategory.Melee)
             {
                 damageDealtBasic *= 2;
             }

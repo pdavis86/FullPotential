@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using FullPotential.Api.Gameplay.Data;
+using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Obsolete;
 
 namespace FullPotential.Api.Gameplay.Inventory
 {
@@ -11,7 +11,7 @@ namespace FullPotential.Api.Gameplay.Inventory
 
         List<string> ValidateIsCraftable(string[] componentIds, ItemBase itemToCraft);
 
-        IEnumerable<ItemBase> GetCompatibleItemsForSlot(IGear.GearCategory? gearCategory);
+        IEnumerable<ItemBase> GetCompatibleItemsForSlot(GearCategory? gearCategory);
 
         KeyValuePair<SlotGameObjectName, EquippedItem>? GetEquippedWithItemId(string itemId);
 

@@ -9,7 +9,7 @@ namespace FullPotential.Standard.Weapons
 
         public string TypeName => nameof(Gun);
 
-        public IGearWeapon.WeaponCategory Category => IGearWeapon.WeaponCategory.Ranged;
+        public WeaponCategory Category => WeaponCategory.Ranged;
 
         public bool AllowAutomatic => true;
 

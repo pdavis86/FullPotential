@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Gameplay.Inventory
+﻿namespace FullPotential.Api.Obsolete
 {
     public enum SlotGameObjectName
     {

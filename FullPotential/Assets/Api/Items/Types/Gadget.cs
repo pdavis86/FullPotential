@@ -1,5 +1,5 @@
-﻿using FullPotential.Api.Gameplay.Items;
-using FullPotential.Api.Items.Base;
+﻿using FullPotential.Api.Items.Base;
+using FullPotential.Api.Obsolete;
 
 namespace FullPotential.Api.Items.Types
 {

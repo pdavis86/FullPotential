@@ -1,16 +1,9 @@
-﻿namespace FullPotential.Api.Registry.Crafting
+﻿using FullPotential.Api.Obsolete;
+
+namespace FullPotential.Api.Registry.Crafting
 {
     public interface ILoot : IRegisterable
     {
-        public enum LootCategory
-        {
-            Technology,
-            Magic
-        }
-
-        /// <summary>
-        /// The category of loot
-        /// </summary>
-        LootCategory Category { get; }
+        ResourceConsumptionType ResourceConsumptionType { get; }
     }
 }

@@ -1,5 +1,5 @@
-﻿using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Items.Base;
+﻿using FullPotential.Api.Items.Base;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Effects;
 using UnityEngine;
 

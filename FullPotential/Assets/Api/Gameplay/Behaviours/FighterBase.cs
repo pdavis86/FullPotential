@@ -2,14 +2,13 @@
 using System.Collections;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Data;
-using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Inventory;
-using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
@@ -526,7 +525,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             var registryType = (IGearWeapon)weaponInHand.RegistryType;
 
-            var isRanged = registryType.Category == IGearWeapon.WeaponCategory.Ranged;
+            var isRanged = registryType.Category == WeaponCategory.Ranged;
 
             var handStatus = isLeftHand
                 ? HandStatusLeft

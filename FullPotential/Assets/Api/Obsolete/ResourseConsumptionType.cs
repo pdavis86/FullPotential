@@ -1,6 +1,4 @@
-﻿// ReSharper disable UnusedMember.Global
-
-namespace FullPotential.Api.Gameplay.Items
+﻿namespace FullPotential.Api.Obsolete
 {
     public enum ResourceConsumptionType
     {

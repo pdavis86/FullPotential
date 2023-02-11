@@ -1,7 +1,7 @@
 ﻿using FullPotential.Api.Items.Base;
 using UnityEngine;
 
-namespace FullPotential.Api.Gameplay.Data
+namespace FullPotential.Api.Gameplay.Player
 {
     public class EquippedItem
     {

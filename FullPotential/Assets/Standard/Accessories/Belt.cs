@@ -1,4 +1,5 @@
 ﻿using System;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
 
 namespace FullPotential.Standard.Accessories
@@ -9,7 +10,7 @@ namespace FullPotential.Standard.Accessories
 
         public string TypeName => nameof(Belt);
 
-        public IGearAccessory.AccessoryCategory Category => IGearAccessory.AccessoryCategory.Belt;
+        public AccessoryCategory Category => AccessoryCategory.Belt;
 
         public string PrefabAddress => "Standard/Prefabs/Accessories/Belt.prefab";
     }

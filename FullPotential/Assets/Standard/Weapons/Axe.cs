@@ -9,7 +9,7 @@ namespace FullPotential.Standard.Weapons
 
         public string TypeName => nameof(Axe);
 
-        public IGearWeapon.WeaponCategory Category => IGearWeapon.WeaponCategory.Melee;
+        public WeaponCategory Category => WeaponCategory.Melee;
 
         public bool AllowAutomatic => false;
 

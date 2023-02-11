@@ -9,7 +9,7 @@ namespace FullPotential.Standard.Weapons
 
         public string TypeName => nameof(Shield);
 
-        public IGearWeapon.WeaponCategory Category => IGearWeapon.WeaponCategory.Defensive;
+        public WeaponCategory Category => WeaponCategory.Defensive;
 
         public bool AllowAutomatic => false;
 

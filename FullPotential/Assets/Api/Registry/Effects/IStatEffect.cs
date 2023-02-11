@@ -1,4 +1,5 @@
 ﻿using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Obsolete;
 
 namespace FullPotential.Api.Registry.Effects
 {

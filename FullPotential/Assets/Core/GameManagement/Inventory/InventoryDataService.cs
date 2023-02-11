@@ -1,9 +1,10 @@
-﻿using FullPotential.Api.Items.Base;
+﻿using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Api.Gameplay.Data
+namespace FullPotential.Core.GameManagement.Inventory
 {
     public class InventoryDataService : IInventoryDataService
     {

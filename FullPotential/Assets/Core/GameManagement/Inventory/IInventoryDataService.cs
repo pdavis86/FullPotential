@@ -1,6 +1,7 @@
-﻿using FullPotential.Api.Items.Base;
+﻿using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Items.Base;
 
-namespace FullPotential.Api.Gameplay.Data
+namespace FullPotential.Core.GameManagement.Inventory
 {
     public interface IInventoryDataService
     {

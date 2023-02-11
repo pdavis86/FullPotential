@@ -8,6 +8,7 @@ using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
@@ -72,7 +73,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
                     //todo: move this, feels like the wrong place
                     var registryType = (IGearWeapon)itemUsed.RegistryType;
-                    var isRanged = registryType?.Category == IGearWeapon.WeaponCategory.Ranged;
+                    var isRanged = registryType?.Category == WeaponCategory.Ranged;
                     if (isRanged)
                     {
                         SpawnBulletHole(target, position);

@@ -5,17 +5,19 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Crafting;
-using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.GameManagement.Inventory;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Utilities.Extensions;
@@ -224,7 +226,7 @@ namespace FullPotential.Core.Player
             }
         }
 
-        public IEnumerable<ItemBase> GetCompatibleItemsForSlot(IGear.GearCategory? gearCategory)
+        public IEnumerable<ItemBase> GetCompatibleItemsForSlot(GearCategory? gearCategory)
         {
             if (gearCategory == null)
             {
@@ -235,7 +237,7 @@ namespace FullPotential.Core.Player
 
             IEnumerable<KeyValuePair<string, ItemBase>> itemsForSlot;
 
-            if (gearCategory == IGear.GearCategory.Hand)
+            if (gearCategory == GearCategory.Hand)
             {
                 itemsForSlot = _items
                     .Where(x => x.Value is Weapon or Spell or Gadget);

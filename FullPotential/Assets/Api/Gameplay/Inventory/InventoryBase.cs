@@ -1,11 +1,11 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Utilities.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Obsolete;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -33,7 +33,7 @@ namespace FullPotential.Api.Gameplay.Inventory
             _items = new Dictionary<string, ItemBase>();
             _equippedItems = new Dictionary<SlotGameObjectName, EquippedItem>();
 
-            _armorSlotCount = Enum.GetNames(typeof(IGearArmor.ArmorCategory)).Length;
+            _armorSlotCount = Enum.GetNames(typeof(ArmorCategory)).Length;
         }
 
         #endregion

@@ -1,5 +1,6 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Items.Base;
+using FullPotential.Api.Obsolete;
 
 namespace FullPotential.Api.Gameplay.Inventory
 {

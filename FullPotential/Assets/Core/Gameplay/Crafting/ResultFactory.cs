@@ -10,6 +10,7 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
@@ -274,7 +275,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 }
             };
 
-            var magicalLootTypes = _lootTypes.Where(x => x.Category == ILoot.LootCategory.Magic).ToList();
+            var magicalLootTypes = _lootTypes.Where(x => x.ResourceConsumptionType == ResourceConsumptionType.Mana).ToList();
 
             var isMagical = magicalLootTypes.Any() && IsSuccess(50);
             if (isMagical)
@@ -311,7 +312,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             else
             {
                 lootDrop.RegistryType = _lootTypes
-                    .Where(x => x.Category == ILoot.LootCategory.Technology)
+                    .Where(x => x.ResourceConsumptionType == ResourceConsumptionType.Energy)
                     .OrderBy(_ => ValueCalculator.Random.Next())
                     .First();
             }
@@ -518,15 +519,15 @@ namespace FullPotential.Core.Gameplay.Crafting
                     var craftableWeapon = _typeRegistry.GetRegisteredByTypeName<IGearWeapon>(typeName);
                     switch (craftableWeapon.Category)
                     {
-                        case IGearWeapon.WeaponCategory.Melee: return GetMeleeWeapon(craftableWeapon, components, isTwoHanded);
-                        case IGearWeapon.WeaponCategory.Ranged: return GetRangedWeapon(craftableWeapon, components, isTwoHanded);
-                        case IGearWeapon.WeaponCategory.Defensive: return GetDefensiveWeapon(craftableWeapon, components, isTwoHanded);
+                        case WeaponCategory.Melee: return GetMeleeWeapon(craftableWeapon, components, isTwoHanded);
+                        case WeaponCategory.Ranged: return GetRangedWeapon(craftableWeapon, components, isTwoHanded);
+                        case WeaponCategory.Defensive: return GetDefensiveWeapon(craftableWeapon, components, isTwoHanded);
                         default: throw new Exception($"Unexpected weapon category '{craftableWeapon.Category}'");
                     }
 
                 case nameof(Armor):
                     var craftableArmor = _typeRegistry.GetRegisteredByTypeName<IGearArmor>(typeName);
-                    return craftableArmor.Category == IGearArmor.ArmorCategory.Barrier
+                    return craftableArmor.Category == ArmorCategory.Barrier
                         ? GetBarrier(craftableArmor, components)
                         : GetArmor(craftableArmor, components);
 

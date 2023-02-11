@@ -5,9 +5,10 @@ using System.Linq;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Persistence;
 using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Helpers;
@@ -490,10 +491,10 @@ namespace FullPotential.Core.Player
             if (IsServer)
             {
                 _entityName.Value = Username;
-                _energy.Value = playerData.Consumables.Energy;
-                _health.Value = playerData.Consumables.Health > 0 ? playerData.Consumables.Health : GetHealthMax();
-                _mana.Value = playerData.Consumables.Mana;
-                _stamina.Value = playerData.Consumables.Stamina;
+                _energy.Value = playerData.ResourceType.Energy;
+                _health.Value = playerData.ResourceType.Health > 0 ? playerData.ResourceType.Health : GetHealthMax();
+                _mana.Value = playerData.ResourceType.Mana;
+                _stamina.Value = playerData.ResourceType.Stamina;
             }
 
             try
@@ -653,10 +654,10 @@ namespace FullPotential.Core.Player
 
         public PlayerData UpdateAndReturnPlayerData()
         {
-            _saveData.Consumables.Energy = _energy.Value;
-            _saveData.Consumables.Health = _health.Value;
-            _saveData.Consumables.Mana = _mana.Value;
-            _saveData.Consumables.Stamina = _stamina.Value;
+            _saveData.ResourceType.Energy = _energy.Value;
+            _saveData.ResourceType.Health = _health.Value;
+            _saveData.ResourceType.Mana = _mana.Value;
+            _saveData.ResourceType.Stamina = _stamina.Value;
             _saveData.Inventory = Inventory.GetSaveData();
             return _saveData;
         }

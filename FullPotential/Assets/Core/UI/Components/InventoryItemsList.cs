@@ -5,7 +5,7 @@ using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Gameplay.Tooltips;
@@ -28,7 +28,7 @@ namespace FullPotential.Core.Ui.Components
             GameObject rowPrefab,
             IPlayerInventory playerInventory,
             Action<GameObject, GameObject, ItemBase> toggleAction,
-            IGear.GearCategory? gearCategory = null,
+            GearCategory? gearCategory = null,
             bool showEquippedItems = true,
             Action<IPlayerInventory, string, InventoryUiRow> assignDrawingAction = null
         )

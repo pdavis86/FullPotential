@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace FullPotential.Api.Gameplay.Data
+namespace FullPotential.Api.Obsolete
 {
     [Serializable]
-    public class Consumables
+    public class ResourceType
     {
         public int Energy;
         public int Health;

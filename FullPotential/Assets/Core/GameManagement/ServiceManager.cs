@@ -1,7 +1,6 @@
 ﻿using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Crafting;
-using FullPotential.Api.Gameplay.Data;
 using FullPotential.Api.Gameplay.Drawing;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
@@ -10,6 +9,7 @@ using FullPotential.Api.Persistence;
 using FullPotential.Api.Spawning;
 using FullPotential.Api.Ui.Services;
 using FullPotential.Api.Utilities;
+using FullPotential.Core.GameManagement.Inventory;
 using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Localization;

@@ -5,6 +5,7 @@ using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Utilities.Extensions;
 
@@ -20,12 +21,12 @@ namespace FullPotential.Api.Items.Types
 
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
         {
-            return GetArmorCategory() == IGearArmor.ArmorCategory.Barrier
+            return GetArmorCategory() == ArmorCategory.Barrier
                 ? GetBarrierDescription(localizer, levelOfDetail, itemName)
                 : GetArmorDescription(localizer, levelOfDetail, itemName);
         }
 
-        private IGearArmor.ArmorCategory GetArmorCategory()
+        private ArmorCategory GetArmorCategory()
         {
             if (RegistryType is not IGearArmor armor)
             {

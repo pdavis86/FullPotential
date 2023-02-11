@@ -1,4 +1,5 @@
 ﻿using System;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
 
 namespace FullPotential.Standard.Accessories
@@ -9,7 +10,7 @@ namespace FullPotential.Standard.Accessories
 
         public string TypeName => nameof(Amulet);
 
-        public IGearAccessory.AccessoryCategory Category => IGearAccessory.AccessoryCategory.Amulet;
+        public AccessoryCategory Category => AccessoryCategory.Amulet;
 
         public string PrefabAddress => "Standard/Prefabs/Accessories/Amulet.prefab";
     }

@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Gameplay.Effects
+﻿namespace FullPotential.Api.Obsolete
 {
     public enum AffectableStat
     {
