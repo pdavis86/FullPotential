@@ -68,7 +68,11 @@ namespace FullPotential.Api.Items.Base
 
         protected ItemBase()
         {
-            //todo: investigate why quitting game gives errors here
+            if (!DependenciesContext.Dependencies.IsReady())
+            {
+                return;
+            }
+
             _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
             _valueCalculator = DependenciesContext.Dependencies.GetService<IValueCalculator>();
         }

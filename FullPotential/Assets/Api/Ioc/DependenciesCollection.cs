@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -15,6 +16,11 @@ namespace FullPotential.Api.Ioc
         private readonly Dictionary<Type, Type> _registry = new Dictionary<Type, Type>();
         private readonly Dictionary<Type, object> _singletons = new Dictionary<Type, object>();
         private readonly Dictionary<Type, Dependency> _factoryDependencies = new Dictionary<Type, Dependency>();
+
+        public bool IsReady()
+        {
+            return _registry.Any();
+        }
 
         public void Register<TInterface, TClass>(bool newInstanceOnRequest = false)
             where TClass : class, TInterface
