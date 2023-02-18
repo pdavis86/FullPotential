@@ -11,7 +11,7 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public string TypeName => nameof(ManaTap);
 
-        public Affect Affect => Affect.PeriodicIncrease;
+        public AffectType AffectType => AffectType.PeriodicIncrease;
 
         public AffectableStat StatToAffect => AffectableStat.Mana;
     }

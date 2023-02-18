@@ -1,6 +1,6 @@
 ﻿namespace FullPotential.Api.Gameplay.Effects
 {
-    public enum Affect
+    public enum AffectType
     {
         SingleIncrease,
         SingleDecrease,

@@ -11,7 +11,7 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public string TypeName => nameof(Lethargy);
 
-        public Affect Affect => Affect.TemporaryMaxDecrease;
+        public AffectType AffectType => AffectType.TemporaryMaxDecrease;
 
         public AffectableStat StatToAffect => AffectableStat.Stamina;
     }

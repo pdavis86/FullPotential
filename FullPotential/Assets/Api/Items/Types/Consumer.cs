@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using System.Text;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
+using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Utilities.Extensions;
@@ -64,10 +64,10 @@ namespace FullPotential.Api.Items.Types
                 .Select(e => (IStatEffect)e)
                 .ToList();
             
-            var single = healthEffects.Where(se => se.Affect == Affect.SingleDecrease || se.Affect == Affect.SingleIncrease);
+            var single = healthEffects.Where(se => se.AffectType == AffectType.SingleDecrease || se.AffectType == AffectType.SingleIncrease);
             var singleDamage = single.Count() * itemDamage;
 
-            var periodic = healthEffects.Where(se => se.Affect == Affect.PeriodicDecrease || se.Affect == Affect.PeriodicIncrease);
+            var periodic = healthEffects.Where(se => se.AffectType == AffectType.PeriodicDecrease || se.AffectType == AffectType.PeriodicIncrease);
             var periodicDamage = periodic.Sum(GetPeriodicStatDamagePerSecond) * -1;
 
             return singleDamage + periodicDamage;

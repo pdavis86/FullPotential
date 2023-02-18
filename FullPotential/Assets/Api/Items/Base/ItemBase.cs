@@ -226,7 +226,7 @@ namespace FullPotential.Api.Items.Base
         {
             var change = GetAdjustedStrength();
 
-            if (statEffect.Affect is Affect.PeriodicDecrease or Affect.SingleDecrease or Affect.TemporaryMaxDecrease)
+            if (statEffect.AffectType is AffectType.PeriodicDecrease or AffectType.SingleDecrease or AffectType.TemporaryMaxDecrease)
             {
                 change *= -1;
             }

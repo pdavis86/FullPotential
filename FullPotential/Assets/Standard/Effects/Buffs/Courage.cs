@@ -11,7 +11,7 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public string TypeName => nameof(Courage);
 
-        public Affect Affect => Affect.TemporaryMaxIncrease;
+        public AffectType AffectType => AffectType.TemporaryMaxIncrease;
 
         public AffectableStat StatToAffect => AffectableStat.Health;
     }

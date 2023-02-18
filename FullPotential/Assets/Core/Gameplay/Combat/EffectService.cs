@@ -255,19 +255,19 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private void ApplyStatEffect(IFighter targetFighter, IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
         {
-            switch (statEffect.Affect)
+            switch (statEffect.AffectType)
             {
-                case Affect.PeriodicDecrease:
-                case Affect.PeriodicIncrease:
+                case AffectType.PeriodicDecrease:
+                case AffectType.PeriodicIncrease:
                     targetFighter.ApplyPeriodicActionToStat(statEffect, itemUsed, sourceFighter);
                     return;
 
-                case Affect.SingleDecrease:
-                case Affect.SingleIncrease:
+                case AffectType.SingleDecrease:
+                case AffectType.SingleIncrease:
 
                     var change = itemUsed.GetStatChange(statEffect);
 
-                    if (statEffect.StatToAffect == AffectableStat.Health && statEffect.Affect == Affect.SingleDecrease)
+                    if (statEffect.StatToAffect == AffectableStat.Health && statEffect.AffectType == AffectType.SingleDecrease)
                     {
                         change = GetDamageValueFromAttack(itemUsed, targetFighter.GetDefenseValue()) * -1;
                     }
@@ -275,13 +275,13 @@ namespace FullPotential.Core.Gameplay.Combat
                     targetFighter.ApplyStatValueChange(statEffect, itemUsed, sourceFighter, change, position);
                     return;
 
-                case Affect.TemporaryMaxDecrease:
-                case Affect.TemporaryMaxIncrease:
+                case AffectType.TemporaryMaxDecrease:
+                case AffectType.TemporaryMaxIncrease:
                     targetFighter.ApplyTemporaryMaxActionToStat(statEffect, itemUsed, sourceFighter, position);
                     return;
 
                 default:
-                    Debug.LogError($"Not implemented handling for affect {statEffect.Affect}");
+                    Debug.LogError($"Not implemented handling for affect {statEffect.AffectType}");
                     return;
             }
         }

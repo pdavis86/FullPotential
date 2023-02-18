@@ -12,7 +12,7 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public string TypeName => nameof(ManaDrain);
 
-        public Affect Affect => Affect.PeriodicDecrease;
+        public AffectType AffectType => AffectType.PeriodicDecrease;
 
         public AffectableStat StatToAffect => AffectableStat.Mana;
 

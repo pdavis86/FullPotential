@@ -133,7 +133,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
 
         public string TypeName => nameof(SingleDamageEffect);
 
-        public Affect Affect => Affect.SingleDecrease;
+        public AffectType AffectType => AffectType.SingleDecrease;
 
         public AffectableStat StatToAffect => AffectableStat.Health;
     }

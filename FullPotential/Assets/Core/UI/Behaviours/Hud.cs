@@ -231,9 +231,9 @@ namespace FullPotential.Core.Ui.Behaviours
         {
             if (effect is IStatEffect statEffect)
             {
-                if (statEffect.Affect == Affect.SingleIncrease
-                    || statEffect.Affect == Affect.PeriodicIncrease
-                    || statEffect.Affect == Affect.TemporaryMaxIncrease)
+                if (statEffect.AffectType == AffectType.SingleIncrease
+                    || statEffect.AffectType == AffectType.PeriodicIncrease
+                    || statEffect.AffectType == AffectType.TemporaryMaxIncrease)
                 {
                     return Color.green;
                 }

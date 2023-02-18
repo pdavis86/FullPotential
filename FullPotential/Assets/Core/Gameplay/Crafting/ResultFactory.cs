@@ -151,16 +151,16 @@ namespace FullPotential.Core.Gameplay.Crafting
                             return other;
                         }
 
-                        switch (statEffect.Affect)
+                        switch (statEffect.AffectType)
                         {
-                            case Affect.PeriodicIncrease:
-                            case Affect.SingleIncrease:
-                            case Affect.TemporaryMaxIncrease:
+                            case AffectType.PeriodicIncrease:
+                            case AffectType.SingleIncrease:
+                            case AffectType.TemporaryMaxIncrease:
                                 return buff;
 
-                            case Affect.PeriodicDecrease:
-                            case Affect.SingleDecrease:
-                            case Affect.TemporaryMaxDecrease:
+                            case AffectType.PeriodicDecrease:
+                            case AffectType.SingleDecrease:
+                            case AffectType.TemporaryMaxDecrease:
                                 return debuff;
 
                             default:
