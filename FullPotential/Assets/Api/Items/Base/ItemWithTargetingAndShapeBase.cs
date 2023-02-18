@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Registry.SpellsAndGadgets;
+﻿using FullPotential.Api.Registry.Consumers;
 
 namespace FullPotential.Api.Items.Base
 {

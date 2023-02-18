@@ -5,13 +5,12 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
+using FullPotential.Api.Modding;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Utilities;
 using Moq;
 using NUnit.Framework;
 
@@ -74,11 +73,8 @@ namespace FullPotential.Api.Tests.Gameplay.Items
                 Luck = 50
             };
 
-            var gadget = new Gadget { Attributes = allFifty, Effects = new List<IEffect> { _singleDamageEffect } };
-            Assert.AreEqual((int)expectedBaseDamage, GetDamage(gadget));
-
-            var spell = new Spell { Attributes = allFifty, Effects = new List<IEffect> { _singleDamageEffect } };
-            Assert.AreEqual((int)expectedBaseDamage, GetDamage(spell));
+            var consumer = new Consumer { Attributes = allFifty, Effects = new List<IEffect> { _singleDamageEffect } };
+            Assert.AreEqual((int)expectedBaseDamage, GetDamage(consumer));
 
             //todo: test multiple effects
             //todo: test periodic damage

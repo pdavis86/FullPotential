@@ -9,6 +9,7 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Modding;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Ui.Components;
@@ -385,10 +386,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return 100 + GetStatMaxAdjustment(AffectableStat.Energy);
         }
 
-        protected int GetEnergyCost(Gadget gadget)
+        protected int GetEnergyCost(Consumer consumer)
         {
             //todo: zzz v0.5 - trait-based energy cost
-            return gadget.GetResourceCost();
+            return consumer.GetResourceCost();
         }
 
         protected abstract bool IsConsumingEnergy();
@@ -435,10 +436,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return 100 + GetStatMaxAdjustment(AffectableStat.Mana);
         }
 
-        protected int GetManaCost(Spell spell)
+        protected int GetManaCost(Consumer consumer)
         {
             //todo: zzz v0.5 - trait-based mana cost
-            return spell.GetResourceCost();
+            return consumer.GetResourceCost();
         }
 
         protected abstract bool IsConsumingMana();

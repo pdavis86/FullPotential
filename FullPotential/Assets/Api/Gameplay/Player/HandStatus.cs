@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
-using FullPotential.Api.Registry.SpellsAndGadgets;
+using FullPotential.Api.Obsolete;
+using FullPotential.Api.Registry.Consumers;
 
 namespace FullPotential.Api.Gameplay.Player
 {
@@ -21,13 +22,13 @@ namespace FullPotential.Api.Gameplay.Player
 
         #endregion
 
-        #region SpellOrGadget
+        #region Consumer
 
-        public SpellOrGadgetItemBase EquippedSpellOrGadget { get; private set; }
+        public Consumer EquippedConsumer { get; private set; }
 
         public IEnumerator ChargeEnumerator { get; set; }
 
-        public ISpellOrGadgetBehaviour ActiveSpellOrGadgetBehaviour { get; set; }
+        public IConsumerBehaviour ActiveConsumerBehaviour { get; set; }
 
         //public IEnumerator CooldownEnumerator { get; set; }
 
@@ -35,10 +36,10 @@ namespace FullPotential.Api.Gameplay.Player
 
         public void SetEquippedItem(ItemBase item, string description)
         {
-            if (ActiveSpellOrGadgetBehaviour != null)
+            if (ActiveConsumerBehaviour != null)
             {
-                ActiveSpellOrGadgetBehaviour.Stop();
-                ActiveSpellOrGadgetBehaviour = null;
+                ActiveConsumerBehaviour.Stop();
+                ActiveConsumerBehaviour = null;
             }
 
             EquippedItem = item;
@@ -48,34 +49,29 @@ namespace FullPotential.Api.Gameplay.Player
             {
                 case Weapon weapon:
                     EquippedWeapon = weapon;
-                    EquippedSpellOrGadget = null;
+                    EquippedConsumer = null;
                     break;
 
-                case Spell spell:
+                case Consumer consumer:
                     EquippedWeapon = null;
-                    EquippedSpellOrGadget = spell;
-                    break;
-
-                case Gadget gadget:
-                    EquippedWeapon = null;
-                    EquippedSpellOrGadget = gadget;
+                    EquippedConsumer = consumer;
                     break;
 
                 default:
                     EquippedWeapon = null;
-                    EquippedSpellOrGadget = null;
+                    EquippedConsumer = null;
                     break;
             }
         }
 
         public bool IsConsumingMana()
         {
-            return EquippedSpellOrGadget is Spell && ActiveSpellOrGadgetBehaviour != null;
+            return ActiveConsumerBehaviour != null && EquippedConsumer.ResourceConsumptionType == ResourceConsumptionType.Mana;
         }
 
         public bool IsConsumingEnergy()
         {
-            return EquippedSpellOrGadget is Gadget && ActiveSpellOrGadgetBehaviour != null;
+            return ActiveConsumerBehaviour != null && EquippedConsumer.ResourceConsumptionType == ResourceConsumptionType.Energy;
         }
     }
 }

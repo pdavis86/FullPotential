@@ -1,5 +1,5 @@
 ﻿using System;
-using FullPotential.Api.Registry.SpellsAndGadgets;
+using FullPotential.Api.Registry.Consumers;
 
 namespace FullPotential.Standard.SpellsAndGadgets.Shapes
 {

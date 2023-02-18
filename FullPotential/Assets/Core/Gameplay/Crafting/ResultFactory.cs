@@ -11,10 +11,10 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Registry.Consumers;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
-using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Registry;
 using FullPotential.Core.Utilities.Extensions;
@@ -35,9 +35,6 @@ namespace FullPotential.Core.Gameplay.Crafting
         private readonly List<IEffect> _effectsForLoot;
         private readonly List<ITargeting> _targetingOptions;
         private readonly List<IShape> _shapeOptions;
-
-        //Cover Names
-        private Dictionary<string, string> _coverNamesSog;
 
         public ResultFactory(
             ITypeRegistry typeRegistry,
@@ -197,7 +194,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     .ToList();
             }
 
-            if (craftingType != nameof(Spell) && craftingType != nameof(Gadget))
+            if (craftingType != nameof(Consumer))
             {
                 throw new Exception($"Unexpected craftingType '{craftingType}'");
             }
@@ -325,26 +322,18 @@ namespace FullPotential.Core.Gameplay.Crafting
             return lootDrop;
         }
 
-        private SpellOrGadgetItemBase GetSpellOrGadget(string categoryName, IList<ItemBase> components)
+        private Consumer GetConsumer(string categoryName, IList<ItemBase> components)
         {
             var relevantComponents = components.OfType<IHasTargetingAndShape>().ToList();
 
             var targeting = GetTargeting(relevantComponents);
 
-            SpellOrGadgetItemBase spellOrGadget;
-            if (categoryName == nameof(Spell))
-            {
-                spellOrGadget = new Spell();
-            }
-            else
-            {
-                spellOrGadget = new Gadget();
-            }
+            var consumer = new Consumer();
 
-            spellOrGadget.Id = Guid.NewGuid().ToMinimisedString();
-            spellOrGadget.Targeting = targeting;
-            spellOrGadget.Shape = GetShapeOrNone(targeting, relevantComponents);
-            spellOrGadget.Attributes = new Attributes
+            consumer.Id = Guid.NewGuid().ToMinimisedString();
+            consumer.Targeting = targeting;
+            consumer.Shape = GetShapeOrNone(targeting, relevantComponents);
+            consumer.Attributes = new Attributes
             {
                 IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
                 Strength = ComputeAttribute(components, x => x.Attributes.Strength),
@@ -355,22 +344,22 @@ namespace FullPotential.Core.Gameplay.Crafting
                 Recovery = ComputeAttribute(components, x => x.Attributes.Recovery),
                 Duration = ComputeAttribute(components, x => x.Attributes.Duration)
             };
-            spellOrGadget.Effects = GetEffects(categoryName, components, targeting);
+            consumer.Effects = GetEffects(categoryName, components, targeting);
 
-            var suffix = _localizer.GetTranslatedTypeName(spellOrGadget.Targeting)
+            var suffix = _localizer.GetTranslatedTypeName(consumer.Targeting)
                 + " "
                 + _localizer.Translate(TranslationType.CraftingCategory, categoryName);
 
-            if (spellOrGadget.Effects.Count > 0)
+            if (consumer.Effects.Count > 0)
             {
-                spellOrGadget.Name = _localizer.GetTranslatedTypeName(spellOrGadget.Effects.First()) + " " + suffix;
+                consumer.Name = _localizer.GetTranslatedTypeName(consumer.Effects.First()) + " " + suffix;
             }
             else
             {
-                spellOrGadget.Name = GetItemName(true, spellOrGadget, suffix);
+                consumer.Name = GetItemName(true, consumer, suffix);
             }
 
-            return spellOrGadget;
+            return consumer;
         }
 
         private string GetItemNamePrefix(bool isAttack)
@@ -508,9 +497,9 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         public ItemBase GetCraftedItem(string categoryName, string typeName, bool isTwoHanded, IList<ItemBase> components)
         {
-            if (categoryName == nameof(Spell) || categoryName == nameof(Gadget))
+            if (categoryName == nameof(Consumer))
             {
-                return GetSpellOrGadget(categoryName, components);
+                return GetConsumer(categoryName, components);
             }
 
             switch (categoryName)

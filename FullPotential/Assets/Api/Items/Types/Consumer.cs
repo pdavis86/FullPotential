@@ -2,21 +2,22 @@
 using System.Text;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Utilities.Extensions;
 
-namespace FullPotential.Api.Items.Base
+namespace FullPotential.Api.Items.Types
 {
     [System.Serializable]
-    public abstract class SpellOrGadgetItemBase : ItemWithTargetingAndShapeBase
+    public class Consumer : ItemWithTargetingAndShapeBase
     {
-        public const string AliasSegmentSog = "sog";
+        public const string AliasSegmentConsumer = "consumer";
         public const string AliasSegmentEffects = "effects";
 
-        public ResourceConsumptionType ResourceConsumptionType { get; protected set; }
+        public ResourceConsumptionType ResourceConsumptionType;
 
         public int ChargePercentage { get; set; }
 
@@ -42,7 +43,7 @@ namespace FullPotential.Api.Items.Base
         public float GetChargeTime()
         {
             var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0, 2);
-            //Debug.Log("GetSogChargeTime: " + returnValue);
+            //Debug.Log("GetChargeTime: " + returnValue);
             return returnValue;
         }
 
@@ -98,7 +99,7 @@ namespace FullPotential.Api.Items.Base
                 localizer,
                 Attributes.Efficiency,
                 nameof(Attributes.Efficiency),
-                AliasSegmentSog,
+                AliasSegmentConsumer,
                 RoundFloatForDisplay(GetResourceCost()));
 
             AppendToDescription(
@@ -123,7 +124,7 @@ namespace FullPotential.Api.Items.Base
                 localizer,
                 Attributes.Speed,
                 nameof(Attributes.Speed),
-                AliasSegmentSog,
+                AliasSegmentConsumer,
                 RoundFloatForDisplay(GetChargeTime()),
                 UnitsType.Time);
 
@@ -142,7 +143,7 @@ namespace FullPotential.Api.Items.Base
                 localizer,
                 Attributes.Duration,
                 nameof(Attributes.Duration),
-                AliasSegmentSog,
+                AliasSegmentConsumer,
                 RoundFloatForDisplay(GetEffectDuration()),
                 UnitsType.Time);
 

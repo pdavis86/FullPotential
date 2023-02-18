@@ -2,8 +2,8 @@
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Modding;
 using FullPotential.Api.Unity.Helpers;
-using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 

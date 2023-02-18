@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Modding;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Spawning;
 using FullPotential.Api.Unity.Helpers;
-using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.Enemies.Behaviours;
 using Unity.Netcode;

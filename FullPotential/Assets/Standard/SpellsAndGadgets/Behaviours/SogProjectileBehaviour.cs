@@ -1,11 +1,11 @@
 ﻿using System;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Items.Base;
-using FullPotential.Api.Registry.SpellsAndGadgets;
+using FullPotential.Api.Items.Types;
+using FullPotential.Api.Modding;
+using FullPotential.Api.Registry.Consumers;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
-using FullPotential.Api.Utilities;
 using FullPotential.Standard.SpellsAndGadgets.Shapes;
 using Unity.Netcode;
 using UnityEngine;
@@ -14,12 +14,12 @@ using UnityEngine;
 
 namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
-    public class SogProjectileBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
+    public class SogProjectileBehaviour : MonoBehaviour, IConsumerBehaviour
     {
         private IEffectService _effectService;
         private IModHelper _modHelper;
 
-        public SpellOrGadgetItemBase SpellOrGadget;
+        public Consumer Consumer;
         public IFighter SourceFighter;
         public Vector3 ForwardDirection;
 
@@ -33,7 +33,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            if (SpellOrGadget == null)
+            if (Consumer == null)
             {
                 Debug.LogError("No spell has been set");
                 Destroy(gameObject);
@@ -45,13 +45,13 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             Physics.IgnoreCollision(GetComponent<Collider>(), SourceFighter.GameObject.GetComponent<Collider>());
 
 
-            var affectedByGravity = SpellOrGadget.Shape != null;
+            var affectedByGravity = Consumer.Shape != null;
 
             var rigidBody = GetComponent<Rigidbody>();
 
-            var shotDirection = SpellOrGadget.GetShotDirection(ForwardDirection);
+            var shotDirection = Consumer.GetShotDirection(ForwardDirection);
 
-            rigidBody.AddForce(20f * SpellOrGadget.GetProjectileSpeed() * shotDirection, ForceMode.VelocityChange);
+            rigidBody.AddForce(20f * Consumer.GetProjectileSpeed() * shotDirection, ForceMode.VelocityChange);
 
             if (affectedByGravity)
             {
@@ -84,14 +84,14 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 throw new ArgumentException("Position Vector3 cannot be null for projectiles");
             }
 
-            if (SpellOrGadget.Shape == null)
+            if (Consumer.Shape == null)
             {
                 if (!NetworkManager.Singleton.IsServer)
                 {
                     return;
                 }
 
-                _effectService.ApplyEffects(SourceFighter, SpellOrGadget, target, position);
+                _effectService.ApplyEffects(SourceFighter, Consumer, target, position);
             }
             else
             {
@@ -110,20 +110,20 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                         : position.Value;
                 }
 
-                if (SpellOrGadget.Shape is Wall)
+                if (Consumer.Shape is Wall)
                 {
                     var rotation = Quaternion.LookRotation(ForwardDirection);
                     rotation.x = 0;
                     rotation.z = 0;
-                    _modHelper.SpawnShapeGameObject<SogWallBehaviour>(SpellOrGadget, SourceFighter, spawnPosition, rotation);
+                    _modHelper.SpawnShapeGameObject<SogWallBehaviour>(Consumer, SourceFighter, spawnPosition, rotation);
                 }
-                else if (SpellOrGadget.Shape is Zone)
+                else if (Consumer.Shape is Zone)
                 {
-                    _modHelper.SpawnShapeGameObject<SogZoneBehaviour>(SpellOrGadget, SourceFighter, spawnPosition, Quaternion.identity);
+                    _modHelper.SpawnShapeGameObject<SogZoneBehaviour>(Consumer, SourceFighter, spawnPosition, Quaternion.identity);
                 }
                 else
                 {
-                    Debug.LogError($"Unexpected secondary effect for spell {SpellOrGadget.Id} '{SpellOrGadget.Name}'");
+                    Debug.LogError($"Unexpected secondary effect for spell {Consumer.Id} '{Consumer.Name}'");
                 }
             }
         }

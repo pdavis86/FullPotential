@@ -5,12 +5,12 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Modding;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Registry.Consumers;
 using FullPotential.Api.Registry.Crafting;
-using FullPotential.Api.Registry.SpellsAndGadgets;
 using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -20,7 +20,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
     public abstract class FighterBase : LivingEntityBase, IFighter, IMoveable
     {
         private const int MeleeRangeLimit = 8;
-        private const int SpellOrGadgetRangeLimit = 50;
+        private const int ConsumerRangeLimit = 50;
         private const int MaximumRange = 100;
 
         #region Inspector Variables
@@ -80,18 +80,18 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             _consumeResource = new DelayedAction(.5f, () =>
             {
-                if (HandStatusLeft.ActiveSpellOrGadgetBehaviour != null
-                    && !ConsumeResource(HandStatusLeft.EquippedSpellOrGadget, HandStatusLeft.EquippedSpellOrGadget.Targeting.IsContinuous))
+                if (HandStatusLeft.ActiveConsumerBehaviour != null
+                    && !ConsumeResource(HandStatusLeft.EquippedConsumer, HandStatusLeft.EquippedConsumer.Targeting.IsContinuous))
                 {
-                    StopActiveSpellOrGadgetBehaviour(HandStatusLeft);
-                    StopCastingClientRpc(true, _rpcService.ForNearbyPlayers(transform.position));
+                    StopActiveConsumerBehaviour(HandStatusLeft);
+                    StopActiveConsumerBehaviourClientRpc(true, _rpcService.ForNearbyPlayers(transform.position));
                 }
 
-                if (HandStatusRight.ActiveSpellOrGadgetBehaviour != null
-                    && !ConsumeResource(HandStatusRight.EquippedSpellOrGadget, HandStatusRight.EquippedSpellOrGadget.Targeting.IsContinuous))
+                if (HandStatusRight.ActiveConsumerBehaviour != null
+                    && !ConsumeResource(HandStatusRight.EquippedConsumer, HandStatusRight.EquippedConsumer.Targeting.IsContinuous))
                 {
-                    StopActiveSpellOrGadgetBehaviour(HandStatusRight);
-                    StopCastingClientRpc(false, _rpcService.ForNearbyPlayers(transform.position));
+                    StopActiveConsumerBehaviour(HandStatusRight);
+                    StopActiveConsumerBehaviourClientRpc(false, _rpcService.ForNearbyPlayers(transform.position));
                 }
             });
         }
@@ -173,13 +173,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        private void StopCastingClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
+        private void StopActiveConsumerBehaviourClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
         {
             var leftOrRight = isLeftHand
                 ? HandStatusLeft
                 : HandStatusRight;
 
-            StopActiveSpellOrGadgetBehaviour(leftOrRight);
+            StopActiveConsumerBehaviour(leftOrRight);
         }
 
         [ClientRpc]
@@ -262,8 +262,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
             HandStatusLeft.IsReloading = false;
             HandStatusRight.IsReloading = false;
 
-            StopActiveSpellOrGadgetBehaviour(HandStatusLeft);
-            StopActiveSpellOrGadgetBehaviour(HandStatusRight);
+            StopActiveConsumerBehaviour(HandStatusLeft);
+            StopActiveConsumerBehaviour(HandStatusRight);
 
             base.HandleDeath();
         }
@@ -274,15 +274,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ? HandStatusLeft
                 : HandStatusRight;
 
-            if (leftOrRight.EquippedSpellOrGadget != null)
+            if (leftOrRight.EquippedConsumer != null)
             {
-                if (!ConsumeResource(leftOrRight.EquippedSpellOrGadget, isTest: true))
+                if (!ConsumeResource(leftOrRight.EquippedConsumer, isTest: true))
                 {
                     return false;
                 }
 
-                var timeToCharge = leftOrRight.EquippedSpellOrGadget.GetChargeTime();
-                leftOrRight.ChargeEnumerator = SpellOrGadgetChargeCoroutine(leftOrRight, DateTime.Now.AddSeconds(timeToCharge));
+                var timeToCharge = leftOrRight.EquippedConsumer.GetChargeTime();
+                leftOrRight.ChargeEnumerator = ConsumerChargeCoroutine(leftOrRight, DateTime.Now.AddSeconds(timeToCharge));
                 StartCoroutine(leftOrRight.ChargeEnumerator);
 
                 return true;
@@ -300,17 +300,17 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return false;
         }
 
-        private IEnumerator SpellOrGadgetChargeCoroutine(HandStatus handStatus, DateTime deadline)
+        private IEnumerator ConsumerChargeCoroutine(HandStatus handStatus, DateTime deadline)
         {
             var millisecondsUntilDone = (deadline - DateTime.Now).TotalMilliseconds;
 
             //var sw = System.Diagnostics.Stopwatch.StartNew();
 
-            while (handStatus.EquippedSpellOrGadget.ChargePercentage < 100)
+            while (handStatus.EquippedConsumer.ChargePercentage < 100)
             {
                 yield return new WaitForSeconds(0.01F);
                 var millisecondsRemaining = (deadline - DateTime.Now).TotalMilliseconds;
-                handStatus.EquippedSpellOrGadget.ChargePercentage = 100 - (int)(millisecondsRemaining / millisecondsUntilDone * 100);
+                handStatus.EquippedConsumer.ChargePercentage = 100 - (int)(millisecondsRemaining / millisecondsUntilDone * 100);
             }
 
             //Debug.Log("Charged in: " + sw.ElapsedMilliseconds + "ms");
@@ -373,9 +373,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 case null:
                     return Punch();
 
-                case Gadget:
-                case Spell:
-                    return UseSpellOrGadget(isLeftHand, handPosition, itemInHand as SpellOrGadgetItemBase);
+                case Consumer consumer:
+                    return UseConsumer(isLeftHand, handPosition, consumer);
 
                 case Weapon weaponInHand:
                     return UseWeapon(isLeftHand, handPosition, weaponInHand, isAutoFire);
@@ -406,34 +405,34 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return true;
         }
 
-        private bool StopActiveSpellOrGadgetBehaviour(HandStatus handStatus)
+        private bool StopActiveConsumerBehaviour(HandStatus handStatus)
         {
-            if (handStatus.ActiveSpellOrGadgetBehaviour == null)
+            if (handStatus.ActiveConsumerBehaviour == null)
             {
                 return false;
             }
 
-            StartSpellOrGadgetCooldown(handStatus);
+            StartConsumerCooldown(handStatus);
 
-            handStatus.ActiveSpellOrGadgetBehaviour.Stop();
-            handStatus.ActiveSpellOrGadgetBehaviour = null;
+            handStatus.ActiveConsumerBehaviour.Stop();
+            handStatus.ActiveConsumerBehaviour = null;
 
             return true;
         }
 
         //todo: zzz v0.4.1 - remove SoG cooldown if not necessary
-        private void StartSpellOrGadgetCooldown(HandStatus handStatus)
+        private void StartConsumerCooldown(HandStatus handStatus)
         {
-            handStatus.EquippedSpellOrGadget.ChargePercentage = 0;
+            handStatus.EquippedConsumer.ChargePercentage = 0;
 
             //var timeToCooldown = handStatus.EquippedSpellOrGadget.ChargePercentage / 100f * handStatus.EquippedSpellOrGadget.GetCooldownTime();
             //handStatus.CooldownEnumerator = SpellOrGadgetCooldownCoroutine(handStatus, handStatus.EquippedSpellOrGadget.ChargePercentage, DateTime.Now.AddSeconds(timeToCooldown));
             //StartCoroutine(handStatus.CooldownEnumerator);
         }
 
-        private bool UseSpellOrGadget(bool isLeftHand, Vector3 handPosition, SpellOrGadgetItemBase spellOrGadget)
+        private bool UseConsumer(bool isLeftHand, Vector3 handPosition, Consumer consumer)
         {
-            if (spellOrGadget == null)
+            if (consumer == null)
             {
                 return false;
             }
@@ -442,7 +441,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ? HandStatusLeft
                 : HandStatusRight;
 
-            if (StopActiveSpellOrGadgetBehaviour(leftOrRight))
+            if (StopActiveConsumerBehaviour(leftOrRight))
             {
                 //Return true as the action also needs performing on the server
                 return true;
@@ -450,14 +449,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (IsServer || NetworkManager.LocalClientId == OwnerClientId)
             {
-                if (leftOrRight.EquippedSpellOrGadget.ChargePercentage < 100)
+                if (leftOrRight.EquippedConsumer.ChargePercentage < 100)
                 {
                     //Debug.Log("Charge was not finished");
 
                     if (leftOrRight.ChargeEnumerator != null)
                     {
                         StopCoroutine(leftOrRight.ChargeEnumerator);
-                        StartSpellOrGadgetCooldown(leftOrRight);
+                        StartConsumerCooldown(leftOrRight);
                     }
 
                     return false;
@@ -469,17 +468,17 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 //    return false;
                 //}
 
-                if (!ConsumeResource(spellOrGadget, isTest: true))
+                if (!ConsumeResource(consumer, isTest: true))
                 {
                     return false;
                 }
             }
 
             _typeRegistry.LoadAddessable(
-                spellOrGadget.Targeting.PrefabAddress,
-                prefab => InstantiateSogGameObject(leftOrRight, isLeftHand, handPosition, spellOrGadget, prefab));
+                consumer.Targeting.PrefabAddress,
+                prefab => InstantiateConsumerGameObject(leftOrRight, isLeftHand, handPosition, consumer, prefab));
 
-            if (spellOrGadget.Targeting.IsServerSideOnly && IsServer)
+            if (consumer.Targeting.IsServerSideOnly && IsServer)
             {
                 return false;
             }
@@ -487,37 +486,37 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return true;
         }
 
-        private void InstantiateSogGameObject(
+        private void InstantiateConsumerGameObject(
             HandStatus leftOrRight,
             bool isLeftHand,
             Vector3 handPosition,
-            SpellOrGadgetItemBase spellOrGadget,
+            Consumer consumer,
             GameObject prefab)
         {
-            var targetDirection = GetAttackDirection(handPosition, SpellOrGadgetRangeLimit);
+            var targetDirection = GetAttackDirection(handPosition, ConsumerRangeLimit);
 
-            var parentTransform = spellOrGadget.Targeting.IsParentedToSource
+            var parentTransform = consumer.Targeting.IsParentedToSource
                 ? transform
                 : _gameManager.GetSceneBehaviour().GetTransform();
 
-            var spellOrGadgetGameObject = Instantiate(prefab, handPosition, Quaternion.identity);
+            var consumerGameObject = Instantiate(prefab, handPosition, Quaternion.identity);
 
-            spellOrGadget.Targeting.SetBehaviourVariables(spellOrGadgetGameObject, spellOrGadget, this, handPosition, targetDirection, isLeftHand);
+            consumer.Targeting.SetBehaviourVariables(consumerGameObject, consumer, this, handPosition, targetDirection, isLeftHand);
 
-            spellOrGadgetGameObject.transform.parent = parentTransform;
+            consumerGameObject.transform.parent = parentTransform;
 
-            if (spellOrGadget.Targeting.IsContinuous)
+            if (consumer.Targeting.IsContinuous)
             {
-                leftOrRight.ActiveSpellOrGadgetBehaviour = spellOrGadgetGameObject.GetComponent<ISpellOrGadgetBehaviour>();
+                leftOrRight.ActiveConsumerBehaviour = consumerGameObject.GetComponent<IConsumerBehaviour>();
             }
             else
             {
-                StartSpellOrGadgetCooldown(leftOrRight);
+                StartConsumerCooldown(leftOrRight);
             }
 
             if (IsServer)
             {
-                ConsumeResource(spellOrGadget);
+                ConsumeResource(consumer);
             }
         }
 
@@ -608,25 +607,25 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return true;
         }
 
-        private (NetworkVariable<int> Variable, int? Cost)? GetResourceVariableAndCost(SpellOrGadgetItemBase spellOrGadget)
+        private (NetworkVariable<int> Variable, int? Cost)? GetResourceVariableAndCost(Consumer consumer)
         {
-            switch (spellOrGadget.ResourceConsumptionType)
+            switch (consumer.ResourceConsumptionType)
             {
                 case ResourceConsumptionType.Mana:
-                    return (_mana, GetManaCost((Spell)spellOrGadget));
+                    return (_mana, GetManaCost(consumer));
 
                 case ResourceConsumptionType.Energy:
-                    return (_energy, GetEnergyCost((Gadget)spellOrGadget));
+                    return (_energy, GetEnergyCost(consumer));
 
                 default:
-                    Debug.LogError("Not yet implemented GetResourceVariable() for resource type " + spellOrGadget.ResourceConsumptionType);
+                    Debug.LogError("Not yet implemented GetResourceVariable() for resource type " + consumer.ResourceConsumptionType);
                     return null;
             }
         }
 
-        private bool ConsumeResource(SpellOrGadgetItemBase spellOrGadget, bool slowDrain = false, bool isTest = false)
+        private bool ConsumeResource(Consumer consumer, bool slowDrain = false, bool isTest = false)
         {
-            var tuple = GetResourceVariableAndCost(spellOrGadget);
+            var tuple = GetResourceVariableAndCost(consumer);
 
             if (!tuple.HasValue || !tuple.Value.Cost.HasValue)
             {

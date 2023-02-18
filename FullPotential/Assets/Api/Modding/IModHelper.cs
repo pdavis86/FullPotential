@@ -1,17 +1,17 @@
 ﻿using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Items.Base;
-using FullPotential.Api.Registry.SpellsAndGadgets;
+using FullPotential.Api.Items.Types;
+using FullPotential.Api.Registry.Consumers;
 using UnityEngine;
 
-namespace FullPotential.Api.Utilities
+namespace FullPotential.Api.Modding
 {
     public interface IModHelper
     {
         IGameManager GetGameManager();
 
         void SpawnShapeGameObject<T>(
-            SpellOrGadgetItemBase spellOrGadget,
+            Consumer consumer,
             IFighter sourceFighter,
             Vector3 startPosition,
             Quaternion rotation)

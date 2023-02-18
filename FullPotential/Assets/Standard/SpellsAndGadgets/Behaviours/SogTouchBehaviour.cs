@@ -1,7 +1,7 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Items.Base;
-using FullPotential.Api.Registry.SpellsAndGadgets;
+using FullPotential.Api.Items.Types;
+using FullPotential.Api.Registry.Consumers;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,11 +9,11 @@ using UnityEngine;
 
 namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
-    public class SogTouchBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
+    public class SogTouchBehaviour : MonoBehaviour, IConsumerBehaviour
     {
         private const int MaxDistance = 3;
 
-        public SpellOrGadgetItemBase SpellOrGadget;
+        public Consumer Consumer;
         public IFighter SourceFighter;
         public Vector3 StartPosition;
         public Vector3 ForwardDirection;
@@ -23,7 +23,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            if (SpellOrGadget == null)
+            if (Consumer == null)
             {
                 Debug.LogError("No spell has been set");
                 Destroy(gameObject);
@@ -52,7 +52,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _effectService.ApplyEffects(SourceFighter, SpellOrGadget, target, position);
+            _effectService.ApplyEffects(SourceFighter, Consumer, target, position);
         }
 
     }

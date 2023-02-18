@@ -1,7 +1,7 @@
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Items.Base;
-using FullPotential.Api.Registry.SpellsAndGadgets;
+using FullPotential.Api.Items.Types;
+using FullPotential.Api.Registry.Consumers;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,9 +9,9 @@ using UnityEngine;
 
 namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
-    public class SogSelfBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
+    public class SogSelfBehaviour : MonoBehaviour, IConsumerBehaviour
     {
-        public SpellOrGadgetItemBase SpellOrGadget;
+        public Consumer Consumer;
         public IFighter SourceFighter;
         public Vector3 ForwardDirection;
 
@@ -25,7 +25,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            if (SpellOrGadget == null)
+            if (Consumer == null)
             {
                 Debug.LogError("No spell has been set");
                 Destroy(gameObject);
@@ -34,13 +34,13 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 
             _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
 
-            _castSpeed = SpellOrGadget.Attributes.Speed / 50f;
+            _castSpeed = Consumer.Attributes.Speed / 50f;
             if (_castSpeed < 0.5)
             {
                 _castSpeed = 0.5f;
             }
 
-            _distanceBeforeReturning = (101 - SpellOrGadget.Attributes.Range) / 100f * 6;
+            _distanceBeforeReturning = (101 - Consumer.Attributes.Range) / 100f * 6;
 
             _rigidBody = GetComponent<Rigidbody>();
             _rigidBody.AddForce(_castSpeed * 20f * ForwardDirection, ForceMode.VelocityChange);
@@ -103,7 +103,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _effectService.ApplyEffects(SourceFighter, SpellOrGadget, target, position);
+            _effectService.ApplyEffects(SourceFighter, Consumer, target, position);
             Destroy(gameObject);
         }
 

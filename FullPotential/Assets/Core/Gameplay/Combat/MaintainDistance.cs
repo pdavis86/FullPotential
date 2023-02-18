@@ -1,5 +1,5 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items.Types;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Networking;
 using UnityEngine;
@@ -13,7 +13,7 @@ namespace FullPotential.Core.Gameplay.Combat
         // ReSharper disable UnassignedField.Global
         public IFighter SourceFighter;
         public float Distance;
-        public SpellOrGadgetItemBase ItemUsed;
+        public Consumer Consumer;
         // ReSharper restore UnassignedField.Global
 
         private GameObject _targetPositionGameObject;
@@ -35,7 +35,7 @@ namespace FullPotential.Core.Gameplay.Combat
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            if (ItemUsed.ChargePercentage != 100)
+            if (Consumer.ChargePercentage != 100)
             {
                 Cleanup();
                 return;

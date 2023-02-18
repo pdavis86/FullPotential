@@ -1,7 +1,7 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Items.Base;
-using FullPotential.Api.Registry.SpellsAndGadgets;
+using FullPotential.Api.Items.Types;
+using FullPotential.Api.Registry.Consumers;
 using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -10,9 +10,9 @@ using UnityEngine;
 
 namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
-    public class SogBeamBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour
+    public class SogBeamBehaviour : MonoBehaviour, IConsumerBehaviour
     {
-        public SpellOrGadgetItemBase SpellOrGadget;
+        public Consumer Consumer;
         public IFighter SourceFighter;
         public bool IsLeftHand;
 
@@ -40,14 +40,14 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            if (SpellOrGadget == null)
+            if (Consumer == null)
             {
-                Debug.LogError("No SpellOrGadget has been set");
+                Debug.LogError("No Consumer has been set");
                 Destroy(gameObject);
                 return;
             }
 
-            _maxBeamLength = SpellOrGadget.GetRange();
+            _maxBeamLength = Consumer.GetRange();
 
             PerformGraphicsAdjustments();
 
@@ -56,7 +56,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            var effectsDelay = SpellOrGadget.GetEffectTimeBetween();
+            var effectsDelay = Consumer.GetEffectTimeBetween();
             _applyEffectsAction = new DelayedAction(effectsDelay, () => ApplyEffects(_hit.transform.gameObject, _hit.point));
         }
 
@@ -110,7 +110,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            _effectService.ApplyEffects(SourceFighter, SpellOrGadget, target, position);
+            _effectService.ApplyEffects(SourceFighter, Consumer, target, position);
         }
 
         private void PerformGraphicsAdjustments()

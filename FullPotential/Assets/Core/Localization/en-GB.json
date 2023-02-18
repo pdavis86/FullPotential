@@ -157,19 +157,19 @@
     
     
     {
-      "Key": "attribute.alias.sog.efficiency",
+      "Key": "attribute.alias.consumer.efficiency",
       "Value": "Resource cost"
     },
     {
-      "Key": "attribute.alias.sog.speed",
+      "Key": "attribute.alias.consumer.speed",
       "Value": "Charge Time"
     },
     {
-      "Key": "attribute.alias.sog.recovery",
+      "Key": "attribute.alias.consumer.recovery",
       "Value": "Cooldown Time"
     },
     {
-      "Key": "attribute.alias.sog.duration",
+      "Key": "attribute.alias.consumer.duration",
       "Value": "Effect duration"
     },
 	

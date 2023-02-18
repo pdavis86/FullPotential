@@ -1,5 +1,5 @@
 ﻿using FullPotential.Api.Ioc;
-using FullPotential.Api.Utilities;
+using FullPotential.Api.Modding;
 using Unity.Netcode;
 using UnityEngine;
 

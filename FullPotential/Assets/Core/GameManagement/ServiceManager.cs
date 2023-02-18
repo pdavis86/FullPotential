@@ -5,19 +5,19 @@ using FullPotential.Api.Gameplay.Drawing;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Modding;
 using FullPotential.Api.Persistence;
 using FullPotential.Api.Spawning;
 using FullPotential.Api.Ui.Services;
-using FullPotential.Api.Utilities;
 using FullPotential.Core.GameManagement.Inventory;
 using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Localization;
+using FullPotential.Core.Modding;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Persistence;
 using FullPotential.Core.Registry;
 using FullPotential.Core.Spawning;
-using FullPotential.Core.Utilities;
 
 namespace FullPotential.Core.GameManagement
 {

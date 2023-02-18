@@ -144,7 +144,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateHandCharge(ProgressWheel chargeWheel, HandStatus handStatus)
         {
-            if (handStatus == null || handStatus.EquippedSpellOrGadget == null)
+            if (handStatus == null || handStatus.EquippedConsumer == null)
             {
                 chargeWheel.gameObject.SetActive(false);
                 return;
@@ -155,7 +155,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 chargeWheel.gameObject.SetActive(true);
             }
 
-            chargeWheel.Slider.value = handStatus.EquippedSpellOrGadget.ChargePercentage / 100f;
+            chargeWheel.Slider.value = handStatus.EquippedConsumer.ChargePercentage / 100f;
         }
 
         private void UpdateStaminaPercentage()

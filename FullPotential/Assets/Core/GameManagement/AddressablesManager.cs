@@ -27,6 +27,7 @@ namespace FullPotential.Core.GameManagement
                     continue;
                 }
 
+                //todo: use the "Assets/{modPrefix}/Registration" file instead
                 var groupedByMod = localisationAddresses.GroupBy(a => a.Substring(0, a.IndexOf("/", StringComparison.Ordinal)));
                 foreach (var modGroup in groupedByMod)
                 {

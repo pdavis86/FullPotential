@@ -2,9 +2,9 @@
 
 // ReSharper disable UnusedMemberInSuper.Global
 
-namespace FullPotential.Api.Registry.SpellsAndGadgets
+namespace FullPotential.Api.Registry.Consumers
 {
-    public interface ISpellOrGadgetBehaviour
+    public interface IConsumerBehaviour
     {
         void Stop();
         

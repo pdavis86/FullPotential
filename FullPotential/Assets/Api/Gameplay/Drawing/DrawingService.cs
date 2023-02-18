@@ -6,6 +6,8 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Drawing
 {
+    //todo: move to core
+
     public class DrawingService : IDrawingService
     {
         public string GetDrawingCode(Vector2 direction, int length)

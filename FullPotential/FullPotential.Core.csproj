@@ -79,7 +79,7 @@
     <Compile Include="Assets\Core\GameManagement\Data\ServerGameData.cs" />
     <Compile Include="Assets\Core\GameManagement\UserInterface.cs" />
     <Compile Include="Assets\Core\Registry\TypeRegistry.cs" />
-    <Compile Include="Assets\Core\Utilities\ModHelper.cs" />
+    <Compile Include="Assets\Core\Modding\ModHelper.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\EffectService.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\MainMenuUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectsUi.cs" />

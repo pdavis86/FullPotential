@@ -6,6 +6,7 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,6 +29,7 @@ namespace FullPotential.Core.UI.Components
         private Dictionary<IGearArmor, string> _armorTypes;
         private Dictionary<IGearAccessory, string> _accessoryTypes;
         private Dictionary<IGearWeapon, string> _weaponTypes;
+        private Dictionary<ResourceConsumptionType, string> _consumerTypes;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -39,8 +41,7 @@ namespace FullPotential.Core.UI.Components
                 { typeof(Weapon), localizer.Translate(TranslationType.CraftingCategory, nameof(Weapon)) },
                 { typeof(Armor), localizer.Translate(TranslationType.CraftingCategory, nameof(Armor)) },
                 { typeof(Accessory), localizer.Translate(TranslationType.CraftingCategory, nameof(Accessory)) },
-                { typeof(Spell), localizer.Translate(TranslationType.CraftingCategory, nameof(Spell)) },
-                { typeof(Gadget), localizer.Translate(TranslationType.CraftingCategory, nameof(Gadget)) }
+                { typeof(Consumer), localizer.Translate(TranslationType.CraftingCategory, nameof(Consumer)) }
             };
 
             _handednessOptions = new List<string> {
@@ -63,6 +64,10 @@ namespace FullPotential.Core.UI.Components
                 .ToDictionary(x => x, x => localizer.GetTranslatedTypeName(x))
                 .OrderBy(x => x.Value)
                 .ToDictionary(x => x.Key, x => x.Value);
+
+            _consumerTypes = Enum.GetValues(typeof(ResourceConsumptionType))
+                .Cast<ResourceConsumptionType>()
+                .ToDictionary(x => x, x => localizer.Translate(x.ToString()));
 
             _optionalTwoHandedWeaponIndexes = _weaponTypes
                 .Select((x, i) => !x.Key.EnforceTwoHanded && x.Key.AllowTwoHanded ? (int?)i : null)
@@ -100,33 +105,18 @@ namespace FullPotential.Core.UI.Components
         {
             SubTypeDropdown.ClearOptions();
 
-            var shownSubTypes = true;
-
             var craftingCategory = GetCraftingCategory();
             switch (craftingCategory.Key.Name)
             {
                 case nameof(Weapon): SubTypeDropdown.AddOptions(_weaponTypes.Select(x => x.Value).ToList()); break;
                 case nameof(Armor): SubTypeDropdown.AddOptions(_armorTypes.Select(x => x.Value).ToList()); break;
                 case nameof(Accessory): SubTypeDropdown.AddOptions(_accessoryTypes.Select(x => x.Value).ToList()); break;
-
-                case nameof(Spell):
-                case nameof(Gadget):
-                    shownSubTypes = false;
-                    break;
-
-                default:
-                    throw new InvalidOperationException("Unknown crafting type");
+                case nameof(Consumer): SubTypeDropdown.AddOptions(_consumerTypes.Select(x => x.Value).ToList()); break;
+                default: throw new InvalidOperationException("Unknown crafting type");
             }
 
-            if (shownSubTypes)
-            {
-                SubTypeDropdown.RefreshShownValue();
-                SubTypeDropdown.gameObject.SetActive(true);
-            }
-            else
-            {
-                SubTypeDropdown.gameObject.SetActive(false);
-            }
+            SubTypeDropdown.RefreshShownValue();
+            SubTypeDropdown.gameObject.SetActive(true);
 
             SetHandednessDropDownVisibility();
         }
@@ -143,11 +133,7 @@ namespace FullPotential.Core.UI.Components
                 case nameof(Weapon): return _weaponTypes.ElementAt(SubTypeDropdown.value).Key.TypeName;
                 case nameof(Armor): return _armorTypes.ElementAt(SubTypeDropdown.value).Key.TypeName;
                 case nameof(Accessory): return _accessoryTypes.ElementAt(SubTypeDropdown.value).Key.TypeName;
-
-                case nameof(Spell):
-                case nameof(Gadget):
-                    return null;
-
+                case nameof(Consumer): return _consumerTypes.ElementAt(SubTypeDropdown.value).Key.ToString();
                 default: throw new InvalidOperationException("Unknown crafting type");
             }
         }

@@ -1,7 +1,7 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Items.Base;
-using FullPotential.Api.Registry.SpellsAndGadgets;
+using FullPotential.Api.Items.Types;
+using FullPotential.Api.Registry.Consumers;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using Unity.Netcode;
@@ -11,11 +11,11 @@ using UnityEngine;
 
 namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
-    public class SogZoneBehaviour : MonoBehaviour, ISpellOrGadgetBehaviour, IShapeBehaviour
+    public class SogZoneBehaviour : MonoBehaviour, IConsumerBehaviour, IShapeBehaviour
     {
         private const float DistanceFromGround = 1f;
 
-        public SpellOrGadgetItemBase SpellOrGadget { get; set; }
+        public Consumer Consumer { get; set; }
         public IFighter SourceFighter { get; set; }
 
         private IEffectService _effectService;
@@ -26,18 +26,18 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            if (SpellOrGadget == null)
+            if (Consumer == null)
             {
                 Debug.LogError("No spell has been set");
                 Destroy(gameObject);
                 return;
             }
 
-            Destroy(gameObject, SpellOrGadget.GetEffectDuration());
+            Destroy(gameObject, Consumer.GetEffectDuration());
 
             _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
 
-            _timeBetweenEffects = SpellOrGadget.GetEffectTimeBetween();
+            _timeBetweenEffects = Consumer.GetEffectTimeBetween();
             _timeSinceLastEffective = _timeBetweenEffects;
         }
 
@@ -78,7 +78,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             }
 
             var adjustedPosition = position + new Vector3(0, DistanceFromGround);
-            _effectService.ApplyEffects(SourceFighter, SpellOrGadget, target, adjustedPosition);
+            _effectService.ApplyEffects(SourceFighter, Consumer, target, adjustedPosition);
         }
     }
 }

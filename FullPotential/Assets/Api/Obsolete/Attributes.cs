@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Items
+﻿namespace FullPotential.Api.Obsolete
 {
     [System.Serializable]
     public struct Attributes

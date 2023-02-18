@@ -1,9 +1,9 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items.Types;
 using FullPotential.Api.Registry.Crafting;
 using UnityEngine;
 
-namespace FullPotential.Api.Registry.SpellsAndGadgets
+namespace FullPotential.Api.Registry.Consumers
 {
     public interface ITargeting : IRegisterable, IHasPrefab
     {
@@ -17,7 +17,7 @@ namespace FullPotential.Api.Registry.SpellsAndGadgets
 
         void SetBehaviourVariables(
             GameObject gameObject,
-            SpellOrGadgetItemBase spellOrGadget,
+            Consumer consumer,
             IFighter sourceFighter,
             Vector3 startPosition, 
             Vector3 forwardDirection,

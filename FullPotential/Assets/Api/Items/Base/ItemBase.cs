@@ -8,9 +8,10 @@ using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
+using FullPotential.Api.Modding;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 
@@ -67,6 +68,7 @@ namespace FullPotential.Api.Items.Base
 
         protected ItemBase()
         {
+            //todo: investigate why quitting game gives errors here
             _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
             _valueCalculator = DependenciesContext.Dependencies.GetService<IValueCalculator>();
         }

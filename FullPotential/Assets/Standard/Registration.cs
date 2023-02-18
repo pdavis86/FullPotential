@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using FullPotential.Api.Registry;
+using FullPotential.Api.Modding;
 using UnityEngine;
 
 // ReSharper disable UnusedType.Global

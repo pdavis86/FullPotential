@@ -13,8 +13,7 @@ namespace FullPotential.Core.GameManagement.Inventory
             var itemType = item.GetType();
             invChanges.Accessories = itemType == typeof(Accessory) ? new[] { item as Accessory } : null;
             invChanges.Armor = itemType == typeof(Armor) ? new[] { item as Armor } : null;
-            invChanges.Gadgets = itemType == typeof(Gadget) ? new[] { item as Gadget } : null;
-            invChanges.Spells = itemType == typeof(Spell) ? new[] { item as Spell } : null;
+            invChanges.Consumers = itemType == typeof(Consumer) ? new[] { item as Consumer } : null;
             invChanges.Weapons = itemType == typeof(Weapon) ? new[] { item as Weapon } : null;
         }
     }

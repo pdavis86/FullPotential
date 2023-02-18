@@ -5,7 +5,6 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Items;
-using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Obsolete;
@@ -194,8 +193,8 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private bool IsEffectAllowed(ItemBase itemUsed, GameObject target, IEffect effect)
         {
-            if (itemUsed is SpellOrGadgetItemBase sog
-                && sog.Targeting.IsContinuous)
+            if (itemUsed is Consumer consumer
+                && consumer.Targeting.IsContinuous)
             {
                 if (effect is IMovementEffect movementEffect
                     && movementEffect.Direction == MovementDirection.MaintainDistance)
@@ -301,7 +300,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private void ApplyMaintainDistance(ItemBase itemUsed, GameObject targetGameObject, IFighter sourceFighter)
         {
-            if (itemUsed is not SpellOrGadgetItemBase sog || !sog.Targeting.IsContinuous)
+            if (itemUsed is not Consumer consumer || !consumer.Targeting.IsContinuous)
             {
                 Debug.LogWarning("MaintainDistance has been incorrectly applied to an item");
                 return;
@@ -312,7 +311,7 @@ namespace FullPotential.Core.Gameplay.Combat
             var comp = targetGameObject.AddComponent<MaintainDistance>();
             comp.SourceFighter = sourceFighter;
             comp.Distance = (targetGameObject.transform.position - sourceFighter.Transform.position).magnitude;
-            comp.ItemUsed = sog;
+            comp.Consumer = consumer;
         }
 
         private void ApplyMovementEffect(GameObject targetGameObject, IMovementEffect movementEffect, ItemBase itemUsed, IFighter sourceFighter)

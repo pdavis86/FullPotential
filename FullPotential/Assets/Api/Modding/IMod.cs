@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FullPotential.Api.Registry
+namespace FullPotential.Api.Modding
 {
     public interface IMod
     {

@@ -8,6 +8,8 @@ using Random = System.Random;
 
 namespace FullPotential.Api.Gameplay.Items
 {
+    //todo: merge ValueCalculator into EffectService
+
     public class ValueCalculator : IValueCalculator
     {
         public static readonly Random Random = new Random();
@@ -18,8 +20,6 @@ namespace FullPotential.Api.Gameplay.Items
             var adder = Random.Next(0, 6);
             return (int)Math.Ceiling(basicValue / multiplier) + adder;
         }
-
-        //todo: merge into EffectService
         public int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense, bool addVariation = true)
         {
             var weapon = itemUsed as Weapon;

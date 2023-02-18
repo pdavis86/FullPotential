@@ -240,7 +240,7 @@ namespace FullPotential.Core.Player
             if (gearCategory == GearCategory.Hand)
             {
                 itemsForSlot = _items
-                    .Where(x => x.Value is Weapon or Spell or Gadget);
+                    .Where(x => x.Value is Weapon or Consumer);
             }
             else
             {
@@ -315,13 +315,24 @@ namespace FullPotential.Core.Player
                 ? inventoryData.MaxItems
                 : 30;
 
+            //Here for backwards-compatibility
+            foreach (var spell in inventoryData.Spells)
+            {
+                spell.ResourceConsumptionType = ResourceConsumptionType.Mana;
+            }
+            foreach (var gadget in inventoryData.Gadgets)
+            {
+                gadget.ResourceConsumptionType = ResourceConsumptionType.Energy;
+            }
+
             var itemsToAdd = Enumerable.Empty<ItemBase>()
                 .UnionIfNotNull(inventoryData.Loot)
                 .UnionIfNotNull(inventoryData.Accessories)
                 .UnionIfNotNull(inventoryData.Armor)
+                .UnionIfNotNull(inventoryData.Weapons)
+                .UnionIfNotNull(inventoryData.Consumers)
                 .UnionIfNotNull(inventoryData.Gadgets)
-                .UnionIfNotNull(inventoryData.Spells)
-                .UnionIfNotNull(inventoryData.Weapons);
+                .UnionIfNotNull(inventoryData.Spells);
 
             foreach (var item in itemsToAdd)
             {
@@ -404,7 +415,7 @@ namespace FullPotential.Core.Player
                     magicalItem.Targeting = _resultFactory.GetTargetingFromTypeName(magicalItem.TargetingTypeName);
                 }
 
-                if (item is SpellOrGadgetItemBase && magicalItem.Targeting == null)
+                if (item is Consumer && magicalItem.Targeting == null)
                 {
                     Debug.LogWarning($"Item '{item.Id}' is missing a Targeting ID");
                 }
@@ -448,8 +459,7 @@ namespace FullPotential.Core.Player
                 Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(Loot))?.Select(x => x as Loot).ToArray(),
                 Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray(),
                 Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
-                Gadgets = groupedItems.FirstOrDefault(x => x.Key == typeof(Gadget))?.Select(x => x as Gadget).ToArray(),
-                Spells = groupedItems.FirstOrDefault(x => x.Key == typeof(Spell))?.Select(x => x as Spell).ToArray(),
+                Consumers = groupedItems.FirstOrDefault(x => x.Key == typeof(Consumer))?.Select(x => x as Consumer).ToArray(),
                 Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
                 EquippedItems = equippedItems.ToArray(),
                 ShapeMapping = shapeMapping.ToArray()
@@ -487,9 +497,9 @@ namespace FullPotential.Core.Player
             var components = GetComponentsFromIds(componentIds);
 
             var errors = new List<string>();
-            if (itemToCraft is SpellOrGadgetItemBase spellOrGadgetItem)
+            if (itemToCraft is Consumer consumerItem)
             {
-                if (spellOrGadgetItem.EffectIds.Length == 0)
+                if (consumerItem.EffectIds.Length == 0)
                 {
                     errors.Add(_localizer.Translate("crafting.error.missingeffect"));
                 }
@@ -607,9 +617,8 @@ namespace FullPotential.Core.Player
 
                     break;
 
-                case Spell:
-                case Gadget:
-                    var prefab = item is Spell
+                case Consumer consumer:
+                    var prefab = consumer.ResourceConsumptionType == ResourceConsumptionType.Mana
                         ? GameManager.Instance.Prefabs.Combat.SpellInHand
                         : GameManager.Instance.Prefabs.Combat.GadgetInHand;
 
