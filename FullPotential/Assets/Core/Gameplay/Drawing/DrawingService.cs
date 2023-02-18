@@ -1,13 +1,12 @@
 ﻿using System.Text;
+using FullPotential.Api.Gameplay.Drawing;
 using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Api.Gameplay.Drawing
+namespace FullPotential.Core.Gameplay.Drawing
 {
-    //todo: move to core
-
     public class DrawingService : IDrawingService
     {
         public string GetDrawingCode(Vector2 direction, int length)

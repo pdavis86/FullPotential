@@ -162,7 +162,7 @@ namespace FullPotential.Core.GameManagement
                 {
                     Debug.LogWarning($"User {playerUsername} is already connected");
 
-                    //todo: reject reason does not seem to work yet. Approve so we can send a disconnect reason
+                    //todo: zzz v0.5 - reject reason does not seem to work yet. Approve so we can send a disconnect reason
                     approvalResponse.Approved = true;
                     SendServerToClientSetDisconnectReason(approvalRequest.ClientNetworkId, ConnectStatus.LoggedInAgain);
                     StartCoroutine(WaitToDisconnect(approvalRequest.ClientNetworkId));

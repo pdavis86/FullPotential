@@ -70,7 +70,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 {
                     //Debug.LogWarning("Target is not an IFighter. Target was: " + target);
 
-                    //todo: move this, feels like the wrong place
+                    //todo: zzz v0.6 - SpawnBulletHole: move this, feels like the wrong place
                     var registryType = (IGearWeapon)itemUsed.RegistryType;
                     var isRanged = registryType?.Category == WeaponCategory.Ranged;
                     if (isRanged)

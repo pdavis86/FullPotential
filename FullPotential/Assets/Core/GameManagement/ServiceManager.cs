@@ -12,6 +12,7 @@ using FullPotential.Api.Ui.Services;
 using FullPotential.Core.GameManagement.Inventory;
 using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Crafting;
+using FullPotential.Core.Gameplay.Drawing;
 using FullPotential.Core.Localization;
 using FullPotential.Core.Modding;
 using FullPotential.Core.Networking;

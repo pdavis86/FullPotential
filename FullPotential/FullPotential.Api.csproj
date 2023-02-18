@@ -149,7 +149,6 @@
     <Compile Include="Assets\Api\Registry\Crafting\IHasPrefab.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IEffect.cs" />
     <Compile Include="Assets\Api\Localization\Enums\UnitsType.cs" />
-    <Compile Include="Assets\Api\Gameplay\Drawing\DrawingService.cs" />
     <Compile Include="Assets\Api\Obsolete\ArmorCategory.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\HandStatus.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemWithHealthBase.cs" />
