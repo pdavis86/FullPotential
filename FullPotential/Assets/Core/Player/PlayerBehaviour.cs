@@ -3,7 +3,6 @@ using System.Linq;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Inventory;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
@@ -12,6 +11,7 @@ using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.GameManagement.Inventory;
+using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
@@ -429,9 +429,9 @@ namespace FullPotential.Core.Player
         [ClientRpc]
         public void ShowHealthChangeClientRpc(Vector3 position, int change, bool isCritical, ClientRpcParams clientRpcParams)
         {
-            var offsetX = (float)ValueCalculator.Random.Next(-9, 10) / 100;
-            var offsetY = (float)ValueCalculator.Random.Next(-9, 10) / 100;
-            var offsetZ = (float)ValueCalculator.Random.Next(-9, 10) / 100;
+            var offsetX = (float)EffectService.Random.Next(-9, 10) / 100;
+            var offsetY = (float)EffectService.Random.Next(-9, 10) / 100;
+            var offsetZ = (float)EffectService.Random.Next(-9, 10) / 100;
             var adjustedPosition = position + new Vector3(offsetX, offsetY, offsetZ);
 
             var hit = Instantiate(_hitTextPrefab);

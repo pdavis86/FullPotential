@@ -68,7 +68,7 @@ namespace FullPotential.Api.Items.Types
 
         public float GetMeleeDps()
         {
-            var damage = _valueCalculator.GetDamageValueFromAttack(this, 0, false);
+            var damage = _effectService.GetDamageValueFromAttack(this, 0, false);
 
             var windUp = GetMeleeWindUpTime();
             var timeForTwoAttacks = windUp + GetMeleeRecoveryTime() + windUp;
@@ -78,7 +78,7 @@ namespace FullPotential.Api.Items.Types
 
         public float GetRangedDps()
         {
-            var damage = _valueCalculator.GetDamageValueFromAttack(this, 0, false);
+            var damage = _effectService.GetDamageValueFromAttack(this, 0, false);
             return GetDamagePerSecond(damage, GetAmmoMax(), GetBulletsPerSecond(), GetReloadTime());
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
@@ -28,7 +29,7 @@ namespace FullPotential.Api.Items.Base
 
         // ReSharper disable InconsistentNaming
         protected IGameManager _gameManager;
-        protected IValueCalculator _valueCalculator;
+        protected IEffectService _effectService;
         // ReSharper restore InconsistentNaming
 
         public string Id;
@@ -74,7 +75,7 @@ namespace FullPotential.Api.Items.Base
             }
 
             _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
-            _valueCalculator = DependenciesContext.Dependencies.GetService<IValueCalculator>();
+            _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
         }
 
         public float GetHighInHighOutInRange(int attributeValue, float min, float max)

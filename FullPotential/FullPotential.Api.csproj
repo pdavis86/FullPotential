@@ -108,7 +108,6 @@
     <Compile Include="Assets\Api\Gameplay\Behaviours\LivingEntityBase.cs" />
     <Compile Include="Assets\Api\Persistence\IUserRepository.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemBase.cs" />
-    <Compile Include="Assets\Api\Gameplay\Items\IValueCalculator.cs" />
     <Compile Include="Assets\Api\Obsolete\Attributes.cs" />
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
     <Compile Include="Assets\Api\Registry\Crafting\IGear.cs" />
@@ -127,7 +126,6 @@
     <Compile Include="Assets\Api\Ioc\Dependency.cs" />
     <Compile Include="Assets\Api\Registry\Consumers\ITargeting.cs" />
     <Compile Include="Assets\Api\Scenes\ISceneBehaviour.cs" />
-    <Compile Include="Assets\Api\Gameplay\Items\ValueCalculator.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\Vector3Extensions.cs" />
     <Compile Include="Assets\Api\Registry\Consumers\IConsumerBehaviour.cs" />
     <Compile Include="Assets\Api\Scenes\SpawnPoint.cs" />

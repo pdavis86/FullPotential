@@ -59,7 +59,6 @@
     <Compile Include="Assets\Api.Tests\Ioc\DependenciesCollectionTests.cs" />
     <Compile Include="Assets\Api.Tests\Ioc\MethodInjectionExample.cs" />
     <Compile Include="Assets\Api.Tests\Ioc\ConstructorInjectionExample.cs" />
-    <Compile Include="Assets\Api.Tests\Gameplay\Items\ValueCalculatorTests.cs" />
     <Compile Include="Assets\Api.Tests\Utilities\Extensions\Vector2ExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>

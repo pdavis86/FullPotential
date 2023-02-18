@@ -57,7 +57,7 @@ namespace FullPotential.Api.Items.Types
 
         public float GetDps()
         {
-            var itemDamage = _valueCalculator.GetDamageValueFromAttack(this, 0, false);
+            var itemDamage = _effectService.GetDamageValueFromAttack(this, 0, false);
 
             var healthEffects = Effects
                 .Where(e => e is IStatEffect se && se.StatToAffect == AffectableStat.Health)

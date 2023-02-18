@@ -12,10 +12,10 @@ namespace FullPotential.Api.Tests.Ioc
         public IPlayerInventory Inventory;
         // ReSharper restore UnassignedField.Global
 
-        //public void InjectDependencies(IPlayerFighter fighter, IPlayerInventory inventory)
-        //{
-        //    Fighter = fighter;
-        //    Inventory = inventory;
-        //}
+        public void InjectDependencies(IPlayerFighter fighter, IPlayerInventory inventory)
+        {
+            Fighter = fighter;
+            Inventory = inventory;
+        }
     }
 }

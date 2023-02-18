@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
@@ -11,26 +11,42 @@ using FullPotential.Api.Modding;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Core.Gameplay.Combat;
 using Moq;
 using NUnit.Framework;
 
-namespace FullPotential.Api.Tests.Gameplay.Items
+namespace FullPotential.Core.Tests.Gameplay.Combat
 {
-    public class ValueCalculatorTests
+    public class EffectServiceTests
     {
-        private IValueCalculator _valueCalculator;
+        private IEffectService _effectService;
         private IEffect _singleDamageEffect;
 
         [SetUp]
         public void Setup()
         {
-            _valueCalculator = new ValueCalculator();
             _singleDamageEffect = new SingleDamageEffect();
 
-            var modHelperMock = new Mock<IModHelper>();
+            DependenciesContext.Dependencies.ResetForTesting();
+
             var gameManagerMock = new Mock<IGameManager>();
 
-            DependenciesContext.Dependencies.ResetForTesting();
+            gameManagerMock
+                .Setup(m => m.CurrentCulture)
+                .Returns(new CultureInfo("en-GB"));
+
+            DependenciesContext.Dependencies.Register(new Dependency
+            {
+                Type = typeof(IEffectService),
+                Factory = () => _effectService,
+                IsSingleton = true
+            });
+
+            var modHelperMock = new Mock<IModHelper>();
+
+            modHelperMock
+                .Setup(m => m.GetGameManager())
+                .Returns(gameManagerMock.Object);
 
             DependenciesContext.Dependencies.Register(new Dependency
             {
@@ -39,20 +55,7 @@ namespace FullPotential.Api.Tests.Gameplay.Items
                 IsSingleton = true
             });
 
-            DependenciesContext.Dependencies.Register(new Dependency
-            {
-                Type = typeof(IValueCalculator),
-                Factory = () => _valueCalculator,
-                IsSingleton = true
-            });
-
-            modHelperMock
-                .Setup(m => m.GetGameManager())
-                .Returns(gameManagerMock.Object);
-
-            gameManagerMock
-                .Setup(m => m.CurrentCulture)
-                .Returns(new CultureInfo("en-GB"));
+            _effectService = new EffectService(Mock.Of<ITypeRegistry>(), Mock.Of<IRpcService>());
         }
 
         [Test]
@@ -100,7 +103,7 @@ namespace FullPotential.Api.Tests.Gameplay.Items
 
         private int GetDamage(ItemBase item)
         {
-            return _valueCalculator.GetDamageValueFromAttack(item, 0, false);
+            return _effectService.GetDamageValueFromAttack(item, 0, false);
         }
 
         private Weapon GetMeleeWeapon(bool isTwoHanded, Attributes attributes)

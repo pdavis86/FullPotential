@@ -11,6 +11,7 @@ using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Consumers;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Player;
 using FullPotential.Core.UI.Components;
@@ -179,7 +180,7 @@ namespace FullPotential.Core.UI.Behaviours
             foreach (var behaviour in _attributeSliderBehaviours)
             {
                 behaviour.Slider.value = Mathf.Approximately(behaviour.Slider.maxValue, 100)
-                    ? ValueCalculator.Random.Next(1, 101)
+                    ? EffectService.Random.Next(1, 101)
                     : 0;
             }
         }

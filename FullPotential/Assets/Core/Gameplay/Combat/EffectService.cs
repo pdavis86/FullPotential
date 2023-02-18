@@ -4,7 +4,6 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Obsolete;
@@ -23,19 +22,18 @@ namespace FullPotential.Core.Gameplay.Combat
 {
     public class EffectService : IEffectService
     {
+        public static readonly System.Random Random = new System.Random();
+
         private readonly ITypeRegistry _typeRegistry;
         private readonly IRpcService _rpcService;
-        private readonly IValueCalculator _valueCalculator;
         private readonly Punch _punchEffect;
 
         public EffectService(
             ITypeRegistry typeRegistry,
-            IRpcService rpcService,
-            IValueCalculator valueCalculator)
+            IRpcService rpcService)
         {
             _typeRegistry = typeRegistry;
             _rpcService = rpcService;
-            _valueCalculator = valueCalculator;
 
             _punchEffect = new Punch();
         }
@@ -83,10 +81,10 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 //Debug.Log($"Applying just damage (no effects) to {targetFighter.FighterName}");
 
-                var damageDealt = _valueCalculator.GetDamageValueFromAttack(itemUsed, targetFighter.GetDefenseValue()) * -1;
+                var damageDealt = GetDamageValueFromAttack(itemUsed, targetFighter.GetDefenseValue()) * -1;
 
                 var sourceFighterCriticalHitChance = sourceFighter.GetCriticalHitChance();
-                var critTestValue = ValueCalculator.Random.Next(0, 101);
+                var critTestValue = Random.Next(0, 101);
                 var isCritical = critTestValue <= sourceFighterCriticalHitChance;
 
                 if (isCritical)
@@ -245,7 +243,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     return;
 
                 case IElement elementalEffect:
-                    var damageDealt = _valueCalculator.GetDamageValueFromAttack(itemUsed, targetFighter.GetDefenseValue()) * -1;
+                    var damageDealt = GetDamageValueFromAttack(itemUsed, targetFighter.GetDefenseValue()) * -1;
                     ApplyElementalEffect(targetFighter, elementalEffect, itemUsed, sourceFighter, damageDealt, position);
                     return;
 
@@ -271,7 +269,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
                     if (statEffect.StatToAffect == AffectableStat.Health && statEffect.Affect == Affect.SingleDecrease)
                     {
-                        change = _valueCalculator.GetDamageValueFromAttack(itemUsed, targetFighter.GetDefenseValue()) * -1;
+                        change = GetDamageValueFromAttack(itemUsed, targetFighter.GetDefenseValue()) * -1;
                     }
 
                     targetFighter.ApplyStatValueChange(statEffect, itemUsed, sourceFighter, change, position);
@@ -424,6 +422,48 @@ namespace FullPotential.Core.Gameplay.Combat
 
             var nearbyClients = _rpcService.ForNearbyPlayersExcept(targetGameObject.transform.position, 0);
             targetMoveable.ApplyMovementForceClientRpc(forceToApply, ForceMode.Acceleration, nearbyClients);
+        }
+
+
+        private int AddVariationToValue(double basicValue)
+        {
+            var multiplier = (double)Random.Next(90, 111) / 100;
+            var adder = Random.Next(0, 6);
+            return (int)Math.Ceiling(basicValue / multiplier) + adder;
+        }
+
+        public int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense, bool addVariation = true)
+        {
+            var weapon = itemUsed as Weapon;
+            var weaponCategory = (weapon?.RegistryType as IGearWeapon)?.Category;
+
+            float attackStrength = itemUsed?.Attributes.Strength ?? 1;
+            var defenceRatio = 100f / (100 + targetDefense);
+            
+            if (weaponCategory == WeaponCategory.Ranged)
+            {
+                attackStrength /= weapon.GetBulletsPerSecond();
+            }
+
+            //Even a small attack can still do damage
+            var damageDealtBasic = Math.Ceiling(attackStrength * defenceRatio / ItemBase.StrengthDivisor);
+
+            if (weapon != null && weapon.IsTwoHanded)
+            {
+                damageDealtBasic *= 2;
+            }
+
+            if (weaponCategory == WeaponCategory.Melee)
+            {
+                damageDealtBasic *= 2;
+            }
+
+            if (!addVariation)
+            {
+                return (int)damageDealtBasic;
+            }
+
+            return AddVariationToValue(damageDealtBasic);
         }
 
     }

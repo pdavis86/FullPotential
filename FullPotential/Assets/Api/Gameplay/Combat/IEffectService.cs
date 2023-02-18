@@ -11,5 +11,7 @@ namespace FullPotential.Api.Gameplay.Combat
             GameObject target,
             Vector3? position
         );
+
+        int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense, bool addVariation = true);
     }
 }

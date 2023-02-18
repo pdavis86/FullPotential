@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Core.Tests\Utilities\GuidExtensionsTests.cs" />
+    <Compile Include="Assets\Core.Tests\Gameplay\Combat\EffectServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Core.Tests\EditModeTests.asmdef" />
