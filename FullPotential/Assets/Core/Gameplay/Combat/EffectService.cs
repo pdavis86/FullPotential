@@ -57,6 +57,8 @@ namespace FullPotential.Core.Gameplay.Combat
                 ApplyEffect(sourceFighter, _punchEffect, itemUsed, target, position);
             }
 
+            ApplyShape();
+
             var itemHasEffects = itemUsed.Effects != null && itemUsed.Effects.Any();
             var itemIsWeapon = itemUsed is Weapon;
 
@@ -126,6 +128,76 @@ namespace FullPotential.Core.Gameplay.Combat
                     ApplyEffect(null, sideEffect, itemUsed, sourceFighter.GameObject, position);
                 }
             }
+        }
+
+        private void ApplyShape()
+        {
+            //    var gameManager = GetGameManager();
+            //    var typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
+            //    var spawnService = gameManager.GetSceneBehaviour().GetSpawnService();
+            //    var sceneBehaviour = gameManager.GetSceneBehaviour();
+
+            //    typeRegistry.LoadAddessable(
+            //        consumer.Shape.PrefabAddress,
+            //        prefab =>
+            //        {
+            //            var consumerGameObject = Object.Instantiate(prefab, startPosition, rotation);
+            //            spawnService.AdjustPositionToBeAboveGround(startPosition, consumerGameObject.transform, false);
+
+            //            var behaviourScript = consumerGameObject.GetComponent<T>();
+            //            behaviourScript.Consumer = consumer;
+            //            behaviourScript.SourceFighter = sourceFighter;
+
+            //            consumerGameObject.transform.parent = sceneBehaviour.GetTransform();
+            //        }
+
+            //if (!position.HasValue)
+            //{
+            //    throw new ArgumentException("Position Vector3 cannot be null for projectiles");
+            //}
+
+            //if (Consumer.Shape == null)
+            //{
+            //    if (!NetworkManager.Singleton.IsServer)
+            //    {
+            //        return;
+            //    }
+
+            //    _effectService.ApplyEffects(SourceFighter, Consumer, target, position);
+            //}
+            //else
+            //{
+            //    Vector3 spawnPosition;
+            //    if (!target.CompareTagAny(Tags.Player, Tags.Enemy))
+            //    {
+            //        spawnPosition = position.Value;
+            //    }
+            //    else
+            //    {
+            //        var pointUnderTarget = new Vector3(target.transform.position.x, -100, target.transform.position.z);
+            //        var feetOfTarget = target.GetComponent<Collider>().ClosestPointOnBounds(pointUnderTarget);
+
+            //        spawnPosition = Physics.Raycast(feetOfTarget, transform.up * -1, out var hit)
+            //            ? hit.point
+            //            : position.Value;
+            //    }
+
+            //    if (Consumer.Shape is Wall)
+            //    {
+            //        var rotation = Quaternion.LookRotation(ForwardDirection);
+            //        rotation.x = 0;
+            //        rotation.z = 0;
+            //        _modHelper.SpawnShapeGameObject<SogWallVisuals>(Consumer, SourceFighter, spawnPosition, rotation);
+            //    }
+            //    else if (Consumer.Shape is Zone)
+            //    {
+            //        _modHelper.SpawnShapeGameObject<SogZoneVisuals>(Consumer, SourceFighter, spawnPosition, Quaternion.identity);
+            //    }
+            //    else
+            //    {
+            //        Debug.LogError($"Unexpected secondary effect for spell {Consumer.Id} '{Consumer.Name}'");
+            //    }
+            //}
         }
 
         private void SpawnBulletHole(

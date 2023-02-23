@@ -1,7 +1,8 @@
-﻿using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
-using FullPotential.Api.Registry.Consumers;
+using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using Unity.Netcode;
@@ -11,10 +12,8 @@ using UnityEngine;
 
 namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
-    public class SogZoneBehaviour : MonoBehaviour, IConsumerBehaviour, IShapeBehaviour
+    public class SogWallVisuals : ConsumerVisualBehaviour
     {
-        private const float DistanceFromGround = 1f;
-
         public Consumer Consumer { get; set; }
         public IFighter SourceFighter { get; set; }
 
@@ -65,7 +64,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             ApplyEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
         }
 
-        public void Stop()
+        public override void Stop()
         {
             //Nothing here
         }
@@ -77,8 +76,8 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 return;
             }
 
-            var adjustedPosition = position + new Vector3(0, DistanceFromGround);
-            _effectService.ApplyEffects(SourceFighter, Consumer, target, adjustedPosition);
+            _effectService.ApplyEffects(SourceFighter, Consumer, target, position);
         }
+
     }
 }

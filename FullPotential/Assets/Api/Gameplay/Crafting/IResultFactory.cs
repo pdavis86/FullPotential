@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.Consumers;
+using FullPotential.Api.Registry.Shapes;
+using FullPotential.Api.Registry.Targeting;
 
 namespace FullPotential.Api.Gameplay.Crafting
 {

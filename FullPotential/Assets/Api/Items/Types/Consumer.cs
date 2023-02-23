@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
-using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Utilities.Extensions;
@@ -20,6 +22,8 @@ namespace FullPotential.Api.Items.Types
         public ResourceConsumptionType ResourceConsumptionType;
 
         public int ChargePercentage { get; set; }
+
+        public List<IStoppable> Stoppables { get; } = new List<IStoppable>();
 
         public int GetResourceCost()
         {
@@ -63,7 +67,7 @@ namespace FullPotential.Api.Items.Types
                 .Where(e => e is IStatEffect se && se.StatToAffect == AffectableStat.Health)
                 .Select(e => (IStatEffect)e)
                 .ToList();
-            
+
             var single = healthEffects.Where(se => se.AffectType == AffectType.SingleDecrease || se.AffectType == AffectType.SingleIncrease);
             var singleDamage = single.Count() * itemDamage;
 
@@ -166,6 +170,16 @@ namespace FullPotential.Api.Items.Types
                 UnitsType.UnitPerTime);
 
             return sb.ToString();
+        }
+
+        public void StopStoppables()
+        {
+            foreach (var stoppable in Stoppables)
+            {
+                stoppable.Stop();
+            }
+
+            Stoppables.Clear();
         }
 
     }

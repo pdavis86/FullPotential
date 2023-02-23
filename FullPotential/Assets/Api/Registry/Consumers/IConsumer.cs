@@ -1,6 +1,8 @@
-﻿namespace FullPotential.Api.Registry.Consumers
+﻿using FullPotential.Api.Registry.Crafting;
+
+namespace FullPotential.Api.Registry.Consumers
 {
-    public interface IConsumer
+    public interface IConsumer : IHasPrefab
     {
     }
 }

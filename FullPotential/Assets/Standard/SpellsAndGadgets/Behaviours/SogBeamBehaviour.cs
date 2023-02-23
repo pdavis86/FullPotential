@@ -1,8 +1,4 @@
-﻿using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Ioc;
-using FullPotential.Api.Items.Types;
-using FullPotential.Api.Registry.Consumers;
-using FullPotential.Api.Utilities;
+﻿using FullPotential.Api.Gameplay.Items;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -10,54 +6,33 @@ using UnityEngine;
 
 namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
 {
-    public class SogBeamBehaviour : MonoBehaviour, IConsumerBehaviour
+    public class SogBeamBehaviour : ConsumerVisualBehaviour
     {
-        public Consumer Consumer;
-        public IFighter SourceFighter;
-        public bool IsLeftHand;
-
 #pragma warning disable 0649
         [SerializeField] private float _leftRightAdjustment;
 #pragma warning restore 0649
 
-        private IEffectService _effectService;
-
         private Transform _cylinderParentTransform;
         private Transform _cylinderTransform;
-        private RaycastHit _hit;
-        private DelayedAction _applyEffectsAction;
         private float _maxBeamLength;
+        private bool _isLeftHand;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _cylinderParentTransform = transform.GetChild(0);
             _cylinderTransform = _cylinderParentTransform.GetChild(0);
-
-            _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
         }
 
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            if (Consumer == null)
-            {
-                Debug.LogError("No Consumer has been set");
-                Destroy(gameObject);
-                return;
-            }
-
             _maxBeamLength = Consumer.GetRange();
 
             PerformGraphicsAdjustments();
 
-            if (!NetworkManager.Singleton.IsServer)
-            {
-                return;
-            }
-
-            var effectsDelay = Consumer.GetEffectTimeBetween();
-            _applyEffectsAction = new DelayedAction(effectsDelay, () => ApplyEffects(_hit.transform.gameObject, _hit.point));
+            //todo: _isLeftHand
+            _isLeftHand = false;
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -71,13 +46,6 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 {
                     Debug.LogWarning("Beam is hitting the source player!");
                     return;
-                }
-
-                _hit = hit;
-
-                if (NetworkManager.Singleton.IsServer)
-                {
-                   _applyEffectsAction.TryPerformAction();
                 }
 
                 targetDirection = (hit.point - _cylinderParentTransform.position).normalized;
@@ -98,19 +66,9 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
             Destroy(_cylinderParentTransform.gameObject);
         }
 
-        public void Stop()
+        public override void Stop()
         {
             Destroy(gameObject);
-        }
-
-        public void ApplyEffects(GameObject target, Vector3? position)
-        {
-            if (!NetworkManager.Singleton.IsServer)
-            {
-                return;
-            }
-
-            _effectService.ApplyEffects(SourceFighter, Consumer, target, position);
         }
 
         private void PerformGraphicsAdjustments()
@@ -129,7 +87,7 @@ namespace FullPotential.Standard.SpellsAndGadgets.Behaviours
                 _cylinderParentTransform.position -= SourceFighter.Transform.forward * adjustment;
 
                 //Move it a little sideways
-                _cylinderParentTransform.position += (IsLeftHand ? _leftRightAdjustment : -_leftRightAdjustment) * SourceFighter.Transform.right;
+                _cylinderParentTransform.position += (_isLeftHand ? _leftRightAdjustment : -_leftRightAdjustment) * SourceFighter.Transform.right;
             }
 
             //Move the tip to the middle

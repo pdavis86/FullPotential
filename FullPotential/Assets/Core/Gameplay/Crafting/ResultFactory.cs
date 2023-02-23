@@ -10,10 +10,11 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Consumers;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
+using FullPotential.Api.Registry.Shapes;
+using FullPotential.Api.Registry.Targeting;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Registry;
@@ -107,7 +108,7 @@ namespace FullPotential.Core.Gameplay.Crafting
         private IShape GetShapeOrNone(ITargeting targeting, IList<IHasTargetingAndShape> components)
         {
             //Only one shape, if any
-            if (!targeting.HasShape)
+            if (!targeting.CanHaveShape)
             {
                 return null;
             }

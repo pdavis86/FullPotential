@@ -1,4 +1,5 @@
-﻿using FullPotential.Api.Registry.Consumers;
+﻿using FullPotential.Api.Registry.Shapes;
+using FullPotential.Api.Registry.Targeting;
 
 // ReSharper disable UnusedMemberInSuper.Global
 

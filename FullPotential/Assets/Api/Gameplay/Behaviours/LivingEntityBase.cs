@@ -761,14 +761,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 .Where(x =>
                     x.Effect is IStatEffect statEffect
                     && statEffect.StatToAffect == affectableStat
-                    && statEffect.Affect is Affect.TemporaryMaxIncrease or Affect.TemporaryMaxDecrease)
+                    && statEffect.AffectType is AffectType.TemporaryMaxIncrease or AffectType.TemporaryMaxDecrease)
                 .Sum(x => x.Change);
         }
 
-        private bool DoesAffectAllowMultiple(Affect affect)
+        private bool DoesAffectAllowMultiple(AffectType affectType)
         {
-            return affect == Affect.TemporaryMaxIncrease
-                || affect == Affect.TemporaryMaxDecrease;
+            return affectType == AffectType.TemporaryMaxIncrease
+                || affectType == AffectType.TemporaryMaxDecrease;
         }
 
         private void AddOrUpdateEffect(IEffect effect, int change, DateTime expiry)
@@ -776,14 +776,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var statEffect = effect as IStatEffect;
 
             var showExpiry = !(statEffect != null
-                && statEffect.Affect is Affect.SingleDecrease or Affect.SingleIncrease);
+                && statEffect.AffectType is AffectType.SingleDecrease or AffectType.SingleIncrease);
 
             var effectMatch = _activeEffects.FirstOrDefault(x => x.Effect == effect);
 
             if (effectMatch != null)
             {
                 var multipleAllowed =
-                    (statEffect != null && DoesAffectAllowMultiple(statEffect.Affect))
+                    (statEffect != null && DoesAffectAllowMultiple(statEffect.AffectType))
                     || effect is IAttributeEffect;
 
                 if (multipleAllowed)

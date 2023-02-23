@@ -404,31 +404,11 @@ namespace FullPotential.Core.Player
 
             if (item is ItemWithTargetingAndShapeBase magicalItem)
             {
-                if (!string.IsNullOrWhiteSpace(magicalItem.TargetingTypeId))
-                {
-                    magicalItem.Targeting = _resultFactory.GetTargeting(magicalItem.TargetingTypeId);
-                }
-
-                //Here for backwards-compatibility
-                if (magicalItem.Targeting == null && !string.IsNullOrWhiteSpace(magicalItem.TargetingTypeName))
-                {
-                    magicalItem.Targeting = _resultFactory.GetTargetingFromTypeName(magicalItem.TargetingTypeName);
-                }
-
-                if (item is Consumer && magicalItem.Targeting == null)
-                {
-                    Debug.LogWarning($"Item '{item.Id}' is missing a Targeting ID");
-                }
+                magicalItem.Targeting = _resultFactory.GetTargeting(magicalItem.TargetingTypeId);
 
                 if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeId))
                 {
                     magicalItem.Shape = _resultFactory.GetShape(magicalItem.ShapeTypeId);
-                }
-
-                //Here for backwards-compatibility
-                if (magicalItem.Shape == null && !string.IsNullOrWhiteSpace(magicalItem.ShapeTypeName))
-                {
-                    magicalItem.Shape = _resultFactory.GetShapeFromTypeName(magicalItem.ShapeTypeName);
                 }
             }
 

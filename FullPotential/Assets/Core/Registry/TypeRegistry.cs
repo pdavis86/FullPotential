@@ -3,15 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay.Targeting;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Registry.Consumers;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Shapes;
+using FullPotential.Api.Registry.Targeting;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using Touch = FullPotential.Api.Gameplay.Targeting.Touch;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -30,6 +34,8 @@ namespace FullPotential.Core.Registry
 
         public void FindAndRegisterAll(List<string> modPrefixes)
         {
+            RegisterCoreTypes();
+
             foreach (var modPrefix in modPrefixes)
             {
                 var asyncOp = Addressables.LoadAssetAsync<GameObject>($"Assets/{modPrefix}/Registration");
@@ -52,6 +58,14 @@ namespace FullPotential.Core.Registry
                     HandleModRegistration(mod);
                 };
             }
+        }
+
+        private void RegisterCoreTypes()
+        {
+            ValidateAndRegister(typeof(PointToPoint));
+            ValidateAndRegister(typeof(Projectile));
+            ValidateAndRegister(typeof(Touch));
+            ValidateAndRegister(typeof(Self));
         }
 
         private void HandleModRegistration(IMod mod)

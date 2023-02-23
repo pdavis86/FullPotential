@@ -1,16 +1,16 @@
 ﻿using FullPotential.Api.Registry.Consumers;
+using FullPotential.Api.Registry.Shapes;
+using FullPotential.Api.Registry.Targeting;
 
 namespace FullPotential.Api.Items.Base
 {
     public abstract class ItemWithTargetingAndShapeBase : ItemBase, IHasTargetingAndShape
     {
-        //todo: zzz v0.5 - remove these now data is fixed
-        public string TargetingTypeName;
-        public string ShapeTypeName;
-
         //Variables so they are serialized
         public string TargetingTypeId;
+        public string TargetingVisualsTypeId;
         public string ShapeTypeId;
+        public string ShapeVisualsTypeId;
 
         private ITargeting _targeting;
         public ITargeting Targeting
@@ -23,7 +23,22 @@ namespace FullPotential.Api.Items.Base
             {
                 _targeting = value;
                 TargetingTypeId = _targeting?.TypeId.ToString();
-                TargetingTypeName = _targeting?.TypeName;
+            }
+        }
+
+
+        public ITargetingVisuals<ITargeting> TargetingVisuals
+        {
+            get
+            {
+                //todo: if TargetingVisuals set against the item then use it
+                //otherwise fallback to the default
+                return null;
+            }
+            set
+            {
+                //todo: set TargetingVisuals
+                //otherwise fallback to the default
             }
         }
 
@@ -38,7 +53,21 @@ namespace FullPotential.Api.Items.Base
             {
                 _shape = value;
                 ShapeTypeId = _shape?.TypeId.ToString();
-                ShapeTypeName = _shape?.TypeName;
+            }
+        }
+
+        public IShapeVisuals<IShape> ShapeVisuals 
+        {
+            get
+            {
+                //todo: if ShapeVisuals set against the item then use it
+                //otherwise fallback to the default
+                return null;
+            }
+            set
+            {
+                //todo: set ShapeVisuals
+                //otherwise fallback to the default
             }
         }
     }

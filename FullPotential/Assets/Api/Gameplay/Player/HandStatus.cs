@@ -2,7 +2,6 @@
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Consumers;
 
 namespace FullPotential.Api.Gameplay.Player
 {
@@ -28,7 +27,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public IEnumerator ChargeEnumerator { get; set; }
 
-        public IConsumerBehaviour ActiveConsumerBehaviour { get; set; }
+        public Consumer ActiveConsumer { get; set; }
 
         //public IEnumerator CooldownEnumerator { get; set; }
 
@@ -36,10 +35,10 @@ namespace FullPotential.Api.Gameplay.Player
 
         public void SetEquippedItem(ItemBase item, string description)
         {
-            if (ActiveConsumerBehaviour != null)
+            if (ActiveConsumer != null)
             {
-                ActiveConsumerBehaviour.Stop();
-                ActiveConsumerBehaviour = null;
+                ActiveConsumer.StopStoppables();
+                ActiveConsumer = null;
             }
 
             EquippedItem = item;
@@ -64,14 +63,16 @@ namespace FullPotential.Api.Gameplay.Player
             }
         }
 
+        //todo: generalise these
         public bool IsConsumingMana()
         {
-            return ActiveConsumerBehaviour != null && EquippedConsumer.ResourceConsumptionType == ResourceConsumptionType.Mana;
+            return ActiveConsumer != null && EquippedConsumer.ResourceConsumptionType == ResourceConsumptionType.Mana;
         }
 
+        //todo: generalise these
         public bool IsConsumingEnergy()
         {
-            return ActiveConsumerBehaviour != null && EquippedConsumer.ResourceConsumptionType == ResourceConsumptionType.Energy;
+            return ActiveConsumer != null && EquippedConsumer.ResourceConsumptionType == ResourceConsumptionType.Energy;
         }
     }
 }

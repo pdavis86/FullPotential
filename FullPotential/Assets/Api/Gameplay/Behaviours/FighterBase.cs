@@ -3,13 +3,14 @@ using System.Collections;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Gameplay.Player;
+using FullPotential.Api.Gameplay.Targeting;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Consumers;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Utilities;
 using Unity.Netcode;
@@ -80,14 +81,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             _consumeResource = new DelayedAction(.5f, () =>
             {
-                if (HandStatusLeft.ActiveConsumerBehaviour != null
+                if (HandStatusLeft.ActiveConsumer != null
                     && !ConsumeResource(HandStatusLeft.EquippedConsumer, HandStatusLeft.EquippedConsumer.Targeting.IsContinuous))
                 {
                     StopActiveConsumerBehaviour(HandStatusLeft);
                     StopActiveConsumerBehaviourClientRpc(true, _rpcService.ForNearbyPlayers(transform.position));
                 }
 
-                if (HandStatusRight.ActiveConsumerBehaviour != null
+                if (HandStatusRight.ActiveConsumer != null
                     && !ConsumeResource(HandStatusRight.EquippedConsumer, HandStatusRight.EquippedConsumer.Targeting.IsContinuous))
                 {
                     StopActiveConsumerBehaviour(HandStatusRight);
@@ -407,15 +408,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private bool StopActiveConsumerBehaviour(HandStatus handStatus)
         {
-            if (handStatus.ActiveConsumerBehaviour == null)
+            if (handStatus.ActiveConsumer == null)
             {
                 return false;
             }
 
             StartConsumerCooldown(handStatus);
 
-            handStatus.ActiveConsumerBehaviour.Stop();
-            handStatus.ActiveConsumerBehaviour = null;
+            handStatus.ActiveConsumer.StopStoppables();
+            handStatus.ActiveConsumer = null;
 
             return true;
         }
@@ -447,77 +448,119 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return true;
             }
 
-            if (IsServer || NetworkManager.LocalClientId == OwnerClientId)
+            if (leftOrRight.EquippedConsumer.ChargePercentage < 100)
             {
-                if (leftOrRight.EquippedConsumer.ChargePercentage < 100)
+                //Debug.Log("Charge was not finished");
+
+                if (leftOrRight.ChargeEnumerator != null)
                 {
-                    //Debug.Log("Charge was not finished");
-
-                    if (leftOrRight.ChargeEnumerator != null)
-                    {
-                        StopCoroutine(leftOrRight.ChargeEnumerator);
-                        StartConsumerCooldown(leftOrRight);
-                    }
-
-                    return false;
+                    StopCoroutine(leftOrRight.ChargeEnumerator);
+                    StartConsumerCooldown(leftOrRight);
                 }
 
-                //if (leftOrRight.CooldownEnumerator != null)
-                //{
-                //    //Debug.Log("Still cooling down");
-                //    return false;
-                //}
-
-                if (!ConsumeResource(consumer, isTest: true))
-                {
-                    return false;
-                }
+                return false;
             }
 
-            _typeRegistry.LoadAddessable(
-                consumer.Targeting.PrefabAddress,
-                prefab => InstantiateConsumerGameObject(leftOrRight, isLeftHand, handPosition, consumer, prefab));
+            //if (leftOrRight.CooldownEnumerator != null)
+            //{
+            //    //Debug.Log("Still cooling down");
+            //    return false;
+            //}
 
-            if (consumer.Targeting.IsServerSideOnly && IsServer)
+            if (!ConsumeResource(consumer, isTest: true))
             {
                 return false;
             }
 
-            return true;
-        }
+            var attackDirection = GetAttackDirection(handPosition, ConsumerRangeLimit);
 
-        private void InstantiateConsumerGameObject(
-            HandStatus leftOrRight,
-            bool isLeftHand,
-            Vector3 handPosition,
-            Consumer consumer,
-            GameObject prefab)
-        {
-            var targetDirection = GetAttackDirection(handPosition, ConsumerRangeLimit);
+            Transform visualsParentTransform;
 
-            var parentTransform = consumer.Targeting.IsParentedToSource
-                ? transform
-                : _gameManager.GetSceneBehaviour().GetTransform();
+            if (consumer.Targeting is Projectile)
+            {
+                visualsParentTransform = SpawnProjectileGameObject(consumer, attackDirection).transform;
+            }
+            else
+            {
+                visualsParentTransform = consumer.TargetingVisuals.IsParentedToSource
+                    ? transform
+                    : _gameManager.GetSceneBehaviour().GetTransform();
+            }
 
-            var consumerGameObject = Instantiate(prefab, handPosition, Quaternion.identity);
+            _typeRegistry.LoadAddessable(
+                consumer.TargetingVisuals.PrefabAddress,
+                prefab =>
+                {
+                    var stoppable = SpawnVisualsGameObject(prefab, handPosition, visualsParentTransform, consumer, attackDirection);
 
-            consumer.Targeting.SetBehaviourVariables(consumerGameObject, consumer, this, handPosition, targetDirection, isLeftHand);
-
-            consumerGameObject.transform.parent = parentTransform;
+                    if (stoppable != null && consumer.Targeting.IsContinuous)
+                    {
+                        consumer.Stoppables.Add(stoppable);
+                    }
+                });
 
             if (consumer.Targeting.IsContinuous)
             {
-                leftOrRight.ActiveConsumerBehaviour = consumerGameObject.GetComponent<IConsumerBehaviour>();
+                leftOrRight.ActiveConsumer = consumer;
             }
             else
             {
                 StartConsumerCooldown(leftOrRight);
             }
 
-            if (IsServer)
+            ConsumeResource(consumer);
+
+            var targets = consumer.Targeting.GetTargets(this, consumer);
+
+            foreach (var target in targets)
             {
-                ConsumeResource(consumer);
+                //todo: target.EffectPercentage
+                _effectService.ApplyEffects(this, consumer, target.GameObject, target.Position);
             }
+
+            return true;
+        }
+
+        private GameObject SpawnProjectileGameObject(
+            Consumer consumer,
+            Vector3 direction)
+        {
+            //todo: instantiate from prefab
+            var projectileGameObject = new GameObject();
+
+            var behaviour = projectileGameObject.GetComponent<IProjectileBehaviour>();
+
+            behaviour.Consumer = consumer;
+            behaviour.SourceFighter = this;
+            behaviour.Direction = direction;
+
+            return projectileGameObject;
+        }
+
+        private IStoppable SpawnVisualsGameObject(
+            GameObject prefab,
+            Vector3 startPosition,
+            Transform parentTransform,
+            Consumer consumer,
+            Vector3 direction)
+        {
+            var visualsGameObject = Instantiate(prefab, startPosition, Quaternion.identity);
+
+            visualsGameObject.transform.parent = parentTransform;
+
+            var visualsBehaviour = visualsGameObject.GetComponent<ConsumerVisualBehaviour>();
+
+            if (visualsBehaviour == null)
+            {
+                return null;
+            }
+
+            visualsBehaviour.Consumer = consumer;
+            visualsBehaviour.SourceFighter = this;
+            visualsBehaviour.StartPosition = startPosition;
+            visualsBehaviour.Direction = direction;
+
+            return visualsBehaviour;
         }
 
         private bool UseWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand, bool isAutoFire)
@@ -609,6 +652,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private (NetworkVariable<int> Variable, int? Cost)? GetResourceVariableAndCost(Consumer consumer)
         {
+            //todo: energy and mana should be registered types not named variables
+
             switch (consumer.ResourceConsumptionType)
             {
                 case ResourceConsumptionType.Mana:

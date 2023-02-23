@@ -8,7 +8,7 @@ namespace FullPotential.Api.Registry.Effects
         /// <summary>
         /// The underlying result of applying this effect
         /// </summary>
-        Affect Affect { get; }
+        AffectType AffectType { get; }
 
         /// <summary>
         /// The stat which will be affected
