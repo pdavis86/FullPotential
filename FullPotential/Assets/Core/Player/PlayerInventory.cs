@@ -402,7 +402,7 @@ namespace FullPotential.Core.Player
                 item.RegistryType = _typeRegistry.GetRegisteredForItem(item);
             }
 
-            if (item is ItemWithTargetingAndShapeBase magicalItem)
+            if (item is ItemWithTargetingAndShapeBase magicalItem && !string.IsNullOrWhiteSpace(magicalItem.TargetingTypeId))
             {
                 magicalItem.Targeting = _resultFactory.GetTargeting(magicalItem.TargetingTypeId);
 

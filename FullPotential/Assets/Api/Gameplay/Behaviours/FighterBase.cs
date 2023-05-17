@@ -3,9 +3,7 @@ using System.Collections;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Inventory;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Gameplay.Player;
-using FullPotential.Api.Gameplay.Targeting;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
@@ -474,30 +472,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var attackDirection = GetAttackDirection(handPosition, ConsumerRangeLimit);
 
-            Transform visualsParentTransform;
-
-            if (consumer.Targeting is Projectile)
-            {
-                visualsParentTransform = SpawnProjectileGameObject(consumer, attackDirection).transform;
-            }
-            else
-            {
-                visualsParentTransform = consumer.TargetingVisuals.IsParentedToSource
-                    ? transform
-                    : _gameManager.GetSceneBehaviour().GetTransform();
-            }
-
-            _typeRegistry.LoadAddessable(
-                consumer.TargetingVisuals.PrefabAddress,
-                prefab =>
-                {
-                    var stoppable = SpawnVisualsGameObject(prefab, handPosition, visualsParentTransform, consumer, attackDirection);
-
-                    if (stoppable != null && consumer.Targeting.IsContinuous)
-                    {
-                        consumer.Stoppables.Add(stoppable);
-                    }
-                });
+            _effectService.SpawnConsumerVisuals(this, consumer, handPosition, attackDirection);
 
             if (consumer.Targeting.IsContinuous)
             {
@@ -519,48 +494,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             return true;
-        }
-
-        private GameObject SpawnProjectileGameObject(
-            Consumer consumer,
-            Vector3 direction)
-        {
-            //todo: instantiate from prefab
-            var projectileGameObject = new GameObject();
-
-            var behaviour = projectileGameObject.GetComponent<IProjectileBehaviour>();
-
-            behaviour.Consumer = consumer;
-            behaviour.SourceFighter = this;
-            behaviour.Direction = direction;
-
-            return projectileGameObject;
-        }
-
-        private IStoppable SpawnVisualsGameObject(
-            GameObject prefab,
-            Vector3 startPosition,
-            Transform parentTransform,
-            Consumer consumer,
-            Vector3 direction)
-        {
-            var visualsGameObject = Instantiate(prefab, startPosition, Quaternion.identity);
-
-            visualsGameObject.transform.parent = parentTransform;
-
-            var visualsBehaviour = visualsGameObject.GetComponent<ConsumerVisualBehaviour>();
-
-            if (visualsBehaviour == null)
-            {
-                return null;
-            }
-
-            visualsBehaviour.Consumer = consumer;
-            visualsBehaviour.SourceFighter = this;
-            visualsBehaviour.StartPosition = startPosition;
-            visualsBehaviour.Direction = direction;
-
-            return visualsBehaviour;
         }
 
         private bool UseWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand, bool isAutoFire)

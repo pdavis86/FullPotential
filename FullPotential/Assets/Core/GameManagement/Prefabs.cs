@@ -15,6 +15,7 @@ namespace FullPotential.Core.GameManagement
         public class CombatObjects
         {
             public GameObject ProjectileWithTrail;
+            public GameObject ProjectileWithBehaviour;
             public GameObject SpellInHand;
             public GameObject GadgetInHand;
             public GameObject BulletHole;

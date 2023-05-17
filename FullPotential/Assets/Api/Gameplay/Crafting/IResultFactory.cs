@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Registry.Consumers;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 
@@ -12,9 +11,5 @@ namespace FullPotential.Api.Gameplay.Crafting
         IShape GetShape(string typeName);
         ItemBase GetLootDrop();
         ItemBase GetCraftedItem(string categoryName, string typeName, bool isTwoHanded, IList<ItemBase> components);
-
-        //Obsolete
-        ITargeting GetTargetingFromTypeName(string typeName);
-        IShape GetShapeFromTypeName(string typeName);
     }
 }

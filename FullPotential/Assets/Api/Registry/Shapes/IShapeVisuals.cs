@@ -1,9 +1,10 @@
-﻿using FullPotential.Api.Registry.Crafting;
+﻿using System;
+using FullPotential.Api.Registry.Crafting;
 
 namespace FullPotential.Api.Registry.Shapes
 {
-    public interface IShapeVisuals<T> : IRegisterable, IHasPrefab
-        where T : IShape
+    public interface IShapeVisuals : IRegisterable, IHasPrefab
     {
+        Guid ShapeGuid { get; }
     }
 }

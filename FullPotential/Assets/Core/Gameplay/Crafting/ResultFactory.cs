@@ -75,12 +75,6 @@ namespace FullPotential.Core.Gameplay.Crafting
             return _targetingOptions.First(x => x.TypeId.ToString() == typeId);
         }
 
-        [Obsolete("Use the overload that takes an ID instead")]
-        public ITargeting GetTargetingFromTypeName(string typeName)
-        {
-            return _targetingOptions.First(x => x.TypeName == typeName);
-        }
-
         private ITargeting GetTargeting(IList<IHasTargetingAndShape> components)
         {
             //Exactly one targeting option
@@ -97,12 +91,6 @@ namespace FullPotential.Core.Gameplay.Crafting
         public IShape GetShape(string typeId)
         {
             return _shapeOptions.First(x => x.TypeId.ToString() == typeId);
-        }
-
-        [Obsolete("Use the overload that takes an ID instead")]
-        public IShape GetShapeFromTypeName(string typeName)
-        {
-            return _shapeOptions.First(x => x.TypeName == typeName);
         }
 
         private IShape GetShapeOrNone(ITargeting targeting, IList<IHasTargetingAndShape> components)

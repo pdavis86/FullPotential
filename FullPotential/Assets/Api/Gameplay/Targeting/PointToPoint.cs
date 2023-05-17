@@ -9,7 +9,9 @@ namespace FullPotential.Api.Gameplay.Targeting
 {
     public class PointToPoint : ITargeting
     {
-        public Guid TypeId => new Guid("3c528d09-bd4f-4211-af17-d8721975fef1");
+        public const string Id = "3c528d09-bd4f-4211-af17-d8721975fef1";
+
+        public Guid TypeId => new Guid(Id);
 
         public string TypeName => nameof(PointToPoint);
 

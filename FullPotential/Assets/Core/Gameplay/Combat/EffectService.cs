@@ -4,6 +4,8 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Gameplay.Targeting;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Obsolete;
@@ -20,6 +22,7 @@ using UnityEngine;
 
 namespace FullPotential.Core.Gameplay.Combat
 {
+    //todo: rename to CombatService
     public class EffectService : IEffectService
     {
         public static readonly System.Random Random = new System.Random();
@@ -511,7 +514,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             float attackStrength = itemUsed?.Attributes.Strength ?? 1;
             var defenceRatio = 100f / (100 + targetDefense);
-            
+
             if (weaponCategory == WeaponCategory.Ranged)
             {
                 attackStrength /= weapon.GetBulletsPerSecond();
@@ -538,5 +541,60 @@ namespace FullPotential.Core.Gameplay.Combat
             return AddVariationToValue(damageDealtBasic);
         }
 
+        public void SpawnConsumerVisuals(IFighter sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction)
+        {
+            Transform parentTransform;
+
+            if (consumer.Targeting is Projectile)
+            {
+                parentTransform = SpawnProjectileGameObject(sourceFighter, consumer, direction).transform;
+            }
+            else
+            {
+                parentTransform = consumer.TargetingVisuals.IsParentedToSource
+                    ? sourceFighter.Transform
+                    : GameManager.Instance.GetSceneBehaviour().GetTransform();
+            }
+
+            _typeRegistry.LoadAddessable(
+                consumer.TargetingVisuals.PrefabAddress,
+                prefab =>
+                {
+                    var visualsGameObject = UnityEngine.Object.Instantiate(prefab, startPosition, Quaternion.identity);
+
+                    visualsGameObject.transform.parent = parentTransform;
+
+                    var visualsBehaviour = visualsGameObject.GetComponent<ConsumerVisualBehaviour>();
+
+                    if (visualsBehaviour != null)
+                    {
+                        visualsBehaviour.Consumer = consumer;
+                        visualsBehaviour.SourceFighter = sourceFighter;
+                        visualsBehaviour.StartPosition = startPosition;
+                        visualsBehaviour.Direction = direction;
+
+                        if (consumer.Targeting.IsContinuous)
+                        {
+                            consumer.Stoppables.Add(visualsBehaviour);
+                        }
+                    }
+                });
+        }
+
+        private GameObject SpawnProjectileGameObject(
+            IFighter sourceFighter,
+            Consumer consumer,
+            Vector3 direction)
+        {
+            var projectileGameObject = GameManager.Instance.Prefabs.Combat.ProjectileWithBehaviour;
+
+            var behaviour = projectileGameObject.GetComponent<ITargetingBehaviour>();
+
+            behaviour.SourceFighter = sourceFighter;
+            behaviour.Consumer = consumer;
+            behaviour.Direction = direction;
+
+            return projectileGameObject;
+        }
     }
 }

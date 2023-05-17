@@ -56,18 +56,6 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Api\Gameplay\Combat\ViableTarget.cs" />
-    <Compile Include="Assets\Api\Gameplay\Items\LevelOfDetail.cs" />
-    <Compile Include="Assets\Api\Gameplay\Shapes\Wall.cs" />
-    <Compile Include="Assets\Api\Gameplay\Shapes\Zone.cs" />
-    <Compile Include="Assets\Api\Gameplay\Targeting\IProjectileBehaviour.cs" />
-    <Compile Include="Assets\Api\Gameplay\Targeting\Touch.cs" />
-    <Compile Include="Assets\Api\Gameplay\Targeting\PointToPoint.cs" />
-    <Compile Include="Assets\Api\Gameplay\Targeting\Projectile.cs" />
-    <Compile Include="Assets\Api\Gameplay\Targeting\Self.cs" />
-    <Compile Include="Assets\Api\Registry\Targeting\ITargetingVisuals.cs" />
-    <Compile Include="Assets\Api\Gameplay\Behaviours\IStoppable.cs" />
-    <Compile Include="Assets\Api\Gameplay\Items\ConsumerVisualBehaviour.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\GameObjectExtensions.cs" />
     <Compile Include="Assets\Api\Persistence\ISettingsRepository.cs" />
     <Compile Include="Assets\Api\Registry\Crafting\ILoot.cs" />
@@ -77,6 +65,7 @@
     <Compile Include="Assets\Api\Obsolete\GearCategory.cs" />
     <Compile Include="Assets\Api\Modding\IModHelper.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\UnityExtensions.cs" />
+    <Compile Include="Assets\Api\Gameplay\Items\ConsumerVisualBehaviour.cs" />
     <Compile Include="Assets\Api\Ui\Components\IStatSlider.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\IEffectService.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IPlayerInventory.cs" />
@@ -90,9 +79,12 @@
     <Compile Include="Assets\Api\Ioc\DependenciesContext.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IInventory.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\IPlayerBehaviour.cs" />
+    <Compile Include="Assets\Api\Registry\Shapes\IShape.cs" />
+    <Compile Include="Assets\Api\Gameplay\Combat\ViableTarget.cs" />
     <Compile Include="Assets\Api\Registry\Crafting\IGearWeapon.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesCollection.cs" />
     <Compile Include="Assets\Api\Registry\Effects\ICustomEffect.cs" />
+    <Compile Include="Assets\Api\Gameplay\Items\LevelOfDetail.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\AffectType.cs" />
     <Compile Include="Assets\Api\Items\Types\Accessory.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\IDamageable.cs" />
@@ -103,11 +95,11 @@
     <Compile Include="Assets\Api\Ui\IHud.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\IFighter.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Layers.cs" />
-    <Compile Include="Assets\Api\Registry\Shapes\IShapeVisuals.cs" />
     <Compile Include="Assets\Api\Spawning\ISpawnService.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\StringExtensions.cs" />
     <Compile Include="Assets\Api\Ui\Services\UiAssistant.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IStatEffect.cs" />
+    <Compile Include="Assets\Api\Gameplay\Targeting\PointToPoint.cs" />
     <Compile Include="Assets\Api\Obsolete\SlotGameObjectName.cs" />
     <Compile Include="Assets\Api\Items\Types\Consumer.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\IDefensible.cs" />
@@ -115,9 +107,12 @@
     <Compile Include="Assets\Api\GameManagement\GameObjectNames.cs" />
     <Compile Include="Assets\Api\Gameplay\Drawing\IDrawingService.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\ArrayExtensions.cs" />
+    <Compile Include="Assets\Api\Registry\Shapes\IShapeVisuals.cs" />
+    <Compile Include="Assets\Api\Gameplay\Shapes\Wall.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\LivingEntityBase.cs" />
     <Compile Include="Assets\Api\Persistence\IUserRepository.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemBase.cs" />
+    <Compile Include="Assets\Api\Gameplay\Targeting\Touch.cs" />
     <Compile Include="Assets\Api\Obsolete\Attributes.cs" />
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
     <Compile Include="Assets\Api\Registry\Crafting\IGear.cs" />
@@ -133,20 +128,24 @@
     <Compile Include="Assets\Api\Obsolete\ResourceType.cs" />
     <Compile Include="Assets\Api\Obsolete\AccessoryCategory.cs" />
     <Compile Include="Assets\Api\Utilities\Data\KeyValuePair.cs" />
+    <Compile Include="Assets\Api\Gameplay\Targeting\Self.cs" />
     <Compile Include="Assets\Api\Ioc\Dependency.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargeting.cs" />
     <Compile Include="Assets\Api\Scenes\ISceneBehaviour.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\Vector3Extensions.cs" />
     <Compile Include="Assets\Api\Scenes\SpawnPoint.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\PlayerData.cs" />
+    <Compile Include="Assets\Api\Registry\Targeting\ITargetingVisuals.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\EquippedItem.cs" />
     <Compile Include="Assets\Api\Ui\Services\IUiAssistant.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemWithTargetingAndShapeBase.cs" />
+    <Compile Include="Assets\Api\Gameplay\Targeting\ITargetingBehaviour.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IAttributeEffect.cs" />
     <Compile Include="Assets\Api\Registry\Consumers\IConsumer.cs" />
+    <Compile Include="Assets\Api\Gameplay\Targeting\Projectile.cs" />
     <Compile Include="Assets\Api\Ui\IUserInterface.cs" />
     <Compile Include="Assets\Api\GameManagement\ITypeRegistry.cs" />
-    <Compile Include="Assets\Api\Registry\Shapes\IShape.cs" />
+    <Compile Include="Assets\Api\Gameplay\Behaviours\IStoppable.cs" />
     <Compile Include="Assets\Api\GameManagement\IRpcService.cs" />
     <Compile Include="Assets\Api\GameManagement\GameSettings.cs" />
     <Compile Include="Assets\Api\Obsolete\AffectableStat.cs" />
@@ -165,6 +164,7 @@
     <Compile Include="Assets\Api\Registry\Crafting\ICraftable.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\PlayerSettings.cs" />
     <Compile Include="Assets\Api\Modding\IMod.cs" />
+    <Compile Include="Assets\Api\Gameplay\Shapes\Zone.cs" />
     <Compile Include="Assets\Api\Obsolete\AffectableAttribute.cs" />
     <Compile Include="Assets\Api\Registry\Elements\IElement.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Tags.cs" />
@@ -850,7 +850,8 @@
       <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

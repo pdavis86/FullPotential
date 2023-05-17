@@ -56,7 +56,6 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Core\Gameplay\Targeting\ProjectileBehaviour.cs" />
     <Compile Include="Assets\Core\Networking\RpcService.cs" />
     <Compile Include="Assets\Core\UI\Components\NameAndToggle.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\NetworkStats.cs" />
@@ -66,6 +65,7 @@
     <Compile Include="Assets\Core\UI\Behaviours\RespawnUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiCraftingTab.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUi.cs" />
+    <Compile Include="Assets\Core\Gameplay\Drawing\DrawingService.cs" />
     <Compile Include="Assets\Core\UI\Components\EquippedSummary.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\DebuggingUi.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\Punch.cs" />
@@ -89,6 +89,7 @@
     <Compile Include="Assets\Core\Utilities\Extensions\GuidExtensions.cs" />
     <Compile Include="Assets\Core\UI\Components\SlideOutAlert.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DestroyOnTriggerEnter.cs" />
+    <Compile Include="Assets\Core\Gameplay\Targeting\Behaviours\ProjectileBehaviour.cs" />
     <Compile Include="Assets\Core\UI\Components\InventoryItemsList.cs" />
     <Compile Include="Assets\Core\Player\PlayerBehaviour.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DontDestroy.cs" />
@@ -133,7 +134,6 @@
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsStartup.cs" />
     <Compile Include="Assets\Core\GameManagement\AddressablesManager.cs" />
     <Compile Include="Assets\Core\GameManagement\GameManager.cs" />
-    <Compile Include="Assets\Core\Gameplay\Drawing\DrawingService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Core\FullPotential.Core.asmdef" />
@@ -827,7 +827,6 @@
       <Name>FullPotential.Api</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

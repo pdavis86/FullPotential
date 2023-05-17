@@ -8,7 +8,9 @@ namespace FullPotential.Api.Gameplay.Targeting
 {
     public class Projectile : ITargeting
     {
-        public Guid TypeId => new Guid("6e41729e-bb21-44f8-8fb9-b9ad48c0e680");
+        public const string Id = "6e41729e-bb21-44f8-8fb9-b9ad48c0e680";
+
+        public Guid TypeId => new Guid(Id);
 
         public string TypeName => nameof(Projectile);
 

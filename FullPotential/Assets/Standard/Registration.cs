@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using FullPotential.Api.Modding;
+using FullPotential.Standard.Shapes;
 using FullPotential.Standard.Targeting;
 using UnityEngine;
-using Touch = FullPotential.Standard.Targeting.Touch;
 
 // ReSharper disable UnusedType.Global
 
@@ -37,14 +37,13 @@ namespace FullPotential.Standard
 
                 typeof(Loot.Scrap),
                 typeof(Loot.Shard),
-
-                typeof(SpellsAndGadgets.Shapes.Wall),
-                typeof(SpellsAndGadgets.Shapes.Zone),
                 
-                typeof(Projectile),
-                typeof(Beam),
-                typeof(Self),
-                typeof(Touch),
+                typeof(ProjectileVisuals),
+                typeof(BeamVisuals),
+                typeof(SelfVisuals),
+                typeof(TouchVisuals),
+                typeof(WallVisuals),
+                typeof(ZoneVisuals),
 
                 typeof(Effects.Buffs.Courage),
                 typeof(Effects.Buffs.Endurance),

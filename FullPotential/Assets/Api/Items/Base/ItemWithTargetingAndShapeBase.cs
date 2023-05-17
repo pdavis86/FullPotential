@@ -1,18 +1,21 @@
-﻿using FullPotential.Api.Registry.Consumers;
-using FullPotential.Api.Registry.Shapes;
+﻿using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 
 namespace FullPotential.Api.Items.Base
 {
     public abstract class ItemWithTargetingAndShapeBase : ItemBase, IHasTargetingAndShape
     {
+        private ITargeting _targeting;
+        private ITargetingVisuals _targetingVisuals;
+        private IShape _shape;
+        private IShapeVisuals _shapeVisuals;
+
         //Variables so they are serialized
         public string TargetingTypeId;
         public string TargetingVisualsTypeId;
         public string ShapeTypeId;
         public string ShapeVisualsTypeId;
 
-        private ITargeting _targeting;
         public ITargeting Targeting
         {
             get
@@ -27,7 +30,7 @@ namespace FullPotential.Api.Items.Base
         }
 
 
-        public ITargetingVisuals<ITargeting> TargetingVisuals
+        public ITargetingVisuals TargetingVisuals
         {
             get
             {
@@ -42,7 +45,6 @@ namespace FullPotential.Api.Items.Base
             }
         }
 
-        private IShape _shape;
         public IShape Shape
         {
             get
@@ -56,7 +58,7 @@ namespace FullPotential.Api.Items.Base
             }
         }
 
-        public IShapeVisuals<IShape> ShapeVisuals 
+        public IShapeVisuals ShapeVisuals 
         {
             get
             {

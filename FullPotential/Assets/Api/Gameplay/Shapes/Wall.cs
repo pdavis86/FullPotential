@@ -1,12 +1,14 @@
 ﻿using System;
-using FullPotential.Api.Registry.Consumers;
 using FullPotential.Api.Registry.Shapes;
 
 namespace FullPotential.Api.Gameplay.Shapes
 {
     public class Wall : IShape
     {
-        public Guid TypeId { get; }
-        public string TypeName { get; }
+        public const string Id = "4aad2866-5903-4b79-bda2-e3dcab920d9e";
+
+        public Guid TypeId => new Guid(Id);
+
+        public string TypeName => nameof(Wall);
     }
 }
