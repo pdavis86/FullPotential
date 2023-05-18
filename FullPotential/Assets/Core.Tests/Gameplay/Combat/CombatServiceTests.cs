@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
@@ -14,12 +11,15 @@ using FullPotential.Api.Registry.Effects;
 using FullPotential.Core.Gameplay.Combat;
 using Moq;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace FullPotential.Core.Tests.Gameplay.Combat
 {
-    public class EffectServiceTests
+    public class CombatServiceTests
     {
-        private IEffectService _effectService;
+        private ICombatService _combatService;
         private IEffect _singleDamageEffect;
 
         [SetUp]
@@ -37,8 +37,8 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
 
             DependenciesContext.Dependencies.Register(new Dependency
             {
-                Type = typeof(IEffectService),
-                Factory = () => _effectService,
+                Type = typeof(ICombatService),
+                Factory = () => _combatService,
                 IsSingleton = true
             });
 
@@ -55,7 +55,9 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
                 IsSingleton = true
             });
 
-            _effectService = new EffectService(Mock.Of<ITypeRegistry>(), Mock.Of<IRpcService>());
+            _combatService = new CombatService(
+                Mock.Of<ITypeRegistry>(),
+                Mock.Of<IRpcService>());
         }
 
         [Test]
@@ -103,7 +105,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
 
         private int GetDamage(ItemBase item)
         {
-            return _effectService.GetDamageValueFromAttack(item, 0, false);
+            return _combatService.GetDamageValueFromAttack(item, 0, false);
         }
 
         private Weapon GetMeleeWeapon(bool isTwoHanded, Attributes attributes)

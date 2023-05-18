@@ -32,7 +32,7 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<ITypeRegistry, TypeRegistry>();
             DependenciesContext.Dependencies.Register<ISpawnService, SpawnService>(true);
             DependenciesContext.Dependencies.Register<IRpcService, RpcService>();
-            DependenciesContext.Dependencies.Register<IEffectService, EffectService>();
+            DependenciesContext.Dependencies.Register<ICombatService, CombatService>();
             DependenciesContext.Dependencies.Register<IModHelper, ModHelper>();
             DependenciesContext.Dependencies.Register<IDrawingService, DrawingService>();
             DependenciesContext.Dependencies.Register<IUiAssistant, UiAssistant>();

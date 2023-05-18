@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using FullPotential.Api.GameManagement;
+﻿using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Items;
@@ -16,10 +13,11 @@ using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Registry;
 using FullPotential.Core.Utilities.Extensions;
-using FullPotential.Core.Utilities.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -29,6 +27,7 @@ namespace FullPotential.Core.Gameplay.Crafting
     {
         public const int MaxExtraAmmo = 3;
 
+        private readonly Random _random = new Random();
         private readonly TypeRegistry _typeRegistry;
         private readonly ILocalizer _localizer;
 
@@ -209,24 +208,24 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private bool IsSuccess(int percentageChance)
         {
-            return EffectService.Random.Next(1, 101) <= percentageChance;
+            return _random.Next(1, 101) <= percentageChance;
         }
 
         private int GetAttributeValue(int percentageChance)
         {
-            return IsSuccess(percentageChance) ? EffectService.Random.Next(1, 100) : 0;
+            return IsSuccess(percentageChance) ? _random.Next(1, 100) : 0;
         }
 
         private IEffect GetRandomEffect()
         {
-            return _effectsForLoot.ElementAt(EffectService.Random.Next(0, _effectsForLoot.Count));
+            return _effectsForLoot.ElementAt(_random.Next(0, _effectsForLoot.Count));
         }
 
         private ITargeting GetRandomTargetingOrNone()
         {
             if (IsSuccess(50))
             {
-                return _targetingOptions.ElementAt(EffectService.Random.Next(0, _targetingOptions.Count));
+                return _targetingOptions.ElementAt(_random.Next(0, _targetingOptions.Count));
             }
             return null;
         }
@@ -235,7 +234,7 @@ namespace FullPotential.Core.Gameplay.Crafting
         {
             if (IsSuccess(10))
             {
-                return _shapeOptions.ElementAt(EffectService.Random.Next(0, _shapeOptions.Count));
+                return _shapeOptions.ElementAt(_random.Next(0, _shapeOptions.Count));
             }
             return null;
         }
@@ -249,7 +248,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 {
                     IsSoulbound = IsSuccess(10),
                     IsAutomatic = IsSuccess(50),
-                    ExtraAmmoPerShot = IsSuccess(20) ? Convert.ToByte(EffectService.Random.Next(1, MaxExtraAmmo + 1)) : (byte)0,
+                    ExtraAmmoPerShot = IsSuccess(20) ? Convert.ToByte(_random.Next(1, MaxExtraAmmo + 1)) : (byte)0,
                     Strength = GetAttributeValue(75),
                     Efficiency = GetAttributeValue(75),
                     Range = GetAttributeValue(75),
@@ -267,11 +266,11 @@ namespace FullPotential.Core.Gameplay.Crafting
             if (isMagical)
             {
                 lootDrop.RegistryType = magicalLootTypes
-                    .OrderBy(_ => EffectService.Random.Next())
+                    .OrderBy(_ => _random.Next())
                     .First();
 
                 var effects = new List<IEffect>();
-                var numberOfEffects = MathsHelper.GetMinBiasedNumber(1, Math.Min(4, _effectsForLoot.Count), EffectService.Random);
+                var numberOfEffects = GetMinBiasedNumber(1, Math.Min(4, _effectsForLoot.Count));
                 for (var i = 1; i <= numberOfEffects; i++)
                 {
                     IEffect effect;
@@ -299,7 +298,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             {
                 lootDrop.RegistryType = _lootTypes
                     .Where(x => x.ResourceConsumptionType == ResourceConsumptionType.Energy)
-                    .OrderBy(_ => EffectService.Random.Next())
+                    .OrderBy(_ => _random.Next())
                     .First();
             }
 
@@ -309,6 +308,11 @@ namespace FullPotential.Core.Gameplay.Crafting
             lootDrop.Name = $"{_localizer.GetTranslatedTypeName(lootDrop.RegistryType)} ({typeTranslation} #{suffix.ToString("D5", GameManager.Instance.CurrentCulture)})";
 
             return lootDrop;
+        }
+
+        private int GetMinBiasedNumber(int min, int max)
+        {
+            return min + (int)Math.Round((max - min) * Math.Pow(_random.NextDouble(), 3), 0);
         }
 
         private Consumer GetConsumer(string categoryName, IList<ItemBase> components)

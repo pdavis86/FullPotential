@@ -63,7 +63,6 @@
     <Compile Include="Assets\Standard\Effects\Debuffs\Slow.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Air.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Poison.cs" />
-    <Compile Include="Assets\Standard\Targeting\BeamVisualBehaviour.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Hold.cs" />
     <Compile Include="Assets\Standard\Armor\Helm.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Stengthen.cs" />
@@ -87,6 +86,7 @@
     <Compile Include="Assets\Standard\Weapons\Bow.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Conjure.cs" />
     <Compile Include="Assets\Standard\Weapons\Axe.cs" />
+    <Compile Include="Assets\Standard\Targeting\BeamVisualsBehaviour.cs" />
     <Compile Include="Assets\Standard\Targeting\TouchVisuals.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\ManaTap.cs" />
     <Compile Include="Assets\Standard\Registration.cs" />

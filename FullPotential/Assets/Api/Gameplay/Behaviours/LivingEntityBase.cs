@@ -52,7 +52,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected IRpcService _rpcService;
         protected ILocalizer _localizer;
         protected ITypeRegistry _typeRegistry;
-        protected IEffectService _effectService;
+        protected ICombatService _combatService;
 
         protected readonly NetworkVariable<FixedString32Bytes> _entityName = new NetworkVariable<FixedString32Bytes>();
         protected readonly NetworkVariable<int> _energy = new NetworkVariable<int>(100);
@@ -100,7 +100,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
-            _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
+            _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
 
             _entityName.OnValueChanged += OnNameChanged;
             _health.OnValueChanged += OnHealthChanged;

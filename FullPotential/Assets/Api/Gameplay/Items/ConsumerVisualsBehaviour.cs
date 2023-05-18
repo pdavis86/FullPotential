@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Items
 {
-    public abstract class ConsumerVisualBehaviour : MonoBehaviour, IStoppable
+    public abstract class ConsumerVisualsBehaviour : MonoBehaviour, IStoppable
     {
         public IFighter SourceFighter { get; set; }
 

@@ -6,7 +6,9 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Targeting
 {
-    public class BeamVisualBehaviour : ConsumerVisualBehaviour
+    //todo: I think this whole class needs re-writing!
+
+    public class BeamVisualsBehaviour : ConsumerVisualsBehaviour
     {
 #pragma warning disable 0649
         [SerializeField] private float _leftRightAdjustment;

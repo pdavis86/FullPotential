@@ -56,7 +56,9 @@ namespace FullPotential.Core.GameManagement
 
         private void FindLocalisationFiles(IEnumerable<string> stringKeys)
         {
-            var localisationAddresses = stringKeys.Where(x => x.Contains("/Localization/") && x.EndsWith(".json"));
+            var localisationAddresses = stringKeys
+                .Where(x => x.Contains("/Localization/") && x.EndsWith(".json"))
+                .ToList();
 
             if (!localisationAddresses.Any())
             {

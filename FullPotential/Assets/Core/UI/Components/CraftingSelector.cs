@@ -112,7 +112,7 @@ namespace FullPotential.Core.UI.Components
                 case nameof(Armor): SubTypeDropdown.AddOptions(_armorTypes.Select(x => x.Value).ToList()); break;
                 case nameof(Accessory): SubTypeDropdown.AddOptions(_accessoryTypes.Select(x => x.Value).ToList()); break;
                 case nameof(Consumer): SubTypeDropdown.AddOptions(_consumerTypes.Select(x => x.Value).ToList()); break;
-                default: throw new InvalidOperationException("Unknown crafting type");
+                default: throw new InvalidOperationException($"Unknown crafting type: '{craftingCategory.Key.Name}'");
             }
 
             SubTypeDropdown.RefreshShownValue();
@@ -134,7 +134,7 @@ namespace FullPotential.Core.UI.Components
                 case nameof(Armor): return _armorTypes.ElementAt(SubTypeDropdown.value).Key.TypeName;
                 case nameof(Accessory): return _accessoryTypes.ElementAt(SubTypeDropdown.value).Key.TypeName;
                 case nameof(Consumer): return _consumerTypes.ElementAt(SubTypeDropdown.value).Key.ToString();
-                default: throw new InvalidOperationException("Unknown crafting type");
+                default: throw new InvalidOperationException($"Unknown crafting category: '{craftingCategory}'");
             }
         }
 

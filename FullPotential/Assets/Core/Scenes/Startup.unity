@@ -15720,19 +15720,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Player: {fileID: 7392779647718654627, guid: e289f79f4fd69ec47a403b44b6cf327f, type: 3}
   Combat:
-    ProjectileWithTrail: {fileID: 4563083350583329192, guid: 92356876fd6de514e9c2f4e4bdea6cc0,
-      type: 3}
-    ProjectileWithBehaviour: {fileID: 4991308441274877191, guid: d76b723de09f993479b0cbe5cf10694a,
-      type: 3}
     SpellInHand: {fileID: 5923469330004543499, guid: 404031c7fdd421f4295a39230469eb19,
       type: 3}
     GadgetInHand: {fileID: 5117168970597480252, guid: f48fb857652d00a409512598fbea223b,
+      type: 3}
+    Projectile: {fileID: 4991308441274877191, guid: d76b723de09f993479b0cbe5cf10694a,
+      type: 3}
+    BulletTrail: {fileID: 4563083350583329192, guid: 92356876fd6de514e9c2f4e4bdea6cc0,
       type: 3}
     BulletHole: {fileID: 4982191730498096428, guid: 9ed0afac89fcf0145a7bbfec0337d367,
       type: 3}
   Environment:
     LootChest: {fileID: 6779003295890321588, guid: 0da494cf737d72c44b603f7a79174481,
       type: 3}
+  Shapes:
+    Wall: {fileID: 605297549439960408, guid: a2c569deaf0fe1745b9be93de6c19d6e, type: 3}
+    Zone: {fileID: 585545506049340028, guid: db85dbe43a3d3e8458e830f2530250e7, type: 3}
 --- !u!1 &1549162085111107810
 GameObject:
   m_ObjectHideFlags: 0

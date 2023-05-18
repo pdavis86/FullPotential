@@ -15,7 +15,7 @@ namespace FullPotential.Core.Gameplay.Shapes
     {
         private const float DistanceFromGround = 1f;
 
-        private IEffectService _effectService;
+        private ICombatService _combatService;
 
         private float _timeSinceLastEffective;
         private float _timeBetweenEffects;
@@ -38,7 +38,7 @@ namespace FullPotential.Core.Gameplay.Shapes
 
             Destroy(gameObject, Consumer.GetEffectDuration());
 
-            _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
+            _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
 
             _timeBetweenEffects = Consumer.GetEffectTimeBetween();
             _timeSinceLastEffective = _timeBetweenEffects;
@@ -76,7 +76,7 @@ namespace FullPotential.Core.Gameplay.Shapes
             }
 
             var adjustedPosition = position + new Vector3(0, DistanceFromGround);
-            _effectService.ApplyEffects(SourceFighter, Consumer, target, adjustedPosition);
+            _combatService.ApplyEffects(SourceFighter, Consumer, target, adjustedPosition);
         }
     }
 }

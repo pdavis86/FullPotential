@@ -294,7 +294,7 @@ namespace FullPotential.Core.Player
 
             var go = Instantiate(prefab, position, transform.rotation * Quaternion.Euler(0, 90, 0));
 
-            GameManager.Instance.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, go.transform, false);
+            GameManager.Instance.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, go.transform);
 
             go.transform.parent = GameManager.Instance.GetSceneBehaviour().GetTransform();
             go.name = id;

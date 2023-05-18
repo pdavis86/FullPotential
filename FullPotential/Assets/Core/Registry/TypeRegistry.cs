@@ -37,7 +37,7 @@ namespace FullPotential.Core.Registry
 
             foreach (var modPrefix in modPrefixes)
             {
-                var asyncOp = Addressables.LoadAssetAsync<GameObject>($"Assets/{modPrefix}/Registration");
+                var asyncOp = Addressables.LoadAssetAsync<GameObject>($"{modPrefix}/Registration");
                 asyncOp.Completed += opHandle =>
                 {
                     if (opHandle.Result == null)

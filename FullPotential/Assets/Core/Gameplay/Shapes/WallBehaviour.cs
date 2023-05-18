@@ -13,7 +13,7 @@ namespace FullPotential.Core.Gameplay.Shapes
 {
     public class WallBehaviour : MonoBehaviour, IShapeBehaviour
     {
-        private IEffectService _effectService;
+        private ICombatService _combatService;
 
         private float _timeSinceLastEffective;
         private float _timeBetweenEffects;
@@ -36,7 +36,7 @@ namespace FullPotential.Core.Gameplay.Shapes
 
             Destroy(gameObject, Consumer.GetEffectDuration());
 
-            _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
+            _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
 
             _timeBetweenEffects = Consumer.GetEffectTimeBetween();
             _timeSinceLastEffective = _timeBetweenEffects;
@@ -73,7 +73,7 @@ namespace FullPotential.Core.Gameplay.Shapes
                 return;
             }
 
-            _effectService.ApplyEffects(SourceFighter, Consumer, target, position);
+            _combatService.ApplyEffects(SourceFighter, Consumer, target, position);
         }
 
     }

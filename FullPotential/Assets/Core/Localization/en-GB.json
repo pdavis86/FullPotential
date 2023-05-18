@@ -226,6 +226,34 @@
       "Key": "attribute.units.percent",
       "Value": "%"
     },
+    
+
+    {
+      "Key": "shape.wall",
+      "Value": "Wall"
+    },
+    {
+      "Key": "shape.zone",
+      "Value": "Zone"
+    },
+
+
+    {
+      "Key": "targeting.pointtopoint",
+      "Value": "Point-to-point"
+    },
+    {
+      "Key": "targeting.projectile",
+      "Value": "Projectile"
+    },
+    {
+      "Key": "targeting.self",
+      "Value": "Self"
+    },
+    {
+      "Key": "targeting.touch",
+      "Value": "Touch"
+    },
 
 
     {

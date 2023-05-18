@@ -9,7 +9,7 @@ namespace FullPotential.Standard.Shapes
 
         public string TypeName => nameof(WallVisuals);
 
-        public string PrefabAddress => "Standard/Prefabs/SpellOrGadget/Wall.prefab";
+        public string PrefabAddress => "Standard/Prefabs/Shapes/Wall.prefab";
 
         public Guid ShapeTypeId => new Guid(Api.Gameplay.Shapes.Wall.Id);
     }

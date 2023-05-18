@@ -4,6 +4,8 @@
 
 namespace FullPotential.Core.Utilities.Helpers
 {
+    //todo: make this a service 
+
     public static class ShaderHelper
     {
         public enum BlendMode

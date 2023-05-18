@@ -9,7 +9,7 @@ namespace FullPotential.Standard.Targeting
 
         public string TypeName => nameof(ProjectileVisuals);
 
-        public string PrefabAddress => "Standard/Prefabs/SpellOrGadget/Projectile.prefab";
+        public string PrefabAddress => "Standard/Prefabs/Targeting/Projectile.prefab";
 
         public Guid TargetingTypeId => new Guid(Api.Gameplay.Targeting.Projectile.Id);
 

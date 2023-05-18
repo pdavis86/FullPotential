@@ -405,38 +405,6 @@
     {
       "Key": "effect.stepback.description",
       "Value": "Causes your target to move backwards"
-    },
-    
-
-    {
-      "Key": "shape.wall",
-      "Value": "Wall"
-    },
-    {
-      "Key": "shape.zone",
-      "Value": "Zone"
-    },
-
-
-    {
-      "Key": "targeting.beam",
-      "Value": "Beam"
-    },
-    {
-      "Key": "targeting.cone",
-      "Value": "Cone"
-    },
-    {
-      "Key": "targeting.projectile",
-      "Value": "Projectile"
-    },
-    {
-      "Key": "targeting.self",
-      "Value": "Self"
-    },
-    {
-      "Key": "targeting.touch",
-      "Value": "Touch"
     }
     
   ]

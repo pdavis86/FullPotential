@@ -124,7 +124,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7777513537368169150}
-  - component: {fileID: -1528059297460204056}
+  - component: {fileID: -8836096983543026624}
   m_Layer: 0
   m_Name: BeamVisuals
   m_TagString: Untagged
@@ -148,7 +148,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-1528059297460204056
+--- !u!114 &-8836096983543026624
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -157,7 +157,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 9101233024267604900}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd9d8055410151542a8e7ad86b962b15, type: 3}
+  m_Script: {fileID: 11500000, guid: 3c955826540683d4a9c4ba7a3cef8755, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _leftRightAdjustment: 0
+  _leftRightAdjustment: 20

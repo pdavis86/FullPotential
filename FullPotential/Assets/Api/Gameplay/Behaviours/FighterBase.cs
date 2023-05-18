@@ -397,7 +397,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, MeleeRangeLimit))
                 {
-                    _effectService.ApplyEffects(this, null, hit.transform.gameObject, hit.point);
+                    _combatService.ApplyEffects(this, null, hit.transform.gameObject, hit.point);
                 }
             }
 
@@ -472,7 +472,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var attackDirection = GetAttackDirection(handPosition, ConsumerRangeLimit);
 
-            _effectService.SpawnConsumerGameObjects(this, consumer, handPosition, attackDirection);
+            _combatService.SpawnConsumerGameObjects(this, consumer, handPosition, attackDirection);
 
             if (consumer.Targeting.IsContinuous)
             {
@@ -492,7 +492,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 foreach (var target in targets)
                 {
                     //todo: target.EffectPercentage
-                    _effectService.ApplyEffects(this, consumer, target.GameObject, target.Position);
+                    _combatService.ApplyEffects(this, consumer, target.GameObject, target.Position);
                 }
             }
 
@@ -560,7 +560,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 //Debug.Log("Should only be called once on server");
                 for (var i = 0; i < ammoUsed; i++)
                 {
-                    _effectService.ApplyEffects(this, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
+                    _combatService.ApplyEffects(this, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
                 }
             }
 
@@ -579,7 +579,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
                 if (Physics.Raycast(LookTransform.position, LookTransform.forward, out var meleeHit, meleeRange))
                 {
-                    _effectService.ApplyEffects(this, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
+                    _combatService.ApplyEffects(this, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
                 }
             }
 

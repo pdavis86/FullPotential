@@ -9,7 +9,7 @@ namespace FullPotential.Standard.Shapes
 
         public string TypeName => nameof(ZoneVisuals);
 
-        public string PrefabAddress => "Standard/Prefabs/SpellOrGadget/Zone.prefab";
+        public string PrefabAddress => "Standard/Prefabs/Shapes/Zone.prefab";
 
         public Guid ShapeTypeId => new Guid(Api.Gameplay.Shapes.Zone.Id);
     }

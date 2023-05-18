@@ -9,7 +9,7 @@ namespace FullPotential.Standard.Targeting
 
         public string TypeName => nameof(BeamVisuals);
 
-        public string PrefabAddress => "Standard/Prefabs/SpellOrGadget/Beam.prefab";
+        public string PrefabAddress => "Standard/Prefabs/Targeting/Beam.prefab";
 
         public Guid TargetingTypeId => new Guid(Api.Gameplay.Targeting.PointToPoint.Id);
 

@@ -16,7 +16,7 @@ namespace FullPotential.Core.Gameplay.Targeting
         private DelayedAction _applyEffectsAction;
         private float _maxBeamLength;
 
-        private IEffectService _effectService;
+        private ICombatService _combatService;
 
         public IFighter SourceFighter { get; set; }
 
@@ -27,7 +27,7 @@ namespace FullPotential.Core.Gameplay.Targeting
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
+            _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -42,7 +42,7 @@ namespace FullPotential.Core.Gameplay.Targeting
 
             _applyEffectsAction = new DelayedAction(
                 Consumer.GetEffectTimeBetween(),
-                () => _effectService.ApplyEffects(SourceFighter, Consumer, _hit.transform.gameObject, _hit.point));
+                () => _combatService.ApplyEffects(SourceFighter, Consumer, _hit.transform.gameObject, _hit.point));
         }
 
         // ReSharper disable once UnusedMember.Local

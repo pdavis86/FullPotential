@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using FullPotential.Api.GameManagement;
+﻿using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
@@ -15,6 +13,8 @@ using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
+using System;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -22,16 +22,15 @@ using UnityEngine;
 
 namespace FullPotential.Core.Gameplay.Combat
 {
-    //todo: rename to CombatService
-    public class EffectService : IEffectService
+    public class CombatService : ICombatService
     {
-        public static readonly System.Random Random = new System.Random();
+        private readonly System.Random _random = new System.Random();
 
         private readonly ITypeRegistry _typeRegistry;
         private readonly IRpcService _rpcService;
         private readonly Punch _punchEffect;
 
-        public EffectService(
+        public CombatService(
             ITypeRegistry typeRegistry,
             IRpcService rpcService)
         {
@@ -56,11 +55,11 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (itemUsed == null)
             {
+                //todo: this feels like a hack. Review this
                 itemUsed = new Loot { Attributes = new Attributes { Strength = sourceFighter.GetAttributeValue(AffectableAttribute.Strength) } };
+
                 ApplyEffect(sourceFighter, _punchEffect, itemUsed, target, position);
             }
-
-            ApplyShape();
 
             var itemHasEffects = itemUsed.Effects != null && itemUsed.Effects.Any();
             var itemIsWeapon = itemUsed is Weapon;
@@ -73,7 +72,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 {
                     //Debug.LogWarning("Target is not an IFighter. Target was: " + target);
 
-                    //todo: zzz v0.6 - SpawnBulletHole: move this, feels like the wrong place
+                    //todo: zzz v0.6 - SpawnBulletHole: make this a VisualsBehaviour on BulletTrail
                     var registryType = (IGearWeapon)itemUsed.RegistryType;
                     var isRanged = registryType?.Category == WeaponCategory.Ranged;
                     if (isRanged)
@@ -86,20 +85,20 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 //Debug.Log($"Applying just damage (no effects) to {targetFighter.FighterName}");
 
-                var damageDealt = GetDamageValueFromAttack(itemUsed, targetFighter.GetDefenseValue()) * -1;
+                var damageToDeal = GetDamageValueFromAttack(itemUsed, targetFighter.GetDefenseValue()) * -1;
 
                 var sourceFighterCriticalHitChance = sourceFighter.GetCriticalHitChance();
-                var critTestValue = Random.Next(0, 101);
-                var isCritical = critTestValue <= sourceFighterCriticalHitChance;
+                var criticalTestValue = _random.Next(0, 101);
+                var isCritical = criticalTestValue <= sourceFighterCriticalHitChance;
 
                 if (isCritical)
                 {
-                    //Debug.Log($"CRITICAL! Chance:{sourceFighterCriticalHitChance}, test:{critTestValue}");
+                    //Debug.Log($"CRITICAL! Chance:{sourceFighterCriticalHitChance}, test:{criticalTestValue}");
 
-                    damageDealt *= 2;
+                    damageToDeal *= 2;
                 }
 
-                targetFighter.TakeDamageFromFighter(sourceFighter, itemUsed, position, damageDealt, isCritical);
+                targetFighter.TakeDamageFromFighter(sourceFighter, itemUsed, position, damageToDeal, isCritical);
 
                 if (!itemIsWeapon)
                 {
@@ -131,76 +130,6 @@ namespace FullPotential.Core.Gameplay.Combat
                     ApplyEffect(null, sideEffect, itemUsed, sourceFighter.GameObject, position);
                 }
             }
-        }
-
-        private void ApplyShape()
-        {
-            //    var gameManager = GetGameManager();
-            //    var typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
-            //    var spawnService = gameManager.GetSceneBehaviour().GetSpawnService();
-            //    var sceneBehaviour = gameManager.GetSceneBehaviour();
-
-            //    typeRegistry.LoadAddessable(
-            //        consumer.Shape.PrefabAddress,
-            //        prefab =>
-            //        {
-            //            var consumerGameObject = Object.Instantiate(prefab, startPosition, rotation);
-            //            spawnService.AdjustPositionToBeAboveGround(startPosition, consumerGameObject.transform, false);
-
-            //            var behaviourScript = consumerGameObject.GetComponent<T>();
-            //            behaviourScript.Consumer = consumer;
-            //            behaviourScript.SourceFighter = sourceFighter;
-
-            //            consumerGameObject.transform.parent = sceneBehaviour.GetTransform();
-            //        }
-
-            //if (!position.HasValue)
-            //{
-            //    throw new ArgumentException("Position Vector3 cannot be null for projectiles");
-            //}
-
-            //if (Consumer.Shape == null)
-            //{
-            //    if (!NetworkManager.Singleton.IsServer)
-            //    {
-            //        return;
-            //    }
-
-            //    _effectService.ApplyEffects(SourceFighter, Consumer, target, position);
-            //}
-            //else
-            //{
-            //    Vector3 spawnPosition;
-            //    if (!target.CompareTagAny(Tags.Player, Tags.Enemy))
-            //    {
-            //        spawnPosition = position.Value;
-            //    }
-            //    else
-            //    {
-            //        var pointUnderTarget = new Vector3(target.transform.position.x, -100, target.transform.position.z);
-            //        var feetOfTarget = target.GetComponent<Collider>().ClosestPointOnBounds(pointUnderTarget);
-
-            //        spawnPosition = Physics.Raycast(feetOfTarget, transform.up * -1, out var hit)
-            //            ? hit.point
-            //            : position.Value;
-            //    }
-
-            //    if (Consumer.Shape is Wall)
-            //    {
-            //        var rotation = Quaternion.LookRotation(ForwardDirection);
-            //        rotation.x = 0;
-            //        rotation.z = 0;
-            //        _modHelper.SpawnShapeGameObject<SogWallVisuals>(Consumer, SourceFighter, spawnPosition, rotation);
-            //    }
-            //    else if (Consumer.Shape is Zone)
-            //    {
-            //        _modHelper.SpawnShapeGameObject<SogZoneVisuals>(Consumer, SourceFighter, spawnPosition, Quaternion.identity);
-            //    }
-            //    else
-            //    {
-            //        Debug.LogError($"Unexpected secondary effect for spell {Consumer.Id} '{Consumer.Name}'");
-            //    }
-            //}
         }
 
         private void SpawnBulletHole(
@@ -301,7 +230,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (targetFighter == null)
             {
-                Debug.LogWarning($"Not applying {effect.TypeName} to {targetGameObject.name} because they are not an IFighter");
+                //Debug.LogWarning($"Not applying {effect.TypeName} to {targetGameObject.name} because they are not an IFighter");
                 return;
             }
 
@@ -499,11 +428,10 @@ namespace FullPotential.Core.Gameplay.Combat
             targetMoveable.ApplyMovementForceClientRpc(forceToApply, ForceMode.Acceleration, nearbyClients);
         }
 
-
         private int AddVariationToValue(double basicValue)
         {
-            var multiplier = (double)Random.Next(90, 111) / 100;
-            var adder = Random.Next(0, 6);
+            var multiplier = (double)_random.Next(90, 111) / 100;
+            var adder = _random.Next(0, 6);
             return (int)Math.Ceiling(basicValue / multiplier) + adder;
         }
 
@@ -547,7 +475,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (consumer.Targeting is Projectile)
             {
-                var projectileGameObject = UnityEngine.Object.Instantiate(GameManager.Instance.Prefabs.Combat.ProjectileWithBehaviour, startPosition, Quaternion.identity);
+                var projectileGameObject = UnityEngine.Object.Instantiate(GameManager.Instance.Prefabs.Combat.Projectile, startPosition, Quaternion.identity);
 
                 var behaviour = projectileGameObject.GetComponent<ITargetingBehaviour>();
 
@@ -564,15 +492,43 @@ namespace FullPotential.Core.Gameplay.Combat
                     : GameManager.Instance.GetSceneBehaviour().GetTransform();
             }
 
-            _typeRegistry.LoadAddessable(
+            SpawnConsumerVisuals(
                 consumer.TargetingVisuals.PrefabAddress,
-                prefab =>
+                parentTransform,
+                consumer,
+                sourceFighter,
+                startPosition,
+                direction,
+                visualsBehaviour =>
                 {
-                    var visualsGameObject = UnityEngine.Object.Instantiate(prefab, startPosition, Quaternion.identity);
+                    if (visualsBehaviour != null && consumer.Targeting.IsContinuous)
+                    {
+                        consumer.Stoppables.Add(visualsBehaviour);
+                    }
+                });
+        }
 
-                    visualsGameObject.transform.parent = parentTransform;
+        public void SpawnConsumerVisuals(
+            string prefabAddress,
+            Transform parentTransform,
+            Consumer consumer,
+            IFighter sourceFighter,
+            Vector3 startPosition,
+            Vector3 direction,
+            Action<ConsumerVisualsBehaviour> handleVisualsBehaviour)
+        {
+            _typeRegistry.LoadAddessable(
+                prefabAddress,
+                visualsPrefab =>
+                {
+                    var visualsGameObject = UnityEngine.Object.Instantiate(visualsPrefab, parentTransform);
+                    visualsGameObject.transform.localPosition = Vector3.zero;
+                    visualsGameObject.transform.localRotation = Quaternion.identity;
+                    visualsGameObject.transform.localScale = Vector3.one;
 
-                    var visualsBehaviour = visualsGameObject.GetComponent<ConsumerVisualBehaviour>();
+                    consumer.Stoppables.Add(new DestroyStoppable(visualsGameObject));
+
+                    var visualsBehaviour = visualsGameObject.GetComponent<ConsumerVisualsBehaviour>();
 
                     if (visualsBehaviour != null)
                     {
@@ -580,11 +536,11 @@ namespace FullPotential.Core.Gameplay.Combat
                         visualsBehaviour.SourceFighter = sourceFighter;
                         visualsBehaviour.StartPosition = startPosition;
                         visualsBehaviour.Direction = direction;
+                    }
 
-                        if (consumer.Targeting.IsContinuous)
-                        {
-                            consumer.Stoppables.Add(visualsBehaviour);
-                        }
+                    if (handleVisualsBehaviour != null)
+                    {
+                        handleVisualsBehaviour(visualsBehaviour);
                     }
                 });
         }

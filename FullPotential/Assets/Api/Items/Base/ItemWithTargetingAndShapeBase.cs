@@ -12,18 +12,17 @@ namespace FullPotential.Api.Items.Base
 
         //Variables so they are serialized
         // ReSharper disable MemberCanBePrivate.Global
+        // ReSharper disable NotAccessedField.Global
         public string TargetingTypeId;
         public string TargetingVisualsTypeId;
         public string ShapeTypeId;
         public string ShapeVisualsTypeId;
         // ReSharper restore MemberCanBePrivate.Global
+        // ReSharper restore NotAccessedField.Global
 
         public ITargeting Targeting
         {
-            get
-            {
-                return _targeting;
-            }
+            get => _targeting;
             set
             {
                 _targeting = value;
@@ -34,10 +33,7 @@ namespace FullPotential.Api.Items.Base
 
         public ITargetingVisuals TargetingVisuals
         {
-            get
-            {
-                return _targetingVisuals;
-            }
+            get => _targetingVisuals;
             set
             {
                 _targetingVisuals = value;
@@ -47,10 +43,7 @@ namespace FullPotential.Api.Items.Base
 
         public IShape Shape
         {
-            get
-            {
-                return _shape;
-            }
+            get => _shape;
             set
             {
                 _shape = value;
@@ -60,10 +53,7 @@ namespace FullPotential.Api.Items.Base
 
         public IShapeVisuals ShapeVisuals
         {
-            get
-            {
-                return _shapeVisuals;
-            }
+            get => _shapeVisuals;
             set
             {
                 _shapeVisuals = value;

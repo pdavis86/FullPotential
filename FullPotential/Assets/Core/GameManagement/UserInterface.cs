@@ -140,7 +140,7 @@ namespace FullPotential.Core.GameManagement
         public void SpawnProjectileTrail(Vector3 startPosition, Vector3 endPosition)
         {
             var projectile = Instantiate(
-                GameManager.Instance.Prefabs.Combat.ProjectileWithTrail,
+                GameManager.Instance.Prefabs.Combat.BulletTrail,
                 startPosition,
                 Quaternion.identity);
 

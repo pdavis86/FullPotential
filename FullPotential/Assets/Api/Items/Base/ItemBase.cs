@@ -29,7 +29,7 @@ namespace FullPotential.Api.Items.Base
 
         // ReSharper disable InconsistentNaming
         protected IGameManager _gameManager;
-        protected IEffectService _effectService;
+        protected ICombatService _combatService;
         // ReSharper restore InconsistentNaming
 
         public string Id;
@@ -75,7 +75,7 @@ namespace FullPotential.Api.Items.Base
             }
 
             _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
-            _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
+            _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
         }
 
         public float GetHighInHighOutInRange(int attributeValue, float min, float max)
@@ -103,16 +103,13 @@ namespace FullPotential.Api.Items.Base
 
         public int GetNameHash()
         {
-            unchecked
-            {
-                var hash = 101;
-                hash = hash * 103 + Id.GetHashCode();
-                hash = hash * 107 + (RegistryTypeId ?? string.Empty).GetHashCode();
-                hash = hash * 109 + (Name ?? string.Empty).GetHashCode();
-                hash = hash * 113 + Attributes.GetHashCode();
-                hash = hash * 127 + (EffectIds != null ? string.Join(null, EffectIds) : string.Empty).GetHashCode();
-                return hash;
-            }
+            var hash = 101;
+            hash = hash * 103 + Id.GetHashCode();
+            hash = hash * 107 + (RegistryTypeId ?? string.Empty).GetHashCode();
+            hash = hash * 109 + (Name ?? string.Empty).GetHashCode();
+            hash = hash * 113 + Attributes.GetHashCode();
+            hash = hash * 127 + (EffectIds != null ? string.Join(null, EffectIds) : string.Empty).GetHashCode();
+            return hash;
         }
 
         protected void AppendToDescription(StringBuilder builder, ILocalizer localizer, bool attributeValue, string attributeName)

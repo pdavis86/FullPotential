@@ -138,27 +138,27 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cd7343b2907f0bb43b33607835902cda
-    m_Address: Standard/Prefabs/SpellOrGadget/Beam.prefab
+    m_Address: Standard/Prefabs/Targeting/Beam.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7297a77e0760fc442a8de9c1615f5d4c
-    m_Address: Standard/Prefabs/SpellOrGadget/Projectile.prefab
+    m_Address: Standard/Prefabs/Targeting/Projectile.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: da2c19386588bc24cb34810a8530adc5
-    m_Address: Standard/Prefabs/SpellOrGadget/Wall.prefab
+    m_Address: Standard/Prefabs/Shapes/Wall.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b7d2fcaa5eb669840928413506c5b9ea
-    m_Address: Standard/Prefabs/SpellOrGadget/Zone.prefab
+    m_Address: Standard/Prefabs/Shapes/Zone.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a11be9c5a65095d44ae0e51ea7f797e2
-    m_Address: Assets/Standard/Registration
+    m_Address: Standard/Registration
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
