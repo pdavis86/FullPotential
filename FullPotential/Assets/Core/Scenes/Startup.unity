@@ -15722,7 +15722,7 @@ MonoBehaviour:
   Combat:
     ProjectileWithTrail: {fileID: 4563083350583329192, guid: 92356876fd6de514e9c2f4e4bdea6cc0,
       type: 3}
-    ProjectileWithBehaviour: {fileID: 4991308441274877191, guid: 2fe79723d6d117d44ac84a40b3d497ac,
+    ProjectileWithBehaviour: {fileID: 4991308441274877191, guid: d76b723de09f993479b0cbe5cf10694a,
       type: 3}
     SpellInHand: {fileID: 5923469330004543499, guid: 404031c7fdd421f4295a39230469eb19,
       type: 3}

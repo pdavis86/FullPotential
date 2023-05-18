@@ -63,7 +63,7 @@
     <Compile Include="Assets\Standard\Effects\Debuffs\Slow.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Air.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Poison.cs" />
-    <Compile Include="Assets\Standard\Targeting\BeamBehaviour.cs" />
+    <Compile Include="Assets\Standard\Targeting\BeamVisualBehaviour.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Hold.cs" />
     <Compile Include="Assets\Standard\Armor\Helm.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Stengthen.cs" />
@@ -112,14 +112,12 @@
     <Compile Include="Assets\Standard\Effects\Buffs\Focus.cs" />
     <Compile Include="Assets\Standard\Accessories\Ring.cs" />
     <Compile Include="Assets\Standard\Targeting\ProjectileVisuals.cs" />
-    <Compile Include="Assets\Standard\Shapes\ZoneBehaviour.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Lethargy.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\ShortCircuit.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Water.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\StepBack.cs" />
     <Compile Include="Assets\Standard\Accessories\Belt.cs" />
     <Compile Include="Assets\Standard\Scenes\Behaviours\SceneObjectsLevel001.cs" />
-    <Compile Include="Assets\Standard\Shapes\WallBehaviour.cs" />
     <Compile Include="Assets\Standard\Weapons\Staff.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\ManaDrain.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Earth.cs" />

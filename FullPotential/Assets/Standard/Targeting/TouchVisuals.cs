@@ -11,7 +11,7 @@ namespace FullPotential.Standard.Targeting
 
         public string PrefabAddress => "Standard/Prefabs/SpellOrGadget/Touch.prefab";
 
-        public Guid TargetingGuid => new Guid(Api.Gameplay.Targeting.Touch.Id);
+        public Guid TargetingTypeId => new Guid(Api.Gameplay.Targeting.Touch.Id);
 
         public bool IsParentedToSource => false;
     }

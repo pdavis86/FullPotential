@@ -11,7 +11,7 @@ namespace FullPotential.Standard.Targeting
 
         public string PrefabAddress => "Standard/Prefabs/SpellOrGadget/Projectile.prefab";
 
-        public Guid TargetingGuid => new Guid(Api.Gameplay.Targeting.Projectile.Id);
+        public Guid TargetingTypeId => new Guid(Api.Gameplay.Targeting.Projectile.Id);
 
         public bool IsParentedToSource => false;
     }

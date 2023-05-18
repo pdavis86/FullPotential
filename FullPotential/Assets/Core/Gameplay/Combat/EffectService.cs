@@ -541,13 +541,21 @@ namespace FullPotential.Core.Gameplay.Combat
             return AddVariationToValue(damageDealtBasic);
         }
 
-        public void SpawnConsumerVisuals(IFighter sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction)
+        public void SpawnConsumerGameObjects(IFighter sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction)
         {
             Transform parentTransform;
 
             if (consumer.Targeting is Projectile)
             {
-                parentTransform = SpawnProjectileGameObject(sourceFighter, consumer, direction).transform;
+                var projectileGameObject = UnityEngine.Object.Instantiate(GameManager.Instance.Prefabs.Combat.ProjectileWithBehaviour, startPosition, Quaternion.identity);
+
+                var behaviour = projectileGameObject.GetComponent<ITargetingBehaviour>();
+
+                behaviour.SourceFighter = sourceFighter;
+                behaviour.Consumer = consumer;
+                behaviour.Direction = direction;
+
+                parentTransform = projectileGameObject.transform;
             }
             else
             {
@@ -579,22 +587,6 @@ namespace FullPotential.Core.Gameplay.Combat
                         }
                     }
                 });
-        }
-
-        private GameObject SpawnProjectileGameObject(
-            IFighter sourceFighter,
-            Consumer consumer,
-            Vector3 direction)
-        {
-            var projectileGameObject = GameManager.Instance.Prefabs.Combat.ProjectileWithBehaviour;
-
-            var behaviour = projectileGameObject.GetComponent<ITargetingBehaviour>();
-
-            behaviour.SourceFighter = sourceFighter;
-            behaviour.Consumer = consumer;
-            behaviour.Direction = direction;
-
-            return projectileGameObject;
         }
     }
 }

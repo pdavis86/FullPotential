@@ -5,6 +5,6 @@ namespace FullPotential.Api.Registry.Shapes
 {
     public interface IShapeVisuals : IRegisterable, IHasPrefab
     {
-        Guid ShapeGuid { get; }
+        Guid ShapeTypeId { get; }
     }
 }

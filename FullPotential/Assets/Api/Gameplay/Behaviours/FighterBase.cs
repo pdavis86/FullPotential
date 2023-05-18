@@ -472,7 +472,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var attackDirection = GetAttackDirection(handPosition, ConsumerRangeLimit);
 
-            _effectService.SpawnConsumerVisuals(this, consumer, handPosition, attackDirection);
+            _effectService.SpawnConsumerGameObjects(this, consumer, handPosition, attackDirection);
 
             if (consumer.Targeting.IsContinuous)
             {
@@ -487,10 +487,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var targets = consumer.Targeting.GetTargets(this, consumer);
 
-            foreach (var target in targets)
+            if (targets != null)
             {
-                //todo: target.EffectPercentage
-                _effectService.ApplyEffects(this, consumer, target.GameObject, target.Position);
+                foreach (var target in targets)
+                {
+                    //todo: target.EffectPercentage
+                    _effectService.ApplyEffects(this, consumer, target.GameObject, target.Position);
+                }
             }
 
             return true;

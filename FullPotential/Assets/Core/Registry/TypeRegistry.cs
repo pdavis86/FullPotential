@@ -176,7 +176,7 @@ namespace FullPotential.Core.Registry
             var invalidTargetingVisuals = new List<ITargetingVisuals>();
             foreach (var targetingVisual in _targetingVisuals)
             {
-                if (_targeting.FirstOrDefault(t => t.TypeId == targetingVisual.TargetingGuid) == null)
+                if (_targeting.FirstOrDefault(t => t.TypeId == targetingVisual.TargetingTypeId) == null)
                 {
                     Debug.LogError($"{targetingVisual.GetType().FullName} refers to a targeting type that is not registered");
                     invalidTargetingVisuals.Add(targetingVisual);
@@ -191,7 +191,7 @@ namespace FullPotential.Core.Registry
             var invalidShapeVisuals = new List<IShapeVisuals>();
             foreach (var shapeVisual in _shapeVisuals)
             {
-                if (_shapes.FirstOrDefault(t => t.TypeId == shapeVisual.ShapeGuid) == null)
+                if (_shapes.FirstOrDefault(t => t.TypeId == shapeVisual.ShapeTypeId) == null)
                 {
                     Debug.LogError($"{shapeVisual.GetType().FullName} refers to a shape type that is not registered");
                     invalidShapeVisuals.Add(shapeVisual);
@@ -215,7 +215,9 @@ namespace FullPotential.Core.Registry
                 case nameof(ILoot): return (IEnumerable<T>)_loot;
                 case nameof(IEffect): return (IEnumerable<T>)_effects;
                 case nameof(IShape): return (IEnumerable<T>)_shapes;
+                case nameof(IShapeVisuals): return (IEnumerable<T>)_shapeVisuals;
                 case nameof(ITargeting): return (IEnumerable<T>)_targeting;
+                case nameof(ITargetingVisuals): return (IEnumerable<T>)_targetingVisuals;
                 default: throw new Exception($"Unexpected type {interfaceName}");
             }
         }

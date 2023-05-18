@@ -89,7 +89,7 @@
     <Compile Include="Assets\Core\Utilities\Extensions\GuidExtensions.cs" />
     <Compile Include="Assets\Core\UI\Components\SlideOutAlert.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DestroyOnTriggerEnter.cs" />
-    <Compile Include="Assets\Core\Gameplay\Targeting\Behaviours\ProjectileBehaviour.cs" />
+    <Compile Include="Assets\Core\Gameplay\Targeting\ProjectileBehaviour.cs" />
     <Compile Include="Assets\Core\UI\Components\InventoryItemsList.cs" />
     <Compile Include="Assets\Core\Player\PlayerBehaviour.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DontDestroy.cs" />
@@ -134,6 +134,9 @@
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsStartup.cs" />
     <Compile Include="Assets\Core\GameManagement\AddressablesManager.cs" />
     <Compile Include="Assets\Core\GameManagement\GameManager.cs" />
+    <Compile Include="Assets\Core\Gameplay\Shapes\WallBehaviour.cs" />
+    <Compile Include="Assets\Core\Gameplay\Shapes\ZoneBehaviour.cs" />
+    <Compile Include="Assets\Core\Gameplay\Targeting\BeamBehaviour.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Core\FullPotential.Core.asmdef" />

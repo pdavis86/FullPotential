@@ -13,6 +13,8 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Registry.Shapes;
+using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities.Extensions;
@@ -406,9 +408,19 @@ namespace FullPotential.Core.Player
             {
                 magicalItem.Targeting = _resultFactory.GetTargeting(magicalItem.TargetingTypeId);
 
+                //todo: set TargetingVisuals otherwise fallback to the default
+
+                magicalItem.TargetingVisuals = _typeRegistry.GetRegisteredTypes<ITargetingVisuals>()
+                    .FirstOrDefault(v => v.TargetingTypeId == magicalItem.Targeting.TypeId);
+
                 if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeId))
                 {
                     magicalItem.Shape = _resultFactory.GetShape(magicalItem.ShapeTypeId);
+
+                    //todo: set ShapeVisuals otherwise fallback to the default
+
+                    magicalItem.ShapeVisuals = _typeRegistry.GetRegisteredTypes<IShapeVisuals>()
+                        .FirstOrDefault(v => v.ShapeTypeId == magicalItem.Shape.TypeId);
                 }
             }
 

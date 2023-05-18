@@ -15,6 +15,6 @@ namespace FullPotential.Api.Gameplay.Combat
 
         int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense, bool addVariation = true);
 
-        void SpawnConsumerVisuals(IFighter sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction);
+        void SpawnConsumerGameObjects(IFighter sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction);
     }
 }

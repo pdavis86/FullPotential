@@ -5,7 +5,7 @@ namespace FullPotential.Api.Registry.Targeting
 {
     public interface ITargetingVisuals : IRegisterable, IHasPrefab
     {
-        Guid TargetingGuid { get; }
+        Guid TargetingTypeId { get; }
 
         bool IsParentedToSource { get; }
     }

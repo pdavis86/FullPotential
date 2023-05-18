@@ -11,10 +11,12 @@ namespace FullPotential.Api.Items.Base
         private IShapeVisuals _shapeVisuals;
 
         //Variables so they are serialized
+        // ReSharper disable MemberCanBePrivate.Global
         public string TargetingTypeId;
         public string TargetingVisualsTypeId;
         public string ShapeTypeId;
         public string ShapeVisualsTypeId;
+        // ReSharper restore MemberCanBePrivate.Global
 
         public ITargeting Targeting
         {
@@ -34,14 +36,12 @@ namespace FullPotential.Api.Items.Base
         {
             get
             {
-                //todo: if TargetingVisuals set against the item then use it
-                //otherwise fallback to the default
-                return null;
+                return _targetingVisuals;
             }
             set
             {
-                //todo: set TargetingVisuals
-                //otherwise fallback to the default
+                _targetingVisuals = value;
+                TargetingVisualsTypeId = _targetingVisuals?.TypeId.ToString();
             }
         }
 
@@ -58,18 +58,16 @@ namespace FullPotential.Api.Items.Base
             }
         }
 
-        public IShapeVisuals ShapeVisuals 
+        public IShapeVisuals ShapeVisuals
         {
             get
             {
-                //todo: if ShapeVisuals set against the item then use it
-                //otherwise fallback to the default
-                return null;
+                return _shapeVisuals;
             }
             set
             {
-                //todo: set ShapeVisuals
-                //otherwise fallback to the default
+                _shapeVisuals = value;
+                ShapeVisualsTypeId = _shapeVisuals?.TypeId.ToString();
             }
         }
     }

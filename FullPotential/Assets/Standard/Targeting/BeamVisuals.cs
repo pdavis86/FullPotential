@@ -11,7 +11,7 @@ namespace FullPotential.Standard.Targeting
 
         public string PrefabAddress => "Standard/Prefabs/SpellOrGadget/Beam.prefab";
 
-        public Guid TargetingGuid => new Guid(Api.Gameplay.Targeting.PointToPoint.Id);
+        public Guid TargetingTypeId => new Guid(Api.Gameplay.Targeting.PointToPoint.Id);
 
         public bool IsParentedToSource => true;
     }

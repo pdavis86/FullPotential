@@ -11,6 +11,6 @@ namespace FullPotential.Standard.Shapes
 
         public string PrefabAddress => "Standard/Prefabs/SpellOrGadget/Zone.prefab";
 
-        public Guid ShapeGuid => new Guid(Api.Gameplay.Shapes.Zone.Id);
+        public Guid ShapeTypeId => new Guid(Api.Gameplay.Shapes.Zone.Id);
     }
 }

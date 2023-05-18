@@ -147,11 +147,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: bd7b43d17a423b84a96eceaa0a28419f
-    m_Address: Standard/Prefabs/SpellOrGadget/Self.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: da2c19386588bc24cb34810a8530adc5
     m_Address: Standard/Prefabs/SpellOrGadget/Wall.prefab
     m_ReadOnly: 0
