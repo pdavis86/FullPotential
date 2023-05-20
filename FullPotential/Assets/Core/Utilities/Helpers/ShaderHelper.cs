@@ -4,7 +4,7 @@
 
 namespace FullPotential.Core.Utilities.Helpers
 {
-    //todo: make this a service 
+    //todo: make ShaderHelper a service 
 
     public static class ShaderHelper
     {

@@ -30,6 +30,14 @@ namespace FullPotential.Core.Gameplay.Targeting
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
+            if (SourceFighter == null)
+            {
+                //They logged out or crashed
+                Stop();
+                Destroy(gameObject);
+                return;
+            }
+
             Vector3 targetDirection;
             float beamLength;
             if (Physics.Raycast(SourceFighter.LookTransform.position, SourceFighter.LookTransform.forward, out var hit, _maxBeamLength))
@@ -65,7 +73,7 @@ namespace FullPotential.Core.Gameplay.Targeting
             //Move the back end to the middle
             _cylinderTransform.position += _cylinderTransform.up * _cylinderTransform.localScale.y;
 
-            if (SourceFighter.OwnerClientId == NetworkManager.LocalClientId)
+            if (SourceFighter.OwnerClientId == NetworkManager.Singleton.LocalClientId)
             {
                 //Parent to player head so the beam looks attached to the hand
                 _cylinderParentTransform.parent = SourceFighter.LookTransform;

@@ -18,6 +18,8 @@ namespace FullPotential.Core.GameManagement
             public GameObject SpellInHand;
             public GameObject GadgetInHand;
             public GameObject Projectile;
+            public GameObject ProjectileVisuals;
+            public GameObject PointToPoint;
             public GameObject BulletTrail;
             public GameObject BulletHole;
         }

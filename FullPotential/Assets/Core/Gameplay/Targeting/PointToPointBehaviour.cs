@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace FullPotential.Core.Gameplay.Targeting
 {
-    public class BeamBehaviour : MonoBehaviour, ITargetingBehaviour
+    public class PointToPointBehaviour : MonoBehaviour, ITargetingBehaviour
     {
         private RaycastHit _hit;
         private DelayedAction _applyEffectsAction;

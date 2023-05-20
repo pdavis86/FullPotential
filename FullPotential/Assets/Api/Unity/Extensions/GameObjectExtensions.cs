@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.Netcode;
+using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
 
@@ -56,6 +57,19 @@ namespace FullPotential.Api.Unity.Extensions
             {
                 Object.Destroy(child.gameObject);
             }
+        }
+
+        public static void NetworkSpawn(this GameObject gameObject, bool warnOnFailure = true)
+        {
+            var networkObject = gameObject.GetComponent<NetworkObject>();
+
+            if (warnOnFailure && networkObject == null)
+            {
+                Debug.LogWarning($"Cannot network spawn {gameObject.name} as it does not have a NetworkObject component");
+                return;
+            }
+                
+            networkObject?.Spawn(true);
         }
 
     }

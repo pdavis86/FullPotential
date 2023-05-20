@@ -111,7 +111,6 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
             enemyNetObj.Spawn(true);
 
-            //Must re-parent after spawn
             enemyNetObj.transform.parent = transform;
 
             _enemyCounter++;

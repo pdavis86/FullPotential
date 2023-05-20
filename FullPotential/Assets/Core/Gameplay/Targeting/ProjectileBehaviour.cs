@@ -7,6 +7,7 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace FullPotential.Core.Gameplay.Targeting
@@ -15,7 +16,8 @@ namespace FullPotential.Core.Gameplay.Targeting
     {
         private ICombatService _combatService;
         private ITypeRegistry _typeRegistry;
-
+        
+        private bool _collisionDetected;
         public IFighter SourceFighter { get; set; }
 
         public Consumer Consumer { get; set; }
@@ -32,7 +34,10 @@ namespace FullPotential.Core.Gameplay.Targeting
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            Destroy(gameObject, 3f);
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                return;
+            }
 
             Physics.IgnoreCollision(GetComponent<Collider>(), SourceFighter.GameObject.GetComponent<Collider>());
 
@@ -53,14 +58,28 @@ namespace FullPotential.Core.Gameplay.Targeting
         // ReSharper disable once UnusedMember.Local
         private void OnTriggerEnter(Collider other)
         {
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                return;
+            }
+
             if (other.isTrigger)
             {
                 return;
             }
 
+            if (_collisionDetected)
+            {
+                return;
+            }
+
+            _collisionDetected = true;
+
             _combatService.ApplyEffects(SourceFighter, Consumer, other.gameObject, other.ClosestPointOnBounds(transform.position));
 
             SpawnShape(other.gameObject, other.ClosestPointOnBounds(transform.position));
+
+            Consumer.StopStoppables();
 
             Destroy(gameObject);
         }
@@ -113,18 +132,16 @@ namespace FullPotential.Core.Gameplay.Targeting
 
         private void SpawnShapeGameObjects(GameObject prefab, Vector3 spawnPosition, Quaternion rotation)
         {
-            var sceneBehaviour = GameManager.Instance.GetSceneBehaviour();
-
             var shapeGameObject = Instantiate(prefab, spawnPosition, rotation);
 
-            shapeGameObject.transform.parent = sceneBehaviour.GetTransform();
+            shapeGameObject.NetworkSpawn();
 
             var shapeBehaviour = shapeGameObject.GetComponent<IShapeBehaviour>();
             shapeBehaviour.SourceFighter = SourceFighter;
             shapeBehaviour.Consumer = Consumer;
             shapeBehaviour.Direction = Direction;
 
-            sceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(spawnPosition, shapeGameObject.transform);
+            GameManager.Instance.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(spawnPosition, shapeGameObject.transform);
 
             if (!string.IsNullOrWhiteSpace(Consumer.ShapeVisuals?.PrefabAddress))
             {

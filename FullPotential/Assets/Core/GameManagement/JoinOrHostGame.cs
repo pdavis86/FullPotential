@@ -201,7 +201,7 @@ namespace FullPotential.Core.GameManagement
             GameManager.Instance.GameSettings.LastSigninUsername = _username;
             GameManager.Instance.SaveGameSettings();
 
-                GameManager.Instance.LocalGameDataStore.PlayerToken = token;
+            GameManager.Instance.LocalGameDataStore.PlayerToken = token;
             _username = _password = null;
 
             _signinError.gameObject.SetActive(false);
@@ -254,7 +254,7 @@ namespace FullPotential.Core.GameManagement
             {
                 _networkTransport.ConnectPort = desiredPort;
             }
-            
+
         }
 
         private void HostGameInternal()
@@ -348,7 +348,7 @@ namespace FullPotential.Core.GameManagement
             reader.ReadValueSafe(out ConnectStatus status);
 
             Debug.LogWarning($"Server refused connection with status {status}");
-            
+
             GameManager.Instance.LocalGameDataStore.DisconnectReason = status.ToString();
         }
 

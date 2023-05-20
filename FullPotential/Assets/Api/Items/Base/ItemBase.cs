@@ -13,6 +13,7 @@ using FullPotential.Api.Modding;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 
@@ -78,7 +79,7 @@ namespace FullPotential.Api.Items.Base
             _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
         }
 
-        public float GetHighInHighOutInRange(int attributeValue, float min, float max)
+        public static float GetHighInHighOutInRange(int attributeValue, float min, float max)
         {
             return attributeValue / 100f * (max - min) + min;
         }

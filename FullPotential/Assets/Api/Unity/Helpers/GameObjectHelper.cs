@@ -5,6 +5,8 @@ using UnityEngine;
 
 namespace FullPotential.Api.Unity.Helpers
 {
+    //todo: make GameObjectHelper not a static class and rename to UnityHelperUtilities
+
     public static class GameObjectHelper
     {
         public static GameObject GetObjectAtRoot(string name)

@@ -61,7 +61,7 @@
     <Compile Include="Assets\Api\Registry\Crafting\ILoot.cs" />
     <Compile Include="Assets\Api\Registry\IRegisterable.cs" />
     <Compile Include="Assets\Api\Obsolete\ResourseConsumptionType.cs" />
-    <Compile Include="Assets\Api\Utilities\Extensions\Vector2Extensions.cs" />
+    <Compile Include="Assets\Api\Unity\Extensions\Vector2Extensions.cs" />
     <Compile Include="Assets\Api\Obsolete\GearCategory.cs" />
     <Compile Include="Assets\Api\Modding\IModHelper.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\UnityExtensions.cs" />
@@ -84,6 +84,7 @@
     <Compile Include="Assets\Api\Registry\Crafting\IGearWeapon.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesCollection.cs" />
     <Compile Include="Assets\Api\Registry\Effects\ICustomEffect.cs" />
+    <Compile Include="Assets\Api\Unity\Extensions\TransformExtensions.cs" />
     <Compile Include="Assets\Api\Gameplay\Items\LevelOfDetail.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\AffectType.cs" />
     <Compile Include="Assets\Api\Items\Types\Accessory.cs" />
@@ -132,7 +133,7 @@
     <Compile Include="Assets\Api\Ioc\Dependency.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargeting.cs" />
     <Compile Include="Assets\Api\Scenes\ISceneBehaviour.cs" />
-    <Compile Include="Assets\Api\Utilities\Extensions\Vector3Extensions.cs" />
+    <Compile Include="Assets\Api\Unity\Extensions\Vector3Extensions.cs" />
     <Compile Include="Assets\Api\Gameplay\Shapes\IShapeBehaviour.cs" />
     <Compile Include="Assets\Api\Scenes\SpawnPoint.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\PlayerData.cs" />

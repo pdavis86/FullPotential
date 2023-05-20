@@ -15,9 +15,28 @@ namespace FullPotential.Api.Gameplay.Combat
             Vector3? position
         );
 
-        int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense, bool addVariation = true);
+        int GetDamageValueFromAttack(
+            IFighter sourceFighter,
+            int targetDefense,
+            bool addVariation = true);
 
-        void SpawnConsumerGameObjects(IFighter sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction);
+        int GetDamageValueFromAttack(
+            ItemBase itemUsed,
+            int targetDefense,
+            bool addVariation = true);
+
+        void SpawnTargetingGameObject(
+            IFighter sourceFighter,
+            Consumer consumer,
+            Vector3 startPosition,
+            Vector3 direction);
+
+        void SpawnTargetingVisuals(
+            IFighter sourceFighter,
+            Consumer consumer,
+            Vector3 startPosition,
+            Vector3 direction,
+            Transform parentTransform = null);
 
         void SpawnConsumerVisuals(
             GameObject visualsPrefab,

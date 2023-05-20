@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1963866746874951432}
   - component: {fileID: 7236671613998201943}
   - component: {fileID: -6473739940884833896}
+  - component: {fileID: -4625258854096919767}
   m_Layer: 0
   m_Name: Zone
   m_TagString: Untagged
@@ -61,3 +62,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _visualsFallbackPrefab: {fileID: 585545506049340028, guid: ee66f94af399aef46b98d3e673fa9aa8,
     type: 3}
+--- !u!114 &-4625258854096919767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 585545506049340028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1

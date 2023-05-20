@@ -15726,6 +15726,10 @@ MonoBehaviour:
       type: 3}
     Projectile: {fileID: 4991308441274877191, guid: d76b723de09f993479b0cbe5cf10694a,
       type: 3}
+    ProjectileVisuals: {fileID: 4991308441274877191, guid: 0b5fd68a25a4ae04ab373c7fdb43b59a,
+      type: 3}
+    PointToPoint: {fileID: 937278294356468739, guid: 41999c09d1855944f8323a0d9808169e,
+      type: 3}
     BulletTrail: {fileID: 4563083350583329192, guid: 92356876fd6de514e9c2f4e4bdea6cc0,
       type: 3}
     BulletHole: {fileID: 4982191730498096428, guid: 9ed0afac89fcf0145a7bbfec0337d367,
@@ -16351,6 +16355,18 @@ MonoBehaviour:
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
       Prefab: {fileID: 4982191730498096428, guid: 9ed0afac89fcf0145a7bbfec0337d367,
+        type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 4991308441274877191, guid: d76b723de09f993479b0cbe5cf10694a,
+        type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 4991308441274877191, guid: 0b5fd68a25a4ae04ab373c7fdb43b59a,
         type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0

@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
@@ -79,9 +82,37 @@ namespace FullPotential.Core.Registry
 
             ValidateCrossTypeLinks();
 
-            foreach (var p in mod.GetNetworkPrefabs())
+            foreach (var address in mod.GetNetworkPrefabAddresses())
             {
-                NetworkManager.Singleton.AddNetworkPrefab(p);
+                LoadAddessable(address, gameObject =>
+                {
+                    var networkObject = gameObject.GetComponent<NetworkObject>();
+
+                    if (networkObject == null)
+                    {
+                        Debug.LogError($"Cannot register {address} as a Network Prefab as it does not have a NetworkObject component");
+                        return;
+                    }
+
+                    //todo: zzz v0.5 - use gameObject.GetHashCode().ToString() instead of address in GenerateHash() to get the "NetworkConfig mismatch" issue
+                    // then you can figure out how to tell the client that just tried to join
+
+                    //Work-around for https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/1499
+                    var hashFiledInfo = typeof(NetworkObject).GetField("GlobalObjectIdHash", BindingFlags.NonPublic | BindingFlags.Instance);
+                    hashFiledInfo!.SetValue(networkObject, GenerateHash(address));
+
+                    NetworkManager.Singleton.AddNetworkPrefab(gameObject);
+                });
+            }
+        }
+
+        private static uint GenerateHash(string input)
+        {
+            using (var hasher = MD5.Create())
+            {
+                var inputBytes = Encoding.UTF8.GetBytes(input);
+                var hashBytes = hasher.ComputeHash(inputBytes);
+                return BitConverter.ToUInt32(hashBytes, 0);
             }
         }
 
@@ -197,7 +228,7 @@ namespace FullPotential.Core.Registry
                     invalidShapeVisuals.Add(shapeVisual);
                 }
             }
-            
+
             foreach (var shapeVisual in invalidShapeVisuals)
             {
                 _shapeVisuals.Remove(shapeVisual);

@@ -82,11 +82,6 @@ namespace FullPotential.Core.Gameplay.Crafting
             return targetingComponent.Targeting;
         }
 
-        public IShape GetShape(string typeId)
-        {
-            return _shapeOptions.First(x => x.TypeId.ToString() == typeId);
-        }
-
         private IShape GetShapeOrNone(ITargeting targeting, IList<IHasTargetingAndShape> components)
         {
             //Only one shape, if any

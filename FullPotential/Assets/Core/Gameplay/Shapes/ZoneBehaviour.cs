@@ -35,6 +35,11 @@ namespace FullPotential.Core.Gameplay.Shapes
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                return;
+            }
+
             if (Consumer == null)
             {
                 Debug.LogError("No Consumer has been set");
@@ -42,7 +47,7 @@ namespace FullPotential.Core.Gameplay.Shapes
                 return;
             }
 
-            Destroy(gameObject, Consumer.GetEffectDuration());
+            Invoke(nameof(DestroyGameObjectAndChildren), Consumer.GetEffectDuration());
 
             _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
 
@@ -83,6 +88,16 @@ namespace FullPotential.Core.Gameplay.Shapes
 
             var adjustedPosition = position + new Vector3(0, DistanceFromGround);
             _combatService.ApplyEffects(SourceFighter, Consumer, target, adjustedPosition);
+        }
+
+        private void DestroyGameObjectAndChildren()
+        {
+            foreach (Transform child in transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            Destroy(gameObject);
         }
     }
 }

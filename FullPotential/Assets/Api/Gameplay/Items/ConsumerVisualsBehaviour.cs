@@ -1,12 +1,13 @@
 ﻿using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Items.Types;
-using Unity.Netcode;
 using UnityEngine;
+
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace FullPotential.Api.Gameplay.Items
 {
-    public abstract class ConsumerVisualsBehaviour : NetworkBehaviour, IStoppable
+    public abstract class ConsumerVisualsBehaviour : MonoBehaviour, IStoppable
     {
         public IFighter SourceFighter { get; set; }
 

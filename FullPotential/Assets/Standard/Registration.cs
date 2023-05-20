@@ -88,9 +88,13 @@ namespace FullPotential.Standard
             };
         }
 
-        public IEnumerable<GameObject> GetNetworkPrefabs()
+        public IEnumerable<string> GetNetworkPrefabAddresses()
         {
-            return Array.Empty<GameObject>();
+            return new[]
+            {
+                WallVisuals.NetworkPrefabAddress,
+                ZoneVisuals.NetworkPrefabAddress
+            };
         }
     }
 }

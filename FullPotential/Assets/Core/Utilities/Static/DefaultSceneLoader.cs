@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -25,7 +26,6 @@ namespace FullPotential.Core.Utilities.Static
                     break;
 
                 case PlayModeStateChange.EnteredPlayMode:
-                {
                     var activeScene = SceneManager.GetActiveScene();
                     if (activeScene.buildIndex != 0)
                     {
@@ -34,9 +34,9 @@ namespace FullPotential.Core.Utilities.Static
                     }
 
                     break;
-                }
             }
         }
     }
 }
+
 #endif

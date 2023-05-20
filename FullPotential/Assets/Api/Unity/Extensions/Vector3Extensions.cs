@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FullPotential.Api.Utilities.Extensions
+namespace FullPotential.Api.Unity.Extensions
 {
     public static class Vector3Extensions
     {

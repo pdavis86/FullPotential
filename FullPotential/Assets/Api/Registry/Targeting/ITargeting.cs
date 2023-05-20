@@ -6,7 +6,7 @@ namespace FullPotential.Api.Registry.Targeting
 {
     public interface ITargeting : IRegisterable
     {
-        //todo: implement
+        //todo: implement CanHaveShape
         bool CanHaveShape { get; }
 
         bool IsContinuous { get; }

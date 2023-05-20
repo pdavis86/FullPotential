@@ -470,10 +470,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return false;
             }
 
-            var attackDirection = GetAttackDirection(handPosition, ConsumerRangeLimit);
-
-            _combatService.SpawnConsumerGameObjects(this, consumer, handPosition, attackDirection);
-
             if (consumer.Targeting.IsContinuous)
             {
                 leftOrRight.ActiveConsumer = consumer;
@@ -483,7 +479,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 StartConsumerCooldown(leftOrRight);
             }
 
+            var attackDirection = GetAttackDirection(handPosition, ConsumerRangeLimit);
+
+            if (IsServer)
+            {
             ConsumeResource(consumer);
+
+                _combatService.SpawnTargetingGameObject(this, consumer, handPosition, attackDirection);
 
             var targets = consumer.Targeting.GetTargets(this, consumer);
 
@@ -494,6 +496,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     //todo: target.EffectPercentage
                     _combatService.ApplyEffects(this, consumer, target.GameObject, target.Position);
                 }
+            }
+            }
+
+            if (IsClient)
+            {
+                _combatService.SpawnTargetingVisuals(this, consumer, handPosition, attackDirection);
             }
 
             return true;
