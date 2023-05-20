@@ -11,5 +11,7 @@ namespace FullPotential.Api.Gameplay.Shapes
         public Consumer Consumer { get; set; }
 
         public Vector3 Direction { get; set; }
+
+        public GameObject VisualsFallbackPrefab { get; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using FullPotential.Api.Gameplay.Combat;
+﻿using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Shapes;
 using FullPotential.Api.Gameplay.Targeting;
 using FullPotential.Api.Ioc;
@@ -13,6 +14,7 @@ namespace FullPotential.Core.Gameplay.Targeting
     public class ProjectileBehaviour : MonoBehaviour, ITargetingBehaviour
     {
         private ICombatService _combatService;
+        private ITypeRegistry _typeRegistry;
 
         public IFighter SourceFighter { get; set; }
 
@@ -24,6 +26,7 @@ namespace FullPotential.Core.Gameplay.Targeting
         private void Awake()
         {
             _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
+            _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -123,14 +126,33 @@ namespace FullPotential.Core.Gameplay.Targeting
 
             sceneBehaviour.GetSpawnService().AdjustPositionToBeAboveGround(spawnPosition, shapeGameObject.transform);
 
-            _combatService.SpawnConsumerVisuals(
-                Consumer.ShapeVisuals.PrefabAddress,
-                shapeGameObject.transform,
-                Consumer,
-                SourceFighter,
-                spawnPosition,
-                Direction,
-                null);
+            if (!string.IsNullOrWhiteSpace(Consumer.ShapeVisuals?.PrefabAddress))
+            {
+                _typeRegistry.LoadAddessable(
+                    Consumer.ShapeVisuals.PrefabAddress,
+                    visualsPrefab =>
+                    {
+                        _combatService.SpawnConsumerVisuals(
+                            visualsPrefab,
+                            shapeGameObject.transform,
+                            Consumer,
+                            SourceFighter,
+                            spawnPosition,
+                            Direction,
+                            null);
+                    });
+            }
+            else if (shapeBehaviour.VisualsFallbackPrefab != null)
+            {
+                _combatService.SpawnConsumerVisuals(
+                    shapeBehaviour.VisualsFallbackPrefab,
+                    shapeGameObject.transform,
+                    Consumer,
+                    SourceFighter,
+                    spawnPosition,
+                    Direction,
+                    null);
+            }
         }
     }
 }

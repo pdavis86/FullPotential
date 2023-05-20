@@ -59,3 +59,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75a7e1c6a0c4dbe48bbb76e6a290070a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _visualsFallbackPrefab: {fileID: 585545506049340028, guid: ee66f94af399aef46b98d3e673fa9aa8,
+    type: 3}

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
@@ -41,7 +40,6 @@ namespace FullPotential.Core.Player
         private IRpcService _rpcService;
         private ILocalizer _localizer;
         private IInventoryDataService _inventoryDataService;
-        private IResultFactory _resultFactory;
 
         private PlayerState _playerState;
         private int _maxItems;
@@ -62,7 +60,6 @@ namespace FullPotential.Core.Player
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _inventoryDataService = DependenciesContext.Dependencies.GetService<IInventoryDataService>();
-            _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
         }
 
         #endregion
@@ -406,21 +403,19 @@ namespace FullPotential.Core.Player
 
             if (item is ItemWithTargetingAndShapeBase magicalItem && !string.IsNullOrWhiteSpace(magicalItem.TargetingTypeId))
             {
-                magicalItem.Targeting = _resultFactory.GetTargeting(magicalItem.TargetingTypeId);
-
-                //todo: set TargetingVisuals otherwise fallback to the default
+                magicalItem.Targeting = _typeRegistry.GetRegisteredTypes<ITargeting>()
+                    .First(x => x.TypeId.ToString() == magicalItem.TargetingTypeId);
 
                 magicalItem.TargetingVisuals = _typeRegistry.GetRegisteredTypes<ITargetingVisuals>()
-                    .FirstOrDefault(v => v.TargetingTypeId == magicalItem.Targeting.TypeId);
+                    .FirstOrDefault(v => v.TypeId.ToString() == magicalItem.TargetingVisualsTypeId);
 
                 if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeId))
                 {
-                    magicalItem.Shape = _resultFactory.GetShape(magicalItem.ShapeTypeId);
-
-                    //todo: set ShapeVisuals otherwise fallback to the default
+                    magicalItem.Shape = _typeRegistry.GetRegisteredTypes<IShape>()
+                        .First(x => x.TypeId.ToString() == magicalItem.ShapeTypeId);
 
                     magicalItem.ShapeVisuals = _typeRegistry.GetRegisteredTypes<IShapeVisuals>()
-                        .FirstOrDefault(v => v.ShapeTypeId == magicalItem.Shape.TypeId);
+                        .FirstOrDefault(v => v.TypeId.ToString() == magicalItem.ShapeVisualsTypeId);
                 }
             }
 

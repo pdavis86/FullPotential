@@ -210,6 +210,8 @@ namespace FullPotential.Api.Items.Base
 
         public float GetEffectTimeBetween()
         {
+            //todo: decrease time between effects but increase effect value
+
             var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0.5f, 1.5f);
             return returnValue;
         }

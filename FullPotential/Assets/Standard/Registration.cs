@@ -39,9 +39,6 @@ namespace FullPotential.Standard
                 typeof(Loot.Shard),
                 
                 typeof(ProjectileVisuals),
-                typeof(BeamVisuals),
-                typeof(SelfVisuals),
-                typeof(TouchVisuals),
                 typeof(WallVisuals),
                 typeof(ZoneVisuals),
 

@@ -162,6 +162,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0b5fd68a25a4ae04ab373c7fdb43b59a
+    m_Address: Core/Prefabs/Targeting/ProjectileVisuals.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 33676b6f1d960ea4db1d947cb63ee983
+    m_Address: Core/Prefabs/Targeting/BeamVisuals.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 101452080fc0cca43abdd31fc4649980, type: 2}
   m_SchemaSet:

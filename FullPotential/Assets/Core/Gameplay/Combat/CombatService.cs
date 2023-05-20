@@ -15,6 +15,7 @@ using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
 using System;
 using System.Linq;
+using FullPotential.Api.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -487,29 +488,40 @@ namespace FullPotential.Core.Gameplay.Combat
             }
             else
             {
-                parentTransform = consumer.TargetingVisuals.IsParentedToSource
+                parentTransform = consumer.Targeting.VisualsParentedToSource
                     ? sourceFighter.Transform
                     : GameManager.Instance.GetSceneBehaviour().GetTransform();
             }
 
-            SpawnConsumerVisuals(
-                consumer.TargetingVisuals.PrefabAddress,
-                parentTransform,
-                consumer,
-                sourceFighter,
-                startPosition,
-                direction,
-                visualsBehaviour =>
-                {
-                    if (visualsBehaviour != null && consumer.Targeting.IsContinuous)
+            var visualsPrefabAddress = (consumer.TargetingVisuals?.PrefabAddress)
+                .OrIfNullOrWhitespace(consumer.Targeting.VisualsFallbackPrefabAddress);
+
+            if (!visualsPrefabAddress.IsNullOrWhiteSpace())
+            {
+                _typeRegistry.LoadAddessable(
+                    visualsPrefabAddress,
+                    visualsPrefab =>
                     {
-                        consumer.Stoppables.Add(visualsBehaviour);
-                    }
-                });
+                        SpawnConsumerVisuals(
+                            visualsPrefab,
+                            parentTransform,
+                            consumer,
+                            sourceFighter,
+                            startPosition,
+                            direction,
+                            visualsBehaviour =>
+                            {
+                                if (visualsBehaviour != null && consumer.Targeting.IsContinuous)
+                                {
+                                    consumer.Stoppables.Add(visualsBehaviour);
+                                }
+                            });
+                    });
+            }
         }
 
         public void SpawnConsumerVisuals(
-            string prefabAddress,
+            GameObject visualsPrefab,
             Transform parentTransform,
             Consumer consumer,
             IFighter sourceFighter,
@@ -517,32 +529,27 @@ namespace FullPotential.Core.Gameplay.Combat
             Vector3 direction,
             Action<ConsumerVisualsBehaviour> handleVisualsBehaviour)
         {
-            _typeRegistry.LoadAddessable(
-                prefabAddress,
-                visualsPrefab =>
-                {
-                    var visualsGameObject = UnityEngine.Object.Instantiate(visualsPrefab, parentTransform);
-                    visualsGameObject.transform.localPosition = Vector3.zero;
-                    visualsGameObject.transform.localRotation = Quaternion.identity;
-                    visualsGameObject.transform.localScale = Vector3.one;
+            var visualsGameObject = UnityEngine.Object.Instantiate(visualsPrefab, parentTransform);
+            visualsGameObject.transform.localPosition = Vector3.zero;
+            visualsGameObject.transform.localRotation = Quaternion.identity;
+            visualsGameObject.transform.localScale = Vector3.one;
 
-                    consumer.Stoppables.Add(new DestroyStoppable(visualsGameObject));
+            consumer.Stoppables.Add(new DestroyStoppable(visualsGameObject));
 
-                    var visualsBehaviour = visualsGameObject.GetComponent<ConsumerVisualsBehaviour>();
+            var visualsBehaviour = visualsGameObject.GetComponent<ConsumerVisualsBehaviour>();
 
-                    if (visualsBehaviour != null)
-                    {
-                        visualsBehaviour.Consumer = consumer;
-                        visualsBehaviour.SourceFighter = sourceFighter;
-                        visualsBehaviour.StartPosition = startPosition;
-                        visualsBehaviour.Direction = direction;
-                    }
+            if (visualsBehaviour != null)
+            {
+                visualsBehaviour.Consumer = consumer;
+                visualsBehaviour.SourceFighter = sourceFighter;
+                visualsBehaviour.StartPosition = startPosition;
+                visualsBehaviour.Direction = direction;
+            }
 
-                    if (handleVisualsBehaviour != null)
-                    {
-                        handleVisualsBehaviour(visualsBehaviour);
-                    }
-                });
+            if (handleVisualsBehaviour != null)
+            {
+                handleVisualsBehaviour(visualsBehaviour);
+            }
         }
     }
 }

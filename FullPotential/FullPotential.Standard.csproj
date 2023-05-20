@@ -74,7 +74,6 @@
     <Compile Include="Assets\Standard\Effects\Debuffs\Fear.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Launch.cs" />
     <Compile Include="Assets\Standard\Armor\Chest.cs" />
-    <Compile Include="Assets\Standard\Targeting\BeamVisuals.cs" />
     <Compile Include="Assets\Standard\Shapes\WallVisuals.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveRight.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Weaken.cs" />
@@ -86,8 +85,6 @@
     <Compile Include="Assets\Standard\Weapons\Bow.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Conjure.cs" />
     <Compile Include="Assets\Standard\Weapons\Axe.cs" />
-    <Compile Include="Assets\Standard\Targeting\BeamVisualsBehaviour.cs" />
-    <Compile Include="Assets\Standard\Targeting\TouchVisuals.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\ManaTap.cs" />
     <Compile Include="Assets\Standard\Registration.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Ice.cs" />
@@ -97,7 +94,6 @@
     <Compile Include="Assets\Standard\Effects\Elements\Lightning.cs" />
     <Compile Include="Assets\Standard\Weapons\Gun.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Distract.cs" />
-    <Compile Include="Assets\Standard\Targeting\SelfVisuals.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Courage.cs" />
     <Compile Include="Assets\Standard\Scenes\Behaviours\ShopInteractable.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Fire.cs" />

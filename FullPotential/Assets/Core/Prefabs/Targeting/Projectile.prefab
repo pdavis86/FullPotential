@@ -75,3 +75,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55eeb65c1b6a81a43ba4779d982a3e2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _visualsFallbackAddress: Core/Prefabs/Targeting/ProjectileVisuals.prefab

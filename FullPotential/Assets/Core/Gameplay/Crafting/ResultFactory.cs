@@ -69,11 +69,6 @@ namespace FullPotential.Core.Gameplay.Crafting
             return result == 0 ? 1 : result;
         }
 
-        public ITargeting GetTargeting(string typeId)
-        {
-            return _targetingOptions.First(x => x.TypeId.ToString() == typeId);
-        }
-
         private ITargeting GetTargeting(IList<IHasTargetingAndShape> components)
         {
             //Exactly one targeting option

@@ -19,6 +19,10 @@ namespace FullPotential.Api.Gameplay.Targeting
 
         public bool IsContinuous => true;
 
+        public bool VisualsParentedToSource => true;
+
+        public string VisualsFallbackPrefabAddress => "Core/Prefabs/Targeting/BeamVisuals.prefab";
+
         public IEnumerable<ViableTarget> GetTargets(IFighter sourceFighter, Consumer consumer)
         {
             if (Physics.Raycast(sourceFighter.LookTransform.position, sourceFighter.LookTransform.forward, out var hit, consumer.GetRange()))

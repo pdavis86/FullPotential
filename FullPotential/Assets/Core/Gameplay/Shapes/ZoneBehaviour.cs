@@ -16,15 +16,21 @@ namespace FullPotential.Core.Gameplay.Shapes
         private const float DistanceFromGround = 1f;
 
         private ICombatService _combatService;
-
+        
         private float _timeSinceLastEffective;
         private float _timeBetweenEffects;
+
+#pragma warning disable CS0649
+        [SerializeField] private GameObject _visualsFallbackPrefab;
+#pragma warning restore CS0649
 
         public IFighter SourceFighter { get; set; }
 
         public Consumer Consumer { get; set; }
 
         public Vector3 Direction { get; set; }
+
+        public GameObject VisualsFallbackPrefab => _visualsFallbackPrefab;
 
         // ReSharper disable once UnusedMember.Local
         private void Start()

@@ -165,12 +165,12 @@
     <Compile Include="Assets\Api\Registry\Crafting\ICraftable.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\PlayerSettings.cs" />
     <Compile Include="Assets\Api\Modding\IMod.cs" />
+    <Compile Include="Assets\Api\Gameplay\Items\DestroyStoppable.cs" />
     <Compile Include="Assets\Api\Gameplay\Shapes\Zone.cs" />
     <Compile Include="Assets\Api\Obsolete\AffectableAttribute.cs" />
     <Compile Include="Assets\Api\Registry\Elements\IElement.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Tags.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\InventoryChanges.cs" />
-    <Compile Include="Assets\Api\Gameplay\Items\DestroyStoppable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Api\FullPotential.Api.asmdef" />

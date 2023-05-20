@@ -4,20 +4,13 @@ using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Standard.Targeting
+namespace FullPotential.Core.Gameplay.Targeting
 {
-    //todo: I think this whole class needs re-writing!
-
     public class BeamVisualsBehaviour : ConsumerVisualsBehaviour
     {
-#pragma warning disable 0649
-        [SerializeField] private float _leftRightAdjustment;
-#pragma warning restore 0649
-
         private Transform _cylinderParentTransform;
         private Transform _cylinderTransform;
         private float _maxBeamLength;
-        private bool _isLeftHand;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -31,10 +24,7 @@ namespace FullPotential.Standard.Targeting
         {
             _maxBeamLength = Consumer.GetRange();
 
-            //todo: _isLeftHand
-            _isLeftHand = false;
-
-            PerformGraphicsAdjustments();
+            SetInitialPositionAndParent();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -55,56 +45,39 @@ namespace FullPotential.Standard.Targeting
             }
             else
             {
-                targetDirection = SourceFighter.LookTransform.forward;
+                var pointAtMaxDistance = SourceFighter.LookTransform.position + (SourceFighter.LookTransform.forward * _maxBeamLength);
+                targetDirection = (pointAtMaxDistance - _cylinderParentTransform.position).normalized;
                 beamLength = _maxBeamLength;
             }
 
             UpdateBeam(targetDirection, beamLength);
         }
 
-        // ReSharper disable once UnusedMember.Global
-        public void OnDestroy()
+        public override void Stop()
         {
             Destroy(_cylinderParentTransform.gameObject);
         }
 
-        public override void Stop()
+        private void SetInitialPositionAndParent()
         {
-            Destroy(gameObject);
-        }
+            transform.position = StartPosition;
 
-        private void PerformGraphicsAdjustments()
-        {
-            if (!NetworkManager.Singleton.IsClient)
+            //Move the back end to the middle
+            _cylinderTransform.position += _cylinderTransform.up * _cylinderTransform.localScale.y;
+
+            if (SourceFighter.OwnerClientId == NetworkManager.LocalClientId)
             {
-                return;
-            }
+                //Parent to player head so the beam looks attached to the hand
+                _cylinderParentTransform.parent = SourceFighter.LookTransform;
 
-            _cylinderParentTransform.parent = SourceFighter.LookTransform;
-
-            if (SourceFighter.OwnerClientId == NetworkManager.Singleton.LocalClientId)
-            {
                 //Adjust for FoV
                 var adjustment = (Camera.main.fieldOfView - 50) * 0.0125f;
                 _cylinderParentTransform.position -= SourceFighter.Transform.forward * adjustment;
-
-                //Move it a little sideways
-                _cylinderParentTransform.position += (_isLeftHand ? _leftRightAdjustment : -_leftRightAdjustment) * SourceFighter.Transform.right;
             }
-
-            //Move the tip to the middle
-            _cylinderTransform.position += _cylinderTransform.up * _cylinderTransform.localScale.y;
-
-            _cylinderTransform.gameObject.SetActive(false);
         }
 
         private void UpdateBeam(Vector3 targetDirection, float beamLength)
         {
-            if (!NetworkManager.Singleton.IsClient)
-            {
-                return;
-            }
-
             _cylinderParentTransform.rotation = Quaternion.LookRotation(targetDirection);
 
             if (!Mathf.Approximately(_cylinderTransform.localScale.y * 2, beamLength))
@@ -112,13 +85,6 @@ namespace FullPotential.Standard.Targeting
                 _cylinderTransform.localScale = new Vector3(_cylinderTransform.localScale.x, beamLength / 2, _cylinderTransform.localScale.z);
                 _cylinderTransform.position = _cylinderParentTransform.position + (_cylinderTransform.up * _cylinderTransform.localScale.y);
             }
-
-            if (!_cylinderTransform.gameObject.activeInHierarchy)
-            {
-                _cylinderTransform.gameObject.SetActive(true);
-            }
-
-            //todo: zzz v0.4.1 - draw a ball that will hit the end when GetTimeBetweenEffects is up
         }
 
     }

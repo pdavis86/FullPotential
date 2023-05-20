@@ -71,6 +71,8 @@ namespace FullPotential.Core.Localization
 
             foreach (var item in data.Translations)
             {
+                //todo: should translations be prefixed with the mod name to prevent overwriting?
+
                 if (_translations.ContainsKey(item.Key))
                 {
                     Debug.LogWarning($"Translations already contains a value for key '{item.Key}'");

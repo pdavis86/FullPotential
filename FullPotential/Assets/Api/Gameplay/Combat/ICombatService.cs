@@ -20,7 +20,7 @@ namespace FullPotential.Api.Gameplay.Combat
         void SpawnConsumerGameObjects(IFighter sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction);
 
         void SpawnConsumerVisuals(
-            string prefabAddress,
+            GameObject visualsPrefab,
             Transform parentTransform,
             Consumer consumer,
             IFighter sourceFighter,
