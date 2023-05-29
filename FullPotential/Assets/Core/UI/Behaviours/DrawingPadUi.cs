@@ -174,8 +174,13 @@ namespace FullPotential.Core.UI.Behaviours
             CheckForShape(rawMousePosition);
         }
 
-        public void StopDrawing()
+        public void StopDrawing(SlotGameObjectName slotGameObjectName)
         {
+            if (slotGameObjectName != _slotGameObjectName)
+            {
+                return;
+            }
+
             _isDrawing = false;
 
             _canvasRenderer.SetMesh(new Mesh());

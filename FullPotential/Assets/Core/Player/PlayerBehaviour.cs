@@ -210,7 +210,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.StopDrawing();
+                _drawingPadUi.StopDrawing(SlotGameObjectName.LeftHand);
             }
 
             OnAttack(true);
@@ -237,7 +237,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.StopDrawing();
+                _drawingPadUi.StopDrawing(SlotGameObjectName.RightHand);
             }
 
             OnAttack(false);

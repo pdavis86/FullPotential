@@ -16,7 +16,7 @@ namespace FullPotential.Core.Gameplay.Shapes
         private const float DistanceFromGround = 1f;
 
         private ICombatService _combatService;
-        
+
         private float _timeSinceLastEffective;
         private float _timeBetweenEffects;
 
@@ -76,18 +76,10 @@ namespace FullPotential.Core.Gameplay.Shapes
 
             _timeSinceLastEffective = 0;
 
-            ApplyEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
-        }
-
-        private void ApplyEffects(GameObject target, Vector3? position)
-        {
-            if (!NetworkManager.Singleton.IsServer)
-            {
-                return;
-            }
-
+            var position = other.ClosestPointOnBounds(transform.position);
             var adjustedPosition = position + new Vector3(0, DistanceFromGround);
-            _combatService.ApplyEffects(SourceFighter, Consumer, target, adjustedPosition);
+
+            _combatService.ApplyEffects(SourceFighter, Consumer, other.gameObject, adjustedPosition);
         }
 
         private void DestroyGameObjectAndChildren()
