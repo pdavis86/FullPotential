@@ -22,6 +22,9 @@ namespace FullPotential.Core.Gameplay.Targeting
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
+            //todo: the problem is that the client does not have access to all of the data it needs
+            //can we just send it the end position?
+
             _maxBeamLength = Consumer.GetRange();
 
             SetInitialPositionAndParent();
@@ -64,6 +67,7 @@ namespace FullPotential.Core.Gameplay.Targeting
         public override void Stop()
         {
             Destroy(_cylinderParentTransform.gameObject);
+            Destroy(gameObject);
         }
 
         private void SetInitialPositionAndParent()

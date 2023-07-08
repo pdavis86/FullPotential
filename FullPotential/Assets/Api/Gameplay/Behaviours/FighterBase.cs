@@ -481,11 +481,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var attackDirection = GetAttackDirection(handPosition, ConsumerRangeLimit);
 
-            if (IsServer)
+            if (!IsServer)
             {
+                return true;
+            }
+
             ConsumeResource(consumer);
 
-                _combatService.SpawnTargetingGameObject(this, consumer, handPosition, attackDirection);
+            _combatService.SpawnTargetingGameObject(this, consumer, handPosition, attackDirection);
 
             var targets = consumer.Targeting.GetTargets(this, consumer);
 
@@ -497,12 +500,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     _combatService.ApplyEffects(this, consumer, target.GameObject, target.Position);
                 }
             }
-            }
 
-            if (IsClient)
-            {
-                _combatService.SpawnTargetingVisuals(this, consumer, handPosition, attackDirection);
-            }
+            _combatService.SpawnTargetingVisuals(this, consumer, handPosition, attackDirection);
 
             return true;
         }
@@ -637,7 +636,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (!isTest)
             {
-                resourceVariable.Value -= resourceCost;
+                //todo: resourceVariable.Value -= resourceCost;
             }
 
             return true;

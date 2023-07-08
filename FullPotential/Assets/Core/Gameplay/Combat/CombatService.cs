@@ -488,7 +488,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (consumer.Targeting is Projectile)
             {
-                targetingGameObject = SpawnTargetingProjectile(sourceFighter, consumer, startPosition, direction);
+                targetingGameObject = SpawnProjectileGameObject(sourceFighter, consumer, startPosition, direction);
             }
             else if (consumer.Targeting is PointToPoint)
             {
@@ -498,8 +498,6 @@ namespace FullPotential.Core.Gameplay.Combat
                 targetingBehaviour.SourceFighter = sourceFighter;
                 targetingBehaviour.Consumer = consumer;
                 targetingBehaviour.Direction = direction;
-
-                targetingGameObject.NetworkSpawn(false);
             }
 
             if (targetingGameObject != null)
@@ -508,7 +506,7 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private GameObject SpawnTargetingProjectile(IFighter sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction)
+        private GameObject SpawnProjectileGameObject(IFighter sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction)
         {
             var targetingGameObject = UnityEngine.Object.Instantiate(GameManager.Instance.Prefabs.Combat.Projectile, startPosition, Quaternion.identity);
 
@@ -546,6 +544,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 ? sourceFighter.Transform
                 : GameManager.Instance.GetSceneBehaviour().GetTransform());
 
+            //todo: zzz v0.5 - don't load Core visuals from addressables
             _typeRegistry.LoadAddessable(
                 visualsPrefabAddress,
                 visualsPrefab =>

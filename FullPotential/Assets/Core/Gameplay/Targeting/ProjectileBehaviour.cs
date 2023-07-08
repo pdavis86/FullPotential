@@ -39,6 +39,8 @@ namespace FullPotential.Core.Gameplay.Targeting
                 return;
             }
 
+            //todo: Destroy(gameObject, 3f);
+
             Physics.IgnoreCollision(GetComponent<Collider>(), SourceFighter.GameObject.GetComponent<Collider>());
 
             var affectedByGravity = Consumer.Shape != null;
