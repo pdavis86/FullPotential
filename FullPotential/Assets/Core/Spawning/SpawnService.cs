@@ -25,6 +25,18 @@ namespace FullPotential.Core.Spawning
             return _groundCollider.ClosestPointOnBounds(startingPoint);
         }
 
+        public Vector3 GetPositionAboveGround(Vector3 startingPoint, Collider collider)
+        {
+            var groundClosestPoint = GetPositionAboveGround(startingPoint);
+
+            var gameObjectHeight = collider.bounds.max.y - collider.bounds.min.y;
+
+            return new Vector3(
+                startingPoint.x,
+                groundClosestPoint.y + (gameObjectHeight / 2f),
+                startingPoint.z);
+        }
+
         public void AdjustPositionToBeAboveGround(Vector3 startingPoint, Transform transform, bool removeHalfHeight = true)
         {
             var groundClosestPoint = GetPositionAboveGround(startingPoint);

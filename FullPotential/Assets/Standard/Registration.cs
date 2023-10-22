@@ -15,6 +15,7 @@ namespace FullPotential.Standard
         {
             return new[]
             {
+                //todo: Armor classes need renaming to be less generic
                 typeof(Armor.Helm),
                 typeof(Armor.Chest),
                 typeof(Armor.Legs),
@@ -90,11 +91,7 @@ namespace FullPotential.Standard
 
         public IEnumerable<string> GetNetworkPrefabAddresses()
         {
-            return new[]
-            {
-                WallVisuals.NetworkPrefabAddress,
-                ZoneVisuals.NetworkPrefabAddress
-            };
+            return Array.Empty<string>();
         }
     }
 }

@@ -1,0 +1,15 @@
+﻿using UnityEngine;
+
+namespace FullPotential.Api.Gameplay.Targeting
+{
+    public interface ITargetingVisualsBehaviour
+    {
+        public Vector3 StartPosition { get; set; }
+
+        public Vector3 StartDirection { get; set; }
+
+        public bool IsLocalPlayer { get; set; }
+
+        public void UpdateVisuals(Vector3 origin, Vector3 direction, float maxRange);
+    }
+}

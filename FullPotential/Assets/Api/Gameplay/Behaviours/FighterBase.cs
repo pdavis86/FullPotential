@@ -364,8 +364,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : _inventory.GetItemInSlot(SlotGameObjectName.RightHand);
 
             var handPosition = isLeftHand
-                ? Positions.LeftHandInFront.position
-                : Positions.RightHandInFront.position;
+                ? Positions.LeftHand.position
+                : Positions.RightHand.position;
 
             switch (itemInHand)
             {
@@ -500,8 +500,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     _combatService.ApplyEffects(this, consumer, target.GameObject, target.Position);
                 }
             }
-
-            _combatService.SpawnTargetingVisuals(this, consumer, handPosition, attackDirection);
 
             return true;
         }

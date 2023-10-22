@@ -1,9 +1,12 @@
+using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Shapes;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
+using FullPotential.Api.Utilities.Extensions;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -11,16 +14,13 @@ using UnityEngine;
 
 namespace FullPotential.Core.Gameplay.Shapes
 {
-    public class WallBehaviour : MonoBehaviour, IShapeBehaviour
+    public class WallBehaviour : NetworkBehaviour, IShapeBehaviour
     {
         private ICombatService _combatService;
+        private ITypeRegistry _typeRegistry;
 
         private float _timeSinceLastEffective;
         private float _timeBetweenEffects;
-
-#pragma warning disable CS0649
-        [SerializeField] private GameObject _visualsFallbackPrefab;
-#pragma warning restore CS0649
 
         public IFighter SourceFighter { get; set; }
 
@@ -28,12 +28,21 @@ namespace FullPotential.Core.Gameplay.Shapes
 
         public Vector3 Direction { get; set; }
 
-        public GameObject VisualsFallbackPrefab => _visualsFallbackPrefab;
+        private readonly NetworkVariable<FixedString4096Bytes> _visualsPrefabAddress = new NetworkVariable<FixedString4096Bytes>();
+
+        // ReSharper disable once UnusedMember.Local
+        private void Awake()
+        {
+            _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
+            _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
+
+            _visualsPrefabAddress.OnValueChanged += HandleVisualsPrefabAddressValueChanged;
+        }
 
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            if (!NetworkManager.Singleton.IsServer)
+            if (!IsServer)
             {
                 return;
             }
@@ -47,16 +56,17 @@ namespace FullPotential.Core.Gameplay.Shapes
 
             Invoke(nameof(DestroyGameObjectAndChildren), Consumer.GetEffectDuration());
 
-            _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
-
             _timeBetweenEffects = Consumer.GetEffectTimeBetween();
             _timeSinceLastEffective = _timeBetweenEffects;
+
+            _visualsPrefabAddress.Value = (Consumer.ShapeVisuals?.PrefabAddress)
+                .OrIfNullOrWhitespace(Consumer.Shape.VisualsFallbackPrefabAddress);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnTriggerStay(Collider other)
         {
-            if (!NetworkManager.Singleton.IsServer)
+            if (!IsServer)
             {
                 return;
             }
@@ -77,9 +87,26 @@ namespace FullPotential.Core.Gameplay.Shapes
             ApplyEffects(other.gameObject, other.ClosestPointOnBounds(transform.position));
         }
 
+        private void HandleVisualsPrefabAddressValueChanged(FixedString4096Bytes previousValue, FixedString4096Bytes newValue)
+        {
+            if (_visualsPrefabAddress.Value.ToString().IsNullOrWhiteSpace())
+            {
+                Debug.LogError("Cannot spawn visuals as no prefab address was provided");
+                return;
+            }
+
+            _typeRegistry.LoadAddessable(
+                _visualsPrefabAddress.Value.ToString(),
+                visualsPrefab =>
+                {
+                    var visualsGameObject = Instantiate(visualsPrefab, transform);
+                    visualsGameObject.transform.localScale = Vector3.one;
+                });
+        }
+
         private void ApplyEffects(GameObject target, Vector3? position)
         {
-            if (!NetworkManager.Singleton.IsServer)
+            if (!IsServer)
             {
                 return;
             }

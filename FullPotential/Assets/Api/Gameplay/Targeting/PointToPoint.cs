@@ -9,17 +9,13 @@ namespace FullPotential.Api.Gameplay.Targeting
 {
     public class PointToPoint : ITargeting
     {
-        public const string Id = "3c528d09-bd4f-4211-af17-d8721975fef1";
-
-        public Guid TypeId => new Guid(Id);
+        public Guid TypeId => new Guid("3c528d09-bd4f-4211-af17-d8721975fef1");
 
         public string TypeName => nameof(PointToPoint);
 
         public bool CanHaveShape => false;
 
         public bool IsContinuous => true;
-
-        public bool VisualsParentedToSource => true;
 
         public string VisualsFallbackPrefabAddress => "Core/Prefabs/Targeting/BeamVisuals.prefab";
 

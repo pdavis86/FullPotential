@@ -11,8 +11,6 @@ namespace FullPotential.Api.Registry.Targeting
 
         bool IsContinuous { get; }
 
-        bool VisualsParentedToSource { get; }
-
         string VisualsFallbackPrefabAddress { get; }
 
         IEnumerable<ViableTarget> GetTargets(IFighter sourceFighter, Consumer consumer);

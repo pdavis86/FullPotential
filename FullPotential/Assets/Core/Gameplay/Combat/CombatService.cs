@@ -10,13 +10,12 @@ using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
+using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
 using System;
 using System.Linq;
-using FullPotential.Api.Unity.Extensions;
-using FullPotential.Api.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -138,6 +137,7 @@ namespace FullPotential.Core.Gameplay.Combat
             GameObject target,
             Vector3? position)
         {
+            //todo: this should be client-side only
             //todo: zzz v0.6 - SpawnBulletHole only works for box colliders that line up with the X and Z alias
 
             if (!position.HasValue)
@@ -484,31 +484,23 @@ namespace FullPotential.Core.Gameplay.Combat
 
         public void SpawnTargetingGameObject(IFighter sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction)
         {
-            GameObject targetingGameObject = null;
+            GameObject prefab;
 
-            if (consumer.Targeting is Projectile)
+            switch (consumer.Targeting)
             {
-                targetingGameObject = SpawnProjectileGameObject(sourceFighter, consumer, startPosition, direction);
-            }
-            else if (consumer.Targeting is PointToPoint)
-            {
-                targetingGameObject = UnityEngine.Object.Instantiate(GameManager.Instance.Prefabs.Combat.PointToPoint, startPosition, Quaternion.identity);
+                case Projectile:
+                    prefab = GameManager.Instance.Prefabs.Combat.Projectile;
+                    break;
 
-                var targetingBehaviour = targetingGameObject.GetComponent<ITargetingBehaviour>();
-                targetingBehaviour.SourceFighter = sourceFighter;
-                targetingBehaviour.Consumer = consumer;
-                targetingBehaviour.Direction = direction;
+                case PointToPoint:
+                    prefab = GameManager.Instance.Prefabs.Combat.PointToPoint;
+                    break;
+
+                default:
+                    throw new Exception("Unexpected targeting: " + consumer.Targeting);
             }
 
-            if (targetingGameObject != null)
-            {
-                consumer.Stoppables.Add(new DestroyStoppable(targetingGameObject));
-            }
-        }
-
-        private GameObject SpawnProjectileGameObject(IFighter sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction)
-        {
-            var targetingGameObject = UnityEngine.Object.Instantiate(GameManager.Instance.Prefabs.Combat.Projectile, startPosition, Quaternion.identity);
+            var targetingGameObject = UnityEngine.Object.Instantiate(prefab, startPosition, Quaternion.identity);
 
             var targetingBehaviour = targetingGameObject.GetComponent<ITargetingBehaviour>();
             targetingBehaviour.SourceFighter = sourceFighter;
@@ -517,96 +509,12 @@ namespace FullPotential.Core.Gameplay.Combat
 
             targetingGameObject.NetworkSpawn();
 
-            //todo: zzz v0.5 - allow mods to supply custom visuals
-            var visualsGameObject = UnityEngine.Object.Instantiate(GameManager.Instance.Prefabs.Combat.ProjectileVisuals, targetingGameObject.transform.position, Quaternion.identity);
-
-            visualsGameObject.NetworkSpawn();
-
-            visualsGameObject.transform.parent = targetingGameObject.transform;
-
-            consumer.Stoppables.Add(new DestroyStoppable(visualsGameObject));
-
-            return targetingGameObject;
-        }
-
-        private void SpawnTargetingVisualsInternal(IFighter sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction, Transform parentTransform = null)
-        {
-            var visualsPrefabAddress = (consumer.TargetingVisuals?.PrefabAddress)
-                .OrIfNullOrWhitespace(consumer.Targeting.VisualsFallbackPrefabAddress);
-
-            if (visualsPrefabAddress.IsNullOrWhiteSpace())
+            if (consumer.Targeting is PointToPoint)
             {
-                Debug.LogWarning($"Missing targeting visuals prefab address for consumer {consumer.Name}");
-                return;
+                targetingGameObject.transform.parent = sourceFighter.Transform;
             }
 
-            var parentTransformChecked = parentTransform ?? (consumer.Targeting.VisualsParentedToSource
-                ? sourceFighter.Transform
-                : GameManager.Instance.GetSceneBehaviour().GetTransform());
-
-            //todo: zzz v0.5 - don't load Core visuals from addressables
-            _typeRegistry.LoadAddessable(
-                visualsPrefabAddress,
-                visualsPrefab =>
-                {
-                    SpawnConsumerVisuals(
-                        visualsPrefab,
-                        parentTransformChecked,
-                        consumer,
-                        sourceFighter,
-                        startPosition,
-                        direction,
-                        visualsBehaviour =>
-                        {
-                            if (visualsBehaviour != null && consumer.Targeting.IsContinuous)
-                            {
-                                consumer.Stoppables.Add(visualsBehaviour);
-                            }
-                        });
-                });
-        }
-
-        public void SpawnTargetingVisuals(IFighter sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction, Transform parentTransform = null)
-        {
-            if (consumer.Targeting is Projectile)
-            {
-                return;
-            }
-
-            SpawnTargetingVisualsInternal(sourceFighter, consumer, startPosition, direction, parentTransform);
-        }
-
-        public void SpawnConsumerVisuals(
-            GameObject visualsPrefab,
-            Transform parentTransform,
-            Consumer consumer,
-            IFighter sourceFighter,
-            Vector3 startPosition,
-            Vector3 direction,
-            Action<ConsumerVisualsBehaviour> handleVisualsBehaviour)
-        {
-            var visualsGameObject = UnityEngine.Object.Instantiate(visualsPrefab);
-
-            visualsGameObject.NetworkSpawn();
-
-            visualsGameObject.transform.parent = parentTransform;
-
-            visualsGameObject.transform.Reset();
-
-            var visualsBehaviour = visualsGameObject.GetComponent<ConsumerVisualsBehaviour>();
-
-            if (visualsBehaviour != null)
-            {
-                visualsBehaviour.SourceFighter = sourceFighter;
-                visualsBehaviour.Consumer = consumer;
-                visualsBehaviour.StartPosition = startPosition;
-                visualsBehaviour.Direction = direction;
-            }
-
-            if (handleVisualsBehaviour != null)
-            {
-                handleVisualsBehaviour(visualsBehaviour);
-            }
+            consumer.Stoppables.Add(new DestroyStoppable(targetingGameObject));
         }
     }
 }

@@ -2,5 +2,6 @@
 {
     public interface IShape : IRegisterable
     {
+        string VisualsFallbackPrefabAddress { get; }
     }
 }

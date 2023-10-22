@@ -1,16 +1,20 @@
-﻿using FullPotential.Api.Gameplay.Items;
-using Unity.Netcode;
+﻿using FullPotential.Api.Gameplay.Targeting;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Gameplay.Targeting
 {
-    public class BeamVisualsBehaviour : ConsumerVisualsBehaviour
+    public class BeamVisualsBehaviour : MonoBehaviour, ITargetingVisualsBehaviour
     {
         private Transform _cylinderParentTransform;
         private Transform _cylinderTransform;
-        private float _maxBeamLength;
+
+        public Vector3 StartPosition { get; set; }
+
+        public Vector3 StartDirection { get; set; }
+
+        public bool IsLocalPlayer { get; set; }
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -22,74 +26,44 @@ namespace FullPotential.Core.Gameplay.Targeting
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            //todo: the problem is that the client does not have access to all of the data it needs
-            //can we just send it the end position?
-
-            _maxBeamLength = Consumer.GetRange();
-
             SetInitialPositionAndParent();
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void FixedUpdate()
+        private void OnDestroy()
         {
-            if (SourceFighter == null)
-            {
-                //They logged out or crashed
-                Stop();
-                Destroy(gameObject);
-                return;
-            }
+            Destroy(_cylinderParentTransform.gameObject);
+        }
 
+        private void SetInitialPositionAndParent()
+        {
+            //Move the back end to the middle
+            _cylinderTransform.position += _cylinderTransform.up * _cylinderTransform.localScale.y;
+
+            if (IsLocalPlayer)
+            {
+                //Adjust for FoV
+                var adjustment = (Camera.main.fieldOfView - 50) * 0.0125f;
+                _cylinderParentTransform.position -= StartDirection * adjustment;
+            }
+        }
+
+        public void UpdateVisuals(Vector3 origin, Vector3 direction, float maxRange)
+        {
             Vector3 targetDirection;
             float beamLength;
-            if (Physics.Raycast(SourceFighter.LookTransform.position, SourceFighter.LookTransform.forward, out var hit, _maxBeamLength))
+            if (Physics.Raycast(origin, direction, out var hit, maxRange))
             {
-                if (hit.transform.gameObject == SourceFighter.GameObject)
-                {
-                    Debug.LogWarning("Beam is hitting the source player!");
-                    return;
-                }
-
                 targetDirection = (hit.point - _cylinderParentTransform.position).normalized;
                 beamLength = Vector3.Distance(_cylinderParentTransform.position, hit.point);
             }
             else
             {
-                var pointAtMaxDistance = SourceFighter.LookTransform.position + (SourceFighter.LookTransform.forward * _maxBeamLength);
+                var pointAtMaxDistance = origin + (direction * maxRange);
                 targetDirection = (pointAtMaxDistance - _cylinderParentTransform.position).normalized;
-                beamLength = _maxBeamLength;
+                beamLength = maxRange;
             }
 
-            UpdateBeam(targetDirection, beamLength);
-        }
-
-        public override void Stop()
-        {
-            Destroy(_cylinderParentTransform.gameObject);
-            Destroy(gameObject);
-        }
-
-        private void SetInitialPositionAndParent()
-        {
-            transform.position = StartPosition;
-
-            //Move the back end to the middle
-            _cylinderTransform.position += _cylinderTransform.up * _cylinderTransform.localScale.y;
-
-            if (SourceFighter.OwnerClientId == NetworkManager.Singleton.LocalClientId)
-            {
-                //Parent to player head so the beam looks attached to the hand
-                _cylinderParentTransform.parent = SourceFighter.LookTransform;
-
-                //Adjust for FoV
-                var adjustment = (Camera.main.fieldOfView - 50) * 0.0125f;
-                _cylinderParentTransform.position -= SourceFighter.Transform.forward * adjustment;
-            }
-        }
-
-        private void UpdateBeam(Vector3 targetDirection, float beamLength)
-        {
             _cylinderParentTransform.rotation = Quaternion.LookRotation(targetDirection);
 
             if (!Mathf.Approximately(_cylinderTransform.localScale.y * 2, beamLength))

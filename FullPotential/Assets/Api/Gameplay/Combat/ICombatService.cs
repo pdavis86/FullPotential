@@ -1,6 +1,4 @@
-﻿using System;
-using FullPotential.Api.Gameplay.Items;
-using FullPotential.Api.Items.Base;
+﻿using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using UnityEngine;
 
@@ -30,21 +28,5 @@ namespace FullPotential.Api.Gameplay.Combat
             Consumer consumer,
             Vector3 startPosition,
             Vector3 direction);
-
-        void SpawnTargetingVisuals(
-            IFighter sourceFighter,
-            Consumer consumer,
-            Vector3 startPosition,
-            Vector3 direction,
-            Transform parentTransform = null);
-
-        void SpawnConsumerVisuals(
-            GameObject visualsPrefab,
-            Transform parentTransform,
-            Consumer consumer,
-            IFighter sourceFighter,
-            Vector3 startPosition,
-            Vector3 direction,
-            Action<ConsumerVisualsBehaviour> handleVisualsBehaviour);
     }
 }
