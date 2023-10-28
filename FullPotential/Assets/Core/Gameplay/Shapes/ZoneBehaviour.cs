@@ -70,6 +70,7 @@ namespace FullPotential.Core.Gameplay.Shapes
         private void OnTriggerEnter(Collider other)
         {
             _colliders.Add(other);
+            ApplyEffects(other);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -99,6 +100,11 @@ namespace FullPotential.Core.Gameplay.Shapes
 
             _timeSinceLastEffective = 0;
 
+            ApplyEffects(other);
+        }
+
+        private void ApplyEffects(Collider other)
+        {
             var position = other.ClosestPointOnBounds(transform.position);
             var adjustedPosition = position + new Vector3(0, DistanceFromGround);
 
