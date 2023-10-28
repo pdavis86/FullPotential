@@ -313,8 +313,6 @@ namespace FullPotential.Core.Gameplay.Combat
                 return;
             }
 
-            //todo: handle networking
-
             var comp = targetGameObject.AddComponent<MaintainDistance>();
             comp.SourceFighter = sourceFighter;
             comp.Distance = (targetGameObject.transform.position - sourceFighter.Transform.position).magnitude;

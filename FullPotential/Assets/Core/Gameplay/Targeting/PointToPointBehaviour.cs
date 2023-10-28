@@ -27,7 +27,7 @@ namespace FullPotential.Core.Gameplay.Targeting
         private GameObject _visualsGameObject;
         private ITargetingVisualsBehaviour _visualsBehaviour;
 
-        private readonly NetworkVariable<long> _fighterClientId = new NetworkVariable<long>();
+        private readonly NetworkVariable<bool> _isLocalOwner = new NetworkVariable<bool>();
         private readonly NetworkVariable<Vector3> _startDirection = new NetworkVariable<Vector3>();
         private readonly NetworkVariable<FixedString4096Bytes> _visualsPrefabAddress = new NetworkVariable<FixedString4096Bytes>();
 
@@ -57,16 +57,21 @@ namespace FullPotential.Core.Gameplay.Targeting
 
             _applyEffectsAction = new DelayedAction(
                 Consumer.GetEffectTimeBetween(),
-                () => _combatService.ApplyEffects(SourceFighter, Consumer, _hit.transform.gameObject, _hit.point));
+                ApplyEffectsOnHit);
 
             _maxBeamLength = Consumer.GetRange();
 
-            _fighterClientId.Value = (long)SourceFighter.OwnerClientId;
+            _isLocalOwner.Value = SourceFighter.OwnerClientId == NetworkManager.Singleton.LocalClientId;
 
             _startDirection.Value = Direction;
 
             _visualsPrefabAddress.Value = (Consumer.TargetingVisuals?.PrefabAddress)
                 .OrIfNullOrWhitespace(Consumer.Targeting.VisualsFallbackPrefabAddress);
+        }
+
+        private void ApplyEffectsOnHit()
+        {
+            _combatService.ApplyEffects(SourceFighter, Consumer, _hit.transform.gameObject, _hit.point);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -97,11 +102,16 @@ namespace FullPotential.Core.Gameplay.Targeting
                 if (IsServer)
                 {
                     _applyEffectsAction.TryPerformAction();
+
+                    var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
+                    UpdateVisualsClientRpc(true, hit.point, SourceFighter.LookTransform.position, SourceFighter.LookTransform.forward, _maxBeamLength, nearbyClients);
                 }
             }
-
-            var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-            UpdateVisualsClientRpc(SourceFighter.LookTransform.position, SourceFighter.LookTransform.forward, _maxBeamLength, nearbyClients);
+            else if (IsServer)
+            {
+                var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
+                UpdateVisualsClientRpc(false, Vector3.zero, SourceFighter.LookTransform.position, SourceFighter.LookTransform.forward, _maxBeamLength, nearbyClients);
+            }
         }
 
         public override void OnDestroy()
@@ -113,9 +123,9 @@ namespace FullPotential.Core.Gameplay.Targeting
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        private void UpdateVisualsClientRpc(Vector3 origin, Vector3 direction, float maxRange, ClientRpcParams clientRpcParams)
+        private void UpdateVisualsClientRpc(bool isHitting, Vector3 hitPoint, Vector3 origin, Vector3 direction, float maxRange, ClientRpcParams clientRpcParams)
         {
-            _visualsBehaviour?.UpdateVisuals(origin, direction, maxRange);
+            _visualsBehaviour?.UpdateVisuals(isHitting, hitPoint, origin, direction, maxRange);
         }
 
         private void HandleVisualsPrefabAddressValueChanged(FixedString4096Bytes previousValue, FixedString4096Bytes newValue)
@@ -133,14 +143,12 @@ namespace FullPotential.Core.Gameplay.Targeting
                     _visualsGameObject = Instantiate(visualsPrefab, transform);
                     _visualsGameObject.transform.Reset();
 
-                    var sourceFighterClientId = (ulong)_fighterClientId.Value;
-
                     _visualsBehaviour = _visualsGameObject.GetComponent<ITargetingVisualsBehaviour>();
                     _visualsBehaviour.StartPosition = transform.position;
                     _visualsBehaviour.StartDirection = _startDirection.Value;
-                    _visualsBehaviour.IsLocalOwner = sourceFighterClientId == NetworkManager.Singleton.LocalClientId;
+                    _visualsBehaviour.IsLocalOwner = _isLocalOwner.Value;
 
-                    if (_visualsBehaviour.IsLocalOwner)
+                    if (_isLocalOwner.Value)
                     {
                         var sourceFighter = NetworkManager.LocalClient.PlayerObject.GetComponent<IFighter>();
 

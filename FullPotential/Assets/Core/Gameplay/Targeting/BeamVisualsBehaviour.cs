@@ -26,7 +26,7 @@ namespace FullPotential.Core.Gameplay.Targeting
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            SetInitialPositionAndParent();
+            AdjustForFieldOfView();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -35,11 +35,8 @@ namespace FullPotential.Core.Gameplay.Targeting
             Destroy(_cylinderParentTransform.gameObject);
         }
 
-        private void SetInitialPositionAndParent()
+        private void AdjustForFieldOfView()
         {
-            //Move the back end to the middle
-            _cylinderTransform.position += _cylinderTransform.up * _cylinderTransform.localScale.y;
-
             if (IsLocalOwner)
             {
                 //Adjust for FoV
@@ -48,14 +45,14 @@ namespace FullPotential.Core.Gameplay.Targeting
             }
         }
 
-        public void UpdateVisuals(Vector3 origin, Vector3 direction, float maxRange)
+        public void UpdateVisuals(bool isHitting, Vector3 hitPoint, Vector3 origin, Vector3 direction, float maxRange)
         {
             Vector3 targetDirection;
             float beamLength;
-            if (Physics.Raycast(origin, direction, out var hit, maxRange))
+            if (isHitting)
             {
-                targetDirection = (hit.point - _cylinderParentTransform.position).normalized;
-                beamLength = Vector3.Distance(_cylinderParentTransform.position, hit.point);
+                targetDirection = (hitPoint - _cylinderParentTransform.position).normalized;
+                beamLength = Vector3.Distance(_cylinderParentTransform.position, hitPoint);
             }
             else
             {

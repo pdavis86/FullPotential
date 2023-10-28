@@ -365,8 +365,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : _inventory.GetItemInSlot(SlotGameObjectName.RightHand);
 
             var handPosition = isLeftHand
-                ? Positions.LeftHandInFront.position
-                : Positions.RightHandInFront.position;
+                ? Positions.LeftHand.position
+                : Positions.RightHand.position;
 
             switch (itemInHand)
             {
@@ -383,13 +383,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     Debug.LogWarning("Not implemented attack for " + itemInHand.Name + " yet");
                     return false;
             }
-        }
-
-        private Vector3 GetAttackDirection(Vector3 handPosition, float maxDistance)
-        {
-            return Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, maxDistance)
-                ? (hit.point - handPosition).normalized
-                : LookTransform.forward;
         }
 
         private bool Punch()
@@ -480,7 +473,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 StartConsumerCooldown(leftOrRight);
             }
 
-            var attackDirection = GetAttackDirection(handPosition, ConsumerRangeLimit);
+            var attackDirection = Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, ConsumerRangeLimit)
+                ? (hit.point - handPosition).normalized
+                : LookTransform.forward;
 
             if (!IsServer)
             {
@@ -491,7 +486,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var targets = consumer.Targeting.GetTargets(this, consumer);
 
-            if (consumer.Shape == null)
+            if (targets == null || consumer.Shape == null)
             {
                 _combatService.SpawnTargetingGameObject(this, consumer, handPosition, attackDirection);
 
@@ -504,9 +499,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     }
                 }
             }
-            else
+            else if (consumer.Shape != null)
             {
-                _combatService.SpawnShapeGameObject(this, consumer, null, transform.position, attackDirection);
+                _combatService.SpawnShapeGameObject(this, consumer, null, transform.position, transform.forward);
             }
 
             return true;

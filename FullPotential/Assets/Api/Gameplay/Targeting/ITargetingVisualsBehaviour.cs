@@ -10,6 +10,6 @@ namespace FullPotential.Api.Gameplay.Targeting
 
         public bool IsLocalOwner { get; set; }
 
-        public void UpdateVisuals(Vector3 origin, Vector3 direction, float maxRange);
+        public void UpdateVisuals(bool isHitting, Vector3 hitPoint, Vector3 origin, Vector3 direction, float maxRange);
     }
 }

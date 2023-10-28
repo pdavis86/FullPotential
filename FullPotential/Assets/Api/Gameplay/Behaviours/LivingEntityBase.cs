@@ -561,6 +561,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var vertical = velocity.y > VelocityThreshold ? velocity.y - VelocityThreshold : 0;
 
+            //todo: fall damage is too much
+
             var basicDamage = math.pow((horizontal + vertical) * 10, 1.3) * -1;
             return (int)basicDamage;
         }

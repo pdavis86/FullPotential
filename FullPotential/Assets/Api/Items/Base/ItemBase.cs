@@ -298,10 +298,10 @@ namespace FullPotential.Api.Items.Base
             return (change, DateTime.Now.AddSeconds(timeToLive));
         }
 
-        public Vector3 GetShotDirection(Vector3 lookDirection)
+        public Vector3 GetShotDirection(Vector3 aimDirection)
         {
             var maxAccuracyAngleDeviation = (101 - GetAccuracy()) / 100f * MaximumAccuracyAngleDeviation;
-            return lookDirection.AddNoiseOnAngle(-maxAccuracyAngleDeviation, maxAccuracyAngleDeviation);
+            return aimDirection.AddNoiseOnAngle(-maxAccuracyAngleDeviation, maxAccuracyAngleDeviation);
         }
 
     }
