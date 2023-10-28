@@ -73,7 +73,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 {
                     //Debug.LogWarning("Target is not an IFighter. Target was: " + target);
 
-                    //todo: zzz v0.6 - make SpawnBulletHole a VisualsBehaviour on BulletTrail
+                    //todo: zzz v0.5 - make SpawnBulletHole a VisualsBehaviour on BulletTrail
                     if (itemIsWeapon)
                     {
                         var registryType = (IWeapon)itemUsed.RegistryType;
@@ -140,8 +140,8 @@ namespace FullPotential.Core.Gameplay.Combat
             GameObject target,
             Vector3? position)
         {
-            //todo: zzz v0.4.1 - this should be client-side only
-            //todo: zzz v0.6 - SpawnBulletHole only works for box colliders that line up with the X and Z alias
+            //todo: zzz v0.4 - this should be client-side only
+            //todo: zzz v0.5 - SpawnBulletHole only works for box colliders that line up with the X and Z alias
 
             if (!position.HasValue)
             {

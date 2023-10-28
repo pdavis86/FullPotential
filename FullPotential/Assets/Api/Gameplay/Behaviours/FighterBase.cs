@@ -582,7 +582,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private bool UseMeleeWeapon(Weapon weaponInHand)
         {
-            //todo: take speed and recovery into account
+            //todo: zzz v0.5 - take speed and recovery into account
 
             if (IsServer)
             {

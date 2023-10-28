@@ -102,7 +102,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
         [Test]
         public void GetDefenceValue_GivenItemsWithAttributesAll50_SameBaseDefence()
         {
-            //todo: GetDefenceValue_GivenItemsWithAttributesAll50_SameBaseDefence()
+            //todo: write test GetDefenceValue_GivenItemsWithAttributesAll50_SameBaseDefence()
         }
 
         private int GetDamage(ItemBase item)

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FullPotential.Core.Gameplay.Combat
 {
-    //todo: this should be another LineOfSight behaviour
+    //todo: zzz v0.5 - this should be another LineOfSight behaviour
 
     public class ProjectileWithTrail : MonoBehaviour
     {
