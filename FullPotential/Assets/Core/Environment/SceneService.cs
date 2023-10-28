@@ -2,7 +2,7 @@
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
-using FullPotential.Api.Unity.Helpers;
+using FullPotential.Api.Unity.Services;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -13,9 +13,9 @@ namespace FullPotential.Core.Environment
     {
         private readonly Collider _groundCollider;
 
-        public SceneService()
+        public SceneService(IUnityHelperUtilities unityHelperUtilities)
         {
-            var ground = GameObjectHelper.GetObjectAtRoot(GameObjectNames.Environment).FindChildWithTag(Tags.Ground);
+            var ground = unityHelperUtilities.GetObjectAtRoot(GameObjectNames.Environment).FindChildWithTag(Tags.Ground);
             _groundCollider = ground.GetComponent<Collider>();
         }
 

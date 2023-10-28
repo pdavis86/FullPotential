@@ -1,5 +1,5 @@
-﻿using FullPotential.Api.GameManagement;
-using FullPotential.Api.Ioc;
+﻿using FullPotential.Api.Ioc;
+using FullPotential.Api.Networking;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.GameManagement.Events;
 using Unity.Netcode;

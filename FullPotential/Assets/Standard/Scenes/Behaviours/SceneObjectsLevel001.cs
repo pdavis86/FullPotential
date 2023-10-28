@@ -3,7 +3,7 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Scenes;
-using FullPotential.Api.Unity.Helpers;
+using FullPotential.Api.Unity.Services;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.Enemies.Behaviours;
 using Unity.Netcode;
@@ -26,6 +26,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
         private IGameManager _gameManager;
         private ISceneService _sceneService;
+        private IUnityHelperUtilities _unityHelperUtilities;
 
         private List<Transform> _spawnPoints;
         private NetworkObject _enemyPrefabNetObj;
@@ -46,12 +47,13 @@ namespace FullPotential.Standard.Scenes.Behaviours
         {
             _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
             _sceneService = DependenciesContext.Dependencies.GetService<ISceneService>();
+            _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
         }
 
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            GameObjectHelper.GetObjectAtRoot(GameObjectNames.SceneCanvas).SetActive(true);
+            _unityHelperUtilities.GetObjectAtRoot(GameObjectNames.SceneCanvas).SetActive(true);
 
             if (!IsServer)
             {
@@ -67,7 +69,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
             _enemyPrefabNetObj = _enemyPrefab.GetComponent<NetworkObject>();
 
-            var spawnPointsParent = GameObjectHelper.GetObjectAtRoot(GameObjectNames.SpawnPoints).transform;
+            var spawnPointsParent = _unityHelperUtilities.GetObjectAtRoot(GameObjectNames.SpawnPoints).transform;
             _spawnPoints = new List<Transform>();
             foreach (Transform spawnPoint in spawnPointsParent)
             {

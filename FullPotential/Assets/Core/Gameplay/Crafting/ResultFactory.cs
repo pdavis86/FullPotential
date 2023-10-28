@@ -1,4 +1,6 @@
-﻿using FullPotential.Api.GameManagement;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Items;
@@ -7,19 +9,16 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
+using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Registry.Weapons;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Registry;
 using FullPotential.Core.Utilities.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using FullPotential.Api.Registry;
-using FullPotential.Api.Registry.Gear;
-using FullPotential.Api.Registry.Weapons;
 
 // ReSharper disable ClassNeverInstantiated.Global
 

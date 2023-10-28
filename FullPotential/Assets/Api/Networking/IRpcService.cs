@@ -5,7 +5,7 @@ using UnityEngine;
 // ReSharper disable UnusedParameter.Global
 // ReSharper disable UnusedMemberInSuper.Global
 
-namespace FullPotential.Api.GameManagement
+namespace FullPotential.Api.Networking
 {
     public interface IRpcService
     {

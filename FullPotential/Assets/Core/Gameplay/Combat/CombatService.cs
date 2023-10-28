@@ -1,4 +1,5 @@
-﻿using FullPotential.Api.GameManagement;
+﻿using System;
+using System.Linq;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
@@ -6,17 +7,16 @@ using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Gameplay.Targeting;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
+using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
+using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Unity.Extensions;
-using FullPotential.Api.Unity.Helpers;
+using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
-using System;
-using System.Linq;
-using FullPotential.Api.Registry.Weapons;
-using FullPotential.Api.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -153,7 +153,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 return;
             }
 
-            var vertices = GameObjectHelper.GetBoxColliderVertices(targetCollider);
+            var vertices = targetCollider.GetBoxColliderVertices();
 
             var matchesX = vertices.Where(v => Mathf.Approximately(v.x, position.Value.x)).ToList();
             var matchesZ = vertices.Where(v => Mathf.Approximately(v.z, position.Value.z)).ToList();

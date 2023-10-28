@@ -10,7 +10,9 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Modding;
+using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Constants;
@@ -299,7 +301,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (_stamina.Value <= 0)
                 {
-                    //todo: handle no stamina
+                    _stamina.Value = 0;
                 }
 
                 var staminaMax = GetStaminaMax();
@@ -358,7 +360,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (_energy.Value <= 0)
                 {
-                    //todo: handle no energy
+                    _energy.Value = 0;
                 }
 
                 var energyMax = GetEnergyMax();
@@ -409,7 +411,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (_mana.Value <= 0)
                 {
-                    //todo: handle no mana
+                    _mana.Value = 0;
                 }
 
                 var manaMax = GetManaMax();

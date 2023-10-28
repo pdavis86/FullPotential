@@ -1,26 +1,19 @@
-﻿using UnityEngine;
+﻿using FullPotential.Api.Unity.Constants;
+using FullPotential.Api.Unity.Services;
+using UnityEngine;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 // ReSharper disable StringLiteralTypo
 
-namespace FullPotential.Core.Utilities.Helpers
+namespace FullPotential.Core.Unity.Services
 {
-    //todo: make ShaderHelper a service 
-
-    public static class ShaderHelper
+    public class ShaderUtilities : IShaderUtilities
     {
-        public enum BlendMode
+        public void ChangeRenderMode(Material standardShaderMaterial, ShaderRenderMode renderMode)
         {
-            Opaque,
-            Cutout,
-            Fade,
-            Transparent
-        }
-
-        public static void ChangeRenderMode(Material standardShaderMaterial, BlendMode blendMode)
-        {
-            switch (blendMode)
+            switch (renderMode)
             {
-                case BlendMode.Opaque:
+                case ShaderRenderMode.Opaque:
                     standardShaderMaterial.SetFloat("_Mode", 0);
                     standardShaderMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
                     standardShaderMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
@@ -31,7 +24,7 @@ namespace FullPotential.Core.Utilities.Helpers
                     standardShaderMaterial.renderQueue = -1;
                     break;
 
-                case BlendMode.Cutout:
+                case ShaderRenderMode.Cutout:
                     standardShaderMaterial.SetFloat("_Mode", 1);
                     standardShaderMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
                     standardShaderMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
@@ -42,7 +35,7 @@ namespace FullPotential.Core.Utilities.Helpers
                     standardShaderMaterial.renderQueue = 2450;
                     break;
 
-                case BlendMode.Fade:
+                case ShaderRenderMode.Fade:
                     standardShaderMaterial.SetFloat("_Mode", 2);
                     standardShaderMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
                     standardShaderMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
@@ -53,7 +46,7 @@ namespace FullPotential.Core.Utilities.Helpers
                     standardShaderMaterial.renderQueue = 3000;
                     break;
 
-                case BlendMode.Transparent:
+                case ShaderRenderMode.Transparent:
                     standardShaderMaterial.SetFloat("_Mode", 3);
                     standardShaderMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
                     standardShaderMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);

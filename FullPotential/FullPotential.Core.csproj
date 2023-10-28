@@ -60,7 +60,7 @@
     <Compile Include="Assets\Core\UI\Components\NameAndToggle.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\NetworkStats.cs" />
     <Compile Include="Assets\Core\Player\PlayerInventory.cs" />
-    <Compile Include="Assets\Core\Utilities\Helpers\ShaderHelper.cs" />
+    <Compile Include="Assets\Core\Unity\Services\ShaderUtilities.cs" />
     <Compile Include="Assets\Core\Gameplay\Crafting\ResultFactory.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\RespawnUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiCraftingTab.cs" />
@@ -137,6 +137,7 @@
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsStartup.cs" />
     <Compile Include="Assets\Core\GameManagement\AddressablesManager.cs" />
     <Compile Include="Assets\Core\GameManagement\GameManager.cs" />
+    <Compile Include="Assets\Core\Unity\Services\UnityHelperUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Core\FullPotential.Core.asmdef" />

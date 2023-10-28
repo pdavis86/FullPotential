@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
@@ -5,15 +8,14 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Modding;
+using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Weapons;
 using FullPotential.Core.Gameplay.Combat;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using FullPotential.Api.Registry.Weapons;
 
 namespace FullPotential.Core.Tests.Gameplay.Combat
 {

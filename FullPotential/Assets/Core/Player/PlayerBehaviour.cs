@@ -8,7 +8,7 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Unity.Constants;
-using FullPotential.Api.Unity.Helpers;
+using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.GameManagement.Inventory;
 using FullPotential.Core.Gameplay.Tooltips;
@@ -98,7 +98,7 @@ namespace FullPotential.Core.Player
 
             //Avoids weapons clipping with other objects
             _playerState.InFrontOfPlayer.transform.parent = _inFrontOfPlayerCamera.transform;
-            GameObjectHelper.SetGameLayerRecursive(_playerState.InFrontOfPlayer, LayerMask.NameToLayer(Layers.InFrontOfPlayer));
+            _playerState.InFrontOfPlayer.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
 
             _inFrontOfPlayerCamera.gameObject.SetActive(true);
             _playerCamera.gameObject.SetActive(true);

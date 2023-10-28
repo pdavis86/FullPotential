@@ -1,9 +1,9 @@
-﻿using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay.Combat;
+﻿using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Shapes;
 using FullPotential.Api.Gameplay.Targeting;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;

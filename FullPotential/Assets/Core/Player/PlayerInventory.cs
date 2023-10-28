@@ -3,20 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Unity.Constants;
-using FullPotential.Api.Unity.Helpers;
+using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.GameManagement.Inventory;
@@ -635,7 +636,7 @@ namespace FullPotential.Core.Player
 
             if (IsOwner)
             {
-                GameObjectHelper.SetGameLayerRecursive(newObj, _playerState.InFrontOfPlayer.layer);
+                newObj.SetGameLayerRecursive(_playerState.InFrontOfPlayer.layer);
             }
 
             _equippedItems[slotGameObjectName].GameObject = newObj;
@@ -671,7 +672,7 @@ namespace FullPotential.Core.Player
 
                     if (showsOnPlayerCamera && thisClient)
                     {
-                        GameObjectHelper.SetGameLayerRecursive(newObj, LayerMask.NameToLayer(Layers.InFrontOfPlayer));
+                        newObj.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
                     }
 
                     _equippedItems[slotGameObjectName].GameObject = newObj;

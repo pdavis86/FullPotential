@@ -11,7 +11,8 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Persistence;
 using FullPotential.Api.Ui.Components;
-using FullPotential.Api.Unity.Helpers;
+using FullPotential.Api.Unity.Constants;
+using FullPotential.Api.Unity.Services;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Environment;
@@ -20,7 +21,6 @@ using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.Utilities.Extensions;
-using FullPotential.Core.Utilities.Helpers;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -48,6 +48,8 @@ namespace FullPotential.Core.Player
 
         //Registered Services
         private IUserRepository _userRepository;
+        private IUnityHelperUtilities _unityHelperUtilities;
+        private IShaderUtilities _shaderUtilities;
 
         //Data
         private PlayerData _saveData;
@@ -117,6 +119,8 @@ namespace FullPotential.Core.Player
             _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
 
             _userRepository = DependenciesContext.Dependencies.GetService<IUserRepository>();
+            _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
+            _shaderUtilities = DependenciesContext.Dependencies.GetService<IShaderUtilities>();
 
             HealthStatSlider = _healthSlider;
         }
@@ -128,7 +132,7 @@ namespace FullPotential.Core.Player
 
             if (IsOwner)
             {
-                GameObjectHelper.GetObjectAtRoot(GameObjectNames.SceneCanvas).transform
+                _unityHelperUtilities.GetObjectAtRoot(GameObjectNames.SceneCanvas).transform
                     .Find(GameObjectNames.LoadingScreen).gameObject
                     .SetActive(false);
 
@@ -332,7 +336,7 @@ namespace FullPotential.Core.Player
                     }
 
                     var bodyMaterialForRespawn = _bodyMeshRenderer.material;
-                    ShaderHelper.ChangeRenderMode(bodyMaterialForRespawn, ShaderHelper.BlendMode.Fade);
+                    _shaderUtilities.ChangeRenderMode(bodyMaterialForRespawn, ShaderRenderMode.Fade);
                     bodyMaterialForRespawn.color = new Color(1, 1, 1, 0.2f);
                     ApplyMaterial(bodyMaterialForRespawn);
 
@@ -340,7 +344,7 @@ namespace FullPotential.Core.Player
 
                 case LivingEntityState.Alive:
                     var bodyMaterial = _bodyMeshRenderer.material;
-                    ShaderHelper.ChangeRenderMode(bodyMaterial, ShaderHelper.BlendMode.Opaque);
+                    _shaderUtilities.ChangeRenderMode(bodyMaterial, ShaderRenderMode.Opaque);
                     ApplyMaterial(bodyMaterial);
 
                     break;
@@ -404,7 +408,7 @@ namespace FullPotential.Core.Player
                 }
             });
 
-            _aliveStateChanges.Queue(isAlive => GameObjectHelper.GetObjectAtRoot(GameObjectNames.SceneCamera).SetActive(!isAlive));
+            _aliveStateChanges.Queue(isAlive => _unityHelperUtilities.GetObjectAtRoot(GameObjectNames.SceneCamera).SetActive(!isAlive));
 
             _aliveStateChanges.Queue(isAlive =>
             {

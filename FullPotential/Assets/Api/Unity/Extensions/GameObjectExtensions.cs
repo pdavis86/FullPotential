@@ -68,8 +68,35 @@ namespace FullPotential.Api.Unity.Extensions
                 Debug.LogWarning($"Cannot network spawn {gameObject.name} as it does not have a NetworkObject component");
                 return;
             }
-                
+
             networkObject?.Spawn(true);
+        }
+
+        public static void SetGameLayerRecursive(this GameObject gameObject, int layer)
+        {
+            gameObject.layer = layer;
+            foreach (Transform child in gameObject.transform)
+            {
+                child.gameObject.layer = layer;
+
+                var hasChildren = child.GetComponentInChildren<Transform>();
+                if (hasChildren != null)
+                {
+                    SetGameLayerRecursive(child.gameObject, layer);
+                }
+            }
+        }
+
+        public static GameObject GetClosestParentWithTag(this GameObject gameObject, string tag)
+        {
+            var current = gameObject.transform;
+            do
+            {
+                current = current.parent;
+
+            } while (current != null && !current.CompareTag(tag));
+
+            return current == null ? null : current.gameObject;
         }
 
     }

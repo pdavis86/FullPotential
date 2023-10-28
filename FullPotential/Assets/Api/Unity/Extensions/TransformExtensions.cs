@@ -10,5 +10,13 @@ namespace FullPotential.Api.Unity.Extensions
             transform.localRotation = Quaternion.identity;
             transform.localScale = Vector3.one;
         }
+
+        public static void DestroyChildren(this Transform transform)
+        {
+            foreach (Transform child in transform)
+            {
+                Object.Destroy(child.gameObject);
+            }
+        }
     }
 }

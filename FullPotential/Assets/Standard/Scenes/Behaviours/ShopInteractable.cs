@@ -3,7 +3,7 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Modding;
-using FullPotential.Api.Unity.Helpers;
+using FullPotential.Api.Unity.Services;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 
@@ -15,12 +15,14 @@ namespace FullPotential.Standard.Scenes.Behaviours
     {
         private IGameManager _gameManager;
         private ILocalizer _localizer;
+        private IUnityHelperUtilities _unityHelperUtilities;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+            _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
 
             RequiresServerCheck = false;
         }
@@ -35,7 +37,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
         public override void OnInteract(NetworkObject networkObject)
         {
-            var shopUiGameObject = GameObjectHelper.GetObjectAtRoot(GameObjectNames.SceneCanvas).transform.Find("ShopUi").gameObject;
+            var shopUiGameObject = _unityHelperUtilities.GetObjectAtRoot(GameObjectNames.SceneCanvas).transform.Find("ShopUi").gameObject;
             _gameManager.GetUserInterface().OpenCustomMenu(shopUiGameObject);
         }
 

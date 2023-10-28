@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
@@ -8,6 +7,7 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Modding;
+using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities;
@@ -192,12 +192,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected override bool IsConsumingEnergy()
         {
-            return HandStatusLeft.IsConsumingEnergy() || HandStatusRight.IsConsumingEnergy();
+            return HandStatusLeft.IsConsumingResource(ResourceConsumptionType.Energy) 
+                   || HandStatusRight.IsConsumingResource(ResourceConsumptionType.Energy);
         }
 
         protected override bool IsConsumingMana()
         {
-            return HandStatusLeft.IsConsumingMana() || HandStatusRight.IsConsumingMana();
+            return HandStatusLeft.IsConsumingResource(ResourceConsumptionType.Mana) 
+                   || HandStatusRight.IsConsumingResource(ResourceConsumptionType.Mana);
         }
 
         public IEnumerator ReloadCoroutine(HandStatus handStatus)
@@ -252,7 +254,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public override int GetDefenseValue()
         {
-            //todo: add barrier strength to defence strength
             return _inventory.GetDefenseValue();
         }
 
@@ -593,7 +594,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private (NetworkVariable<int> Variable, int? Cost)? GetResourceVariableAndCost(Consumer consumer)
         {
-            //todo: energy and mana should be registered types not named variables
+            //todo: zzz v0.5 - energy and mana should be registered types not named variables
 
             switch (consumer.ResourceConsumptionType)
             {

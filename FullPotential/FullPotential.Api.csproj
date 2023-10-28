@@ -64,7 +64,6 @@
     <Compile Include="Assets\Api\Unity\Extensions\Vector2Extensions.cs" />
     <Compile Include="Assets\Api\Obsolete\GearCategory.cs" />
     <Compile Include="Assets\Api\Modding\IModHelper.cs" />
-    <Compile Include="Assets\Api\Unity\Extensions\UnityExtensions.cs" />
     <Compile Include="Assets\Api\Ui\Components\IStatSlider.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\ICombatService.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IPlayerInventory.cs" />
@@ -115,7 +114,6 @@
     <Compile Include="Assets\Api\Obsolete\Attributes.cs" />
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
     <Compile Include="Assets\Api\Scenes\SceneAttributes.cs" />
-    <Compile Include="Assets\Api\Unity\Helpers\GameObjectHelper.cs" />
     <Compile Include="Assets\Api\Gameplay\Targeting\ITargetingVisualsBehaviour.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\IMoveable.cs" />
     <Compile Include="Assets\Api\Items\Types\Loot.cs" />
@@ -143,9 +141,9 @@
     <Compile Include="Assets\Api\Registry\Effects\IAttributeEffect.cs" />
     <Compile Include="Assets\Api\Gameplay\Targeting\Projectile.cs" />
     <Compile Include="Assets\Api\Ui\IUserInterface.cs" />
-    <Compile Include="Assets\Api\GameManagement\ITypeRegistry.cs" />
+    <Compile Include="Assets\Api\Registry\ITypeRegistry.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\IStoppable.cs" />
-    <Compile Include="Assets\Api\GameManagement\IRpcService.cs" />
+    <Compile Include="Assets\Api\Networking\IRpcService.cs" />
     <Compile Include="Assets\Api\GameManagement\GameSettings.cs" />
     <Compile Include="Assets\Api\Obsolete\AffectableStat.cs" />
     <Compile Include="Assets\Api\Utilities\DelayedAction.cs" />
@@ -170,6 +168,10 @@
     <Compile Include="Assets\Api\Registry\IVisuals.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IAccessoryVisuals.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IArmorVisuals.cs" />
+    <Compile Include="Assets\Api\Unity\Extensions\ColliderExtensions.cs" />
+    <Compile Include="Assets\Api\Unity\Services\IUnityHelperUtilities.cs" />
+    <Compile Include="Assets\Api\Unity\Services\IShaderUtilities.cs" />
+    <Compile Include="Assets\Api\Unity\Constants\ShaderRenderMode.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Api\FullPotential.Api.asmdef" />
