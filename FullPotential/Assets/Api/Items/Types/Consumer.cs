@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FullPotential.Api.Gameplay.Behaviours;
@@ -13,7 +14,7 @@ using FullPotential.Api.Utilities.Extensions;
 
 namespace FullPotential.Api.Items.Types
 {
-    [System.Serializable]
+    [Serializable]
     public class Consumer : ItemWithTargetingAndShapeBase
     {
         public const string AliasSegmentConsumer = "consumer";
@@ -27,11 +28,10 @@ namespace FullPotential.Api.Items.Types
 
         public int GetResourceCost()
         {
-            //todo: scale up with number of effects
-
             var returnValue = GetHighInLowOutInRange(Attributes.Efficiency, 5, 50);
+
             //Debug.Log("GetResourceCost: " + returnValue);
-            return (int)returnValue;
+            return (int)returnValue * Math.Max(Effects.Count, 1);
         }
 
         public float GetProjectileSpeed()

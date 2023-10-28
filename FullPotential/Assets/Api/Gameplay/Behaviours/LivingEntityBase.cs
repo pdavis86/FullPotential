@@ -683,17 +683,19 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Effect-related methods
 
-        public void AddAttributeModifier(IAttributeEffect attributeEffect, ItemBase itemUsed)
+        public void AddAttributeModifier(IAttributeEffect attributeEffect, ItemBase itemUsed, float effectPercentage)
         {
             var (change, expiry) = itemUsed.GetAttributeChangeAndExpiry(attributeEffect);
-            AddOrUpdateEffect(attributeEffect, change, expiry);
+            var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
+            AddOrUpdateEffect(attributeEffect, adjustedChange, expiry);
         }
 
-        public void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter)
+        public void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, float effectPercentage)
         {
             var (change, expiry, delay) = itemUsed.GetPeriodicStatChangeExpiryAndDelay(statEffect);
-            AddOrUpdateEffect(statEffect, change, expiry);
-            StartCoroutine(PeriodicActionToStatCoroutine(statEffect.StatToAffect, change, sourceFighter, delay, expiry));
+            var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
+            AddOrUpdateEffect(statEffect, adjustedChange, expiry);
+            StartCoroutine(PeriodicActionToStatCoroutine(statEffect.StatToAffect, adjustedChange, sourceFighter, delay, expiry));
         }
 
         private IEnumerator PeriodicActionToStatCoroutine(AffectableStat stat, int change, IFighter sourceFighter, float delay, DateTime expiry)
@@ -706,27 +708,31 @@ namespace FullPotential.Api.Gameplay.Behaviours
             } while (DateTime.Now < expiry);
         }
 
-        public void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, int change, Vector3? position)
+        public void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
         {
-            AddOrUpdateEffect(statEffect, change, DateTime.Now.AddSeconds(3));
+            var change = itemUsed.GetStatChange(statEffect);
+            var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
 
-            ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, position);
+            AddOrUpdateEffect(statEffect, adjustedChange, DateTime.Now.AddSeconds(3));
+
+            ApplyStatChange(statEffect.StatToAffect, adjustedChange, sourceFighter, position);
         }
 
-        public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
+        public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
         {
             var (change, expiry) = itemUsed.GetStatChangeAndExpiry(statEffect);
+            var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
 
-            AddOrUpdateEffect(statEffect, change, expiry);
+            AddOrUpdateEffect(statEffect, adjustedChange, expiry);
 
-            ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, position);
+            ApplyStatChange(statEffect.StatToAffect, adjustedChange, sourceFighter, position);
         }
 
-        public void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, int change, Vector3? position)
+        public void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
         {
             //todo: zzz v0.4.1 - ApplyElementalEffect
             //Debug.LogWarning("Not yet implemented elemental effects");
-            ApplyHealthChange(change, sourceFighter, position, false);
+            ApplyHealthChange(-5, sourceFighter, position, false);
         }
 
         public List<ActiveEffect> GetActiveEffects()

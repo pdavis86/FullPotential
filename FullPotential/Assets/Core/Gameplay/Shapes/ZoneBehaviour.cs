@@ -1,4 +1,6 @@
-﻿using FullPotential.Api.Gameplay.Combat;
+﻿using System.Collections.Generic;
+using System.Linq;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Shapes;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
@@ -12,10 +14,12 @@ using UnityEngine;
 
 namespace FullPotential.Core.Gameplay.Shapes
 {
-    // ReSharper disable once UnusedType.Global
     public class ZoneBehaviour : NetworkBehaviour, IShapeBehaviour
     {
         private const float DistanceFromGround = 1f;
+
+        private readonly NetworkVariable<FixedString4096Bytes> _visualsPrefabAddress = new NetworkVariable<FixedString4096Bytes>();
+        private readonly List<Collider> _colliders = new List<Collider>();
 
         private ICombatService _combatService;
         private ITypeRegistry _typeRegistry;
@@ -28,8 +32,6 @@ namespace FullPotential.Core.Gameplay.Shapes
         public Consumer Consumer { get; set; }
 
         public Vector3 Direction { get; set; }
-
-        private readonly NetworkVariable<FixedString4096Bytes> _visualsPrefabAddress = new NetworkVariable<FixedString4096Bytes>();
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -65,6 +67,18 @@ namespace FullPotential.Core.Gameplay.Shapes
         }
 
         // ReSharper disable once UnusedMember.Local
+        private void OnTriggerEnter(Collider other)
+        {
+            _colliders.Add(other);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnTriggerExit(Collider other)
+        {
+            _colliders.Remove(other);
+        }
+
+        // ReSharper disable once UnusedMember.Local
         private void OnTriggerStay(Collider other)
         {
             if (!IsServer)
@@ -88,7 +102,8 @@ namespace FullPotential.Core.Gameplay.Shapes
             var position = other.ClosestPointOnBounds(transform.position);
             var adjustedPosition = position + new Vector3(0, DistanceFromGround);
 
-            _combatService.ApplyEffects(SourceFighter, Consumer, other.gameObject, adjustedPosition);
+            var effectPercentage = 1f / _colliders.Count(c => c != null);
+            _combatService.ApplyEffects(SourceFighter, Consumer, other.gameObject, adjustedPosition, effectPercentage);
         }
 
         private void HandleVisualsPrefabAddressValueChanged(FixedString4096Bytes previousValue, FixedString4096Bytes newValue)

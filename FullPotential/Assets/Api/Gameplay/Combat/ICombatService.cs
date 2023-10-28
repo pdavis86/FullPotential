@@ -10,7 +10,8 @@ namespace FullPotential.Api.Gameplay.Combat
             IFighter sourceFighter,
             ItemBase itemUsed,
             GameObject target,
-            Vector3? position
+            Vector3? position,
+            float effectPercentage
         );
 
         int GetDamageValueFromAttack(
@@ -35,5 +36,7 @@ namespace FullPotential.Api.Gameplay.Combat
             GameObject target,
             Vector3 fallbackPosition,
             Vector3 lookDirection);
+
+        float AddVariationToValue(float basicValue);
     }
 }

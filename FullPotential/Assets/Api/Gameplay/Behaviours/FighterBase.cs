@@ -391,7 +391,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, MeleeRangeLimit))
                 {
-                    _combatService.ApplyEffects(this, null, hit.transform.gameObject, hit.point);
+                    _combatService.ApplyEffects(this, null, hit.transform.gameObject, hit.point, 1);
                 }
             }
 
@@ -494,8 +494,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 {
                     foreach (var target in targets)
                     {
-                        //todo: target.EffectPercentage
-                        _combatService.ApplyEffects(this, consumer, target.GameObject, target.Position);
+                        _combatService.ApplyEffects(this, consumer, target.GameObject, target.Position, target.EffectPercentage);
                     }
                 }
             }
@@ -568,7 +567,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 //Debug.Log("Should only be called once on server");
                 for (var i = 0; i < ammoUsed; i++)
                 {
-                    _combatService.ApplyEffects(this, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
+                    _combatService.ApplyEffects(this, weaponInHand, rangedHit.transform.gameObject, rangedHit.point, 1);
                 }
             }
 
@@ -587,7 +586,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
                 if (Physics.Raycast(LookTransform.position, LookTransform.forward, out var meleeHit, meleeRange))
                 {
-                    _combatService.ApplyEffects(this, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
+                    _combatService.ApplyEffects(this, weaponInHand, meleeHit.transform.gameObject, meleeHit.point, 1);
                 }
             }
 
@@ -637,7 +636,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (!isTest)
             {
-                //todo: resourceVariable.Value -= resourceCost;
+                resourceVariable.Value -= resourceCost;
             }
 
             return true;

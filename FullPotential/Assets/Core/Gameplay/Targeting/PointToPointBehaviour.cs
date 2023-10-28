@@ -72,7 +72,7 @@ namespace FullPotential.Core.Gameplay.Targeting
 
         private void ApplyEffectsOnHit()
         {
-            _combatService.ApplyEffects(SourceFighter, Consumer, _hit.transform.gameObject, _hit.point);
+            _combatService.ApplyEffects(SourceFighter, Consumer, _hit.transform.gameObject, _hit.point, 1);
         }
 
         // ReSharper disable once UnusedMember.Local
