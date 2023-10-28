@@ -159,8 +159,7 @@ namespace FullPotential.Core.Player
 
         private void ApplyMovementToLocalObject(Vector3 position, Quaternion rotation, Vector3 lookDirection, bool isTryingToJump, bool isTryingToSprint)
         {
-            transform.position = position;
-            transform.rotation = rotation;
+            transform.SetPositionAndRotation(position, rotation);
 
             _playerCamera.transform.localEulerAngles = lookDirection;
 
@@ -245,7 +244,7 @@ namespace FullPotential.Core.Player
                 if (IsOnSolidObject())
                 {
                     _isMidJump = true;
-                    _rb.AddForce(Vector3.up * _jumpForceMultiplier * Time.fixedDeltaTime, ForceMode.Acceleration);
+                    _rb.AddForce(_jumpForceMultiplier * Time.fixedDeltaTime * Vector3.up, ForceMode.Acceleration);
                 }
             }
         }
