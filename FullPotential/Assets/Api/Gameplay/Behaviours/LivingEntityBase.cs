@@ -20,7 +20,6 @@ using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using TMPro;
 using Unity.Collections;
-using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -32,7 +31,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
     [RequireComponent(typeof(Rigidbody))]
     public abstract class LivingEntityBase : NetworkBehaviour
     {
-        private const int VelocityThreshold = 4;
+        private const int VelocityThreshold = 3;
+        private const int ForceThreshold = 1000;
 
         #region Inspector Variables
 #pragma warning disable 0649
@@ -524,47 +524,36 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            if (collision.relativeVelocity.magnitude < VelocityThreshold)
+            var contactPoint = collision.GetContact(0);
+
+            var force = collision.impulse / Time.fixedDeltaTime;
+            var isForceDamage = force.magnitude >= ForceThreshold;
+
+            var velocityMagnitude = collision.relativeVelocity.magnitude;
+            var isVelocityDamage = velocityMagnitude >= VelocityThreshold;
+
+            if (!isVelocityDamage && !isForceDamage)
             {
                 _fighterWhoMovedMeLast = null;
                 return;
             }
 
-            var normalizedVelocity = collision.relativeVelocity.normalized;
+            var cause = _localizer.Translate(contactPoint.normal == Vector3.up
+                ? "ui.alert.falldamage"
+                : "ui.alert.environmentaldamage");
 
-            string cause;
-            if (math.abs(normalizedVelocity.y) > math.abs(normalizedVelocity.x)
-                && math.abs(normalizedVelocity.y) > math.abs(normalizedVelocity.z))
-            {
-                cause = _localizer.Translate("ui.alert.falldamage");
-            }
-            else
-            {
-                cause = _localizer.Translate("ui.alert.environmentaldamage");
-            }
+            //Debug.Log($"{name} collided with {collision.gameObject.name} at velocity {collision.relativeVelocity} with force {force} with cause {cause}");
 
-            //Debug.Log($"{name} collided with {collision.gameObject.name} at velocity {collision.relativeVelocity} with cause {cause}");
+            var healthChangeRaw = isVelocityDamage
+                ? Vector3.Dot(contactPoint.normal, collision.relativeVelocity)
+                : force.magnitude / 700;
 
-            var healthChange = GetDamageValueFromVelocity(collision.relativeVelocity);
-            var position = collision.GetContact(0).point;
+            var healthChange = -1 * (int)MathF.Round(healthChangeRaw, MidpointRounding.AwayFromZero);
 
             _lastDamageItemName = null;
             _lastDamageSourceName = cause;
 
-            ApplyHealthChange(healthChange, _fighterWhoMovedMeLast, position, false);
-        }
-
-        private int GetDamageValueFromVelocity(Vector3 velocity)
-        {
-            var horizontal = (velocity.x > VelocityThreshold ? velocity.x - VelocityThreshold : 0)
-                + (velocity.z > VelocityThreshold ? velocity.z - VelocityThreshold : 0);
-
-            var vertical = velocity.y > VelocityThreshold ? velocity.y - VelocityThreshold : 0;
-
-            //todo: fall damage is too much
-
-            var basicDamage = math.pow((horizontal + vertical) * 10, 1.3) * -1;
-            return (int)basicDamage;
+            ApplyHealthChange(healthChange, _fighterWhoMovedMeLast, contactPoint.point, false);
         }
 
         #endregion

@@ -325,8 +325,15 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (targetRigidBody == null)
             {
-                Debug.LogWarning($"Cannot move target '{targetGameObject.name}' as it does not have a RigidBody");
+                //Debug.LogWarning($"Cannot move target '{targetGameObject.name}' as it does not have a RigidBody");
                 return;
+            }
+
+            var targetLivingEntity = targetGameObject.GetComponent<LivingEntityBase>();
+
+            if (targetLivingEntity != null)
+            {
+                targetLivingEntity.SetLastMover(sourceFighter);
             }
 
             if (movementEffect.Direction == MovementDirection.MaintainDistance)
@@ -347,13 +354,6 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 Debug.LogWarning($"Cannot apply a movement effect to target '{targetGameObject.name}' as it has no components that implement {nameof(IMoveable)}");
                 return;
-            }
-
-            var targetLivingEntity = targetGameObject.GetComponent<LivingEntityBase>();
-
-            if (targetLivingEntity != null)
-            {
-                targetLivingEntity.SetLastMover(sourceFighter);
             }
 
             var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
