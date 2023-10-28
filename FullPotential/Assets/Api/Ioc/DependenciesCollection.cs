@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -53,6 +54,7 @@ namespace FullPotential.Api.Ioc
             return (T)GetServiceInternal(typeof(T));
         }
 
+        [ExcludeFromCodeCoverage]
         public void ResetForTesting()
         {
             _doNotCache.Clear();

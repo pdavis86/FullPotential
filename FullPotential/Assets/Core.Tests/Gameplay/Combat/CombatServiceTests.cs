@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
@@ -80,11 +81,11 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
                 Luck = 50
             };
 
-            var consumer = new Consumer { Attributes = allFifty, Effects = new List<IEffect> { _singleDamageEffect } };
-            Assert.AreEqual((int)expectedBaseDamage, GetDamage(consumer));
+            var consumerSingleDamage = new Consumer { Attributes = allFifty, Effects = new List<IEffect> { _singleDamageEffect } };
+            Assert.AreEqual((int)expectedBaseDamage, GetDamage(consumerSingleDamage));
 
-            //todo: test multiple effects
-            //todo: test periodic damage
+            var consumerMultipleEffects = new Consumer { Attributes = allFifty, Effects = new List<IEffect> { _singleDamageEffect, _singleDamageEffect } };
+            Assert.AreEqual((int)expectedBaseDamage, GetDamage(consumerMultipleEffects));
 
             var meleeOneHandedWeapon = GetMeleeWeapon(false, allFifty);
             Assert.AreEqual((int)(expectedBaseDamage * 2), GetDamage(meleeOneHandedWeapon));
@@ -97,12 +98,6 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
 
             var rangedTwoHandedWeapon = GetRangedWeapon(true, allFifty);
             Assert.AreEqual((int)(expectedBaseDamage * 2 / rangedTwoHandedWeapon.GetBulletsPerSecond()), GetDamage(rangedTwoHandedWeapon));
-        }
-
-        [Test]
-        public void GetDefenceValue_GivenItemsWithAttributesAll50_SameBaseDefence()
-        {
-            //todo: write test GetDefenceValue_GivenItemsWithAttributesAll50_SameBaseDefence()
         }
 
         private int GetDamage(ItemBase item)
@@ -131,6 +126,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
         }
     }
 
+    [ExcludeFromCodeCoverage]
     public class SingleDamageEffect : IStatEffect
     {
         public Guid TypeId => new Guid("3fd4d8d9-6fed-4ada-85dd-408602769ee5");
@@ -142,6 +138,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
         public AffectableStat StatToAffect => AffectableStat.Health;
     }
 
+    [ExcludeFromCodeCoverage]
     public class TestWeaponType : IWeapon
     {
         // ReSharper disable UnassignedGetOnlyAutoProperty
