@@ -8,7 +8,7 @@ namespace FullPotential.Api.Gameplay.Targeting
 
         public Vector3 StartDirection { get; set; }
 
-        public bool IsLocalPlayer { get; set; }
+        public bool IsLocalOwner { get; set; }
 
         public void UpdateVisuals(Vector3 origin, Vector3 direction, float maxRange);
     }

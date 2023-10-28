@@ -26,6 +26,7 @@ namespace FullPotential.Core.Gameplay.Targeting
         private GameObject _visualsGameObject;
         private ITargetingVisualsBehaviour _visualsBehaviour;
 
+        private readonly NetworkVariable<long> _fighterClientId = new NetworkVariable<long>();
         private readonly NetworkVariable<Vector3> _startDirection = new NetworkVariable<Vector3>();
         private readonly NetworkVariable<FixedString4096Bytes> _visualsPrefabAddress = new NetworkVariable<FixedString4096Bytes>();
 
@@ -58,6 +59,8 @@ namespace FullPotential.Core.Gameplay.Targeting
                 () => _combatService.ApplyEffects(SourceFighter, Consumer, _hit.transform.gameObject, _hit.point));
 
             _maxBeamLength = Consumer.GetRange();
+
+            _fighterClientId.Value = (long)SourceFighter.OwnerClientId;
 
             _startDirection.Value = Direction;
 
@@ -129,15 +132,19 @@ namespace FullPotential.Core.Gameplay.Targeting
                     _visualsGameObject = Instantiate(visualsPrefab, transform);
                     _visualsGameObject.transform.Reset();
 
+                    var sourceFighterClientId = (ulong)_fighterClientId.Value;
+
                     _visualsBehaviour = _visualsGameObject.GetComponent<ITargetingVisualsBehaviour>();
                     _visualsBehaviour.StartPosition = transform.position;
                     _visualsBehaviour.StartDirection = _startDirection.Value;
-                    _visualsBehaviour.IsLocalPlayer = OwnerClientId == NetworkManager.Singleton.LocalClientId;
+                    _visualsBehaviour.IsLocalOwner = sourceFighterClientId == NetworkManager.Singleton.LocalClientId;
 
-                    if (_visualsBehaviour.IsLocalPlayer)
+                    if (_visualsBehaviour.IsLocalOwner)
                     {
+                        var sourceFighter = NetworkManager.LocalClient.PlayerObject.GetComponent<IFighter>();
+
                         //Parent to player head so the beam looks attached to the hand
-                        _visualsGameObject.transform.parent = SourceFighter.LookTransform;
+                        _visualsGameObject.transform.parent = sourceFighter.LookTransform;
                     }
                 });
         }

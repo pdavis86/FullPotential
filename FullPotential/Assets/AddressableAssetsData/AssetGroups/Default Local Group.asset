@@ -182,6 +182,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d76b723de09f993479b0cbe5cf10694a
+    m_Address: Core/Prefabs/Targeting/Projectile.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 41999c09d1855944f8323a0d9808169e
+    m_Address: Core/Prefabs/Targeting/PointToPoint.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 101452080fc0cca43abdd31fc4649980, type: 2}
   m_SchemaSet:

@@ -9,15 +9,15 @@ namespace FullPotential.Api.Gameplay.Targeting
 {
     public class Touch : ITargeting
     {
-        public const string Id = "144cc142-2e64-476f-b3a6-de57cc3abd05";
-
-        public Guid TypeId => new Guid(Id);
+        public Guid TypeId => new Guid("144cc142-2e64-476f-b3a6-de57cc3abd05");
 
         public string TypeName => nameof(Touch);
 
         public bool CanHaveShape => true;
 
         public bool IsContinuous => false;
+
+        public string NetworkPrefabAddress => null;
 
         public string VisualsFallbackPrefabAddress => null;
 

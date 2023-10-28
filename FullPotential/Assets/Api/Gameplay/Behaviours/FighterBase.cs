@@ -364,8 +364,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : _inventory.GetItemInSlot(SlotGameObjectName.RightHand);
 
             var handPosition = isLeftHand
-                ? Positions.LeftHand.position
-                : Positions.RightHand.position;
+                ? Positions.LeftHandInFront.position
+                : Positions.RightHandInFront.position;
 
             switch (itemInHand)
             {

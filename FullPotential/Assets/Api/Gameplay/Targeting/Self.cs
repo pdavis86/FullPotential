@@ -8,15 +8,15 @@ namespace FullPotential.Api.Gameplay.Targeting
 {
     public class Self : ITargeting
     {
-        public const string Id = "b7cd2ff2-e054-4955-bde9-38b3b6b9a1bf";
-
-        public Guid TypeId => new Guid(Id);
+        public Guid TypeId => new Guid("b7cd2ff2-e054-4955-bde9-38b3b6b9a1bf");
 
         public string TypeName => nameof(Self);
 
         public bool CanHaveShape => true;
 
         public bool IsContinuous => false;
+
+        public string NetworkPrefabAddress => null;
 
         public string VisualsFallbackPrefabAddress => null;
 

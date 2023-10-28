@@ -17,6 +17,8 @@ namespace FullPotential.Api.Gameplay.Targeting
 
         public bool IsContinuous => true;
 
+        public string NetworkPrefabAddress => "Core/Prefabs/Targeting/PointToPoint.prefab";
+
         public string VisualsFallbackPrefabAddress => "Core/Prefabs/Targeting/BeamVisuals.prefab";
 
         public IEnumerable<ViableTarget> GetTargets(IFighter sourceFighter, Consumer consumer)

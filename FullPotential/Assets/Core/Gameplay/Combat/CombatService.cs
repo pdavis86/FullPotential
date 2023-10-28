@@ -16,6 +16,7 @@ using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
 using System;
 using System.Linq;
+using FullPotential.Api.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -484,37 +485,31 @@ namespace FullPotential.Core.Gameplay.Combat
 
         public void SpawnTargetingGameObject(IFighter sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction)
         {
-            GameObject prefab;
-
-            switch (consumer.Targeting)
+            if (consumer.Targeting.NetworkPrefabAddress.IsNullOrWhiteSpace())
             {
-                case Projectile:
-                    prefab = GameManager.Instance.Prefabs.Combat.Projectile;
-                    break;
-
-                case PointToPoint:
-                    prefab = GameManager.Instance.Prefabs.Combat.PointToPoint;
-                    break;
-
-                default:
-                    throw new Exception("Unexpected targeting: " + consumer.Targeting);
+                return;
             }
 
-            var targetingGameObject = UnityEngine.Object.Instantiate(prefab, startPosition, Quaternion.identity);
+            _typeRegistry.LoadAddessable(
+                consumer.Targeting.NetworkPrefabAddress,
+                prefab =>
+                {
+                    var targetingGameObject = UnityEngine.Object.Instantiate(prefab, startPosition, Quaternion.identity);
 
-            var targetingBehaviour = targetingGameObject.GetComponent<ITargetingBehaviour>();
-            targetingBehaviour.SourceFighter = sourceFighter;
-            targetingBehaviour.Consumer = consumer;
-            targetingBehaviour.Direction = direction;
+                    var targetingBehaviour = targetingGameObject.GetComponent<ITargetingBehaviour>();
+                    targetingBehaviour.SourceFighter = sourceFighter;
+                    targetingBehaviour.Consumer = consumer;
+                    targetingBehaviour.Direction = direction;
 
-            targetingGameObject.NetworkSpawn();
+                    targetingGameObject.NetworkSpawn();
 
-            if (consumer.Targeting is PointToPoint)
-            {
-                targetingGameObject.transform.parent = sourceFighter.Transform;
-            }
+                    if (consumer.Targeting.IsContinuous)
+                    {
+                        targetingGameObject.transform.parent = sourceFighter.Transform;
+                    }
 
-            consumer.Stoppables.Add(new DestroyStoppable(targetingGameObject));
+                    consumer.Stoppables.Add(new DestroyStoppable(targetingGameObject));
+                });
         }
     }
 }

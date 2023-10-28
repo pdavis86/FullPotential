@@ -14,7 +14,7 @@ namespace FullPotential.Core.Gameplay.Targeting
 
         public Vector3 StartDirection { get; set; }
 
-        public bool IsLocalPlayer { get; set; }
+        public bool IsLocalOwner { get; set; }
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -40,7 +40,7 @@ namespace FullPotential.Core.Gameplay.Targeting
             //Move the back end to the middle
             _cylinderTransform.position += _cylinderTransform.up * _cylinderTransform.localScale.y;
 
-            if (IsLocalPlayer)
+            if (IsLocalOwner)
             {
                 //Adjust for FoV
                 var adjustment = (Camera.main.fieldOfView - 50) * 0.0125f;

@@ -18,6 +18,8 @@ namespace FullPotential.Api.Gameplay.Targeting
 
         public bool IsContinuous => false;
 
+        public string NetworkPrefabAddress => "Core/Prefabs/Targeting/Projectile.prefab";
+
         public string VisualsFallbackPrefabAddress => "Core/Prefabs/Targeting/ProjectileVisuals.prefab";
 
         public IEnumerable<ViableTarget> GetTargets(IFighter sourceFighter, Consumer consumer)
