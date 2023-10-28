@@ -11,6 +11,8 @@ namespace FullPotential.Api.Gameplay.Shapes
 
         public string TypeName => nameof(Wall);
 
+        public string PrefabAddress => "Core/Prefabs/Shapes/Wall.prefab";
+
         public string VisualsFallbackPrefabAddress => "Core/Prefabs/Shapes/WallVisuals.prefab";
     }
 }

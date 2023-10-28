@@ -150,7 +150,7 @@ namespace FullPotential.Core.Localization
             return $"'{id}' translation is missing";
         }
 
-        public string GetTranslatedTypeName(IRegisterable registeredItem)
+        public string Translate(IRegisterable registeredItem)
         {
             if (registeredItem is IWeapon) { return Translate("weapon." + registeredItem.TypeName); }
             if (registeredItem is ILoot) { return Translate("loot." + registeredItem.TypeName); }
@@ -160,7 +160,7 @@ namespace FullPotential.Core.Localization
             return "Unexpected IRegisterable type";
         }
 
-        public string GetTranslatedTypeName(Enum enumValue)
+        public string Translate(Enum enumValue)
         {
             return Translate(enumValue.GetType().Name + "." + enumValue);
         }

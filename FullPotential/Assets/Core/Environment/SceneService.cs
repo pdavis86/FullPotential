@@ -19,7 +19,7 @@ namespace FullPotential.Core.Environment
             _groundCollider = ground.GetComponent<Collider>();
         }
 
-        private Vector3 GetPositionAboveGround(Vector3 startingPoint)
+        public Vector3 GetPositionAboveGround(Vector3 startingPoint)
         {
             startingPoint.y += 10;
             return _groundCollider.ClosestPointOnBounds(startingPoint);

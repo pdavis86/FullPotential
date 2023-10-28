@@ -220,7 +220,7 @@ namespace FullPotential.Core.Ui.Behaviours
                     activeEffectScript.SetEffect(
                         activeEffect.Id,
                         GetEffectColor(activeEffect.Effect),
-                        _localizer.GetTranslatedTypeName(activeEffect.Effect),
+                        _localizer.Translate(activeEffect.Effect),
                         activeEffect.ShowExpiry,
                         activeEffect.Expiry);
                 }

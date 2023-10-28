@@ -6,6 +6,7 @@ namespace FullPotential.Api.Gameplay.Crafting
     public interface IResultFactory
     {
         ItemBase GetLootDrop();
-        ItemBase GetCraftedItem(string categoryName, string typeName, bool isTwoHanded, IList<ItemBase> components);
+
+        ItemBase GetCraftedItem(CraftableType craftableType, string subTypeName, bool isTwoHanded, IList<ItemBase> components);
     }
 }

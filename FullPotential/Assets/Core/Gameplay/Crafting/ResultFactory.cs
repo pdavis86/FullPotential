@@ -101,7 +101,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return _shapeOptions.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
         }
 
-        private List<IEffect> GetEffects(string craftingType, IList<ItemBase> components, ITargeting targeting = null)
+        private List<IEffect> GetEffects(CraftableType craftableType, IList<ItemBase> components, ITargeting targeting = null)
         {
             const string buff = "Buff";
             const string debuff = "Debuff";
@@ -155,7 +155,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     .Except(elementalEffects.Where(x => x != elementalEffect));
             }
 
-            if (craftingType is nameof(Armor) or nameof(Accessory))
+            if (craftableType is CraftableType.Armor or CraftableType.Accessory)
             {
                 return effects
                     .Where(x =>
@@ -164,7 +164,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     .ToList();
             }
 
-            if (craftingType == nameof(Weapon))
+            if (craftableType == CraftableType.Weapon)
             {
                 return effects
                     .Where(x =>
@@ -173,9 +173,9 @@ namespace FullPotential.Core.Gameplay.Crafting
                     .ToList();
             }
 
-            if (craftingType != nameof(Consumer))
+            if (craftableType != CraftableType.Consumer)
             {
-                throw new Exception($"Unexpected craftingType '{craftingType}'");
+                throw new Exception($"Unexpected craftingType '{craftableType}'");
             }
 
             if (effects.Any(x => effectTypeLookup[x] == buff || effectTypeLookup[x] == other))
@@ -296,7 +296,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             var typeTranslation = _localizer.Translate("crafting.loot.type");
             var suffix = int.Parse(lootDrop.GetNameHash().ToString().TrimStart('-').Substring(5));
 
-            lootDrop.Name = $"{_localizer.GetTranslatedTypeName(lootDrop.RegistryType)} ({typeTranslation} #{suffix.ToString("D5", GameManager.Instance.CurrentCulture)})";
+            lootDrop.Name = $"{_localizer.Translate(lootDrop.RegistryType)} ({typeTranslation} #{suffix.ToString("D5", GameManager.Instance.CurrentCulture)})";
 
             return lootDrop;
         }
@@ -306,37 +306,39 @@ namespace FullPotential.Core.Gameplay.Crafting
             return min + (int)Math.Round((max - min) * Math.Pow(_random.NextDouble(), 3), 0);
         }
 
-        private Consumer GetConsumer(string categoryName, IList<ItemBase> components)
+        private Consumer GetConsumer(CraftableType craftableType, ResourceConsumptionType consumptionType, IList<ItemBase> components)
         {
             var relevantComponents = components.OfType<IHasTargetingAndShape>().ToList();
 
             var targeting = GetTargeting(relevantComponents);
 
-            var consumer = new Consumer();
-
-            consumer.Id = Guid.NewGuid().ToMinimisedString();
-            consumer.Targeting = targeting;
-            consumer.Shape = GetShapeOrNone(targeting, relevantComponents);
-            consumer.Attributes = new Attributes
+            var consumer = new Consumer
             {
-                IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
-                Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
-                Range = ComputeAttribute(components, x => x.Attributes.Range),
-                Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
-                Speed = ComputeAttribute(components, x => x.Attributes.Speed),
-                Recovery = ComputeAttribute(components, x => x.Attributes.Recovery),
-                Duration = ComputeAttribute(components, x => x.Attributes.Duration)
+                Id = Guid.NewGuid().ToMinimisedString(),
+                ResourceConsumptionType = consumptionType,
+                Targeting = targeting,
+                Shape = GetShapeOrNone(targeting, relevantComponents),
+                Attributes = new Attributes
+                {
+                    IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
+                    Strength = ComputeAttribute(components, x => x.Attributes.Strength),
+                    Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
+                    Range = ComputeAttribute(components, x => x.Attributes.Range),
+                    Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
+                    Speed = ComputeAttribute(components, x => x.Attributes.Speed),
+                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery),
+                    Duration = ComputeAttribute(components, x => x.Attributes.Duration)
+                },
+                Effects = GetEffects(craftableType, components, targeting)
             };
-            consumer.Effects = GetEffects(categoryName, components, targeting);
 
-            var suffix = _localizer.GetTranslatedTypeName(consumer.Targeting)
-                + " "
-                + _localizer.Translate(TranslationType.CraftingCategory, categoryName);
+            var suffix = _localizer.Translate(consumer.Targeting)
+                + (consumer.Shape != null ? " " + _localizer.Translate(consumer.Shape) : null)
+                + " " + _localizer.Translate(craftableType);
 
             if (consumer.Effects.Count > 0)
             {
-                consumer.Name = _localizer.GetTranslatedTypeName(consumer.Effects.First()) + " " + suffix;
+                consumer.Name = _localizer.Translate(consumer.Effects.First()) + " " + suffix;
             }
             else
             {
@@ -354,7 +356,7 @@ namespace FullPotential.Core.Gameplay.Crafting
         private string GetItemName(bool isAttack, ItemBase item, string customSuffix = null)
         {
             var suffix = string.IsNullOrWhiteSpace(customSuffix)
-                ? _localizer.GetTranslatedTypeName(item.RegistryType)
+                ? _localizer.Translate(item.RegistryType)
                 : customSuffix;
             return $"{GetItemNamePrefix(isAttack)} {item.Attributes.Strength} {suffix}";
         }
@@ -373,7 +375,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(nameof(Weapon), components)
+                Effects = GetEffects(CraftableType.Weapon, components)
             };
             weapon.Name = GetItemName(true, weapon);
             return weapon;
@@ -398,7 +400,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(nameof(Weapon), components)
+                Effects = GetEffects(CraftableType.Weapon, components)
             };
             weapon.Name = GetItemName(true, weapon);
             weapon.Ammo = weapon.GetAmmoMax();
@@ -419,7 +421,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(nameof(Weapon), components)
+                Effects = GetEffects(CraftableType.Weapon, components)
             };
             weapon.Name = GetItemName(false, weapon);
             return weapon;
@@ -436,7 +438,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength)
                 },
-                Effects = GetEffects(nameof(Armor), components)
+                Effects = GetEffects(CraftableType.Armor, components)
             };
             armor.Name = GetItemName(false, armor);
             return armor;
@@ -456,7 +458,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(nameof(Armor), components)
+                Effects = GetEffects(CraftableType.Armor, components)
             };
             armor.Name = GetItemName(false, armor);
             return armor;
@@ -473,23 +475,22 @@ namespace FullPotential.Core.Gameplay.Crafting
                     IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength)
                 },
-                Effects = GetEffects(nameof(Accessory), components)
+                Effects = GetEffects(CraftableType.Accessory, components)
             };
             accessory.Name = GetItemName(true, accessory);
             return accessory;
         }
 
-        public ItemBase GetCraftedItem(string categoryName, string typeName, bool isTwoHanded, IList<ItemBase> components)
+        public ItemBase GetCraftedItem(CraftableType craftableType, string subTypeName, bool isTwoHanded, IList<ItemBase> components)
         {
-            if (categoryName == nameof(Consumer))
+            switch (craftableType)
             {
-                return GetConsumer(categoryName, components);
-            }
+                case CraftableType.Consumer:
+                    var consumptionType = (ResourceConsumptionType)Enum.Parse(typeof(ResourceConsumptionType), subTypeName);
+                    return GetConsumer(craftableType, consumptionType, components);
 
-            switch (categoryName)
-            {
-                case nameof(Weapon):
-                    var craftableWeapon = _typeRegistry.GetRegisteredByTypeName<IWeapon>(typeName);
+                case CraftableType.Weapon:
+                    var craftableWeapon = _typeRegistry.GetRegisteredByTypeName<IWeapon>(subTypeName);
                     switch (craftableWeapon.Category)
                     {
                         case WeaponCategory.Melee: return GetMeleeWeapon(craftableWeapon, components, isTwoHanded);
@@ -498,18 +499,18 @@ namespace FullPotential.Core.Gameplay.Crafting
                         default: throw new Exception($"Unexpected weapon category '{craftableWeapon.Category}'");
                     }
 
-                case nameof(Armor):
-                    var craftableArmor = _typeRegistry.GetRegisteredByTypeName<IArmorVisuals>(typeName);
+                case CraftableType.Armor:
+                    var craftableArmor = _typeRegistry.GetRegisteredByTypeName<IArmorVisuals>(subTypeName);
                     return craftableArmor.Category == ArmorCategory.Barrier
                         ? GetBarrier(craftableArmor, components)
                         : GetArmor(craftableArmor, components);
 
-                case nameof(Accessory):
-                    var craftableAccessory = _typeRegistry.GetRegisteredByTypeName<IAccessoryVisuals>(typeName);
+                case CraftableType.Accessory:
+                    var craftableAccessory = _typeRegistry.GetRegisteredByTypeName<IAccessoryVisuals>(subTypeName);
                     return GetAccessory(craftableAccessory, components);
 
                 default:
-                    throw new Exception($"Unexpected craftable category '{categoryName}'");
+                    throw new Exception($"Unexpected craftable category '{craftableType}'");
             }
         }
 

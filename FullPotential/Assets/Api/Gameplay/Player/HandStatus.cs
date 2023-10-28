@@ -63,9 +63,9 @@ namespace FullPotential.Api.Gameplay.Player
             }
         }
 
-        public bool IsConsumingResource(ResourceConsumptionType resourceType)
+        public bool IsConsumingResource(ResourceConsumptionType consumptionType)
         {
-            return ActiveConsumer != null && EquippedConsumer.ResourceConsumptionType == resourceType;
+            return ActiveConsumer != null && EquippedConsumer.ResourceConsumptionType == consumptionType;
         }
     }
 }

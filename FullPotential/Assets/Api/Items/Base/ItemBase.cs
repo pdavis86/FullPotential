@@ -154,7 +154,7 @@ namespace FullPotential.Api.Items.Base
 
             if (Effects != null && Effects.Count > 0)
             {
-                var localisedEffects = Effects.Select(localizer.GetTranslatedTypeName);
+                var localisedEffects = Effects.Select(localizer.Translate);
                 sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Effects))}: {string.Join(", ", localisedEffects)}\n");
             }
 

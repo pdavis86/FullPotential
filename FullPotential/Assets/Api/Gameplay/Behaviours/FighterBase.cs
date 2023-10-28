@@ -192,13 +192,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected override bool IsConsumingEnergy()
         {
-            return HandStatusLeft.IsConsumingResource(ResourceConsumptionType.Energy) 
+            return HandStatusLeft.IsConsumingResource(ResourceConsumptionType.Energy)
                    || HandStatusRight.IsConsumingResource(ResourceConsumptionType.Energy);
         }
 
         protected override bool IsConsumingMana()
         {
-            return HandStatusLeft.IsConsumingResource(ResourceConsumptionType.Mana) 
+            return HandStatusLeft.IsConsumingResource(ResourceConsumptionType.Mana)
                    || HandStatusRight.IsConsumingResource(ResourceConsumptionType.Mana);
         }
 
@@ -489,17 +489,24 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             ConsumeResource(consumer);
 
-            _combatService.SpawnTargetingGameObject(this, consumer, handPosition, attackDirection);
-
             var targets = consumer.Targeting.GetTargets(this, consumer);
 
-            if (targets != null)
+            if (consumer.Shape == null)
             {
-                foreach (var target in targets)
+                _combatService.SpawnTargetingGameObject(this, consumer, handPosition, attackDirection);
+
+                if (targets != null)
                 {
-                    //todo: target.EffectPercentage
-                    _combatService.ApplyEffects(this, consumer, target.GameObject, target.Position);
+                    foreach (var target in targets)
+                    {
+                        //todo: target.EffectPercentage
+                        _combatService.ApplyEffects(this, consumer, target.GameObject, target.Position);
+                    }
                 }
+            }
+            else
+            {
+                _combatService.SpawnShapeGameObject(this, consumer, null, transform.position, attackDirection);
             }
 
             return true;

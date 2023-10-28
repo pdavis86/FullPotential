@@ -18,8 +18,8 @@ namespace FullPotential.Api.Localization
 
         string Translate(TranslationType type, string suffix);
 
-        string GetTranslatedTypeName(IRegisterable registeredItem);
+        string Translate(IRegisterable registeredItem);
 
-        string GetTranslatedTypeName(Enum enumValue);
+        string Translate(Enum enumValue);
     }
 }

@@ -269,12 +269,12 @@ namespace FullPotential.Core.UI.Behaviours
 
         private ItemBase GetCraftableItem()
         {
-            var category = _craftingSelector.GetCraftingCategory().Key.Name;
+            var typeToCraft = _craftingSelector.GetTypeToCraft();
             var component = GetLootFromChoices();
 
             return _resultFactory.GetCraftedItem(
-                category,
-                _craftingSelector.GetCraftableTypeName(category),
+                typeToCraft,
+                _craftingSelector.GetSubTypeName(typeToCraft),
                 _craftingSelector.IsTwoHandedSelected(),
                 new List<ItemBase> { component });
         }
@@ -291,12 +291,12 @@ namespace FullPotential.Core.UI.Behaviours
         {
             var component = GetLootFromChoices();
             var componentJson = JsonUtility.ToJson(component);
-            var category = _craftingSelector.GetCraftingCategory().Key.Name;
+            var craftableType = _craftingSelector.GetTypeToCraft();
 
             GameManager.Instance.GetLocalPlayerGameObject().GetComponent<PlayerBehaviour>().CraftItemAsAdminServerRpc(
                 componentJson,
-                category,
-                _craftingSelector.GetCraftableTypeName(category),
+                craftableType.ToString(),
+                _craftingSelector.GetSubTypeName(craftableType),
                 _craftingSelector.IsTwoHandedSelected(),
                 _itemNameText.text
                 );

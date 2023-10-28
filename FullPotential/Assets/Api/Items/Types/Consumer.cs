@@ -87,12 +87,24 @@ namespace FullPotential.Api.Items.Types
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {GetType().Name}" + "\n");
             }
 
-            if (Targeting != null) { sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Targeting))}: {localizer.GetTranslatedTypeName(Targeting)}\n"); }
-            if (Shape != null) { sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Shape))}: {localizer.GetTranslatedTypeName(Shape)}\n"); }
+            if (Targeting != null)
+            {
+                sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(ResourceConsumptionType))}: {localizer.Translate(ResourceConsumptionType)}\n");
+            }
+
+            if (Targeting != null)
+            {
+                sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Targeting))}: {localizer.Translate(Targeting)}\n");
+            }
+
+            if (Shape != null)
+            {
+                sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Shape))}: {localizer.Translate(Shape)}\n");
+            }
 
             if (Effects != null && Effects.Count > 0)
             {
-                var localisedEffects = Effects.Select(localizer.GetTranslatedTypeName);
+                var localisedEffects = Effects.Select(localizer.Translate);
                 sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Effects))}: {string.Join(", ", localisedEffects)}\n");
             }
 

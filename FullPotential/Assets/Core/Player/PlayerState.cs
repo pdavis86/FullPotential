@@ -497,10 +497,10 @@ namespace FullPotential.Core.Player
             if (IsServer)
             {
                 _entityName.Value = Username;
-                _energy.Value = playerData.ResourceType.Energy;
-                _health.Value = playerData.ResourceType.Health > 0 ? playerData.ResourceType.Health : GetHealthMax();
-                _mana.Value = playerData.ResourceType.Mana;
-                _stamina.Value = playerData.ResourceType.Stamina;
+                _energy.Value = playerData.ResourceLevels.Energy;
+                _health.Value = playerData.ResourceLevels.Health > 0 ? playerData.ResourceLevels.Health : GetHealthMax();
+                _mana.Value = playerData.ResourceLevels.Mana;
+                _stamina.Value = playerData.ResourceLevels.Stamina;
             }
 
             try
@@ -660,10 +660,10 @@ namespace FullPotential.Core.Player
 
         public PlayerData UpdateAndReturnPlayerData()
         {
-            _saveData.ResourceType.Energy = _energy.Value;
-            _saveData.ResourceType.Health = _health.Value;
-            _saveData.ResourceType.Mana = _mana.Value;
-            _saveData.ResourceType.Stamina = _stamina.Value;
+            _saveData.ResourceLevels.Energy = _energy.Value;
+            _saveData.ResourceLevels.Health = _health.Value;
+            _saveData.ResourceLevels.Mana = _mana.Value;
+            _saveData.ResourceLevels.Stamina = _stamina.Value;
             _saveData.Inventory = Inventory.GetSaveData();
             return _saveData;
         }

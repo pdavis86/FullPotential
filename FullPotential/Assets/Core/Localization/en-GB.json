@@ -3,59 +3,73 @@
   "Name": "English (United Kingdom)",
   "Translations": [
     {
-      "Key": "accessory.amulet",
+      "Key": "accessorycategory.amulet",
       "Value": "Amulet"
     },
     {
-      "Key": "accessory.belt",
+      "Key": "accessorycategory.belt",
       "Value": "Belt"
     },
     {
-      "Key": "accessory.ring",
+      "Key": "accessorycategory.ring",
       "Value": "Ring"
     },
 
 
     {
-      "Key": "armor.helm",
+      "Key": "armorcategory.helm",
       "Value": "Helm"
     },
     {
-      "Key": "armor.chest",
+      "Key": "armorcategory.chest",
       "Value": "Chest"
     },
     {
-      "Key": "armor.legs",
+      "Key": "armorcategory.legs",
       "Value": "Legs"
     },
     {
-      "Key": "armor.feet",
+      "Key": "armorcategory.feet",
       "Value": "Feet"
     },
     {
-      "Key": "armor.barrier",
+      "Key": "armorcategory.barrier",
       "Value": "Barrier"
     },
 	
 	{
-      "Key": "crafting.category.weapon",
+      "Key": "craftabletype.weapon",
       "Value": "Weapon"
     },
     {
-      "Key": "crafting.category.armor",
+      "Key": "craftabletype.armor",
       "Value": "Armor"
     },
     {
-      "Key": "crafting.category.accessory",
+      "Key": "craftabletype.accessory",
       "Value": "Accessory"
     },
     {
-      "Key": "crafting.category.spell",
-      "Value": "Spell"
+      "Key": "craftabletype.consumer",
+      "Value": "Consumer"
+    },
+	
+	
+    {
+      "Key": "resourceconsumptiontype.health",
+      "Value": "Health"
     },
     {
-      "Key": "crafting.category.gadget",
-      "Value": "Gadget"
+      "Key": "resourceconsumptiontype.stamina",
+      "Value": "Stamina"
+    },
+    {
+      "Key": "resourceconsumptiontype.mana",
+      "Value": "Mana"
+    },
+    {
+      "Key": "resourceconsumptiontype.energy",
+      "Value": "Energy"
     },
     
 	
@@ -168,6 +182,10 @@
     {
       "Key": "attribute.luck",
       "Value": "Luck"
+    },
+    {
+      "Key": "attribute.resourceconsumptiontype",
+      "Value": "Consumes"
     },
 	
 	

@@ -28,5 +28,12 @@ namespace FullPotential.Api.Gameplay.Combat
             Consumer consumer,
             Vector3 startPosition,
             Vector3 direction);
+
+        void SpawnShapeGameObject(
+            IFighter sourceFighter,
+            Consumer consumer,
+            GameObject target,
+            Vector3 fallbackPosition,
+            Vector3 lookDirection);
     }
 }

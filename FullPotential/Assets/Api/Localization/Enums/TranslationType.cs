@@ -5,7 +5,6 @@
         Attribute,
         AttributeAlias,
         AttributeUnits,
-        CraftingCategory,
         CraftingHandedness,
         CraftingNamePrefix,
         Item,

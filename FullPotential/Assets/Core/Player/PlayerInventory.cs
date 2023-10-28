@@ -119,6 +119,7 @@ namespace FullPotential.Core.Player
                 .UnionIfNotNull(changes.Armor)
                 .UnionIfNotNull(changes.Gadgets)
                 .UnionIfNotNull(changes.Spells)
+                .UnionIfNotNull(changes.Consumers)
                 .UnionIfNotNull(changes.Weapons)
                 .FirstOrDefault();
 
@@ -284,6 +285,7 @@ namespace FullPotential.Core.Player
                 .UnionIfNotNull(changes.Armor)
                 .UnionIfNotNull(changes.Gadgets)
                 .UnionIfNotNull(changes.Spells)
+                .UnionIfNotNull(changes.Consumers)
                 .UnionIfNotNull(changes.Weapons);
 
             foreach (var item in itemsToAdd)

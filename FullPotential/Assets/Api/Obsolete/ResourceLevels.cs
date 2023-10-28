@@ -3,7 +3,7 @@
 namespace FullPotential.Api.Obsolete
 {
     [Serializable]
-    public class ResourceType
+    public class ResourceLevels
     {
         public int Energy;
         public int Health;

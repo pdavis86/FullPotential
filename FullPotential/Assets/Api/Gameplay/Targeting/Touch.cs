@@ -13,7 +13,7 @@ namespace FullPotential.Api.Gameplay.Targeting
 
         public string TypeName => nameof(Touch);
 
-        public bool CanHaveShape => true;
+        public bool CanHaveShape => false;
 
         public bool IsContinuous => false;
 

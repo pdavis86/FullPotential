@@ -9,7 +9,7 @@ namespace FullPotential.Api.Gameplay.Player
     {
         public string Username;
         public PlayerSettings Settings;
-        public ResourceType ResourceType;
+        public ResourceLevels ResourceLevels;
         public InventoryData Inventory;
 
         [NonSerialized] public bool InventoryLoadedSuccessfully;

@@ -122,7 +122,7 @@
     <Compile Include="Assets\Api\Localization\ILocalizer.cs" />
     <Compile Include="Assets\Api\Items\Types\Weapon.cs" />
     <Compile Include="Assets\Api\Localization\Enums\TranslationType.cs" />
-    <Compile Include="Assets\Api\Obsolete\ResourceType.cs" />
+    <Compile Include="Assets\Api\Obsolete\ResourceLevels.cs" />
     <Compile Include="Assets\Api\Obsolete\AccessoryCategory.cs" />
     <Compile Include="Assets\Api\Utilities\Data\KeyValuePair.cs" />
     <Compile Include="Assets\Api\Gameplay\Targeting\Self.cs" />
@@ -172,6 +172,8 @@
     <Compile Include="Assets\Api\Unity\Services\IUnityHelperUtilities.cs" />
     <Compile Include="Assets\Api\Unity\Services\IShaderUtilities.cs" />
     <Compile Include="Assets\Api\Unity\Constants\ShaderRenderMode.cs" />
+    <Compile Include="Assets\Api\Utilities\Extensions\DictionaryExtensions.cs" />
+    <Compile Include="Assets\Api\Gameplay\Crafting\CraftableType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Api\FullPotential.Api.asmdef" />

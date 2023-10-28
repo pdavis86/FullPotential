@@ -4,6 +4,7 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Items;
+using FullPotential.Api.Gameplay.Shapes;
 using FullPotential.Api.Gameplay.Targeting;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
@@ -13,6 +14,7 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Registry.Weapons;
+using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
@@ -38,7 +40,7 @@ namespace FullPotential.Core.Gameplay.Combat
         {
             _typeRegistry = typeRegistry;
             _rpcService = rpcService;
-
+            
             _punchEffect = new Punch();
         }
 
@@ -510,6 +512,54 @@ namespace FullPotential.Core.Gameplay.Combat
 
                     consumer.Stoppables.Add(new DestroyStoppable(targetingGameObject));
                 });
+        }
+
+        public void SpawnShapeGameObject(IFighter sourceFighter, Consumer consumer, GameObject target, Vector3 fallbackPosition, Vector3 lookDirection)
+        {
+            if (consumer.Shape == null)
+            {
+                return;
+            }
+
+            Vector3 spawnPosition;
+            if (target == null || !target.CompareTagAny(Tags.Player, Tags.Enemy))
+            {
+                spawnPosition = fallbackPosition;
+            }
+            else
+            {
+                var pointUnderTarget = new Vector3(target.transform.position.x, -100, target.transform.position.z);
+                var feetOfTarget = target.GetComponent<Collider>().ClosestPointOnBounds(pointUnderTarget);
+
+                spawnPosition = Physics.Raycast(feetOfTarget, Vector3.down, out var hit)
+                    ? hit.point
+                    : fallbackPosition;
+            }
+
+            var rotation = Quaternion.LookRotation(lookDirection);
+            rotation.x = 0;
+            rotation.z = 0;
+
+            _typeRegistry.LoadAddessable(
+                consumer.Shape.PrefabAddress,
+                prefab =>
+                {
+                    SpawnShapeGameObjects(sourceFighter, consumer, prefab, spawnPosition, lookDirection, rotation);
+                });
+        }
+
+        private void SpawnShapeGameObjects(IFighter sourceFighter, Consumer consumer, GameObject prefab, Vector3 spawnPosition, Vector3 lookDirection, Quaternion rotation)
+        {
+            var shapeGameObject = UnityEngine.Object.Instantiate(prefab, spawnPosition, rotation);
+
+            shapeGameObject.transform.position = GameManager.Instance.GetSceneBehaviour().GetSceneService().GetPositionAboveGround(spawnPosition, shapeGameObject);
+
+            var shapeBehaviour = shapeGameObject.GetComponent<IShapeBehaviour>();
+            shapeBehaviour.SourceFighter = sourceFighter;
+            shapeBehaviour.Consumer = consumer;
+            shapeBehaviour.Direction = lookDirection;
+
+            shapeGameObject.NetworkSpawn();
         }
     }
 }

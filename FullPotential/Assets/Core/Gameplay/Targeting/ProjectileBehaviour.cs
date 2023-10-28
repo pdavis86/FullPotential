@@ -1,13 +1,9 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Shapes;
 using FullPotential.Api.Gameplay.Targeting;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Registry;
-using FullPotential.Api.Unity.Constants;
-using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Core.GameManagement;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -88,7 +84,7 @@ namespace FullPotential.Core.Gameplay.Targeting
 
             _combatService.ApplyEffects(SourceFighter, Consumer, other.gameObject, other.ClosestPointOnBounds(transform.position));
 
-            SpawnShape(other.gameObject, other.ClosestPointOnBounds(transform.position));
+            _combatService.SpawnShapeGameObject(SourceFighter, Consumer, other.gameObject, other.ClosestPointOnBounds(transform.position), Direction);
 
             Consumer.StopStoppables();
 
@@ -110,72 +106,6 @@ namespace FullPotential.Core.Gameplay.Targeting
                     var visualsGameObject = Instantiate(visualsPrefab, transform);
                     visualsGameObject.transform.localScale = Vector3.one;
                 });
-        }
-
-        private void SpawnShape(GameObject target, Vector3? position)
-        {
-            if (Consumer.Shape == null)
-            {
-                return;
-            }
-
-            if (!position.HasValue)
-            {
-                Debug.LogError("Position Vector3 cannot be null for spawning a shape");
-                return;
-            }
-
-            Vector3 spawnPosition;
-            if (!target.CompareTagAny(Tags.Player, Tags.Enemy))
-            {
-                spawnPosition = position.Value;
-            }
-            else
-            {
-                var pointUnderTarget = new Vector3(target.transform.position.x, -100, target.transform.position.z);
-                var feetOfTarget = target.GetComponent<Collider>().ClosestPointOnBounds(pointUnderTarget);
-
-                spawnPosition = Physics.Raycast(feetOfTarget, Vector3.down, out var hit)
-                    ? hit.point
-                    : position.Value;
-            }
-
-            if (Consumer.Shape is Wall)
-            {
-                var rotation = Quaternion.LookRotation(Direction);
-                rotation.x = 0;
-                rotation.z = 0;
-
-                var wallPrefab = GameManager.Instance.Prefabs.Shapes.Wall;
-
-                var adjustedSpawnPosition = GameManager.Instance.GetSceneBehaviour().GetSceneService().GetPositionAboveGround(spawnPosition, wallPrefab);
-
-                SpawnShapeGameObjects(wallPrefab, adjustedSpawnPosition, rotation);
-            }
-            else if (Consumer.Shape is Zone)
-            {
-                var zonePrefab = GameManager.Instance.Prefabs.Shapes.Zone;
-
-                var adjustedSpawnPosition = GameManager.Instance.GetSceneBehaviour().GetSceneService().GetPositionAboveGround(spawnPosition, zonePrefab);
-
-                SpawnShapeGameObjects(zonePrefab, adjustedSpawnPosition, Quaternion.identity);
-            }
-            else
-            {
-                Debug.LogError($"Unexpected shape for consumer {Consumer.Id} '{Consumer.Name}'");
-            }
-        }
-
-        private void SpawnShapeGameObjects(GameObject prefab, Vector3 spawnPosition, Quaternion rotation)
-        {
-            var shapeGameObject = Instantiate(prefab, spawnPosition, rotation);
-
-            var shapeBehaviour = shapeGameObject.GetComponent<IShapeBehaviour>();
-            shapeBehaviour.SourceFighter = SourceFighter;
-            shapeBehaviour.Consumer = Consumer;
-            shapeBehaviour.Direction = Direction;
-
-            shapeGameObject.NetworkSpawn();
         }
     }
 }

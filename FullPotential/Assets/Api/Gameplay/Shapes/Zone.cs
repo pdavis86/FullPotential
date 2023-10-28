@@ -11,6 +11,8 @@ namespace FullPotential.Api.Gameplay.Shapes
 
         public string TypeName => nameof(Zone);
 
+        public string PrefabAddress => "Core/Prefabs/Shapes/Zone.prefab";
+
         public string VisualsFallbackPrefabAddress => "Core/Prefabs/Shapes/ZoneVisuals.prefab";
     }
 }
