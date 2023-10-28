@@ -7,7 +7,7 @@ namespace FullPotential.Api.Gameplay.Player
 {
     public class HandStatus
     {
-        public ItemBase EquippedItem{ get; private set; }
+        public ItemBase EquippedItem { get; private set; }
 
         public string EquippedItemDescription { get; private set; }
 

@@ -3,7 +3,6 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Scenes;
-using FullPotential.Api.Spawning;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.Enemies.Behaviours;
@@ -26,7 +25,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
 #pragma warning restore 0649
 
         private IGameManager _gameManager;
-        private ISpawnService _spawnService;
+        private ISceneService _sceneService;
 
         private List<Transform> _spawnPoints;
         private NetworkObject _enemyPrefabNetObj;
@@ -46,7 +45,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
         private void Awake()
         {
             _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
-            _spawnService = DependenciesContext.Dependencies.GetService<ISpawnService>();
+            _sceneService = DependenciesContext.Dependencies.GetService<ISceneService>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -107,7 +106,9 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
             var enemyNetObj = Instantiate(_enemyPrefabNetObj, chosenSpawnPoint.Position, chosenSpawnPoint.Rotation);
 
-            _spawnService.AdjustPositionToBeAboveGround(chosenSpawnPoint.Position, enemyNetObj.transform);
+            enemyNetObj.transform.position = _sceneService.GetPositionAboveGround(
+                chosenSpawnPoint.Position,
+                enemyNetObj.GetComponent<Collider>());
 
             enemyNetObj.Spawn(true);
 
@@ -125,9 +126,9 @@ namespace FullPotential.Standard.Scenes.Behaviours
             }
         }
 
-        public ISpawnService GetSpawnService()
+        public ISceneService GetSceneService()
         {
-            return _spawnService;
+            return _sceneService;
         }
 
         public Transform GetTransform()
@@ -135,23 +136,13 @@ namespace FullPotential.Standard.Scenes.Behaviours
             return transform;
         }
 
-        public SpawnPoint GetSpawnPoint(GameObject gameObjectToSpawn = null)
+        public SpawnPoint GetSpawnPoint()
         {
             var chosenSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Count)];
             var spawnPosition = chosenSpawnPoint.position + new Vector3(
                 Random.Range(_spawnVariationMin, _spawnVariationMax),
                 0,
                 Random.Range(_spawnVariationMin, _spawnVariationMax));
-
-            if (gameObjectToSpawn != null)
-            {
-                _spawnService.AdjustPositionToBeAboveGround(spawnPosition, gameObjectToSpawn.transform);
-                return new SpawnPoint
-                {
-                    Position = gameObjectToSpawn.transform.position,
-                    Rotation = chosenSpawnPoint.rotation
-                };
-            }
 
             return new SpawnPoint
             {

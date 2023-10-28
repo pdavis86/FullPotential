@@ -120,7 +120,7 @@
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\TextLocalizer.cs" />
     <Compile Include="Assets\Core\GameManagement\Data\LocalGameData.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\TextMeshProLocalizer.cs" />
-    <Compile Include="Assets\Core\Spawning\SpawnService.cs" />
+    <Compile Include="Assets\Core\Environment\SceneService.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\ProjectileWithTrail.cs" />
     <Compile Include="Assets\Core\Networking\ClientNetworkTransform.cs" />
     <Compile Include="Assets\Core\Networking\Data\ConnectionPayload.cs" />

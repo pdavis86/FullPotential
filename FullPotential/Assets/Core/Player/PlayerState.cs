@@ -238,7 +238,7 @@ namespace FullPotential.Core.Player
 
             AliveState = LivingEntityState.Respawning;
 
-            var spawnPoint = GameManager.Instance.GetSceneBehaviour().GetSpawnPoint(gameObject);
+            var spawnPoint = GameManager.Instance.GetSceneBehaviour().GetSpawnPoint();
 
             PlayerSpawnStateChange(AliveState, spawnPoint.Position, spawnPoint.Rotation);
 
@@ -294,7 +294,8 @@ namespace FullPotential.Core.Player
 
             var go = Instantiate(prefab, position, transform.rotation * Quaternion.Euler(0, 90, 0));
 
-            GameManager.Instance.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, go.transform);
+            var sceneService = _gameManager.GetSceneBehaviour().GetSceneService();
+            go.transform.position = sceneService.GetPositionAboveGround(position, go.GetComponent<Collider>());
 
             go.transform.parent = GameManager.Instance.GetSceneBehaviour().GetTransform();
             go.name = id;
@@ -362,7 +363,8 @@ namespace FullPotential.Core.Player
                     break;
 
                 case LivingEntityState.Respawning:
-                    GameManager.Instance.GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, transform, _myHeight);
+                    var sceneService = _gameManager.GetSceneBehaviour().GetSceneService();
+                    transform.position = sceneService.GetPositionAboveGround(position, _myHeight);
 
                     transform.rotation = rotation;
                     _playerCamera.transform.localEulerAngles = Vector3.zero;

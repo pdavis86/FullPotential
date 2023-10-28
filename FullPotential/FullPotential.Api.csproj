@@ -95,7 +95,7 @@
     <Compile Include="Assets\Api\Ui\IHud.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\IFighter.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Layers.cs" />
-    <Compile Include="Assets\Api\Spawning\ISpawnService.cs" />
+    <Compile Include="Assets\Api\Scenes\ISceneService.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\StringExtensions.cs" />
     <Compile Include="Assets\Api\Ui\Services\UiAssistant.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IStatEffect.cs" />

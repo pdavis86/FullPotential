@@ -6,8 +6,9 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Persistence;
-using FullPotential.Api.Spawning;
+using FullPotential.Api.Scenes;
 using FullPotential.Api.Ui.Services;
+using FullPotential.Core.Environment;
 using FullPotential.Core.GameManagement.Inventory;
 using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Crafting;
@@ -17,7 +18,6 @@ using FullPotential.Core.Modding;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Persistence;
 using FullPotential.Core.Registry;
-using FullPotential.Core.Spawning;
 
 namespace FullPotential.Core.GameManagement
 {
@@ -25,12 +25,15 @@ namespace FullPotential.Core.GameManagement
     {
         public static void RegisterServices()
         {
+            //Scoped
+            DependenciesContext.Dependencies.Register<ISceneService, SceneService>(true);
+
+            //Singleton
             DependenciesContext.Dependencies.Register<IUserRepository, UserRepository>();
             DependenciesContext.Dependencies.Register<IResultFactory, ResultFactory>();
             DependenciesContext.Dependencies.Register<IInventoryDataService, InventoryDataService>();
             DependenciesContext.Dependencies.Register<ILocalizer, Localizer>();
             DependenciesContext.Dependencies.Register<ITypeRegistry, TypeRegistry>();
-            DependenciesContext.Dependencies.Register<ISpawnService, SpawnService>(true);
             DependenciesContext.Dependencies.Register<IRpcService, RpcService>();
             DependenciesContext.Dependencies.Register<ICombatService, CombatService>();
             DependenciesContext.Dependencies.Register<IModHelper, ModHelper>();

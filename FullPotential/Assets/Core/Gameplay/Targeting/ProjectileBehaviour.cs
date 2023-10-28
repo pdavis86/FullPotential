@@ -148,7 +148,7 @@ namespace FullPotential.Core.Gameplay.Targeting
 
                 var wallPrefab = GameManager.Instance.Prefabs.Shapes.Wall;
 
-                var adjustedSpawnPosition = GameManager.Instance.GetSceneBehaviour().GetSpawnService().GetPositionAboveGround(spawnPosition, wallPrefab.GetComponent<Collider>());
+                var adjustedSpawnPosition = GameManager.Instance.GetSceneBehaviour().GetSceneService().GetPositionAboveGround(spawnPosition, wallPrefab);
 
                 SpawnShapeGameObjects(wallPrefab, adjustedSpawnPosition, rotation);
             }
@@ -156,7 +156,7 @@ namespace FullPotential.Core.Gameplay.Targeting
             {
                 var zonePrefab = GameManager.Instance.Prefabs.Shapes.Zone;
 
-                var adjustedSpawnPosition = GameManager.Instance.GetSceneBehaviour().GetSpawnService().GetPositionAboveGround(spawnPosition, zonePrefab.GetComponent<Collider>());
+                var adjustedSpawnPosition = GameManager.Instance.GetSceneBehaviour().GetSceneService().GetPositionAboveGround(spawnPosition, zonePrefab);
 
                 SpawnShapeGameObjects(zonePrefab, adjustedSpawnPosition, Quaternion.identity);
             }
