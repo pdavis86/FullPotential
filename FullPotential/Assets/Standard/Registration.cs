@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using FullPotential.Api.Modding;
-using FullPotential.Standard.Shapes;
-using FullPotential.Standard.Targeting;
 using UnityEngine;
 
 // ReSharper disable UnusedType.Global
@@ -15,12 +13,23 @@ namespace FullPotential.Standard
         {
             return new[]
             {
-                //todo: Armor classes need renaming to be less generic
-                typeof(Armor.Helm),
-                typeof(Armor.Chest),
-                typeof(Armor.Legs),
-                typeof(Armor.Feet),
-                typeof(Armor.Barrier),
+                typeof(Accessories.SilverNecklace),
+                typeof(Accessories.LeatherBelt),
+                typeof(Accessories.SilverRing),
+
+                typeof(Armor.LeatherHelmet),
+                typeof(Armor.LeatherJerkin),
+                typeof(Armor.LeatherGreaves),
+                typeof(Armor.LeatherBoots),
+                typeof(Armor.BasicWard),
+                
+                typeof(Targeting.ProjectileFlames),
+
+                typeof(Shapes.WallOfFlames),
+                typeof(Shapes.ZoneOfFlames),
+
+                typeof(Loot.Scrap),
+                typeof(Loot.Shard),
 
                 typeof(Weapons.Axe),
                 typeof(Weapons.Bow),
@@ -31,17 +40,6 @@ namespace FullPotential.Standard
                 typeof(Weapons.Shield),
                 typeof(Weapons.Staff),
                 typeof(Weapons.Sword),
-
-                typeof(Accessories.Amulet),
-                typeof(Accessories.Belt),
-                typeof(Accessories.Ring),
-
-                typeof(Loot.Scrap),
-                typeof(Loot.Shard),
-                
-                typeof(ProjectileVisuals),
-                typeof(WallVisuals),
-                typeof(ZoneVisuals),
 
                 typeof(Effects.Buffs.Courage),
                 typeof(Effects.Buffs.Endurance),

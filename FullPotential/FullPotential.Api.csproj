@@ -58,7 +58,7 @@
   <ItemGroup>
     <Compile Include="Assets\Api\Unity\Extensions\GameObjectExtensions.cs" />
     <Compile Include="Assets\Api\Persistence\ISettingsRepository.cs" />
-    <Compile Include="Assets\Api\Registry\Crafting\ILoot.cs" />
+    <Compile Include="Assets\Api\Registry\ILoot.cs" />
     <Compile Include="Assets\Api\Registry\IRegisterable.cs" />
     <Compile Include="Assets\Api\Obsolete\ResourseConsumptionType.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector2Extensions.cs" />
@@ -71,7 +71,6 @@
     <Compile Include="Assets\Api\Items\Types\Armor.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\Interactable.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\IPlayerFighter.cs" />
-    <Compile Include="Assets\Api\Registry\Crafting\IGearAccessory.cs" />
     <Compile Include="Assets\Api\Items\IHasTargetingAndShape.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IIsSideEffect.cs" />
     <Compile Include="Assets\Api\Obsolete\LivingEntityState.cs" />
@@ -80,7 +79,7 @@
     <Compile Include="Assets\Api\Gameplay\Behaviours\IPlayerBehaviour.cs" />
     <Compile Include="Assets\Api\Registry\Shapes\IShape.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\ViableTarget.cs" />
-    <Compile Include="Assets\Api\Registry\Crafting\IGearWeapon.cs" />
+    <Compile Include="Assets\Api\Registry\Weapons\IWeapon.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesCollection.cs" />
     <Compile Include="Assets\Api\Registry\Effects\ICustomEffect.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\TransformExtensions.cs" />
@@ -90,7 +89,7 @@
     <Compile Include="Assets\Api\Gameplay\Combat\IDamageable.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\ActiveEffect.cs" />
     <Compile Include="Assets\Api\Input\DefaultInputActions.cs" />
-    <Compile Include="Assets\Api\Registry\Crafting\WeaponCategory.cs" />
+    <Compile Include="Assets\Api\Registry\Weapons\WeaponCategory.cs" />
     <Compile Include="Assets\Api\Utilities\ActionQueue.cs" />
     <Compile Include="Assets\Api\Ui\IHud.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\IFighter.cs" />
@@ -115,7 +114,6 @@
     <Compile Include="Assets\Api\Gameplay\Targeting\Touch.cs" />
     <Compile Include="Assets\Api\Obsolete\Attributes.cs" />
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
-    <Compile Include="Assets\Api\Registry\Crafting\IGear.cs" />
     <Compile Include="Assets\Api\Scenes\SceneAttributes.cs" />
     <Compile Include="Assets\Api\Unity\Helpers\GameObjectHelper.cs" />
     <Compile Include="Assets\Api\Gameplay\Targeting\ITargetingVisualsBehaviour.cs" />
@@ -143,7 +141,6 @@
     <Compile Include="Assets\Api\Items\Base\ItemWithTargetingAndShapeBase.cs" />
     <Compile Include="Assets\Api\Gameplay\Targeting\ITargetingBehaviour.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IAttributeEffect.cs" />
-    <Compile Include="Assets\Api\Registry\Consumers\IConsumer.cs" />
     <Compile Include="Assets\Api\Gameplay\Targeting\Projectile.cs" />
     <Compile Include="Assets\Api\Ui\IUserInterface.cs" />
     <Compile Include="Assets\Api\GameManagement\ITypeRegistry.cs" />
@@ -151,10 +148,9 @@
     <Compile Include="Assets\Api\GameManagement\IRpcService.cs" />
     <Compile Include="Assets\Api\GameManagement\GameSettings.cs" />
     <Compile Include="Assets\Api\Obsolete\AffectableStat.cs" />
-    <Compile Include="Assets\Api\Registry\Crafting\IGearArmor.cs" />
     <Compile Include="Assets\Api\Utilities\DelayedAction.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\FighterBase.cs" />
-    <Compile Include="Assets\Api\Registry\Crafting\IHasPrefab.cs" />
+    <Compile Include="Assets\Api\Registry\IHasPrefab.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IEffect.cs" />
     <Compile Include="Assets\Api\Localization\Enums\UnitsType.cs" />
     <Compile Include="Assets\Api\Obsolete\ArmorCategory.cs" />
@@ -163,7 +159,6 @@
     <Compile Include="Assets\Api\Gameplay\Inventory\InventoryData.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IHasSideEffect.cs" />
     <Compile Include="Assets\Api\Gameplay\Crafting\IResultFactory.cs" />
-    <Compile Include="Assets\Api\Registry\Crafting\ICraftable.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\PlayerSettings.cs" />
     <Compile Include="Assets\Api\Modding\IMod.cs" />
     <Compile Include="Assets\Api\Gameplay\Items\DestroyStoppable.cs" />
@@ -172,6 +167,9 @@
     <Compile Include="Assets\Api\Registry\Elements\IElement.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Tags.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\InventoryChanges.cs" />
+    <Compile Include="Assets\Api\Registry\IVisuals.cs" />
+    <Compile Include="Assets\Api\Registry\Gear\IAccessoryVisuals.cs" />
+    <Compile Include="Assets\Api\Registry\Gear\IArmorVisuals.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Api\FullPotential.Api.asmdef" />

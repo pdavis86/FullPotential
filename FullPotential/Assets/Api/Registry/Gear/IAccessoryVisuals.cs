@@ -1,8 +1,8 @@
 ﻿using FullPotential.Api.Obsolete;
 
-namespace FullPotential.Api.Registry.Crafting
+namespace FullPotential.Api.Registry.Gear
 {
-    public interface IGearAccessory : IGear
+    public interface IAccessoryVisuals : IVisuals
     {
         AccessoryCategory Category { get; }
     }

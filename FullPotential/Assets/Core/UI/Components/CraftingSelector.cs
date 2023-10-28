@@ -7,7 +7,7 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Registry.Weapons;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,11 +25,11 @@ namespace FullPotential.Core.UI.Components
 
         private List<string> _handednessOptions;
         private List<int?> _optionalTwoHandedWeaponIndexes;
+        private List<string> _accessoryTypes;
+        private List<string> _armorTypes;
+        private List<string> _consumerTypes;
         private Dictionary<Type, string> _craftingCategories;
-        private Dictionary<IGearArmor, string> _armorTypes;
-        private Dictionary<IGearAccessory, string> _accessoryTypes;
-        private Dictionary<IGearWeapon, string> _weaponTypes;
-        private Dictionary<ResourceConsumptionType, string> _consumerTypes;
+        private Dictionary<IWeapon, string> _weaponTypes;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -51,27 +51,33 @@ namespace FullPotential.Core.UI.Components
 
             var typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
 
-            _armorTypes = typeRegistry.GetRegisteredTypes<IGearArmor>()
-                .ToDictionary(x => x, x => localizer.GetTranslatedTypeName(x))
-                .ToDictionary(x => x.Key, x => x.Value);
+            _armorTypes = Enum.GetValues(typeof(ArmorCategory))
+                .Cast<ArmorCategory>()
+                .Select(x => localizer.GetTranslatedTypeName(x))
+                .OrderBy(x => x)
+                .ToList();
 
-            _accessoryTypes = typeRegistry.GetRegisteredTypes<IGearAccessory>()
-                .ToDictionary(x => x, x => localizer.GetTranslatedTypeName(x))
-                .OrderBy(x => x.Value)
-                .ToDictionary(x => x.Key, x => x.Value);
-
-            _weaponTypes = typeRegistry.GetRegisteredTypes<IGearWeapon>()
-                .ToDictionary(x => x, x => localizer.GetTranslatedTypeName(x))
-                .OrderBy(x => x.Value)
-                .ToDictionary(x => x.Key, x => x.Value);
+            _accessoryTypes = Enum.GetValues(typeof(AccessoryCategory))
+                .Cast<AccessoryCategory>()
+                .Select(x => localizer.GetTranslatedTypeName(x))
+                .OrderBy(x => x)
+                .ToList();
 
             _consumerTypes = Enum.GetValues(typeof(ResourceConsumptionType))
                 .Cast<ResourceConsumptionType>()
-                .ToDictionary(x => x, x => localizer.Translate(x.ToString()));
+                .Select(x => localizer.GetTranslatedTypeName(x))
+                .OrderBy(x => x)
+                .ToList();
+
+            _weaponTypes = typeRegistry.GetRegisteredTypes<IWeapon>()
+                .ToDictionary(x => x, x => localizer.GetTranslatedTypeName(x))
+                .OrderBy(x => x.Value)
+                .ToDictionary(x => x.Key, x => x.Value);
 
             _optionalTwoHandedWeaponIndexes = _weaponTypes
                 .Select((x, i) => !x.Key.EnforceTwoHanded && x.Key.AllowTwoHanded ? (int?)i : null)
                 .Where(x => x != null)
+                .OrderBy(x => x)
                 .ToList();
 
             TypeDropdown.ClearOptions();
@@ -108,10 +114,10 @@ namespace FullPotential.Core.UI.Components
             var craftingCategory = GetCraftingCategory();
             switch (craftingCategory.Key.Name)
             {
+                case nameof(Accessory): SubTypeDropdown.AddOptions(_accessoryTypes); break;
+                case nameof(Armor): SubTypeDropdown.AddOptions(_armorTypes); break;
                 case nameof(Weapon): SubTypeDropdown.AddOptions(_weaponTypes.Select(x => x.Value).ToList()); break;
-                case nameof(Armor): SubTypeDropdown.AddOptions(_armorTypes.Select(x => x.Value).ToList()); break;
-                case nameof(Accessory): SubTypeDropdown.AddOptions(_accessoryTypes.Select(x => x.Value).ToList()); break;
-                case nameof(Consumer): SubTypeDropdown.AddOptions(_consumerTypes.Select(x => x.Value).ToList()); break;
+                case nameof(Consumer): SubTypeDropdown.AddOptions(_consumerTypes); break;
                 default: throw new InvalidOperationException($"Unknown crafting type: '{craftingCategory.Key.Name}'");
             }
 
@@ -130,10 +136,10 @@ namespace FullPotential.Core.UI.Components
         {
             switch (craftingCategory)
             {
+                case nameof(Accessory): return _accessoryTypes.ElementAt(SubTypeDropdown.value);
+                case nameof(Armor): return _armorTypes.ElementAt(SubTypeDropdown.value);
                 case nameof(Weapon): return _weaponTypes.ElementAt(SubTypeDropdown.value).Key.TypeName;
-                case nameof(Armor): return _armorTypes.ElementAt(SubTypeDropdown.value).Key.TypeName;
-                case nameof(Accessory): return _accessoryTypes.ElementAt(SubTypeDropdown.value).Key.TypeName;
-                case nameof(Consumer): return _consumerTypes.ElementAt(SubTypeDropdown.value).Key.ToString();
+                case nameof(Consumer): return _consumerTypes.ElementAt(SubTypeDropdown.value);
                 default: throw new InvalidOperationException($"Unknown crafting category: '{craftingCategory}'");
             }
         }

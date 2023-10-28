@@ -9,10 +9,11 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Modding;
-using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Registry.Weapons;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -23,15 +24,17 @@ namespace FullPotential.Core.Registry
 {
     public class TypeRegistry : ITypeRegistry
     {
-        private readonly List<IGearAccessory> _accessories = new List<IGearAccessory>();
-        private readonly List<IGearArmor> _armor = new List<IGearArmor>();
-        private readonly List<IGearWeapon> _weapons = new List<IGearWeapon>();
+        private readonly List<IAccessoryVisuals> _accessoryVisuals = new List<IAccessoryVisuals>();
+        private readonly List<IArmorVisuals> _armorVisuals = new List<IArmorVisuals>();
+        private readonly List<ITargetingVisuals> _targetingVisuals = new List<ITargetingVisuals>();
+        private readonly List<IShapeVisuals> _shapeVisuals = new List<IShapeVisuals>();
+
+        private readonly List<IWeapon> _weapons = new List<IWeapon>();
         private readonly List<ILoot> _loot = new List<ILoot>();
         private readonly List<IEffect> _effects = new List<IEffect>();
         private readonly List<ITargeting> _targeting = new List<ITargeting>();
-        private readonly List<ITargetingVisuals> _targetingVisuals = new List<ITargetingVisuals>();
         private readonly List<IShape> _shapes = new List<IShape>();
-        private readonly List<IShapeVisuals> _shapeVisuals = new List<IShapeVisuals>();
+
         private readonly Dictionary<string, GameObject> _loadedAddressables = new Dictionary<string, GameObject>();
 
         public void FindAndRegisterAll(List<string> modPrefixes)
@@ -128,19 +131,19 @@ namespace FullPotential.Core.Registry
 
                 var toRegister = Activator.CreateInstance(type);
 
-                if (toRegister is IGearAccessory accessory)
+                if (toRegister is IAccessoryVisuals accessory)
                 {
-                    AddToRegister(_accessories, accessory);
+                    AddToRegister(_accessoryVisuals, accessory);
                     return;
                 }
 
-                if (toRegister is IGearArmor armor)
+                if (toRegister is IArmorVisuals armor)
                 {
-                    AddToRegister(_armor, armor);
+                    AddToRegister(_armorVisuals, armor);
                     return;
                 }
 
-                if (toRegister is IGearWeapon craftableWeapon)
+                if (toRegister is IWeapon craftableWeapon)
                 {
                     AddToRegister(_weapons, craftableWeapon);
                     return;
@@ -240,9 +243,9 @@ namespace FullPotential.Core.Registry
             var interfaceName = typeof(T).Name;
             switch (interfaceName)
             {
-                case nameof(IGearAccessory): return (IEnumerable<T>)_accessories;
-                case nameof(IGearArmor): return (IEnumerable<T>)_armor;
-                case nameof(IGearWeapon): return (IEnumerable<T>)_weapons;
+                case nameof(IAccessoryVisuals): return (IEnumerable<T>)_accessoryVisuals;
+                case nameof(IArmorVisuals): return (IEnumerable<T>)_armorVisuals;
+                case nameof(IWeapon): return (IEnumerable<T>)_weapons;
                 case nameof(ILoot): return (IEnumerable<T>)_loot;
                 case nameof(IEffect): return (IEnumerable<T>)_effects;
                 case nameof(IShape): return (IEnumerable<T>)_shapes;
@@ -287,11 +290,11 @@ namespace FullPotential.Core.Registry
             switch (item)
             {
                 case Accessory:
-                    return GetRegisteredById<IGearAccessory>(item.RegistryTypeId);
+                    return GetRegisteredById<IAccessoryVisuals>(item.RegistryTypeId);
                 case Armor:
-                    return GetRegisteredById<IGearArmor>(item.RegistryTypeId);
+                    return GetRegisteredById<IArmorVisuals>(item.RegistryTypeId);
                 case Weapon:
-                    return GetRegisteredById<IGearWeapon>(item.RegistryTypeId);
+                    return GetRegisteredById<IWeapon>(item.RegistryTypeId);
                 case Loot:
                     return GetRegisteredById<ILoot>(item.RegistryTypeId);
                 default:

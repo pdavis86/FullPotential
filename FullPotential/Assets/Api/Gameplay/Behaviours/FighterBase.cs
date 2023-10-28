@@ -9,7 +9,7 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -506,7 +506,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private bool UseWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand, bool isAutoFire)
         {
-            var registryType = (IGearWeapon)weaponInHand.RegistryType;
+            var registryType = (IWeapon)weaponInHand.RegistryType;
 
             var isRanged = registryType.Category == WeaponCategory.Ranged;
 

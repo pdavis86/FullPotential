@@ -11,9 +11,10 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Helpers;
 using FullPotential.Api.Utilities.Extensions;
@@ -245,8 +246,8 @@ namespace FullPotential.Core.Player
             {
                 itemsForSlot = _items
                 .Where(x =>
-                    (x.Value is Accessory acc && (int)((IGearAccessory)acc.RegistryType).Category == (int)gearCategory)
-                    || (x.Value is Armor armor && (int)((IGearArmor)armor.RegistryType).Category == (int)gearCategory));
+                    (x.Value is Accessory acc && (int)((IAccessoryVisuals)acc.RegistryType).Category == (int)gearCategory)
+                    || (x.Value is Armor armor && (int)((IArmorVisuals)armor.RegistryType).Category == (int)gearCategory));
             }
 
             return itemsForSlot
@@ -588,7 +589,7 @@ namespace FullPotential.Core.Player
             switch (item)
             {
                 case Weapon weapon:
-                    if (item.RegistryType is not IGearWeapon weaponRegistryType)
+                    if (item.RegistryType is not IWeapon weaponRegistryType)
                     {
                         Debug.LogError("Item is not a weapon");
                         return;
@@ -654,7 +655,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            if (item.RegistryType is not IGearAccessory registryType)
+            if (item.RegistryType is not IAccessoryVisuals registryType)
             {
                 Debug.LogError("Item is not an accessory");
                 return;
@@ -682,7 +683,7 @@ namespace FullPotential.Core.Player
             ItemBase item,
             Transform parentTransform)
         {
-            if (item.RegistryType is not IGearArmor registryType)
+            if (item.RegistryType is not IArmorVisuals registryType)
             {
                 Debug.LogError("Item is not armor");
                 return;

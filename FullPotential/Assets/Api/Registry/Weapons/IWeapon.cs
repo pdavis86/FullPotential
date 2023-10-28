@@ -1,6 +1,6 @@
-﻿namespace FullPotential.Api.Registry.Crafting
+﻿namespace FullPotential.Api.Registry.Weapons
 {
-    public interface IGearWeapon : IGear
+    public interface IWeapon : IRegisterable, IHasPrefab
     {
         /// <summary>
         /// The category of weapon

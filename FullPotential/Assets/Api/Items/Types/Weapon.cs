@@ -4,7 +4,7 @@ using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 
@@ -84,7 +84,7 @@ namespace FullPotential.Api.Items.Types
 
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
         {
-            if (RegistryType is not IGearWeapon weaponType)
+            if (RegistryType is not IWeapon weaponType)
             {
                 Debug.LogError($"Unexpected RegistryType on item '{Name}' with ID '{Id}'");
                 return null;

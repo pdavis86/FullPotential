@@ -1,14 +1,14 @@
 ﻿using System;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.Armor
 {
-    public class Barrier : IGearArmor
+    public class BasicWard : IArmorVisuals
     {
         public Guid TypeId => new Guid("17a6e875-cccd-46f0-b525-fe15cfdd8096");
 
-        public string TypeName => nameof(Barrier);
+        public string TypeName => nameof(BasicWard);
 
         public ArmorCategory Category => ArmorCategory.Barrier;
 

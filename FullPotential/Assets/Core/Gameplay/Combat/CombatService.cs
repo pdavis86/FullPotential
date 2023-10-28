@@ -7,7 +7,6 @@ using FullPotential.Api.Gameplay.Targeting;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Unity.Extensions;
@@ -16,6 +15,7 @@ using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
 using System;
 using System.Linq;
+using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
@@ -74,7 +74,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     //todo: zzz v0.6 - make SpawnBulletHole a VisualsBehaviour on BulletTrail
                     if (itemIsWeapon)
                     {
-                        var registryType = (IGearWeapon)itemUsed.RegistryType;
+                        var registryType = (IWeapon)itemUsed.RegistryType;
                         var isRanged = registryType?.Category == WeaponCategory.Ranged;
                         if (isRanged)
                         {
@@ -442,7 +442,7 @@ namespace FullPotential.Core.Gameplay.Combat
         private int GetDamageValueFromAttack(IFighter sourceFighter, ItemBase itemUsed, int targetDefense, bool addVariation = true)
         {
             var weapon = itemUsed as Weapon;
-            var weaponCategory = (weapon?.RegistryType as IGearWeapon)?.Category;
+            var weaponCategory = (weapon?.RegistryType as IWeapon)?.Category;
 
             float attackStrength = itemUsed?.Attributes.Strength ?? sourceFighter.GetAttributeValue(AffectableAttribute.Strength);
             var defenceRatio = 100f / (100 + targetDefense);

@@ -1,14 +1,14 @@
 ﻿using System;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.Armor
 {
-    public class Helm : IGearArmor
+    public class LeatherHelmet : IArmorVisuals
     {
         public Guid TypeId => new Guid("bd6f655b-6fed-42e5-8797-e9cb3f675696");
 
-        public string TypeName => nameof(Helm);
+        public string TypeName => nameof(LeatherHelmet);
 
         public ArmorCategory Category => ArmorCategory.Helm;
 

@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Registry.Crafting
+﻿namespace FullPotential.Api.Registry.Weapons
 {
     public enum WeaponCategory
     {

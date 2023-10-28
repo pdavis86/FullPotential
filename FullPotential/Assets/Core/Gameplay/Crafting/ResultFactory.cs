@@ -7,7 +7,6 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Registry.Shapes;
@@ -18,6 +17,9 @@ using FullPotential.Core.Utilities.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Registry;
+using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Weapons;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -358,7 +360,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return $"{GetItemNamePrefix(isAttack)} {item.Attributes.Strength} {suffix}";
         }
 
-        private Weapon GetMeleeWeapon(IGearWeapon craftableType, IList<ItemBase> components, bool isTwoHanded)
+        private Weapon GetMeleeWeapon(IWeapon craftableType, IList<ItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon
             {
@@ -378,7 +380,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Weapon GetRangedWeapon(IGearWeapon craftableType, IList<ItemBase> components, bool isTwoHanded)
+        private Weapon GetRangedWeapon(IWeapon craftableType, IList<ItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon
             {
@@ -404,7 +406,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Weapon GetDefensiveWeapon(IGearWeapon craftableType, IList<ItemBase> components, bool isTwoHanded)
+        private Weapon GetDefensiveWeapon(IWeapon craftableType, IList<ItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon
             {
@@ -424,7 +426,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Armor GetArmor(IGearArmor craftableType, IList<ItemBase> components)
+        private Armor GetArmor(IArmorVisuals craftableType, IList<ItemBase> components)
         {
             var armor = new Armor
             {
@@ -441,7 +443,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return armor;
         }
 
-        private Armor GetBarrier(IGearArmor craftableType, IList<ItemBase> components)
+        private Armor GetBarrier(IArmorVisuals craftableType, IList<ItemBase> components)
         {
             var armor = new Armor
             {
@@ -461,7 +463,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return armor;
         }
 
-        private Accessory GetAccessory(IGearAccessory craftableType, IList<ItemBase> components)
+        private Accessory GetAccessory(IAccessoryVisuals craftableType, IList<ItemBase> components)
         {
             var accessory = new Accessory
             {
@@ -488,7 +490,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             switch (categoryName)
             {
                 case nameof(Weapon):
-                    var craftableWeapon = _typeRegistry.GetRegisteredByTypeName<IGearWeapon>(typeName);
+                    var craftableWeapon = _typeRegistry.GetRegisteredByTypeName<IWeapon>(typeName);
                     switch (craftableWeapon.Category)
                     {
                         case WeaponCategory.Melee: return GetMeleeWeapon(craftableWeapon, components, isTwoHanded);
@@ -498,13 +500,13 @@ namespace FullPotential.Core.Gameplay.Crafting
                     }
 
                 case nameof(Armor):
-                    var craftableArmor = _typeRegistry.GetRegisteredByTypeName<IGearArmor>(typeName);
+                    var craftableArmor = _typeRegistry.GetRegisteredByTypeName<IArmorVisuals>(typeName);
                     return craftableArmor.Category == ArmorCategory.Barrier
                         ? GetBarrier(craftableArmor, components)
                         : GetArmor(craftableArmor, components);
 
                 case nameof(Accessory):
-                    var craftableAccessory = _typeRegistry.GetRegisteredByTypeName<IGearAccessory>(typeName);
+                    var craftableAccessory = _typeRegistry.GetRegisteredByTypeName<IAccessoryVisuals>(typeName);
                     return GetAccessory(craftableAccessory, components);
 
                 default:

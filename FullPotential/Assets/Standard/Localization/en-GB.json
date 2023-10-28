@@ -3,42 +3,6 @@
   "Name": "English (United Kingdom)",
   "Translations": [
     {
-      "Key": "accessory.amulet",
-      "Value": "Amulet"
-    },
-    {
-      "Key": "accessory.belt",
-      "Value": "Belt"
-    },
-    {
-      "Key": "accessory.ring",
-      "Value": "Ring"
-    },
-
-
-    {
-      "Key": "armor.helm",
-      "Value": "Helm"
-    },
-    {
-      "Key": "armor.chest",
-      "Value": "Chest"
-    },
-    {
-      "Key": "armor.legs",
-      "Value": "Legs"
-    },
-    {
-      "Key": "armor.feet",
-      "Value": "Feet"
-    },
-    {
-      "Key": "armor.barrier",
-      "Value": "Barrier"
-    },
-
-
-    {
       "Key": "loot.scrap",
       "Value": "Scrap"
     },

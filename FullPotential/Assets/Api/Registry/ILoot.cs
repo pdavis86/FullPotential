@@ -1,6 +1,6 @@
 ﻿using FullPotential.Api.Obsolete;
 
-namespace FullPotential.Api.Registry.Crafting
+namespace FullPotential.Api.Registry
 {
     public interface ILoot : IRegisterable
     {

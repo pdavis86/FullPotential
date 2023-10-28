@@ -1,9 +1,9 @@
 ﻿using System;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Registry.Weapons;
 
 namespace FullPotential.Standard.Weapons
 {
-    public class Dagger : IGearWeapon
+    public class Dagger : IWeapon
     {
         public Guid TypeId => new Guid("6eabecda-d308-48b2-b7d3-93c7800df8c2");
 

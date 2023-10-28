@@ -6,7 +6,6 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Core.Gameplay.Combat;
 using Moq;
@@ -14,6 +13,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using FullPotential.Api.Registry.Weapons;
 
 namespace FullPotential.Core.Tests.Gameplay.Combat
 {
@@ -140,7 +140,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
         public AffectableStat StatToAffect => AffectableStat.Health;
     }
 
-    public class TestWeaponType : IGearWeapon
+    public class TestWeaponType : IWeapon
     {
         // ReSharper disable UnassignedGetOnlyAutoProperty
 

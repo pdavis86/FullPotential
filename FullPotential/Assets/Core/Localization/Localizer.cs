@@ -6,10 +6,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
-using FullPotential.Api.Registry.Crafting;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -147,25 +147,22 @@ namespace FullPotential.Core.Localization
             }
 
             Debug.LogWarning($"Missing translation for '{id}'");
-            return $"{id} translation is missing";
+            return $"'{id}' translation is missing";
         }
 
         public string GetTranslatedTypeName(IRegisterable registeredItem)
         {
-            if (registeredItem is IGearAccessory) { return Translate("accessory." + registeredItem.TypeName); }
-            if (registeredItem is IGearArmor) { return Translate("armor." + registeredItem.TypeName); }
-            if (registeredItem is IGearWeapon) { return Translate("weapon." + registeredItem.TypeName); }
+            if (registeredItem is IWeapon) { return Translate("weapon." + registeredItem.TypeName); }
             if (registeredItem is ILoot) { return Translate("loot." + registeredItem.TypeName); }
             if (registeredItem is IEffect) { return Translate("effect." + registeredItem.TypeName); }
             if (registeredItem is IShape) { return Translate("shape." + registeredItem.TypeName); }
             if (registeredItem is ITargeting) { return Translate("targeting." + registeredItem.TypeName); }
-            return "Unexpected ICraftable type";
+            return "Unexpected IRegisterable type";
         }
 
-        private static string[] SplitOnCapitals(string value)
+        public string GetTranslatedTypeName(Enum enumValue)
         {
-            const string regexSplitOnCapitals = @"(?<!^)(?=[A-Z])";
-            return Regex.Split(value, regexSplitOnCapitals);
+            return Translate(enumValue.GetType().Name + "." + enumValue);
         }
 
         public string Translate(TranslationType type, string suffix)
@@ -173,6 +170,12 @@ namespace FullPotential.Core.Localization
             var split = SplitOnCapitals(type.ToString());
             var translationKey = string.Join('.', split) + '.' + suffix;
             return Translate(translationKey);
+        }
+
+        private static string[] SplitOnCapitals(string value)
+        {
+            const string regexSplitOnCapitals = @"(?<!^)(?=[A-Z])";
+            return Regex.Split(value, regexSplitOnCapitals);
         }
 
     }
