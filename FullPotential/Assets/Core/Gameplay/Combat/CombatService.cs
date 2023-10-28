@@ -542,22 +542,19 @@ namespace FullPotential.Core.Gameplay.Combat
                 consumer.Shape.PrefabAddress,
                 prefab =>
                 {
-                    SpawnShapeGameObjects(sourceFighter, consumer, prefab, spawnPosition, lookDirection, rotation);
+                    var shapeGameObject = UnityEngine.Object.Instantiate(prefab, spawnPosition, rotation);
+
+                    shapeGameObject.transform.position = GameManager.Instance.GetSceneBehaviour().GetSceneService().GetPositionAboveGround(spawnPosition, shapeGameObject);
+
+                    shapeGameObject.layer = LayerMask.NameToLayer(Layers.NonSolid);
+
+                    var shapeBehaviour = shapeGameObject.GetComponent<IShapeBehaviour>();
+                    shapeBehaviour.SourceFighter = sourceFighter;
+                    shapeBehaviour.Consumer = consumer;
+                    shapeBehaviour.Direction = lookDirection;
+
+                    shapeGameObject.NetworkSpawn();
                 });
-        }
-
-        private void SpawnShapeGameObjects(IFighter sourceFighter, Consumer consumer, GameObject prefab, Vector3 spawnPosition, Vector3 lookDirection, Quaternion rotation)
-        {
-            var shapeGameObject = UnityEngine.Object.Instantiate(prefab, spawnPosition, rotation);
-
-            shapeGameObject.transform.position = GameManager.Instance.GetSceneBehaviour().GetSceneService().GetPositionAboveGround(spawnPosition, shapeGameObject);
-
-            var shapeBehaviour = shapeGameObject.GetComponent<IShapeBehaviour>();
-            shapeBehaviour.SourceFighter = sourceFighter;
-            shapeBehaviour.Consumer = consumer;
-            shapeBehaviour.Direction = lookDirection;
-
-            shapeGameObject.NetworkSpawn();
         }
     }
 }

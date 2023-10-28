@@ -4,6 +4,7 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Registry;
+using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
@@ -89,7 +90,9 @@ namespace FullPotential.Core.Gameplay.Targeting
                 return;
             }
 
-            if (Physics.Raycast(SourceFighter.LookTransform.position, SourceFighter.LookTransform.forward, out var hit, _maxBeamLength))
+            var anythingSolid =~ LayerMask.GetMask(Layers.NonSolid);
+
+            if (Physics.Raycast(SourceFighter.LookTransform.position, SourceFighter.LookTransform.forward, out var hit, _maxBeamLength, anythingSolid))
             {
                 if (hit.transform.gameObject == SourceFighter.GameObject)
                 {

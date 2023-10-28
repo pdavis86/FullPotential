@@ -10,6 +10,7 @@ namespace FullPotential.Core.Gameplay.Targeting
         private Transform _cylinderParentTransform;
         private Transform _cylinderTransform;
 
+        //todo: zzz v0.6 - Supplying StartPosition to beam means other clients see it in a weird position
         public Vector3 StartPosition { get; set; }
 
         public Vector3 StartDirection { get; set; }
