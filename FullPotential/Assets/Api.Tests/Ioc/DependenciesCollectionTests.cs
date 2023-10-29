@@ -113,22 +113,22 @@ namespace FullPotential.Api.Tests.Ioc
         {
             public Vector3 GetPositionAboveGround(Vector3 startingPoint)
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
 
             public Vector3 GetPositionAboveGround(Vector3 startingPoint, GameObject gameObject)
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
 
             public Vector3 GetPositionAboveGround(Vector3 startingPoint, Collider collider)
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
 
             public Vector3 GetPositionAboveGround(Vector3 startingPoint, float gameObjectHeight)
             {
-                throw new System.NotImplementedException();
+                throw new NotImplementedException();
             }
         }
     }
