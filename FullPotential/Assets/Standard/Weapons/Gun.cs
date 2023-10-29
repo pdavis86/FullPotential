@@ -1,9 +1,9 @@
 ﻿using System;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Registry.Weapons;
 
 namespace FullPotential.Standard.Weapons
 {
-    public class Gun : IGearWeapon
+    public class Gun : IWeapon
     {
         public Guid TypeId => new Guid("9b5a211a-07d2-4e5c-b8b8-639dbfb807e9");
 

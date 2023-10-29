@@ -1,5 +1,5 @@
+using System.Linq;
 using FullPotential.Api.GameManagement;
-using FullPotential.Api.Unity.Helpers;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -12,7 +12,11 @@ namespace FullPotential.Core.SceneObjects
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            GameObjectHelper.GetObjectAtRoot(GameObjectNames.SceneCanvas).SetActive(true);
+            //NOTE: Should use IUnityHelperUtilities but the game has not initialized yet
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene()
+                .GetRootGameObjects()
+                .First(x => x.name == GameObjectNames.SceneCanvas)
+                .SetActive(true);
         }
 
     }

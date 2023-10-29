@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
@@ -8,10 +7,11 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Consumers;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Shapes;
+using FullPotential.Api.Registry.Targeting;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Player;
 using FullPotential.Core.UI.Components;
@@ -24,6 +24,8 @@ namespace FullPotential.Core.UI.Behaviours
 {
     public class AdminShopUi : MonoBehaviour
     {
+        private readonly System.Random _random = new System.Random();
+
 #pragma warning disable 0649
         [SerializeField] private CraftingSelector _craftingSelector;
         [SerializeField] private GameObject _nameAndTogglePrefab;
@@ -180,7 +182,7 @@ namespace FullPotential.Core.UI.Behaviours
             foreach (var behaviour in _attributeSliderBehaviours)
             {
                 behaviour.Slider.value = Mathf.Approximately(behaviour.Slider.maxValue, 100)
-                    ? EffectService.Random.Next(1, 101)
+                    ? _random.Next(1, 101)
                     : 0;
             }
         }
@@ -267,12 +269,12 @@ namespace FullPotential.Core.UI.Behaviours
 
         private ItemBase GetCraftableItem()
         {
-            var category = _craftingSelector.GetCraftingCategory().Key.Name;
+            var typeToCraft = _craftingSelector.GetTypeToCraft();
             var component = GetLootFromChoices();
 
             return _resultFactory.GetCraftedItem(
-                category,
-                _craftingSelector.GetCraftableTypeName(category),
+                typeToCraft,
+                _craftingSelector.GetSubTypeName(typeToCraft),
                 _craftingSelector.IsTwoHandedSelected(),
                 new List<ItemBase> { component });
         }
@@ -289,12 +291,12 @@ namespace FullPotential.Core.UI.Behaviours
         {
             var component = GetLootFromChoices();
             var componentJson = JsonUtility.ToJson(component);
-            var category = _craftingSelector.GetCraftingCategory().Key.Name;
+            var craftableType = _craftingSelector.GetTypeToCraft();
 
             GameManager.Instance.GetLocalPlayerGameObject().GetComponent<PlayerBehaviour>().CraftItemAsAdminServerRpc(
                 componentJson,
-                category,
-                _craftingSelector.GetCraftableTypeName(category),
+                craftableType.ToString(),
+                _craftingSelector.GetSubTypeName(craftableType),
                 _craftingSelector.IsTwoHandedSelected(),
                 _itemNameText.text
                 );

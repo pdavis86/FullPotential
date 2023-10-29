@@ -11,7 +11,7 @@ namespace FullPotential.Api.Gameplay.Combat
             IFighter sourceFighter,
             ItemBase itemUsed,
             Vector3? position,
-            int damageDealt,
+            int damageToDeal,
             bool isCritical);
 
         void HandleDeath();

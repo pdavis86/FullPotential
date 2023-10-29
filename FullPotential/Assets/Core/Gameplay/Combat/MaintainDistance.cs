@@ -44,6 +44,13 @@ namespace FullPotential.Core.Gameplay.Combat
             _targetPositionGameObject.transform.position = SourceFighter.Transform.position + (SourceFighter.LookTransform.forward * Distance);
         }
 
+        // ReSharper disable once UnusedMember.Local
+        // ReSharper disable once UnusedParameter.Local
+        private void OnJointBreak(float value)
+        {
+            Cleanup();
+        }
+
         private void CreateNewJoint()
         {
             _targetPositionGameObject = new GameObject("MaintainDistanceFromSource", typeof(Rigidbody));
@@ -53,6 +60,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             _joint = gameObject.AddComponent<FixedJoint>();
             _joint.connectedBody = _targetPositionGameObject.GetComponent<Rigidbody>();
+            _joint.breakForce = 10_000;
         }
 
         private void Cleanup()

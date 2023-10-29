@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry;
@@ -17,6 +18,8 @@ namespace FullPotential.Api.Localization
 
         string Translate(TranslationType type, string suffix);
 
-        string GetTranslatedTypeName(IRegisterable registeredItem);
+        string Translate(IRegisterable registeredItem);
+
+        string Translate(Enum enumValue);
     }
 }

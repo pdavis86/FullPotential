@@ -17,7 +17,7 @@ namespace FullPotential.Api.Gameplay.Inventory
         public KeyValuePair<string, string>[] EquippedItems;
         public KeyValuePair<string, string>[] ShapeMapping;
 
-        //todo: remove gadgets and spells at a later date
+        //todo: zzz v0.5 - remove gadgets and spells
         public Consumer[] Gadgets;
         public Consumer[] Spells;
     }

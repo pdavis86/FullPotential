@@ -8,10 +8,9 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Unity.Constants;
-using FullPotential.Api.Unity.Helpers;
+using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.GameManagement.Inventory;
-using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
@@ -30,6 +29,8 @@ namespace FullPotential.Core.Player
     public class PlayerBehaviour : NetworkBehaviour, IPlayerBehaviour
     {
         private const string EventSource = nameof(PlayerBehaviour);
+
+        private readonly System.Random _random = new System.Random();
 
 #pragma warning disable 0649
         [SerializeField] private Camera _playerCamera;
@@ -97,7 +98,7 @@ namespace FullPotential.Core.Player
 
             //Avoids weapons clipping with other objects
             _playerState.InFrontOfPlayer.transform.parent = _inFrontOfPlayerCamera.transform;
-            GameObjectHelper.SetGameLayerRecursive(_playerState.InFrontOfPlayer, LayerMask.NameToLayer(Layers.InFrontOfPlayer));
+            _playerState.InFrontOfPlayer.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
 
             _inFrontOfPlayerCamera.gameObject.SetActive(true);
             _playerCamera.gameObject.SetActive(true);
@@ -209,7 +210,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.StopDrawing();
+                _drawingPadUi.StopDrawing(SlotGameObjectName.LeftHand);
             }
 
             OnAttack(true);
@@ -236,7 +237,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.StopDrawing();
+                _drawingPadUi.StopDrawing(SlotGameObjectName.RightHand);
             }
 
             OnAttack(false);
@@ -319,7 +320,7 @@ namespace FullPotential.Core.Player
         }
 
         [ServerRpc]
-        public void CraftItemServerRpc(string componentIdsCsv, string categoryName, string craftableTypeName, bool isTwoHanded, string itemName)
+        public void CraftItemServerRpc(string componentIdsCsv, string craftableTypeName, string craftableSubTypeName, bool isTwoHanded, string itemName)
         {
             var componentIdArray = componentIdsCsv.Split(',');
 
@@ -331,9 +332,11 @@ namespace FullPotential.Core.Player
                 return;
             }
 
+            var craftableType = (CraftableType)Enum.Parse(typeof(CraftableType), craftableTypeName);
+
             var craftedItem = _resultFactory.GetCraftedItem(
-                categoryName,
-                craftableTypeName,
+                craftableType,
+                craftableSubTypeName,
                 isTwoHanded,
                 components
             );
@@ -368,7 +371,7 @@ namespace FullPotential.Core.Player
         }
 
         [ServerRpc]
-        public void CraftItemAsAdminServerRpc(string serialisedLoot, string categoryName, string craftableTypeName, bool isTwoHanded, string itemName)
+        public void CraftItemAsAdminServerRpc(string serialisedLoot, string craftableTypeName, string craftableSubTypeName, bool isTwoHanded, string itemName)
         {
             GameManager.Instance.CheckIsAdmin();
 
@@ -377,7 +380,7 @@ namespace FullPotential.Core.Player
 
             ((PlayerInventory)_playerState.Inventory).AddItemAsAdmin(loot);
 
-            CraftItemServerRpc(loot.Id, categoryName, craftableTypeName, isTwoHanded, itemName);
+            CraftItemServerRpc(loot.Id, craftableTypeName, craftableSubTypeName, isTwoHanded, itemName);
         }
 
         [ServerRpc]
@@ -429,9 +432,9 @@ namespace FullPotential.Core.Player
         [ClientRpc]
         public void ShowHealthChangeClientRpc(Vector3 position, int change, bool isCritical, ClientRpcParams clientRpcParams)
         {
-            var offsetX = (float)EffectService.Random.Next(-9, 10) / 100;
-            var offsetY = (float)EffectService.Random.Next(-9, 10) / 100;
-            var offsetZ = (float)EffectService.Random.Next(-9, 10) / 100;
+            var offsetX = (float)_random.Next(-9, 10) / 100;
+            var offsetY = (float)_random.Next(-9, 10) / 100;
+            var offsetZ = (float)_random.Next(-9, 10) / 100;
             var adjustedPosition = position + new Vector3(offsetX, offsetY, offsetZ);
 
             var hit = Instantiate(_hitTextPrefab);

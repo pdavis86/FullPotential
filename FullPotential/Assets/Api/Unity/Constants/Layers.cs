@@ -6,5 +6,6 @@ namespace FullPotential.Api.Unity.Constants
     {
         public const string Default = "Default";
         public const string InFrontOfPlayer = "InFrontOfPlayer";
+        public const string NonSolid = "NonSolid";
     }
 }

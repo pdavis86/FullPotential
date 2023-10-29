@@ -13,6 +13,7 @@ using FullPotential.Api.Modding;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 
@@ -29,7 +30,7 @@ namespace FullPotential.Api.Items.Base
 
         // ReSharper disable InconsistentNaming
         protected IGameManager _gameManager;
-        protected IEffectService _effectService;
+        protected ICombatService _combatService;
         // ReSharper restore InconsistentNaming
 
         public string Id;
@@ -75,10 +76,10 @@ namespace FullPotential.Api.Items.Base
             }
 
             _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
-            _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
+            _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
         }
 
-        public float GetHighInHighOutInRange(int attributeValue, float min, float max)
+        public static float GetHighInHighOutInRange(int attributeValue, float min, float max)
         {
             return attributeValue / 100f * (max - min) + min;
         }
@@ -103,16 +104,13 @@ namespace FullPotential.Api.Items.Base
 
         public int GetNameHash()
         {
-            unchecked
-            {
-                var hash = 101;
-                hash = hash * 103 + Id.GetHashCode();
-                hash = hash * 107 + (RegistryTypeId ?? string.Empty).GetHashCode();
-                hash = hash * 109 + (Name ?? string.Empty).GetHashCode();
-                hash = hash * 113 + Attributes.GetHashCode();
-                hash = hash * 127 + (EffectIds != null ? string.Join(null, EffectIds) : string.Empty).GetHashCode();
-                return hash;
-            }
+            var hash = 101;
+            hash = hash * 103 + Id.GetHashCode();
+            hash = hash * 107 + (RegistryTypeId ?? string.Empty).GetHashCode();
+            hash = hash * 109 + (Name ?? string.Empty).GetHashCode();
+            hash = hash * 113 + Attributes.GetHashCode();
+            hash = hash * 127 + (EffectIds != null ? string.Join(null, EffectIds) : string.Empty).GetHashCode();
+            return hash;
         }
 
         protected void AppendToDescription(StringBuilder builder, ILocalizer localizer, bool attributeValue, string attributeName)
@@ -156,7 +154,7 @@ namespace FullPotential.Api.Items.Base
 
             if (Effects != null && Effects.Count > 0)
             {
-                var localisedEffects = Effects.Select(localizer.GetTranslatedTypeName);
+                var localisedEffects = Effects.Select(localizer.Translate);
                 sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Effects))}: {string.Join(", ", localisedEffects)}\n");
             }
 
@@ -300,10 +298,10 @@ namespace FullPotential.Api.Items.Base
             return (change, DateTime.Now.AddSeconds(timeToLive));
         }
 
-        public Vector3 GetShotDirection(Vector3 lookDirection)
+        public Vector3 GetShotDirection(Vector3 aimDirection)
         {
             var maxAccuracyAngleDeviation = (101 - GetAccuracy()) / 100f * MaximumAccuracyAngleDeviation;
-            return lookDirection.AddNoiseOnAngle(-maxAccuracyAngleDeviation, maxAccuracyAngleDeviation);
+            return aimDirection.AddNoiseOnAngle(-maxAccuracyAngleDeviation, maxAccuracyAngleDeviation);
         }
 
     }

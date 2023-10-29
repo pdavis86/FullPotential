@@ -13,11 +13,23 @@ namespace FullPotential.Standard
         {
             return new[]
             {
-                typeof(Armor.Helm),
-                typeof(Armor.Chest),
-                typeof(Armor.Legs),
-                typeof(Armor.Feet),
-                typeof(Armor.Barrier),
+                typeof(Accessories.SilverNecklace),
+                typeof(Accessories.LeatherBelt),
+                typeof(Accessories.SilverRing),
+
+                typeof(Armor.LeatherHelmet),
+                typeof(Armor.LeatherJerkin),
+                typeof(Armor.LeatherGreaves),
+                typeof(Armor.LeatherBoots),
+                typeof(Armor.BasicWard),
+                
+                typeof(Targeting.ProjectileFlames),
+
+                typeof(Shapes.WallOfFlames),
+                typeof(Shapes.ZoneOfFlames),
+
+                typeof(Loot.Scrap),
+                typeof(Loot.Shard),
 
                 typeof(Weapons.Axe),
                 typeof(Weapons.Bow),
@@ -28,21 +40,6 @@ namespace FullPotential.Standard
                 typeof(Weapons.Shield),
                 typeof(Weapons.Staff),
                 typeof(Weapons.Sword),
-
-                typeof(Accessories.Amulet),
-                typeof(Accessories.Belt),
-                typeof(Accessories.Ring),
-
-                typeof(Loot.Scrap),
-                typeof(Loot.Shard),
-
-                typeof(SpellsAndGadgets.Shapes.Wall),
-                typeof(SpellsAndGadgets.Shapes.Zone),
-                
-                typeof(SpellsAndGadgets.Targeting.Projectile),
-                typeof(SpellsAndGadgets.Targeting.Beam),
-                typeof(SpellsAndGadgets.Targeting.Self),
-                typeof(SpellsAndGadgets.Targeting.Touch),
 
                 typeof(Effects.Buffs.Courage),
                 typeof(Effects.Buffs.Endurance),
@@ -90,9 +87,9 @@ namespace FullPotential.Standard
             };
         }
 
-        public IEnumerable<GameObject> GetNetworkPrefabs()
+        public IEnumerable<string> GetNetworkPrefabAddresses()
         {
-            return Array.Empty<GameObject>();
+            return Array.Empty<string>();
         }
     }
 }

@@ -6,7 +6,7 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Utilities.Extensions;
 
 namespace FullPotential.Api.Items.Types
@@ -28,7 +28,7 @@ namespace FullPotential.Api.Items.Types
 
         private ArmorCategory GetArmorCategory()
         {
-            if (RegistryType is not IGearArmor armor)
+            if (RegistryType is not IArmorVisuals armor)
             {
                 throw new Exception("Registry type was not IGearArmor");
             }

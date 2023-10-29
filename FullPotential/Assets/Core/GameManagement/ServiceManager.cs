@@ -1,23 +1,4 @@
-﻿using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Crafting;
-using FullPotential.Api.Gameplay.Drawing;
-using FullPotential.Api.Ioc;
-using FullPotential.Api.Localization;
-using FullPotential.Api.Modding;
-using FullPotential.Api.Persistence;
-using FullPotential.Api.Spawning;
-using FullPotential.Api.Ui.Services;
-using FullPotential.Core.GameManagement.Inventory;
-using FullPotential.Core.Gameplay.Combat;
-using FullPotential.Core.Gameplay.Crafting;
-using FullPotential.Core.Gameplay.Drawing;
-using FullPotential.Core.Localization;
-using FullPotential.Core.Modding;
-using FullPotential.Core.Networking;
-using FullPotential.Core.Persistence;
-using FullPotential.Core.Registry;
-using FullPotential.Core.Spawning;
+﻿using FullPotential.Api.Ioc;
 
 namespace FullPotential.Core.GameManagement
 {
@@ -25,18 +6,23 @@ namespace FullPotential.Core.GameManagement
     {
         public static void RegisterServices()
         {
-            DependenciesContext.Dependencies.Register<IUserRepository, UserRepository>();
-            DependenciesContext.Dependencies.Register<IResultFactory, ResultFactory>();
-            DependenciesContext.Dependencies.Register<IInventoryDataService, InventoryDataService>();
-            DependenciesContext.Dependencies.Register<ILocalizer, Localizer>();
-            DependenciesContext.Dependencies.Register<ITypeRegistry, TypeRegistry>();
-            DependenciesContext.Dependencies.Register<ISpawnService, SpawnService>(true);
-            DependenciesContext.Dependencies.Register<IRpcService, RpcService>();
-            DependenciesContext.Dependencies.Register<IEffectService, EffectService>();
-            DependenciesContext.Dependencies.Register<IModHelper, ModHelper>();
-            DependenciesContext.Dependencies.Register<IDrawingService, DrawingService>();
-            DependenciesContext.Dependencies.Register<IUiAssistant, UiAssistant>();
-            DependenciesContext.Dependencies.Register<ISettingsRepository, SettingsRepository>();
+            //Scoped
+            DependenciesContext.Dependencies.Register<Api.Scenes.ISceneService, Environment.SceneService>(true);
+
+            //Singleton
+            DependenciesContext.Dependencies.Register<Inventory.IInventoryDataService, Inventory.InventoryDataService>();
+            DependenciesContext.Dependencies.Register<Api.Persistence.IUserRepository, Persistence.UserRepository>();
+            DependenciesContext.Dependencies.Register<Api.Gameplay.Crafting.IResultFactory, Gameplay.Crafting.ResultFactory>();
+            DependenciesContext.Dependencies.Register<Api.Localization.ILocalizer, Localization.Localizer>();
+            DependenciesContext.Dependencies.Register<Api.Registry.ITypeRegistry, Registry.TypeRegistry>();
+            DependenciesContext.Dependencies.Register<Api.Networking.IRpcService, Networking.RpcService>();
+            DependenciesContext.Dependencies.Register<Api.Gameplay.Combat.ICombatService, Gameplay.Combat.CombatService>();
+            DependenciesContext.Dependencies.Register<Api.Modding.IModHelper, Modding.ModHelper>();
+            DependenciesContext.Dependencies.Register<Api.Gameplay.Drawing.IDrawingService, Gameplay.Drawing.DrawingService>();
+            DependenciesContext.Dependencies.Register<Api.Ui.Services.IUiAssistant, Api.Ui.Services.UiAssistant>();
+            DependenciesContext.Dependencies.Register<Api.Persistence.ISettingsRepository, Persistence.SettingsRepository>();
+            DependenciesContext.Dependencies.Register<Api.Unity.Services.IUnityHelperUtilities, Unity.Services.UnityHelperUtilities>();
+            DependenciesContext.Dependencies.Register<Api.Unity.Services.IShaderUtilities, Unity.Services.ShaderUtilities>();
         }
     }
 }

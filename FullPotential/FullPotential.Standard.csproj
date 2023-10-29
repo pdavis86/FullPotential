@@ -58,47 +58,42 @@
   <ItemGroup>
     <Compile Include="Assets\Standard\Weapons\Shield.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Endurance.cs" />
-    <Compile Include="Assets\Standard\SpellsAndGadgets\Behaviours\SogProjectileBehaviour.cs" />
-    <Compile Include="Assets\Standard\SpellsAndGadgets\Behaviours\SogSelfBehaviour.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Repel.cs" />
     <Compile Include="Assets\Standard\Enemies\Behaviours\EnemyState.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Slow.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Air.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Poison.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Hold.cs" />
-    <Compile Include="Assets\Standard\Armor\Helm.cs" />
+    <Compile Include="Assets\Standard\Armor\LeatherHelmet.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Stengthen.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\LifeTap.cs" />
-    <Compile Include="Assets\Standard\Armor\Barrier.cs" />
-    <Compile Include="Assets\Standard\SpellsAndGadgets\Shapes\Wall.cs" />
+    <Compile Include="Assets\Standard\Armor\BasicWard.cs" />
+    <Compile Include="Assets\Standard\Shapes\ZoneOfFlames.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Heal.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Haste.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Fear.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Launch.cs" />
-    <Compile Include="Assets\Standard\Armor\Chest.cs" />
-    <Compile Include="Assets\Standard\SpellsAndGadgets\Targeting\Beam.cs" />
+    <Compile Include="Assets\Standard\Armor\LeatherJerkin.cs" />
+    <Compile Include="Assets\Standard\Shapes\WallOfFlames.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveRight.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Weaken.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Surge.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Plummet.cs" />
-    <Compile Include="Assets\Standard\Armor\Legs.cs" />
+    <Compile Include="Assets\Standard\Armor\LeatherGreaves.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Reflect.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Lunge.cs" />
     <Compile Include="Assets\Standard\Weapons\Bow.cs" />
-    <Compile Include="Assets\Standard\SpellsAndGadgets\Behaviours\SogBeamBehaviour.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Conjure.cs" />
     <Compile Include="Assets\Standard\Weapons\Axe.cs" />
-    <Compile Include="Assets\Standard\SpellsAndGadgets\Targeting\Touch.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\ManaTap.cs" />
     <Compile Include="Assets\Standard\Registration.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Ice.cs" />
     <Compile Include="Assets\Standard\Loot\Shard.cs" />
-    <Compile Include="Assets\Standard\Accessories\Amulet.cs" />
+    <Compile Include="Assets\Standard\Accessories\SilverNecklace.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Hurt.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Lightning.cs" />
     <Compile Include="Assets\Standard\Weapons\Gun.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Distract.cs" />
-    <Compile Include="Assets\Standard\SpellsAndGadgets\Targeting\Self.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Courage.cs" />
     <Compile Include="Assets\Standard\Scenes\Behaviours\ShopInteractable.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Fire.cs" />
@@ -109,20 +104,16 @@
     <Compile Include="Assets\Standard\Weapons\Dagger.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Float.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Regeneration.cs" />
-    <Compile Include="Assets\Standard\SpellsAndGadgets\Behaviours\SogTouchBehaviour.cs" />
-    <Compile Include="Assets\Standard\Armor\Feet.cs" />
+    <Compile Include="Assets\Standard\Armor\LeatherBoots.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Focus.cs" />
-    <Compile Include="Assets\Standard\Accessories\Ring.cs" />
-    <Compile Include="Assets\Standard\SpellsAndGadgets\Targeting\Projectile.cs" />
-    <Compile Include="Assets\Standard\SpellsAndGadgets\Behaviours\SogZoneBehaviour.cs" />
+    <Compile Include="Assets\Standard\Accessories\SilverRing.cs" />
+    <Compile Include="Assets\Standard\Targeting\ProjectileFlames.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Lethargy.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\ShortCircuit.cs" />
-    <Compile Include="Assets\Standard\SpellsAndGadgets\Shapes\Zone.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Water.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\StepBack.cs" />
-    <Compile Include="Assets\Standard\Accessories\Belt.cs" />
+    <Compile Include="Assets\Standard\Accessories\LeatherBelt.cs" />
     <Compile Include="Assets\Standard\Scenes\Behaviours\SceneObjectsLevel001.cs" />
-    <Compile Include="Assets\Standard\SpellsAndGadgets\Behaviours\SogWallBehaviour.cs" />
     <Compile Include="Assets\Standard\Weapons\Staff.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\ManaDrain.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Earth.cs" />
@@ -414,6 +405,9 @@
     </Reference>
     <Reference Include="Unity.Burst.Cecil.Rocks">
       <HintPath>Library\PackageCache\com.unity.burst@1.6.6\Unity.Burst.CodeGen\Unity.Burst.Cecil.Rocks.dll</HintPath>
+    </Reference>
+    <Reference Include="ReportGeneratorMerged">
+      <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@1.2.4\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@3.0.2\Runtime\Newtonsoft.Json.dll</HintPath>

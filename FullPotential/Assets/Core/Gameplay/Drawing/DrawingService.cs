@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using FullPotential.Api.Gameplay.Drawing;
-using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Api.Unity.Extensions;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global

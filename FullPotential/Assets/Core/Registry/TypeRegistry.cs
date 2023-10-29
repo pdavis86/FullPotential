@@ -1,14 +1,18 @@
-﻿using FullPotential.Api.Registry;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FullPotential.Api.GameManagement;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Modding;
-using FullPotential.Api.Registry.Consumers;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Shapes;
+using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Registry.Weapons;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -19,20 +23,26 @@ namespace FullPotential.Core.Registry
 {
     public class TypeRegistry : ITypeRegistry
     {
-        private readonly List<IGearAccessory> _accessories = new List<IGearAccessory>();
-        private readonly List<IGearArmor> _armor = new List<IGearArmor>();
-        private readonly List<IGearWeapon> _weapons = new List<IGearWeapon>();
+        private readonly List<IAccessoryVisuals> _accessoryVisuals = new List<IAccessoryVisuals>();
+        private readonly List<IArmorVisuals> _armorVisuals = new List<IArmorVisuals>();
+        private readonly List<ITargetingVisuals> _targetingVisuals = new List<ITargetingVisuals>();
+        private readonly List<IShapeVisuals> _shapeVisuals = new List<IShapeVisuals>();
+
+        private readonly List<IWeapon> _weapons = new List<IWeapon>();
         private readonly List<ILoot> _loot = new List<ILoot>();
         private readonly List<IEffect> _effects = new List<IEffect>();
-        private readonly List<IShape> _shapes = new List<IShape>();
         private readonly List<ITargeting> _targeting = new List<ITargeting>();
+        private readonly List<IShape> _shapes = new List<IShape>();
+
         private readonly Dictionary<string, GameObject> _loadedAddressables = new Dictionary<string, GameObject>();
 
         public void FindAndRegisterAll(List<string> modPrefixes)
         {
+            RegisterCoreTypes();
+
             foreach (var modPrefix in modPrefixes)
             {
-                var asyncOp = Addressables.LoadAssetAsync<GameObject>($"Assets/{modPrefix}/Registration");
+                var asyncOp = Addressables.LoadAssetAsync<GameObject>($"{modPrefix}/Registration");
                 asyncOp.Completed += opHandle =>
                 {
                     if (opHandle.Result == null)
@@ -54,6 +64,17 @@ namespace FullPotential.Core.Registry
             }
         }
 
+        private void RegisterCoreTypes()
+        {
+            ValidateAndRegister(typeof(Api.Gameplay.Targeting.PointToPoint));
+            ValidateAndRegister(typeof(Api.Gameplay.Targeting.Projectile));
+            ValidateAndRegister(typeof(Api.Gameplay.Targeting.Self));
+            ValidateAndRegister(typeof(Api.Gameplay.Targeting.Touch));
+
+            ValidateAndRegister(typeof(Api.Gameplay.Shapes.Wall));
+            ValidateAndRegister(typeof(Api.Gameplay.Shapes.Zone));
+        }
+
         private void HandleModRegistration(IMod mod)
         {
             foreach (var t in mod.GetRegisterableTypes())
@@ -61,72 +82,159 @@ namespace FullPotential.Core.Registry
                 ValidateAndRegister(t);
             }
 
-            foreach (var p in mod.GetNetworkPrefabs())
+            ValidateCrossTypeLinks();
+
+            foreach (var address in mod.GetNetworkPrefabAddresses())
             {
-                NetworkManager.Singleton.AddNetworkPrefab(p);
+                LoadAddessable(address, gameObject =>
+                {
+                    var networkObject = gameObject.GetComponent<NetworkObject>();
+
+                    if (networkObject == null)
+                    {
+                        Debug.LogError($"Cannot register {address} as a Network Prefab as it does not have a NetworkObject component");
+                        return;
+                    }
+
+                    //todo: zzz v0.5 - use gameObject.GetHashCode().ToString() instead of address in GenerateHash() to get the "NetworkConfig mismatch" issue
+                    // then you can figure out how to tell the client that just tried to join
+
+                    //Work-around for https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/1499
+                    var hashFiledInfo = typeof(NetworkObject).GetField("GlobalObjectIdHash", BindingFlags.NonPublic | BindingFlags.Instance);
+                    hashFiledInfo!.SetValue(networkObject, GenerateHash(address));
+
+                    NetworkManager.Singleton.AddNetworkPrefab(gameObject);
+                });
+            }
+        }
+
+        private static uint GenerateHash(string input)
+        {
+            using (var hasher = MD5.Create())
+            {
+                var inputBytes = Encoding.UTF8.GetBytes(input);
+                var hashBytes = hasher.ComputeHash(inputBytes);
+                return BitConverter.ToUInt32(hashBytes, 0);
             }
         }
 
         private void ValidateAndRegister(Type type)
         {
-            if (!typeof(IRegisterable).IsAssignableFrom(type))
+            try
             {
-                Debug.LogError($"{type.Name} does not implement {nameof(IRegisterable)}");
-                return;
-            }
+                if (!typeof(IRegisterable).IsAssignableFrom(type))
+                {
+                    Debug.LogError($"{type.Name} does not implement {nameof(IRegisterable)}");
+                    return;
+                }
 
-            var toRegister = Activator.CreateInstance(type);
+                var toRegister = Activator.CreateInstance(type);
 
-            if (toRegister is IGearAccessory accessory)
-            {
-                Register(_accessories, accessory);
-                return;
-            }
+                if (toRegister is IAccessoryVisuals accessory)
+                {
+                    AddToRegister(_accessoryVisuals, accessory);
+                    return;
+                }
 
-            if (toRegister is IGearArmor armor)
-            {
-                Register(_armor, armor);
-                return;
-            }
-            if (toRegister is IGearWeapon craftableWeapon)
-            {
-                Register(_weapons, craftableWeapon);
-                return;
-            }
-            if (toRegister is ILoot loot)
-            {
-                Register(_loot, loot);
-                return;
-            }
-            if (toRegister is IEffect effect)
-            {
-                Register(_effects, effect);
-                return;
-            }
-            if (toRegister is IShape shape)
-            {
-                Register(_shapes, shape);
-                return;
-            }
-            if (toRegister is ITargeting targeting)
-            {
-                Register(_targeting, targeting);
-                return;
-            }
+                if (toRegister is IArmorVisuals armor)
+                {
+                    AddToRegister(_armorVisuals, armor);
+                    return;
+                }
 
-            Debug.LogError($"{type.Name} does not implement any of the valid interfaces");
+                if (toRegister is IWeapon craftableWeapon)
+                {
+                    AddToRegister(_weapons, craftableWeapon);
+                    return;
+                }
+
+                if (toRegister is ILoot loot)
+                {
+                    AddToRegister(_loot, loot);
+                    return;
+                }
+
+                if (toRegister is IEffect effect)
+                {
+                    AddToRegister(_effects, effect);
+                    return;
+                }
+
+                if (toRegister is ITargeting targeting)
+                {
+                    AddToRegister(_targeting, targeting);
+                    return;
+                }
+
+                if (toRegister is ITargetingVisuals targetingVisuals)
+                {
+                    AddToRegister(_targetingVisuals, targetingVisuals);
+                    return;
+                }
+
+                if (toRegister is IShape shape)
+                {
+                    AddToRegister(_shapes, shape);
+                    return;
+                }
+
+                if (toRegister is IShapeVisuals shapeVisuals)
+                {
+                    AddToRegister(_shapeVisuals, shapeVisuals);
+                    return;
+                }
+
+                Debug.LogError($"{type.FullName} does not implement any of the valid interfaces");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"{type.FullName} failed to register: " + ex);
+            }
         }
 
-        private void Register<T>(List<T> list, T item) where T : IRegisterable
+        private void AddToRegister<T>(List<T> list, T item) where T : IRegisterable
         {
             var match = list.FirstOrDefault(x => x.TypeId == item.TypeId);
             if (match != null)
             {
-                Debug.LogError($"A type with name '{item.TypeId}' has already been registered");
+                Debug.LogError($"A type with ID '{item.TypeId}' has already been registered");
                 return;
             }
 
             list.Add(item);
+        }
+
+        private void ValidateCrossTypeLinks()
+        {
+            var invalidTargetingVisuals = new List<ITargetingVisuals>();
+            foreach (var targetingVisual in _targetingVisuals)
+            {
+                if (_targeting.FirstOrDefault(t => t.TypeId == targetingVisual.TargetingTypeId) == null)
+                {
+                    Debug.LogError($"{targetingVisual.GetType().FullName} refers to a targeting type that is not registered");
+                    invalidTargetingVisuals.Add(targetingVisual);
+                }
+            }
+
+            foreach (var targetingVisual in invalidTargetingVisuals)
+            {
+                _targetingVisuals.Remove(targetingVisual);
+            }
+
+            var invalidShapeVisuals = new List<IShapeVisuals>();
+            foreach (var shapeVisual in _shapeVisuals)
+            {
+                if (_shapes.FirstOrDefault(t => t.TypeId == shapeVisual.ShapeTypeId) == null)
+                {
+                    Debug.LogError($"{shapeVisual.GetType().FullName} refers to a shape type that is not registered");
+                    invalidShapeVisuals.Add(shapeVisual);
+                }
+            }
+
+            foreach (var shapeVisual in invalidShapeVisuals)
+            {
+                _shapeVisuals.Remove(shapeVisual);
+            }
         }
 
         public IEnumerable<T> GetRegisteredTypes<T>() where T : IRegisterable
@@ -134,13 +242,15 @@ namespace FullPotential.Core.Registry
             var interfaceName = typeof(T).Name;
             switch (interfaceName)
             {
-                case nameof(IGearAccessory): return (IEnumerable<T>)_accessories;
-                case nameof(IGearArmor): return (IEnumerable<T>)_armor;
-                case nameof(IGearWeapon): return (IEnumerable<T>)_weapons;
+                case nameof(IAccessoryVisuals): return (IEnumerable<T>)_accessoryVisuals;
+                case nameof(IArmorVisuals): return (IEnumerable<T>)_armorVisuals;
+                case nameof(IWeapon): return (IEnumerable<T>)_weapons;
                 case nameof(ILoot): return (IEnumerable<T>)_loot;
                 case nameof(IEffect): return (IEnumerable<T>)_effects;
                 case nameof(IShape): return (IEnumerable<T>)_shapes;
+                case nameof(IShapeVisuals): return (IEnumerable<T>)_shapeVisuals;
                 case nameof(ITargeting): return (IEnumerable<T>)_targeting;
+                case nameof(ITargetingVisuals): return (IEnumerable<T>)_targetingVisuals;
                 default: throw new Exception($"Unexpected type {interfaceName}");
             }
         }
@@ -159,14 +269,14 @@ namespace FullPotential.Core.Registry
                 return (T)(object)null;
             }
 
-            var matches = craftablesOfType.Where(x => x.TypeId == new Guid(typeId));
+            var matches = craftablesOfType.Where(x => x.TypeId == new Guid(typeId)).ToList();
 
             if (!matches.Any())
             {
                 throw new Exception($"Could not find a match for '{typeof(T).Name}' and '{typeId}'");
             }
 
-            if (matches.Count() > 1)
+            if (matches.Count > 1)
             {
                 throw new Exception($"How is there more than one match for '{typeof(T).Name}' and '{typeId}'");
             }
@@ -179,11 +289,11 @@ namespace FullPotential.Core.Registry
             switch (item)
             {
                 case Accessory:
-                    return GetRegisteredById<IGearAccessory>(item.RegistryTypeId);
+                    return GetRegisteredById<IAccessoryVisuals>(item.RegistryTypeId);
                 case Armor:
-                    return GetRegisteredById<IGearArmor>(item.RegistryTypeId);
+                    return GetRegisteredById<IArmorVisuals>(item.RegistryTypeId);
                 case Weapon:
-                    return GetRegisteredById<IGearWeapon>(item.RegistryTypeId);
+                    return GetRegisteredById<IWeapon>(item.RegistryTypeId);
                 case Loot:
                     return GetRegisteredById<ILoot>(item.RegistryTypeId);
                 default:

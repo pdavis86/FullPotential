@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
@@ -8,9 +7,9 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Modding;
+using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Consumers;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -80,14 +79,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             _consumeResource = new DelayedAction(.5f, () =>
             {
-                if (HandStatusLeft.ActiveConsumerBehaviour != null
+                if (HandStatusLeft.ActiveConsumer != null
                     && !ConsumeResource(HandStatusLeft.EquippedConsumer, HandStatusLeft.EquippedConsumer.Targeting.IsContinuous))
                 {
                     StopActiveConsumerBehaviour(HandStatusLeft);
                     StopActiveConsumerBehaviourClientRpc(true, _rpcService.ForNearbyPlayers(transform.position));
                 }
 
-                if (HandStatusRight.ActiveConsumerBehaviour != null
+                if (HandStatusRight.ActiveConsumer != null
                     && !ConsumeResource(HandStatusRight.EquippedConsumer, HandStatusRight.EquippedConsumer.Targeting.IsContinuous))
                 {
                     StopActiveConsumerBehaviour(HandStatusRight);
@@ -193,12 +192,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected override bool IsConsumingEnergy()
         {
-            return HandStatusLeft.IsConsumingEnergy() || HandStatusRight.IsConsumingEnergy();
+            return HandStatusLeft.IsConsumingResource(ResourceConsumptionType.Energy)
+                   || HandStatusRight.IsConsumingResource(ResourceConsumptionType.Energy);
         }
 
         protected override bool IsConsumingMana()
         {
-            return HandStatusLeft.IsConsumingMana() || HandStatusRight.IsConsumingMana();
+            return HandStatusLeft.IsConsumingResource(ResourceConsumptionType.Mana)
+                   || HandStatusRight.IsConsumingResource(ResourceConsumptionType.Mana);
         }
 
         public IEnumerator ReloadCoroutine(HandStatus handStatus)
@@ -253,7 +254,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public override int GetDefenseValue()
         {
-            //todo: add barrier strength to defence strength
             return _inventory.GetDefenseValue();
         }
 
@@ -365,8 +365,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : _inventory.GetItemInSlot(SlotGameObjectName.RightHand);
 
             var handPosition = isLeftHand
-                ? Positions.LeftHandInFront.position
-                : Positions.RightHandInFront.position;
+                ? Positions.LeftHand.position
+                : Positions.RightHand.position;
 
             switch (itemInHand)
             {
@@ -385,20 +385,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        private Vector3 GetAttackDirection(Vector3 handPosition, float maxDistance)
-        {
-            return Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, maxDistance)
-                ? (hit.point - handPosition).normalized
-                : LookTransform.forward;
-        }
-
         private bool Punch()
         {
             if (IsServer)
             {
                 if (Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, MeleeRangeLimit))
                 {
-                    _effectService.ApplyEffects(this, null, hit.transform.gameObject, hit.point);
+                    _combatService.ApplyEffects(this, null, hit.transform.gameObject, hit.point, 1);
                 }
             }
 
@@ -407,15 +400,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private bool StopActiveConsumerBehaviour(HandStatus handStatus)
         {
-            if (handStatus.ActiveConsumerBehaviour == null)
+            if (handStatus.ActiveConsumer == null)
             {
                 return false;
             }
 
             StartConsumerCooldown(handStatus);
 
-            handStatus.ActiveConsumerBehaviour.Stop();
-            handStatus.ActiveConsumerBehaviour = null;
+            handStatus.ActiveConsumer.StopStoppables();
+            handStatus.ActiveConsumer = null;
 
             return true;
         }
@@ -447,82 +440,75 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return true;
             }
 
-            if (IsServer || NetworkManager.LocalClientId == OwnerClientId)
+            if (leftOrRight.EquippedConsumer.ChargePercentage < 100)
             {
-                if (leftOrRight.EquippedConsumer.ChargePercentage < 100)
+                //Debug.Log("Charge was not finished");
+
+                if (leftOrRight.ChargeEnumerator != null)
                 {
-                    //Debug.Log("Charge was not finished");
-
-                    if (leftOrRight.ChargeEnumerator != null)
-                    {
-                        StopCoroutine(leftOrRight.ChargeEnumerator);
-                        StartConsumerCooldown(leftOrRight);
-                    }
-
-                    return false;
+                    StopCoroutine(leftOrRight.ChargeEnumerator);
+                    StartConsumerCooldown(leftOrRight);
                 }
 
-                //if (leftOrRight.CooldownEnumerator != null)
-                //{
-                //    //Debug.Log("Still cooling down");
-                //    return false;
-                //}
-
-                if (!ConsumeResource(consumer, isTest: true))
-                {
-                    return false;
-                }
+                return false;
             }
 
-            _typeRegistry.LoadAddessable(
-                consumer.Targeting.PrefabAddress,
-                prefab => InstantiateConsumerGameObject(leftOrRight, isLeftHand, handPosition, consumer, prefab));
+            //if (leftOrRight.CooldownEnumerator != null)
+            //{
+            //    //Debug.Log("Still cooling down");
+            //    return false;
+            //}
 
-            if (consumer.Targeting.IsServerSideOnly && IsServer)
+            if (!ConsumeResource(consumer, isTest: true))
             {
                 return false;
             }
 
-            return true;
-        }
-
-        private void InstantiateConsumerGameObject(
-            HandStatus leftOrRight,
-            bool isLeftHand,
-            Vector3 handPosition,
-            Consumer consumer,
-            GameObject prefab)
-        {
-            var targetDirection = GetAttackDirection(handPosition, ConsumerRangeLimit);
-
-            var parentTransform = consumer.Targeting.IsParentedToSource
-                ? transform
-                : _gameManager.GetSceneBehaviour().GetTransform();
-
-            var consumerGameObject = Instantiate(prefab, handPosition, Quaternion.identity);
-
-            consumer.Targeting.SetBehaviourVariables(consumerGameObject, consumer, this, handPosition, targetDirection, isLeftHand);
-
-            consumerGameObject.transform.parent = parentTransform;
-
             if (consumer.Targeting.IsContinuous)
             {
-                leftOrRight.ActiveConsumerBehaviour = consumerGameObject.GetComponent<IConsumerBehaviour>();
+                leftOrRight.ActiveConsumer = consumer;
             }
             else
             {
                 StartConsumerCooldown(leftOrRight);
             }
 
-            if (IsServer)
+            var attackDirection = Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, ConsumerRangeLimit)
+                ? (hit.point - handPosition).normalized
+                : LookTransform.forward;
+
+            if (!IsServer)
             {
-                ConsumeResource(consumer);
+                return true;
             }
+
+            ConsumeResource(consumer);
+
+            var targets = consumer.Targeting.GetTargets(this, consumer);
+
+            if (targets == null || consumer.Shape == null)
+            {
+                _combatService.SpawnTargetingGameObject(this, consumer, handPosition, attackDirection);
+
+                if (targets != null)
+                {
+                    foreach (var target in targets)
+                    {
+                        _combatService.ApplyEffects(this, consumer, target.GameObject, target.Position, target.EffectPercentage);
+                    }
+                }
+            }
+            else if (consumer.Shape != null)
+            {
+                _combatService.SpawnShapeGameObject(this, consumer, null, transform.position, transform.forward);
+            }
+
+            return true;
         }
 
         private bool UseWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand, bool isAutoFire)
         {
-            var registryType = (IGearWeapon)weaponInHand.RegistryType;
+            var registryType = (IWeapon)weaponInHand.RegistryType;
 
             var isRanged = registryType.Category == WeaponCategory.Ranged;
 
@@ -581,7 +567,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 //Debug.Log("Should only be called once on server");
                 for (var i = 0; i < ammoUsed; i++)
                 {
-                    _effectService.ApplyEffects(this, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
+                    _combatService.ApplyEffects(this, weaponInHand, rangedHit.transform.gameObject, rangedHit.point, 1);
                 }
             }
 
@@ -590,7 +576,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private bool UseMeleeWeapon(Weapon weaponInHand)
         {
-            //todo: take speed and recovery into account
+            //todo: zzz v0.5 - take speed and recovery into account
 
             if (IsServer)
             {
@@ -600,7 +586,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
                 if (Physics.Raycast(LookTransform.position, LookTransform.forward, out var meleeHit, meleeRange))
                 {
-                    _effectService.ApplyEffects(this, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
+                    _combatService.ApplyEffects(this, weaponInHand, meleeHit.transform.gameObject, meleeHit.point, 1);
                 }
             }
 
@@ -609,6 +595,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private (NetworkVariable<int> Variable, int? Cost)? GetResourceVariableAndCost(Consumer consumer)
         {
+            //todo: zzz v0.5 - energy and mana should be registered types not named variables
+
             switch (consumer.ResourceConsumptionType)
             {
                 case ResourceConsumptionType.Mana:

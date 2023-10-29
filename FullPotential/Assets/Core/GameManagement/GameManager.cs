@@ -10,9 +10,10 @@ using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Persistence;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Ui;
-using FullPotential.Api.Unity.Helpers;
+using FullPotential.Api.Unity.Services;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement.Data;
@@ -57,6 +58,7 @@ namespace FullPotential.Core.GameManagement
         private IUserRepository _userRepository;
         private ISettingsRepository _settingsRepository;
         private ILocalizer _localizer;
+        private IUnityHelperUtilities _unityHelperUtilities;
 
         //Variables
         private bool _isSaving;
@@ -92,6 +94,7 @@ namespace FullPotential.Core.GameManagement
             _userRepository = DependenciesContext.Dependencies.GetService<IUserRepository>();
             _settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+            _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
 
             await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
 
@@ -384,7 +387,7 @@ namespace FullPotential.Core.GameManagement
         {
             if (_sceneObjects == null || _sceneBehaviour == null)
             {
-                _sceneObjects = GameObjectHelper.GetObjectAtRoot(GameObjectNames.SceneObjects);
+                _sceneObjects = _unityHelperUtilities.GetObjectAtRoot(GameObjectNames.SceneObjects);
                 _sceneBehaviour = _sceneObjects.GetComponent<ISceneBehaviour>();
             }
             return _sceneBehaviour;
@@ -413,7 +416,7 @@ namespace FullPotential.Core.GameManagement
             }
 
             const string playersGameObjectName = "Players";
-            var parentObject = GameObjectHelper.GetObjectAtRoot(playersGameObjectName);
+            var parentObject = _unityHelperUtilities.GetObjectAtRoot(playersGameObjectName);
             if (parentObject == null)
             {
                 parentObject = new GameObject(playersGameObjectName);
@@ -434,7 +437,9 @@ namespace FullPotential.Core.GameManagement
 
             var playerNetObj = Instantiate(_playerPrefabNetObj, position, rotation, GetPlayersParentTransform());
 
-            GetSceneBehaviour().GetSpawnService().AdjustPositionToBeAboveGround(position, playerNetObj.transform);
+            var sceneService = GetSceneBehaviour().GetSceneService();
+            var newPosition = sceneService.GetPositionAboveGround(position, playerNetObj.GetComponent<Collider>());
+            playerNetObj.transform.position = newPosition;
 
             var playerState = playerNetObj.GetComponent<PlayerState>();
             playerState.PlayerToken = playerToken;

@@ -1,6 +1,6 @@
 ﻿using System;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Registry;
 
 namespace FullPotential.Standard.Loot
 {

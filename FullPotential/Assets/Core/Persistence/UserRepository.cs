@@ -51,7 +51,7 @@ namespace FullPotential.Core.Persistence
                 {
                     Username = username,
                     Settings = new PlayerSettings(),
-                    ResourceType = new ResourceType(),
+                    ResourceLevels = new ResourceLevels(),
                     Inventory = new InventoryData()
                 };
             }
@@ -93,6 +93,7 @@ namespace FullPotential.Core.Persistence
             playerData.Inventory.Loot = playerData.Inventory.Loot.Where(x => equippedItemIds.Contains(x.Id)).ToArray();
             playerData.Inventory.Gadgets = playerData.Inventory.Gadgets.Where(x => equippedItemIds.Contains(x.Id)).ToArray();
             playerData.Inventory.Spells = playerData.Inventory.Spells.Where(x => equippedItemIds.Contains(x.Id)).ToArray();
+            playerData.Inventory.Consumers = playerData.Inventory.Consumers.Where(x => equippedItemIds.Contains(x.Id)).ToArray();
             playerData.Inventory.Weapons = playerData.Inventory.Weapons.Where(x => equippedItemIds.Contains(x.Id)).ToArray();
         }
 

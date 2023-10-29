@@ -10,7 +10,9 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Modding;
+using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Constants;
@@ -18,7 +20,6 @@ using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using TMPro;
 using Unity.Collections;
-using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -30,7 +31,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
     [RequireComponent(typeof(Rigidbody))]
     public abstract class LivingEntityBase : NetworkBehaviour
     {
-        private const int VelocityThreshold = 4;
+        private const int VelocityThreshold = 3;
+        private const int ForceThreshold = 1000;
 
         #region Inspector Variables
 #pragma warning disable 0649
@@ -52,7 +54,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected IRpcService _rpcService;
         protected ILocalizer _localizer;
         protected ITypeRegistry _typeRegistry;
-        protected IEffectService _effectService;
+        protected ICombatService _combatService;
 
         protected readonly NetworkVariable<FixedString32Bytes> _entityName = new NetworkVariable<FixedString32Bytes>();
         protected readonly NetworkVariable<int> _energy = new NetworkVariable<int>(100);
@@ -100,7 +102,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
-            _effectService = DependenciesContext.Dependencies.GetService<IEffectService>();
+            _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
 
             _entityName.OnValueChanged += OnNameChanged;
             _health.OnValueChanged += OnHealthChanged;
@@ -299,7 +301,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (_stamina.Value <= 0)
                 {
-                    //todo: handle no stamina
+                    _stamina.Value = 0;
                 }
 
                 var staminaMax = GetStaminaMax();
@@ -358,7 +360,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (_energy.Value <= 0)
                 {
-                    //todo: handle no energy
+                    _energy.Value = 0;
                 }
 
                 var energyMax = GetEnergyMax();
@@ -409,7 +411,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (_mana.Value <= 0)
                 {
-                    //todo: handle no mana
+                    _mana.Value = 0;
                 }
 
                 var manaMax = GetManaMax();
@@ -522,45 +524,36 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            if (collision.relativeVelocity.magnitude < VelocityThreshold)
+            var contactPoint = collision.GetContact(0);
+
+            var force = collision.impulse / Time.fixedDeltaTime;
+            var isForceDamage = force.magnitude >= ForceThreshold;
+
+            var velocityMagnitude = collision.relativeVelocity.magnitude;
+            var isVelocityDamage = velocityMagnitude >= VelocityThreshold;
+
+            if (!isVelocityDamage && !isForceDamage)
             {
                 _fighterWhoMovedMeLast = null;
                 return;
             }
 
-            var normalizedVelocity = collision.relativeVelocity.normalized;
+            var cause = _localizer.Translate(contactPoint.normal == Vector3.up
+                ? "ui.alert.falldamage"
+                : "ui.alert.environmentaldamage");
 
-            string cause;
-            if (math.abs(normalizedVelocity.y) > math.abs(normalizedVelocity.x)
-                && math.abs(normalizedVelocity.y) > math.abs(normalizedVelocity.z))
-            {
-                cause = _localizer.Translate("ui.alert.falldamage");
-            }
-            else
-            {
-                cause = _localizer.Translate("ui.alert.environmentaldamage");
-            }
+            //Debug.Log($"{name} collided with {collision.gameObject.name} at velocity {collision.relativeVelocity} with force {force} with cause {cause}");
 
-            //Debug.Log($"{name} collided with {collision.gameObject.name} at velocity {collision.relativeVelocity} with cause {cause}");
+            var healthChangeRaw = isVelocityDamage
+                ? Vector3.Dot(contactPoint.normal, collision.relativeVelocity)
+                : force.magnitude / 700;
 
-            var healthChange = GetDamageValueFromVelocity(collision.relativeVelocity);
-            var position = collision.GetContact(0).point;
+            var healthChange = -1 * (int)MathF.Round(healthChangeRaw, MidpointRounding.AwayFromZero);
 
             _lastDamageItemName = null;
             _lastDamageSourceName = cause;
 
-            ApplyHealthChange(healthChange, _fighterWhoMovedMeLast, position, false);
-        }
-
-        private int GetDamageValueFromVelocity(Vector3 velocity)
-        {
-            var horizontal = (velocity.x > VelocityThreshold ? velocity.x - VelocityThreshold : 0)
-                + (velocity.z > VelocityThreshold ? velocity.z - VelocityThreshold : 0);
-
-            var vertical = velocity.y > VelocityThreshold ? velocity.y - VelocityThreshold : 0;
-
-            var basicDamage = math.pow((horizontal + vertical) * 10, 1.3) * -1;
-            return (int)basicDamage;
+            ApplyHealthChange(healthChange, _fighterWhoMovedMeLast, contactPoint.point, false);
         }
 
         #endregion
@@ -690,17 +683,19 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Effect-related methods
 
-        public void AddAttributeModifier(IAttributeEffect attributeEffect, ItemBase itemUsed)
+        public void AddAttributeModifier(IAttributeEffect attributeEffect, ItemBase itemUsed, float effectPercentage)
         {
             var (change, expiry) = itemUsed.GetAttributeChangeAndExpiry(attributeEffect);
-            AddOrUpdateEffect(attributeEffect, change, expiry);
+            var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
+            AddOrUpdateEffect(attributeEffect, adjustedChange, expiry);
         }
 
-        public void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter)
+        public void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, float effectPercentage)
         {
             var (change, expiry, delay) = itemUsed.GetPeriodicStatChangeExpiryAndDelay(statEffect);
-            AddOrUpdateEffect(statEffect, change, expiry);
-            StartCoroutine(PeriodicActionToStatCoroutine(statEffect.StatToAffect, change, sourceFighter, delay, expiry));
+            var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
+            AddOrUpdateEffect(statEffect, adjustedChange, expiry);
+            StartCoroutine(PeriodicActionToStatCoroutine(statEffect.StatToAffect, adjustedChange, sourceFighter, delay, expiry));
         }
 
         private IEnumerator PeriodicActionToStatCoroutine(AffectableStat stat, int change, IFighter sourceFighter, float delay, DateTime expiry)
@@ -713,27 +708,31 @@ namespace FullPotential.Api.Gameplay.Behaviours
             } while (DateTime.Now < expiry);
         }
 
-        public void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, int change, Vector3? position)
+        public void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
         {
-            AddOrUpdateEffect(statEffect, change, DateTime.Now.AddSeconds(3));
+            var change = itemUsed.GetStatChange(statEffect);
+            var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
 
-            ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, position);
+            AddOrUpdateEffect(statEffect, adjustedChange, DateTime.Now.AddSeconds(3));
+
+            ApplyStatChange(statEffect.StatToAffect, adjustedChange, sourceFighter, position);
         }
 
-        public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position)
+        public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
         {
             var (change, expiry) = itemUsed.GetStatChangeAndExpiry(statEffect);
+            var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
 
-            AddOrUpdateEffect(statEffect, change, expiry);
+            AddOrUpdateEffect(statEffect, adjustedChange, expiry);
 
-            ApplyStatChange(statEffect.StatToAffect, change, sourceFighter, position);
+            ApplyStatChange(statEffect.StatToAffect, adjustedChange, sourceFighter, position);
         }
 
-        public void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, int change, Vector3? position)
+        public void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
         {
             //todo: zzz v0.4.1 - ApplyElementalEffect
             //Debug.LogWarning("Not yet implemented elemental effects");
-            ApplyHealthChange(change, sourceFighter, position, false);
+            ApplyHealthChange(-5, sourceFighter, position, false);
         }
 
         public List<ActiveEffect> GetActiveEffects()
@@ -761,14 +760,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 .Where(x =>
                     x.Effect is IStatEffect statEffect
                     && statEffect.StatToAffect == affectableStat
-                    && statEffect.Affect is Affect.TemporaryMaxIncrease or Affect.TemporaryMaxDecrease)
+                    && statEffect.AffectType is AffectType.TemporaryMaxIncrease or AffectType.TemporaryMaxDecrease)
                 .Sum(x => x.Change);
         }
 
-        private bool DoesAffectAllowMultiple(Affect affect)
+        private bool DoesAffectAllowMultiple(AffectType affectType)
         {
-            return affect == Affect.TemporaryMaxIncrease
-                || affect == Affect.TemporaryMaxDecrease;
+            return affectType == AffectType.TemporaryMaxIncrease
+                || affectType == AffectType.TemporaryMaxDecrease;
         }
 
         private void AddOrUpdateEffect(IEffect effect, int change, DateTime expiry)
@@ -776,14 +775,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var statEffect = effect as IStatEffect;
 
             var showExpiry = !(statEffect != null
-                && statEffect.Affect is Affect.SingleDecrease or Affect.SingleIncrease);
+                && statEffect.AffectType is AffectType.SingleDecrease or AffectType.SingleIncrease);
 
             var effectMatch = _activeEffects.FirstOrDefault(x => x.Effect == effect);
 
             if (effectMatch != null)
             {
                 var multipleAllowed =
-                    (statEffect != null && DoesAffectAllowMultiple(statEffect.Affect))
+                    (statEffect != null && DoesAffectAllowMultiple(statEffect.AffectType))
                     || effect is IAttributeEffect;
 
                 if (multipleAllowed)

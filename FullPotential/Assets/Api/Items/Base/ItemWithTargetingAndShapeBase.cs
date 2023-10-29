@@ -1,44 +1,63 @@
-﻿using FullPotential.Api.Registry.Consumers;
+﻿using FullPotential.Api.Registry.Shapes;
+using FullPotential.Api.Registry.Targeting;
 
 namespace FullPotential.Api.Items.Base
 {
     public abstract class ItemWithTargetingAndShapeBase : ItemBase, IHasTargetingAndShape
     {
-        //todo: zzz v0.5 - remove these now data is fixed
-        public string TargetingTypeName;
-        public string ShapeTypeName;
+        private ITargeting _targeting;
+        private ITargetingVisuals _targetingVisuals;
+        private IShape _shape;
+        private IShapeVisuals _shapeVisuals;
 
         //Variables so they are serialized
+        // ReSharper disable MemberCanBePrivate.Global
+        // ReSharper disable NotAccessedField.Global
         public string TargetingTypeId;
+        public string TargetingVisualsTypeId;
         public string ShapeTypeId;
+        public string ShapeVisualsTypeId;
+        // ReSharper restore MemberCanBePrivate.Global
+        // ReSharper restore NotAccessedField.Global
 
-        private ITargeting _targeting;
         public ITargeting Targeting
         {
-            get
-            {
-                return _targeting;
-            }
+            get => _targeting;
             set
             {
                 _targeting = value;
                 TargetingTypeId = _targeting?.TypeId.ToString();
-                TargetingTypeName = _targeting?.TypeName;
             }
         }
 
-        private IShape _shape;
+
+        public ITargetingVisuals TargetingVisuals
+        {
+            get => _targetingVisuals;
+            set
+            {
+                _targetingVisuals = value;
+                TargetingVisualsTypeId = _targetingVisuals?.TypeId.ToString();
+            }
+        }
+
         public IShape Shape
         {
-            get
-            {
-                return _shape;
-            }
+            get => _shape;
             set
             {
                 _shape = value;
                 ShapeTypeId = _shape?.TypeId.ToString();
-                ShapeTypeName = _shape?.TypeName;
+            }
+        }
+
+        public IShapeVisuals ShapeVisuals
+        {
+            get => _shapeVisuals;
+            set
+            {
+                _shapeVisuals = value;
+                ShapeVisualsTypeId = _shapeVisuals?.TypeId.ToString();
             }
         }
     }

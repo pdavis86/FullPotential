@@ -3,42 +3,6 @@
   "Name": "English (United Kingdom)",
   "Translations": [
     {
-      "Key": "accessory.amulet",
-      "Value": "Amulet"
-    },
-    {
-      "Key": "accessory.belt",
-      "Value": "Belt"
-    },
-    {
-      "Key": "accessory.ring",
-      "Value": "Ring"
-    },
-
-
-    {
-      "Key": "armor.helm",
-      "Value": "Helm"
-    },
-    {
-      "Key": "armor.chest",
-      "Value": "Chest"
-    },
-    {
-      "Key": "armor.legs",
-      "Value": "Legs"
-    },
-    {
-      "Key": "armor.feet",
-      "Value": "Feet"
-    },
-    {
-      "Key": "armor.barrier",
-      "Value": "Barrier"
-    },
-
-
-    {
       "Key": "loot.scrap",
       "Value": "Scrap"
     },
@@ -405,38 +369,6 @@
     {
       "Key": "effect.stepback.description",
       "Value": "Causes your target to move backwards"
-    },
-    
-
-    {
-      "Key": "shape.wall",
-      "Value": "Wall"
-    },
-    {
-      "Key": "shape.zone",
-      "Value": "Zone"
-    },
-
-
-    {
-      "Key": "targeting.beam",
-      "Value": "Beam"
-    },
-    {
-      "Key": "targeting.cone",
-      "Value": "Cone"
-    },
-    {
-      "Key": "targeting.projectile",
-      "Value": "Projectile"
-    },
-    {
-      "Key": "targeting.self",
-      "Value": "Self"
-    },
-    {
-      "Key": "targeting.touch",
-      "Value": "Touch"
     }
     
   ]

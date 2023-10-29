@@ -3515,8 +3515,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 333.27527, y: -26.415512}
-  m_SizeDelta: {x: 218.85017, y: 45.110123}
+  m_AnchoredPosition: {x: 389.77527, y: -26.415512}
+  m_SizeDelta: {x: 256.51685, y: 45.110123}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &581361329
 CanvasRenderer:
@@ -5653,8 +5653,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 557.1254, y: -26.415512}
-  m_SizeDelta: {x: 218.85017, y: 45.110123}
+  m_AnchoredPosition: {x: 651.2921, y: -26.415512}
+  m_SizeDelta: {x: 256.51685, y: 45.110123}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &810997064
 CanvasRenderer:
@@ -11849,7 +11849,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.00024414, y: 0.0025024414}
+  m_AnchoredPosition: {x: 0.00024414062, y: 0.0025024414}
   m_SizeDelta: {x: 0.00048828, y: -0.005}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1694873972
@@ -15720,17 +15720,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Player: {fileID: 7392779647718654627, guid: e289f79f4fd69ec47a403b44b6cf327f, type: 3}
   Combat:
-    ProjectileWithTrail: {fileID: 4563083350583329192, guid: 92356876fd6de514e9c2f4e4bdea6cc0,
-      type: 3}
     SpellInHand: {fileID: 5923469330004543499, guid: 404031c7fdd421f4295a39230469eb19,
       type: 3}
     GadgetInHand: {fileID: 5117168970597480252, guid: f48fb857652d00a409512598fbea223b,
+      type: 3}
+    Projectile: {fileID: 4991308441274877191, guid: d76b723de09f993479b0cbe5cf10694a,
+      type: 3}
+    PointToPoint: {fileID: 937278294356468739, guid: 41999c09d1855944f8323a0d9808169e,
+      type: 3}
+    BulletTrail: {fileID: 4563083350583329192, guid: 92356876fd6de514e9c2f4e4bdea6cc0,
       type: 3}
     BulletHole: {fileID: 4982191730498096428, guid: 9ed0afac89fcf0145a7bbfec0337d367,
       type: 3}
   Environment:
     LootChest: {fileID: 6779003295890321588, guid: 0da494cf737d72c44b603f7a79174481,
       type: 3}
+  Shapes:
+    Wall: {fileID: 605297549439960408, guid: a2c569deaf0fe1745b9be93de6c19d6e, type: 3}
+    Zone: {fileID: 585545506049340028, guid: db85dbe43a3d3e8458e830f2530250e7, type: 3}
 --- !u!1 &1549162085111107810
 GameObject:
   m_ObjectHideFlags: 0
@@ -16016,12 +16023,12 @@ PrefabInstance:
     - target: {fileID: 5081276652260113279, guid: d175f1aa2496ff643962c37ac0cc076a,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 340.10892
+      value: 379.60892
       objectReference: {fileID: 0}
     - target: {fileID: 5081276652260113279, guid: d175f1aa2496ff643962c37ac0cc076a,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 170.05446
+      value: 189.80446
       objectReference: {fileID: 0}
     - target: {fileID: 5081276652260113279, guid: d175f1aa2496ff643962c37ac0cc076a,
         type: 3}
@@ -16151,12 +16158,12 @@ PrefabInstance:
     - target: {fileID: 5081276653121217350, guid: d175f1aa2496ff643962c37ac0cc076a,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 340.10892
+      value: 379.60892
       objectReference: {fileID: 0}
     - target: {fileID: 5081276653121217350, guid: d175f1aa2496ff643962c37ac0cc076a,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 170.05446
+      value: 189.80446
       objectReference: {fileID: 0}
     - target: {fileID: 5081276653121217350, guid: d175f1aa2496ff643962c37ac0cc076a,
         type: 3}
@@ -16176,12 +16183,12 @@ PrefabInstance:
     - target: {fileID: 5081276653922248537, guid: d175f1aa2496ff643962c37ac0cc076a,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 340.10892
+      value: 379.60892
       objectReference: {fileID: 0}
     - target: {fileID: 5081276653922248537, guid: d175f1aa2496ff643962c37ac0cc076a,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 170.05446
+      value: 189.80446
       objectReference: {fileID: 0}
     - target: {fileID: 5081276653922248537, guid: d175f1aa2496ff643962c37ac0cc076a,
         type: 3}
@@ -16346,6 +16353,30 @@ MonoBehaviour:
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
       Prefab: {fileID: 4982191730498096428, guid: 9ed0afac89fcf0145a7bbfec0337d367,
+        type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 4991308441274877191, guid: d76b723de09f993479b0cbe5cf10694a,
+        type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 937278294356468739, guid: 41999c09d1855944f8323a0d9808169e,
+        type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 605297549439960408, guid: a2c569deaf0fe1745b9be93de6c19d6e,
+        type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 585545506049340028, guid: db85dbe43a3d3e8458e830f2530250e7,
         type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
@@ -17817,6 +17848,6 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 109.42509, y: -26.415512}
-  m_SizeDelta: {x: 218.85017, y: 45.110123}
+  m_AnchoredPosition: {x: 128.25842, y: -26.415512}
+  m_SizeDelta: {x: 256.51685, y: 45.110123}
   m_Pivot: {x: 0.5, y: 0.5}

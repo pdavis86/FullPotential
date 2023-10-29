@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace FullPotential.Core.Gameplay.Combat
 {
+    //todo: zzz v0.5 - this should be another LineOfSight behaviour
+
     public class ProjectileWithTrail : MonoBehaviour
     {
         public Vector3 TargetPosition;

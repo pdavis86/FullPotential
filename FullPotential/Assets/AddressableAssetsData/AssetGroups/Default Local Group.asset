@@ -137,38 +137,68 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: cd7343b2907f0bb43b33607835902cda
-    m_Address: Standard/Prefabs/SpellOrGadget/Beam.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7297a77e0760fc442a8de9c1615f5d4c
-    m_Address: Standard/Prefabs/SpellOrGadget/Projectile.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: bd7b43d17a423b84a96eceaa0a28419f
-    m_Address: Standard/Prefabs/SpellOrGadget/Self.prefab
+    m_Address: Standard/Prefabs/Targeting/Projectile.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: da2c19386588bc24cb34810a8530adc5
-    m_Address: Standard/Prefabs/SpellOrGadget/Wall.prefab
+    m_Address: Standard/Prefabs/Shapes/Wall.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b7d2fcaa5eb669840928413506c5b9ea
-    m_Address: Standard/Prefabs/SpellOrGadget/Zone.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 047241ab43d5e0b4d91c0eaf63455b5f
-    m_Address: Standard/Prefabs/SpellOrGadget/Touch.prefab
+    m_Address: Standard/Prefabs/Shapes/Zone.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a11be9c5a65095d44ae0e51ea7f797e2
-    m_Address: Assets/Standard/Registration
+    m_Address: Standard/Registration
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0b5fd68a25a4ae04ab373c7fdb43b59a
+    m_Address: Core/Prefabs/Targeting/ProjectileVisuals.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 33676b6f1d960ea4db1d947cb63ee983
+    m_Address: Core/Prefabs/Targeting/BeamVisuals.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: af169d5b2c8e10c498c33bcc32cc3ea7
+    m_Address: Standard/Localization/fr-FR.json
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a14becadb0f4f4642b091407dc9c2ae7
+    m_Address: Core/Prefabs/Shapes/WallVisuals.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ee66f94af399aef46b98d3e673fa9aa8
+    m_Address: Core/Prefabs/Shapes/ZoneVisuals.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d76b723de09f993479b0cbe5cf10694a
+    m_Address: Core/Prefabs/Targeting/Projectile.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 41999c09d1855944f8323a0d9808169e
+    m_Address: Core/Prefabs/Targeting/PointToPoint.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a2c569deaf0fe1745b9be93de6c19d6e
+    m_Address: Core/Prefabs/Shapes/Wall.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: db85dbe43a3d3e8458e830f2530250e7
+    m_Address: Core/Prefabs/Shapes/Zone.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

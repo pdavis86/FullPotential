@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace FullPotential.Api.Modding
 {
@@ -8,6 +7,6 @@ namespace FullPotential.Api.Modding
     {
         IEnumerable<Type> GetRegisterableTypes();
 
-        IEnumerable<GameObject> GetNetworkPrefabs();
+        IEnumerable<string> GetNetworkPrefabAddresses();
     }
 }

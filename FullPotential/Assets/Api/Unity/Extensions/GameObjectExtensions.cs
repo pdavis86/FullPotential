@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.Netcode;
+using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
 
@@ -56,6 +57,46 @@ namespace FullPotential.Api.Unity.Extensions
             {
                 Object.Destroy(child.gameObject);
             }
+        }
+
+        public static void NetworkSpawn(this GameObject gameObject, bool warnOnFailure = true)
+        {
+            var networkObject = gameObject.GetComponent<NetworkObject>();
+
+            if (warnOnFailure && networkObject == null)
+            {
+                Debug.LogWarning($"Cannot network spawn {gameObject.name} as it does not have a NetworkObject component");
+                return;
+            }
+
+            networkObject?.Spawn(true);
+        }
+
+        public static void SetGameLayerRecursive(this GameObject gameObject, int layer)
+        {
+            gameObject.layer = layer;
+            foreach (Transform child in gameObject.transform)
+            {
+                child.gameObject.layer = layer;
+
+                var hasChildren = child.GetComponentInChildren<Transform>();
+                if (hasChildren != null)
+                {
+                    SetGameLayerRecursive(child.gameObject, layer);
+                }
+            }
+        }
+
+        public static GameObject GetClosestParentWithTag(this GameObject gameObject, string tag)
+        {
+            var current = gameObject.transform;
+            do
+            {
+                current = current.parent;
+
+            } while (current != null && !current.CompareTag(tag));
+
+            return current == null ? null : current.gameObject;
         }
 
     }

@@ -3,24 +3,73 @@
   "Name": "English (United Kingdom)",
   "Translations": [
     {
-      "Key": "crafting.category.weapon",
+      "Key": "accessorycategory.amulet",
+      "Value": "Amulet"
+    },
+    {
+      "Key": "accessorycategory.belt",
+      "Value": "Belt"
+    },
+    {
+      "Key": "accessorycategory.ring",
+      "Value": "Ring"
+    },
+
+
+    {
+      "Key": "armorcategory.helm",
+      "Value": "Helm"
+    },
+    {
+      "Key": "armorcategory.chest",
+      "Value": "Chest"
+    },
+    {
+      "Key": "armorcategory.legs",
+      "Value": "Legs"
+    },
+    {
+      "Key": "armorcategory.feet",
+      "Value": "Feet"
+    },
+    {
+      "Key": "armorcategory.barrier",
+      "Value": "Barrier"
+    },
+	
+	{
+      "Key": "craftabletype.weapon",
       "Value": "Weapon"
     },
     {
-      "Key": "crafting.category.armor",
+      "Key": "craftabletype.armor",
       "Value": "Armor"
     },
     {
-      "Key": "crafting.category.accessory",
+      "Key": "craftabletype.accessory",
       "Value": "Accessory"
     },
     {
-      "Key": "crafting.category.spell",
-      "Value": "Spell"
+      "Key": "craftabletype.consumer",
+      "Value": "Consumer"
+    },
+	
+	
+    {
+      "Key": "resourceconsumptiontype.health",
+      "Value": "Health"
     },
     {
-      "Key": "crafting.category.gadget",
-      "Value": "Gadget"
+      "Key": "resourceconsumptiontype.stamina",
+      "Value": "Stamina"
+    },
+    {
+      "Key": "resourceconsumptiontype.mana",
+      "Value": "Mana"
+    },
+    {
+      "Key": "resourceconsumptiontype.energy",
+      "Value": "Energy"
     },
     
 	
@@ -134,6 +183,10 @@
       "Key": "attribute.luck",
       "Value": "Luck"
     },
+    {
+      "Key": "attribute.resourceconsumptiontype",
+      "Value": "Consumes"
+    },
 	
 	
     {
@@ -225,6 +278,34 @@
     {
       "Key": "attribute.units.percent",
       "Value": "%"
+    },
+    
+
+    {
+      "Key": "shape.wall",
+      "Value": "Wall"
+    },
+    {
+      "Key": "shape.zone",
+      "Value": "Zone"
+    },
+
+
+    {
+      "Key": "targeting.pointtopoint",
+      "Value": "Point-to-point"
+    },
+    {
+      "Key": "targeting.projectile",
+      "Value": "Projectile"
+    },
+    {
+      "Key": "targeting.self",
+      "Value": "Self"
+    },
+    {
+      "Key": "targeting.touch",
+      "Value": "Touch"
     },
 
 

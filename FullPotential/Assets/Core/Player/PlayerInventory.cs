@@ -3,18 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Crafting;
+using FullPotential.Api.Registry;
+using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Shapes;
+using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Unity.Constants;
-using FullPotential.Api.Unity.Helpers;
+using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.GameManagement.Inventory;
@@ -39,7 +42,6 @@ namespace FullPotential.Core.Player
         private IRpcService _rpcService;
         private ILocalizer _localizer;
         private IInventoryDataService _inventoryDataService;
-        private IResultFactory _resultFactory;
 
         private PlayerState _playerState;
         private int _maxItems;
@@ -60,7 +62,6 @@ namespace FullPotential.Core.Player
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _inventoryDataService = DependenciesContext.Dependencies.GetService<IInventoryDataService>();
-            _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
         }
 
         #endregion
@@ -118,6 +119,7 @@ namespace FullPotential.Core.Player
                 .UnionIfNotNull(changes.Armor)
                 .UnionIfNotNull(changes.Gadgets)
                 .UnionIfNotNull(changes.Spells)
+                .UnionIfNotNull(changes.Consumers)
                 .UnionIfNotNull(changes.Weapons)
                 .FirstOrDefault();
 
@@ -246,8 +248,8 @@ namespace FullPotential.Core.Player
             {
                 itemsForSlot = _items
                 .Where(x =>
-                    (x.Value is Accessory acc && (int)((IGearAccessory)acc.RegistryType).Category == (int)gearCategory)
-                    || (x.Value is Armor armor && (int)((IGearArmor)armor.RegistryType).Category == (int)gearCategory));
+                    (x.Value is Accessory acc && (int)((IAccessoryVisuals)acc.RegistryType).Category == (int)gearCategory)
+                    || (x.Value is Armor armor && (int)((IArmorVisuals)armor.RegistryType).Category == (int)gearCategory));
             }
 
             return itemsForSlot
@@ -283,6 +285,7 @@ namespace FullPotential.Core.Player
                 .UnionIfNotNull(changes.Armor)
                 .UnionIfNotNull(changes.Gadgets)
                 .UnionIfNotNull(changes.Spells)
+                .UnionIfNotNull(changes.Consumers)
                 .UnionIfNotNull(changes.Weapons);
 
             foreach (var item in itemsToAdd)
@@ -402,33 +405,21 @@ namespace FullPotential.Core.Player
                 item.RegistryType = _typeRegistry.GetRegisteredForItem(item);
             }
 
-            if (item is ItemWithTargetingAndShapeBase magicalItem)
+            if (item is ItemWithTargetingAndShapeBase magicalItem && !string.IsNullOrWhiteSpace(magicalItem.TargetingTypeId))
             {
-                if (!string.IsNullOrWhiteSpace(magicalItem.TargetingTypeId))
-                {
-                    magicalItem.Targeting = _resultFactory.GetTargeting(magicalItem.TargetingTypeId);
-                }
+                magicalItem.Targeting = _typeRegistry.GetRegisteredTypes<ITargeting>()
+                    .First(x => x.TypeId.ToString() == magicalItem.TargetingTypeId);
 
-                //Here for backwards-compatibility
-                if (magicalItem.Targeting == null && !string.IsNullOrWhiteSpace(magicalItem.TargetingTypeName))
-                {
-                    magicalItem.Targeting = _resultFactory.GetTargetingFromTypeName(magicalItem.TargetingTypeName);
-                }
-
-                if (item is Consumer && magicalItem.Targeting == null)
-                {
-                    Debug.LogWarning($"Item '{item.Id}' is missing a Targeting ID");
-                }
+                magicalItem.TargetingVisuals = _typeRegistry.GetRegisteredTypes<ITargetingVisuals>()
+                    .FirstOrDefault(v => v.TypeId.ToString() == magicalItem.TargetingVisualsTypeId);
 
                 if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeId))
                 {
-                    magicalItem.Shape = _resultFactory.GetShape(magicalItem.ShapeTypeId);
-                }
+                    magicalItem.Shape = _typeRegistry.GetRegisteredTypes<IShape>()
+                        .First(x => x.TypeId.ToString() == magicalItem.ShapeTypeId);
 
-                //Here for backwards-compatibility
-                if (magicalItem.Shape == null && !string.IsNullOrWhiteSpace(magicalItem.ShapeTypeName))
-                {
-                    magicalItem.Shape = _resultFactory.GetShapeFromTypeName(magicalItem.ShapeTypeName);
+                    magicalItem.ShapeVisuals = _typeRegistry.GetRegisteredTypes<IShapeVisuals>()
+                        .FirstOrDefault(v => v.TypeId.ToString() == magicalItem.ShapeVisualsTypeId);
                 }
             }
 
@@ -601,7 +592,7 @@ namespace FullPotential.Core.Player
             switch (item)
             {
                 case Weapon weapon:
-                    if (item.RegistryType is not IGearWeapon weaponRegistryType)
+                    if (item.RegistryType is not IWeapon weaponRegistryType)
                     {
                         Debug.LogError("Item is not a weapon");
                         return;
@@ -647,7 +638,7 @@ namespace FullPotential.Core.Player
 
             if (IsOwner)
             {
-                GameObjectHelper.SetGameLayerRecursive(newObj, _playerState.InFrontOfPlayer.layer);
+                newObj.SetGameLayerRecursive(_playerState.InFrontOfPlayer.layer);
             }
 
             _equippedItems[slotGameObjectName].GameObject = newObj;
@@ -667,7 +658,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            if (item.RegistryType is not IGearAccessory registryType)
+            if (item.RegistryType is not IAccessoryVisuals registryType)
             {
                 Debug.LogError("Item is not an accessory");
                 return;
@@ -683,7 +674,7 @@ namespace FullPotential.Core.Player
 
                     if (showsOnPlayerCamera && thisClient)
                     {
-                        GameObjectHelper.SetGameLayerRecursive(newObj, LayerMask.NameToLayer(Layers.InFrontOfPlayer));
+                        newObj.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
                     }
 
                     _equippedItems[slotGameObjectName].GameObject = newObj;
@@ -695,7 +686,7 @@ namespace FullPotential.Core.Player
             ItemBase item,
             Transform parentTransform)
         {
-            if (item.RegistryType is not IGearArmor registryType)
+            if (item.RegistryType is not IArmorVisuals registryType)
             {
                 Debug.LogError("Item is not armor");
                 return;

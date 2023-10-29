@@ -19,15 +19,15 @@ namespace FullPotential.Api.Gameplay.Combat
 
         ulong OwnerClientId { get; }
 
-        void AddAttributeModifier(IAttributeEffect attributeEffect, ItemBase itemUsed);
+        void AddAttributeModifier(IAttributeEffect attributeEffect, ItemBase itemUsed, float effectPercentage);
 
-        void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter);
+        void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, float effectPercentage);
 
-        void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, int change, Vector3? position);
+        void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage);
 
-        void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position);
+        void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage);
 
-        void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, int change, Vector3? position);
+        void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage);
 
         int GetAttributeValue(AffectableAttribute attribute);
 

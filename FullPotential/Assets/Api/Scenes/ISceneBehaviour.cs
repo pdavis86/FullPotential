@@ -1,5 +1,4 @@
-﻿using FullPotential.Api.Spawning;
-using Unity.Netcode;
+﻿using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable UnusedParameter.Global
@@ -10,11 +9,11 @@ namespace FullPotential.Api.Scenes
     {
         SceneAttributes Attributes { get; }
 
-        ISpawnService GetSpawnService();
+        ISceneService GetSceneService();
 
         Transform GetTransform();
 
-        SpawnPoint GetSpawnPoint(GameObject gameObjectToSpawn);
+        SpawnPoint GetSpawnPoint();
 
         void HandleEnemyDeath();
 

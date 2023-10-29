@@ -1,17 +1,20 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
-using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Utilities.Extensions;
 
 namespace FullPotential.Api.Items.Types
 {
-    [System.Serializable]
+    [Serializable]
     public class Consumer : ItemWithTargetingAndShapeBase
     {
         public const string AliasSegmentConsumer = "consumer";
@@ -21,13 +24,14 @@ namespace FullPotential.Api.Items.Types
 
         public int ChargePercentage { get; set; }
 
+        public List<IStoppable> Stoppables { get; } = new List<IStoppable>();
+
         public int GetResourceCost()
         {
-            //todo: scale up with number of effects
-
             var returnValue = GetHighInLowOutInRange(Attributes.Efficiency, 5, 50);
+
             //Debug.Log("GetResourceCost: " + returnValue);
-            return (int)returnValue;
+            return (int)returnValue * Math.Max(Effects.Count, 1);
         }
 
         public float GetProjectileSpeed()
@@ -57,13 +61,13 @@ namespace FullPotential.Api.Items.Types
 
         public float GetDps()
         {
-            var itemDamage = _effectService.GetDamageValueFromAttack(this, 0, false);
+            var itemDamage = _combatService.GetDamageValueFromAttack(this, 0, false);
 
             var healthEffects = Effects
                 .Where(e => e is IStatEffect se && se.StatToAffect == AffectableStat.Health)
                 .Select(e => (IStatEffect)e)
                 .ToList();
-            
+
             var single = healthEffects.Where(se => se.AffectType == AffectType.SingleDecrease || se.AffectType == AffectType.SingleIncrease);
             var singleDamage = single.Count() * itemDamage;
 
@@ -83,12 +87,24 @@ namespace FullPotential.Api.Items.Types
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {GetType().Name}" + "\n");
             }
 
-            if (Targeting != null) { sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Targeting))}: {localizer.GetTranslatedTypeName(Targeting)}\n"); }
-            if (Shape != null) { sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Shape))}: {localizer.GetTranslatedTypeName(Shape)}\n"); }
+            if (Targeting != null)
+            {
+                sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(ResourceConsumptionType))}: {localizer.Translate(ResourceConsumptionType)}\n");
+            }
+
+            if (Targeting != null)
+            {
+                sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Targeting))}: {localizer.Translate(Targeting)}\n");
+            }
+
+            if (Shape != null)
+            {
+                sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Shape))}: {localizer.Translate(Shape)}\n");
+            }
 
             if (Effects != null && Effects.Count > 0)
             {
-                var localisedEffects = Effects.Select(localizer.GetTranslatedTypeName);
+                var localisedEffects = Effects.Select(localizer.Translate);
                 sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Effects))}: {string.Join(", ", localisedEffects)}\n");
             }
 
@@ -166,6 +182,16 @@ namespace FullPotential.Api.Items.Types
                 UnitsType.UnitPerTime);
 
             return sb.ToString();
+        }
+
+        public void StopStoppables()
+        {
+            foreach (var stoppable in Stoppables)
+            {
+                stoppable.Stop();
+            }
+
+            Stoppables.Clear();
         }
 
     }
