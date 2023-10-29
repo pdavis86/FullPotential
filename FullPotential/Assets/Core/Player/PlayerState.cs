@@ -39,7 +39,7 @@ namespace FullPotential.Core.Player
         private readonly Dictionary<string, DateTime> _unclaimedLoot = new Dictionary<string, DateTime>();
 
         private string _textureUrl;
-        private Vector3 _startingPosition;
+        private Vector3 _positionAfterRespawn;
         private float _myHeight;
         private MeshRenderer _bodyMeshRenderer;
 
@@ -373,7 +373,7 @@ namespace FullPotential.Core.Player
                     transform.rotation = rotation;
                     _playerCamera.transform.localEulerAngles = Vector3.zero;
 
-                    _startingPosition = transform.position;
+                    _positionAfterRespawn = transform.position;
 
                     GraphicsTransform.gameObject.SetActive(true);
                     RigidBody.isKinematic = false;
@@ -429,12 +429,18 @@ namespace FullPotential.Core.Player
 
         private void BecomeVulnerable()
         {
-            if (AliveState == LivingEntityState.Dead || _startingPosition == Vector3.zero)
+            if (AliveState is LivingEntityState.Dead or LivingEntityState.Alive)
             {
                 return;
             }
 
-            var distanceMoved = Vector3.Distance(transform.position, _startingPosition);
+            if ((int)transform.position.x == 0 && (int)transform.position.z == 0)
+            {
+                //Wait for transform to move to spawn position
+                return;
+            }
+
+            var distanceMoved = Vector3.Distance(transform.position, _positionAfterRespawn);
 
             if (distanceMoved > 1)
             {
@@ -444,7 +450,7 @@ namespace FullPotential.Core.Player
 
                 var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
                 PlayerSpawnStateChangeClientRpc(AliveState, Vector3.zero, Quaternion.identity, nearbyClients);
-                _startingPosition = Vector3.zero;
+                _positionAfterRespawn = Vector3.zero;
             }
         }
 
