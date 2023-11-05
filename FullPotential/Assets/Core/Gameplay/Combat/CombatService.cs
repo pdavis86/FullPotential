@@ -536,8 +536,9 @@ namespace FullPotential.Core.Gameplay.Combat
                 prefab =>
                 {
                     var shapeGameObject = UnityEngine.Object.Instantiate(prefab, spawnPosition, rotation);
+                    var sceneService = GameManager.Instance.GetSceneBehaviour().GetSceneService();
 
-                    shapeGameObject.transform.position = GameManager.Instance.GetSceneBehaviour().GetSceneService().GetPositionAboveGround(spawnPosition, shapeGameObject);
+                    shapeGameObject.transform.position = sceneService.GetHeightAdjustedPosition(spawnPosition, shapeGameObject);
 
                     shapeGameObject.layer = LayerMask.NameToLayer(Layers.NonSolid);
 

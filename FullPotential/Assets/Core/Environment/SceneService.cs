@@ -1,8 +1,4 @@
-﻿using FullPotential.Api.GameManagement;
-using FullPotential.Api.Scenes;
-using FullPotential.Api.Unity.Constants;
-using FullPotential.Api.Unity.Extensions;
-using FullPotential.Api.Unity.Services;
+﻿using FullPotential.Api.Scenes;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -11,21 +7,7 @@ namespace FullPotential.Core.Environment
 {
     public class SceneService : ISceneService
     {
-        private readonly Collider _groundCollider;
-
-        public SceneService(IUnityHelperUtilities unityHelperUtilities)
-        {
-            var ground = unityHelperUtilities.GetObjectAtRoot(GameObjectNames.Environment).FindChildWithTag(Tags.Ground);
-            _groundCollider = ground.GetComponent<Collider>();
-        }
-
-        public Vector3 GetPositionAboveGround(Vector3 startingPoint)
-        {
-            startingPoint.y += 10;
-            return _groundCollider.ClosestPointOnBounds(startingPoint);
-        }
-
-        public Vector3 GetPositionAboveGround(Vector3 startingPoint, GameObject gameObject)
+        public Vector3 GetHeightAdjustedPosition(Vector3 startingPoint, GameObject gameObject)
         {
             var collider = gameObject.GetComponent<Collider>();
 
@@ -35,20 +17,18 @@ namespace FullPotential.Core.Environment
                 return startingPoint;
             }
 
-            return GetPositionAboveGround(startingPoint, collider);
+            return GetHeightAdjustedPosition(startingPoint, collider);
         }
 
-        public Vector3 GetPositionAboveGround(Vector3 startingPoint, Collider collider)
+        public Vector3 GetHeightAdjustedPosition(Vector3 startingPoint, Collider collider)
         {
             var gameObjectHeight = collider.bounds.max.y - collider.bounds.min.y;
 
-            return GetPositionAboveGround(startingPoint, gameObjectHeight);
+            return GetHeightAdjustedPosition(startingPoint, gameObjectHeight);
         }
 
-        public Vector3 GetPositionAboveGround(Vector3 startingPoint, float gameObjectHeight)
+        public Vector3 GetHeightAdjustedPosition(Vector3 startingPoint, float gameObjectHeight)
         {
-            var groundClosestPoint = GetPositionAboveGround(startingPoint);
-
             if (gameObjectHeight == 0)
             {
                 Debug.LogWarning("Collider did not have any height");
@@ -59,7 +39,7 @@ namespace FullPotential.Core.Environment
 
             return new Vector3(
                 startingPoint.x,
-                groundClosestPoint.y + adjustment,
+                startingPoint.y + adjustment,
                 startingPoint.z);
         }
     }

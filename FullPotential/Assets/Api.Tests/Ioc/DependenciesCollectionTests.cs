@@ -111,22 +111,22 @@ namespace FullPotential.Api.Tests.Ioc
         [ExcludeFromCodeCoverage]
         private class MyDummySceneService : ISceneService
         {
-            public Vector3 GetPositionAboveGround(Vector3 startingPoint)
+            public Vector3 GetHeightAdjustedPosition(Vector3 startingPoint)
             {
                 throw new NotImplementedException();
             }
 
-            public Vector3 GetPositionAboveGround(Vector3 startingPoint, GameObject gameObject)
+            public Vector3 GetHeightAdjustedPosition(Vector3 startingPoint, GameObject gameObject)
             {
                 throw new NotImplementedException();
             }
 
-            public Vector3 GetPositionAboveGround(Vector3 startingPoint, Collider collider)
+            public Vector3 GetHeightAdjustedPosition(Vector3 startingPoint, Collider collider)
             {
                 throw new NotImplementedException();
             }
 
-            public Vector3 GetPositionAboveGround(Vector3 startingPoint, float gameObjectHeight)
+            public Vector3 GetHeightAdjustedPosition(Vector3 startingPoint, float gameObjectHeight)
             {
                 throw new NotImplementedException();
             }

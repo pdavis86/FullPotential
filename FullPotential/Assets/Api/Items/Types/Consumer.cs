@@ -89,11 +89,6 @@ namespace FullPotential.Api.Items.Types
 
             if (Targeting != null)
             {
-                sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(ResourceConsumptionType))}: {localizer.Translate(ResourceConsumptionType)}\n");
-            }
-
-            if (Targeting != null)
-            {
                 sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Targeting))}: {localizer.Translate(Targeting)}\n");
             }
 
@@ -110,13 +105,15 @@ namespace FullPotential.Api.Items.Types
 
             AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
 
+            var resourceConsumptionType = localizer.Translate(ResourceConsumptionType);
+
             AppendToDescription(
                 sb,
                 localizer,
                 Attributes.Efficiency,
                 nameof(Attributes.Efficiency),
                 AliasSegmentConsumer,
-                RoundFloatForDisplay(GetResourceCost()));
+                $"{RoundFloatForDisplay(GetResourceCost())} {resourceConsumptionType}");
 
             AppendToDescription(
                 sb,

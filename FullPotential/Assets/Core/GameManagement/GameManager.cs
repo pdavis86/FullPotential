@@ -438,7 +438,7 @@ namespace FullPotential.Core.GameManagement
             var playerNetObj = Instantiate(_playerPrefabNetObj, position, rotation, GetPlayersParentTransform());
 
             var sceneService = GetSceneBehaviour().GetSceneService();
-            var newPosition = sceneService.GetPositionAboveGround(position, playerNetObj.GetComponent<Collider>());
+            var newPosition = sceneService.GetHeightAdjustedPosition(position, playerNetObj.GetComponent<Collider>());
             playerNetObj.transform.position = newPosition;
 
             var playerState = playerNetObj.GetComponent<PlayerState>();

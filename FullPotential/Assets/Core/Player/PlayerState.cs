@@ -31,6 +31,8 @@ namespace FullPotential.Core.Player
 {
     public class PlayerState : FighterBase, IPlayerFighter
     {
+        private const string LoadingScreenGameObjectName = "LoadingScreen";
+
         #region Variables
 
         private ClientRpcParams _clientRpcParams;
@@ -133,7 +135,7 @@ namespace FullPotential.Core.Player
             if (IsOwner)
             {
                 _unityHelperUtilities.GetObjectAtRoot(GameObjectNames.SceneCanvas).transform
-                    .Find(GameObjectNames.LoadingScreen).gameObject
+                    .Find(LoadingScreenGameObjectName).gameObject
                     .SetActive(false);
 
                 GameManager.Instance.LocalGameDataStore.PlayerGameObject = gameObject;
@@ -299,7 +301,7 @@ namespace FullPotential.Core.Player
             var go = Instantiate(prefab, position, transform.rotation * Quaternion.Euler(0, 90, 0));
 
             var sceneService = _gameManager.GetSceneBehaviour().GetSceneService();
-            go.transform.position = sceneService.GetPositionAboveGround(position, go.GetComponent<Collider>());
+            go.transform.position = sceneService.GetHeightAdjustedPosition(position, go);
 
             go.transform.parent = GameManager.Instance.GetSceneBehaviour().GetTransform();
             go.name = id;
@@ -368,7 +370,7 @@ namespace FullPotential.Core.Player
 
                 case LivingEntityState.Respawning:
                     var sceneService = _gameManager.GetSceneBehaviour().GetSceneService();
-                    transform.position = sceneService.GetPositionAboveGround(position, _myHeight);
+                    transform.position = sceneService.GetHeightAdjustedPosition(position, _myHeight);
 
                     transform.rotation = rotation;
                     _playerCamera.transform.localEulerAngles = Vector3.zero;

@@ -7,6 +7,5 @@
 
         //Custom tags
         public const string Enemy = "Enemy";
-        public const string Ground = "Ground";
     }
 }

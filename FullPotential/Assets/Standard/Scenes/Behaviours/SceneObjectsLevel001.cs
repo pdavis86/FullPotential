@@ -108,9 +108,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
 
             var enemyNetObj = Instantiate(_enemyPrefabNetObj, chosenSpawnPoint.Position, chosenSpawnPoint.Rotation);
 
-            enemyNetObj.transform.position = _sceneService.GetPositionAboveGround(
-                chosenSpawnPoint.Position,
-                enemyNetObj.GetComponent<Collider>());
+            enemyNetObj.transform.position = _sceneService.GetHeightAdjustedPosition(chosenSpawnPoint.Position, enemyNetObj.GetComponent<Collider>());
 
             enemyNetObj.Spawn(true);
 
