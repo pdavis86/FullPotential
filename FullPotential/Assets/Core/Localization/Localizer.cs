@@ -154,6 +154,7 @@ namespace FullPotential.Core.Localization
         {
             if (registeredItem is IWeapon) { return Translate("weapon." + registeredItem.TypeName); }
             if (registeredItem is ILoot) { return Translate("loot." + registeredItem.TypeName); }
+            if (registeredItem is IAmmunition) { return Translate("ammunition." + registeredItem.TypeName); }
             if (registeredItem is IEffect) { return Translate("effect." + registeredItem.TypeName); }
             if (registeredItem is IShape) { return Translate("shape." + registeredItem.TypeName); }
             if (registeredItem is ITargeting) { return Translate("targeting." + registeredItem.TypeName); }

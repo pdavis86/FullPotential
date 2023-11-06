@@ -1,11 +1,18 @@
-﻿namespace FullPotential.Api.Registry.Weapons
+﻿using System;
+
+namespace FullPotential.Api.Registry.Weapons
 {
     public interface IWeapon : IRegisterable, IHasPrefab
     {
         /// <summary>
-        /// The category of weapon
+        /// This weapon is used primarily for defense
         /// </summary>
-        WeaponCategory Category { get; }
+        bool IsDefensive { get; }
+
+        /// <summary>
+        /// Optional, what type of ammunition is used
+        /// </summary>
+        Guid? AmmunitionTypeId { get; }
 
         /// <summary>
         /// Whether the weapon has the capability of automatic fire

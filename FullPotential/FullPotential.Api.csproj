@@ -94,7 +94,6 @@
     <Compile Include="Assets\Api\Gameplay\Combat\IDamageable.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\ActiveEffect.cs" />
     <Compile Include="Assets\Api\Input\DefaultInputActions.cs" />
-    <Compile Include="Assets\Api\Registry\Weapons\WeaponCategory.cs" />
     <Compile Include="Assets\Api\Utilities\ActionQueue.cs" />
     <Compile Include="Assets\Api\Ui\IHud.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\IFighter.cs" />
@@ -116,7 +115,7 @@
     <Compile Include="Assets\Api\Gameplay\Shapes\Wall.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\LivingEntityBase.cs" />
     <Compile Include="Assets\Api\Persistence\IUserRepository.cs" />
-    <Compile Include="Assets\Api\Items\Base\ItemBase.cs" />
+    <Compile Include="Assets\Api\Items\Base\ItemForCombatBase.cs" />
     <Compile Include="Assets\Api\Gameplay\Targeting\Touch.cs" />
     <Compile Include="Assets\Api\Obsolete\Attributes.cs" />
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
@@ -174,6 +173,10 @@
     <Compile Include="Assets\Api\Registry\Elements\IElement.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Tags.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\InventoryChanges.cs" />
+    <Compile Include="Assets\Api\Registry\Weapons\IAmmunition.cs" />
+    <Compile Include="Assets\Api\Gameplay\Inventory\ItemStack.cs" />
+    <Compile Include="Assets\Api\Items\Base\ItemBase.cs" />
+    <Compile Include="Assets\Api\Gameplay\Inventory\IItemStack.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Api\FullPotential.Api.asmdef" />

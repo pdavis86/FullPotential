@@ -111,7 +111,7 @@ namespace FullPotential.Api.Tests.Ioc
         [ExcludeFromCodeCoverage]
         private class MyDummySceneService : ISceneService
         {
-            public Vector3 GetHeightAdjustedPosition(Vector3 startingPoint)
+            public Vector3 GetPositionOnSolidObject(Vector3 startingPoint)
             {
                 throw new NotImplementedException();
             }

@@ -7,10 +7,9 @@ using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Ui;
-using FullPotential.Core.UI.Behaviours;
 using FullPotential.Core.Ui.Components;
+using FullPotential.Core.UI.Behaviours;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -126,7 +125,7 @@ namespace FullPotential.Core.Ui.Behaviours
         {
             if (handStatus == null
                 || handStatus.EquippedWeapon == null
-                || ((handStatus.EquippedWeapon.RegistryType is IWeapon gearWeapon) && gearWeapon.Category is not WeaponCategory.Ranged))
+                || !handStatus.EquippedWeapon.IsRanged)
             {
                 ammoText.gameObject.SetActive(false);
                 return;

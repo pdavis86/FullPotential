@@ -9,7 +9,9 @@ namespace FullPotential.Standard.Weapons
 
         public string TypeName => nameof(Hammer);
 
-        public WeaponCategory Category => WeaponCategory.Melee;
+        public bool IsDefensive => false;
+
+        public Guid? AmmunitionTypeId => null;
 
         public bool AllowAutomatic => false;
 

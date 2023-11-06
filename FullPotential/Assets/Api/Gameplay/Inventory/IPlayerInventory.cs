@@ -7,7 +7,7 @@ namespace FullPotential.Api.Gameplay.Inventory
 {
     public interface IPlayerInventory : IInventory
     {
-        List<ItemBase> GetComponentsFromIds(string[] componentIds);
+        List<ItemForCombatBase> GetComponentsFromIds(string[] componentIds);
 
         List<string> ValidateIsCraftable(string[] componentIds, ItemBase itemToCraft);
 

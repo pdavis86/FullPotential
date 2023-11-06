@@ -4,6 +4,7 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Obsolete;
@@ -20,6 +21,7 @@ using FullPotential.Core.Utilities.Extensions;
 using FullPotential.Core.Utilities.UtilityBehaviours;
 using TMPro;
 using Unity.Netcode;
+using UnityEditor;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -393,9 +395,23 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            var loot = _resultFactory.GetLootDrop();
+            //todo: test claiming loot when inventory is full. Is it lost?
 
-            var invChange = new InventoryChanges { Loot = new[] { loot as Loot } };
+            InventoryChanges invChange;
+            if (_random.Next(1, 3) == 1)
+            {
+                invChange = new InventoryChanges
+                {
+                    ItemStacks = new[] { _resultFactory.GetAmmoDrop() as ItemStack }
+                };
+            }
+            else
+            {
+                invChange = new InventoryChanges
+                {
+                    Loot = new[] { _resultFactory.GetLootDrop() as Loot },
+                };
+            }
 
             ApplyInventoryChanges(invChange);
 

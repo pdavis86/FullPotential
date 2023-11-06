@@ -46,7 +46,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
         public void ApplyEffects(
             IFighter sourceFighter,
-            ItemBase itemUsed,
+            ItemForCombatBase itemUsed,
             GameObject target,
             Vector3? position,
             float effectPercentage
@@ -64,9 +64,9 @@ namespace FullPotential.Core.Gameplay.Combat
             }
 
             var itemHasEffects = itemUsed?.Effects != null && itemUsed.Effects.Any();
-            var itemIsWeapon = itemUsed is Weapon;
+            var weapon = itemUsed as Weapon;
 
-            if (!itemHasEffects || itemIsWeapon)
+            if (!itemHasEffects || weapon != null)
             {
                 var targetFighter = target.GetComponent<IFighter>();
 
@@ -75,11 +75,9 @@ namespace FullPotential.Core.Gameplay.Combat
                     //Debug.LogWarning("Target is not an IFighter. Target was: " + target);
 
                     //todo: zzz v0.5 - make SpawnBulletHole a VisualsBehaviour on BulletTrail
-                    if (itemIsWeapon)
+                    if (weapon != null)
                     {
-                        var registryType = (IWeapon)itemUsed.RegistryType;
-                        var isRanged = registryType?.Category == WeaponCategory.Ranged;
-                        if (isRanged)
+                        if (weapon.IsRanged)
                         {
                             SpawnBulletHole(target, position);
                         }
@@ -105,7 +103,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 targetFighter.TakeDamageFromFighter(sourceFighter, itemUsed, position, (int)damageToDeal, isCritical);
 
-                if (!itemIsWeapon)
+                if (weapon == null)
                 {
                     return;
                 }
@@ -140,7 +138,7 @@ namespace FullPotential.Core.Gameplay.Combat
             GameObject target,
             Vector3? position)
         {
-            //todo: zzz v0.4.1 - this should be client-side only
+            //todo: zzz v0.4.1 - SpawnBulletHole should be client-side only
             //todo: zzz v0.5 - SpawnBulletHole only works for box colliders that line up with the X and Z alias
 
             if (!position.HasValue)
@@ -198,7 +196,7 @@ namespace FullPotential.Core.Gameplay.Combat
             UnityEngine.Object.Destroy(bulletHole, 5);
         }
 
-        private bool IsEffectAllowed(ItemBase itemUsed, GameObject target, IEffect effect)
+        private bool IsEffectAllowed(ItemForCombatBase itemUsed, GameObject target, IEffect effect)
         {
             if (itemUsed is Consumer consumer
                 && consumer.Targeting.IsContinuous)
@@ -223,7 +221,7 @@ namespace FullPotential.Core.Gameplay.Combat
             return true;
         }
 
-        private void ApplyEffect(IFighter sourceFighter, IEffect effect, ItemBase itemUsed, GameObject targetGameObject, Vector3? position, float effectPercentage)
+        private void ApplyEffect(IFighter sourceFighter, IEffect effect, ItemForCombatBase itemUsed, GameObject targetGameObject, Vector3? position, float effectPercentage)
         {
             if (effect is IMovementEffect movementEffect)
             {
@@ -261,7 +259,7 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private void ApplyStatEffect(IFighter targetFighter, IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
+        private void ApplyStatEffect(IFighter targetFighter, IStatEffect statEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
         {
             switch (statEffect.AffectType)
             {
@@ -286,17 +284,17 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private void ApplyAttributeEffect(IFighter targetFighter, IAttributeEffect attributeEffect, ItemBase itemUsed, float effectPercentage)
+        private void ApplyAttributeEffect(IFighter targetFighter, IAttributeEffect attributeEffect, ItemForCombatBase itemUsed, float effectPercentage)
         {
             targetFighter.AddAttributeModifier(attributeEffect, itemUsed, effectPercentage);
         }
 
-        private void ApplyElementalEffect(IFighter targetFighter, IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
+        private void ApplyElementalEffect(IFighter targetFighter, IEffect elementalEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
         {
             targetFighter.ApplyElementalEffect(elementalEffect, itemUsed, sourceFighter, position, effectPercentage);
         }
 
-        private void ApplyMaintainDistance(ItemBase itemUsed, GameObject targetGameObject, IFighter sourceFighter)
+        private void ApplyMaintainDistance(ItemForCombatBase itemUsed, GameObject targetGameObject, IFighter sourceFighter)
         {
             if (itemUsed is not Consumer consumer || !consumer.Targeting.IsContinuous)
             {
@@ -310,7 +308,7 @@ namespace FullPotential.Core.Gameplay.Combat
             comp.Consumer = consumer;
         }
 
-        private void ApplyMovementEffect(IFighter sourceFighter, ItemBase itemUsed, IMovementEffect movementEffect, GameObject targetGameObject, float effectPercentage)
+        private void ApplyMovementEffect(IFighter sourceFighter, ItemForCombatBase itemUsed, IMovementEffect movementEffect, GameObject targetGameObject, float effectPercentage)
         {
             var targetRigidBody = targetGameObject.GetComponent<Rigidbody>();
 
@@ -349,7 +347,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
             var force = itemUsed?.GetMovementForceValue(adjustForGravity)
-                ?? ItemBase.GetHighInHighOutInRange(sourceFighter.GetAttributeValue(AffectableAttribute.Strength), 200, 500);
+                ?? ItemForCombatBase.GetHighInHighOutInRange(sourceFighter.GetAttributeValue(AffectableAttribute.Strength), 200, 500);
 
             force *= effectPercentage;
 
@@ -432,28 +430,27 @@ namespace FullPotential.Core.Gameplay.Combat
             return (float)Math.Ceiling(basicValue / multiplier) + adder;
         }
 
-        private int GetDamageValueFromAttack(IFighter sourceFighter, ItemBase itemUsed, int targetDefense, bool addVariation = true)
+        private int GetDamageValueFromAttack(IFighter sourceFighter, ItemForCombatBase itemUsed, int targetDefense, bool addVariation = true)
         {
             var weapon = itemUsed as Weapon;
-            var weaponCategory = (weapon?.RegistryType as IWeapon)?.Category;
 
             float attackStrength = itemUsed?.Attributes.Strength ?? sourceFighter.GetAttributeValue(AffectableAttribute.Strength);
             var defenceRatio = 100f / (100 + targetDefense);
 
-            if (weaponCategory == WeaponCategory.Ranged)
+            if (weapon != null && weapon.IsRanged)
             {
-                attackStrength /= weapon.GetBulletsPerSecond();
+                attackStrength /= weapon.GetAmmoPerSecond();
             }
 
             //Even a small attack can still do damage
-            var damageDealtBasic = Mathf.Ceil(attackStrength * defenceRatio / ItemBase.StrengthDivisor);
+            var damageDealtBasic = Mathf.Ceil(attackStrength * defenceRatio / ItemForCombatBase.StrengthDivisor);
 
             if (weapon != null && weapon.IsTwoHanded)
             {
                 damageDealtBasic *= 2;
             }
 
-            if (weaponCategory == WeaponCategory.Melee)
+            if (weapon != null && weapon.IsMelee)
             {
                 damageDealtBasic *= 2;
             }
@@ -471,7 +468,7 @@ namespace FullPotential.Core.Gameplay.Combat
             return GetDamageValueFromAttack(sourceFighter, null, targetDefense, addVariation);
         }
 
-        public int GetDamageValueFromAttack(ItemBase itemUsed, int targetDefense, bool addVariation = true)
+        public int GetDamageValueFromAttack(ItemForCombatBase itemUsed, int targetDefense, bool addVariation = true)
         {
             return GetDamageValueFromAttack(null, itemUsed, targetDefense, addVariation);
         }

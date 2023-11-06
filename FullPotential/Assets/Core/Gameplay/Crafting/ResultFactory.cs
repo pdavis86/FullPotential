@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
@@ -33,6 +34,7 @@ namespace FullPotential.Core.Gameplay.Crafting
         private readonly ILocalizer _localizer;
 
         private readonly List<ILoot> _lootTypes;
+        private readonly List<IAmmunition> _ammoTypes;
         private readonly List<IEffect> _effectsForLoot;
         private readonly List<ITargeting> _targetingOptions;
         private readonly List<IShape> _shapeOptions;
@@ -45,12 +47,13 @@ namespace FullPotential.Core.Gameplay.Crafting
             _localizer = localizer;
 
             _lootTypes = _typeRegistry.GetRegisteredTypes<ILoot>().ToList();
+            _ammoTypes = _typeRegistry.GetRegisteredTypes<IAmmunition>().ToList();
             _effectsForLoot = _typeRegistry.GetLootPossibilities();
             _targetingOptions = _typeRegistry.GetRegisteredTypes<ITargeting>().ToList();
             _shapeOptions = _typeRegistry.GetRegisteredTypes<IShape>().ToList();
         }
 
-        private int ComputeAttribute(IList<ItemBase> components, Func<ItemBase, int> getProp, bool allowMax = true)
+        private int ComputeAttribute(IList<ItemForCombatBase> components, Func<ItemForCombatBase, int> getProp, bool allowMax = true)
         {
             var withValue = components.Where(x => getProp(x) > 0).ToList();
 
@@ -101,7 +104,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return _shapeOptions.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
         }
 
-        private List<IEffect> GetEffects(CraftableType craftableType, IList<ItemBase> components, ITargeting targeting = null)
+        private List<IEffect> GetEffects(CraftableType craftableType, IList<ItemForCombatBase> components, ITargeting targeting = null)
         {
             const string buff = "Buff";
             const string debuff = "Debuff";
@@ -301,12 +304,29 @@ namespace FullPotential.Core.Gameplay.Crafting
             return lootDrop;
         }
 
+        public ItemBase GetAmmoDrop()
+        {
+            var randomAmmo = _ammoTypes
+                .OrderBy(_ => _random.Next())
+                .First();
+
+            var randomCount = _random.Next(randomAmmo.MinDropCount, randomAmmo.MaxDropCount);
+
+            return new ItemStack
+            {
+                RegistryType = randomAmmo,
+                Id = Guid.NewGuid().ToMinimisedString(),
+                Name = $"{_localizer.Translate(randomAmmo)} ({randomCount})",
+                Count = randomCount
+            };
+        }
+
         private int GetMinBiasedNumber(int min, int max)
         {
             return min + (int)Math.Round((max - min) * Math.Pow(_random.NextDouble(), 3), 0);
         }
 
-        private Consumer GetConsumer(CraftableType craftableType, ResourceConsumptionType consumptionType, IList<ItemBase> components)
+        private Consumer GetConsumer(CraftableType craftableType, ResourceConsumptionType consumptionType, IList<ItemForCombatBase> components)
         {
             var relevantComponents = components.OfType<IHasTargetingAndShape>().ToList();
 
@@ -353,7 +373,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return _localizer.Translate(TranslationType.CraftingNamePrefix, isAttack ? "attack" : "defence");
         }
 
-        private string GetItemName(bool isAttack, ItemBase item, string customSuffix = null)
+        private string GetItemName(bool isAttack, ItemForCombatBase item, string customSuffix = null)
         {
             var suffix = string.IsNullOrWhiteSpace(customSuffix)
                 ? _localizer.Translate(item.RegistryType)
@@ -361,7 +381,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return $"{GetItemNamePrefix(isAttack)} {item.Attributes.Strength} {suffix}";
         }
 
-        private Weapon GetMeleeWeapon(IWeapon craftableType, IList<ItemBase> components, bool isTwoHanded)
+        private Weapon GetMeleeWeapon(IWeapon craftableType, IList<ItemForCombatBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon
             {
@@ -381,7 +401,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Weapon GetRangedWeapon(IWeapon craftableType, IList<ItemBase> components, bool isTwoHanded)
+        private Weapon GetRangedWeapon(IWeapon craftableType, IList<ItemForCombatBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon
             {
@@ -407,7 +427,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Weapon GetDefensiveWeapon(IWeapon craftableType, IList<ItemBase> components, bool isTwoHanded)
+        private Weapon GetDefensiveWeapon(IWeapon craftableType, IList<ItemForCombatBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon
             {
@@ -427,7 +447,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Armor GetArmor(IArmorVisuals craftableType, IList<ItemBase> components)
+        private Armor GetArmor(IArmorVisuals craftableType, IList<ItemForCombatBase> components)
         {
             var armor = new Armor
             {
@@ -444,7 +464,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return armor;
         }
 
-        private Armor GetBarrier(IArmorVisuals craftableType, IList<ItemBase> components)
+        private Armor GetBarrier(IArmorVisuals craftableType, IList<ItemForCombatBase> components)
         {
             var armor = new Armor
             {
@@ -464,7 +484,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return armor;
         }
 
-        private Accessory GetAccessory(IAccessoryVisuals craftableType, IList<ItemBase> components)
+        private Accessory GetAccessory(IAccessoryVisuals craftableType, IList<ItemForCombatBase> components)
         {
             var accessory = new Accessory
             {
@@ -481,7 +501,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return accessory;
         }
 
-        public ItemBase GetCraftedItem(CraftableType craftableType, string subTypeName, bool isTwoHanded, IList<ItemBase> components)
+        public ItemBase GetCraftedItem(CraftableType craftableType, string subTypeName, bool isTwoHanded, IList<ItemForCombatBase> components)
         {
             switch (craftableType)
             {
@@ -490,14 +510,18 @@ namespace FullPotential.Core.Gameplay.Crafting
                     return GetConsumer(craftableType, consumptionType, components);
 
                 case CraftableType.Weapon:
-                    var craftableWeapon = _typeRegistry.GetRegisteredByTypeName<IWeapon>(subTypeName);
-                    switch (craftableWeapon.Category)
+                    var weaponType = _typeRegistry.GetRegisteredByTypeName<IWeapon>(subTypeName);
+                    if (weaponType.IsDefensive)
                     {
-                        case WeaponCategory.Melee: return GetMeleeWeapon(craftableWeapon, components, isTwoHanded);
-                        case WeaponCategory.Ranged: return GetRangedWeapon(craftableWeapon, components, isTwoHanded);
-                        case WeaponCategory.Defensive: return GetDefensiveWeapon(craftableWeapon, components, isTwoHanded);
-                        default: throw new Exception($"Unexpected weapon category '{craftableWeapon.Category}'");
+                        return GetDefensiveWeapon(weaponType, components, isTwoHanded);
                     }
+
+                    if (weaponType.AmmunitionTypeId == null)
+                    {
+                        return GetMeleeWeapon(weaponType, components, isTwoHanded);
+                    }
+
+                    return GetRangedWeapon(weaponType, components, isTwoHanded);
 
                 case CraftableType.Armor:
                     var craftableArmor = _typeRegistry.GetRegisteredByTypeName<IArmorVisuals>(subTypeName);

@@ -9,7 +9,6 @@ using FullPotential.Api.Localization;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -508,10 +507,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private bool UseWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand, bool isAutoFire)
         {
-            var registryType = (IWeapon)weaponInHand.RegistryType;
-
-            var isRanged = registryType.Category == WeaponCategory.Ranged;
-
             var handStatus = isLeftHand
                 ? HandStatusLeft
                 : HandStatusRight;
@@ -523,7 +518,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return true;
             }
 
-            if (!isRanged || handStatus.EquippedWeapon == null)
+            if (!weaponInHand.IsRanged || handStatus.EquippedWeapon == null)
             {
                 return UseMeleeWeapon(weaponInHand);
             }

@@ -3,7 +3,7 @@ using FullPotential.Api.Registry.Targeting;
 
 namespace FullPotential.Api.Items.Base
 {
-    public abstract class ItemWithTargetingAndShapeBase : ItemBase, IHasTargetingAndShape
+    public abstract class ItemWithTargetingAndShapeBase : ItemForCombatBase, IHasTargetingAndShape
     {
         private ITargeting _targeting;
         private ITargetingVisuals _targetingVisuals;

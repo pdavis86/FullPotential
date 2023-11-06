@@ -276,7 +276,7 @@ namespace FullPotential.Core.UI.Behaviours
                 typeToCraft,
                 _craftingSelector.GetSubTypeName(typeToCraft),
                 _craftingSelector.IsTwoHandedSelected(),
-                new List<ItemBase> { component });
+                new List<ItemForCombatBase> { component });
         }
 
         // ReSharper disable once UnusedMember.Global

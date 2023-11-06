@@ -10,6 +10,6 @@ namespace FullPotential.Standard.Loot
 
         public string TypeName => nameof(Shard);
 
-        public ResourceConsumptionType ResourceConsumptionType => ResourceConsumptionType.Mana;
+        public ResourceConsumptionType? ResourceConsumptionType => Api.Obsolete.ResourceConsumptionType.Mana;
     }
 }

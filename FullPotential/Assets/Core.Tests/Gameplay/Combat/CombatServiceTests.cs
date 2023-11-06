@@ -94,13 +94,13 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
             Assert.AreEqual((int)(expectedBaseDamage * 4), GetDamage(meleeTwoHandedWeapon));
 
             var rangedOneHandedWeapon = GetRangedWeapon(false, allFifty);
-            Assert.AreEqual((int)(expectedBaseDamage / rangedOneHandedWeapon.GetBulletsPerSecond()), GetDamage(rangedOneHandedWeapon));
+            Assert.AreEqual((int)(expectedBaseDamage / rangedOneHandedWeapon.GetAmmoPerSecond()), GetDamage(rangedOneHandedWeapon));
 
             var rangedTwoHandedWeapon = GetRangedWeapon(true, allFifty);
-            Assert.AreEqual((int)(expectedBaseDamage * 2 / rangedTwoHandedWeapon.GetBulletsPerSecond()), GetDamage(rangedTwoHandedWeapon));
+            Assert.AreEqual((int)(expectedBaseDamage * 2 / rangedTwoHandedWeapon.GetAmmoPerSecond()), GetDamage(rangedTwoHandedWeapon));
         }
 
-        private int GetDamage(ItemBase item)
+        private int GetDamage(ItemForCombatBase item)
         {
             return _combatService.GetDamageValueFromAttack(item, 0, false);
         }
@@ -109,7 +109,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
         {
             return new Weapon
             {
-                RegistryType = new TestWeaponType(WeaponCategory.Melee),
+                RegistryType = new TestWeaponType(),
                 Attributes = attributes,
                 IsTwoHanded = isTwoHanded
             };
@@ -119,7 +119,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
         {
             return new Weapon
             {
-                RegistryType = new TestWeaponType(WeaponCategory.Ranged),
+                RegistryType = new TestWeaponType { AmmunitionTypeId = new Guid("8c25a561-7321-4599-b30c-0ef1bf94ad1c") },
                 Attributes = attributes,
                 IsTwoHanded = isTwoHanded
             };
@@ -142,16 +142,11 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
     public class TestWeaponType : IWeapon
     {
         // ReSharper disable UnassignedGetOnlyAutoProperty
-
-        public TestWeaponType(WeaponCategory category)
-        {
-            Category = category;
-        }
-
         public Guid TypeId { get; }
         public string TypeName { get; }
         public string PrefabAddress { get; }
-        public WeaponCategory Category { get; }
+        public bool IsDefensive { get; }
+        public Guid? AmmunitionTypeId { get; set; }
         public bool AllowAutomatic { get; }
         public bool AllowTwoHanded { get; }
         public bool EnforceTwoHanded { get; }

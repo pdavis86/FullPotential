@@ -296,15 +296,17 @@ namespace FullPotential.Core.Player
         [ClientRpc]
         private void SpawnLootChestClientRpc(string id, Vector3 position, ClientRpcParams clientRpcParams)
         {
-            var prefab = GameManager.Instance.Prefabs.Environment.LootChest;
-
-            var go = Instantiate(prefab, position, transform.rotation * Quaternion.Euler(0, 90, 0));
-
             var sceneService = _gameManager.GetSceneBehaviour().GetSceneService();
-            go.transform.position = sceneService.GetHeightAdjustedPosition(position, go);
+
+            var startingPosition = sceneService.GetPositionOnSolidObject(position);
+
+            var prefab = GameManager.Instance.Prefabs.Environment.LootChest;
+            var go = Instantiate(prefab, startingPosition, transform.rotation * Quaternion.Euler(0, 90, 0));
+
+            go.transform.position = sceneService.GetHeightAdjustedPosition(startingPosition, go);
 
             go.transform.parent = GameManager.Instance.GetSceneBehaviour().GetTransform();
-            go.name = id;
+            go.name = "Loot Chest " + id;
 
             var lootScript = go.GetComponent<LootInteractable>();
             lootScript.UnclaimedLootId = id;

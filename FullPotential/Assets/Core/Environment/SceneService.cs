@@ -7,13 +7,25 @@ namespace FullPotential.Core.Environment
 {
     public class SceneService : ISceneService
     {
+        public Vector3 GetPositionOnSolidObject(Vector3 startingPoint)
+        {
+            startingPoint.y += 10;
+
+            if (Physics.Raycast(startingPoint, Vector3.down, out var hit, 30f))
+            {
+                return hit.point;
+            }
+
+            return startingPoint;
+        }
+
         public Vector3 GetHeightAdjustedPosition(Vector3 startingPoint, GameObject gameObject)
         {
             var collider = gameObject.GetComponent<Collider>();
 
             if (collider == null)
             {
-                Debug.LogWarning("GamObject did not have any collider");
+                Debug.LogWarning("GameObject did not have any collider");
                 return startingPoint;
             }
 

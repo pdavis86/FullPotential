@@ -30,6 +30,10 @@ namespace FullPotential.Standard
 
                 typeof(Loot.Scrap),
                 typeof(Loot.Shard),
+                typeof(Loot.Junk),
+
+                typeof(Weapons.Ammo.Arrow),
+                typeof(Weapons.Ammo.Bullet),
 
                 typeof(Weapons.Axe),
                 typeof(Weapons.Bow),

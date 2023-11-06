@@ -18,6 +18,14 @@ namespace FullPotential.Api.Items.Types
 
         public int Ammo;
 
+        public IWeapon WeaponType => (IWeapon) RegistryType;
+
+        public bool IsRanged => WeaponType.AmmunitionTypeId != null;
+
+        public bool IsMelee => WeaponType.AmmunitionTypeId == null;
+
+        public bool IsDefensive => WeaponType.IsDefensive;
+
         public int GetAmmoMax()
         {
             const int ammoCap = 100;
@@ -54,7 +62,7 @@ namespace FullPotential.Api.Items.Types
             return returnValue;
         }
 
-        public float GetBulletsPerSecond()
+        public float GetAmmoPerSecond()
         {
             return 1 / GetDelayBetweenShots();
         }
@@ -79,32 +87,22 @@ namespace FullPotential.Api.Items.Types
         public float GetRangedDps()
         {
             var damage = _combatService.GetDamageValueFromAttack(this, 0, false);
-            return GetDamagePerSecond(damage, GetAmmoMax(), GetBulletsPerSecond(), GetReloadTime());
+            return GetDamagePerSecond(damage, GetAmmoMax(), GetAmmoPerSecond(), GetReloadTime());
         }
 
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
         {
-            if (RegistryType is not IWeapon weaponType)
+            if (IsDefensive)
             {
-                Debug.LogError($"Unexpected RegistryType on item '{Name}' with ID '{Id}'");
-                return null;
+                return GetDefensiveWeaponDescription(localizer, levelOfDetail, itemName);
+            }
+            
+            if (IsMelee)
+            {
+                return GetMeleeWeaponDescription(localizer, levelOfDetail, itemName);
             }
 
-            switch (weaponType.Category)
-            {
-                case WeaponCategory.Defensive:
-                    return GetDefensiveWeaponDescription(localizer, levelOfDetail, itemName);
-
-                case WeaponCategory.Melee:
-                    return GetMeleeWeaponDescription(localizer, levelOfDetail, itemName);
-
-                case WeaponCategory.Ranged:
-                    return GetRangedWeaponDescription(localizer, levelOfDetail, itemName);
-
-                default:
-                    Debug.LogError($"Unexpected weaponType.Category on item '{Name}' with ID '{Id}'");
-                    return null;
-            }
+            return GetRangedWeaponDescription(localizer, levelOfDetail, itemName);
         }
 
         public string GetDefensiveWeaponDescription(ILocalizer localizer, LevelOfDetail levelOfDetail, string itemName = null)
@@ -255,7 +253,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Speed,
                 nameof(Attributes.Speed),
                 AliasSegmentRanged,
-                RoundFloatForDisplay(GetBulletsPerSecond()),
+                RoundFloatForDisplay(GetAmmoPerSecond()),
                 UnitsType.UnitPerTime);
 
             AppendToDescription(

@@ -19,15 +19,15 @@ namespace FullPotential.Api.Gameplay.Combat
 
         ulong OwnerClientId { get; }
 
-        void AddAttributeModifier(IAttributeEffect attributeEffect, ItemBase itemUsed, float effectPercentage);
+        void AddAttributeModifier(IAttributeEffect attributeEffect, ItemForCombatBase itemUsed, float effectPercentage);
 
-        void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, float effectPercentage);
+        void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, float effectPercentage);
 
-        void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage);
+        void ApplyStatValueChange(IStatEffect statEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage);
 
-        void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage);
+        void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage);
 
-        void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage);
+        void ApplyElementalEffect(IEffect elementalEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage);
 
         int GetAttributeValue(AffectableAttribute attribute);
 

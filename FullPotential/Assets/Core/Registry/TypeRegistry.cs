@@ -28,11 +28,12 @@ namespace FullPotential.Core.Registry
         private readonly List<ITargetingVisuals> _targetingVisuals = new List<ITargetingVisuals>();
         private readonly List<IShapeVisuals> _shapeVisuals = new List<IShapeVisuals>();
 
-        private readonly List<IWeapon> _weapons = new List<IWeapon>();
-        private readonly List<ILoot> _loot = new List<ILoot>();
-        private readonly List<IEffect> _effects = new List<IEffect>();
-        private readonly List<ITargeting> _targeting = new List<ITargeting>();
-        private readonly List<IShape> _shapes = new List<IShape>();
+        private readonly List<IWeapon> _weaponTypes = new List<IWeapon>();
+        private readonly List<ILoot> _lootTypes = new List<ILoot>();
+        private readonly List<IAmmunition> _ammoTypes = new List<IAmmunition>();
+        private readonly List<IEffect> _effectTypes = new List<IEffect>();
+        private readonly List<ITargeting> _targetingTypes = new List<ITargeting>();
+        private readonly List<IShape> _shapeTypes = new List<IShape>();
 
         private readonly Dictionary<string, GameObject> _loadedAddressables = new Dictionary<string, GameObject>();
 
@@ -142,27 +143,33 @@ namespace FullPotential.Core.Registry
                     return;
                 }
 
+                if (toRegister is IAmmunition ammoType)
+                {
+                    AddToRegister(_ammoTypes, ammoType);
+                    return;
+                }
+
                 if (toRegister is IWeapon craftableWeapon)
                 {
-                    AddToRegister(_weapons, craftableWeapon);
+                    AddToRegister(_weaponTypes, craftableWeapon);
                     return;
                 }
 
                 if (toRegister is ILoot loot)
                 {
-                    AddToRegister(_loot, loot);
+                    AddToRegister(_lootTypes, loot);
                     return;
                 }
 
                 if (toRegister is IEffect effect)
                 {
-                    AddToRegister(_effects, effect);
+                    AddToRegister(_effectTypes, effect);
                     return;
                 }
 
                 if (toRegister is ITargeting targeting)
                 {
-                    AddToRegister(_targeting, targeting);
+                    AddToRegister(_targetingTypes, targeting);
                     return;
                 }
 
@@ -174,7 +181,7 @@ namespace FullPotential.Core.Registry
 
                 if (toRegister is IShape shape)
                 {
-                    AddToRegister(_shapes, shape);
+                    AddToRegister(_shapeTypes, shape);
                     return;
                 }
 
@@ -209,7 +216,7 @@ namespace FullPotential.Core.Registry
             var invalidTargetingVisuals = new List<ITargetingVisuals>();
             foreach (var targetingVisual in _targetingVisuals)
             {
-                if (_targeting.FirstOrDefault(t => t.TypeId == targetingVisual.TargetingTypeId) == null)
+                if (_targetingTypes.FirstOrDefault(t => t.TypeId == targetingVisual.TargetingTypeId) == null)
                 {
                     Debug.LogError($"{targetingVisual.GetType().FullName} refers to a targeting type that is not registered");
                     invalidTargetingVisuals.Add(targetingVisual);
@@ -224,7 +231,7 @@ namespace FullPotential.Core.Registry
             var invalidShapeVisuals = new List<IShapeVisuals>();
             foreach (var shapeVisual in _shapeVisuals)
             {
-                if (_shapes.FirstOrDefault(t => t.TypeId == shapeVisual.ShapeTypeId) == null)
+                if (_shapeTypes.FirstOrDefault(t => t.TypeId == shapeVisual.ShapeTypeId) == null)
                 {
                     Debug.LogError($"{shapeVisual.GetType().FullName} refers to a shape type that is not registered");
                     invalidShapeVisuals.Add(shapeVisual);
@@ -244,12 +251,13 @@ namespace FullPotential.Core.Registry
             {
                 case nameof(IAccessoryVisuals): return (IEnumerable<T>)_accessoryVisuals;
                 case nameof(IArmorVisuals): return (IEnumerable<T>)_armorVisuals;
-                case nameof(IWeapon): return (IEnumerable<T>)_weapons;
-                case nameof(ILoot): return (IEnumerable<T>)_loot;
-                case nameof(IEffect): return (IEnumerable<T>)_effects;
-                case nameof(IShape): return (IEnumerable<T>)_shapes;
+                case nameof(IWeapon): return (IEnumerable<T>)_weaponTypes;
+                case nameof(ILoot): return (IEnumerable<T>)_lootTypes;
+                case nameof(IAmmunition): return (IEnumerable<T>)_ammoTypes;
+                case nameof(IEffect): return (IEnumerable<T>)_effectTypes;
+                case nameof(IShape): return (IEnumerable<T>)_shapeTypes;
                 case nameof(IShapeVisuals): return (IEnumerable<T>)_shapeVisuals;
-                case nameof(ITargeting): return (IEnumerable<T>)_targeting;
+                case nameof(ITargeting): return (IEnumerable<T>)_targetingTypes;
                 case nameof(ITargetingVisuals): return (IEnumerable<T>)_targetingVisuals;
                 default: throw new Exception($"Unexpected type {interfaceName}");
             }
@@ -303,19 +311,19 @@ namespace FullPotential.Core.Registry
 
         public List<IEffect> GetLootPossibilities()
         {
-            return _effects
+            return _effectTypes
                 .Where(x => x is not IIsSideEffect)
                 .ToList();
         }
 
         public IEffect GetEffect(Guid typeId)
         {
-            return _effects.FirstOrDefault(x => x.TypeId == typeId);
+            return _effectTypes.FirstOrDefault(x => x.TypeId == typeId);
         }
 
         public IEffect GetEffect(Type type)
         {
-            return _effects.FirstOrDefault(x => x.GetType() == type);
+            return _effectTypes.FirstOrDefault(x => x.GetType() == type);
         }
 
         public void LoadAddessable(string address, Action<GameObject> action)

@@ -9,7 +9,9 @@ namespace FullPotential.Standard.Weapons
 
         public string TypeName => nameof(Shield);
 
-        public WeaponCategory Category => WeaponCategory.Defensive;
+        public bool IsDefensive => true;
+
+        public Guid? AmmunitionTypeId => null;
 
         public bool AllowAutomatic => false;
 

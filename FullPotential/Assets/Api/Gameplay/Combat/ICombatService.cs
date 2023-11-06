@@ -8,7 +8,7 @@ namespace FullPotential.Api.Gameplay.Combat
     {
         void ApplyEffects(
             IFighter sourceFighter,
-            ItemBase itemUsed,
+            ItemForCombatBase itemUsed,
             GameObject target,
             Vector3? position,
             float effectPercentage
@@ -20,7 +20,7 @@ namespace FullPotential.Api.Gameplay.Combat
             bool addVariation = true);
 
         int GetDamageValueFromAttack(
-            ItemBase itemUsed,
+            ItemForCombatBase itemUsed,
             int targetDefense,
             bool addVariation = true);
 

@@ -9,7 +9,9 @@ namespace FullPotential.Standard.Weapons
 
         public string TypeName => nameof(Gun);
 
-        public WeaponCategory Category => WeaponCategory.Ranged;
+        public bool IsDefensive => false;
+
+        public Guid? AmmunitionTypeId => new Guid(Ammo.Bullet.Id);
 
         public bool AllowAutomatic => true;
 

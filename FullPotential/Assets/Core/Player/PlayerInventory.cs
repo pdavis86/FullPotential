@@ -286,6 +286,7 @@ namespace FullPotential.Core.Player
                 .UnionIfNotNull(changes.Gadgets)
                 .UnionIfNotNull(changes.Spells)
                 .UnionIfNotNull(changes.Consumers)
+                .UnionIfNotNull(changes.ItemStacks)
                 .UnionIfNotNull(changes.Weapons);
 
             foreach (var item in itemsToAdd)
@@ -293,6 +294,8 @@ namespace FullPotential.Core.Player
                 FillTypesFromIds(item);
                 _items.Add(item.Id, item);
             }
+
+            //todo: merge item stacks up to max
 
             var itemToAddCount = itemsToAdd.Count();
 
@@ -423,9 +426,12 @@ namespace FullPotential.Core.Player
                 }
             }
 
-            if (item.EffectIds != null && item.EffectIds.Length > 0 && item.Effects == null)
+            if (item is ItemForCombatBase combatItem)
             {
-                item.Effects = item.EffectIds.Select(x => _typeRegistry.GetEffect(new Guid(x))).ToList();
+                if (combatItem.EffectIds != null && combatItem.EffectIds.Length > 0 && combatItem.Effects == null)
+                {
+                    combatItem.Effects = combatItem.EffectIds.Select(x => _typeRegistry.GetEffect(new Guid(x))).ToList();
+                }
             }
         }
 
@@ -463,13 +469,13 @@ namespace FullPotential.Core.Player
             return match.Value == null ? null : match;
         }
 
-        public List<ItemBase> GetComponentsFromIds(string[] componentIds)
+        public List<ItemForCombatBase> GetComponentsFromIds(string[] componentIds)
         {
             //Check that the components are actually in the player's inventory and load them in the order they are given
-            var components = new List<ItemBase>();
+            var components = new List<ItemForCombatBase>();
             foreach (var id in componentIds)
             {
-                var match = GetItemWithId<ItemBase>(id);
+                var match = GetItemWithId<ItemForCombatBase>(id);
                 if (match != null)
                 {
                     components.Add(match);

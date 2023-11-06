@@ -13,6 +13,16 @@
 
 
     {
+      "Key": "ammunition.arrow",
+      "Value": "Arrow"
+    },
+	{
+      "Key": "ammunition.bullet",
+      "Value": "Bullet"
+    },
+
+
+    {
       "Key": "weapon.axe",
       "Value": "Axe"
     },

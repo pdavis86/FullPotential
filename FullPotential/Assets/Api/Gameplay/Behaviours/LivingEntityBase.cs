@@ -683,14 +683,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Effect-related methods
 
-        public void AddAttributeModifier(IAttributeEffect attributeEffect, ItemBase itemUsed, float effectPercentage)
+        public void AddAttributeModifier(IAttributeEffect attributeEffect, ItemForCombatBase itemUsed, float effectPercentage)
         {
             var (change, expiry) = itemUsed.GetAttributeChangeAndExpiry(attributeEffect);
             var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
             AddOrUpdateEffect(attributeEffect, adjustedChange, expiry);
         }
 
-        public void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, float effectPercentage)
+        public void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, float effectPercentage)
         {
             var (change, expiry, delay) = itemUsed.GetPeriodicStatChangeExpiryAndDelay(statEffect);
             var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
@@ -708,7 +708,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             } while (DateTime.Now < expiry);
         }
 
-        public void ApplyStatValueChange(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
+        public void ApplyStatValueChange(IStatEffect statEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
         {
             var change = itemUsed.GetStatChange(statEffect);
             var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
@@ -718,7 +718,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             ApplyStatChange(statEffect.StatToAffect, adjustedChange, sourceFighter, position);
         }
 
-        public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
+        public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
         {
             var (change, expiry) = itemUsed.GetStatChangeAndExpiry(statEffect);
             var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
@@ -728,9 +728,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
             ApplyStatChange(statEffect.StatToAffect, adjustedChange, sourceFighter, position);
         }
 
-        public void ApplyElementalEffect(IEffect elementalEffect, ItemBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
+        public void ApplyElementalEffect(IEffect elementalEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
         {
-            //todo: zzz v0.4.1 - ApplyElementalEffect
+            //todo: zzz v0.8 - ApplyElementalEffect
             //Debug.LogWarning("Not yet implemented elemental effects");
             ApplyHealthChange(-5, sourceFighter, position, false);
         }
