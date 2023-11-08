@@ -12,6 +12,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public bool TemporaryMaxIncrease => false;
 
-        public AffectableAttribute AttributeToAffect => AffectableAttribute.Strength;
+        public AttributeAffected AttributeAffectedToAffect => AttributeAffected.Strength;
     }
 }

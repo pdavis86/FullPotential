@@ -12,6 +12,6 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public bool TemporaryMaxIncrease => true;
 
-        public AffectableAttribute AttributeToAffect => AffectableAttribute.Strength;
+        public AttributeAffected AttributeAffectedToAffect => AttributeAffected.Strength;
     }
 }

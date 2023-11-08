@@ -13,6 +13,6 @@ namespace FullPotential.Standard.Effects.Support
 
         public AffectType AffectType => AffectType.SingleIncrease;
 
-        public AffectableStat StatToAffect => AffectableStat.Health;
+        public ResourceType StatToAffect => ResourceType.Health;
     }
 }

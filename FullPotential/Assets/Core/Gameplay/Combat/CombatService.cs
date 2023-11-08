@@ -13,7 +13,6 @@ using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
-using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
@@ -347,7 +346,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
             var force = itemUsed?.GetMovementForceValue(adjustForGravity)
-                ?? ItemForCombatBase.GetHighInHighOutInRange(sourceFighter.GetAttributeValue(AffectableAttribute.Strength), 200, 500);
+                ?? ItemForCombatBase.GetHighInHighOutInRange(sourceFighter.GetAttributeValue(AttributeAffected.Strength), 200, 500);
 
             force *= effectPercentage;
 
@@ -434,7 +433,7 @@ namespace FullPotential.Core.Gameplay.Combat
         {
             var weapon = itemUsed as Weapon;
 
-            float attackStrength = itemUsed?.Attributes.Strength ?? sourceFighter.GetAttributeValue(AffectableAttribute.Strength);
+            float attackStrength = itemUsed?.Attributes.Strength ?? sourceFighter.GetAttributeValue(AttributeAffected.Strength);
             var defenceRatio = 100f / (100 + targetDefense);
 
             if (weapon != null && weapon.IsRanged)

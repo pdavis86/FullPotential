@@ -20,7 +20,7 @@ namespace FullPotential.Api.Items.Types
         public const string AliasSegmentConsumer = "consumer";
         public const string AliasSegmentEffects = "effects";
 
-        public ResourceConsumptionType ResourceConsumptionType;
+        public ResourceType ResourceType;
 
         public int ChargePercentage { get; set; }
 
@@ -64,7 +64,7 @@ namespace FullPotential.Api.Items.Types
             var itemDamage = _combatService.GetDamageValueFromAttack(this, 0, false);
 
             var healthEffects = Effects
-                .Where(e => e is IStatEffect se && se.StatToAffect == AffectableStat.Health)
+                .Where(e => e is IStatEffect se && se.StatToAffect == ResourceType.Health)
                 .Select(e => (IStatEffect)e)
                 .ToList();
 
@@ -105,7 +105,7 @@ namespace FullPotential.Api.Items.Types
 
             AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
 
-            var resourceConsumptionType = localizer.Translate(ResourceConsumptionType);
+            var resourceConsumptionType = localizer.Translate(ResourceType);
 
             AppendToDescription(
                 sb,

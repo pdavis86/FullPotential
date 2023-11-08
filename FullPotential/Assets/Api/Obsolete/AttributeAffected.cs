@@ -2,7 +2,7 @@
 {
     // ReSharper disable UnusedMember.Global
 
-    public enum AffectableAttribute
+    public enum AttributeAffected
     {
         Strength,
         Efficiency,

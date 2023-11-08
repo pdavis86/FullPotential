@@ -228,7 +228,7 @@ namespace FullPotential.Core.Player
             }
         }
 
-        public IEnumerable<ItemBase> GetCompatibleItemsForSlot(GearCategory? gearCategory)
+        public IEnumerable<ItemBase> GetCompatibleItemsForSlot(SlotType? gearCategory)
         {
             if (gearCategory == null)
             {
@@ -239,7 +239,7 @@ namespace FullPotential.Core.Player
 
             IEnumerable<KeyValuePair<string, ItemBase>> itemsForSlot;
 
-            if (gearCategory == GearCategory.Hand)
+            if (gearCategory == SlotType.Hand)
             {
                 itemsForSlot = _items
                     .Where(x => x.Value is Weapon or Consumer);
@@ -248,8 +248,8 @@ namespace FullPotential.Core.Player
             {
                 itemsForSlot = _items
                 .Where(x =>
-                    (x.Value is Accessory acc && (int)((IAccessoryVisuals)acc.RegistryType).Category == (int)gearCategory)
-                    || (x.Value is Armor armor && (int)((IArmorVisuals)armor.RegistryType).Category == (int)gearCategory));
+                    (x.Value is Accessory acc && (int)((IAccessoryVisuals)acc.RegistryType).Type == (int)gearCategory)
+                    || (x.Value is Armor armor && (int)((IArmorVisuals)armor.RegistryType).Type == (int)gearCategory));
             }
 
             return itemsForSlot
@@ -324,11 +324,11 @@ namespace FullPotential.Core.Player
             //Here for backwards-compatibility
             foreach (var spell in inventoryData.Spells)
             {
-                spell.ResourceConsumptionType = ResourceConsumptionType.Mana;
+                spell.ResourceType = ResourceType.Mana;
             }
             foreach (var gadget in inventoryData.Gadgets)
             {
-                gadget.ResourceConsumptionType = ResourceConsumptionType.Energy;
+                gadget.ResourceType = ResourceType.Energy;
             }
 
             var itemsToAdd = Enumerable.Empty<ItemBase>()
@@ -615,7 +615,7 @@ namespace FullPotential.Core.Player
                     break;
 
                 case Consumer consumer:
-                    var prefab = consumer.ResourceConsumptionType == ResourceConsumptionType.Mana
+                    var prefab = consumer.ResourceType == ResourceType.Mana
                         ? GameManager.Instance.Prefabs.Combat.SpellInHand
                         : GameManager.Instance.Prefabs.Combat.GadgetInHand;
 

@@ -54,20 +54,22 @@ namespace FullPotential.Core.Ui.Behaviours
 
             switch (clickedObject.name)
             {
-                case nameof(SlotGameObjectName.Helm): LoadInventoryItems(clickedObject, GearCategory.Helm); break;
-                case nameof(SlotGameObjectName.Chest): LoadInventoryItems(clickedObject, GearCategory.Chest); break;
-                case nameof(SlotGameObjectName.Legs): LoadInventoryItems(clickedObject, GearCategory.Legs); break;
-                case nameof(SlotGameObjectName.Feet): LoadInventoryItems(clickedObject, GearCategory.Feet); break;
-                case nameof(SlotGameObjectName.Barrier): LoadInventoryItems(clickedObject, GearCategory.Barrier); break;
+                case nameof(SlotGameObjectName.Helm): LoadInventoryItems(clickedObject, SlotType.Helm); break;
+                case nameof(SlotGameObjectName.Chest): LoadInventoryItems(clickedObject, SlotType.Chest); break;
+                case nameof(SlotGameObjectName.Legs): LoadInventoryItems(clickedObject, SlotType.Legs); break;
+                case nameof(SlotGameObjectName.Feet): LoadInventoryItems(clickedObject, SlotType.Feet); break;
+                case nameof(SlotGameObjectName.Barrier): LoadInventoryItems(clickedObject, SlotType.Barrier); break;
 
                 case nameof(SlotGameObjectName.LeftHand):
-                case nameof(SlotGameObjectName.RightHand): LoadInventoryItems(clickedObject, GearCategory.Hand); break;
+                case nameof(SlotGameObjectName.RightHand): LoadInventoryItems(clickedObject, SlotType.Hand); break;
 
                 case nameof(SlotGameObjectName.LeftRing):
-                case nameof(SlotGameObjectName.RightRing): LoadInventoryItems(clickedObject, GearCategory.Ring); break;
+                case nameof(SlotGameObjectName.RightRing): LoadInventoryItems(clickedObject, SlotType.Ring); break;
 
-                case nameof(SlotGameObjectName.Amulet): LoadInventoryItems(clickedObject, GearCategory.Amulet); break;
-                case nameof(SlotGameObjectName.Belt): LoadInventoryItems(clickedObject, GearCategory.Belt); break;
+                case nameof(SlotGameObjectName.Amulet): LoadInventoryItems(clickedObject, SlotType.Amulet); break;
+                case nameof(SlotGameObjectName.Belt): LoadInventoryItems(clickedObject, SlotType.Belt); break;
+
+                case nameof(SlotGameObjectName.Reloader): LoadInventoryItems(clickedObject, SlotType.Reloader); break;
 
                 default:
                     Debug.LogError($"Cannot handle click for slot {clickedObject.name}");
@@ -142,7 +144,7 @@ namespace FullPotential.Core.Ui.Behaviours
             }
         }
 
-        private void LoadInventoryItems(GameObject slot, GearCategory? gearCategory = null)
+        private void LoadInventoryItems(GameObject slot, SlotType? gearCategory = null)
         {
             _componentsContainer.SetActive(true);
 

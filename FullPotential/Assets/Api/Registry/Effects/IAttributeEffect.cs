@@ -12,6 +12,6 @@ namespace FullPotential.Api.Registry.Effects
         /// <summary>
         /// The attribute which will be affected
         /// </summary>
-        AffectableAttribute AttributeToAffect { get; }
+        AttributeAffected AttributeAffectedToAffect { get; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace FullPotential.Api.Obsolete
 {
-    public enum GearCategory
+    public enum SlotType
     {
         Helm,
         Chest,
@@ -12,6 +12,7 @@
 
         Ring,
         Belt,
-        Amulet
+        Amulet,
+        Reloader,
     }
 }

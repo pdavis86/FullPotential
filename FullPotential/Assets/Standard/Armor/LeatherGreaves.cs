@@ -10,7 +10,7 @@ namespace FullPotential.Standard.Armor
 
         public string TypeName => nameof(LeatherGreaves);
 
-        public ArmorCategory Category => ArmorCategory.Legs;
+        public ArmorType Type => ArmorType.Legs;
 
         public string PrefabAddress => "Standard/Prefabs/Armor/Legs.prefab";
     }

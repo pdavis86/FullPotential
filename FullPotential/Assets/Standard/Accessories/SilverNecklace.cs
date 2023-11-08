@@ -10,7 +10,7 @@ namespace FullPotential.Standard.Accessories
 
         public string TypeName => nameof(SilverNecklace);
 
-        public AccessoryCategory Category => AccessoryCategory.Amulet;
+        public AccessoryType Type => AccessoryType.Amulet;
 
         public string PrefabAddress => "Standard/Prefabs/Accessories/Amulet.prefab";
     }

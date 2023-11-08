@@ -3,7 +3,7 @@ using FullPotential.Api.Registry.Weapons;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 
-namespace FullPotential.Standard.Weapons.Ammo
+namespace FullPotential.Standard.Ammo
 {
     public class Bullet : IAmmunition
     {

@@ -283,7 +283,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public int GetHealthMax()
         {
             //todo: zzz v0.5 - trait-based health max
-            return 100 + GetStatMaxAdjustment(AffectableStat.Health);
+            return 100 + GetStatMaxAdjustment(ResourceType.Health);
         }
 
         #endregion
@@ -326,7 +326,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public int GetStaminaMax()
         {
             //todo: zzz v0.5 - trait-based stamina max
-            return 100 + GetStatMaxAdjustment(AffectableStat.Stamina);
+            return 100 + GetStatMaxAdjustment(ResourceType.Stamina);
         }
 
         public int GetStaminaCost()
@@ -385,7 +385,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public int GetEnergyMax()
         {
             //todo: zzz v0.5 - trait-based energy max
-            return 100 + GetStatMaxAdjustment(AffectableStat.Energy);
+            return 100 + GetStatMaxAdjustment(ResourceType.Energy);
         }
 
         protected int GetEnergyCost(Consumer consumer)
@@ -435,7 +435,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public int GetManaMax()
         {
             //todo: zzz v0.5 - trait-based mana max
-            return 100 + GetStatMaxAdjustment(AffectableStat.Mana);
+            return 100 + GetStatMaxAdjustment(ResourceType.Mana);
         }
 
         protected int GetManaCost(Consumer consumer)
@@ -698,11 +698,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
             StartCoroutine(PeriodicActionToStatCoroutine(statEffect.StatToAffect, adjustedChange, sourceFighter, delay, expiry));
         }
 
-        private IEnumerator PeriodicActionToStatCoroutine(AffectableStat stat, int change, IFighter sourceFighter, float delay, DateTime expiry)
+        private IEnumerator PeriodicActionToStatCoroutine(ResourceType resourceType, int change, IFighter sourceFighter, float delay, DateTime expiry)
         {
             do
             {
-                ApplyStatChange(stat, change, sourceFighter, transform.position);
+                ApplyStatChange(resourceType, change, sourceFighter, transform.position);
                 yield return new WaitForSeconds(delay);
 
             } while (DateTime.Now < expiry);
@@ -745,21 +745,21 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return _activeEffects;
         }
 
-        protected int GetAttributeAdjustment(AffectableAttribute attribute)
+        protected int GetAttributeAdjustment(AttributeAffected attributeAffected)
         {
             return _activeEffects
                 .Where(x =>
                     x.Effect is IAttributeEffect attributeEffect
-                    && attributeEffect.AttributeToAffect == attribute)
+                    && attributeEffect.AttributeAffectedToAffect == attributeAffected)
                 .Sum(x => x.Change * (x.Effect is IAttributeEffect attributeEffect && attributeEffect.TemporaryMaxIncrease ? 1 : -1));
         }
 
-        private int GetStatMaxAdjustment(AffectableStat affectableStat)
+        private int GetStatMaxAdjustment(ResourceType resourceType)
         {
             return _activeEffects
                 .Where(x =>
                     x.Effect is IStatEffect statEffect
-                    && statEffect.StatToAffect == affectableStat
+                    && statEffect.StatToAffect == resourceType
                     && statEffect.AffectType is AffectType.TemporaryMaxIncrease or AffectType.TemporaryMaxDecrease)
                 .Sum(x => x.Change);
         }
@@ -821,31 +821,31 @@ namespace FullPotential.Api.Gameplay.Behaviours
         }
 
         private void ApplyStatChange(
-            AffectableStat stat,
+            ResourceType resourceType,
             int change,
             IFighter sourceFighter,
             Vector3? position)
         {
-            switch (stat)
+            switch (resourceType)
             {
-                case AffectableStat.Energy:
+                case ResourceType.Energy:
                     ApplyEnergyChange(change);
                     return;
 
-                case AffectableStat.Health:
+                case ResourceType.Health:
                     ApplyHealthChange(change, sourceFighter, position, false);
                     return;
 
-                case AffectableStat.Mana:
+                case ResourceType.Mana:
                     ApplyManaChange(change);
                     return;
 
-                case AffectableStat.Stamina:
+                case ResourceType.Stamina:
                     ApplyStaminaChange(change);
                     return;
 
                 default:
-                    throw new ArgumentException("Unexpected AffectableStat: " + stat);
+                    throw new ArgumentException("Unexpected ResourceType: " + resourceType);
             }
         }
 
@@ -861,19 +861,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 _activeEffects.Remove(activeEffect);
             }
         }
-
-        //private int GetStatVariableMax(AffectableStat stat)
-        //{
-        //    switch (stat)
-        //    {
-        //        case AffectableStat.Energy: return GetEnergyMax();
-        //        case AffectableStat.Health: return GetHealthMax();
-        //        case AffectableStat.Mana: return GetManaMax();
-        //        case AffectableStat.Stamina: return GetStaminaMax();
-        //        default:
-        //            throw new ArgumentException("Unexpected AffectableStat: " + stat);
-        //    }
-        //}
 
         #endregion
     }

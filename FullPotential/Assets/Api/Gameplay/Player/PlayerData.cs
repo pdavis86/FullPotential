@@ -1,6 +1,6 @@
 ﻿using System;
 using FullPotential.Api.Gameplay.Inventory;
-using FullPotential.Api.Obsolete;
+using FullPotential.Api.Utilities.Data;
 
 namespace FullPotential.Api.Gameplay.Player
 {
@@ -9,7 +9,7 @@ namespace FullPotential.Api.Gameplay.Player
     {
         public string Username;
         public PlayerSettings Settings;
-        public ResourceLevels ResourceLevels;
+        public KeyValuePair<string, int>[] Resources;
         public InventoryData Inventory;
 
         [NonSerialized] public bool InventoryLoadedSuccessfully;

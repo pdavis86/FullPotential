@@ -10,7 +10,7 @@ namespace FullPotential.Standard.Accessories
 
         public string TypeName => nameof(SilverRing);
 
-        public AccessoryCategory Category => AccessoryCategory.Ring;
+        public AccessoryType Type => AccessoryType.Ring;
 
         public string PrefabAddress => "Standard/Prefabs/Accessories/Ring.prefab";
     }

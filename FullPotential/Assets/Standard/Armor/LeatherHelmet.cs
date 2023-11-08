@@ -10,7 +10,7 @@ namespace FullPotential.Standard.Armor
 
         public string TypeName => nameof(LeatherHelmet);
 
-        public ArmorCategory Category => ArmorCategory.Helm;
+        public ArmorType Type => ArmorType.Helm;
 
         public string PrefabAddress => "Standard/Prefabs/Armor/Helm.prefab";
     }

@@ -6,7 +6,6 @@ using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
-using UnityEngine;
 
 namespace FullPotential.Api.Items.Types
 {

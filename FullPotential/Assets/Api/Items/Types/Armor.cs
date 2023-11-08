@@ -21,19 +21,19 @@ namespace FullPotential.Api.Items.Types
 
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
         {
-            return GetArmorCategory() == ArmorCategory.Barrier
+            return GetArmorCategory() == ArmorType.Barrier
                 ? GetBarrierDescription(localizer, levelOfDetail, itemName)
                 : GetArmorDescription(localizer, levelOfDetail, itemName);
         }
 
-        private ArmorCategory GetArmorCategory()
+        private ArmorType GetArmorCategory()
         {
             if (RegistryType is not IArmorVisuals armor)
             {
                 throw new Exception("Registry type was not IGearArmor");
             }
 
-            return armor.Category;
+            return armor.Type;
         }
 
         private float GetRechargeDelay()

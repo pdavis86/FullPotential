@@ -10,7 +10,7 @@ namespace FullPotential.Standard.Armor
 
         public string TypeName => nameof(LeatherJerkin);
 
-        public ArmorCategory Category => ArmorCategory.Chest;
+        public ArmorType Type => ArmorType.Chest;
 
         public string PrefabAddress => "Standard/Prefabs/Armor/Chest.prefab";
     }

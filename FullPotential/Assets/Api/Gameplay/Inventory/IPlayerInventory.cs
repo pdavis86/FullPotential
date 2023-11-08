@@ -11,7 +11,7 @@ namespace FullPotential.Api.Gameplay.Inventory
 
         List<string> ValidateIsCraftable(string[] componentIds, ItemBase itemToCraft);
 
-        IEnumerable<ItemBase> GetCompatibleItemsForSlot(GearCategory? gearCategory);
+        IEnumerable<ItemBase> GetCompatibleItemsForSlot(SlotType? gearCategory);
 
         KeyValuePair<SlotGameObjectName, EquippedItem>? GetEquippedWithItemId(string itemId);
 

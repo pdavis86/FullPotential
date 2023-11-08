@@ -119,11 +119,11 @@ namespace FullPotential.Core.UI.Components
                 .Cast<CraftableType>()
                 .ToDictionary(x => x, x => localizer.Translate(x));
 
-            _accessoryTypes = GetDictionaryFromEnum<AccessoryCategory>(localizer);
+            _accessoryTypes = GetDictionaryFromEnum<AccessoryType>(localizer);
 
-            _armorTypes = GetDictionaryFromEnum<ArmorCategory>(localizer);
+            _armorTypes = GetDictionaryFromEnum<ArmorType>(localizer);
 
-            _consumerTypes = GetDictionaryFromEnum<ResourceConsumptionType>(localizer);
+            _consumerTypes = GetDictionaryFromEnum<ResourceType>(localizer);
 
             _weaponTypes = typeRegistry.GetRegisteredTypes<IWeapon>()
                 .ToDictionary(x => x, x => localizer.Translate(x))

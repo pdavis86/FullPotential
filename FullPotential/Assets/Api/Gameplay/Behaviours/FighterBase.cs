@@ -35,6 +35,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         #region Protected variables
         // ReSharper disable InconsistentNaming
 
+        //todo: redundant as we have Inventory
         protected IInventory _inventory;
 
         // ReSharper restore InconsistentNaming
@@ -191,14 +192,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected override bool IsConsumingEnergy()
         {
-            return HandStatusLeft.IsConsumingResource(ResourceConsumptionType.Energy)
-                   || HandStatusRight.IsConsumingResource(ResourceConsumptionType.Energy);
+            return HandStatusLeft.IsConsumingResource(ResourceType.Energy)
+                   || HandStatusRight.IsConsumingResource(ResourceType.Energy);
         }
 
         protected override bool IsConsumingMana()
         {
-            return HandStatusLeft.IsConsumingResource(ResourceConsumptionType.Mana)
-                   || HandStatusRight.IsConsumingResource(ResourceConsumptionType.Mana);
+            return HandStatusLeft.IsConsumingResource(ResourceType.Mana)
+                   || HandStatusRight.IsConsumingResource(ResourceType.Mana);
         }
 
         public IEnumerator ReloadCoroutine(HandStatus handStatus)
@@ -222,25 +223,25 @@ namespace FullPotential.Api.Gameplay.Behaviours
             handStatus.IsReloading = false;
         }
 
-        public int GetAttributeValue(AffectableAttribute attribute)
+        public int GetAttributeValue(AttributeAffected attributeAffected)
         {
             //todo: zzz v0.5 - trait-based attributes
-            switch (attribute)
+            switch (attributeAffected)
             {
-                case AffectableAttribute.Strength:
-                    return 25 + GetAttributeAdjustment(AffectableAttribute.Strength);
+                case AttributeAffected.Strength:
+                    return 25 + GetAttributeAdjustment(AttributeAffected.Strength);
 
-                case AffectableAttribute.Luck:
-                    return 50 + GetAttributeAdjustment(AffectableAttribute.Luck);
+                case AttributeAffected.Luck:
+                    return 50 + GetAttributeAdjustment(AttributeAffected.Luck);
 
                 default:
-                    throw new Exception("Not yet implemented GetAttributeValue() for " + attribute);
+                    throw new Exception("Not yet implemented GetAttributeValue() for " + attributeAffected);
             }
         }
 
         public float GetCriticalHitChance()
         {
-            var luckValue = GetAttributeValue(AffectableAttribute.Luck);
+            var luckValue = GetAttributeValue(AttributeAffected.Luck);
 
             if (luckValue < 20)
             {
@@ -592,16 +593,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             //todo: zzz v0.5 - energy and mana should be registered types not named variables
 
-            switch (consumer.ResourceConsumptionType)
+            switch (consumer.ResourceType)
             {
-                case ResourceConsumptionType.Mana:
+                case ResourceType.Mana:
                     return (_mana, GetManaCost(consumer));
 
-                case ResourceConsumptionType.Energy:
+                case ResourceType.Energy:
                     return (_energy, GetEnergyCost(consumer));
 
                 default:
-                    Debug.LogError("Not yet implemented GetResourceVariable() for resource type " + consumer.ResourceConsumptionType);
+                    Debug.LogError("Not yet implemented GetResourceVariable() for resource type " + consumer.ResourceType);
                     return null;
             }
         }

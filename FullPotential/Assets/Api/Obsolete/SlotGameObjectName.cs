@@ -12,6 +12,7 @@
         LeftRing,
         RightRing,
         Belt,
-        Amulet
+        Amulet,
+        Reloader
     }
 }

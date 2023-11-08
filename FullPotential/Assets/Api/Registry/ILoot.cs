@@ -4,6 +4,6 @@ namespace FullPotential.Api.Registry
 {
     public interface ILoot : IRegisterable
     {
-        ResourceConsumptionType? ResourceConsumptionType { get; }
+        ResourceType? ResourceConsumptionType { get; }
     }
 }

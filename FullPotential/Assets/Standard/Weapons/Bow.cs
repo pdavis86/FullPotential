@@ -1,5 +1,6 @@
 ﻿using System;
 using FullPotential.Api.Registry.Weapons;
+using FullPotential.Standard.Ammo;
 
 namespace FullPotential.Standard.Weapons
 {
@@ -11,7 +12,7 @@ namespace FullPotential.Standard.Weapons
 
         public bool IsDefensive => false;
 
-        public Guid? AmmunitionTypeId => new Guid(Ammo.Arrow.Id);
+        public Guid? AmmunitionTypeId => new Guid(Arrow.Id);
 
         public bool AllowAutomatic => false;
 

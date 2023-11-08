@@ -254,7 +254,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 }
             };
 
-            var magicalLootTypes = _lootTypes.Where(x => x.ResourceConsumptionType == ResourceConsumptionType.Mana).ToList();
+            var magicalLootTypes = _lootTypes.Where(x => x.ResourceConsumptionType == ResourceType.Mana).ToList();
 
             var isMagical = magicalLootTypes.Any() && IsSuccess(50);
             if (isMagical)
@@ -291,7 +291,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             else
             {
                 lootDrop.RegistryType = _lootTypes
-                    .Where(x => x.ResourceConsumptionType == ResourceConsumptionType.Energy)
+                    .Where(x => x.ResourceConsumptionType == ResourceType.Energy)
                     .OrderBy(_ => _random.Next())
                     .First();
             }
@@ -326,7 +326,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return min + (int)Math.Round((max - min) * Math.Pow(_random.NextDouble(), 3), 0);
         }
 
-        private Consumer GetConsumer(CraftableType craftableType, ResourceConsumptionType consumptionType, IList<ItemForCombatBase> components)
+        private Consumer GetConsumer(CraftableType craftableType, ResourceType type, IList<ItemForCombatBase> components)
         {
             var relevantComponents = components.OfType<IHasTargetingAndShape>().ToList();
 
@@ -335,7 +335,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             var consumer = new Consumer
             {
                 Id = Guid.NewGuid().ToMinimisedString(),
-                ResourceConsumptionType = consumptionType,
+                ResourceType = type,
                 Targeting = targeting,
                 Shape = GetShapeOrNone(targeting, relevantComponents),
                 Attributes = new Attributes
@@ -506,7 +506,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             switch (craftableType)
             {
                 case CraftableType.Consumer:
-                    var consumptionType = (ResourceConsumptionType)Enum.Parse(typeof(ResourceConsumptionType), subTypeName);
+                    var consumptionType = (ResourceType)Enum.Parse(typeof(ResourceType), subTypeName);
                     return GetConsumer(craftableType, consumptionType, components);
 
                 case CraftableType.Weapon:
@@ -525,7 +525,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 
                 case CraftableType.Armor:
                     var craftableArmor = _typeRegistry.GetRegisteredByTypeName<IArmorVisuals>(subTypeName);
-                    return craftableArmor.Category == ArmorCategory.Barrier
+                    return craftableArmor.Type == ArmorType.Barrier
                         ? GetBarrier(craftableArmor, components)
                         : GetArmor(craftableArmor, components);
 

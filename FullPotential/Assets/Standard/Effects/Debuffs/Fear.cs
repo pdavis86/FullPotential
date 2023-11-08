@@ -13,6 +13,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public AffectType AffectType => AffectType.TemporaryMaxDecrease;
 
-        public AffectableStat StatToAffect => AffectableStat.Health;
+        public ResourceType StatToAffect => ResourceType.Health;
     }
 }

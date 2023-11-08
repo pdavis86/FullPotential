@@ -135,7 +135,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
 
         public AffectType AffectType => AffectType.SingleDecrease;
 
-        public AffectableStat StatToAffect => AffectableStat.Health;
+        public ResourceType StatToAffect => ResourceType.Health;
     }
 
     [ExcludeFromCodeCoverage]

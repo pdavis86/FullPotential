@@ -10,7 +10,7 @@ namespace FullPotential.Standard.Accessories
 
         public string TypeName => nameof(LeatherBelt);
 
-        public AccessoryCategory Category => AccessoryCategory.Belt;
+        public AccessoryType Type => AccessoryType.Belt;
 
         public string PrefabAddress => "Standard/Prefabs/Accessories/Belt.prefab";
     }

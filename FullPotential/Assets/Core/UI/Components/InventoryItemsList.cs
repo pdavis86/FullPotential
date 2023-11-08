@@ -28,7 +28,7 @@ namespace FullPotential.Core.Ui.Components
             GameObject rowPrefab,
             IPlayerInventory playerInventory,
             Action<GameObject, GameObject, ItemBase> toggleAction,
-            GearCategory? gearCategory = null,
+            SlotType? gearCategory = null,
             bool showEquippedItems = true,
             Action<IPlayerInventory, string, InventoryUiRow> assignDrawingAction = null
         )

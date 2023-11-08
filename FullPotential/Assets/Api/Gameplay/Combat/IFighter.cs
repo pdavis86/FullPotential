@@ -29,7 +29,7 @@ namespace FullPotential.Api.Gameplay.Combat
 
         void ApplyElementalEffect(IEffect elementalEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage);
 
-        int GetAttributeValue(AffectableAttribute attribute);
+        int GetAttributeValue(AttributeAffected attributeAffected);
 
         float GetCriticalHitChance();
     }

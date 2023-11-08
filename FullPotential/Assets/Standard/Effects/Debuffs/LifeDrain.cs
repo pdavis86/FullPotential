@@ -14,7 +14,7 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public AffectType AffectType => AffectType.PeriodicDecrease;
 
-        public AffectableStat StatToAffect => AffectableStat.Health;
+        public ResourceType StatToAffect => ResourceType.Health;
 
         public Type SideEffectType => typeof(LifeTap);
     }

@@ -1,7 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
-using FullPotential.Api.Obsolete;
 using FullPotential.Api.Persistence;
 using UnityEngine;
 
@@ -51,7 +51,7 @@ namespace FullPotential.Core.Persistence
                 {
                     Username = username,
                     Settings = new PlayerSettings(),
-                    ResourceLevels = new ResourceLevels(),
+                    Resources = Array.Empty<Api.Utilities.Data.KeyValuePair<string, int>>(),
                     Inventory = new InventoryData()
                 };
             }
@@ -78,7 +78,7 @@ namespace FullPotential.Core.Persistence
         {
             if (string.IsNullOrWhiteSpace(username))
             {
-                throw new System.ArgumentException("No username supplied");
+                throw new ArgumentException("No username supplied");
             }
 
             return _persistentDataPath + "/" + username + ".json";

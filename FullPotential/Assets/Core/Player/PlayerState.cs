@@ -462,6 +462,9 @@ namespace FullPotential.Core.Player
         {
             var playerData = _userRepository.Load(PlayerToken, null, reduced);
 
+            //todo: for backwards compatibility
+            playerData.Resources ??= Array.Empty<Api.Utilities.Data.KeyValuePair<string, int>>();
+
             if (sendToClientId.HasValue)
             {
                 //Don't send data to the server. It already has it loaded
@@ -506,11 +509,13 @@ namespace FullPotential.Core.Player
 
             if (IsServer)
             {
+                var health = playerData.Resources.FirstOrDefault(x => x.Key == nameof(ResourceType.Health)).Value;
+
                 _entityName.Value = Username;
-                _energy.Value = playerData.ResourceLevels.Energy;
-                _health.Value = playerData.ResourceLevels.Health > 0 ? playerData.ResourceLevels.Health : GetHealthMax();
-                _mana.Value = playerData.ResourceLevels.Mana;
-                _stamina.Value = playerData.ResourceLevels.Stamina;
+                _energy.Value = playerData.Resources.FirstOrDefault(x => x.Key == nameof(ResourceType.Energy)).Value;
+                _health.Value = health > 0 ? health : GetHealthMax();
+                _mana.Value = playerData.Resources.FirstOrDefault(x => x.Key == nameof(ResourceType.Mana)).Value;
+                _stamina.Value = playerData.Resources.FirstOrDefault(x => x.Key == nameof(ResourceType.Stamina)).Value;
             }
 
             try
@@ -670,11 +675,16 @@ namespace FullPotential.Core.Player
 
         public PlayerData UpdateAndReturnPlayerData()
         {
-            _saveData.ResourceLevels.Energy = _energy.Value;
-            _saveData.ResourceLevels.Health = _health.Value;
-            _saveData.ResourceLevels.Mana = _mana.Value;
-            _saveData.ResourceLevels.Stamina = _stamina.Value;
+            _saveData.Resources = new[]
+            {
+                new Api.Utilities.Data.KeyValuePair<string, int>(nameof(ResourceType.Energy), _energy.Value),
+                new Api.Utilities.Data.KeyValuePair<string, int>(nameof(ResourceType.Health), _health.Value),
+                new Api.Utilities.Data.KeyValuePair<string, int>(nameof(ResourceType.Mana), _mana.Value),
+                new Api.Utilities.Data.KeyValuePair<string, int>(nameof(ResourceType.Stamina), _stamina.Value),
+            };
+
             _saveData.Inventory = Inventory.GetSaveData();
+
             return _saveData;
         }
 

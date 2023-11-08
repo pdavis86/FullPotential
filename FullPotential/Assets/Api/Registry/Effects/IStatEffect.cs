@@ -13,6 +13,6 @@ namespace FullPotential.Api.Registry.Effects
         /// <summary>
         /// The stat which will be affected
         /// </summary>
-        AffectableStat StatToAffect { get; }
+        ResourceType StatToAffect { get; }
     }
 }

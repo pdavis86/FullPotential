@@ -1,10 +1,11 @@
 ﻿namespace FullPotential.Api.Obsolete
 {
-    public enum ResourceConsumptionType
+    public enum ResourceType
     {
         Health,
         Stamina,
         Mana,
-        Energy
+        Energy,
+        Money,
     }
 }

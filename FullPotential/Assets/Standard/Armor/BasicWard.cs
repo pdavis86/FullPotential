@@ -10,7 +10,7 @@ namespace FullPotential.Standard.Armor
 
         public string TypeName => nameof(BasicWard);
 
-        public ArmorCategory Category => ArmorCategory.Barrier;
+        public ArmorType Type => ArmorType.Barrier;
 
         public string PrefabAddress => "Standard/Prefabs/Armor/Barrier.prefab";
     }

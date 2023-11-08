@@ -33,7 +33,7 @@ namespace FullPotential.Api.Gameplay.Inventory
             _items = new Dictionary<string, ItemBase>();
             _equippedItems = new Dictionary<SlotGameObjectName, EquippedItem>();
 
-            _armorSlotCount = Enum.GetNames(typeof(ArmorCategory)).Length;
+            _armorSlotCount = Enum.GetNames(typeof(ArmorType)).Length;
         }
 
         #endregion

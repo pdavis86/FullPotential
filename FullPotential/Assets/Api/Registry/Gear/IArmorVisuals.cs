@@ -4,6 +4,6 @@ namespace FullPotential.Api.Registry.Gear
 {
     public interface IArmorVisuals : IVisuals
     {
-        ArmorCategory Category { get; }
+        ArmorType Type { get; }
     }
 }

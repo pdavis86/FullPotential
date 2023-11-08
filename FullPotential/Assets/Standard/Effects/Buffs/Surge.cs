@@ -13,6 +13,6 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public AffectType AffectType => AffectType.TemporaryMaxIncrease;
 
-        public AffectableStat StatToAffect => AffectableStat.Energy;
+        public ResourceType StatToAffect => ResourceType.Energy;
     }
 }

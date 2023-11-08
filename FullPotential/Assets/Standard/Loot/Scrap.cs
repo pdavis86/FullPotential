@@ -10,6 +10,6 @@ namespace FullPotential.Standard.Loot
 
         public string TypeName => nameof(Scrap);
 
-        public ResourceConsumptionType? ResourceConsumptionType => Api.Obsolete.ResourceConsumptionType.Energy;
+        public ResourceType? ResourceConsumptionType => ResourceType.Energy;
     }
 }
