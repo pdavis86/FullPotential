@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Modding;
@@ -36,6 +37,12 @@ namespace FullPotential.Core.Registry
         private readonly List<IShape> _shapeTypes = new List<IShape>();
 
         private readonly Dictionary<string, GameObject> _loadedAddressables = new Dictionary<string, GameObject>();
+        private readonly IEventManager _eventManager;
+
+        public TypeRegistry(IEventManager eventManager)
+        {
+            _eventManager = eventManager;
+        }
 
         public void FindAndRegisterAll(List<string> modPrefixes)
         {
@@ -107,6 +114,8 @@ namespace FullPotential.Core.Registry
                     NetworkManager.Singleton.AddNetworkPrefab(gameObject);
                 });
             }
+
+            mod.RegisterEventHandlers(_eventManager);
         }
 
         private static uint GenerateHash(string input)

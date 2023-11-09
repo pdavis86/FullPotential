@@ -266,15 +266,13 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnReloadLeft()
         {
-            StartCoroutine(_playerState.ReloadCoroutine(_playerState.HandStatusLeft));
-            _playerState.ReloadServerRpc(true);
+            _playerState.TriggerReloadStartEvent(true);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnReloadRight()
         {
-            StartCoroutine(_playerState.ReloadCoroutine(_playerState.HandStatusRight));
-            _playerState.ReloadServerRpc(false);
+            _playerState.TriggerReloadStartEvent(false);
         }
 
 #pragma warning restore IDE0051 // Remove unused private members

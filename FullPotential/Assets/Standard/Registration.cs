@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Modding;
 using UnityEngine;
 
@@ -95,5 +96,30 @@ namespace FullPotential.Standard
         {
             return Array.Empty<string>();
         }
+
+        public void RegisterEventHandlers(IEventManager eventManager)
+        {
+            //eventManager.Subscribe(EventIds.ReloadStart, new Blah());
+        }
     }
+
+    //class Blah : IEventHandler
+    //{
+    //    public Func<IEventHandlerArgs, Task> BeforeEventAsync => Before;
+
+    //    public Func<IEventHandlerArgs, Task> AfterEventAsync => After;
+
+    //    private Task Before(IEventHandlerArgs args)
+    //    {
+    //        Debug.Log("Before cancelling");
+    //        args.IsDefaultHandlerCancelled = true;
+    //        return Task.CompletedTask;
+    //    }
+
+    //    private Task After(IEventHandlerArgs args)
+    //    {
+    //        Debug.Log("After");
+    //        return Task.CompletedTask;
+    //    }
+    //}
 }

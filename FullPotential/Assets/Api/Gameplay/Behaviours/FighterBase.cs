@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Gameplay.Events.Args;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
-using FullPotential.Api.Localization;
-using FullPotential.Api.Modding;
-using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Utilities;
 using Unity.Netcode;
@@ -35,8 +34,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
         #region Protected variables
         // ReSharper disable InconsistentNaming
 
-        //todo: redundant as we have Inventory
         protected IInventory _inventory;
+        protected IEventManager _eventManager;
 
         // ReSharper restore InconsistentNaming
         #endregion
@@ -45,7 +44,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public readonly HandStatus HandStatusLeft = new HandStatus();
         public readonly HandStatus HandStatusRight = new HandStatus();
+
         private DelayedAction _consumeResource;
+        private ReloadEventArgs _reloadArgsLeft;
+        private ReloadEventArgs _reloadArgsRight;
 
         #endregion
 
@@ -68,9 +70,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             base.Awake();
 
-            _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
-            _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
-            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+            _eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
+
+            _reloadArgsLeft = new ReloadEventArgs(this, true);
+            _reloadArgsRight = new ReloadEventArgs(this, false);
         }
 
         protected override void Start()
@@ -131,11 +134,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ServerRpc]
         public void ReloadServerRpc(bool isLeftHand)
         {
-            var leftOrRight = isLeftHand
-                ? HandStatusLeft
-                : HandStatusRight;
+            var handStatus = GetHandStatus(isLeftHand);
+            var args = GetReloadEventArgs(isLeftHand);
 
-            StartCoroutine(ReloadCoroutine(leftOrRight));
+            StartCoroutine(ReloadCoroutine(handStatus, args));
 
             var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, new[] { 0ul, OwnerClientId });
             ReloadingClientRpc(isLeftHand, nearbyClients);
@@ -163,22 +165,18 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ClientRpc]
         private void ReloadingClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
         {
-            var leftOrRight = isLeftHand
-                ? HandStatusLeft
-                : HandStatusRight;
+            var handStatus = GetHandStatus(isLeftHand);
+            var args = GetReloadEventArgs(isLeftHand);
 
-            StartCoroutine(ReloadCoroutine(leftOrRight));
+            StartCoroutine(ReloadCoroutine(handStatus, args));
         }
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
         private void StopActiveConsumerBehaviourClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
         {
-            var leftOrRight = isLeftHand
-                ? HandStatusLeft
-                : HandStatusRight;
-
-            StopActiveConsumerBehaviour(leftOrRight);
+            var handStatus = GetHandStatus(isLeftHand);
+            StopActiveConsumerBehaviour(handStatus);
         }
 
         [ClientRpc]
@@ -202,7 +200,37 @@ namespace FullPotential.Api.Gameplay.Behaviours
                    || HandStatusRight.IsConsumingResource(ResourceType.Mana);
         }
 
-        public IEnumerator ReloadCoroutine(HandStatus handStatus)
+        private HandStatus GetHandStatus(bool isLeftHand)
+        {
+            return isLeftHand ? HandStatusLeft : HandStatusRight;
+        }
+
+        #region Reloading
+
+        private ReloadEventArgs GetReloadEventArgs(bool isLeftHand)
+        {
+            return isLeftHand ? _reloadArgsLeft : _reloadArgsRight;
+        }
+
+        public void TriggerReloadStartEvent(bool isLeftHand)
+        {
+            _eventManager.Trigger(EventIds.FighterReloadStart, GetReloadEventArgs(isLeftHand));
+        }
+
+        public static void HandleReloadStartEvent(IEventHandlerArgs args)
+        {
+            var reloadArgs = (ReloadEventArgs)args;
+            reloadArgs.Fighter.Reload(reloadArgs);
+        }
+
+        public void Reload(ReloadEventArgs reloadArgs)
+        {
+            StartCoroutine(ReloadCoroutine(GetHandStatus(reloadArgs.IsLeftHand), reloadArgs));
+
+            ReloadServerRpc(reloadArgs.IsLeftHand);
+        }
+
+        private IEnumerator ReloadCoroutine(HandStatus handStatus, ReloadEventArgs args)
         {
             if (handStatus.EquippedWeapon == null)
             {
@@ -221,7 +249,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             handStatus.EquippedWeapon.Ammo = handStatus.EquippedWeapon.GetAmmoMax();
             handStatus.IsReloading = false;
+
+            _eventManager.Trigger(EventIds.FighterReloadEnd, args);
         }
+
+        #endregion
 
         public int GetAttributeValue(AttributeAffected attributeAffected)
         {
@@ -270,9 +302,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public bool TryToAttackHold(bool isLeftHand)
         {
-            var leftOrRight = isLeftHand
-                ? HandStatusLeft
-                : HandStatusRight;
+            var leftOrRight = GetHandStatus(isLeftHand);
 
             if (leftOrRight.EquippedConsumer != null)
             {
@@ -430,9 +460,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return false;
             }
 
-            var leftOrRight = isLeftHand
-                ? HandStatusLeft
-                : HandStatusRight;
+            var leftOrRight = GetHandStatus(isLeftHand);
 
             if (StopActiveConsumerBehaviour(leftOrRight))
             {
@@ -646,8 +674,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             public Transform LeftHand;
             public Transform RightHand;
-            public Transform LeftHandInFront;
-            public Transform RightHandInFront;
         }
 
         [Serializable]

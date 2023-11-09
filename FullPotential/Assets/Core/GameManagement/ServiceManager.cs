@@ -23,6 +23,7 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<Api.Persistence.ISettingsRepository, Persistence.SettingsRepository>();
             DependenciesContext.Dependencies.Register<Api.Unity.Services.IUnityHelperUtilities, Unity.Services.UnityHelperUtilities>();
             DependenciesContext.Dependencies.Register<Api.Unity.Services.IShaderUtilities, Unity.Services.ShaderUtilities>();
+            DependenciesContext.Dependencies.Register<Api.Gameplay.Events.IEventManager, Gameplay.Events.EventManager>();
         }
     }
 }

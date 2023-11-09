@@ -6,6 +6,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
@@ -19,6 +21,7 @@ using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement.Data;
 using FullPotential.Core.GameManagement.Enums;
 using FullPotential.Core.GameManagement.Events;
+using FullPotential.Core.Gameplay.Events;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Player;
 using FullPotential.Core.Registry;
@@ -95,6 +98,8 @@ namespace FullPotential.Core.GameManagement
             _settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
+
+            RegisterEvents();
 
             await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
 
@@ -377,6 +382,14 @@ namespace FullPotential.Core.GameManagement
             //{
             //    throw new Exception("You are not an admin so cannot perform that action");
             //}
+        }
+
+        private void RegisterEvents()
+        {
+            var eventManager = (EventManager)DependenciesContext.Dependencies.GetService<IEventManager>();
+
+            eventManager.Register(EventIds.FighterReloadStart, FighterBase.HandleReloadStartEvent);
+            eventManager.Register(EventIds.FighterReloadEnd, null);
         }
 
         #region Methods for Mods

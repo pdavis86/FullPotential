@@ -1,4 +1,5 @@
-﻿using FullPotential.Api.Items.Base;
+﻿using FullPotential.Api.Gameplay.Events.Args;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Effects;
 using UnityEngine;
@@ -32,5 +33,7 @@ namespace FullPotential.Api.Gameplay.Combat
         int GetAttributeValue(AttributeAffected attributeAffected);
 
         float GetCriticalHitChance();
+
+        void Reload(ReloadEventArgs reloadArgs);
     }
 }
