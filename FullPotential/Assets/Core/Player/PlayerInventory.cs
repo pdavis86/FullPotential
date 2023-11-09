@@ -379,9 +379,9 @@ namespace FullPotential.Core.Player
 
         private void SetEquippedItem(ItemBase item, SlotGameObjectName slotGameObjectName)
         {
-            if (_equippedItems.ContainsKey(slotGameObjectName))
+            if (_equippedItems.TryGetValue(slotGameObjectName, out var equippedItem))
             {
-                _equippedItems[slotGameObjectName].Item = item;
+                equippedItem.Item = item;
             }
             else
             {

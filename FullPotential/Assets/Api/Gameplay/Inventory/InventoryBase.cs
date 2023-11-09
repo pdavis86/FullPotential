@@ -44,8 +44,8 @@ namespace FullPotential.Api.Gameplay.Inventory
 
             foreach (SlotGameObjectName slotGameObjectName in Enum.GetValues(typeof(SlotGameObjectName)))
             {
-                var equippedItemId = _equippedItems.ContainsKey(slotGameObjectName)
-                    ? _equippedItems[slotGameObjectName].Item?.Id
+                var equippedItemId = _equippedItems.TryGetValue(slotGameObjectName, out var equippedItem)
+                    ? equippedItem.Item?.Id
                     : null;
 
                 if (equippedItemId.IsNullOrWhiteSpace())
@@ -86,8 +86,8 @@ namespace FullPotential.Api.Gameplay.Inventory
 
         public ItemBase GetItemInSlot(SlotGameObjectName slotGameObjectName)
         {
-            return _equippedItems.ContainsKey(slotGameObjectName)
-                ? _equippedItems[slotGameObjectName].Item
+            return _equippedItems.TryGetValue(slotGameObjectName, out var equippedItem)
+                ? equippedItem.Item
                 : null;
         }
     }

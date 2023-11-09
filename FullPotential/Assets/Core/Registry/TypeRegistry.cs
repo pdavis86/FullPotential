@@ -340,9 +340,9 @@ namespace FullPotential.Core.Registry
             //Addressables.ReleaseInstance(go) : Destroys objects created by Addressables.InstantiateAsync(address)
             //Addressables.Release(opHandle) : Remove the addressable from memory
 
-            if (_loadedAddressables.ContainsKey(address))
+            if (_loadedAddressables.TryGetValue(address, out var loadedAddressable))
             {
-                action(_loadedAddressables[address]);
+                action(loadedAddressable);
             }
             else
             {
@@ -351,10 +351,7 @@ namespace FullPotential.Core.Registry
                 {
                     var prefab = opHandle.Result;
 
-                    if (!_loadedAddressables.ContainsKey(address))
-                    {
-                        _loadedAddressables.Add(address, prefab);
-                    }
+                    _loadedAddressables.TryAdd(address, prefab);
 
                     action(prefab);
                 };

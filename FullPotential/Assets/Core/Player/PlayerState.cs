@@ -160,15 +160,7 @@ namespace FullPotential.Core.Player
             if (IsServer)
             {
                 GetAndLoadPlayerData(false, null);
-
-                if (GameManager.Instance.ServerGameDataStore.ClientIdToUsername.ContainsKey(OwnerClientId))
-                {
-                    GameManager.Instance.ServerGameDataStore.ClientIdToUsername[OwnerClientId] = Username;
-                }
-                else
-                {
-                    GameManager.Instance.ServerGameDataStore.ClientIdToUsername.Add(OwnerClientId, Username);
-                }
+                GameManager.Instance.ServerGameDataStore.ClientIdToUsername[OwnerClientId] = Username;
             }
             else if (IsOwner)
             {

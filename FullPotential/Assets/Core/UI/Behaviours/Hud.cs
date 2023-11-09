@@ -206,10 +206,9 @@ namespace FullPotential.Core.Ui.Behaviours
 
             foreach (var activeEffect in activeEffects)
             {
-                if (existingObjects.ContainsKey(activeEffect.Id))
+                if (existingObjects.TryGetValue(activeEffect.Id, out var effectObject))
                 {
-                    var existingEffectObj = existingObjects[activeEffect.Id];
-                    var existingEffectScript = existingEffectObj.GetComponent<ActiveEffectUi>();
+                    var existingEffectScript = effectObject.GetComponent<ActiveEffectUi>();
                     existingEffectScript.UpdateEffect(activeEffect.Expiry);
                 }
                 else

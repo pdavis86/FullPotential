@@ -141,9 +141,9 @@ namespace FullPotential.Core.Localization
         {
             id = id.ToLower();
 
-            if (_translations.ContainsKey(id))
+            if (_translations.TryGetValue(id, out var translation))
             {
-                return _translations[id];
+                return translation;
             }
 
             Debug.LogWarning($"Missing translation for '{id}'");

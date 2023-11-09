@@ -72,13 +72,13 @@ namespace FullPotential.Api.Ioc
 
             var serviceType = _registry[requestedType];
 
-            if (_singletons.ContainsKey(serviceType))
+            if (_singletons.TryGetValue(serviceType, out var singleton))
             {
-                return _singletons[serviceType];
+                return singleton;
             }
 
-            var newInstance = _factoryDependencies.ContainsKey(serviceType)
-                ? _factoryDependencies[serviceType].Factory()
+            var newInstance = _factoryDependencies.TryGetValue(serviceType, out var dependency)
+                ? dependency.Factory()
                 : CreateInstance(serviceType);
 
             if (!_doNotCache.Contains(serviceType))
