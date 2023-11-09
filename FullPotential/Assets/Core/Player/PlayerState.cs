@@ -462,7 +462,7 @@ namespace FullPotential.Core.Player
         {
             var playerData = _userRepository.Load(PlayerToken, null, reduced);
 
-            //todo: for backwards compatibility
+            //todo: v.0.5 remove, it was for backwards compatibility
             playerData.Resources ??= Array.Empty<Api.Utilities.Data.KeyValuePair<string, int>>();
 
             if (sendToClientId.HasValue)
@@ -479,7 +479,7 @@ namespace FullPotential.Core.Player
             {
                 //Server loading player data from player state
                 LoadFromPlayerData(playerData);
-                TextureUrl = playerData?.Settings?.TextureUrl ?? string.Empty;
+                TextureUrl = playerData.Settings?.TextureUrl ?? string.Empty;
 
                 var msg = _localizer.Translate("ui.alert.playerjoined");
                 var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, OwnerClientId);

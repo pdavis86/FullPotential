@@ -225,7 +225,7 @@ namespace FullPotential.Core.GameManagement
                 if (!string.IsNullOrWhiteSpace(disconnectReason))
                 {
                     Debug.LogWarning($"Server refused connection with status {disconnectReason}");
-                    _gameDetailsError.text = string.Format(_localizer.Translate("ui.connect.joinrejected"), disconnectReason);
+                    _gameDetailsError.text = _localizer.TranslateWithArgs("ui.connect.joinrejected", disconnectReason);
                 }
                 else
                 {

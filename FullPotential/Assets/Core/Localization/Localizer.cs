@@ -166,6 +166,11 @@ namespace FullPotential.Core.Localization
             return Translate(enumValue.GetType().Name + "." + enumValue);
         }
 
+        public string TranslateWithArgs(string id, params object[] arguments)
+        {
+            return string.Format(Translate(id), arguments);
+        }
+
         public string Translate(TranslationType type, string suffix)
         {
             var split = SplitOnCapitals(type.ToString());

@@ -21,5 +21,7 @@ namespace FullPotential.Api.Localization
         string Translate(IRegisterable registeredItem);
 
         string Translate(Enum enumValue);
+
+        string TranslateWithArgs(string id, params object[] arguments);
     }
 }
