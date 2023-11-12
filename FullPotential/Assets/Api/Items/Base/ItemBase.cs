@@ -28,7 +28,7 @@ namespace FullPotential.Api.Items.Base
 
         public virtual string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
         {
-            return "TODO";
+            return Name;
         }
     }
 }

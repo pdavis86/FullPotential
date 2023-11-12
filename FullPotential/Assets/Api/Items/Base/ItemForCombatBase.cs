@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
-using FullPotential.Api.Modding;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Unity.Extensions;
@@ -27,10 +25,7 @@ namespace FullPotential.Api.Items.Base
 
         private const float MaximumAccuracyAngleDeviation = 4;
 
-        // ReSharper disable InconsistentNaming
-        protected IGameManager _gameManager;
-        protected ICombatService _combatService;
-        // ReSharper restore InconsistentNaming
+        private ICombatService _combatService;
 
         public Attributes Attributes;
         public string[] EffectIds;
@@ -50,18 +45,6 @@ namespace FullPotential.Api.Items.Base
             }
         }
 
-        protected ItemForCombatBase()
-        {
-            if (!DependenciesContext.Dependencies.IsReady())
-            {
-                return;
-            }
-
-            //todo: this is a BAD idea!
-            _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
-            _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
-        }
-
         public static float GetHighInHighOutInRange(int attributeValue, float min, float max)
         {
             return attributeValue / 100f * (max - min) + min;
@@ -72,19 +55,6 @@ namespace FullPotential.Api.Items.Base
             return (101 - attributeValue) / 100f * (max - min) + min;
         }
 
-        public string RoundFloatForDisplay(float input, int decimalPlaces = 1)
-        {
-            var rounded = Math.Round(input, decimalPlaces);
-            return rounded.ToString(_gameManager.CurrentCulture);
-        }
-
-        //public int AddVariationToValue(double basicValue)
-        //{
-        //    var multiplier = ValueCalculator.Random.Next(90, 111) / 100f;
-        //    var adder = ValueCalculator.Random.Next(0, 6);
-        //    return (int)Math.Ceiling(basicValue / multiplier) + adder;
-        //}
-
         public int GetNameHash()
         {
             var hash = 101;
@@ -94,6 +64,16 @@ namespace FullPotential.Api.Items.Base
             hash = hash * 113 + Attributes.GetHashCode();
             hash = hash * 127 + (EffectIds != null ? string.Join(null, EffectIds) : string.Empty).GetHashCode();
             return hash;
+        }
+
+        protected ICombatService GetCombatService()
+        {
+            if (!DependenciesContext.Dependencies.IsReady())
+            {
+                return null;
+            }
+
+            return _combatService ??= DependenciesContext.Dependencies.GetService<ICombatService>();
         }
 
         protected void AppendToDescription(StringBuilder builder, ILocalizer localizer, bool attributeValue, string attributeName)
@@ -175,6 +155,7 @@ namespace FullPotential.Api.Items.Base
 
         public virtual float GetRangeForDisplay()
         {
+            //Rough translation from Unity units to metres
             return GetRange() * 0.6f;
         }
 

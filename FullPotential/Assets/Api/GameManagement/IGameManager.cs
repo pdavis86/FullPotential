@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using FullPotential.Api.Scenes;
+﻿using FullPotential.Api.Scenes;
 using FullPotential.Api.Ui;
 using Unity.Netcode;
 using UnityEngine;
@@ -19,7 +18,5 @@ namespace FullPotential.Api.GameManagement
         string GetLocalPlayerToken();
 
         GameObject GetLocalPlayerGameObject();
-
-        public CultureInfo CurrentCulture { get; }
     }
 }

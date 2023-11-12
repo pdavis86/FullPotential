@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
-using FullPotential.Api.Modding;
+using FullPotential.Api.Localization;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
@@ -32,9 +31,9 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
 
             DependenciesContext.Dependencies.ResetForTesting();
 
-            var gameManagerMock = new Mock<IGameManager>();
+            var localizerMock = new Mock<ILocalizer>();
 
-            gameManagerMock
+            localizerMock
                 .Setup(m => m.CurrentCulture)
                 .Returns(new CultureInfo("en-GB"));
 
@@ -42,19 +41,6 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
             {
                 Type = typeof(ICombatService),
                 Factory = () => _combatService,
-                IsSingleton = true
-            });
-
-            var modHelperMock = new Mock<IModHelper>();
-
-            modHelperMock
-                .Setup(m => m.GetGameManager())
-                .Returns(gameManagerMock.Object);
-
-            DependenciesContext.Dependencies.Register(new Dependency
-            {
-                Type = typeof(IModHelper),
-                Factory = () => modHelperMock.Object,
                 IsSingleton = true
             });
 

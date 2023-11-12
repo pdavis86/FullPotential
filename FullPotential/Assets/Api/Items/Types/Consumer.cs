@@ -61,7 +61,7 @@ namespace FullPotential.Api.Items.Types
 
         public float GetDps()
         {
-            var itemDamage = _combatService.GetDamageValueFromAttack(this, 0, false);
+            var itemDamage = GetCombatService().GetDamageValueFromAttack(this, 0, false);
 
             var healthEffects = Effects
                 .Where(e => e is IStatEffect se && se.StatToAffect == ResourceType.Health)
@@ -113,7 +113,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Efficiency,
                 nameof(Attributes.Efficiency),
                 AliasSegmentConsumer,
-                $"{RoundFloatForDisplay(GetResourceCost())} {resourceConsumptionType}");
+                $"{GetResourceCost()} {resourceConsumptionType}");
 
             AppendToDescription(
                 sb,
@@ -121,7 +121,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Range,
                 nameof(Attributes.Range),
                 AliasSegmentItem,
-                RoundFloatForDisplay(GetRangeForDisplay()));
+                localizer.TranslateFloat(GetRangeForDisplay()));
 
             AppendToDescription(
                 sb,
@@ -129,7 +129,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Accuracy,
                 nameof(Attributes.Accuracy),
                 AliasSegmentItem,
-                RoundFloatForDisplay(GetAccuracy()),
+                localizer.TranslateFloat(GetAccuracy()),
                 UnitsType.Percent);
 
             AppendToDescription(
@@ -138,7 +138,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Speed,
                 nameof(Attributes.Speed),
                 AliasSegmentConsumer,
-                RoundFloatForDisplay(GetChargeTime()),
+                localizer.TranslateFloat(GetChargeTime()),
                 UnitsType.Time);
 
             //todo: zzz v0.4.1 - Commented out until I decide what to do with cooldown
@@ -148,7 +148,7 @@ namespace FullPotential.Api.Items.Types
             //    Attributes.Recovery,
             //    nameof(Attributes.Recovery),
             //    AliasSegmentSog,
-            //    RoundFloatForDisplay(GetCooldownTime()),
+            //    localizer.TranslateFloat(GetCooldownTime()),
             //    UnitsType.Time);
 
             AppendToDescription(
@@ -157,7 +157,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Duration,
                 nameof(Attributes.Duration),
                 AliasSegmentConsumer,
-                RoundFloatForDisplay(GetEffectDuration()),
+                localizer.TranslateFloat(GetEffectDuration()),
                 UnitsType.Time);
 
             AppendToDescription(
@@ -166,7 +166,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Speed,
                 nameof(Attributes.Speed),
                 AliasSegmentEffects,
-                RoundFloatForDisplay(GetEffectTimeBetween()),
+                localizer.TranslateFloat(GetEffectTimeBetween()),
                 UnitsType.Time);
 
             AppendToDescription(
@@ -175,7 +175,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Strength,
                 nameof(Attributes.Strength),
                 AliasSegmentItem,
-                RoundFloatForDisplay(GetDps()),
+                localizer.TranslateFloat(GetDps()),
                 UnitsType.UnitPerTime);
 
             return sb.ToString();

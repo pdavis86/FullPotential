@@ -77,7 +77,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Strength,
                 nameof(Attributes.Strength),
                 AliasSegmentDefensive,
-                GetDefenseValue().ToString(_gameManager.CurrentCulture));
+                localizer.TranslateInt(GetDefenseValue()));
 
             return sb.ToString();
         }
@@ -107,7 +107,7 @@ namespace FullPotential.Api.Items.Types
                Attributes.Strength,
                nameof(Attributes.Strength),
                AliasSegmentDefensive,
-               GetDefenseValue().ToString(_gameManager.CurrentCulture));
+               localizer.TranslateInt(GetDefenseValue()));
 
             //What does Efficiency do for a barrier?
             //AppendToDescription(sb, localizer, Attributes.Efficiency, nameof(Attributes.Efficiency));
@@ -119,7 +119,7 @@ namespace FullPotential.Api.Items.Types
             //    Attributes.Speed,
             //    nameof(Attributes.Speed),
             //    nameof(IGearArmor.ArmorCategory.Barrier),
-            //    RoundFloatForDisplay(GetRechargeDelay()),
+            //    localizer.TranslateFloat(GetRechargeDelay()),
             //    UnitsType.Time);
 
             //todo: zzz v0.4.1 - implement borderlands-like shields
@@ -129,7 +129,7 @@ namespace FullPotential.Api.Items.Types
             //    Attributes.Recovery,
             //    nameof(Attributes.Recovery),
             //    nameof(IGearArmor.ArmorCategory.Barrier),
-            //    RoundFloatForDisplay(GetRechargeRate()),
+            //    localizer.TranslateFloat(GetRechargeRate()),
             //    UnitsType.UnitPerTime);
 
             return sb.ToString();

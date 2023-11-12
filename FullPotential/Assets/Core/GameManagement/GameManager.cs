@@ -44,7 +44,6 @@ namespace FullPotential.Core.GameManagement
         //Non-editor properties
         public Prefabs Prefabs { get; private set; }
         public UserInterface UserInterface { get; private set; }
-        public CultureInfo CurrentCulture { get; private set; }
 
         //Input
         public DefaultInputActions InputActions { get; private set; }
@@ -230,17 +229,16 @@ namespace FullPotential.Core.GameManagement
             NetworkManager.Singleton.DisconnectClient(clientId);
         }
 
-        public async Task SetCultureAsync(string culture)
+        public async Task SetCultureAsync(string cultureCode)
         {
-            await _localizer.LoadLocalizationFilesAsync(culture);
+            await _localizer.LoadLocalizationFilesAsync(cultureCode);
 
             //Re-activate anything already active
             UserInterface.DebuggingOverlay.SetActive(false);
             UserInterface.DebuggingOverlay.SetActive(true);
 
             EnsureGameSettingsLoaded();
-            GameSettings.Culture = culture;
-            CurrentCulture = new CultureInfo(culture);
+            GameSettings.Culture = cultureCode;
         }
 
         private void EnsureGameSettingsLoaded()

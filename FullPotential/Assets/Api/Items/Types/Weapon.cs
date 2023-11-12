@@ -75,7 +75,7 @@ namespace FullPotential.Api.Items.Types
 
         public float GetMeleeDps()
         {
-            var damage = _combatService.GetDamageValueFromAttack(this, 0, false);
+            var damage = GetCombatService().GetDamageValueFromAttack(this, 0, false);
 
             var windUp = GetMeleeWindUpTime();
             var timeForTwoAttacks = windUp + GetMeleeRecoveryTime() + windUp;
@@ -85,7 +85,7 @@ namespace FullPotential.Api.Items.Types
 
         public float GetRangedDps()
         {
-            var damage = _combatService.GetDamageValueFromAttack(this, 0, false);
+            var damage = GetCombatService().GetDamageValueFromAttack(this, 0, false);
             return GetDamagePerSecond(damage, GetAmmoMax(), GetAmmoPerSecond(), GetReloadTime());
         }
 
@@ -134,7 +134,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Strength,
                 nameof(Attributes.Strength),
                 AliasSegmentDefensive,
-                GetDefenseValue().ToString(_gameManager.CurrentCulture));
+                localizer.TranslateInt(GetDefenseValue()));
 
             //todo: zzz v0.4.1 - Implement melee with a shield
             //AppendToDescription(
@@ -143,7 +143,7 @@ namespace FullPotential.Api.Items.Types
             //    Attributes.Strength,
             //    nameof(Attributes.Strength),
             //    AliasSegmentItem,
-            //    RoundFloatForDisplay(GetMeleeDps()),
+            //    localizer.TranslateFloat(GetMeleeDps()),
             //    UnitsType.UnitPerTime);
 
             return sb.ToString();
@@ -173,7 +173,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Efficiency,
                 nameof(Attributes.Efficiency),
                 AliasSegmentMelee,
-                RoundFloatForDisplay(GetMeleeWindUpTime()),
+                localizer.TranslateFloat(GetMeleeWindUpTime()),
                 UnitsType.UnitPerTime);
 
             AppendToDescription(
@@ -182,7 +182,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Recovery,
                 nameof(Attributes.Recovery),
                 AliasSegmentMelee,
-                RoundFloatForDisplay(GetMeleeRecoveryTime()),
+                localizer.TranslateFloat(GetMeleeRecoveryTime()),
                 UnitsType.UnitPerTime);
 
             AppendToDescription(
@@ -191,7 +191,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Strength,
                 nameof(Attributes.Strength),
                 AliasSegmentItem,
-                RoundFloatForDisplay(GetMeleeDps()),
+                localizer.TranslateFloat(GetMeleeDps()),
                 UnitsType.UnitPerTime);
 
             return sb.ToString();
@@ -225,7 +225,7 @@ namespace FullPotential.Api.Items.Types
                     Attributes.Efficiency,
                     nameof(Attributes.Efficiency),
                     AliasSegmentRanged,
-                    RoundFloatForDisplay(GetAmmoMax()));
+                    localizer.TranslateInt(GetAmmoMax()));
             }
 
             //All ranged weapons have maximum range
@@ -235,7 +235,7 @@ namespace FullPotential.Api.Items.Types
             //    Attributes.Range,
             //    nameof(Attributes.Range),
             //    AliasSegmentItem,
-            //    RoundFloatForDisplay(GetRange()));
+            //    localizer.TranslateFloat(GetRange()));
 
             AppendToDescription(
                 sb,
@@ -243,7 +243,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Accuracy,
                 nameof(Attributes.Accuracy),
                 AliasSegmentItem,
-                RoundFloatForDisplay(GetAccuracy()),
+                localizer.TranslateFloat(GetAccuracy()),
                 UnitsType.Percent);
 
             AppendToDescription(
@@ -252,7 +252,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Speed,
                 nameof(Attributes.Speed),
                 AliasSegmentRanged,
-                RoundFloatForDisplay(GetAmmoPerSecond()),
+                localizer.TranslateFloat(GetAmmoPerSecond()),
                 UnitsType.UnitPerTime);
 
             AppendToDescription(
@@ -261,7 +261,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Recovery,
                 nameof(Attributes.Recovery),
                 AliasSegmentRanged,
-                RoundFloatForDisplay(GetReloadTime()),
+                localizer.TranslateFloat(GetReloadTime()),
                 UnitsType.Time);
 
             AppendToDescription(
@@ -270,7 +270,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Strength,
                 nameof(Attributes.Strength),
                 AliasSegmentItem,
-                RoundFloatForDisplay(GetRangedDps()),
+                localizer.TranslateFloat(GetRangedDps()),
                 UnitsType.UnitPerTime);
 
             return sb.ToString();

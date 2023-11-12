@@ -17,7 +17,6 @@ using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
-using FullPotential.Core.GameManagement;
 using FullPotential.Core.Registry;
 using FullPotential.Core.Utilities.Extensions;
 
@@ -299,7 +298,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             var typeTranslation = _localizer.Translate("crafting.loot.type");
             var suffix = int.Parse(lootDrop.GetNameHash().ToString().TrimStart('-').Substring(5));
 
-            lootDrop.Name = $"{_localizer.Translate(lootDrop.RegistryType)} ({typeTranslation} #{suffix.ToString("D5", GameManager.Instance.CurrentCulture)})";
+            lootDrop.Name = $"{_localizer.Translate(lootDrop.RegistryType)} ({typeTranslation} #{suffix.ToString("D5", _localizer.CurrentCulture)})";
 
             return lootDrop;
         }

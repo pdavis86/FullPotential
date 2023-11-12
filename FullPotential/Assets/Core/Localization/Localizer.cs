@@ -1,6 +1,7 @@
 ﻿using System;
 using FullPotential.Api.Registry;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -20,18 +21,13 @@ namespace FullPotential.Core.Localization
 {
     public class Localizer : ILocalizer
     {
-        private readonly List<string> _addressesLoaded;
-        private readonly Dictionary<string, string> _translations;
-        private readonly List<CultureAddressables> _availableCultures;
-
         public const string DefaultCulture = "en-GB";
 
-        public Localizer()
-        {
-            _addressesLoaded = new List<string>();
-            _translations = new Dictionary<string, string>();
-            _availableCultures = new List<CultureAddressables>();
-        }
+        private readonly List<string> _addressesLoaded = new List<string>();
+        private readonly Dictionary<string, string> _translations = new Dictionary<string, string>();
+        private readonly List<CultureAddressables> _availableCultures = new List<CultureAddressables>();
+
+        public CultureInfo CurrentCulture { get; private set; }
 
         private async Task<Data.Localization> LoadCultureFileAsync(string address)
         {
@@ -106,12 +102,14 @@ namespace FullPotential.Core.Localization
             }
         }
 
-        public async Task LoadLocalizationFilesAsync(string culture)
+        public async Task LoadLocalizationFilesAsync(string cultureCode)
         {
             _addressesLoaded.Clear();
             _translations.Clear();
 
-            var cultureMatch = _availableCultures.First(x => x.Code == culture);
+            CurrentCulture = new CultureInfo(cultureCode);
+
+            var cultureMatch = _availableCultures.First(x => x.Code == cultureCode);
             foreach (var address in cultureMatch.Addresses)
             {
                 if (_addressesLoaded.Contains(address))
@@ -169,6 +167,17 @@ namespace FullPotential.Core.Localization
         public string TranslateWithArgs(string id, params object[] arguments)
         {
             return string.Format(Translate(id), arguments);
+        }
+
+        public string TranslateInt(int input)
+        {
+            return input.ToString();
+        }
+
+        public string TranslateFloat(float input, int decimalPlaces = 1)
+        {
+            var rounded = Math.Round(input, decimalPlaces);
+            return rounded.ToString(CurrentCulture);
         }
 
         public string Translate(TranslationType type, string suffix)
