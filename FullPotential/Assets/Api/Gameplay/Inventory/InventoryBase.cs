@@ -4,8 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Gameplay.Player;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items.Types;
+using FullPotential.Api.Localization;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Registry;
+using FullPotential.Api.Registry.Shapes;
+using FullPotential.Api.Registry.Targeting;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -21,7 +27,12 @@ namespace FullPotential.Api.Gameplay.Inventory
         // ReSharper disable InconsistentNaming
 
         protected Dictionary<string, ItemBase> _items;
+        protected int _maxItemCount;
         protected Dictionary<SlotGameObjectName, EquippedItem> _equippedItems;
+
+        //Services
+        protected ITypeRegistry _typeRegistry;
+        protected ILocalizer _localizer;
 
         // ReSharper restore InconsistentNaming
         #endregion
@@ -34,6 +45,9 @@ namespace FullPotential.Api.Gameplay.Inventory
             _equippedItems = new Dictionary<SlotGameObjectName, EquippedItem>();
 
             _armorSlotCount = Enum.GetNames(typeof(ArmorType)).Length;
+
+            _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
+            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
         }
 
         #endregion
@@ -89,6 +103,92 @@ namespace FullPotential.Api.Gameplay.Inventory
             return _equippedItems.TryGetValue(slotGameObjectName, out var equippedItem)
                 ? equippedItem.Item
                 : null;
+        }
+
+        public bool IsInventoryFull()
+        {
+            return _items.Count >= _maxItemCount;
+        }
+
+        public List<ItemForCombatBase> GetComponentsFromIds(string[] componentIds)
+        {
+            //Check that the components are actually in the player's inventory and load them in the order they are given
+            var components = new List<ItemForCombatBase>();
+            foreach (var id in componentIds)
+            {
+                var match = GetItemWithId<ItemForCombatBase>(id);
+                if (match != null)
+                {
+                    components.Add(match);
+                }
+            }
+            return components;
+        }
+
+        public List<string> ValidateIsCraftable(string[] componentIds, ItemBase itemToCraft)
+        {
+            if (componentIds == null || componentIds.Length == 0)
+            {
+                return new List<string> { _localizer.Translate("crafting.error.nocomponents") };
+            }
+
+            var components = GetComponentsFromIds(componentIds);
+
+            var errors = new List<string>();
+            if (itemToCraft is Consumer consumerItem)
+            {
+                if (consumerItem.EffectIds.Length == 0)
+                {
+                    errors.Add(_localizer.Translate("crafting.error.missingeffect"));
+                }
+            }
+            else if (itemToCraft is Weapon weapon)
+            {
+                if (components.Count > 8)
+                {
+                    errors.Add(_localizer.Translate("crafting.error.toomanycomponents"));
+                }
+                if (components.Count > 4 && !weapon.IsTwoHanded)
+                {
+                    errors.Add(_localizer.Translate("crafting.error.toomanyforonehanded"));
+                }
+            }
+
+            return errors;
+        }
+
+        protected void FillTypesFromIds(ItemBase item)
+        {
+            if (!string.IsNullOrWhiteSpace(item.RegistryTypeId) && item.RegistryType == null)
+            {
+                item.RegistryType = _typeRegistry.GetRegisteredForItem(item);
+            }
+
+            if (item is ItemWithTargetingAndShapeBase magicalItem && !string.IsNullOrWhiteSpace(magicalItem.TargetingTypeId))
+            {
+                magicalItem.Targeting = _typeRegistry.GetRegisteredTypes<ITargeting>()
+                    .First(x => x.TypeId.ToString() == magicalItem.TargetingTypeId);
+
+                magicalItem.TargetingVisuals = _typeRegistry.GetRegisteredTypes<ITargetingVisuals>()
+                    .FirstOrDefault(v => v.TypeId.ToString() == magicalItem.TargetingVisualsTypeId);
+
+                if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeId))
+                {
+                    magicalItem.Shape = _typeRegistry.GetRegisteredTypes<IShape>()
+                        .First(x => x.TypeId.ToString() == magicalItem.ShapeTypeId);
+
+                    magicalItem.ShapeVisuals = _typeRegistry.GetRegisteredTypes<IShapeVisuals>()
+                        .FirstOrDefault(v => v.TypeId.ToString() == magicalItem.ShapeVisualsTypeId);
+                }
+            }
+
+            if (item is ItemForCombatBase combatItem)
+            {
+                if (combatItem.EffectIds != null && combatItem.EffectIds.Length > 0 && combatItem.Effects == null)
+                {
+                    combatItem.Effects = combatItem.EffectIds.Select(x => _typeRegistry.GetEffect(new Guid(x))).ToList();
+                }
+            }
         }
 
         protected void MergeItemStacks(ItemStack itemStack)

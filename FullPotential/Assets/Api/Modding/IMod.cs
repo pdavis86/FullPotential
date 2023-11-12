@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Events;
 
+// ReSharper disable UnusedParameter.Global
+
 namespace FullPotential.Api.Modding
 {
     public interface IMod

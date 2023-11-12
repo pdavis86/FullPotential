@@ -8,13 +8,9 @@ using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
-using FullPotential.Api.Localization;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
-using FullPotential.Api.Registry.Shapes;
-using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
@@ -38,13 +34,10 @@ namespace FullPotential.Core.Player
         // ReSharper restore FieldCanBeMadeReadOnly.Local
 
         //Services
-        private ITypeRegistry _typeRegistry;
         private IRpcService _rpcService;
-        private ILocalizer _localizer;
         private IInventoryDataService _inventoryDataService;
 
         private PlayerState _playerState;
-        private int _maxItems;
 
         private readonly Dictionary<string, string> _itemIdToShapeMapping = new Dictionary<string, string>();
         private readonly FragmentedMessageReconstructor _inventoryChangesReconstructor = new FragmentedMessageReconstructor();
@@ -58,9 +51,7 @@ namespace FullPotential.Core.Player
 
             _playerState = GetComponent<PlayerState>();
 
-            _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
-            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _inventoryDataService = DependenciesContext.Dependencies.GetService<IInventoryDataService>();
         }
 
@@ -257,13 +248,6 @@ namespace FullPotential.Core.Player
                 .OrderBy(x => x.Name);
         }
 
-        //todo: move most of these methods down into InventoryBase
-
-        public bool IsInventoryFull()
-        {
-            return _items.Count >= _maxItems;
-        }
-
         public void ApplyInventoryChanges(InventoryChanges changes)
         {
             if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
@@ -328,7 +312,7 @@ namespace FullPotential.Core.Player
 
         public void LoadInventory(InventoryData inventoryData)
         {
-            _maxItems = inventoryData.MaxItems > 0
+            _maxItemCount = inventoryData.MaxItems > 0
                 ? inventoryData.MaxItems
                 : 30;
 
@@ -412,40 +396,6 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private void FillTypesFromIds(ItemBase item)
-        {
-            if (!string.IsNullOrWhiteSpace(item.RegistryTypeId) && item.RegistryType == null)
-            {
-                item.RegistryType = _typeRegistry.GetRegisteredForItem(item);
-            }
-
-            if (item is ItemWithTargetingAndShapeBase magicalItem && !string.IsNullOrWhiteSpace(magicalItem.TargetingTypeId))
-            {
-                magicalItem.Targeting = _typeRegistry.GetRegisteredTypes<ITargeting>()
-                    .First(x => x.TypeId.ToString() == magicalItem.TargetingTypeId);
-
-                magicalItem.TargetingVisuals = _typeRegistry.GetRegisteredTypes<ITargetingVisuals>()
-                    .FirstOrDefault(v => v.TypeId.ToString() == magicalItem.TargetingVisualsTypeId);
-
-                if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeId))
-                {
-                    magicalItem.Shape = _typeRegistry.GetRegisteredTypes<IShape>()
-                        .First(x => x.TypeId.ToString() == magicalItem.ShapeTypeId);
-
-                    magicalItem.ShapeVisuals = _typeRegistry.GetRegisteredTypes<IShapeVisuals>()
-                        .FirstOrDefault(v => v.TypeId.ToString() == magicalItem.ShapeVisualsTypeId);
-                }
-            }
-
-            if (item is ItemForCombatBase combatItem)
-            {
-                if (combatItem.EffectIds != null && combatItem.EffectIds.Length > 0 && combatItem.Effects == null)
-                {
-                    combatItem.Effects = combatItem.EffectIds.Select(x => _typeRegistry.GetEffect(new Guid(x))).ToList();
-                }
-            }
-        }
-
         public InventoryData GetSaveData()
         {
             var groupedItems = _items
@@ -463,7 +413,7 @@ namespace FullPotential.Core.Player
 
             return new InventoryData
             {
-                MaxItems = _maxItems,
+                MaxItems = _maxItemCount,
                 Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(Loot))?.Select(x => x as Loot).ToArray(),
                 Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray(),
                 Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
@@ -478,53 +428,6 @@ namespace FullPotential.Core.Player
         {
             var match = _equippedItems.FirstOrDefault(x => x.Value?.Item?.Id == itemId);
             return match.Value == null ? null : match;
-        }
-
-        public List<ItemForCombatBase> GetComponentsFromIds(string[] componentIds)
-        {
-            //Check that the components are actually in the player's inventory and load them in the order they are given
-            var components = new List<ItemForCombatBase>();
-            foreach (var id in componentIds)
-            {
-                var match = GetItemWithId<ItemForCombatBase>(id);
-                if (match != null)
-                {
-                    components.Add(match);
-                }
-            }
-            return components;
-        }
-
-        public List<string> ValidateIsCraftable(string[] componentIds, ItemBase itemToCraft)
-        {
-            if (componentIds == null || componentIds.Length == 0)
-            {
-                return new List<string> { _localizer.Translate("crafting.error.nocomponents") };
-            }
-
-            var components = GetComponentsFromIds(componentIds);
-
-            var errors = new List<string>();
-            if (itemToCraft is Consumer consumerItem)
-            {
-                if (consumerItem.EffectIds.Length == 0)
-                {
-                    errors.Add(_localizer.Translate("crafting.error.missingeffect"));
-                }
-            }
-            else if (itemToCraft is Weapon weapon)
-            {
-                if (components.Count > 8)
-                {
-                    errors.Add(_localizer.Translate("crafting.error.toomanycomponents"));
-                }
-                if (components.Count > 4 && !weapon.IsTwoHanded)
-                {
-                    errors.Add(_localizer.Translate("crafting.error.toomanyforonehanded"));
-                }
-            }
-
-            return errors;
         }
 
         private void DespawnEquippedObject(SlotGameObjectName slotGameObjectName)
@@ -546,8 +449,7 @@ namespace FullPotential.Core.Player
             _equippedItems[slotGameObjectName].GameObject = null;
         }
 
-        //todo: zzz v0.5 - generalise for use in LivingEntityBase
-        public void SpawnEquippedObject(ItemBase item, SlotGameObjectName slotGameObjectName)
+        private void SpawnEquippedObject(ItemBase item, SlotGameObjectName slotGameObjectName)
         {
             DespawnEquippedObject(slotGameObjectName);
 

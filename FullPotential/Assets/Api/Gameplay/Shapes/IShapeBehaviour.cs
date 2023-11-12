@@ -2,6 +2,9 @@
 using FullPotential.Api.Items.Types;
 using UnityEngine;
 
+// ReSharper disable UnusedMemberInSuper.Global
+// ReSharper disable UnusedMember.Global
+
 namespace FullPotential.Api.Gameplay.Shapes
 {
     public interface IShapeBehaviour

@@ -1,4 +1,7 @@
-﻿namespace FullPotential.Api.GameManagement
+﻿
+// ReSharper disable UnusedMember.Global
+
+namespace FullPotential.Api.GameManagement
 {
     public static class GameObjectNames
     {

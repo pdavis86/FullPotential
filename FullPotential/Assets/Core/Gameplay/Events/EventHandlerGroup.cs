@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Events;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
 namespace FullPotential.Core.Gameplay.Events
 {
     public class EventHandlerGroup

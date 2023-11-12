@@ -4,6 +4,8 @@ using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Effects;
 using UnityEngine;
 
+// ReSharper disable UnusedParameter.Global
+
 namespace FullPotential.Api.Gameplay.Combat
 {
     public interface IFighter : IDefensible, IDamageable

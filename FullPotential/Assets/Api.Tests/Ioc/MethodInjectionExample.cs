@@ -2,6 +2,7 @@
 using FullPotential.Api.Gameplay.Inventory;
 
 // ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable UnusedMember.Global
 
 namespace FullPotential.Api.Tests.Ioc
 {

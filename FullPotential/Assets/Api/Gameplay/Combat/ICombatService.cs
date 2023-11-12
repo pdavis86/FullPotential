@@ -2,6 +2,8 @@
 using FullPotential.Api.Items.Types;
 using UnityEngine;
 
+// ReSharper disable UnusedMember.Global
+
 namespace FullPotential.Api.Gameplay.Combat
 {
     public interface ICombatService
