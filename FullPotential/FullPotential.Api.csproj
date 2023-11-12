@@ -85,6 +85,7 @@
     <Compile Include="Assets\Api\Gameplay\Combat\ViableTarget.cs" />
     <Compile Include="Assets\Api\Registry\Weapons\IWeapon.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesCollection.cs" />
+    <Compile Include="Assets\Api\Gameplay\Events\IEventManager.cs" />
     <Compile Include="Assets\Api\Registry\Effects\ICustomEffect.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IAccessoryVisuals.cs" />
     <Compile Include="Assets\Api\Obsolete\SlotCategory.cs" />
@@ -148,11 +149,15 @@
     <Compile Include="Assets\Api\Items\Base\ItemWithTargetingAndShapeBase.cs" />
     <Compile Include="Assets\Api\Gameplay\Targeting\ITargetingBehaviour.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IAttributeEffect.cs" />
+    <Compile Include="Assets\Api\Gameplay\Events\IEventHandlerArgs.cs" />
+    <Compile Include="Assets\Api\Gameplay\Events\EventIds.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\ItemStack.cs" />
     <Compile Include="Assets\Api\Gameplay\Targeting\Projectile.cs" />
     <Compile Include="Assets\Api\Ui\IUserInterface.cs" />
     <Compile Include="Assets\Api\Registry\Weapons\IAmmunition.cs" />
+    <Compile Include="Assets\Api\Gameplay\Events\Args\ReloadEventArgs.cs" />
     <Compile Include="Assets\Api\Registry\ITypeRegistry.cs" />
+    <Compile Include="Assets\Api\Gameplay\Events\IEventHandler.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\IStoppable.cs" />
     <Compile Include="Assets\Api\Networking\IRpcService.cs" />
     <Compile Include="Assets\Api\GameManagement\GameSettings.cs" />
@@ -176,11 +181,6 @@
     <Compile Include="Assets\Api\Registry\Elements\IElement.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Tags.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\InventoryChanges.cs" />
-    <Compile Include="Assets\Api\Gameplay\Events\Args\ReloadEventArgs.cs" />
-    <Compile Include="Assets\Api\Gameplay\Events\IEventHandlerArgs.cs" />
-    <Compile Include="Assets\Api\Gameplay\Events\IEventHandler.cs" />
-    <Compile Include="Assets\Api\Gameplay\Events\IEventManager.cs" />
-    <Compile Include="Assets\Api\Gameplay\Events\EventIds.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Api\FullPotential.Api.asmdef" />

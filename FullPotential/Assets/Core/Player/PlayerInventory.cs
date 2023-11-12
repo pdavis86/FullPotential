@@ -257,6 +257,8 @@ namespace FullPotential.Core.Player
                 .OrderBy(x => x.Name);
         }
 
+        //todo: move most of these methods down into InventoryBase
+
         public bool IsInventoryFull()
         {
             return _items.Count >= _maxItems;
@@ -276,6 +278,9 @@ namespace FullPotential.Core.Player
             if (IsInventoryFull())
             {
                 _playerState.AlertInventoryIsFull();
+
+                //todo: zzz v0.7 - send to storage when inventory full
+
                 return;
             }
 
@@ -292,10 +297,16 @@ namespace FullPotential.Core.Player
             foreach (var item in itemsToAdd)
             {
                 FillTypesFromIds(item);
-                _items.Add(item.Id, item);
-            }
 
-            //todo: merge item stacks up to max
+                if (item is ItemStack itemStack)
+                {
+                    MergeItemStacks(itemStack);
+                }
+                else
+                {
+                    _items.Add(item.Id, item);
+                }
+            }
 
             var itemToAddCount = itemsToAdd.Count();
 

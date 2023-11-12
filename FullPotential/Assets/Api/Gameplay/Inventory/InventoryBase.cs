@@ -90,5 +90,43 @@ namespace FullPotential.Api.Gameplay.Inventory
                 ? equippedItem.Item
                 : null;
         }
+
+        protected void MergeItemStacks(ItemStack itemStack)
+        {
+            var partiallyFullStacks = _items
+                .Where(i => i.Value is ItemStack ist && ist.Count < ist.MaxSize)
+                .Select(i => (ItemStack)i.Value);
+
+            if (!partiallyFullStacks.Any())
+            {
+                _items.Add(itemStack.Id, itemStack);
+                return;
+            }
+
+            var itemsRemaining = itemStack.Count;
+
+            foreach (var partiallyFullStack in partiallyFullStacks)
+            {
+                var space = partiallyFullStack.MaxSize - partiallyFullStack.Count;
+
+                if (space <= itemsRemaining)
+                {
+                    partiallyFullStack.Count = partiallyFullStack.MaxSize;
+                    itemsRemaining -= space;
+                    continue;
+                }
+
+                partiallyFullStack.Count += itemsRemaining;
+                break;
+            }
+
+            if (itemsRemaining <= 0)
+            {
+                return;
+            }
+
+            itemStack.Count = itemsRemaining;
+            _items.Add(itemStack.Id, itemStack);
+        }
     }
 }

@@ -392,8 +392,6 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            //todo: test claiming loot when inventory is full. Is it lost?
-
             InventoryChanges invChange;
             if (_random.Next(1, 3) == 1)
             {

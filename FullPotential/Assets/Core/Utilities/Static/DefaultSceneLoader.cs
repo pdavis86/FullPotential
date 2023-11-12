@@ -29,8 +29,7 @@ namespace FullPotential.Core.Utilities.Static
                     var activeScene = SceneManager.GetActiveScene();
                     if (activeScene.buildIndex != 0)
                     {
-                        SceneManager.LoadScene(0);
-                        Debug.LogWarning("Force loaded scene 0 as it was not the active scene in the editor");
+                        Debug.LogWarning("Scene 0 was not the active scene in the editor");
                     }
 
                     break;

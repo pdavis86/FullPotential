@@ -1,5 +1,4 @@
 ﻿using FullPotential.Api.Items.Base;
-using FullPotential.Api.Registry.Weapons;
 
 namespace FullPotential.Api.Gameplay.Inventory
 {
@@ -7,6 +6,6 @@ namespace FullPotential.Api.Gameplay.Inventory
     {
         public int Count { get; set; }
 
-        public int MaxSize => ((IAmmunition) RegistryType).MaxStackSize;
+        public int MaxSize => ((IItemStack)RegistryType).MaxStackSize;
     }
 }

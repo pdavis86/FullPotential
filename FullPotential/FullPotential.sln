@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FullPotential.Core", "FullP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{F5187F1D-07B1-6C52-5DF2-E87296060BE8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FullPotential.Api.IntegrationTests", "FullPotential.Api.IntegrationTests.csproj", "{FF6C143C-CEB8-81BE-A794-FE099653FDCA}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FullPotential.Core.Tests", "FullPotential.Core.Tests.csproj", "{43710FCF-424C-9753-7C2B-BE346A181B02}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FullPotential.Api.Tests", "FullPotential.Api.Tests.csproj", "{B0B02D91-C3AD-031B-84F3-3AC93048CF89}"
@@ -37,6 +39,10 @@ Global
 		{F5187F1D-07B1-6C52-5DF2-E87296060BE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5187F1D-07B1-6C52-5DF2-E87296060BE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5187F1D-07B1-6C52-5DF2-E87296060BE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF6C143C-CEB8-81BE-A794-FE099653FDCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF6C143C-CEB8-81BE-A794-FE099653FDCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF6C143C-CEB8-81BE-A794-FE099653FDCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF6C143C-CEB8-81BE-A794-FE099653FDCA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{43710FCF-424C-9753-7C2B-BE346A181B02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{43710FCF-424C-9753-7C2B-BE346A181B02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43710FCF-424C-9753-7C2B-BE346A181B02}.Release|Any CPU.ActiveCfg = Release|Any CPU

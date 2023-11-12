@@ -454,7 +454,7 @@ namespace FullPotential.Core.Player
         {
             var playerData = _userRepository.Load(PlayerToken, null, reduced);
 
-            //todo: v.0.5 remove, it was for backwards compatibility
+            //todo: zzz v0.5 remove, it was for backwards compatibility
             playerData.Resources ??= Array.Empty<Api.Utilities.Data.KeyValuePair<string, int>>();
 
             if (sendToClientId.HasValue)

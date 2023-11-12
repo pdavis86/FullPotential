@@ -8,11 +8,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>FullPotential</RootNamespace>
-    <ProjectGuid>{40426DF3-0F70-D713-21A2-57984F8B9394}</ProjectGuid>
+    <RootNamespace>FullPotential.Api.IntegrationTests</RootNamespace>
+    <ProjectGuid>{FF6C143C-CEB8-81BE-A794-FE099653FDCA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>FullPotential.Core</AssemblyName>
+    <AssemblyName>FullPotential.Api.IntegrationTests</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -56,93 +56,10 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Core\Networking\RpcService.cs" />
-    <Compile Include="Assets\Core\UI\Components\NameAndToggle.cs" />
-    <Compile Include="Assets\Core\Utilities\UtilityBehaviours\NetworkStats.cs" />
-    <Compile Include="Assets\Core\Player\PlayerInventory.cs" />
-    <Compile Include="Assets\Core\Unity\Services\ShaderUtilities.cs" />
-    <Compile Include="Assets\Core\Gameplay\Crafting\ResultFactory.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\RespawnUi.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiCraftingTab.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUi.cs" />
-    <Compile Include="Assets\Core\Gameplay\Drawing\DrawingService.cs" />
-    <Compile Include="Assets\Core\UI\Components\EquippedSummary.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\DebuggingUi.cs" />
-    <Compile Include="Assets\Core\Gameplay\Combat\Punch.cs" />
-    <Compile Include="Assets\Core\Localization\Localizer.cs" />
-    <Compile Include="Assets\Core\Persistence\UserRepository.cs" />
-    <Compile Include="Assets\Core\Utilities\Extensions\EnumerableExtensions.cs" />
-    <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltip.cs" />
-    <Compile Include="Assets\Core\Networking\Data\FragmentedMessage.cs" />
-    <Compile Include="Assets\Core\GameManagement\Inventory\InventoryDataService.cs" />
-    <Compile Include="Assets\Core\Localization\CultureAddressables.cs" />
-    <Compile Include="Assets\Core\GameManagement\Prefabs.cs" />
-    <Compile Include="Assets\Core\GameManagement\Data\ServerGameData.cs" />
-    <Compile Include="Assets\Core\Gameplay\Targeting\PointToPointBehaviour.cs" />
-    <Compile Include="Assets\Core\GameManagement\UserInterface.cs" />
-    <Compile Include="Assets\Core\Registry\TypeRegistry.cs" />
-    <Compile Include="Assets\Core\Modding\ModHelper.cs" />
-    <Compile Include="Assets\Core\Gameplay\Combat\CombatService.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\MainMenuUi.cs" />
-    <Compile Include="Assets\Core\Unity\Services\UnityHelperUtilities.cs" />
-    <Compile Include="Assets\Core\Gameplay\Events\EventHandlerGroup.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectsUi.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\SettingsMenuUi.cs" />
-    <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DebuggingActiveState.cs" />
-    <Compile Include="Assets\Core\Utilities\Extensions\GuidExtensions.cs" />
-    <Compile Include="Assets\Core\UI\Components\SlideOutAlert.cs" />
-    <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DestroyOnTriggerEnter.cs" />
-    <Compile Include="Assets\Core\Gameplay\Shapes\WallBehaviour.cs" />
-    <Compile Include="Assets\Core\Gameplay\Targeting\ProjectileBehaviour.cs" />
-    <Compile Include="Assets\Core\Gameplay\Shapes\ZoneBehaviour.cs" />
-    <Compile Include="Assets\Core\UI\Components\InventoryItemsList.cs" />
-    <Compile Include="Assets\Core\Player\PlayerBehaviour.cs" />
-    <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DontDestroy.cs" />
-    <Compile Include="Assets\Core\Localization\Data\Localization.cs" />
-    <Compile Include="Assets\Core\Gameplay\Combat\MaintainDistance.cs" />
-    <Compile Include="Assets\Core\GameManagement\Events\GameSettingsUpdatedEventArgs.cs" />
-    <Compile Include="Assets\Core\Player\PlayerState.cs" />
-    <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltips.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\InventoryUiSlot.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiInventoryTab.cs" />
-    <Compile Include="Assets\Core\Networking\FragmentedMessageReconstructor.cs" />
-    <Compile Include="Assets\Core\GameManagement\JoinOrHostGame.cs" />
-    <Compile Include="Assets\Core\UI\Components\BarSlider.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiEquipmentTab.cs" />
-    <Compile Include="Assets\Core\Environment\LootInteractable.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\AdminShopUi.cs" />
-    <Compile Include="Assets\Core\Utilities\Static\DefaultSceneLoader.cs" />
-    <Compile Include="Assets\Core\UI\Components\CraftingSelector.cs" />
-    <Compile Include="Assets\Core\UI\Components\NameAndValueSlider.cs" />
-    <Compile Include="Assets\Core\SceneObjects\SceneObjectsOffline.cs" />
-    <Compile Include="Assets\Core\Gameplay\Targeting\BeamVisualsBehaviour.cs" />
-    <Compile Include="Assets\Core\UI\Events\OnDrawingStopEventArgs.cs" />
-    <Compile Include="Assets\Core\Persistence\SettingsRepository.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\ProgressWheel.cs" />
-    <Compile Include="Assets\Core\Utilities\UtilityBehaviours\TextLocalizer.cs" />
-    <Compile Include="Assets\Core\GameManagement\Data\LocalGameData.cs" />
-    <Compile Include="Assets\Core\Utilities\UtilityBehaviours\TextMeshProLocalizer.cs" />
-    <Compile Include="Assets\Core\Environment\SceneService.cs" />
-    <Compile Include="Assets\Core\Gameplay\Combat\ProjectileWithTrail.cs" />
-    <Compile Include="Assets\Core\Networking\ClientNetworkTransform.cs" />
-    <Compile Include="Assets\Core\Networking\Data\ConnectionPayload.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\Hud.cs" />
-    <Compile Include="Assets\Core\Utilities\UtilityBehaviours\LookAtMainCamera.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\InventoryUiRow.cs" />
-    <Compile Include="Assets\Core\Player\PlayerMovement.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectUi.cs" />
-    <Compile Include="Assets\Core\Gameplay\Events\EventManager.cs" />
-    <Compile Include="Assets\Core\GameManagement\Enums\ConnectStatus.cs" />
-    <Compile Include="Assets\Core\Utilities\UtilityBehaviours\StickUiToWorldPosition.cs" />
-    <Compile Include="Assets\Core\GameManagement\Inventory\IInventoryDataService.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\DrawingPadUi.cs" />
-    <Compile Include="Assets\Core\GameManagement\ServiceManager.cs" />
-    <Compile Include="Assets\Core\SceneObjects\SceneObjectsStartup.cs" />
-    <Compile Include="Assets\Core\GameManagement\AddressablesManager.cs" />
-    <Compile Include="Assets\Core\GameManagement\GameManager.cs" />
+    <Compile Include="Assets\Api.IntegrationTests\Gameplay\Inventory\InventoryBaseTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Core\FullPotential.Core.asmdef" />
+    <None Include="Assets\Api.IntegrationTests\PlayModeTests.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -391,47 +308,8 @@
     <Reference Include="UnityEditor.UnityConnectModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.16f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEditor.Graphs">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.16f1\Editor\Data\Managed\UnityEditor.Graphs.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEditor.WindowsStandalone.Extensions">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.16f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Collections.LowLevel.ILSupport">
-      <HintPath>Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>Assets\Plugins\Moq\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Core">
-      <HintPath>Assets\Plugins\Moq\Castle.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Diagnostics.EventLog">
-      <HintPath>Assets\Plugins\Moq\System.Diagnostics.EventLog.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Burst.Unsafe">
-      <HintPath>Library\PackageCache\com.unity.burst@1.6.6\Unity.Burst.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Burst.Cecil.Mdb">
-      <HintPath>Library\PackageCache\com.unity.burst@1.6.6\Unity.Burst.CodeGen\Unity.Burst.Cecil.Mdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Burst.Cecil.Pdb">
-      <HintPath>Library\PackageCache\com.unity.burst@1.6.6\Unity.Burst.CodeGen\Unity.Burst.Cecil.Pdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Burst.Cecil">
-      <HintPath>Library\PackageCache\com.unity.burst@1.6.6\Unity.Burst.CodeGen\Unity.Burst.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Burst.Cecil.Rocks">
-      <HintPath>Library\PackageCache\com.unity.burst@1.6.6\Unity.Burst.CodeGen\Unity.Burst.Cecil.Rocks.dll</HintPath>
-    </Reference>
-    <Reference Include="ReportGeneratorMerged">
-      <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@1.2.4\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@3.0.2\Runtime\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil@1.10.1\Mono.Cecil.dll</HintPath>
+    <Reference Include="nunit.framework">
+      <HintPath>Library\PackageCache\com.unity.ext.nunit@1.0.6\net35\unity-custom\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Moq">
       <HintPath>Assets\Plugins\Moq\Moq.dll</HintPath>
@@ -802,26 +680,14 @@
     <Reference Include="System.Xml.Serialization">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.16f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Netcode.Components">
-      <HintPath>Library\ScriptAssemblies\Unity.Netcode.Components.dll</HintPath>
+    <Reference Include="UnityEngine.TestRunner">
+      <HintPath>Library\ScriptAssemblies\UnityEngine.TestRunner.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.TestRunner">
+      <HintPath>Library\ScriptAssemblies\UnityEditor.TestRunner.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Netcode.Runtime">
       <HintPath>Library\ScriptAssemblies\Unity.Netcode.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Addressables">
-      <HintPath>Library\ScriptAssemblies\Unity.Addressables.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Collections">
-      <HintPath>Library\ScriptAssemblies\Unity.Collections.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.InputSystem">
-      <HintPath>Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.ResourceManager">
-      <HintPath>Library\ScriptAssemblies\Unity.ResourceManager.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
