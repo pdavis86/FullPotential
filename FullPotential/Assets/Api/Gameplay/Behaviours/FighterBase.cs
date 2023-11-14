@@ -247,7 +247,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 yield break;
             }
 
-            handStatus.EquippedWeapon.Ammo = handStatus.EquippedWeapon.GetAmmoMax();
+            var ammoTypeId = handStatus.EquippedWeapon.GetAmmoTypeId();
+            var ammoMax = handStatus.EquippedWeapon.GetAmmoMax();
+            var availableAmmo = _inventory.TakeItemStack(ammoTypeId, ammoMax);
+
+            handStatus.EquippedWeapon.Ammo = availableAmmo?.Count ?? 0;
             handStatus.IsReloading = false;
 
             _eventManager.Trigger(EventIds.FighterReloadEnd, args);
@@ -298,6 +302,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
             StopActiveConsumerBehaviour(HandStatusRight);
 
             base.HandleDeath();
+        }
+
+        public int GetAvailableAmmo(bool isLeftHand)
+        {
+            var handStatus = GetHandStatus(isLeftHand);
+            var ammoTypeId = handStatus.EquippedWeapon.GetAmmoTypeId();
+            return _inventory.GetItemStackTotal(ammoTypeId);
         }
 
         public bool TryToAttackHold(bool isLeftHand)
@@ -687,5 +698,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         // ReSharper restore UnassignedField.Global
         #endregion
+
+        public bool HasTypeEquipped(SlotGameObjectName slotGameObjectName)
+        {
+            return _inventory.HasTypeEquipped(slotGameObjectName);
+        }
     }
 }

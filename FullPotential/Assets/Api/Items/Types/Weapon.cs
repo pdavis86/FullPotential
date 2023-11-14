@@ -89,6 +89,11 @@ namespace FullPotential.Api.Items.Types
             return GetDamagePerSecond(damage, GetAmmoMax(), GetAmmoPerSecond(), GetReloadTime());
         }
 
+        public string GetAmmoTypeId()
+        {
+            return WeaponType.AmmunitionTypeId!.Value.ToString();
+        }
+
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
         {
             if (IsDefensive)
@@ -146,7 +151,7 @@ namespace FullPotential.Api.Items.Types
             //    localizer.TranslateFloat(GetMeleeDps()),
             //    UnitsType.UnitPerTime);
 
-            return sb.ToString();
+            return sb.ToString().Trim();
         }
 
         public string GetMeleeWeaponDescription(ILocalizer localizer, LevelOfDetail levelOfDetail, string itemName = null)
@@ -194,7 +199,7 @@ namespace FullPotential.Api.Items.Types
                 localizer.TranslateFloat(GetMeleeDps()),
                 UnitsType.UnitPerTime);
 
-            return sb.ToString();
+            return sb.ToString().Trim();
         }
 
         public string GetRangedWeaponDescription(ILocalizer localizer, LevelOfDetail levelOfDetail, string itemName = null)
@@ -273,7 +278,7 @@ namespace FullPotential.Api.Items.Types
                 localizer.TranslateFloat(GetRangedDps()),
                 UnitsType.UnitPerTime);
 
-            return sb.ToString();
+            return sb.ToString().Trim();
         }
     }
 }

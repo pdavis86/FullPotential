@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FullPotential.Core.Utilities.Extensions
+namespace FullPotential.Api.Utilities.Extensions
 {
     public static class GuidExtensions
     {

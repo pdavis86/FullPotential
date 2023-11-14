@@ -20,7 +20,6 @@ using FullPotential.Core.GameManagement;
 using FullPotential.Core.Networking;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Ui.Components;
-using FullPotential.Core.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;

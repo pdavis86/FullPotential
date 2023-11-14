@@ -79,7 +79,7 @@ namespace FullPotential.Api.Items.Types
                 AliasSegmentDefensive,
                 localizer.TranslateInt(GetDefenseValue()));
 
-            return sb.ToString();
+            return sb.ToString().Trim();
         }
 
         private string GetBarrierDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
@@ -132,7 +132,7 @@ namespace FullPotential.Api.Items.Types
             //    localizer.TranslateFloat(GetRechargeRate()),
             //    UnitsType.UnitPerTime);
 
-            return sb.ToString();
+            return sb.ToString().Trim();
         }
     }
 }

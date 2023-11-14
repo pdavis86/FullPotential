@@ -9,5 +9,11 @@ namespace FullPotential.Api.Gameplay.Inventory
         T GetItemWithId<T>(string id, bool logIfNotFound = true) where T : ItemBase;
 
         ItemBase GetItemInSlot(SlotGameObjectName slotGameObjectName);
+        
+        ItemStack TakeItemStack(string typeId, int maxSize);
+
+        int GetItemStackTotal(string typeId);
+        
+        bool HasTypeEquipped(SlotGameObjectName slotGameObjectName);
     }
 }

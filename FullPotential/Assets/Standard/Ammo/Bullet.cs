@@ -13,10 +13,10 @@ namespace FullPotential.Standard.Ammo
 
         public string TypeName => nameof(Bullet);
 
-        public int MaxStackSize => 50;
+        public int MaxStackSize => 500;
 
-        public int MinDropCount => 10;
+        public int MinDropCount => 100;
 
-        public int MaxDropCount => 30;
+        public int MaxDropCount => 400;
     }
 }

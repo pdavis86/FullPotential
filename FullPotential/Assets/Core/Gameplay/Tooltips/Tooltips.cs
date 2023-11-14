@@ -53,7 +53,7 @@ namespace FullPotential.Core.Gameplay.Tooltips
 
             gameObject.SetActive(true);
             _tooltipText.text = tooltipText;
-            _rect.sizeDelta = new Vector2(_tooltipText.preferredWidth + padding, _tooltipText.preferredHeight - 5);
+            _rect.sizeDelta = new Vector2(_tooltipText.preferredWidth + padding, _tooltipText.preferredHeight + padding);
 
             _underOffset = new Vector3(1, -_rect.sizeDelta.y - 1);
             _leftOffset = new Vector3(-_rect.sizeDelta.x - 1, 1);

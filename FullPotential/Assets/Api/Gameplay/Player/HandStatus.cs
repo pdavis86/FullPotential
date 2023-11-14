@@ -7,11 +7,10 @@ namespace FullPotential.Api.Gameplay.Player
 {
     public class HandStatus
     {
-        public ItemBase EquippedItem { get; private set; }
 
         public string EquippedItemDescription { get; private set; }
 
-        #region Weapons
+        #region Weapon
 
         public Weapon EquippedWeapon { get; private set; }
 
@@ -41,7 +40,6 @@ namespace FullPotential.Api.Gameplay.Player
                 ActiveConsumer = null;
             }
 
-            EquippedItem = item;
             EquippedItemDescription = description;
 
             switch (item)

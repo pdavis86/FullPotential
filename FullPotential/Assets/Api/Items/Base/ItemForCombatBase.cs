@@ -134,7 +134,7 @@ namespace FullPotential.Api.Items.Base
             AppendToDescription(sb, localizer, Attributes.Duration, nameof(Attributes.Duration));
             AppendToDescription(sb, localizer, Attributes.Luck, nameof(Attributes.Luck));
 
-            return sb.ToString();
+            return sb.ToString().Trim();
         }
 
         public float GetMovementForceValue(bool adjustForGravity)

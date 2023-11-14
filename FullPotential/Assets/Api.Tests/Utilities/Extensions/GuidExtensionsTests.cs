@@ -1,8 +1,8 @@
-using System;
-using FullPotential.Core.Utilities.Extensions;
+﻿using System;
+using FullPotential.Api.Utilities.Extensions;
 using NUnit.Framework;
 
-namespace FullPotential.Core.Tests.Utilities
+namespace FullPotential.Api.Tests.Utilities.Extensions
 {
     public class GuidExtensionsTests
     {

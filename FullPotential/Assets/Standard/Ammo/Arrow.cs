@@ -13,10 +13,10 @@ namespace FullPotential.Standard.Ammo
 
         public string TypeName => nameof(Arrow);
 
-        public int MaxStackSize => 15;
+        public int MaxStackSize => 50;
 
-        public int MinDropCount => 1;
+        public int MinDropCount => 20;
 
-        public int MaxDropCount => 5;
+        public int MaxDropCount => 40;
     }
 }

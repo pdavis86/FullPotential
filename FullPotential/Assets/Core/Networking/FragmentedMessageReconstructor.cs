@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Networking.Data;
-using FullPotential.Core.Utilities.Extensions;
 using UnityEngine;
 
 namespace FullPotential.Core.Networking

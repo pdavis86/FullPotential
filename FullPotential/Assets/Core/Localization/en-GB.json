@@ -2,38 +2,42 @@
   "Culture": "en-GB",
   "Name": "English (United Kingdom)",
   "Translations": [
-    {
-      "Key": "accessorycategory.amulet",
+	{
+      "Key": "accessorytype.amulet",
       "Value": "Amulet"
     },
     {
-      "Key": "accessorycategory.belt",
+      "Key": "accessorytype.belt",
       "Value": "Belt"
     },
     {
-      "Key": "accessorycategory.ring",
+      "Key": "accessorytype.ring",
       "Value": "Ring"
+    },
+    {
+      "Key": "accessorytype.reloader",
+      "Value": "Reanged Weapon Reloader"
     },
 
 
     {
-      "Key": "armorcategory.helm",
+      "Key": "armortype.helm",
       "Value": "Helm"
     },
     {
-      "Key": "armorcategory.chest",
+      "Key": "armortype.chest",
       "Value": "Chest"
     },
     {
-      "Key": "armorcategory.legs",
+      "Key": "armortype.legs",
       "Value": "Legs"
     },
     {
-      "Key": "armorcategory.feet",
+      "Key": "armortype.feet",
       "Value": "Feet"
     },
     {
-      "Key": "armorcategory.barrier",
+      "Key": "armortype.barrier",
       "Value": "Barrier"
     },
 	
@@ -56,19 +60,19 @@
 	
 	
     {
-      "Key": "resourceconsumptiontype.health",
+      "Key": "resourcetype.health",
       "Value": "Health"
     },
     {
-      "Key": "resourceconsumptiontype.stamina",
+      "Key": "resourcetype.stamina",
       "Value": "Stamina"
     },
     {
-      "Key": "resourceconsumptiontype.mana",
+      "Key": "resourcetype.mana",
       "Value": "Mana"
     },
     {
-      "Key": "resourceconsumptiontype.energy",
+      "Key": "resourcetype.energy",
       "Value": "Energy"
     },
     
@@ -585,6 +589,11 @@
     {
       "Key": "combat.attack.critical",
       "Value": "CRIT:"
+    },
+	
+	{
+      "Key": "noweaponreloader",
+      "Value": "No weapon reloader equipped.\nRemaining ammo will be lost when you reload!"
     }
 
   ]

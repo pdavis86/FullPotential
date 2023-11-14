@@ -34,7 +34,7 @@ namespace FullPotential.Api.Items.Types
             var originalTranslation = localizer.Translate(TranslationType.Attribute, nameof(Attributes.Strength));
             sb.Append($"WiP ({originalTranslation}: {Attributes.Strength})\n");
 
-            return sb.ToString();
+            return sb.ToString().Trim();
         }
     }
 }

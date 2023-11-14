@@ -6,6 +6,5 @@
         Stamina,
         Mana,
         Energy,
-        Money,
     }
 }

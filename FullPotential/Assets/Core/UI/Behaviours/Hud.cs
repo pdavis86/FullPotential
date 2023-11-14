@@ -6,6 +6,7 @@ using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Ui;
 using FullPotential.Core.Ui.Components;
@@ -34,6 +35,8 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private Text _ammoRight;
         [SerializeField] private ProgressWheel _chargeLeft;
         [SerializeField] private ProgressWheel _chargeRight;
+        [SerializeField] private GameObject _noReloaderLeft;
+        [SerializeField] private GameObject _noReloaderRight;
 #pragma warning restore 0649
 
         private ILocalizer _localizer;
@@ -108,11 +111,11 @@ namespace FullPotential.Core.Ui.Behaviours
         private void UpdateHandOverlays()
         {
             UpdateHandDescription(_equippedLeftHandSummary, _playerFighter.HandStatusLeft);
-            UpdateHandAmmo(_ammoLeft, _playerFighter.HandStatusLeft);
+            UpdateHandAmmo(_playerFighter, true);
             UpdateHandCharge(_chargeLeft, _playerFighter.HandStatusLeft);
 
             UpdateHandDescription(_equippedRightHandSummary, _playerFighter.HandStatusRight);
-            UpdateHandAmmo(_ammoRight, _playerFighter.HandStatusRight);
+            UpdateHandAmmo(_playerFighter, false);
             UpdateHandCharge(_chargeRight, _playerFighter.HandStatusRight);
         }
 
@@ -121,12 +124,17 @@ namespace FullPotential.Core.Ui.Behaviours
             equippedSummary.SetContents(handStatus.EquippedItemDescription);
         }
 
-        private void UpdateHandAmmo(Text ammoText, HandStatus handStatus)
+        private void UpdateHandAmmo(FighterBase fighter, bool isLeftHand)
         {
+            var handStatus = isLeftHand ? fighter.HandStatusLeft : fighter.HandStatusRight;
+            var ammoText = isLeftHand ? _ammoLeft : _ammoRight;
+            var noReloaderObject = isLeftHand ? _noReloaderLeft : _noReloaderRight;
+
             if (handStatus == null
                 || handStatus.EquippedWeapon == null
                 || !handStatus.EquippedWeapon.IsRanged)
             {
+                noReloaderObject.SetActive(false);
                 ammoText.gameObject.SetActive(false);
                 return;
             }
@@ -136,9 +144,14 @@ namespace FullPotential.Core.Ui.Behaviours
                 ammoText.gameObject.SetActive(true);
             }
 
+            if (!fighter.HasTypeEquipped(SlotGameObjectName.Reloader))
+            {
+                noReloaderObject.SetActive(true);
+            }
+
             ammoText.text = handStatus.IsReloading
                 ? _reloadingTranslation
-                : $"{handStatus.EquippedWeapon.Ammo}/{handStatus.EquippedWeapon.GetAmmoMax()}";
+                : $"{handStatus.EquippedWeapon.Ammo}/{handStatus.EquippedWeapon.GetAmmoMax()} ({_playerFighter.GetAvailableAmmo(isLeftHand)})";
         }
 
         private void UpdateHandCharge(ProgressWheel chargeWheel, HandStatus handStatus)

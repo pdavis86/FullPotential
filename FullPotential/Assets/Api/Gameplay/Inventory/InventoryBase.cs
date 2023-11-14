@@ -105,6 +105,67 @@ namespace FullPotential.Api.Gameplay.Inventory
                 : null;
         }
 
+        public ItemStack TakeItemStack(string typeId, int maxSize)
+        {
+            var matches = _items
+                .Where(
+                    i => i.Value is ItemStack itemStack
+                    && itemStack.RegistryTypeId == typeId)
+                .Select(i => (ItemStack)i.Value)
+                .OrderByDescending(i => i.Count);
+
+            if (!matches.Any())
+            {
+                return null;
+            }
+
+            var returnStack = new ItemStack
+            {
+                Id = Guid.NewGuid().ToMinimisedString(),
+                RegistryTypeId = matches.First().RegistryTypeId,
+                RegistryType = matches.First().RegistryType
+            };
+
+            var countRemaining = maxSize;
+
+            foreach (var itemStack in matches)
+            {
+                if (countRemaining >= itemStack.Count)
+                {
+                    returnStack.Count += itemStack.Count;
+                    countRemaining -= itemStack.Count;
+                    _items.Remove(itemStack.Id);
+                    continue;
+                }
+
+                returnStack.Count += countRemaining;
+
+                itemStack.Count -= countRemaining;
+
+                if (itemStack.Count == 0)
+                {
+                    _items.Remove(itemStack.Id);
+                }
+            }
+
+            return returnStack;
+        }
+
+        public int GetItemStackTotal(string typeId)
+        {
+            return _items
+                .Where(
+                    i => i.Value is ItemStack itemStack
+                    && itemStack.RegistryTypeId == typeId)
+                .Select(i => (ItemStack)i.Value)
+                .Sum(i => i.Count);
+        }
+
+        public bool HasTypeEquipped(SlotGameObjectName slotGameObjectName)
+        {
+            return _equippedItems.ContainsKey(slotGameObjectName);
+        }
+
         public bool IsInventoryFull()
         {
             return _items.Count >= _maxItemCount;

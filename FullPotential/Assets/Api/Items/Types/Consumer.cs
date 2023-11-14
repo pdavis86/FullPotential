@@ -178,7 +178,7 @@ namespace FullPotential.Api.Items.Types
                 localizer.TranslateFloat(GetDps()),
                 UnitsType.UnitPerTime);
 
-            return sb.ToString();
+            return sb.ToString().Trim();
         }
 
         public void StopStoppables()

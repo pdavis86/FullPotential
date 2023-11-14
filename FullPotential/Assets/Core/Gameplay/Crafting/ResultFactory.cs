@@ -17,8 +17,8 @@ using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
+using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Registry;
-using FullPotential.Core.Utilities.Extensions;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -502,6 +502,11 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         public ItemBase GetCraftedItem(CraftableType craftableType, string subTypeName, bool isTwoHanded, IList<ItemForCombatBase> components)
         {
+            //todo: weapon, armor, and accessory crafting were accidentally working because the class names matched the type names
+            //work out if they ARE visuals or they are types. I think split weapons into types with a default visuals type id
+
+            //todo: accessory crafting needs to get behaviour
+
             switch (craftableType)
             {
                 case CraftableType.Consumer:
