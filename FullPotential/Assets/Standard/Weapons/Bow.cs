@@ -6,7 +6,9 @@ namespace FullPotential.Standard.Weapons
 {
     public class Bow : IWeapon
     {
-        public Guid TypeId => new Guid("47d23976-45ad-4360-b603-7ea4ed29846b");
+        public const string TypeIdString = "47d23976-45ad-4360-b603-7ea4ed29846b";
+
+        public Guid TypeId => new Guid(TypeIdString);
 
         public string TypeName => nameof(Bow);
 
@@ -19,9 +21,5 @@ namespace FullPotential.Standard.Weapons
         public bool AllowTwoHanded => true;
 
         public bool EnforceTwoHanded => true;
-
-        public string PrefabAddress => null;
-
-        public string PrefabAddressTwoHanded => "Standard/Prefabs/Weapons/Bow.prefab";
     }
 }

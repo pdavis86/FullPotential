@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Obsolete;
@@ -11,7 +12,9 @@ namespace FullPotential.Api.Gameplay.Inventory
 
         List<string> ValidateIsCraftable(string[] componentIds, ItemBase itemToCraft);
 
-        IEnumerable<ItemBase> GetCompatibleItemsForSlot(SlotType? gearCategory);
+        IEnumerable<ItemBase> GetHandItems();
+
+        IEnumerable<ItemBase> GetCompatibleItems(Guid? typeId);
 
         KeyValuePair<SlotGameObjectName, EquippedItem>? GetEquippedWithItemId(string itemId);
 

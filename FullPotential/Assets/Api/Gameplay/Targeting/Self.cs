@@ -6,6 +6,7 @@ using FullPotential.Api.Registry.Targeting;
 
 namespace FullPotential.Api.Gameplay.Targeting
 {
+    //todo: Why is Self in API instead of Core?
     public class Self : ITargeting
     {
         public Guid TypeId => new Guid("b7cd2ff2-e054-4955-bde9-38b3b6b9a1bf");

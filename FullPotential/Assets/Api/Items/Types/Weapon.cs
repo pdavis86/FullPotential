@@ -25,6 +25,9 @@ namespace FullPotential.Api.Items.Types
 
         public bool IsDefensive => WeaponType.IsDefensive;
 
+        //todo: set weapon visuals
+        public IWeaponVisuals Visuals { get; set; }
+
         public int GetAmmoMax()
         {
             const int ammoCap = 100;

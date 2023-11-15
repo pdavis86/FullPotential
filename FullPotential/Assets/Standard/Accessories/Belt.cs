@@ -1,0 +1,17 @@
+﻿using System;
+using FullPotential.Api.Gameplay.Player;
+using FullPotential.Api.Registry.Gear;
+
+namespace FullPotential.Standard.Accessories
+{
+    public class Belt : IAccessory
+    {
+        public const string TypeIdString = "6d4bce60-dda6-4a88-82fd-c2b086065c8b";
+
+        public Guid TypeId => new Guid(TypeIdString);
+
+        public string TypeName => nameof(Amulet);
+
+        public AccessoryLocation Location => AccessoryLocation.Waist;
+    }
+}

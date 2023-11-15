@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Targeting
 {
+    //todo: If modders can't define an ITargetingBehaviour why is it in API instead of Core?
     public interface ITargetingBehaviour
     {
         public IFighter SourceFighter { get; set; }

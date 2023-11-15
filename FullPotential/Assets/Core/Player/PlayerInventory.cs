@@ -219,31 +219,25 @@ namespace FullPotential.Core.Player
             }
         }
 
-        public IEnumerable<ItemBase> GetCompatibleItemsForSlot(SlotType? gearCategory)
+        public IEnumerable<ItemBase> GetHandItems()
         {
-            if (gearCategory == null)
+            return _items
+                .Where(x => x.Value is Weapon or Consumer)
+                .Select(x => x.Value)
+                .OrderBy(x => x.Name);
+        }
+
+        public IEnumerable<ItemBase> GetCompatibleItems(Guid? typeId)
+        {
+            if (typeId == null)
             {
                 return _items
                     .Select(x => x.Value)
                     .OrderBy(x => x.Name);
             }
 
-            IEnumerable<KeyValuePair<string, ItemBase>> itemsForSlot;
-
-            if (gearCategory == SlotType.Hand)
-            {
-                itemsForSlot = _items
-                    .Where(x => x.Value is Weapon or Consumer);
-            }
-            else
-            {
-                itemsForSlot = _items
-                .Where(x =>
-                    (x.Value is Accessory acc && (int)((IAccessoryVisuals)acc.RegistryType).Type == (int)gearCategory)
-                    || (x.Value is Armor armor && (int)((IArmorVisuals)armor.RegistryType).Type == (int)gearCategory));
-            }
-
-            return itemsForSlot
+            return _items
+                .Where(x => x.Value.RegistryType.TypeId == typeId)
                 .Select(x => x.Value)
                 .OrderBy(x => x.Name);
         }
@@ -511,19 +505,20 @@ namespace FullPotential.Core.Player
             switch (item)
             {
                 case Weapon weapon:
-                    if (item.RegistryType is not IWeapon weaponRegistryType)
+                    if (item.RegistryType is not IWeapon)
                     {
                         Debug.LogError("Item is not a weapon");
                         return;
                     }
 
-                    _typeRegistry.LoadAddessable(
-                        weapon.IsTwoHanded ? weaponRegistryType.PrefabAddressTwoHanded : weaponRegistryType.PrefabAddress,
-                        prefab =>
-                        {
-                            InstantiateInPlayerHand(prefab, isLeftHand, new Vector3(0, 90), slotGameObjectName);
-                        }
-                    );
+                    //todo: instantiate weapon visuals
+                    //_typeRegistry.LoadAddessable(
+                    //    weapon.Visuals.PrefabAddress,
+                    //    prefab =>
+                    //    {
+                    //        InstantiateInPlayerHand(prefab, isLeftHand, new Vector3(0, 90), slotGameObjectName);
+                    //    }
+                    //);
 
                     break;
 
@@ -577,27 +572,28 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            if (item.RegistryType is not IAccessoryVisuals registryType)
+            if (item.RegistryType is not IAccessory registryType)
             {
                 Debug.LogError("Item is not an accessory");
                 return;
             }
 
-            _typeRegistry.LoadAddessable(
-                registryType.PrefabAddress,
-                prefab =>
-                {
-                    var newObj = Instantiate(prefab, parentTransform);
+            //todo: InstantiateAccessory
+            //_typeRegistry.LoadAddessable(
+            //    registryType.PrefabAddress,
+            //    prefab =>
+            //    {
+            //        var newObj = Instantiate(prefab, parentTransform);
 
-                    manipulateTransform?.Invoke(newObj.transform);
+            //        manipulateTransform?.Invoke(newObj.transform);
 
-                    if (showsOnPlayerCamera && thisClient)
-                    {
-                        newObj.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
-                    }
+            //        if (showsOnPlayerCamera && thisClient)
+            //        {
+            //            newObj.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
+            //        }
 
-                    _equippedItems[slotGameObjectName].GameObject = newObj;
-                });
+            //        _equippedItems[slotGameObjectName].GameObject = newObj;
+            //    });
         }
 
         private void InstantiateArmor(
@@ -605,7 +601,7 @@ namespace FullPotential.Core.Player
             ItemBase item,
             Transform parentTransform)
         {
-            if (item.RegistryType is not IArmorVisuals registryType)
+            if (item.RegistryType is not IArmor registryType)
             {
                 Debug.LogError("Item is not armor");
                 return;
@@ -616,13 +612,14 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            _typeRegistry.LoadAddessable(
-                registryType.PrefabAddress,
-                prefab =>
-                {
-                    var newObj = Instantiate(prefab, parentTransform);
-                    _equippedItems[slotGameObjectName].GameObject = newObj;
-                });
+            //todo: InstantiateArmor
+            //_typeRegistry.LoadAddessable(
+            //    registryType.PrefabAddress,
+            //    prefab =>
+            //    {
+            //        var newObj = Instantiate(prefab, parentTransform);
+            //        _equippedItems[slotGameObjectName].GameObject = newObj;
+            //    });
         }
 
         public void AddItemAsAdmin(ItemBase item)

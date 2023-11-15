@@ -5,7 +5,6 @@ using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Obsolete;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Gameplay.Tooltips;
@@ -28,7 +27,7 @@ namespace FullPotential.Core.Ui.Components
             GameObject rowPrefab,
             IPlayerInventory playerInventory,
             Action<GameObject, GameObject, ItemBase> toggleAction,
-            SlotType? gearCategory = null,
+            Guid? typeId = null,
             bool showEquippedItems = true,
             Action<IPlayerInventory, string, InventoryUiRow> assignDrawingAction = null
         )
@@ -41,7 +40,9 @@ namespace FullPotential.Core.Ui.Components
             var rowRectTransform = rowPrefab.GetComponent<RectTransform>();
             var rowCounter = 0;
 
-            var itemsForSlot = playerInventory.GetCompatibleItemsForSlot(gearCategory).ToList();
+            var itemsForSlot = typeId == Guid.Empty
+                ? playerInventory.GetHandItems()
+                : playerInventory.GetCompatibleItems(typeId);
 
             if (!itemsForSlot.Any())
             {

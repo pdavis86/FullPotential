@@ -6,7 +6,9 @@ namespace FullPotential.Standard.Weapons
 {
     public class Crossbow : IWeapon
     {
-        public Guid TypeId => new Guid("3d8be950-b8b0-44c6-ab84-1bf8434d67bd");
+        public const string TypeIdString = "3d8be950-b8b0-44c6-ab84-1bf8434d67bd";
+
+        public Guid TypeId => new Guid(TypeIdString);
 
         public string TypeName => nameof(Crossbow);
 
@@ -19,9 +21,5 @@ namespace FullPotential.Standard.Weapons
         public bool AllowTwoHanded => true;
 
         public bool EnforceTwoHanded => true;
-
-        public string PrefabAddress => null;
-
-        public string PrefabAddressTwoHanded => "Standard/Prefabs/Weapons/Crossbow.prefab";
     }
 }

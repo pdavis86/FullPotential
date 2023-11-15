@@ -10,6 +10,7 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
+using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using Unity.Netcode;
@@ -44,10 +45,10 @@ namespace FullPotential.Api.Gameplay.Inventory
             _items = new Dictionary<string, ItemBase>();
             _equippedItems = new Dictionary<SlotGameObjectName, EquippedItem>();
 
-            _armorSlotCount = Enum.GetNames(typeof(ArmorType)).Length;
-
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+
+            _armorSlotCount = _typeRegistry.GetRegisteredTypes<IArmor>().Count();
         }
 
         #endregion

@@ -387,6 +387,7 @@ namespace FullPotential.Core.GameManagement
 
             eventManager.Register(EventIds.FighterReloadStart, FighterBase.HandleReloadStartEvent);
             eventManager.Register(EventIds.FighterReloadEnd, null);
+            eventManager.Register(EventIds.FighterDamageTaken, null);
         }
 
         #region Methods for Mods

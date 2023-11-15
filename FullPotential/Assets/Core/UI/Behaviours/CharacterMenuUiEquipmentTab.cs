@@ -52,24 +52,25 @@ namespace FullPotential.Core.Ui.Behaviours
                 return;
             }
 
+            //todo: replace hard-coded values
+
             switch (clickedObject.name)
             {
-                case nameof(SlotGameObjectName.Helm): LoadInventoryItems(clickedObject, SlotType.Helm); break;
-                case nameof(SlotGameObjectName.Chest): LoadInventoryItems(clickedObject, SlotType.Chest); break;
-                case nameof(SlotGameObjectName.Legs): LoadInventoryItems(clickedObject, SlotType.Legs); break;
-                case nameof(SlotGameObjectName.Feet): LoadInventoryItems(clickedObject, SlotType.Feet); break;
-                case nameof(SlotGameObjectName.Barrier): LoadInventoryItems(clickedObject, SlotType.Barrier); break;
+                case nameof(SlotGameObjectName.Helm): LoadInventoryItems(clickedObject, new Guid("b1b9b067-2523-4d57-a4c1-14b3a623f5f3")); break;
+                case nameof(SlotGameObjectName.Chest): LoadInventoryItems(clickedObject, new Guid("a2989e18-6830-4770-8695-1c8592137e2d")); break;
+                case nameof(SlotGameObjectName.Legs): LoadInventoryItems(clickedObject, new Guid("4eda8bc2-6929-4ad6-a5e1-3103b2cbcdac")); break;
+                case nameof(SlotGameObjectName.Feet): LoadInventoryItems(clickedObject, new Guid("e42aefc3-2834-4f61-897f-5fb62d439b56")); break;
 
                 case nameof(SlotGameObjectName.LeftHand):
-                case nameof(SlotGameObjectName.RightHand): LoadInventoryItems(clickedObject, SlotType.Hand); break;
+                case nameof(SlotGameObjectName.RightHand): LoadInventoryItems(clickedObject, Guid.Empty); break;
 
                 case nameof(SlotGameObjectName.LeftRing):
-                case nameof(SlotGameObjectName.RightRing): LoadInventoryItems(clickedObject, SlotType.Ring); break;
+                case nameof(SlotGameObjectName.RightRing): LoadInventoryItems(clickedObject, new Guid("c70a9495-0ef7-48fb-9b16-aad5fe7b29ad")); break;
 
-                case nameof(SlotGameObjectName.Amulet): LoadInventoryItems(clickedObject, SlotType.Amulet); break;
-                case nameof(SlotGameObjectName.Belt): LoadInventoryItems(clickedObject, SlotType.Belt); break;
-
-                case nameof(SlotGameObjectName.Reloader): LoadInventoryItems(clickedObject, SlotType.Reloader); break;
+                case nameof(SlotGameObjectName.Amulet): LoadInventoryItems(clickedObject, new Guid("e02761e5-5155-4b61-8f1c-8feb240a420c")); break;
+                case nameof(SlotGameObjectName.Belt): LoadInventoryItems(clickedObject, new Guid("3275abb7-fc48-4682-abc1-85dda7abf24e")); break;
+                case nameof(SlotGameObjectName.Barrier): LoadInventoryItems(clickedObject, new Guid("c2dbfd42-9a5b-4b0b-ba90-6b02ab710859")); break;
+                case nameof(SlotGameObjectName.Reloader): LoadInventoryItems(clickedObject, new Guid("0298c98c-d9db-4127-bd57-e3045340088f")); break;
 
                 default:
                     Debug.LogError($"Cannot handle click for slot {clickedObject.name}");
@@ -144,7 +145,7 @@ namespace FullPotential.Core.Ui.Behaviours
             }
         }
 
-        private void LoadInventoryItems(GameObject slot, SlotType? gearCategory = null)
+        private void LoadInventoryItems(GameObject slot, Guid? typeId = null)
         {
             _componentsContainer.SetActive(true);
 
@@ -154,7 +155,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 _inventoryRowPrefab,
                 _playerState.Inventory,
                 HandleRowToggle,
-                gearCategory
+                typeId
             );
         }
 

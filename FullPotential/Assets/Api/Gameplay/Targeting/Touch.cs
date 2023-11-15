@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Targeting
 {
+    //todo: Why is Touch in API instead of Core?
     public class Touch : ITargeting
     {
         public Guid TypeId => new Guid("144cc142-2e64-476f-b3a6-de57cc3abd05");

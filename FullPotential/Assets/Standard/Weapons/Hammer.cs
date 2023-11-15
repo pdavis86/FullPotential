@@ -5,7 +5,9 @@ namespace FullPotential.Standard.Weapons
 {
     public class Hammer : IWeapon
     {
-        public Guid TypeId => new Guid("70d38942-f1a9-4bd9-a3a4-c75e8615e31a");
+        public const string TypeIdString = "70d38942-f1a9-4bd9-a3a4-c75e8615e31a";
+
+        public Guid TypeId => new Guid(TypeIdString);
 
         public string TypeName => nameof(Hammer);
 
@@ -18,9 +20,5 @@ namespace FullPotential.Standard.Weapons
         public bool AllowTwoHanded => true;
 
         public bool EnforceTwoHanded => false;
-
-        public string PrefabAddress => "Standard/Prefabs/Weapons/Hammer.prefab";
-
-        public string PrefabAddressTwoHanded => "Standard/Prefabs/Weapons/Hammer2.prefab";
     }
 }

@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Shapes
 {
+    //todo: If modders can't define an IShapeBehaviour why is it in API instead of Core?
     public interface IShapeBehaviour
     {
         public IFighter SourceFighter { get; set; }

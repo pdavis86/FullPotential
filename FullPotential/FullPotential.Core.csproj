@@ -86,6 +86,7 @@
     <Compile Include="Assets\Core\UI\Behaviours\MainMenuUi.cs" />
     <Compile Include="Assets\Core\Unity\Services\UnityHelperUtilities.cs" />
     <Compile Include="Assets\Core\Gameplay\Events\EventHandlerGroup.cs" />
+    <Compile Include="Assets\Core\Gameplay\Tooltips\TooltipWithTranslation.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectsUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\SettingsMenuUi.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DebuggingActiveState.cs" />
@@ -139,7 +140,6 @@
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsStartup.cs" />
     <Compile Include="Assets\Core\GameManagement\AddressablesManager.cs" />
     <Compile Include="Assets\Core\GameManagement\GameManager.cs" />
-    <Compile Include="Assets\Core\Gameplay\Tooltips\TooltipWithTranslation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Core\FullPotential.Core.asmdef" />

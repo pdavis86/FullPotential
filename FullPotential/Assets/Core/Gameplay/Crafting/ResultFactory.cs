@@ -446,7 +446,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Armor GetArmor(IArmorVisuals craftableType, IList<ItemForCombatBase> components)
+        private Armor GetArmor(IArmor craftableType, IList<ItemForCombatBase> components)
         {
             var armor = new Armor
             {
@@ -463,9 +463,11 @@ namespace FullPotential.Core.Gameplay.Crafting
             return armor;
         }
 
-        private Armor GetBarrier(IArmorVisuals craftableType, IList<ItemForCombatBase> components)
+        private Accessory GetAccessory(IAccessory craftableType, IList<ItemForCombatBase> components)
         {
-            var armor = new Armor
+            //todo: accessory crafting needs to get behaviour
+
+            var accessory = new Accessory
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),
@@ -477,23 +479,6 @@ namespace FullPotential.Core.Gameplay.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(CraftableType.Armor, components)
-            };
-            armor.Name = GetItemName(false, armor);
-            return armor;
-        }
-
-        private Accessory GetAccessory(IAccessoryVisuals craftableType, IList<ItemForCombatBase> components)
-        {
-            var accessory = new Accessory
-            {
-                RegistryType = craftableType,
-                Id = Guid.NewGuid().ToMinimisedString(),
-                Attributes = new Attributes
-                {
-                    IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength)
-                },
                 Effects = GetEffects(CraftableType.Accessory, components)
             };
             accessory.Name = GetItemName(true, accessory);
@@ -502,11 +487,6 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         public ItemBase GetCraftedItem(CraftableType craftableType, string subTypeName, bool isTwoHanded, IList<ItemForCombatBase> components)
         {
-            //todo: weapon, armor, and accessory crafting were accidentally working because the class names matched the type names
-            //work out if they ARE visuals or they are types. I think split weapons into types with a default visuals type id
-
-            //todo: accessory crafting needs to get behaviour
-
             switch (craftableType)
             {
                 case CraftableType.Consumer:
@@ -528,13 +508,11 @@ namespace FullPotential.Core.Gameplay.Crafting
                     return GetRangedWeapon(weaponType, components, isTwoHanded);
 
                 case CraftableType.Armor:
-                    var craftableArmor = _typeRegistry.GetRegisteredByTypeName<IArmorVisuals>(subTypeName);
-                    return craftableArmor.Type == ArmorType.Barrier
-                        ? GetBarrier(craftableArmor, components)
-                        : GetArmor(craftableArmor, components);
+                    var craftableArmor = _typeRegistry.GetRegisteredByTypeName<IArmor>(subTypeName);
+                    return GetArmor(craftableArmor, components);
 
                 case CraftableType.Accessory:
-                    var craftableAccessory = _typeRegistry.GetRegisteredByTypeName<IAccessoryVisuals>(subTypeName);
+                    var craftableAccessory = _typeRegistry.GetRegisteredByTypeName<IAccessory>(subTypeName);
                     return GetAccessory(craftableAccessory, components);
 
                 default:
