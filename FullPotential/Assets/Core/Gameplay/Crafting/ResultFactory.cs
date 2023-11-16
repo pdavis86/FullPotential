@@ -34,9 +34,9 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private readonly List<ILoot> _lootTypes;
         private readonly List<IAmmunition> _ammoTypes;
+        private readonly List<ITargeting> _targetingTypes;
+        private readonly List<IShape> _shapeTypes;
         private readonly List<IEffect> _effectsForLoot;
-        private readonly List<ITargeting> _targetingOptions;
-        private readonly List<IShape> _shapeOptions;
 
         public ResultFactory(
             ITypeRegistry typeRegistry,
@@ -47,9 +47,12 @@ namespace FullPotential.Core.Gameplay.Crafting
 
             _lootTypes = _typeRegistry.GetRegisteredTypes<ILoot>().ToList();
             _ammoTypes = _typeRegistry.GetRegisteredTypes<IAmmunition>().ToList();
-            _effectsForLoot = _typeRegistry.GetLootPossibilities();
-            _targetingOptions = _typeRegistry.GetRegisteredTypes<ITargeting>().ToList();
-            _shapeOptions = _typeRegistry.GetRegisteredTypes<IShape>().ToList();
+            _targetingTypes = _typeRegistry.GetRegisteredTypes<ITargeting>().ToList();
+            _shapeTypes = _typeRegistry.GetRegisteredTypes<IShape>().ToList();
+
+            _effectsForLoot = _typeRegistry.GetRegisteredTypes<IEffect>()
+                .Where(x => x is not IIsSideEffect)
+                .ToList();
         }
 
         private int ComputeAttribute(IList<ItemForCombatBase> components, Func<ItemForCombatBase, int> getProp, bool allowMax = true)
@@ -100,7 +103,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 return null;
             }
 
-            return _shapeOptions.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
+            return _shapeTypes.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
         }
 
         private List<IEffect> GetEffects(CraftableType craftableType, IList<ItemForCombatBase> components, ITargeting targeting = null)
@@ -218,7 +221,7 @@ namespace FullPotential.Core.Gameplay.Crafting
         {
             if (IsSuccess(50))
             {
-                return _targetingOptions.ElementAt(_random.Next(0, _targetingOptions.Count));
+                return _targetingTypes.ElementAt(_random.Next(0, _targetingTypes.Count));
             }
             return null;
         }
@@ -227,7 +230,7 @@ namespace FullPotential.Core.Gameplay.Crafting
         {
             if (IsSuccess(10))
             {
-                return _shapeOptions.ElementAt(_random.Next(0, _shapeOptions.Count));
+                return _shapeTypes.ElementAt(_random.Next(0, _shapeTypes.Count));
             }
             return null;
         }
@@ -315,7 +318,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             {
                 RegistryType = randomAmmo,
                 Id = Guid.NewGuid().ToMinimisedString(),
-                Name = $"{_localizer.Translate(randomAmmo)} ({randomCount})",
+                BaseName = _localizer.Translate(randomAmmo),
                 Count = randomCount
             };
         }
@@ -465,8 +468,6 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private Accessory GetAccessory(IAccessory craftableType, IList<ItemForCombatBase> components)
         {
-            //todo: accessory crafting needs to get behaviour
-
             var accessory = new Accessory
             {
                 RegistryType = craftableType,

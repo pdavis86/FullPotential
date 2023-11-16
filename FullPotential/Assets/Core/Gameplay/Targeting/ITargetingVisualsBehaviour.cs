@@ -2,9 +2,8 @@
 
 // ReSharper disable UnusedMember.Global
 
-namespace FullPotential.Api.Gameplay.Targeting
+namespace FullPotential.Core.Gameplay.Targeting
 {
-    //todo: If modders can't define an ITargetingVisualsBehaviour why is it in API instead of Core?
     public interface ITargetingVisualsBehaviour
     {
         public Vector3 StartPosition { get; set; }

@@ -8,7 +8,11 @@ namespace FullPotential.Api.Modding
 {
     public interface IMod
     {
+        IEnumerable<Guid> GetSpecialGearSlotIds();
+
         IEnumerable<Type> GetRegisterableTypes();
+
+        IEnumerable<Type> GetRegisterableVisuals();
 
         IEnumerable<string> GetNetworkPrefabAddresses();
 

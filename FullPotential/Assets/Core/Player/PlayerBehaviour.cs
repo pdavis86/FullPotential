@@ -323,7 +323,7 @@ namespace FullPotential.Core.Player
         {
             var componentIdArray = componentIdsCsv.Split(',');
 
-            var components = _playerState.Inventory.GetComponentsFromIds(componentIdArray);
+            var components = _playerState.PlayerInventory.GetComponentsFromIds(componentIdArray);
 
             if (components.Count != componentIdArray.Length)
             {
@@ -340,7 +340,7 @@ namespace FullPotential.Core.Player
                 components
             );
 
-            if (_playerState.Inventory.ValidateIsCraftable(componentIdArray, craftedItem).Any())
+            if (_playerState.PlayerInventory.ValidateIsCraftable(componentIdArray, craftedItem).Any())
             {
                 Debug.LogWarning("Someone tried cheating: validation was skipped");
                 return;
@@ -627,7 +627,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            var item = _playerState.Inventory.GetItemFromAssignedShape(e.DrawnShape);
+            var item = _playerState.PlayerInventory.GetItemFromAssignedShape(e.DrawnShape);
 
             if (item == null)
             {

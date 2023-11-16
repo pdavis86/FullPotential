@@ -1,5 +1,4 @@
 ﻿using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Targeting;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Networking;

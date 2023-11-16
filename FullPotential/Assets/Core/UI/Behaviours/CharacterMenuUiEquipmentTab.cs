@@ -52,7 +52,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 return;
             }
 
-            //todo: replace hard-coded values
+            //todo: Implement UI slot creation then replace hard-coded values
 
             switch (clickedObject.name)
             {
@@ -153,7 +153,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 slot,
                 _componentsContainer,
                 _inventoryRowPrefab,
-                _playerState.Inventory,
+                _playerState.PlayerInventory,
                 HandleRowToggle,
                 typeId
             );

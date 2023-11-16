@@ -5,12 +5,11 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Registry.Targeting;
 using UnityEngine;
 
-namespace FullPotential.Api.Gameplay.Targeting
+namespace FullPotential.Core.Gameplay.Targeting
 {
-    //todo: Why is Touch in API instead of Core?
     public class Touch : ITargeting
     {
-        public Guid TypeId => new Guid("144cc142-2e64-476f-b3a6-de57cc3abd05");
+        public Guid TypeId => TargetingTypeIds.Touch;
 
         public string TypeName => nameof(Touch);
 

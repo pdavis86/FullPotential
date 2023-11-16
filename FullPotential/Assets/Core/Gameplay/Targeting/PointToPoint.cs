@@ -4,12 +4,11 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Registry.Targeting;
 
-namespace FullPotential.Api.Gameplay.Targeting
+namespace FullPotential.Core.Gameplay.Targeting
 {
-    //todo: Why is PointToPoint in API instead of Core?
     public class PointToPoint : ITargeting
     {
-        public Guid TypeId => new Guid("3c528d09-bd4f-4211-af17-d8721975fef1");
+        public Guid TypeId => TargetingTypeIds.PointToPoint;
 
         public string TypeName => nameof(PointToPoint);
 

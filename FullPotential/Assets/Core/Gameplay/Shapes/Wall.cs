@@ -1,14 +1,11 @@
 ﻿using System;
 using FullPotential.Api.Registry.Shapes;
 
-namespace FullPotential.Api.Gameplay.Shapes
+namespace FullPotential.Core.Gameplay.Shapes
 {
-    //todo: Why is Wall in API instead of Core?
     public class Wall : IShape
     {
-        public const string TypeIdString = "4aad2866-5903-4b79-bda2-e3dcab920d9e";
-
-        public Guid TypeId => new Guid(TypeIdString);
+        public Guid TypeId => ShapeTypeIds.Wall;
 
         public string TypeName => nameof(Wall);
 

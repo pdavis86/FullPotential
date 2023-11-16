@@ -13,6 +13,7 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Registry.Weapons;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -147,6 +148,8 @@ namespace FullPotential.Api.Gameplay.Inventory
                 {
                     _items.Remove(itemStack.Id);
                 }
+
+                return returnStack;
             }
 
             return returnStack;
@@ -223,7 +226,7 @@ namespace FullPotential.Api.Gameplay.Inventory
         {
             if (!string.IsNullOrWhiteSpace(item.RegistryTypeId) && item.RegistryType == null)
             {
-                item.RegistryType = _typeRegistry.GetRegisteredForItem(item);
+                item.RegistryType = _typeRegistry.GetRegistryTypeForItem(item);
             }
 
             if (item is ItemWithTargetingAndShapeBase magicalItem && !string.IsNullOrWhiteSpace(magicalItem.TargetingTypeId))
@@ -244,12 +247,43 @@ namespace FullPotential.Api.Gameplay.Inventory
                 }
             }
 
+            if (item is IHasVisuals itemWithVisuals)
+            {
+                switch (item)
+                {
+                    case Weapon:
+                        SetItemVisuals<IWeaponVisuals>(itemWithVisuals, item);
+                        break;
+                    case Armor:
+                        SetItemVisuals<IArmorVisuals>(itemWithVisuals, item);
+                        break;
+                    case Accessory:
+                        SetItemVisuals<IAccessoryVisuals>(itemWithVisuals, item);
+                        break;
+                }
+            }
+
             if (item is ItemForCombatBase combatItem)
             {
                 if (combatItem.EffectIds != null && combatItem.EffectIds.Length > 0 && combatItem.Effects == null)
                 {
                     combatItem.Effects = combatItem.EffectIds.Select(x => _typeRegistry.GetEffect(new Guid(x))).ToList();
                 }
+            }
+        }
+
+        private void SetItemVisuals<T>(IHasVisuals itemWithVisuals, ItemBase item)
+            where T : IVisuals
+        {
+            if (itemWithVisuals.VisualsTypeId.IsNullOrWhiteSpace())
+            {
+                itemWithVisuals.Visuals = _typeRegistry.GetRegisteredTypes<T>()
+                    .FirstOrDefault(v => v.ApplicableToTypeId == item.RegistryType.TypeId);
+            }
+            else
+            {
+                itemWithVisuals.Visuals = _typeRegistry.GetRegisteredTypes<T>()
+                    .FirstOrDefault(v => v.TypeId.ToString() == itemWithVisuals.VisualsTypeId);
             }
         }
 

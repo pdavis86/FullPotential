@@ -1,4 +1,6 @@
 ﻿using FullPotential.Api.Gameplay.Events.Args;
+using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Effects;
@@ -22,6 +24,8 @@ namespace FullPotential.Api.Gameplay.Combat
 
         ulong OwnerClientId { get; }
 
+        IInventory Inventory { get; }
+
         void AddAttributeModifier(IAttributeEffect attributeEffect, ItemForCombatBase itemUsed, float effectPercentage);
 
         void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, float effectPercentage);
@@ -35,6 +39,8 @@ namespace FullPotential.Api.Gameplay.Combat
         int GetAttributeValue(AttributeAffected attributeAffected);
 
         float GetCriticalHitChance();
+
+        HandStatus GetHandStatus(bool isLeftHand);
 
         void Reload(ReloadEventArgs reloadArgs);
     }

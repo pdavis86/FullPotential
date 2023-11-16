@@ -15,10 +15,7 @@ namespace FullPotential.Api.Items.Base
         private IRegisterable _registryType;
         public IRegisterable RegistryType
         {
-            get
-            {
-                return _registryType;
-            }
+            get => _registryType;
             set
             {
                 _registryType = value;

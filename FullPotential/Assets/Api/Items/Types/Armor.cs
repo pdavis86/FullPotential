@@ -5,16 +5,34 @@ using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
-using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Utilities.Extensions;
 
 namespace FullPotential.Api.Items.Types
 {
     [Serializable]
-    public class Armor : ItemWithHealthBase, IDefensible
+    public class Armor : ItemWithHealthBase, IDefensible, IHasVisuals
     {
-        //todo: set Armor visuals
-        public IArmorVisuals Visuals { get; set; }
+        private IVisuals _visuals;
+
+        //Variables so they are serialized
+        // ReSharper disable MemberCanBePrivate.Global
+        // ReSharper disable NotAccessedField.Global
+        public string ArmorVisualsTypeId;
+        // ReSharper restore MemberCanBePrivate.Global
+        // ReSharper restore NotAccessedField.Global
+
+        public string VisualsTypeId => ArmorVisualsTypeId;
+
+        public IVisuals Visuals
+        {
+            get => _visuals;
+            set
+            {
+                _visuals = value;
+                ArmorVisualsTypeId = _visuals?.TypeId.ToString();
+            }
+        }
 
         public int GetDefenseValue()
         {

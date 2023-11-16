@@ -1,19 +1,30 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
 
 namespace FullPotential.Api.Items.Types
 {
-    [System.Serializable]
-    public class Weapon : ItemWithHealthBase
+    [Serializable]
+    public class Weapon : ItemWithHealthBase, IHasVisuals
     {
         private const string AliasSegmentMelee = "MeleeWeapon";
         private const string AliasSegmentRanged = "RangedWeapon";
+
+        private IVisuals _visuals;
+
+        //Variables so they are serialized
+        // ReSharper disable MemberCanBePrivate.Global
+        // ReSharper disable NotAccessedField.Global
+        public string WeaponVisualsTypeId;
+        // ReSharper restore MemberCanBePrivate.Global
+        // ReSharper restore NotAccessedField.Global
 
         public int Ammo;
 
@@ -25,8 +36,17 @@ namespace FullPotential.Api.Items.Types
 
         public bool IsDefensive => WeaponType.IsDefensive;
 
-        //todo: set weapon visuals
-        public IWeaponVisuals Visuals { get; set; }
+        public string VisualsTypeId => WeaponVisualsTypeId;
+
+        public IVisuals Visuals
+        {
+            get => _visuals;
+            set
+            {
+                _visuals = value;
+                WeaponVisualsTypeId = _visuals?.TypeId.ToString();
+            }
+        }
 
         public int GetAmmoMax()
         {

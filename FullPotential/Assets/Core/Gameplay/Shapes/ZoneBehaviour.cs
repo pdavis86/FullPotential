@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Shapes;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Registry;

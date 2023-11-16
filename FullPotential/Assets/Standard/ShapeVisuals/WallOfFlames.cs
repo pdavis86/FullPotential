@@ -11,6 +11,6 @@ namespace FullPotential.Standard.ShapeVisuals
 
         public string PrefabAddress => "Standard/Prefabs/Shapes/Wall.prefab";
 
-        public Guid ApplicableToTypeId => new Guid(Api.Gameplay.Shapes.Wall.TypeIdString);
+        public Guid ApplicableToTypeId => ShapeTypeIds.Wall;
     }
 }

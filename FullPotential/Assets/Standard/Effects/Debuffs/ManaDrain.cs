@@ -16,6 +16,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public ResourceType StatToAffect => ResourceType.Mana;
 
-        public Type SideEffectType => typeof(ManaTap);
+        public Guid SideEffectTypeId => new Guid(ManaTap.TypeIdString);
     }
 }

@@ -4,12 +4,11 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Registry.Targeting;
 
-namespace FullPotential.Api.Gameplay.Targeting
+namespace FullPotential.Core.Gameplay.Targeting
 {
-    //todo: Why is Self in API instead of Core?
     public class Self : ITargeting
     {
-        public Guid TypeId => new Guid("b7cd2ff2-e054-4955-bde9-38b3b6b9a1bf");
+        public Guid TypeId => TargetingTypeIds.Self;
 
         public string TypeName => nameof(Self);
 

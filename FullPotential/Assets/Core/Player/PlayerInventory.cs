@@ -10,7 +10,6 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
@@ -326,6 +325,7 @@ namespace FullPotential.Core.Player
                 .UnionIfNotNull(inventoryData.Armor)
                 .UnionIfNotNull(inventoryData.Weapons)
                 .UnionIfNotNull(inventoryData.Consumers)
+                .UnionIfNotNull(inventoryData.ItemStacks)
                 .UnionIfNotNull(inventoryData.Gadgets)
                 .UnionIfNotNull(inventoryData.Spells);
 
@@ -413,6 +413,7 @@ namespace FullPotential.Core.Player
                 Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
                 Consumers = groupedItems.FirstOrDefault(x => x.Key == typeof(Consumer))?.Select(x => x as Consumer).ToArray(),
                 Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
+                ItemStacks = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemStack))?.Select(x => x as ItemStack).ToArray(),
                 EquippedItems = equippedItems.ToArray(),
                 ShapeMapping = shapeMapping.ToArray()
             };
@@ -511,14 +512,13 @@ namespace FullPotential.Core.Player
                         return;
                     }
 
-                    //todo: instantiate weapon visuals
-                    //_typeRegistry.LoadAddessable(
-                    //    weapon.Visuals.PrefabAddress,
-                    //    prefab =>
-                    //    {
-                    //        InstantiateInPlayerHand(prefab, isLeftHand, new Vector3(0, 90), slotGameObjectName);
-                    //    }
-                    //);
+                    _typeRegistry.LoadAddessable(
+                        weapon.Visuals.PrefabAddress,
+                        prefab =>
+                        {
+                            InstantiateInPlayerHand(prefab, isLeftHand, new Vector3(0, 90), slotGameObjectName);
+                        }
+                    );
 
                     break;
 
@@ -572,28 +572,27 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            if (item.RegistryType is not IAccessory registryType)
+            if (item is not Accessory accessoryItem)
             {
                 Debug.LogError("Item is not an accessory");
                 return;
             }
 
-            //todo: InstantiateAccessory
-            //_typeRegistry.LoadAddessable(
-            //    registryType.PrefabAddress,
-            //    prefab =>
-            //    {
-            //        var newObj = Instantiate(prefab, parentTransform);
+            _typeRegistry.LoadAddessable(
+                accessoryItem.Visuals.PrefabAddress,
+                prefab =>
+                {
+                    var newObj = Instantiate(prefab, parentTransform);
 
-            //        manipulateTransform?.Invoke(newObj.transform);
+                    manipulateTransform?.Invoke(newObj.transform);
 
-            //        if (showsOnPlayerCamera && thisClient)
-            //        {
-            //            newObj.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
-            //        }
+                    if (showsOnPlayerCamera && thisClient)
+                    {
+                        newObj.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
+                    }
 
-            //        _equippedItems[slotGameObjectName].GameObject = newObj;
-            //    });
+                    _equippedItems[slotGameObjectName].GameObject = newObj;
+                });
         }
 
         private void InstantiateArmor(
@@ -601,7 +600,7 @@ namespace FullPotential.Core.Player
             ItemBase item,
             Transform parentTransform)
         {
-            if (item.RegistryType is not IArmor registryType)
+            if (item is not Armor armorItem)
             {
                 Debug.LogError("Item is not armor");
                 return;
@@ -612,14 +611,13 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            //todo: InstantiateArmor
-            //_typeRegistry.LoadAddessable(
-            //    registryType.PrefabAddress,
-            //    prefab =>
-            //    {
-            //        var newObj = Instantiate(prefab, parentTransform);
-            //        _equippedItems[slotGameObjectName].GameObject = newObj;
-            //    });
+            _typeRegistry.LoadAddessable(
+                armorItem.Visuals.PrefabAddress,
+                prefab =>
+                {
+                    var newObj = Instantiate(prefab, parentTransform);
+                    _equippedItems[slotGameObjectName].GameObject = newObj;
+                });
         }
 
         public void AddItemAsAdmin(ItemBase item)

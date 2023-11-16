@@ -385,7 +385,7 @@ namespace FullPotential.Core.GameManagement
         {
             var eventManager = (EventManager)DependenciesContext.Dependencies.GetService<IEventManager>();
 
-            eventManager.Register(EventIds.FighterReloadStart, FighterBase.HandleReloadStartEvent);
+            eventManager.Register(EventIds.FighterReloadStart, FighterBase.DefaultHandlerForReloadStartEvent);
             eventManager.Register(EventIds.FighterReloadEnd, null);
             eventManager.Register(EventIds.FighterDamageTaken, null);
         }

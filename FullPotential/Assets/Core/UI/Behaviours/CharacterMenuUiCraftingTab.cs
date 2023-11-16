@@ -142,7 +142,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 null,
                 _componentsContainer,
                 _inventoryRowPrefab,
-                _playerState.Inventory,
+                _playerState.PlayerInventory,
                 HandleRowToggle,
                 null,
                 false
@@ -189,7 +189,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 _components
             );
 
-            var errors = _playerState.Inventory.ValidateIsCraftable(_components.Select(x => x.Id).ToArray(), craftedItem);
+            var errors = _playerState.PlayerInventory.ValidateIsCraftable(_components.Select(x => x.Id).ToArray(), craftedItem);
             if (errors.Any())
             {
                 _craftErrors.text = string.Join(System.Environment.NewLine, errors);

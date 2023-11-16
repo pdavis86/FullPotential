@@ -13,11 +13,9 @@ namespace FullPotential.Api.Registry
 
         T GetRegisteredByTypeName<T>(string typeName) where T : IRegisterable;
 
-        IRegisterable GetRegisteredForItem(ItemBase item);
+        IRegisterable GetRegistryTypeForItem(ItemBase item);
 
         IEffect GetEffect(Guid typeId);
-
-        IEffect GetEffect(Type type);
 
         void LoadAddessable(string address, Action<UnityEngine.GameObject> action);
     }

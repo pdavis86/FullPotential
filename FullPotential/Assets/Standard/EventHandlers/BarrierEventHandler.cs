@@ -10,12 +10,12 @@ namespace FullPotential.Standard.EventHandlers
 
         public Action<IEventHandlerArgs> AfterEvent => HandleAfterDamageTaken;
 
-        private void HandleBeforeDamageTaken(IEventHandlerArgs obj)
+        private void HandleBeforeDamageTaken(IEventHandlerArgs eventArgs)
         {
             Debug.Log("Before taking damage");
         }
 
-        private void HandleAfterDamageTaken(IEventHandlerArgs obj)
+        private void HandleAfterDamageTaken(IEventHandlerArgs eventArgs)
         {
             Debug.Log("After taking damage");
         }

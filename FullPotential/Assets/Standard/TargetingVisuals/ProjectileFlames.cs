@@ -11,6 +11,6 @@ namespace FullPotential.Standard.TargetingVisuals
 
         public string PrefabAddress => "Standard/Prefabs/Targeting/Projectile.prefab";
 
-        public Guid ApplicableToTypeId => new Guid(Api.Gameplay.Targeting.Projectile.TypeIdString);
+        public Guid ApplicableToTypeId => TargetingTypeIds.Projectile;
     }
 }

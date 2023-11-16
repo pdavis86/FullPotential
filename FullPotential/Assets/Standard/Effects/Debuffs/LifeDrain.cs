@@ -16,6 +16,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public ResourceType StatToAffect => ResourceType.Health;
 
-        public Type SideEffectType => typeof(LifeTap);
+        public Guid SideEffectTypeId => new Guid(LifeTap.TypeIdString);
     }
 }

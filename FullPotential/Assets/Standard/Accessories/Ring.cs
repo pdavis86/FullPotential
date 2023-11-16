@@ -1,5 +1,4 @@
 ﻿using System;
-using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.Accessories
@@ -11,7 +10,5 @@ namespace FullPotential.Standard.Accessories
         public Guid TypeId => new Guid(TypeIdString);
 
         public string TypeName => nameof(Ring);
-
-        public AccessoryLocation Location => AccessoryLocation.Hand;
     }
 }

@@ -11,6 +11,14 @@ namespace FullPotential.Standard
 {
     public class Registration : MonoBehaviour, IMod
     {
+        public IEnumerable<Guid> GetSpecialGearSlotIds()
+        {
+            return new[]
+            {
+                SpecialGear.SpecialGearSlots.Reloader
+            };
+        }
+
         public IEnumerable<Type> GetRegisterableTypes()
         {
             return new[]
@@ -18,13 +26,7 @@ namespace FullPotential.Standard
                 typeof(Accessories.Amulet),
                 typeof(Accessories.Barrier),
                 typeof(Accessories.Belt),
-                typeof(Accessories.RangedWeaponReloader),
                 typeof(Accessories.Ring),
-
-                typeof(AccessoryVisuals.SilverNecklace),
-                typeof(AccessoryVisuals.LeatherBelt),
-                typeof(AccessoryVisuals.SilverRing),
-                typeof(AccessoryVisuals.BasicWard),
 
                 typeof(Ammo.Arrow),
                 typeof(Ammo.Bullet),
@@ -33,11 +35,6 @@ namespace FullPotential.Standard
                 typeof(Armor.Feet),
                 typeof(Armor.Helm),
                 typeof(Armor.Legs),
-
-                typeof(ArmorVisuals.LeatherHelmet),
-                typeof(ArmorVisuals.LeatherJerkin),
-                typeof(ArmorVisuals.LeatherGreaves),
-                typeof(ArmorVisuals.LeatherBoots),
 
                 typeof(Effects.Buffs.Courage),
                 typeof(Effects.Buffs.Endurance),
@@ -87,10 +84,8 @@ namespace FullPotential.Standard
                 typeof(Loot.Shard),
                 typeof(Loot.Junk),
 
-                typeof(ShapeVisuals.WallOfFlames),
-                typeof(ShapeVisuals.ZoneOfFlames),
-                
-                typeof(TargetingVisuals.ProjectileFlames),
+                typeof(SpecialGear.ConsolidatorReloader),
+                typeof(SpecialGear.TeleportReloader),
 
                 typeof(Weapons.Axe),
                 typeof(Weapons.Bow),
@@ -101,6 +96,27 @@ namespace FullPotential.Standard
                 typeof(Weapons.Shield),
                 typeof(Weapons.Staff),
                 typeof(Weapons.Sword),
+            };
+        }
+
+        public IEnumerable<Type> GetRegisterableVisuals()
+        {
+            return new[]
+            {
+                typeof(AccessoryVisuals.SilverNecklace),
+                typeof(AccessoryVisuals.LeatherBelt),
+                typeof(AccessoryVisuals.SilverRing),
+                typeof(AccessoryVisuals.BasicWard),
+
+                typeof(ArmorVisuals.LeatherHelmet),
+                typeof(ArmorVisuals.LeatherJerkin),
+                typeof(ArmorVisuals.LeatherGreaves),
+                typeof(ArmorVisuals.LeatherBoots),
+
+                typeof(ShapeVisuals.WallOfFlames),
+                typeof(ShapeVisuals.ZoneOfFlames),
+                
+                typeof(TargetingVisuals.ProjectileFlames),
 
                 typeof(WeaponVisuals.BasicAxe),
                 typeof(WeaponVisuals.BasicBow),
@@ -121,6 +137,7 @@ namespace FullPotential.Standard
 
         public void RegisterEventHandlers(IEventManager eventManager)
         {
+            eventManager.Subscribe(EventIds.FighterReloadStart, new ReloaderEventHandler());
             eventManager.Subscribe(EventIds.FighterDamageTaken, new BarrierEventHandler());
         }
     }

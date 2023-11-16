@@ -7,6 +7,6 @@ namespace FullPotential.Api.Registry.Effects
         /// <summary>
         /// This effect occurs as a result of applying another effect
         /// </summary>
-        Type SideEffectType { get; }
+        Guid SideEffectTypeId { get; }
     }
 }

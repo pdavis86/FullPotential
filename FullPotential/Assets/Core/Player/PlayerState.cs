@@ -91,7 +91,7 @@ namespace FullPotential.Core.Player
         [HideInInspector] public string PlayerToken { get; set; }
         [HideInInspector] public string Username { get; private set; }
 
-        public IPlayerInventory Inventory { get; private set; }
+        public IPlayerInventory PlayerInventory { get; private set; }
 
         public override Transform Transform => transform;
 
@@ -115,8 +115,8 @@ namespace FullPotential.Core.Player
             //_mana.OnValueChanged += OnManaChanged;
             //_energy.OnValueChanged += OnEnergyChanged;
 
-            Inventory = GetComponent<PlayerInventory>();
-            _inventory = Inventory;
+            PlayerInventory = GetComponent<PlayerInventory>();
+            _inventory = PlayerInventory;
             _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
 
             _userRepository = DependenciesContext.Dependencies.GetService<IUserRepository>();
@@ -674,7 +674,7 @@ namespace FullPotential.Core.Player
                 new Api.Utilities.Data.KeyValuePair<string, int>(nameof(ResourceType.Stamina), _stamina.Value),
             };
 
-            _saveData.Inventory = Inventory.GetSaveData();
+            _saveData.Inventory = PlayerInventory.GetSaveData();
 
             return _saveData;
         }

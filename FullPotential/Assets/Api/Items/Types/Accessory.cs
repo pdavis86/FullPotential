@@ -1,18 +1,37 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
-using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Utilities.Extensions;
 
 namespace FullPotential.Api.Items.Types
 {
-    [System.Serializable]
-    public class Accessory : ItemWithHealthBase
+    [Serializable]
+    public class Accessory : ItemWithHealthBase, IHasVisuals
     {
-        //todo: set Accessory visuals
-        public IAccessoryVisuals Visuals { get; set; }
+        private IVisuals _visuals;
+
+        //Variables so they are serialized
+        // ReSharper disable MemberCanBePrivate.Global
+        // ReSharper disable NotAccessedField.Global
+        public string AccessoryVisualsTypeId;
+        // ReSharper restore MemberCanBePrivate.Global
+        // ReSharper restore NotAccessedField.Global
+
+        public string VisualsTypeId => AccessoryVisualsTypeId;
+
+        public IVisuals Visuals
+        {
+            get => _visuals;
+            set
+            {
+                _visuals = value;
+                AccessoryVisualsTypeId = _visuals?.TypeId.ToString();
+            }
+        }
 
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
         {

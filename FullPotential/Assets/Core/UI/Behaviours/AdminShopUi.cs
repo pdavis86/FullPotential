@@ -73,7 +73,7 @@ namespace FullPotential.Core.UI.Behaviours
         {
             var playerState = GameManager.Instance.GetLocalPlayerGameObject().GetComponent<PlayerState>();
 
-            if (playerState.Inventory.IsInventoryFull())
+            if (playerState.PlayerInventory.IsInventoryFull())
             {
                 playerState.AlertInventoryIsFull();
                 GameManager.Instance.UserInterface.HideAllMenus();

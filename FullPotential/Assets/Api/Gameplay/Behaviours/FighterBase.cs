@@ -61,6 +61,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public string FighterName => _entityName.Value.ToString();
 
+        public IInventory Inventory => _inventory;
+
         #endregion
 
         #region Unity Events Handlers
@@ -132,12 +134,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
         }
 
         [ServerRpc]
-        public void ReloadServerRpc(bool isLeftHand)
+        private void ReloadServerRpc(bool isLeftHand)
         {
-            var handStatus = GetHandStatus(isLeftHand);
-            var args = GetReloadEventArgs(isLeftHand);
-
-            StartCoroutine(ReloadCoroutine(handStatus, args));
+            StartCoroutine(ReloadCoroutine(GetReloadEventArgs(isLeftHand)));
 
             var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, new[] { 0ul, OwnerClientId });
             ReloadingClientRpc(isLeftHand, nearbyClients);
@@ -165,10 +164,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ClientRpc]
         private void ReloadingClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
         {
-            var handStatus = GetHandStatus(isLeftHand);
-            var args = GetReloadEventArgs(isLeftHand);
-
-            StartCoroutine(ReloadCoroutine(handStatus, args));
+            StartCoroutine(ReloadCoroutine(GetReloadEventArgs(isLeftHand)));
         }
 
         // ReSharper disable once UnusedParameter.Local
@@ -200,7 +196,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                    || HandStatusRight.IsConsumingResource(ResourceType.Mana);
         }
 
-        private HandStatus GetHandStatus(bool isLeftHand)
+        public HandStatus GetHandStatus(bool isLeftHand)
         {
             return isLeftHand ? HandStatusLeft : HandStatusRight;
         }
@@ -209,7 +205,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private ReloadEventArgs GetReloadEventArgs(bool isLeftHand)
         {
-            return isLeftHand ? _reloadArgsLeft : _reloadArgsRight;
+            var reloadEventArgs = isLeftHand ? _reloadArgsLeft : _reloadArgsRight;
+            var handStatus = GetHandStatus(isLeftHand);
+            reloadEventArgs.CurrentAmmoCount = handStatus.EquippedWeapon.Ammo;
+            return reloadEventArgs;
         }
 
         public void TriggerReloadStartEvent(bool isLeftHand)
@@ -217,25 +216,35 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _eventManager.Trigger(EventIds.FighterReloadStart, GetReloadEventArgs(isLeftHand));
         }
 
-        public static void HandleReloadStartEvent(IEventHandlerArgs args)
+        public static void DefaultHandlerForReloadStartEvent(IEventHandlerArgs args)
         {
-            var reloadArgs = (ReloadEventArgs)args;
-            reloadArgs.Fighter.Reload(reloadArgs);
+            var reloadEventArgs = (ReloadEventArgs)args;
+
+            var fighter = reloadEventArgs.Fighter;
+            var handStatus = fighter.GetHandStatus(reloadEventArgs.IsLeftHand);
+
+            var ammoTypeId = handStatus.EquippedWeapon.GetAmmoTypeId();
+            var ammoMax = handStatus.EquippedWeapon.GetAmmoMax();
+            reloadEventArgs.NewAmmoCount = fighter.Inventory.TakeItemStack(ammoTypeId, ammoMax)?.Count ?? 0;
+
+            reloadEventArgs.Fighter.Reload(reloadEventArgs);
         }
 
-        public void Reload(ReloadEventArgs reloadArgs)
+        public void Reload(ReloadEventArgs reloadEventArgs)
         {
-            StartCoroutine(ReloadCoroutine(GetHandStatus(reloadArgs.IsLeftHand), reloadArgs));
-
-            ReloadServerRpc(reloadArgs.IsLeftHand);
-        }
-
-        private IEnumerator ReloadCoroutine(HandStatus handStatus, ReloadEventArgs args)
-        {
-            if (handStatus.EquippedWeapon == null)
+            if (GetHandStatus(reloadEventArgs.IsLeftHand).EquippedWeapon == null)
             {
-                yield break;
+                return;
             }
+
+            StartCoroutine(ReloadCoroutine(reloadEventArgs));
+
+            ReloadServerRpc(reloadEventArgs.IsLeftHand);
+        }
+
+        private IEnumerator ReloadCoroutine(ReloadEventArgs reloadEventArgs)
+        {
+            var handStatus = GetHandStatus(reloadEventArgs.IsLeftHand);
 
             handStatus.IsReloading = true;
 
@@ -247,14 +256,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 yield break;
             }
 
-            var ammoTypeId = handStatus.EquippedWeapon.GetAmmoTypeId();
-            var ammoMax = handStatus.EquippedWeapon.GetAmmoMax();
-            var availableAmmo = _inventory.TakeItemStack(ammoTypeId, ammoMax);
-
-            handStatus.EquippedWeapon.Ammo = availableAmmo?.Count ?? 0;
+            handStatus.EquippedWeapon.Ammo = reloadEventArgs.NewAmmoCount;
             handStatus.IsReloading = false;
 
-            _eventManager.Trigger(EventIds.FighterReloadEnd, args);
+            _eventManager.Trigger(EventIds.FighterReloadEnd, reloadEventArgs);
         }
 
         #endregion
@@ -337,7 +342,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return true;
             }
 
-            Debug.LogWarning("Trying to attack hold an item that is not compatible");
+            //Debug.LogWarning("Trying to attack hold an item that is not compatible");
             return false;
         }
 
