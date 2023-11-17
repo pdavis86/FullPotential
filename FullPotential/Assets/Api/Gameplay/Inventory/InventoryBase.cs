@@ -295,19 +295,22 @@ namespace FullPotential.Api.Gameplay.Inventory
             }
         }
 
-        protected void MergeItemStacks(ItemStack itemStack)
+        protected void MergeItemStacks(ItemStack newStack)
         {
             var partiallyFullStacks = _items
-                .Where(i => i.Value is ItemStack ist && ist.Count < ist.MaxSize)
+                .Where(
+                    i => i.Value is ItemStack oldStack
+                    && oldStack.RegistryTypeId == newStack.RegistryTypeId
+                    && oldStack.Count < oldStack.MaxSize)
                 .Select(i => (ItemStack)i.Value);
 
             if (!partiallyFullStacks.Any())
             {
-                _items.Add(itemStack.Id, itemStack);
+                _items.Add(newStack.Id, newStack);
                 return;
             }
 
-            var itemsRemaining = itemStack.Count;
+            var itemsRemaining = newStack.Count;
 
             foreach (var partiallyFullStack in partiallyFullStacks)
             {
@@ -329,8 +332,8 @@ namespace FullPotential.Api.Gameplay.Inventory
                 return;
             }
 
-            itemStack.Count = itemsRemaining;
-            _items.Add(itemStack.Id, itemStack);
+            newStack.Count = itemsRemaining;
+            _items.Add(newStack.Id, newStack);
         }
     }
 }

@@ -109,6 +109,8 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateHandOverlays()
         {
+            //todo: do not fire on every update!
+
             UpdateHandDescription(_equippedLeftHandSummary, _playerFighter.HandStatusLeft);
             UpdateHandAmmo(_playerFighter, true);
             UpdateHandCharge(_chargeLeft, _playerFighter.HandStatusLeft);
@@ -143,7 +145,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 ammoText.gameObject.SetActive(true);
             }
 
-            //todo: replace hard-coded value
+            //todo: replace hard-coded value for reloader
             if (!fighter.HasItemInSlot("0ebf5a82-bb28-40fc-8a98-e562af78a7b5"))
             {
                 noReloaderObject.SetActive(true);
