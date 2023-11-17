@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Registry.Gear;
+using FullPotential.Standard.EventHandlers;
 
 namespace FullPotential.Standard.Accessories
 {
@@ -10,5 +13,10 @@ namespace FullPotential.Standard.Accessories
         public Guid TypeId => new Guid(TypeIdString);
 
         public string TypeName => nameof(Barrier);
+
+        public Dictionary<string, IEventHandler> EventHandlers { get; } = new Dictionary<string, IEventHandler>
+        {
+            {EventIds.FighterDamageTaken, new BarrierEventHandler()}
+        };
     }
 }

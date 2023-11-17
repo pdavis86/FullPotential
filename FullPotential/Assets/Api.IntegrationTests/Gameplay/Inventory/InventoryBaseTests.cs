@@ -149,13 +149,15 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
             var itemB = new ItemStack { Id = "b", Count = 5, RegistryType = _stackRegistryType1.Object };
             _inventory.Items.Add(itemB.Id, itemB);
 
-            //todo: add a third stack to ensure too many are NOT taken
+            var itemC = new ItemStack { Id = "c", Count = 5, RegistryType = _stackRegistryType1.Object };
+            _inventory.Items.Add(itemC.Id, itemC);
 
             var result = _inventory.TakeItemStack(_stackRegistryType1.Object.TypeId.ToString(), 7);
 
             Assert.IsTrue(result.Count == 7);
             Assert.IsNull(_inventory.GetItemWithId<ItemStack>(itemA.Id, false));
             Assert.IsTrue(_inventory.GetItemWithId<ItemStack>(itemB.Id).Count == 3);
+            Assert.IsTrue(_inventory.GetItemWithId<ItemStack>(itemC.Id).Count == 5);
         }
 
         [Test]

@@ -89,10 +89,12 @@
     <Compile Include="Assets\Core\Gameplay\Tooltips\TooltipWithTranslation.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectsUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\SettingsMenuUi.cs" />
+    <Compile Include="Assets\Core\Gameplay\Targeting\PointToPoint.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DebuggingActiveState.cs" />
     <Compile Include="Assets\Core\UI\Components\SlideOutAlert.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DestroyOnTriggerEnter.cs" />
     <Compile Include="Assets\Core\Gameplay\Shapes\WallBehaviour.cs" />
+    <Compile Include="Assets\Core\Gameplay\Targeting\ITargetingVisualsBehaviour.cs" />
     <Compile Include="Assets\Core\Gameplay\Targeting\ProjectileBehaviour.cs" />
     <Compile Include="Assets\Core\Gameplay\Shapes\ZoneBehaviour.cs" />
     <Compile Include="Assets\Core\UI\Components\InventoryItemsList.cs" />
@@ -101,6 +103,7 @@
     <Compile Include="Assets\Core\Localization\Data\Localization.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\MaintainDistance.cs" />
     <Compile Include="Assets\Core\GameManagement\Events\GameSettingsUpdatedEventArgs.cs" />
+    <Compile Include="Assets\Core\Gameplay\Shapes\Zone.cs" />
     <Compile Include="Assets\Core\Player\PlayerState.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltips.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiSlot.cs" />
@@ -110,9 +113,11 @@
     <Compile Include="Assets\Core\UI\Components\BarSlider.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiEquipmentTab.cs" />
     <Compile Include="Assets\Core\Environment\LootInteractable.cs" />
+    <Compile Include="Assets\Core\Gameplay\Targeting\Projectile.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\AdminShopUi.cs" />
     <Compile Include="Assets\Core\Utilities\Static\DefaultSceneLoader.cs" />
     <Compile Include="Assets\Core\UI\Components\CraftingSelector.cs" />
+    <Compile Include="Assets\Core\Gameplay\Shapes\Wall.cs" />
     <Compile Include="Assets\Core\UI\Components\NameAndValueSlider.cs" />
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsOffline.cs" />
     <Compile Include="Assets\Core\Gameplay\Targeting\BeamVisualsBehaviour.cs" />
@@ -130,9 +135,13 @@
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\LookAtMainCamera.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiRow.cs" />
     <Compile Include="Assets\Core\Player\PlayerMovement.cs" />
+    <Compile Include="Assets\Core\Gameplay\Targeting\Touch.cs" />
+    <Compile Include="Assets\Core\Gameplay\Targeting\Self.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectUi.cs" />
+    <Compile Include="Assets\Core\Gameplay\Targeting\ITargetingBehaviour.cs" />
     <Compile Include="Assets\Core\Gameplay\Events\EventManager.cs" />
     <Compile Include="Assets\Core\GameManagement\Enums\ConnectStatus.cs" />
+    <Compile Include="Assets\Core\Gameplay\Shapes\IShapeBehaviour.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\StickUiToWorldPosition.cs" />
     <Compile Include="Assets\Core\GameManagement\Inventory\IInventoryDataService.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\DrawingPadUi.cs" />
@@ -140,15 +149,6 @@
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsStartup.cs" />
     <Compile Include="Assets\Core\GameManagement\AddressablesManager.cs" />
     <Compile Include="Assets\Core\GameManagement\GameManager.cs" />
-    <Compile Include="Assets\Core\Gameplay\Targeting\ITargetingBehaviour.cs" />
-    <Compile Include="Assets\Core\Gameplay\Targeting\Touch.cs" />
-    <Compile Include="Assets\Core\Gameplay\Targeting\Projectile.cs" />
-    <Compile Include="Assets\Core\Gameplay\Targeting\PointToPoint.cs" />
-    <Compile Include="Assets\Core\Gameplay\Targeting\Self.cs" />
-    <Compile Include="Assets\Core\Gameplay\Shapes\Zone.cs" />
-    <Compile Include="Assets\Core\Gameplay\Shapes\Wall.cs" />
-    <Compile Include="Assets\Core\Gameplay\Shapes\IShapeBehaviour.cs" />
-    <Compile Include="Assets\Core\Gameplay\Targeting\ITargetingVisualsBehaviour.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Core\FullPotential.Core.asmdef" />

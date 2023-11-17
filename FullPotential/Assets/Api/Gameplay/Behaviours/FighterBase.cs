@@ -48,7 +48,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private DelayedAction _consumeResource;
         private ReloadEventArgs _reloadArgsLeft;
         private ReloadEventArgs _reloadArgsRight;
-
+        private ShotFiredEventArgs _shotFiredArgsLeft;
+        private ShotFiredEventArgs _shotFiredArgsRight;
         #endregion
 
         #region Properties
@@ -76,6 +77,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             _reloadArgsLeft = new ReloadEventArgs(this, true);
             _reloadArgsRight = new ReloadEventArgs(this, false);
+
+            _shotFiredArgsLeft = new ShotFiredEventArgs(this, true);
+            _shotFiredArgsRight = new ShotFiredEventArgs(this, false);
         }
 
         protected override void Start()
@@ -205,27 +209,32 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private ReloadEventArgs GetReloadEventArgs(bool isLeftHand)
         {
-            var reloadEventArgs = isLeftHand ? _reloadArgsLeft : _reloadArgsRight;
-            var handStatus = GetHandStatus(isLeftHand);
-            reloadEventArgs.CurrentAmmoCount = handStatus.EquippedWeapon.Ammo;
-            return reloadEventArgs;
+            return isLeftHand ? _reloadArgsLeft : _reloadArgsRight;
+        }
+
+        private ShotFiredEventArgs GetShotFiredEventArgs(bool isLeftHand)
+        {
+            return isLeftHand ? _shotFiredArgsLeft : _shotFiredArgsRight;
         }
 
         public void TriggerReloadStartEvent(bool isLeftHand)
         {
-            _eventManager.Trigger(EventIds.FighterReloadStart, GetReloadEventArgs(isLeftHand));
+            _eventManager.Trigger(EventIds.FighterReloadBegin, GetReloadEventArgs(isLeftHand));
         }
 
         public static void DefaultHandlerForReloadStartEvent(IEventHandlerArgs args)
         {
             var reloadEventArgs = (ReloadEventArgs)args;
 
-            var fighter = reloadEventArgs.Fighter;
-            var handStatus = fighter.GetHandStatus(reloadEventArgs.IsLeftHand);
+            reloadEventArgs.GetNewAmmoCount = () =>
+            {
+                var fighter = reloadEventArgs.Fighter;
+                var handStatus = fighter.GetHandStatus(reloadEventArgs.IsLeftHand);
 
-            var ammoTypeId = handStatus.EquippedWeapon.GetAmmoTypeId();
-            var ammoMax = handStatus.EquippedWeapon.GetAmmoMax();
-            reloadEventArgs.NewAmmoCount = fighter.Inventory.TakeItemStack(ammoTypeId, ammoMax)?.Count ?? 0;
+                var ammoTypeId = handStatus.EquippedWeapon.GetAmmoTypeId();
+                var ammoMax = handStatus.EquippedWeapon.GetAmmoMax();
+                return fighter.Inventory.TakeItemStack(ammoTypeId, ammoMax)?.Count ?? 0;
+            };
 
             reloadEventArgs.Fighter.Reload(reloadEventArgs);
         }
@@ -256,10 +265,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 yield break;
             }
 
-            handStatus.EquippedWeapon.Ammo = reloadEventArgs.NewAmmoCount;
+            handStatus.EquippedWeapon.Ammo = reloadEventArgs.GetNewAmmoCount();
             handStatus.IsReloading = false;
 
-            _eventManager.Trigger(EventIds.FighterReloadEnd, reloadEventArgs);
+            _eventManager.Trigger(EventIds.FighterReloadFinished, reloadEventArgs);
         }
 
         #endregion
@@ -573,21 +582,19 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return false;
             }
 
-            var requiredAmmo = 1 + handStatus.EquippedWeapon.Attributes.ExtraAmmoPerShot;
+            var requiredAmmo = Math.Min(
+                1 + handStatus.EquippedWeapon.Attributes.ExtraAmmoPerShot,
+                handStatus.EquippedWeapon.Ammo);
 
-            if (handStatus.EquippedWeapon.Ammo >= requiredAmmo)
-            {
-                handStatus.EquippedWeapon.Ammo -= requiredAmmo;
-                return UseRangedWeapon(handPosition, weaponInHand, requiredAmmo);
-            }
-
-            var ammoUsed = handStatus.EquippedWeapon.Ammo;
-            handStatus.EquippedWeapon.Ammo = 0;
-            return UseRangedWeapon(handPosition, weaponInHand, ammoUsed);
+            handStatus.EquippedWeapon.Ammo -= requiredAmmo;
+            return UseRangedWeapon(isLeftHand, handPosition, weaponInHand, requiredAmmo);
         }
 
-        private bool UseRangedWeapon(Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
+        private bool UseRangedWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
         {
+            //todo: should this have a default?
+            _eventManager.Trigger(EventIds.FighterShotFired, GetShotFiredEventArgs(isLeftHand));
+
             var shotDirection = weaponInHand.GetShotDirection(LookTransform.forward);
 
             var endPos = Physics.Raycast(LookTransform.position, shotDirection, out var rangedHit, MaximumRange)

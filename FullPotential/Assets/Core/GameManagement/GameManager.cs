@@ -385,9 +385,12 @@ namespace FullPotential.Core.GameManagement
         {
             var eventManager = (EventManager)DependenciesContext.Dependencies.GetService<IEventManager>();
 
-            eventManager.Register(EventIds.FighterReloadStart, FighterBase.DefaultHandlerForReloadStartEvent);
-            eventManager.Register(EventIds.FighterReloadEnd, null);
+            eventManager.Register(EventIds.FighterReloadBegin, FighterBase.DefaultHandlerForReloadStartEvent);
+            eventManager.Register(EventIds.FighterReloadFinished, null);
             eventManager.Register(EventIds.FighterDamageTaken, null);
+
+            //todo: this this have a default?
+            eventManager.Register(EventIds.FighterShotFired, null);
         }
 
         #region Methods for Mods

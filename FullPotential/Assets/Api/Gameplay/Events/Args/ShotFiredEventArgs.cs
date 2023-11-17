@@ -1,19 +1,17 @@
-﻿using System;
-using FullPotential.Api.Gameplay.Combat;
+﻿using FullPotential.Api.Gameplay.Combat;
 
 namespace FullPotential.Api.Gameplay.Events.Args
 {
-    public class ReloadEventArgs : IEventHandlerArgs
+    public class ShotFiredEventArgs : IEventHandlerArgs
     {
+        //todo: can be cancelled?
         public bool IsDefaultHandlerCancelled { get; set; }
 
         public IFighter Fighter { get; }
 
         public bool IsLeftHand { get; }
 
-        public Func<int> GetNewAmmoCount { get; set; }
-
-        public ReloadEventArgs(IFighter fighter, bool isLeftHand)
+        public ShotFiredEventArgs(IFighter fighter, bool isLeftHand)
         {
             Fighter = fighter;
             IsLeftHand = isLeftHand;

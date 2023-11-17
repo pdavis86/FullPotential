@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Modding;
-using FullPotential.Standard.EventHandlers;
 using UnityEngine;
 
 // ReSharper disable UnusedType.Global
@@ -137,8 +136,7 @@ namespace FullPotential.Standard
 
         public void RegisterEventHandlers(IEventManager eventManager)
         {
-            eventManager.Subscribe(EventIds.FighterReloadStart, new ReloaderEventHandler());
-            eventManager.Subscribe(EventIds.FighterDamageTaken, new BarrierEventHandler());
+            //Example: eventManager.Subscribe(EventIds.xxx, new xxxEventHandler());
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.Accessories
@@ -10,5 +12,7 @@ namespace FullPotential.Standard.Accessories
         public Guid TypeId => new Guid(TypeIdString);
 
         public string TypeName => nameof(Amulet);
+
+        public Dictionary<string, IEventHandler> EventHandlers => null;
     }
 }
