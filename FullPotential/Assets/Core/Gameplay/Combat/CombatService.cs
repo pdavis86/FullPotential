@@ -15,9 +15,9 @@ using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Gameplay.Shapes;
-using FullPotential.Core.Gameplay.Targeting;
 using FullPotential.Core.Player;
+using FullPotential.Core.Registry.Shapes;
+using FullPotential.Core.Registry.Targeting;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -127,7 +127,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 if (sourceFighter != null && effect is IHasSideEffect withSideEffect)
                 {
-                    var sideEffect = _typeRegistry.GetEffect(withSideEffect.SideEffectTypeId);
+                    var sideEffect = _typeRegistry.GetEffect(withSideEffect.SideEffectTypeId.ToString());
                     ApplyEffect(null, sideEffect, itemUsed, sourceFighter.GameObject, position, effectPercentage);
                 }
             }

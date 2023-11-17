@@ -18,5 +18,9 @@ namespace FullPotential.Standard.Accessories
         {
             {EventIds.FighterDamageTaken, new BarrierEventHandler()}
         };
+
+        public int SlotCount => 1;
+
+        public string SlotSpritePrefabAddress => "Standard/UI/Equipment/Barrier.png";
     }
 }

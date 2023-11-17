@@ -8,6 +8,7 @@ using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine;
@@ -416,8 +417,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             var itemInHand = isLeftHand
-                ? _inventory.GetItemInSlot(SlotGameObjectName.LeftHand)
-                : _inventory.GetItemInSlot(SlotGameObjectName.RightHand);
+                ? _inventory.GetItemInSlot(SlotIds.LeftHand)
+                : _inventory.GetItemInSlot(SlotIds.RightHand);
 
             var handPosition = isLeftHand
                 ? Positions.LeftHand.position
@@ -592,7 +593,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private bool UseRangedWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
         {
-            //todo: should this have a default?
             _eventManager.Trigger(EventIds.FighterShotFired, GetShotFiredEventArgs(isLeftHand));
 
             var shotDirection = weaponInHand.GetShotDirection(LookTransform.forward);
@@ -711,9 +711,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
         // ReSharper restore UnassignedField.Global
         #endregion
 
-        public bool HasTypeEquipped(SlotGameObjectName slotGameObjectName)
+        public bool HasItemInSlot(string slotId)
         {
-            return _inventory.HasTypeEquipped(slotGameObjectName);
+            return _inventory.HasTypeEquipped(slotId);
         }
     }
 }

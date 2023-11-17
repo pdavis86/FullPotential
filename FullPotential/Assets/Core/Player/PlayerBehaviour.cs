@@ -7,7 +7,7 @@ using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Obsolete;
+using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
@@ -195,7 +195,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.InitialiseForEquip(EventSource, SlotGameObjectName.LeftHand);
+                _drawingPadUi.InitialiseForEquip(EventSource, SlotIds.LeftHand);
                 _drawingPadUi.StartDrawing();
             }
         }
@@ -211,7 +211,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.StopDrawing(SlotGameObjectName.LeftHand);
+                _drawingPadUi.StopDrawing(SlotIds.LeftHand);
             }
 
             OnAttack(true);
@@ -222,7 +222,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.InitialiseForEquip(EventSource, SlotGameObjectName.RightHand);
+                _drawingPadUi.InitialiseForEquip(EventSource, SlotIds.RightHand);
                 _drawingPadUi.StartDrawing();
             }
         }
@@ -238,7 +238,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.StopDrawing(SlotGameObjectName.RightHand);
+                _drawingPadUi.StopDrawing(SlotIds.RightHand);
             }
 
             OnAttack(false);
@@ -621,7 +621,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            if (e.SlotGameObjectName == null)
+            if (e.SlotId.IsNullOrWhiteSpace())
             {
                 Debug.LogError("No slot was set so cannot equip any item");
                 return;
@@ -636,7 +636,7 @@ namespace FullPotential.Core.Player
             }
 
             var playerInventory = (PlayerInventory)_playerState.Inventory;
-            playerInventory.EquipItemServerRpc(item.Id, e.SlotGameObjectName.Value);
+            playerInventory.EquipItemServerRpc(item.Id, e.SlotId);
         }
 
     }

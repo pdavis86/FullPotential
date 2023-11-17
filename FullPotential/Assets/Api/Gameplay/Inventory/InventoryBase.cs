@@ -1,19 +1,19 @@
-﻿using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Utilities.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
+using FullPotential.Api.Ui;
+using FullPotential.Api.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -30,7 +30,7 @@ namespace FullPotential.Api.Gameplay.Inventory
 
         protected Dictionary<string, ItemBase> _items;
         protected int _maxItemCount;
-        protected Dictionary<SlotGameObjectName, EquippedItem> _equippedItems;
+        protected Dictionary<string, EquippedItem> _equippedItems;
 
         //Services
         protected ITypeRegistry _typeRegistry;
@@ -44,7 +44,7 @@ namespace FullPotential.Api.Gameplay.Inventory
         protected virtual void Awake()
         {
             _items = new Dictionary<string, ItemBase>();
-            _equippedItems = new Dictionary<SlotGameObjectName, EquippedItem>();
+            _equippedItems = new Dictionary<string, EquippedItem>();
 
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
@@ -58,18 +58,14 @@ namespace FullPotential.Api.Gameplay.Inventory
         {
             var defenseSum = 0;
 
-            foreach (SlotGameObjectName slotGameObjectName in Enum.GetValues(typeof(SlotGameObjectName)))
+            foreach (var kvp in _equippedItems)
             {
-                var equippedItemId = _equippedItems.TryGetValue(slotGameObjectName, out var equippedItem)
-                    ? equippedItem.Item?.Id
-                    : null;
-
-                if (equippedItemId.IsNullOrWhiteSpace())
+                if (kvp.Value.Item?.Id == null)
                 {
                     continue;
                 }
 
-                var item = GetItemWithId<ItemBase>(equippedItemId);
+                var item = GetItemWithId<ItemBase>(kvp.Value.Item.Id);
                 if (item is IDefensible defensibleItem)
                 {
                     defenseSum += defensibleItem.GetDefenseValue();
@@ -100,9 +96,9 @@ namespace FullPotential.Api.Gameplay.Inventory
             return castAsType;
         }
 
-        public ItemBase GetItemInSlot(SlotGameObjectName slotGameObjectName)
+        public ItemBase GetItemInSlot(string slotId)
         {
-            return _equippedItems.TryGetValue(slotGameObjectName, out var equippedItem)
+            return _equippedItems.TryGetValue(slotId, out var equippedItem)
                 ? equippedItem.Item
                 : null;
         }
@@ -165,9 +161,9 @@ namespace FullPotential.Api.Gameplay.Inventory
                 .Sum(i => i.Count);
         }
 
-        public bool HasTypeEquipped(SlotGameObjectName slotGameObjectName)
+        public bool HasTypeEquipped(string slotId)
         {
-            return _equippedItems.ContainsKey(slotGameObjectName);
+            return _equippedItems.ContainsKey(slotId);
         }
 
         public bool IsInventoryFull()
@@ -222,6 +218,18 @@ namespace FullPotential.Api.Gameplay.Inventory
             return errors;
         }
 
+        protected bool IsValidSlotId(string slotId)
+        {
+            if (slotId is SlotIds.LeftHand or SlotIds.RightHand)
+            {
+                return true;
+            }
+
+            return _typeRegistry.GetRegisteredTypes<IArmor>().FirstOrDefault(t => t.TypeId.ToString() == slotId) != null
+                   || _typeRegistry.GetRegisteredTypes<IAccessory>().FirstOrDefault(t => t.TypeId.ToString().StartsWith(slotId)) != null
+                   || _typeRegistry.GetRegisteredTypes<IRegisterableWithSlot>().FirstOrDefault(t => t.TypeId.ToString() == slotId) != null;
+        }
+
         protected void FillTypesFromIds(ItemBase item)
         {
             if (!string.IsNullOrWhiteSpace(item.RegistryTypeId) && item.RegistryType == null)
@@ -267,7 +275,7 @@ namespace FullPotential.Api.Gameplay.Inventory
             {
                 if (combatItem.EffectIds != null && combatItem.EffectIds.Length > 0 && combatItem.Effects == null)
                 {
-                    combatItem.Effects = combatItem.EffectIds.Select(x => _typeRegistry.GetEffect(new Guid(x))).ToList();
+                    combatItem.Effects = combatItem.EffectIds.Select(x => _typeRegistry.GetEffect(x)).ToList();
                 }
             }
         }

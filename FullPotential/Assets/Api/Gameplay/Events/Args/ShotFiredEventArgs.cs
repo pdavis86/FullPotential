@@ -4,7 +4,7 @@ namespace FullPotential.Api.Gameplay.Events.Args
 {
     public class ShotFiredEventArgs : IEventHandlerArgs
     {
-        //todo: can be cancelled?
+        //todo: ShotFired can be cancelled?
         public bool IsDefaultHandlerCancelled { get; set; }
 
         public IFighter Fighter { get; }

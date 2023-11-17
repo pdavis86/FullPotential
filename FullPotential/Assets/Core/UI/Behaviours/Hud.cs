@@ -6,7 +6,6 @@ using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Ui;
 using FullPotential.Core.Ui.Components;
@@ -144,7 +143,8 @@ namespace FullPotential.Core.Ui.Behaviours
                 ammoText.gameObject.SetActive(true);
             }
 
-            if (!fighter.HasTypeEquipped(SlotGameObjectName.Reloader))
+            //todo: replace hard-coded value
+            if (!fighter.HasItemInSlot("0ebf5a82-bb28-40fc-8a98-e562af78a7b5"))
             {
                 noReloaderObject.SetActive(true);
             }

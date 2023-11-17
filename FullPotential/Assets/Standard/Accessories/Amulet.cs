@@ -14,5 +14,9 @@ namespace FullPotential.Standard.Accessories
         public string TypeName => nameof(Amulet);
 
         public Dictionary<string, IEventHandler> EventHandlers => null;
+
+        public int SlotCount => 1;
+
+        public string SlotSpritePrefabAddress => "Standard/UI/Equipment/Amulet.png";
     }
 }

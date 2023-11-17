@@ -14,5 +14,9 @@ namespace FullPotential.Standard.Accessories
         public string TypeName => nameof(Ring);
 
         public Dictionary<string, IEventHandler> EventHandlers => null;
+        
+        public int SlotCount => 2;
+
+        public string SlotSpritePrefabAddress => "Standard/UI/Equipment/Ring.png";
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
+using FullPotential.Api.Registry.Armor;
 using FullPotential.Api.Registry.Gear;
-using FullPotential.Standard.Armor;
 
 namespace FullPotential.Standard.ArmorVisuals
 {
@@ -12,6 +12,6 @@ namespace FullPotential.Standard.ArmorVisuals
 
         public string PrefabAddress => "Standard/Prefabs/Armor/Chest.prefab";
 
-        public Guid ApplicableToTypeId => new Guid(Chest.TypeIdString);
+        public Guid ApplicableToTypeId => ArmorTypeIds.Chest;
     }
 }

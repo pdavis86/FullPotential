@@ -10,30 +10,17 @@ namespace FullPotential.Standard
 {
     public class Registration : MonoBehaviour, IMod
     {
-        public IEnumerable<Guid> GetSpecialGearSlotIds()
-        {
-            return new[]
-            {
-                SpecialGear.SpecialGearSlots.Reloader
-            };
-        }
-
         public IEnumerable<Type> GetRegisterableTypes()
         {
             return new[]
             {
+                typeof(Accessories.Ring),
                 typeof(Accessories.Amulet),
                 typeof(Accessories.Barrier),
                 typeof(Accessories.Belt),
-                typeof(Accessories.Ring),
 
                 typeof(Ammo.Arrow),
                 typeof(Ammo.Bullet),
-
-                typeof(Armor.Chest),
-                typeof(Armor.Feet),
-                typeof(Armor.Helm),
-                typeof(Armor.Legs),
 
                 typeof(Effects.Buffs.Courage),
                 typeof(Effects.Buffs.Endurance),
@@ -85,6 +72,8 @@ namespace FullPotential.Standard
 
                 typeof(SpecialGear.ConsolidatorReloader),
                 typeof(SpecialGear.TeleportReloader),
+
+                typeof(SpecialSlots.RangedWeaponReloader),
 
                 typeof(Weapons.Axe),
                 typeof(Weapons.Bow),

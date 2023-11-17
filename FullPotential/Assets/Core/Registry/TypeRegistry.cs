@@ -6,9 +6,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.Types;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
@@ -48,6 +46,7 @@ namespace FullPotential.Core.Registry
                 AddToRegister<ISpecialGear>,
                 AddToRegister<ITargeting>,
                 AddToRegister<IWeapon>,
+                AddToRegister<IRegisterableWithSlot>,
             };
 
             _registerVisualsFunctions = new Func<object, bool>[]
@@ -90,19 +89,26 @@ namespace FullPotential.Core.Registry
 
         private void RegisterCoreTypes()
         {
-            ValidateAndRegister(typeof(Gameplay.Targeting.PointToPoint));
-            ValidateAndRegister(typeof(Gameplay.Targeting.Projectile));
-            ValidateAndRegister(typeof(Gameplay.Targeting.Self));
-            ValidateAndRegister(typeof(Gameplay.Targeting.Touch));
+            //Don't need to do this
+            //ValidateAndRegister(typeof(SpecialSlots.LeftHand));
+            //ValidateAndRegister(typeof(SpecialSlots.RightHand));
 
-            ValidateAndRegister(typeof(Gameplay.Shapes.Wall));
-            ValidateAndRegister(typeof(Gameplay.Shapes.Zone));
+            ValidateAndRegister(typeof(Armor.Helm));
+            ValidateAndRegister(typeof(Armor.Chest));
+            ValidateAndRegister(typeof(Armor.Legs));
+            ValidateAndRegister(typeof(Armor.Feet));
+
+            ValidateAndRegister(typeof(Targeting.PointToPoint));
+            ValidateAndRegister(typeof(Targeting.Projectile));
+            ValidateAndRegister(typeof(Targeting.Self));
+            ValidateAndRegister(typeof(Targeting.Touch));
+
+            ValidateAndRegister(typeof(Shapes.Wall));
+            ValidateAndRegister(typeof(Shapes.Zone));
         }
 
         private void HandleModRegistration(IMod mod)
         {
-            //todo: handle special gear slot ID registration 
-
             foreach (var t in mod.GetRegisterableTypes())
             {
                 ValidateAndRegister(t);
@@ -263,7 +269,7 @@ namespace FullPotential.Core.Registry
                 return (T)(object)null;
             }
 
-            var matches = craftablesOfType.Where(x => x.TypeId == new Guid(typeId)).ToList();
+            var matches = craftablesOfType.Where(x => x.TypeId.ToString() == typeId).ToList();
 
             if (!matches.Any())
             {
@@ -287,28 +293,29 @@ namespace FullPotential.Core.Registry
         {
             switch (item)
             {
-                case Accessory:
+                case Api.Items.Types.Accessory:
                     return GetRegistryTypeById<IAccessory>(item.RegistryTypeId);
-                case Armor:
+                case Api.Items.Types.Armor:
                     return GetRegistryTypeById<IArmor>(item.RegistryTypeId);
-                case Weapon:
+                case Api.Items.Types.Weapon:
                     return GetRegistryTypeById<IWeapon>(item.RegistryTypeId);
-                case Loot:
+                case Api.Items.Types.Loot:
                     return GetRegistryTypeById<ILoot>(item.RegistryTypeId);
-                case ItemStack:
+                case Api.Items.Types.ItemStack:
                     return GetItemStackRegistryType(item);
                 default:
                     return null;
             }
         }
 
-        public IEffect GetEffect(Guid typeId)
+        public IEffect GetEffect(string typeId)
         {
             return _registeredTypeLists[typeof(IEffect)]
                 .Cast<IEffect>()
-                .FirstOrDefault(x => x.TypeId == typeId);
+                .FirstOrDefault(x => x.TypeId.ToString() == typeId);
         }
 
+        //todo: generalise away from GameObject?
         public void LoadAddessable(string address, Action<GameObject> action)
         {
             //Addressables.ReleaseInstance(go) : Destroys objects created by Addressables.InstantiateAsync(address)

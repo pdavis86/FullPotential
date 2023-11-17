@@ -389,7 +389,7 @@ namespace FullPotential.Core.GameManagement
             eventManager.Register(EventIds.FighterReloadFinished, null);
             eventManager.Register(EventIds.FighterDamageTaken, null);
 
-            //todo: this this have a default?
+            //todo: should FighterShotFired have a default?
             eventManager.Register(EventIds.FighterShotFired, null);
         }
 

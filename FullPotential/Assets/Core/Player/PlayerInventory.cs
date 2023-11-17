@@ -11,6 +11,7 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Weapons;
+using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
@@ -28,10 +29,6 @@ namespace FullPotential.Core.Player
 {
     public class PlayerInventory : InventoryBase, IPlayerInventory
     {
-        // ReSharper disable FieldCanBeMadeReadOnly.Local
-        [SerializeField] private float _amuletForwardMultiplier = 0.2f;
-        // ReSharper restore FieldCanBeMadeReadOnly.Local
-
         //Services
         private IRpcService _rpcService;
         private IInventoryDataService _inventoryDataService;
@@ -59,11 +56,11 @@ namespace FullPotential.Core.Player
         #region ServerRpc calls
 
         [ServerRpc]
-        public void EquipItemServerRpc(string itemId, SlotGameObjectName slotGameObjectName)
+        public void EquipItemServerRpc(string itemId, string slotId)
         {
             var item = _items[itemId];
 
-            var slotChange = HandleSlotChange(item, slotGameObjectName);
+            var slotChange = HandleSlotChange(item, slotId);
 
             var saveData = GetSaveData();
 
@@ -122,10 +119,10 @@ namespace FullPotential.Core.Player
             foreach (var sourceKvp in changes.EquippedItems)
             {
                 var item = sourceKvp.Value.IsNullOrWhiteSpace() ? null : _items[sourceKvp.Value];
-                var slotGameObjectName = Enum.Parse<SlotGameObjectName>(sourceKvp.Key);
+                var slotId = sourceKvp.Key;
 
-                SetEquippedItem(item, slotGameObjectName);
-                SpawnEquippedObject(item, slotGameObjectName);
+                SetEquippedItem(item, slotId);
+                SpawnEquippedObject(item, slotId);
             }
 
             if (NetworkManager.LocalClientId == OwnerClientId)
@@ -154,51 +151,51 @@ namespace FullPotential.Core.Player
         #endregion
 
         //todo: zzz v0.5 - generalise for use in LivingEntityBase
-        public (bool WasEquipped, List<string> SlotsToSend) HandleSlotChange(ItemBase item, SlotGameObjectName slotGameObjectName)
+        public (bool WasEquipped, List<string> SlotsToSend) HandleSlotChange(ItemBase item, string slotId)
         {
-            var slotsToSend = new List<string> { slotGameObjectName.ToString() };
+            var slotsToSend = new List<string> { slotId };
 
             var previousKvp = _equippedItems
                 .FirstOrDefault(x => x.Value.Item != null && x.Value?.Item.Id == item.Id);
 
-            var previouslyInSlot = previousKvp.Value != null ? (SlotGameObjectName?)previousKvp.Key : null;
+            var previouslyInSlot = previousKvp.Value != null ? previousKvp.Key : null;
 
-            if (previouslyInSlot.HasValue)
+            if (!previouslyInSlot.IsNullOrWhiteSpace())
             {
-                if (previouslyInSlot.Value != slotGameObjectName)
+                if (previouslyInSlot != slotId)
                 {
-                    slotsToSend.Add(previouslyInSlot.Value.ToString());
+                    slotsToSend.Add(previouslyInSlot);
                 }
 
-                _equippedItems[previouslyInSlot.Value].Item = null;
-                SetEquippedItem(null, slotGameObjectName);
+                _equippedItems[previouslyInSlot!].Item = null;
+                SetEquippedItem(null, slotId);
             }
 
             var wasEquipped = false;
-            if (!previouslyInSlot.HasValue || previouslyInSlot.Value != slotGameObjectName)
+            if (previouslyInSlot.IsNullOrWhiteSpace() || previouslyInSlot != slotId)
             {
-                SetEquippedItem(item, slotGameObjectName);
+                SetEquippedItem(item, slotId);
                 wasEquipped = true;
             }
 
-            if (slotGameObjectName == SlotGameObjectName.LeftHand || slotGameObjectName == SlotGameObjectName.RightHand)
+            if (slotId == SlotIds.LeftHand || slotId == SlotIds.RightHand)
             {
-                var otherHandSlot = slotGameObjectName == SlotGameObjectName.LeftHand
-                    ? SlotGameObjectName.RightHand
-                    : SlotGameObjectName.LeftHand;
+                var otherHandSlotId = slotId == SlotIds.LeftHand
+                    ? SlotIds.RightHand
+                    : SlotIds.LeftHand;
 
                 if (item is Weapon weapon && weapon.IsTwoHanded)
                 {
-                    SetEquippedItem(null, otherHandSlot);
-                    slotsToSend.Add(otherHandSlot.ToString());
+                    SetEquippedItem(null, otherHandSlotId);
+                    slotsToSend.Add(otherHandSlotId);
                 }
                 else
                 {
-                    var itemInOtherHand = GetItemInSlot(otherHandSlot);
+                    var itemInOtherHand = GetItemInSlot(otherHandSlotId);
                     if (itemInOtherHand is Weapon otherWeapon && otherWeapon.IsTwoHanded)
                     {
-                        SetEquippedItem(null, otherHandSlot);
-                        slotsToSend.Add(otherHandSlot.ToString());
+                        SetEquippedItem(null, otherHandSlotId);
+                        slotsToSend.Add(otherHandSlotId);
                     }
                 }
             }
@@ -226,7 +223,7 @@ namespace FullPotential.Core.Player
                 .OrderBy(x => x.Name);
         }
 
-        public IEnumerable<ItemBase> GetCompatibleItems(Guid? typeId)
+        public IEnumerable<ItemBase> GetCompatibleItems(string typeId)
         {
             if (typeId == null)
             {
@@ -235,8 +232,13 @@ namespace FullPotential.Core.Player
                     .OrderBy(x => x.Name);
             }
 
+            //todo:remove
+            //var temp = _items
+            //    .Where(x => x.Value.RegistryTypeId == typeId)
+            //    .ToList();
+
             return _items
-                .Where(x => x.Value.RegistryType.TypeId == typeId)
+                .Where(x => x.Value.RegistryTypeId == typeId)
                 .Select(x => x.Value)
                 .OrderBy(x => x.Name);
         }
@@ -344,16 +346,13 @@ namespace FullPotential.Core.Player
                         continue;
                     }
 
-                    if (!Enum.TryParse<SlotGameObjectName>(kvp.Key, out var slotGameObjectName))
-                    {
-                        Debug.LogError($"Failed to load slot data for {kvp.Key}");
-                    }
+                    var slotId = kvp.Key;
 
                     var item = itemsToAdd.First(x => x.Id == kvp.Value);
 
-                    SetEquippedItem(item, slotGameObjectName);
+                    SetEquippedItem(item, slotId);
 
-                    SpawnEquippedObject(item, slotGameObjectName);
+                    SpawnEquippedObject(item, slotId);
                 }
             }
 
@@ -366,25 +365,31 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private void SetEquippedItem(ItemBase item, SlotGameObjectName slotGameObjectName)
+        private void SetEquippedItem(ItemBase item, string slotId)
         {
-            if (_equippedItems.TryGetValue(slotGameObjectName, out var equippedItem))
+            if (_equippedItems.TryGetValue(slotId, out var equippedItem))
             {
                 equippedItem.Item = item;
             }
             else
             {
-                _equippedItems.Add(slotGameObjectName, new EquippedItem
+                if (!IsValidSlotId(slotId))
+                {
+                    Debug.LogWarning($"Invalid slot ID {slotId}");
+                    return;
+                }
+
+                _equippedItems.Add(slotId, new EquippedItem
                 {
                     Item = item
                 });
             }
 
-            if (slotGameObjectName == SlotGameObjectName.LeftHand)
+            if (slotId == SlotIds.LeftHand)
             {
                 _playerState.HandStatusLeft.SetEquippedItem(item, item?.GetDescription(_localizer));
             }
-            else if (slotGameObjectName == SlotGameObjectName.RightHand)
+            else if (slotId == SlotIds.RightHand)
             {
                 _playerState.HandStatusRight.SetEquippedItem(item, item?.GetDescription(_localizer));
             }
@@ -398,9 +403,7 @@ namespace FullPotential.Core.Player
 
             var equippedItems = _equippedItems
                 .Where(x => !(x.Value?.Item?.Id.IsNullOrWhiteSpace() ?? false))
-                .Select(x => new Api.Utilities.Data.KeyValuePair<string, string>(
-                    Enum.GetName(typeof(SlotGameObjectName), x.Key),
-                    x.Value.Item?.Id));
+                .Select(x => new Api.Utilities.Data.KeyValuePair<string, string>(x.Key, x.Value.Item?.Id));
 
             var shapeMapping = _itemIdToShapeMapping
                 .Select(x => new Api.Utilities.Data.KeyValuePair<string, string>(x.Key, x.Value));
@@ -419,20 +422,20 @@ namespace FullPotential.Core.Player
             };
         }
 
-        public KeyValuePair<SlotGameObjectName, EquippedItem>? GetEquippedWithItemId(string itemId)
+        public KeyValuePair<string, EquippedItem>? GetEquippedWithItemId(string itemId)
         {
             var match = _equippedItems.FirstOrDefault(x => x.Value?.Item?.Id == itemId);
             return match.Value == null ? null : match;
         }
 
-        private void DespawnEquippedObject(SlotGameObjectName slotGameObjectName)
+        private void DespawnEquippedObject(string slotId)
         {
-            if (!_equippedItems.ContainsKey(slotGameObjectName))
+            if (!_equippedItems.ContainsKey(slotId))
             {
                 return;
             }
 
-            var currentlyInGame = _equippedItems[slotGameObjectName].GameObject;
+            var currentlyInGame = _equippedItems[slotId].GameObject;
 
             if (currentlyInGame == null)
             {
@@ -441,61 +444,63 @@ namespace FullPotential.Core.Player
 
             currentlyInGame.name = "DESTROY" + currentlyInGame.name;
             Destroy(currentlyInGame);
-            _equippedItems[slotGameObjectName].GameObject = null;
+            _equippedItems[slotId].GameObject = null;
         }
 
-        private void SpawnEquippedObject(ItemBase item, SlotGameObjectName slotGameObjectName)
+        private void SpawnEquippedObject(ItemBase item, string slotId)
         {
-            DespawnEquippedObject(slotGameObjectName);
+            DespawnEquippedObject(slotId);
 
-            var isLeftHand = slotGameObjectName == SlotGameObjectName.LeftHand;
+            var isLeftHand = slotId == SlotIds.LeftHand;
 
             if (item == null)
             {
                 return;
             }
 
-            switch (slotGameObjectName)
+            //todo: handle custom visuals for equipped items
+
+            switch (slotId)
             {
-                case SlotGameObjectName.LeftHand:
-                case SlotGameObjectName.RightHand:
-                    SpawnItemInHand(slotGameObjectName, item, isLeftHand);
+                case SlotIds.LeftHand:
+                case SlotIds.RightHand:
+                    SpawnItemInHand(slotId, item, isLeftHand);
                     break;
 
-                case SlotGameObjectName.Amulet:
-                    InstantiateAccessory(slotGameObjectName, item, _playerState.GraphicsTransform, manipulateTransform: t => t.position += t.forward * _amuletForwardMultiplier);
-                    break;
+                //case SlotGameObjectName.Amulet:
+                //    InstantiateAccessory(slotGameObjectName, item, _playerState.GraphicsTransform, manipulateTransform: t => t.position += t.forward * _amuletForwardMultiplier);
+                //    break;
 
-                case SlotGameObjectName.Belt:
-                    InstantiateAccessory(slotGameObjectName, item, _playerState.GraphicsTransform);
-                    break;
+                //case SlotGameObjectName.Belt:
+                //    InstantiateAccessory(slotGameObjectName, item, _playerState.GraphicsTransform);
+                //    break;
 
-                case SlotGameObjectName.LeftRing:
-                    InstantiateAccessory(slotGameObjectName, item, _playerState.BodyParts.LeftArm, true);
-                    break;
+                //case SlotGameObjectName.LeftRing:
+                //    InstantiateAccessory(slotGameObjectName, item, _playerState.BodyParts.LeftArm, true);
+                //    break;
 
-                case SlotGameObjectName.RightRing:
-                    InstantiateAccessory(slotGameObjectName, item, _playerState.BodyParts.RightArm, true);
-                    break;
+                //case SlotGameObjectName.RightRing:
+                //    InstantiateAccessory(slotGameObjectName, item, _playerState.BodyParts.RightArm, true);
+                //    break;
 
-                case SlotGameObjectName.Helm:
-                    InstantiateArmor(slotGameObjectName, item, _playerState.BodyParts.Head);
-                    break;
+                //case SlotGameObjectName.Helm:
+                //    InstantiateArmor(slotGameObjectName, item, _playerState.BodyParts.Head);
+                //    break;
 
-                case SlotGameObjectName.Barrier:
-                case SlotGameObjectName.Chest:
-                case SlotGameObjectName.Legs:
-                case SlotGameObjectName.Feet:
-                    InstantiateArmor(slotGameObjectName, item, _playerState.GraphicsTransform);
-                    break;
+                //case SlotGameObjectName.Barrier:
+                //case SlotGameObjectName.Chest:
+                //case SlotGameObjectName.Legs:
+                //case SlotGameObjectName.Feet:
+                //    InstantiateArmor(slotGameObjectName, item, _playerState.GraphicsTransform);
+                //    break;
 
-                default:
-                    Debug.LogWarning("Not yet implemented equipping for slot " + slotGameObjectName);
-                    break;
+                //default:
+                //    Debug.LogWarning("Not yet implemented equipping for slot " + slotId);
+                //    break;
             }
         }
 
-        private void SpawnItemInHand(SlotGameObjectName slotGameObjectName, ItemBase item, bool isLeftHand = true)
+        private void SpawnItemInHand(string slotId, ItemBase item, bool isLeftHand = true)
         {
             if (!NetworkManager.Singleton.IsClient)
             {
@@ -516,7 +521,7 @@ namespace FullPotential.Core.Player
                         weapon.Visuals.PrefabAddress,
                         prefab =>
                         {
-                            InstantiateInPlayerHand(prefab, isLeftHand, new Vector3(0, 90), slotGameObjectName);
+                            InstantiateInPlayerHand(prefab, isLeftHand, new Vector3(0, 90), slotId);
                         }
                     );
 
@@ -527,7 +532,7 @@ namespace FullPotential.Core.Player
                         ? GameManager.Instance.Prefabs.Combat.SpellInHand
                         : GameManager.Instance.Prefabs.Combat.GadgetInHand;
 
-                    InstantiateInPlayerHand(prefab, isLeftHand, null, slotGameObjectName);
+                    InstantiateInPlayerHand(prefab, isLeftHand, null, slotId);
 
                     break;
 
@@ -537,7 +542,7 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private void InstantiateInPlayerHand(GameObject prefab, bool isLeftHand, Vector3? rotation, SlotGameObjectName slotGameObjectName)
+        private void InstantiateInPlayerHand(GameObject prefab, bool isLeftHand, Vector3? rotation, string slotId)
         {
             var newObj = Instantiate(prefab, _playerState.InFrontOfPlayer.transform);
 
@@ -555,11 +560,11 @@ namespace FullPotential.Core.Player
                 newObj.SetGameLayerRecursive(_playerState.InFrontOfPlayer.layer);
             }
 
-            _equippedItems[slotGameObjectName].GameObject = newObj;
+            _equippedItems[slotId].GameObject = newObj;
         }
 
         private void InstantiateAccessory(
-            SlotGameObjectName slotGameObjectName,
+            string slotId,
             ItemBase item,
             Transform parentTransform,
             bool showsOnPlayerCamera = false,
@@ -591,12 +596,12 @@ namespace FullPotential.Core.Player
                         newObj.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
                     }
 
-                    _equippedItems[slotGameObjectName].GameObject = newObj;
+                    _equippedItems[slotId].GameObject = newObj;
                 });
         }
 
         private void InstantiateArmor(
-            SlotGameObjectName slotGameObjectName,
+            string slotId,
             ItemBase item,
             Transform parentTransform)
         {
@@ -616,7 +621,7 @@ namespace FullPotential.Core.Player
                 prefab =>
                 {
                     var newObj = Instantiate(prefab, parentTransform);
-                    _equippedItems[slotGameObjectName].GameObject = newObj;
+                    _equippedItems[slotId].GameObject = newObj;
                 });
         }
 

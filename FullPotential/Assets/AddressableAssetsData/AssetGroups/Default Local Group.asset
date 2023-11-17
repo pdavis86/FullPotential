@@ -202,6 +202,61 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 15d9e252bc9b1384886f51232aea20b5
+    m_Address: Standard/UI/Equipment/Amulet.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 34c758a507b94584cafa393d7671a00c
+    m_Address: Standard/UI/Equipment/Barrier.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 78fe1f61227d90a44a484daffd75d7c4
+    m_Address: Standard/UI/Equipment/Belt.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 05df8d1c70568954883da0a9d9f7704f
+    m_Address: Standard/UI/Equipment/Ring.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3ac78cedad3b52e4fa0d9b820b01ef73
+    m_Address: Standard/UI/Equipment/Reloader.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6cb1565c59c3d40428f6cbd54968bd15
+    m_Address: Core/UI/Equipment/Chest.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b222489b8a9e72c4f8d4dfdcd38e8eae
+    m_Address: Core/UI/Equipment/Feet.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: afa8a3ffacb434f4e944b6474bc1dfd3
+    m_Address: Core/UI/Equipment/Helm.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0a8e648d0e4bc35438f2f02c209fee93
+    m_Address: Core/UI/Equipment/Legs.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2f6b06db11b7372448224e4f01462702
+    m_Address: Core/UI/Equipment/LeftHand.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 421dc9b863ebdd64988ef07e3db2ab02
+    m_Address: Core/UI/Equipment/RightHand.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 101452080fc0cca43abdd31fc4649980, type: 2}
   m_SchemaSet:

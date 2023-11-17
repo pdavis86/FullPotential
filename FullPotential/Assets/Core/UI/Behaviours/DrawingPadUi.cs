@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Gameplay.Drawing;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Obsolete;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.UI.Events;
@@ -50,7 +49,7 @@ namespace FullPotential.Core.UI.Behaviours
         private List<string> _drawnShapes;
         private string _eventSource;
         private string _itemId;
-        private SlotGameObjectName? _slotGameObjectName;
+        private string _slotId;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -84,7 +83,7 @@ namespace FullPotential.Core.UI.Behaviours
             _itemId = itemId;
         }
 
-        public void InitialiseForEquip(string eventSource, SlotGameObjectName slotGameObjectName)
+        public void InitialiseForEquip(string eventSource, string slotId)
         {
             if (!_eventSource.IsNullOrWhiteSpace())
             {
@@ -92,7 +91,7 @@ namespace FullPotential.Core.UI.Behaviours
             }
 
             _eventSource = eventSource;
-            _slotGameObjectName = slotGameObjectName;
+            _slotId = slotId;
         }
 
         public void StartDrawing()
@@ -174,9 +173,9 @@ namespace FullPotential.Core.UI.Behaviours
             CheckForShape(rawMousePosition);
         }
 
-        public void StopDrawing(SlotGameObjectName slotGameObjectName)
+        public void StopDrawing(string slotId)
         {
-            if (slotGameObjectName != _slotGameObjectName)
+            if (slotId != _slotId)
             {
                 return;
             }
@@ -208,12 +207,12 @@ namespace FullPotential.Core.UI.Behaviours
 
             var finalShape = string.Join("-", _drawnShapes);
 
-            OnDrawingStop?.Invoke(this, new OnDrawingStopEventArgs(_eventSource, finalShape, _itemId, _slotGameObjectName));
+            OnDrawingStop?.Invoke(this, new OnDrawingStopEventArgs(_eventSource, finalShape, _itemId, _slotId));
 
             _drawnShapes.Clear();
             _eventSource = null;
             _itemId = null;
-            _slotGameObjectName = null;
+            _slotId = null;
         }
 
         private void UpdateMesh()

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;

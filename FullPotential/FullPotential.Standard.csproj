@@ -65,9 +65,8 @@
     <Compile Include="Assets\Standard\Effects\Debuffs\Slow.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Air.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicBow.cs" />
-    <Compile Include="Assets\Standard\Armor\Helm.cs" />
-    <Compile Include="Assets\Standard\Armor\Legs.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Poison.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\TeleportReloaderEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Hold.cs" />
     <Compile Include="Assets\Standard\ArmorVisuals\LeatherHelmet.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Stengthen.cs" />
@@ -121,7 +120,6 @@
     <Compile Include="Assets\Standard\Effects\Support\Float.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Regeneration.cs" />
     <Compile Include="Assets\Standard\Ammo\Arrow.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\SpecialGearSlots.cs" />
     <Compile Include="Assets\Standard\ArmorVisuals\LeatherBoots.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Focus.cs" />
     <Compile Include="Assets\Standard\AccessoryVisuals\SilverRing.cs" />
@@ -145,13 +143,11 @@
     <Compile Include="Assets\Standard\Enemies\Behaviours\EnemyInventory.cs" />
     <Compile Include="Assets\Standard\SpecialGear\ConsolidatorReloaderEventHandler.cs" />
     <Compile Include="Assets\Standard\Loot\Scrap.cs" />
-    <Compile Include="Assets\Standard\Armor\Chest.cs" />
-    <Compile Include="Assets\Standard\Armor\Feet.cs" />
     <Compile Include="Assets\Standard\Weapons\Sword.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Attract.cs" />
     <Compile Include="Assets\Standard\Accessories\Amulet.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveLeft.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\TeleportReloaderEventHandler.cs" />
+    <Compile Include="Assets\Standard\SpecialSlots\RangedWeaponReloader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Standard\FullPotential.Standard.asmdef" />

@@ -11,7 +11,7 @@ namespace FullPotential.Standard.SpecialGear
 
         public string TypeName => nameof(ConsolidatorReloader);
 
-        public Guid SlotId => SpecialGearSlots.Reloader;
+        public Guid SlotId => new Guid(SpecialSlots.RangedWeaponReloader.TypeIdString);
 
         public Dictionary<string, IEventHandler> EventHandlers { get; } = new Dictionary<string, IEventHandler>
         {

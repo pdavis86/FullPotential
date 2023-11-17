@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Obsolete;
 
 namespace FullPotential.Api.Gameplay.Inventory
 {
@@ -14,9 +13,9 @@ namespace FullPotential.Api.Gameplay.Inventory
 
         IEnumerable<ItemBase> GetHandItems();
 
-        IEnumerable<ItemBase> GetCompatibleItems(Guid? typeId);
+        IEnumerable<ItemBase> GetCompatibleItems(string typeId);
 
-        KeyValuePair<SlotGameObjectName, EquippedItem>? GetEquippedWithItemId(string itemId);
+        KeyValuePair<string, EquippedItem>? GetEquippedWithItemId(string itemId);
 
         InventoryData GetSaveData();
 

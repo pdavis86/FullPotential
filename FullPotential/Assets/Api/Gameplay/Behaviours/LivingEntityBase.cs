@@ -208,7 +208,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             //Debug.Log("AddOrUpdateEffectClientRpc called with typeId: " + effectTypeId);
 
-            var effect = _typeRegistry.GetEffect(new Guid(effectTypeId));
+            var effect = _typeRegistry.GetEffect(effectTypeId);
             AddOrUpdateEffect(effect, change, expiry);
         }
 
