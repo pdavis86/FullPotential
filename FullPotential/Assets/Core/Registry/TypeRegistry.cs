@@ -89,10 +89,6 @@ namespace FullPotential.Core.Registry
 
         private void RegisterCoreTypes()
         {
-            //Don't need to do this
-            //ValidateAndRegister(typeof(SpecialSlots.LeftHand));
-            //ValidateAndRegister(typeof(SpecialSlots.RightHand));
-
             ValidateAndRegister(typeof(Armor.Helm));
             ValidateAndRegister(typeof(Armor.Chest));
             ValidateAndRegister(typeof(Armor.Legs));
