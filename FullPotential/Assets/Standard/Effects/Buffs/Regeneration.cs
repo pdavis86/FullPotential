@@ -9,8 +9,6 @@ namespace FullPotential.Standard.Effects.Buffs
     {
         public Guid TypeId => new Guid("158d1f0e-994d-49f7-a649-33ff336b8309");
 
-        public string TypeName => nameof(Regeneration);
-
         public AffectType AffectType => AffectType.PeriodicIncrease;
 
         public ResourceType StatToAffect => ResourceType.Health;

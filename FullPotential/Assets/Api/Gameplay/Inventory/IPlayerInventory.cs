@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items.Base;
 

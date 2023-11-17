@@ -8,8 +8,6 @@ namespace FullPotential.Standard.AccessoryVisuals
     {
         public Guid TypeId => new Guid("e02761e5-5155-4b61-8f1c-8feb240a420c");
 
-        public string TypeName => nameof(SilverNecklace);
-
         public string PrefabAddress => "Standard/Prefabs/Accessories/Amulet.prefab";
 
         public Guid ApplicableToTypeId => new Guid(Amulet.TypeIdString);

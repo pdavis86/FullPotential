@@ -10,8 +10,6 @@ namespace FullPotential.Standard.Effects.Debuffs
     {
         public Guid TypeId => new Guid("fe828022-b20d-4204-a6ff-8fada0e75bb5");
 
-        public string TypeName => nameof(LifeDrain);
-
         public AffectType AffectType => AffectType.PeriodicDecrease;
 
         public ResourceType StatToAffect => ResourceType.Health;

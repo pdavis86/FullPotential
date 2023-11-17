@@ -8,8 +8,6 @@ namespace FullPotential.Core.Registry.Armor
     {
         public Guid TypeId => ArmorTypeIds.Legs;
 
-        public string TypeName => nameof(Legs);
-
         public string SlotSpritePrefabAddress => "Core/UI/Equipment/Legs.png";
     }
 }

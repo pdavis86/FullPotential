@@ -10,8 +10,6 @@ namespace FullPotential.Core.Registry.Targeting
     {
         public Guid TypeId => TargetingTypeIds.Projectile;
 
-        public string TypeName => nameof(Projectile);
-
         public bool CanHaveShape => true;
 
         public bool IsContinuous => false;

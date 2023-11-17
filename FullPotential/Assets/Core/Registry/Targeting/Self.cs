@@ -10,8 +10,6 @@ namespace FullPotential.Core.Registry.Targeting
     {
         public Guid TypeId => TargetingTypeIds.Self;
 
-        public string TypeName => nameof(Self);
-
         public bool CanHaveShape => true;
 
         public bool IsContinuous => false;

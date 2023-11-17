@@ -9,8 +9,6 @@ namespace FullPotential.Standard.Effects.Debuffs
     {
         public Guid TypeId => new Guid("260ff724-0708-42fa-81ab-45af911e6daf");
 
-        public string TypeName => nameof(Lethargy);
-
         public AffectType AffectType => AffectType.TemporaryMaxDecrease;
 
         public ResourceType StatToAffect => ResourceType.Stamina;

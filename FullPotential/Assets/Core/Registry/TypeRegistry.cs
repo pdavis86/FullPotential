@@ -255,9 +255,9 @@ namespace FullPotential.Core.Registry
             return _registeredTypeLists[typeof(T)].Cast<T>();
         }
 
-        public T GetRegisteredByTypeName<T>(string typeName) where T : IRegisterable
+        public T GetRegisteredByTypeId<T>(string typeId) where T : IRegisterable
         {
-            return GetRegisteredTypes<T>().FirstOrDefault(x => x.TypeName.Equals(typeName, StringComparison.OrdinalIgnoreCase));
+            return GetRegisteredTypes<T>().FirstOrDefault(x => x.TypeId.ToString() == typeId);
         }
 
         private T GetRegistryTypeById<T>(string typeId) where T : IRegisterable

@@ -9,8 +9,6 @@ namespace FullPotential.Standard.Weapons
 
         public Guid TypeId => new Guid(TypeIdString);
 
-        public string TypeName => nameof(Shield);
-
         public bool IsDefensive => true;
 
         public Guid? AmmunitionTypeId => null;

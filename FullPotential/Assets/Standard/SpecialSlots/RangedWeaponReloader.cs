@@ -9,8 +9,6 @@ namespace FullPotential.Standard.SpecialSlots
 
         public Guid TypeId => new Guid(TypeIdString);
 
-        public string TypeName => nameof(RangedWeaponReloader);
-
         public string SlotSpritePrefabAddress => "Standard/UI/Equipment/Reloader.png";
     }
 }

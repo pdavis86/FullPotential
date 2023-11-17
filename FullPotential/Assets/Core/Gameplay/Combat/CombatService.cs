@@ -16,6 +16,7 @@ using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
+using FullPotential.Core.Registry.Effects.Movement;
 using FullPotential.Core.Registry.Shapes;
 using FullPotential.Core.Registry.Targeting;
 using Unity.Netcode;

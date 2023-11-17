@@ -9,8 +9,6 @@ namespace FullPotential.Standard.Effects.Buffs
     {
         public Guid TypeId => new Guid("b1edb96d-da2b-49b3-bac3-80c9b1dfe9d6");
 
-        public string TypeName => nameof(Surge);
-
         public AffectType AffectType => AffectType.TemporaryMaxIncrease;
 
         public ResourceType StatToAffect => ResourceType.Energy;

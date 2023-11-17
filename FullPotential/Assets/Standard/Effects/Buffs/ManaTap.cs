@@ -11,8 +11,6 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public Guid TypeId => new Guid(TypeIdString);
 
-        public string TypeName => nameof(ManaTap);
-
         public AffectType AffectType => AffectType.PeriodicIncrease;
 
         public ResourceType StatToAffect => ResourceType.Mana;

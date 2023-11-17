@@ -8,8 +8,6 @@ namespace FullPotential.Standard.Effects.Movement
     {
         public Guid TypeId => new Guid("90781986-e490-4115-a7f6-7864c3ed1e41");
 
-        public string TypeName => nameof(StepBack);
-
         public MovementDirection Direction => MovementDirection.Backwards;
     }
 }

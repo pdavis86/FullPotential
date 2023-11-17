@@ -88,7 +88,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
             var componentIds = string.Join(',', _components.Select(x => x.Id));
             var selectedType = _craftingSelector.GetTypeToCraft();
-            var selectedSubType = _craftingSelector.GetSubTypeName(selectedType);
+            var selectedSubType = _craftingSelector.GetTypeId(selectedType);
             var isTwoHanded = _craftingSelector.IsTwoHandedSelected();
 
             _playerBehaviour.CraftItemServerRpc(componentIds, selectedType.ToString(), selectedSubType, isTwoHanded, _craftName.text);
@@ -184,7 +184,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
             var craftedItem = _resultFactory.GetCraftedItem(
                 craftableType,
-                _craftingSelector.GetSubTypeName(craftableType),
+                _craftingSelector.GetTypeId(craftableType),
                 _craftingSelector.IsTwoHandedSelected(),
                 _components
             );

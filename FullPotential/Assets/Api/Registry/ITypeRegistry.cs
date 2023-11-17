@@ -11,7 +11,7 @@ namespace FullPotential.Api.Registry
     {
         IEnumerable<T> GetRegisteredTypes<T>() where T : IRegisterable;
 
-        T GetRegisteredByTypeName<T>(string typeName) where T : IRegisterable;
+        T GetRegisteredByTypeId<T>(string typeId) where T : IRegisterable;
 
         IRegisterable GetRegistryTypeForItem(ItemBase item);
 

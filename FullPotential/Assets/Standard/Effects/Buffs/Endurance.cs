@@ -9,8 +9,6 @@ namespace FullPotential.Standard.Effects.Buffs
     {
         public Guid TypeId => new Guid("29fa3077-627c-4cc2-9efc-8293ad7ce52d");
 
-        public string TypeName => nameof(Endurance);
-
         public AffectType AffectType => AffectType.TemporaryMaxIncrease;
 
         public ResourceType StatToAffect => ResourceType.Stamina;

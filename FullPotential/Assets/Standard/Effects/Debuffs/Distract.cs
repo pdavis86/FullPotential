@@ -9,8 +9,6 @@ namespace FullPotential.Standard.Effects.Debuffs
     {
         public Guid TypeId => new Guid("fb2fcd58-8a90-46de-8368-731773230835");
 
-        public string TypeName => nameof(Distract);
-
         public AffectType AffectType => AffectType.TemporaryMaxDecrease;
 
         public ResourceType StatToAffect => ResourceType.Mana;

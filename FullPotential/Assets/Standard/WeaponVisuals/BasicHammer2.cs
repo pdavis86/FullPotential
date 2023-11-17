@@ -8,8 +8,6 @@ namespace FullPotential.Standard.WeaponVisuals
     {
         public Guid TypeId => new Guid("04fef0e9-2a84-42bb-96fa-9a3410d3c0d1");
 
-        public string TypeName => nameof(BasicHammer2);
-
         public string PrefabAddress => "Standard/Prefabs/Weapons/Hammer2.prefab";
 
         public Guid ApplicableToTypeId => new Guid(Hammer.TypeIdString);

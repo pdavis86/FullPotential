@@ -11,8 +11,6 @@ namespace FullPotential.Standard.Accessories
 
         public Guid TypeId => new Guid(TypeIdString);
 
-        public string TypeName => nameof(Amulet);
-
         public Dictionary<string, IEventHandler> EventHandlers => null;
 
         public int SlotCount => 1;

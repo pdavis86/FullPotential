@@ -9,8 +9,6 @@ namespace FullPotential.Standard.Effects.Debuffs
     {
         public Guid TypeId => new Guid("434fc4a7-dcbc-44b8-86d6-5815a42eea0b");
 
-        public string TypeName => nameof(ShortCircuit);
-
         public AffectType AffectType => AffectType.TemporaryMaxDecrease;
 
         public ResourceType StatToAffect => ResourceType.Energy;

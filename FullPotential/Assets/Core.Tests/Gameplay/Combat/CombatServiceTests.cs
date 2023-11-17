@@ -117,8 +117,6 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
     {
         public Guid TypeId => new Guid("3fd4d8d9-6fed-4ada-85dd-408602769ee5");
 
-        public string TypeName => nameof(SingleDamageEffect);
-
         public AffectType AffectType => AffectType.SingleDecrease;
 
         public ResourceType StatToAffect => ResourceType.Health;
@@ -129,13 +127,10 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
     {
         // ReSharper disable UnassignedGetOnlyAutoProperty
         public Guid TypeId { get; }
-        public string TypeName { get; }
-        public string PrefabAddress { get; }
         public bool IsDefensive { get; }
         public Guid? AmmunitionTypeId { get; set; }
         public bool AllowAutomatic { get; }
         public bool AllowTwoHanded { get; }
         public bool EnforceTwoHanded { get; }
-        public string PrefabAddressTwoHanded { get; }
     }
 }

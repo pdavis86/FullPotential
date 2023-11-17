@@ -69,13 +69,13 @@ namespace FullPotential.Core.UI.Components
             return _craftableTypes.ElementAt(TypeDropdown.value).Key;
         }
 
-        public string GetSubTypeName(CraftableType craftableType)
+        public string GetTypeId(CraftableType craftableType)
         {
             switch (craftableType)
             {
-                case CraftableType.Accessory: return _accessoryTypes.ElementAt(SubTypeDropdown.value).Key.TypeName;
-                case CraftableType.Armor: return _armorTypes.ElementAt(SubTypeDropdown.value).Key.TypeName;
-                case CraftableType.Weapon: return _weaponTypes.ElementAt(SubTypeDropdown.value).Key.TypeName;
+                case CraftableType.Accessory: return _accessoryTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
+                case CraftableType.Armor: return _armorTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
+                case CraftableType.Weapon: return _weaponTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
                 case CraftableType.Consumer: return _consumerTypes.ElementAt(SubTypeDropdown.value).Key.ToString();
                 default: throw new InvalidOperationException($"Unknown crafting category: '{craftableType}'");
             }

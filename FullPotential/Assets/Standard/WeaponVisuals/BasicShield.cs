@@ -8,8 +8,6 @@ namespace FullPotential.Standard.WeaponVisuals
     {
         public Guid TypeId => new Guid("d2e35462-acb4-41bc-940b-2fe0324cfac6");
 
-        public string TypeName => nameof(BasicShield);
-        
 
         public string PrefabAddress => "Standard/Prefabs/Weapons/Shield.prefab";
 

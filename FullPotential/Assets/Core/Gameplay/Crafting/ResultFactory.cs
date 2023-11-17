@@ -114,7 +114,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             var effects = components
                 .Where(x => x.Effects != null)
                 .SelectMany(x => x.Effects)
-                .GroupBy(x => x.TypeName)
+                .GroupBy(x => x.TypeId)
                 .Select(x => x.First());
 
             var effectTypeLookup = effects
@@ -485,16 +485,16 @@ namespace FullPotential.Core.Gameplay.Crafting
             return accessory;
         }
 
-        public ItemBase GetCraftedItem(CraftableType craftableType, string subTypeName, bool isTwoHanded, IList<ItemForCombatBase> components)
+        public ItemBase GetCraftedItem(CraftableType craftableType, string typeId, bool isTwoHanded, IList<ItemForCombatBase> components)
         {
             switch (craftableType)
             {
                 case CraftableType.Consumer:
-                    var consumptionType = (ResourceType)Enum.Parse(typeof(ResourceType), subTypeName);
+                    var consumptionType = (ResourceType)Enum.Parse(typeof(ResourceType), typeId);
                     return GetConsumer(craftableType, consumptionType, components);
 
                 case CraftableType.Weapon:
-                    var weaponType = _typeRegistry.GetRegisteredByTypeName<IWeapon>(subTypeName);
+                    var weaponType = _typeRegistry.GetRegisteredByTypeId<IWeapon>(typeId);
                     if (weaponType.IsDefensive)
                     {
                         return GetDefensiveWeapon(weaponType, components, isTwoHanded);
@@ -508,11 +508,11 @@ namespace FullPotential.Core.Gameplay.Crafting
                     return GetRangedWeapon(weaponType, components, isTwoHanded);
 
                 case CraftableType.Armor:
-                    var craftableArmor = _typeRegistry.GetRegisteredByTypeName<IArmor>(subTypeName);
+                    var craftableArmor = _typeRegistry.GetRegisteredByTypeId<IArmor>(typeId);
                     return GetArmor(craftableArmor, components);
 
                 case CraftableType.Accessory:
-                    var craftableAccessory = _typeRegistry.GetRegisteredByTypeName<IAccessory>(subTypeName);
+                    var craftableAccessory = _typeRegistry.GetRegisteredByTypeId<IAccessory>(typeId);
                     return GetAccessory(craftableAccessory, components);
 
                 default:

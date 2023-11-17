@@ -11,8 +11,6 @@ namespace FullPotential.Standard.Accessories
 
         public Guid TypeId => new Guid(TypeIdString);
 
-        public string TypeName => nameof(Ring);
-
         public Dictionary<string, IEventHandler> EventHandlers => null;
         
         public int SlotCount => 2;

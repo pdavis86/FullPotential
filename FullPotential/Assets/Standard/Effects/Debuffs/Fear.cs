@@ -9,8 +9,6 @@ namespace FullPotential.Standard.Effects.Debuffs
     {
         public Guid TypeId => new Guid("cc67431d-09d7-4c62-9fde-2dc5aa596ac7");
 
-        public string TypeName => nameof(Fear);
-
         public AffectType AffectType => AffectType.TemporaryMaxDecrease;
 
         public ResourceType StatToAffect => ResourceType.Health;

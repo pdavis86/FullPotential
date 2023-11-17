@@ -10,8 +10,6 @@ namespace FullPotential.Core.Registry.Targeting
     {
         public Guid TypeId => TargetingTypeIds.PointToPoint;
 
-        public string TypeName => nameof(PointToPoint);
-
         public bool CanHaveShape => false;
 
         public bool IsContinuous => true;

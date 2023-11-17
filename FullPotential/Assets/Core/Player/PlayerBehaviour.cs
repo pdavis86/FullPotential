@@ -319,7 +319,7 @@ namespace FullPotential.Core.Player
         }
 
         [ServerRpc]
-        public void CraftItemServerRpc(string componentIdsCsv, string craftableTypeName, string craftableSubTypeName, bool isTwoHanded, string itemName)
+        public void CraftItemServerRpc(string componentIdsCsv, string craftableTypeName, string typeId, bool isTwoHanded, string itemName)
         {
             var componentIdArray = componentIdsCsv.Split(',');
 
@@ -335,7 +335,7 @@ namespace FullPotential.Core.Player
 
             var craftedItem = _resultFactory.GetCraftedItem(
                 craftableType,
-                craftableSubTypeName,
+                typeId,
                 isTwoHanded,
                 components
             );
@@ -370,7 +370,7 @@ namespace FullPotential.Core.Player
         }
 
         [ServerRpc]
-        public void CraftItemAsAdminServerRpc(string serialisedLoot, string craftableTypeName, string craftableSubTypeName, bool isTwoHanded, string itemName)
+        public void CraftItemAsAdminServerRpc(string serialisedLoot, string craftableTypeName, string typeId, bool isTwoHanded, string itemName)
         {
             GameManager.Instance.CheckIsAdmin();
 
@@ -379,7 +379,7 @@ namespace FullPotential.Core.Player
 
             ((PlayerInventory)_playerState.Inventory).AddItemAsAdmin(loot);
 
-            CraftItemServerRpc(loot.Id, craftableTypeName, craftableSubTypeName, isTwoHanded, itemName);
+            CraftItemServerRpc(loot.Id, craftableTypeName, typeId, isTwoHanded, itemName);
         }
 
         [ServerRpc]

@@ -12,8 +12,6 @@ namespace FullPotential.Standard.Accessories
 
         public Guid TypeId => new Guid(TypeIdString);
 
-        public string TypeName => nameof(Barrier);
-
         public Dictionary<string, IEventHandler> EventHandlers { get; } = new Dictionary<string, IEventHandler>
         {
             {EventIds.FighterDamageTaken, new BarrierEventHandler()}

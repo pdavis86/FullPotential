@@ -11,8 +11,6 @@ namespace FullPotential.Core.Registry.Targeting
     {
         public Guid TypeId => TargetingTypeIds.Touch;
 
-        public string TypeName => nameof(Touch);
-
         public bool CanHaveShape => false;
 
         public bool IsContinuous => false;
