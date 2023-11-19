@@ -11,6 +11,7 @@ namespace FullPotential.Core.GameManagement
         public CombatObjects Combat;
         public EnvironmentObjects Environment;
 
+        //todo: spell and gadget replacements
         [System.Serializable]
         public class CombatObjects
         {

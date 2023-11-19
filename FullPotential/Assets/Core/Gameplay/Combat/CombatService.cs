@@ -11,14 +11,14 @@ using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
+using FullPotential.Api.Registry.Shapes;
+using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
 using FullPotential.Core.Registry.Effects.Movement;
-using FullPotential.Core.Registry.Shapes;
-using FullPotential.Core.Registry.Targeting;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -529,7 +529,7 @@ namespace FullPotential.Core.Gameplay.Combat
             rotation.z = 0;
 
             _typeRegistry.LoadAddessable(
-                consumer.Shape.PrefabAddress,
+                consumer.Shape.NetworkPrefabAddress,
                 prefab =>
                 {
                     var shapeGameObject = UnityEngine.Object.Instantiate(prefab, spawnPosition, rotation);

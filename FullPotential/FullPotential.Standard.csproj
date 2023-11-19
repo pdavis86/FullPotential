@@ -65,6 +65,8 @@
     <Compile Include="Assets\Standard\Effects\Debuffs\Slow.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Air.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicBow.cs" />
+    <Compile Include="Assets\Standard\Armor\Helm.cs" />
+    <Compile Include="Assets\Standard\Armor\Legs.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Poison.cs" />
     <Compile Include="Assets\Standard\SpecialGear\TeleportReloaderEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Hold.cs" />
@@ -127,6 +129,7 @@
     <Compile Include="Assets\Standard\Effects\Debuffs\Lethargy.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\ShortCircuit.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicSword.cs" />
+    <Compile Include="Assets\Standard\SpecialSlots\RangedWeaponReloader.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Water.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicHammer2.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicDagger.cs" />
@@ -143,11 +146,24 @@
     <Compile Include="Assets\Standard\Enemies\Behaviours\EnemyInventory.cs" />
     <Compile Include="Assets\Standard\SpecialGear\ConsolidatorReloaderEventHandler.cs" />
     <Compile Include="Assets\Standard\Loot\Scrap.cs" />
+    <Compile Include="Assets\Standard\Armor\Chest.cs" />
+    <Compile Include="Assets\Standard\Armor\Feet.cs" />
     <Compile Include="Assets\Standard\Weapons\Sword.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Attract.cs" />
     <Compile Include="Assets\Standard\Accessories\Amulet.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveLeft.cs" />
-    <Compile Include="Assets\Standard\SpecialSlots\RangedWeaponReloader.cs" />
+    <Compile Include="Assets\Standard\Targeting\PointToPointBehaviour.cs" />
+    <Compile Include="Assets\Standard\Targeting\PointToPoint.cs" />
+    <Compile Include="Assets\Standard\Shapes\WallBehaviour.cs" />
+    <Compile Include="Assets\Standard\Shapes\Zone.cs" />
+    <Compile Include="Assets\Standard\Shapes\ZoneBehaviour.cs" />
+    <Compile Include="Assets\Standard\TargetingVisuals\BeamVisualsBehaviour.cs" />
+    <Compile Include="Assets\Standard\Targeting\Projectile.cs" />
+    <Compile Include="Assets\Standard\Shapes\Wall.cs" />
+    <Compile Include="Assets\Standard\Targeting\Touch.cs" />
+    <Compile Include="Assets\Standard\Targeting\ProjectileBehaviour.cs" />
+    <Compile Include="Assets\Standard\Targeting\Self.cs" />
+    <Compile Include="Assets\Standard\TargetingVisuals\BeamOfFlames.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Standard\FullPotential.Standard.asmdef" />
@@ -818,6 +834,9 @@
     </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Collections">
+      <HintPath>Library\ScriptAssemblies\Unity.Collections.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>

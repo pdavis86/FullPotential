@@ -84,7 +84,20 @@ namespace FullPotential.Standard
                 typeof(Weapons.Shield),
                 typeof(Weapons.Staff),
                 typeof(Weapons.Sword),
-            };
+
+                typeof(Armor.Helm),
+                typeof(Armor.Chest),
+                typeof(Armor.Legs),
+                typeof(Armor.Feet),
+
+                typeof(Targeting.PointToPoint),
+                typeof(Targeting.Projectile),
+                typeof(Targeting.Self),
+                typeof(Targeting.Touch),
+
+                typeof(Shapes.Wall),
+                typeof(Shapes.Zone),
+        };
         }
 
         public IEnumerable<Type> GetRegisterableVisuals()
@@ -103,7 +116,8 @@ namespace FullPotential.Standard
 
                 typeof(ShapeVisuals.WallOfFlames),
                 typeof(ShapeVisuals.ZoneOfFlames),
-                
+
+                typeof(TargetingVisuals.BeamOfFlames),
                 typeof(TargetingVisuals.ProjectileFlames),
 
                 typeof(WeaponVisuals.BasicAxe),
@@ -120,7 +134,13 @@ namespace FullPotential.Standard
 
         public IEnumerable<string> GetNetworkPrefabAddresses()
         {
-            return Array.Empty<string>();
+            return new[]
+            {
+                Shapes.Wall.AddressablePath,
+                Shapes.Zone.AddressablePath,
+                Targeting.PointToPoint.AddressablePath,
+                Targeting.Projectile.AddressablePath,
+            };
         }
 
         public void RegisterEventHandlers(IEventManager eventManager)

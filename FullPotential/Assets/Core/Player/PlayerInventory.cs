@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,7 +11,6 @@ using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Ui;
-using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
@@ -563,67 +561,69 @@ namespace FullPotential.Core.Player
             _equippedItems[slotId].GameObject = newObj;
         }
 
-        private void InstantiateAccessory(
-            string slotId,
-            ItemBase item,
-            Transform parentTransform,
-            bool showsOnPlayerCamera = false,
-            Action<Transform> manipulateTransform = null)
-        {
-            var thisClient = NetworkManager.LocalClientId == OwnerClientId;
+        //todo: InstantiateAccessory 
+        //private void InstantiateAccessory(
+        //    string slotId,
+        //    ItemBase item,
+        //    Transform parentTransform,
+        //    bool showsOnPlayerCamera = false,
+        //    Action<Transform> manipulateTransform = null)
+        //{
+        //    var thisClient = NetworkManager.LocalClientId == OwnerClientId;
 
-            if (!showsOnPlayerCamera && thisClient)
-            {
-                return;
-            }
+        //    if (!showsOnPlayerCamera && thisClient)
+        //    {
+        //        return;
+        //    }
 
-            if (item is not Accessory accessoryItem)
-            {
-                Debug.LogError("Item is not an accessory");
-                return;
-            }
+        //    if (item is not Accessory accessoryItem)
+        //    {
+        //        Debug.LogError("Item is not an accessory");
+        //        return;
+        //    }
 
-            _typeRegistry.LoadAddessable(
-                accessoryItem.Visuals.PrefabAddress,
-                prefab =>
-                {
-                    var newObj = Instantiate(prefab, parentTransform);
+        //    _typeRegistry.LoadAddessable(
+        //        accessoryItem.Visuals.PrefabAddress,
+        //        prefab =>
+        //        {
+        //            var newObj = Instantiate(prefab, parentTransform);
 
-                    manipulateTransform?.Invoke(newObj.transform);
+        //            manipulateTransform?.Invoke(newObj.transform);
 
-                    if (showsOnPlayerCamera && thisClient)
-                    {
-                        newObj.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
-                    }
+        //            if (showsOnPlayerCamera && thisClient)
+        //            {
+        //                newObj.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
+        //            }
 
-                    _equippedItems[slotId].GameObject = newObj;
-                });
-        }
+        //            _equippedItems[slotId].GameObject = newObj;
+        //        });
+        //}
 
-        private void InstantiateArmor(
-            string slotId,
-            ItemBase item,
-            Transform parentTransform)
-        {
-            if (item is not Armor armorItem)
-            {
-                Debug.LogError("Item is not armor");
-                return;
-            }
+        //todo: InstantiateArmor
+        //private void InstantiateArmor(
+        //    string slotId,
+        //    ItemBase item,
+        //    Transform parentTransform)
+        //{
+        //    if (item is not Armor armorItem)
+        //    {
+        //        Debug.LogError("Item is not armor");
+        //        return;
+        //    }
 
-            if (NetworkManager.LocalClientId == OwnerClientId)
-            {
-                return;
-            }
+        //    if (NetworkManager.LocalClientId == OwnerClientId)
+        //    {
+        //        return;
+        //    }
 
-            _typeRegistry.LoadAddessable(
-                armorItem.Visuals.PrefabAddress,
-                prefab =>
-                {
-                    var newObj = Instantiate(prefab, parentTransform);
-                    _equippedItems[slotId].GameObject = newObj;
-                });
-        }
+        //    _typeRegistry.LoadAddessable(
+        //        armorItem.Visuals.PrefabAddress,
+        //        prefab =>
+        //        {
+        //            var newObj = Instantiate(prefab, parentTransform);
+        //            _equippedItems[slotId].GameObject = newObj;
+        //        });
+        //}
 
         public void AddItemAsAdmin(ItemBase item)
         {

@@ -61,8 +61,6 @@ namespace FullPotential.Core.Registry
 
         public void FindAndRegisterAll(List<string> modPrefixes)
         {
-            RegisterCoreTypes();
-
             foreach (var modPrefix in modPrefixes)
             {
                 var asyncOp = Addressables.LoadAssetAsync<GameObject>($"{modPrefix}/Registration");
@@ -85,22 +83,6 @@ namespace FullPotential.Core.Registry
                     HandleModRegistration(mod);
                 };
             }
-        }
-
-        private void RegisterCoreTypes()
-        {
-            ValidateAndRegister(typeof(Armor.Helm));
-            ValidateAndRegister(typeof(Armor.Chest));
-            ValidateAndRegister(typeof(Armor.Legs));
-            ValidateAndRegister(typeof(Armor.Feet));
-
-            ValidateAndRegister(typeof(Targeting.PointToPoint));
-            ValidateAndRegister(typeof(Targeting.Projectile));
-            ValidateAndRegister(typeof(Targeting.Self));
-            ValidateAndRegister(typeof(Targeting.Touch));
-
-            ValidateAndRegister(typeof(Shapes.Wall));
-            ValidateAndRegister(typeof(Shapes.Zone));
         }
 
         private void HandleModRegistration(IMod mod)
