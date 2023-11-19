@@ -61,6 +61,8 @@ namespace FullPotential.Core.Registry
 
         public void FindAndRegisterAll(List<string> modPrefixes)
         {
+            RegisterCoreTypes();
+
             foreach (var modPrefix in modPrefixes)
             {
                 var asyncOp = Addressables.LoadAssetAsync<GameObject>($"{modPrefix}/Registration");
@@ -83,6 +85,12 @@ namespace FullPotential.Core.Registry
                     HandleModRegistration(mod);
                 };
             }
+        }
+
+        private void RegisterCoreTypes()
+        {
+            ValidateAndRegister(typeof(SpecialSlots.LeftHand));
+            ValidateAndRegister(typeof(SpecialSlots.RightHand));
         }
 
         private void HandleModRegistration(IMod mod)
@@ -236,6 +244,25 @@ namespace FullPotential.Core.Registry
         public T GetRegisteredByTypeId<T>(string typeId) where T : IRegisterable
         {
             return GetRegisteredTypes<T>().FirstOrDefault(x => x.TypeId.ToString() == typeId);
+        }
+
+        public IRegisterable GetAnyRegisteredBySlotId(string slotId)
+        {
+            var typeId = slotId.Split(";")[0];
+
+            foreach (var kvp in _registeredTypeLists)
+            {
+                var match = kvp.Value
+                    .Cast<IRegisterable>()
+                    .FirstOrDefault(x => x.TypeId.ToString() == typeId);
+
+                if (match != null)
+                {
+                    return match;
+                }
+            }
+
+            return null;
         }
 
         private T GetRegistryTypeById<T>(string typeId) where T : IRegisterable

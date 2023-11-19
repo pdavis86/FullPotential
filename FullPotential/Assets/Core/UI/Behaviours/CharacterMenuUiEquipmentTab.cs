@@ -70,6 +70,11 @@ namespace FullPotential.Core.Ui.Behaviours
 
             foreach (var type in _typeRegistry.GetRegisteredTypes<IRegisterableWithSlot>())
             {
+                if (type is Registry.SpecialSlots.LeftHand or Registry.SpecialSlots.RightHand)
+                {
+                    continue;
+                }
+
                 InstantiateSlot(type.TypeId.ToString(), type.SlotSpritePrefabAddress, _rhs.transform);
             }
         }
@@ -89,13 +94,6 @@ namespace FullPotential.Core.Ui.Behaviours
                     var image = equipmentSlot.FindInDescendants("PlaceholderImage").GetComponent<Image>();
                     image.sprite = sprite;
                 });
-
-            //var asyncOp = Addressables.LoadAssetAsync<Sprite>(spritePrefabAddress);
-            //asyncOp.Completed += opHandle =>
-            //{
-            //    var image = equipmentSlot.FindInDescendants("PlaceholderImage").GetComponent<Image>();
-            //    image.sprite = opHandle.Result;
-            //};
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -137,10 +135,12 @@ namespace FullPotential.Core.Ui.Behaviours
                 }
                 else
                 {
-                    //todo: show name of slot instead of type ID
+                    var registerable = _typeRegistry.GetAnyRegisteredBySlotId(slot.name);
+                    var translation = _localizer.Translate(registerable);
+
                     tooltip.OnPointerEnterForTooltip += _ =>
                     {
-                        Tooltips.ShowTooltip(slot.name);
+                        Tooltips.ShowTooltip(translation);
                     };
                 }
             }

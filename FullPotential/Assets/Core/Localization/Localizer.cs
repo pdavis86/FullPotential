@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
@@ -26,8 +27,43 @@ namespace FullPotential.Core.Localization
         private readonly List<string> _addressesLoaded = new List<string>();
         private readonly Dictionary<string, string> _translations = new Dictionary<string, string>();
         private readonly List<CultureAddressables> _availableCultures = new List<CultureAddressables>();
+        private readonly Dictionary<Type, string> _typeDictionary = new Dictionary<Type, string>();
 
         public CultureInfo CurrentCulture { get; private set; }
+
+        public Localizer()
+        {
+            CacheRegisterableTypeNames();
+        }
+
+        private void CacheRegisterableTypeNames()
+        {
+            _typeDictionary.Clear();
+
+            CacheRegisterableTypeName<IArmor>();
+            CacheRegisterableTypeName<IAccessory>();
+            CacheRegisterableTypeName<IWeapon>();
+            CacheRegisterableTypeName<ILoot>();
+            CacheRegisterableTypeName<IAmmunition>();
+            CacheRegisterableTypeName<IEffect>();
+            CacheRegisterableTypeName<IShape>();
+            CacheRegisterableTypeName<ITargeting>();
+
+            //NOTE: Add this last to catch anything missed
+            _typeDictionary.Add(typeof(IRegisterableWithSlot), "slot");
+        }
+
+        private void CacheRegisterableTypeName<T>()
+        {
+            var interfaceType = typeof(T);
+
+            if (!interfaceType.Name.StartsWith("I"))
+            {
+                throw new Exception("Was expecting an interface");
+            }
+
+            _typeDictionary.Add(interfaceType, interfaceType.Name.Substring(1).ToLower());
+        }
 
         private async Task<Data.Localization> LoadCultureFileAsync(string address)
         {
@@ -150,14 +186,14 @@ namespace FullPotential.Core.Localization
 
         public string Translate(IRegisterable registeredItem)
         {
-            var typeName = registeredItem.GetType().Name;
+            foreach (var kvp in _typeDictionary)
+            {
+                if (kvp.Key.IsInstanceOfType(registeredItem))
+                {
+                    return Translate(kvp.Value + "." + registeredItem.GetType().Name);
+                }
+            }
 
-            if (registeredItem is IWeapon) { return Translate("weapon." + typeName); }
-            if (registeredItem is ILoot) { return Translate("loot." + typeName); }
-            if (registeredItem is IAmmunition) { return Translate("ammunition." + typeName); }
-            if (registeredItem is IEffect) { return Translate("effect." + typeName); }
-            if (registeredItem is IShape) { return Translate("shape." + typeName); }
-            if (registeredItem is ITargeting) { return Translate("targeting." + typeName); }
             return "Unexpected IRegisterable type";
         }
 

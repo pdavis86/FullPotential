@@ -13,6 +13,8 @@ namespace FullPotential.Api.Registry
 
         T GetRegisteredByTypeId<T>(string typeId) where T : IRegisterable;
 
+        IRegisterable GetAnyRegisteredBySlotId(string typeId);
+
         IRegisterable GetRegistryTypeForItem(ItemBase item);
 
         IEffect GetEffect(string typeId);
