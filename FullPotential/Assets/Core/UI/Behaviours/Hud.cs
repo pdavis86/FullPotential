@@ -34,8 +34,8 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private Text _ammoRight;
         [SerializeField] private ProgressWheel _chargeLeft;
         [SerializeField] private ProgressWheel _chargeRight;
-        [SerializeField] private GameObject _noReloaderLeft;
-        [SerializeField] private GameObject _noReloaderRight;
+        [SerializeField] private GameObject _handWarningLeft;
+        [SerializeField] private GameObject _handWarningRight;
 #pragma warning restore 0649
 
         private ILocalizer _localizer;
@@ -109,7 +109,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateHandOverlays()
         {
-            //todo: do not fire on every update!
+            //todo: zzz v0.6 do not fire on every update!
 
             UpdateHandDescription(_equippedLeftHandSummary, _playerFighter.HandStatusLeft);
             UpdateHandAmmo(_playerFighter, true);
@@ -129,13 +129,11 @@ namespace FullPotential.Core.Ui.Behaviours
         {
             var handStatus = isLeftHand ? fighter.HandStatusLeft : fighter.HandStatusRight;
             var ammoText = isLeftHand ? _ammoLeft : _ammoRight;
-            var noReloaderObject = isLeftHand ? _noReloaderLeft : _noReloaderRight;
 
             if (handStatus == null
                 || handStatus.EquippedWeapon == null
                 || !handStatus.EquippedWeapon.IsRanged)
             {
-                noReloaderObject.SetActive(false);
                 ammoText.gameObject.SetActive(false);
                 return;
             }
@@ -143,12 +141,6 @@ namespace FullPotential.Core.Ui.Behaviours
             if (!ammoText.gameObject.activeInHierarchy)
             {
                 ammoText.gameObject.SetActive(true);
-            }
-
-            //todo: replace hard-coded value for reloader
-            if (!fighter.HasItemInSlot("0ebf5a82-bb28-40fc-8a98-e562af78a7b5"))
-            {
-                noReloaderObject.SetActive(true);
             }
 
             ammoText.text = handStatus.IsReloading
@@ -311,5 +303,10 @@ namespace FullPotential.Core.Ui.Behaviours
             return (newEnergy, $"{energy}/{maxEnergy}");
         }
 
+        public void SetHandWarning(bool isLeftHand, bool isActive)
+        {
+            var handWarningObject = isLeftHand ? _handWarningLeft : _handWarningRight;
+            handWarningObject.SetActive(isActive);
+        }
     }
 }

@@ -6,6 +6,8 @@ namespace FullPotential.Api.Gameplay.Inventory
 {
     public interface IInventory : IDefensible
     {
+        public const string EventIdSlotChange = "9c7972de-4136-4825-aaa3-11925ad049ee";
+
         T GetItemWithId<T>(string id, bool logIfNotFound = true) where T : ItemBase;
 
         ItemBase GetItemInSlot(string slotId);

@@ -6,9 +6,9 @@ namespace FullPotential.Standard.EventHandlers
 {
     public class BarrierEventHandler : IEventHandler
     {
-        public Action<IEventHandlerArgs> BeforeEvent => HandleBeforeDamageTaken;
+        public Action<IEventHandlerArgs> BeforeHandler => HandleBeforeDamageTaken;
 
-        public Action<IEventHandlerArgs> AfterEvent => HandleAfterDamageTaken;
+        public Action<IEventHandlerArgs> AfterHandler => HandleAfterDamageTaken;
 
         private void HandleBeforeDamageTaken(IEventHandlerArgs eventArgs)
         {

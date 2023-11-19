@@ -41,7 +41,7 @@ namespace FullPotential.Core.Ui.Components
             var rowRectTransform = rowPrefab.GetComponent<RectTransform>();
             var rowCounter = 0;
 
-            var itemsForSlot = typeId is SlotIds.LeftHand or SlotIds.RightHand
+            var itemsForSlot = typeId is HandSlotIds.LeftHand or HandSlotIds.RightHand
                 ? playerInventory.GetHandItems()
                 : playerInventory.GetCompatibleItems(typeId);
 

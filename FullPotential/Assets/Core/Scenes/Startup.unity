@@ -7108,7 +7108,7 @@ GameObject:
   - component: {fileID: 1066323329}
   - component: {fileID: 1066323331}
   m_Layer: 5
-  m_Name: ReloaderWarning
+  m_Name: HandWarning
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12183,7 +12183,7 @@ GameObject:
   - component: {fileID: 1876749085}
   - component: {fileID: 1876749087}
   m_Layer: 5
-  m_Name: ReloaderWarning
+  m_Name: HandWarning
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16373,8 +16373,8 @@ MonoBehaviour:
   _ammoRight: {fileID: 1678711891}
   _chargeLeft: {fileID: 552311125}
   _chargeRight: {fileID: 1003479417}
-  _noReloaderLeft: {fileID: 1066323327}
-  _noReloaderRight: {fileID: 1876749083}
+  _handWarningLeft: {fileID: 1066323327}
+  _handWarningRight: {fileID: 1876749083}
 --- !u!224 &7011060654829738619 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5081276653019582285, guid: d175f1aa2496ff643962c37ac0cc076a,

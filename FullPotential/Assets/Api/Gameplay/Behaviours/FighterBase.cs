@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Gameplay.Events.Args;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
@@ -12,6 +12,8 @@ using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine;
+
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
@@ -220,7 +222,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void TriggerReloadStartEvent(bool isLeftHand)
         {
-            _eventManager.Trigger(EventIds.FighterReloadBegin, GetReloadEventArgs(isLeftHand));
+            _eventManager.Before(IFighter.EventIdReload, GetReloadEventArgs(isLeftHand));
         }
 
         public static void DefaultHandlerForReloadStartEvent(IEventHandlerArgs args)
@@ -269,7 +271,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             handStatus.EquippedWeapon.Ammo = reloadEventArgs.GetNewAmmoCount();
             handStatus.IsReloading = false;
 
-            _eventManager.Trigger(EventIds.FighterReloadFinished, reloadEventArgs);
+            _eventManager.After(IFighter.EventIdReload, reloadEventArgs);
         }
 
         #endregion
@@ -417,8 +419,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             var itemInHand = isLeftHand
-                ? _inventory.GetItemInSlot(SlotIds.LeftHand)
-                : _inventory.GetItemInSlot(SlotIds.RightHand);
+                ? _inventory.GetItemInSlot(HandSlotIds.LeftHand)
+                : _inventory.GetItemInSlot(HandSlotIds.RightHand);
 
             var handPosition = isLeftHand
                 ? Positions.LeftHand.position
@@ -593,7 +595,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private bool UseRangedWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
         {
-            _eventManager.Trigger(EventIds.FighterShotFired, GetShotFiredEventArgs(isLeftHand));
+            var eventArgs = GetShotFiredEventArgs(isLeftHand);
+            _eventManager.Before(IFighter.EventIdShotFired, eventArgs);
+
+            if (eventArgs.IsDefaultHandlerCancelled)
+            {
+                return false;
+            }
 
             var shotDirection = weaponInHand.GetShotDirection(LookTransform.forward);
 
@@ -617,6 +625,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     _combatService.ApplyEffects(this, weaponInHand, rangedHit.transform.gameObject, rangedHit.point, 1);
                 }
             }
+
+            _eventManager.After(IFighter.EventIdShotFired, eventArgs);
 
             return true;
         }
@@ -710,10 +720,5 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         // ReSharper restore UnassignedField.Global
         #endregion
-
-        public bool HasItemInSlot(string slotId)
-        {
-            return _inventory.HasTypeEquipped(slotId);
-        }
     }
 }

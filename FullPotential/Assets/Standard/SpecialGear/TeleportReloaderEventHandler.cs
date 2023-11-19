@@ -1,14 +1,14 @@
 ﻿using System;
+using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Gameplay.Events.Args;
 
 namespace FullPotential.Standard.SpecialGear
 {
     public class TeleportReloaderEventHandler : IEventHandler
     {
-        public Action<IEventHandlerArgs> BeforeEvent => HandleShotFired;
+        public Action<IEventHandlerArgs> BeforeHandler => HandleShotFired;
 
-        public Action<IEventHandlerArgs> AfterEvent => null;
+        public Action<IEventHandlerArgs> AfterHandler => null;
 
         private void HandleShotFired(IEventHandlerArgs eventArgs)
         {

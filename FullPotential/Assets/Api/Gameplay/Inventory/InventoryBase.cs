@@ -220,7 +220,7 @@ namespace FullPotential.Api.Gameplay.Inventory
 
         protected bool IsValidSlotId(string slotId)
         {
-            if (slotId is SlotIds.LeftHand or SlotIds.RightHand)
+            if (slotId is HandSlotIds.LeftHand or HandSlotIds.RightHand)
             {
                 return true;
             }

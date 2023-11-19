@@ -164,6 +164,7 @@
     <Compile Include="Assets\Standard\Targeting\ProjectileBehaviour.cs" />
     <Compile Include="Assets\Standard\Targeting\Self.cs" />
     <Compile Include="Assets\Standard\TargetingVisuals\BeamOfFlames.cs" />
+    <Compile Include="Assets\Standard\EventHandlers\SlotChangeEventHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Standard\FullPotential.Standard.asmdef" />

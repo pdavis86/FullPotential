@@ -4,8 +4,8 @@ namespace FullPotential.Api.Gameplay.Events
 {
     public interface IEventHandler
     {
-        Action<IEventHandlerArgs> BeforeEvent { get; }
+        Action<IEventHandlerArgs> BeforeHandler { get; }
 
-        Action<IEventHandlerArgs> AfterEvent { get; }
+        Action<IEventHandlerArgs> AfterHandler { get; }
     }
 }

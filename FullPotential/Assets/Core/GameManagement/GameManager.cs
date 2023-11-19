@@ -6,7 +6,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
@@ -385,12 +387,14 @@ namespace FullPotential.Core.GameManagement
         {
             var eventManager = (EventManager)DependenciesContext.Dependencies.GetService<IEventManager>();
 
-            eventManager.Register(EventIds.FighterReloadBegin, FighterBase.DefaultHandlerForReloadStartEvent);
-            eventManager.Register(EventIds.FighterReloadFinished, null);
-            eventManager.Register(EventIds.FighterDamageTaken, null);
+            eventManager.Register(IFighter.EventIdReload, FighterBase.DefaultHandlerForReloadStartEvent);
+            eventManager.Register(IFighter.EventIdDamageTaken, null);
 
-            //todo: should FighterShotFired have a default?
-            eventManager.Register(EventIds.FighterShotFired, null);
+            //todo: ShotFired can be cancelled?
+            //todo: ShotFired should have a default?
+            eventManager.Register(IFighter.EventIdShotFired, null);
+            
+            eventManager.Register(IInventory.EventIdSlotChange, null);
         }
 
         #region Methods for Mods

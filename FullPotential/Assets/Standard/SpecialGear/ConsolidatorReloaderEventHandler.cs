@@ -1,16 +1,16 @@
 ﻿using System;
+using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Gameplay.Events.Args;
 
 namespace FullPotential.Standard.SpecialGear
 {
     public class ConsolidatorReloaderEventHandler : IEventHandler
     {
-        public Action<IEventHandlerArgs> BeforeEvent => HandleReloadStartBefore;
+        public Action<IEventHandlerArgs> BeforeHandler => HandleReloadBefore;
 
-        public Action<IEventHandlerArgs> AfterEvent => null;
+        public Action<IEventHandlerArgs> AfterHandler => null;
 
-        private void HandleReloadStartBefore(IEventHandlerArgs eventArgs)
+        private void HandleReloadBefore(IEventHandlerArgs eventArgs)
         {
             eventArgs.IsDefaultHandlerCancelled = true;
 

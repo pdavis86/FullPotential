@@ -100,7 +100,7 @@
     <Compile Include="Assets\Api\Gameplay\Combat\IFighter.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Layers.cs" />
     <Compile Include="Assets\Api\Scenes\ISceneService.cs" />
-    <Compile Include="Assets\Api\Gameplay\Events\Args\ShotFiredEventArgs.cs" />
+    <Compile Include="Assets\Api\Gameplay\Combat\EventArgs\ShotFiredEventArgs.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\StringExtensions.cs" />
     <Compile Include="Assets\Api\Ui\Services\UiAssistant.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IStatEffect.cs" />
@@ -116,7 +116,7 @@
     <Compile Include="Assets\Api\Gameplay\Behaviours\LivingEntityBase.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\IResource.cs" />
     <Compile Include="Assets\Api\Persistence\IUserRepository.cs" />
-    <Compile Include="Assets\Api\Ui\SlotIds.cs" />
+    <Compile Include="Assets\Api\Ui\HandSlotIds.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemForCombatBase.cs" />
     <Compile Include="Assets\Api\Obsolete\Attributes.cs" />
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
@@ -144,13 +144,11 @@
     <Compile Include="Assets\Api\Ui\Services\IUiAssistant.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemWithTargetingAndShapeBase.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IAttributeEffect.cs" />
-    <Compile Include="Assets\Api\Gameplay\Events\IEventHandlerArgs.cs" />
-    <Compile Include="Assets\Api\Gameplay\Events\EventIds.cs" />
     <Compile Include="Assets\Api\Items\Types\ItemStack.cs" />
     <Compile Include="Assets\Api\Ui\IUserInterface.cs" />
     <Compile Include="Assets\Api\Registry\Weapons\IAmmunition.cs" />
     <Compile Include="Assets\Api\Registry\IHasVisuals.cs" />
-    <Compile Include="Assets\Api\Gameplay\Events\Args\ReloadEventArgs.cs" />
+    <Compile Include="Assets\Api\Gameplay\Combat\EventArgs\ReloadEventArgs.cs" />
     <Compile Include="Assets\Api\Registry\ITypeRegistry.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\IEventHandler.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\IStoppable.cs" />
@@ -183,6 +181,8 @@
     <Compile Include="Assets\Api\Registry\Shapes\IShapeBehaviour.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingVisualsBehaviour.cs" />
     <Compile Include="Assets\Api\Registry\IHasNetworkPrefab.cs" />
+    <Compile Include="Assets\Api\Gameplay\Inventory\EventArgs\SlotChangeEventArgs.cs" />
+    <Compile Include="Assets\Api\Gameplay\Events\IEventHandlerArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Api\FullPotential.Api.asmdef" />

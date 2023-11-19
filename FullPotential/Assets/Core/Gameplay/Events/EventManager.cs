@@ -25,7 +25,7 @@ namespace FullPotential.Core.Gameplay.Events
             _subscriptions[eventId].OtherHandlers.Remove(handler);
         }
 
-        public void Trigger(string eventId, IEventHandlerArgs args)
+        public void Before(string eventId, IEventHandlerArgs args)
         {
             var handlerGroup = _subscriptions[eventId];
 
@@ -33,17 +33,22 @@ namespace FullPotential.Core.Gameplay.Events
 
             foreach (var handler in handlerGroup.OtherHandlers)
             {
-                handler.BeforeEvent?.Invoke(args);
+                handler.BeforeHandler?.Invoke(args);
             }
 
             if (!args.IsDefaultHandlerCancelled)
             {
                 handlerGroup.DefaultHandler?.Invoke(args);
             }
+        }
+
+        public void After(string eventId, IEventHandlerArgs args)
+        {
+            var handlerGroup = _subscriptions[eventId];
 
             foreach (var handler in handlerGroup.OtherHandlers)
             {
-                handler.AfterEvent?.Invoke(args);
+                handler.AfterHandler?.Invoke(args);
             }
         }
     }

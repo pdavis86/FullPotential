@@ -167,9 +167,9 @@ namespace FullPotential.Core.Ui.Behaviours
 
                     if (item is Weapon weapon && weapon.IsTwoHanded)
                     {
-                        var otherSlotName = slot.name == SlotIds.LeftHand
-                            ? SlotIds.RightHand
-                            : SlotIds.LeftHand;
+                        var otherSlotName = slot.name == HandSlotIds.LeftHand
+                            ? HandSlotIds.RightHand
+                            : HandSlotIds.LeftHand;
                         SetSlot(_rhs.transform.Find(otherSlotName).gameObject, null);
                     }
                 }

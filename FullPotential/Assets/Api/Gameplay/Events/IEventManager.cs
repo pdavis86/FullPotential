@@ -9,6 +9,8 @@ namespace FullPotential.Api.Gameplay.Events
 
         void Unsubscribe(string eventId, IEventHandler handler);
 
-        void Trigger(string eventId, IEventHandlerArgs args);
+        void Before(string eventId, IEventHandlerArgs args);
+        
+        void After(string eventId, IEventHandlerArgs args);
     }
 }

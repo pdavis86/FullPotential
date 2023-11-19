@@ -195,7 +195,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.InitialiseForEquip(EventSource, SlotIds.LeftHand);
+                _drawingPadUi.InitialiseForEquip(EventSource, HandSlotIds.LeftHand);
                 _drawingPadUi.StartDrawing();
             }
         }
@@ -211,7 +211,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.StopDrawing(SlotIds.LeftHand);
+                _drawingPadUi.StopDrawing(HandSlotIds.LeftHand);
             }
 
             OnAttack(true);
@@ -222,7 +222,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.InitialiseForEquip(EventSource, SlotIds.RightHand);
+                _drawingPadUi.InitialiseForEquip(EventSource, HandSlotIds.RightHand);
                 _drawingPadUi.StartDrawing();
             }
         }
@@ -238,7 +238,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.StopDrawing(SlotIds.RightHand);
+                _drawingPadUi.StopDrawing(HandSlotIds.RightHand);
             }
 
             OnAttack(false);

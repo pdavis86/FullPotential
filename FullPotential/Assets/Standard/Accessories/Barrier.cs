@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Standard.EventHandlers;
@@ -14,7 +15,7 @@ namespace FullPotential.Standard.Accessories
 
         public Dictionary<string, IEventHandler> EventHandlers { get; } = new Dictionary<string, IEventHandler>
         {
-            {EventIds.FighterDamageTaken, new BarrierEventHandler()}
+            {IFighter.EventIdDamageTaken, new BarrierEventHandler()}
         };
 
         public int SlotCount => 1;

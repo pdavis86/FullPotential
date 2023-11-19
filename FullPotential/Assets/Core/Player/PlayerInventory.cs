@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Gameplay.Inventory.EventArgs;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
@@ -30,6 +32,7 @@ namespace FullPotential.Core.Player
         //Services
         private IRpcService _rpcService;
         private IInventoryDataService _inventoryDataService;
+        private IEventManager _eventManager;
 
         private PlayerState _playerState;
 
@@ -47,6 +50,7 @@ namespace FullPotential.Core.Player
 
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
             _inventoryDataService = DependenciesContext.Dependencies.GetService<IInventoryDataService>();
+            _eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
         }
 
         #endregion
@@ -151,6 +155,15 @@ namespace FullPotential.Core.Player
         //todo: zzz v0.5 - generalise for use in LivingEntityBase
         public (bool WasEquipped, List<string> SlotsToSend) HandleSlotChange(ItemBase item, string slotId)
         {
+            var eventArgs = new SlotChangeEventArgs(this, slotId, item.Id);
+            _eventManager.Before(IPlayerInventory.EventIdSlotChange, eventArgs);
+
+            //todo: I think SlotChange event needs a default
+            if (eventArgs.IsDefaultHandlerCancelled)
+            {
+                return default;
+            }
+
             var slotsToSend = new List<string> { slotId };
 
             var previousKvp = _equippedItems
@@ -176,11 +189,11 @@ namespace FullPotential.Core.Player
                 wasEquipped = true;
             }
 
-            if (slotId == SlotIds.LeftHand || slotId == SlotIds.RightHand)
+            if (slotId == HandSlotIds.LeftHand || slotId == HandSlotIds.RightHand)
             {
-                var otherHandSlotId = slotId == SlotIds.LeftHand
-                    ? SlotIds.RightHand
-                    : SlotIds.LeftHand;
+                var otherHandSlotId = slotId == HandSlotIds.LeftHand
+                    ? HandSlotIds.RightHand
+                    : HandSlotIds.LeftHand;
 
                 if (item is Weapon weapon && weapon.IsTwoHanded)
                 {
@@ -197,6 +210,8 @@ namespace FullPotential.Core.Player
                     }
                 }
             }
+
+            _eventManager.After(IPlayerInventory.EventIdSlotChange, eventArgs);
 
             return (wasEquipped, slotsToSend);
         }
@@ -383,11 +398,11 @@ namespace FullPotential.Core.Player
                 });
             }
 
-            if (slotId == SlotIds.LeftHand)
+            if (slotId == HandSlotIds.LeftHand)
             {
                 _playerState.HandStatusLeft.SetEquippedItem(item, item?.GetDescription(_localizer));
             }
-            else if (slotId == SlotIds.RightHand)
+            else if (slotId == HandSlotIds.RightHand)
             {
                 _playerState.HandStatusRight.SetEquippedItem(item, item?.GetDescription(_localizer));
             }
@@ -449,7 +464,7 @@ namespace FullPotential.Core.Player
         {
             DespawnEquippedObject(slotId);
 
-            var isLeftHand = slotId == SlotIds.LeftHand;
+            var isLeftHand = slotId == HandSlotIds.LeftHand;
 
             if (item == null)
             {
@@ -460,8 +475,8 @@ namespace FullPotential.Core.Player
 
             switch (slotId)
             {
-                case SlotIds.LeftHand:
-                case SlotIds.RightHand:
+                case HandSlotIds.LeftHand:
+                case HandSlotIds.RightHand:
                     SpawnItemInHand(slotId, item, isLeftHand);
                     break;
 
