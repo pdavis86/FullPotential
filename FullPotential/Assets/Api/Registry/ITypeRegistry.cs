@@ -17,6 +17,6 @@ namespace FullPotential.Api.Registry
 
         IEffect GetEffect(string typeId);
 
-        void LoadAddessable(string address, Action<UnityEngine.GameObject> action);
+        void LoadAddessable<T>(string address, Action<T> action);
     }
 }

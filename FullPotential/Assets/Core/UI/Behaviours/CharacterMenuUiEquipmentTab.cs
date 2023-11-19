@@ -12,7 +12,6 @@ using FullPotential.Core.Player;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.UI.Behaviours;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -83,24 +82,24 @@ namespace FullPotential.Core.Ui.Behaviours
             var button = equipmentSlot.GetComponent<Button>();
             button.onClick.AddListener(() => OnSlotClick(equipmentSlot));
 
-            //todo: replace when I case use generics for loading Addressables?
-            //_typeRegistry.LoadAddessable(
-            //    spritePrefabAddress,
-            //    prefab =>
-            //    {
-            //        button.targetGraphic = prefab;
-            //    });
+            _typeRegistry.LoadAddessable<Sprite>(
+                spritePrefabAddress,
+                sprite =>
+                {
+                    var image = equipmentSlot.FindInDescendants("PlaceholderImage").GetComponent<Image>();
+                    image.sprite = sprite;
+                });
 
-            var asyncOp = Addressables.LoadAssetAsync<Sprite>(spritePrefabAddress);
-            asyncOp.Completed += opHandle =>
-            {
-                var image = equipmentSlot.FindInDescendants("PlaceholderImage").GetComponent<Image>();
-                image.sprite = opHandle.Result;
-            };
+            //var asyncOp = Addressables.LoadAssetAsync<Sprite>(spritePrefabAddress);
+            //asyncOp.Completed += opHandle =>
+            //{
+            //    var image = equipmentSlot.FindInDescendants("PlaceholderImage").GetComponent<Image>();
+            //    image.sprite = opHandle.Result;
+            //};
         }
 
         // ReSharper disable once UnusedMember.Global
-        public void OnSlotClick(GameObject clickedObject)
+        private void OnSlotClick(GameObject clickedObject)
         {
             if (_lastClickedSlot == clickedObject)
             {

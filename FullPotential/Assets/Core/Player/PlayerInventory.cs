@@ -515,7 +515,7 @@ namespace FullPotential.Core.Player
                         return;
                     }
 
-                    _typeRegistry.LoadAddessable(
+                    _typeRegistry.LoadAddessable<GameObject>(
                         weapon.Visuals.PrefabAddress,
                         prefab =>
                         {

@@ -480,7 +480,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 return;
             }
 
-            _typeRegistry.LoadAddessable(
+            _typeRegistry.LoadAddessable<GameObject>(
                 consumer.Targeting.NetworkPrefabAddress,
                 prefab =>
                 {
@@ -528,7 +528,7 @@ namespace FullPotential.Core.Gameplay.Combat
             rotation.x = 0;
             rotation.z = 0;
 
-            _typeRegistry.LoadAddessable(
+            _typeRegistry.LoadAddessable<GameObject>(
                 consumer.Shape.NetworkPrefabAddress,
                 prefab =>
                 {

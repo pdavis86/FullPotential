@@ -26,7 +26,7 @@ namespace FullPotential.Core.Registry
     {
         private readonly HashSet<Guid> _registeredTypeIds = new HashSet<Guid>();
         private readonly Dictionary<Type, IList> _registeredTypeLists = new Dictionary<Type, IList>();
-        private readonly Dictionary<string, GameObject> _loadedAddressables = new Dictionary<string, GameObject>();
+        private readonly Dictionary<string, object> _loadedAddressables = new Dictionary<string, object>();
         private readonly IEventManager _eventManager;
         private readonly Func<object, bool>[] _registerTypeFunctions;
         private readonly Func<object, bool>[] _registerVisualsFunctions;
@@ -99,7 +99,7 @@ namespace FullPotential.Core.Registry
 
             foreach (var address in mod.GetNetworkPrefabAddresses())
             {
-                LoadAddessable(address, gameObject =>
+                LoadAddessable<GameObject>(address, gameObject =>
                 {
                     var networkObject = gameObject.GetComponent<NetworkObject>();
 
@@ -293,19 +293,18 @@ namespace FullPotential.Core.Registry
                 .FirstOrDefault(x => x.TypeId.ToString() == typeId);
         }
 
-        //todo: generalise away from GameObject?
-        public void LoadAddessable(string address, Action<GameObject> action)
+        public void LoadAddessable<T>(string address, Action<T> action)
         {
             //Addressables.ReleaseInstance(go) : Destroys objects created by Addressables.InstantiateAsync(address)
             //Addressables.Release(opHandle) : Remove the addressable from memory
 
             if (_loadedAddressables.TryGetValue(address, out var loadedAddressable))
             {
-                action(loadedAddressable);
+                action((T)loadedAddressable);
             }
             else
             {
-                var asyncOp = Addressables.LoadAssetAsync<GameObject>(address);
+                var asyncOp = Addressables.LoadAssetAsync<T>(address);
                 asyncOp.Completed += opHandle =>
                 {
                     var prefab = opHandle.Result;

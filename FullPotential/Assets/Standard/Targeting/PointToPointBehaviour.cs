@@ -143,7 +143,7 @@ namespace FullPotential.Standard.Targeting
                 return;
             }
 
-            _typeRegistry.LoadAddessable(
+            _typeRegistry.LoadAddessable<GameObject>(
                 _visualsPrefabAddress.Value.ToString(),
                 visualsPrefab =>
                 {

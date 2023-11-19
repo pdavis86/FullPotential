@@ -123,7 +123,7 @@ namespace FullPotential.Standard.Shapes
                 return;
             }
 
-            _typeRegistry.LoadAddessable(
+            _typeRegistry.LoadAddessable<GameObject>(
                 _visualsPrefabAddress.Value.ToString(),
                 visualsPrefab =>
                 {
