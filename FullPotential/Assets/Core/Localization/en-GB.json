@@ -28,6 +28,10 @@
       "Key": "craftabletype.consumer",
       "Value": "Consumer"
     },
+    {
+      "Key": "craftabletype.special",
+      "Value": "Special"
+    },
 	
 	
     {

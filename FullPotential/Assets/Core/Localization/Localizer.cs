@@ -48,6 +48,7 @@ namespace FullPotential.Core.Localization
             CacheRegisterableTypeName<IEffect>();
             CacheRegisterableTypeName<IShape>();
             CacheRegisterableTypeName<ITargeting>();
+            CacheRegisterableTypeName<ISpecialGear>();
 
             //NOTE: Add this last to catch anything missed
             _typeDictionary.Add(typeof(IRegisterableWithSlot), "slot");

@@ -15,6 +15,8 @@ namespace FullPotential.Core.GameManagement.Inventory
             invChanges.Armor = itemType == typeof(Armor) ? new[] { item as Armor } : null;
             invChanges.Consumers = itemType == typeof(Consumer) ? new[] { item as Consumer } : null;
             invChanges.Weapons = itemType == typeof(Weapon) ? new[] { item as Weapon } : null;
+            invChanges.ItemStacks = itemType == typeof(ItemStack) ? new[] { item as ItemStack } : null;
+            invChanges.SpecialGear = itemType == typeof(SpecialGear) ? new[] { item as SpecialGear } : null;
         }
     }
 }

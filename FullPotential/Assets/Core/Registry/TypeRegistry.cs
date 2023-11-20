@@ -308,6 +308,8 @@ namespace FullPotential.Core.Registry
                     return GetRegistryTypeById<ILoot>(item.RegistryTypeId);
                 case Api.Items.Types.ItemStack:
                     return GetItemStackRegistryType(item);
+                case Api.Items.Types.SpecialGear:
+                    return GetRegistryTypeById<ISpecialGear>(item.RegistryTypeId);
                 default:
                     return null;
             }

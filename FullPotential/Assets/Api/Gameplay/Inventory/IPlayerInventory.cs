@@ -12,7 +12,7 @@ namespace FullPotential.Api.Gameplay.Inventory
 
         IEnumerable<ItemBase> GetHandItems();
 
-        IEnumerable<ItemBase> GetCompatibleItems(string typeId);
+        IEnumerable<ItemBase> GetCompatibleItems(string slotId);
 
         KeyValuePair<string, EquippedItem>? GetEquippedWithItemId(string itemId);
 

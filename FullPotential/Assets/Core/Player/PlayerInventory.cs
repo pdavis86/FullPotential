@@ -11,6 +11,7 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Extensions;
@@ -155,35 +156,27 @@ namespace FullPotential.Core.Player
         //todo: zzz v0.5 - generalise for use in LivingEntityBase
         public (bool WasEquipped, List<string> SlotsToSend) HandleSlotChange(ItemBase item, string slotId)
         {
-            var eventArgs = new SlotChangeEventArgs(this, slotId, item.Id);
-            _eventManager.Before(IPlayerInventory.EventIdSlotChange, eventArgs);
-
-            //todo: I think SlotChange event needs a default
-            if (eventArgs.IsDefaultHandlerCancelled)
-            {
-                return default;
-            }
-
             var slotsToSend = new List<string> { slotId };
 
             var previousKvp = _equippedItems
                 .FirstOrDefault(x => x.Value.Item != null && x.Value?.Item.Id == item.Id);
 
-            var previouslyInSlot = previousKvp.Value != null ? previousKvp.Key : null;
+            var previousSlotId = previousKvp.Value != null ? previousKvp.Key : null;
 
-            if (!previouslyInSlot.IsNullOrWhiteSpace())
+            if (!previousSlotId.IsNullOrWhiteSpace())
             {
-                if (previouslyInSlot != slotId)
+                if (previousSlotId != slotId)
                 {
-                    slotsToSend.Add(previouslyInSlot);
+                    slotsToSend.Add(previousSlotId);
                 }
 
-                _equippedItems[previouslyInSlot!].Item = null;
+                _equippedItems[previousSlotId!].Item = null;
+
                 SetEquippedItem(null, slotId);
             }
 
             var wasEquipped = false;
-            if (previouslyInSlot.IsNullOrWhiteSpace() || previouslyInSlot != slotId)
+            if (previousSlotId.IsNullOrWhiteSpace() || previousSlotId != slotId)
             {
                 SetEquippedItem(item, slotId);
                 wasEquipped = true;
@@ -211,8 +204,6 @@ namespace FullPotential.Core.Player
                 }
             }
 
-            _eventManager.After(IPlayerInventory.EventIdSlotChange, eventArgs);
-
             return (wasEquipped, slotsToSend);
         }
 
@@ -236,22 +227,26 @@ namespace FullPotential.Core.Player
                 .OrderBy(x => x.Name);
         }
 
-        public IEnumerable<ItemBase> GetCompatibleItems(string typeId)
+        public IEnumerable<ItemBase> GetCompatibleItems(string slotId)
         {
-            if (typeId == null)
+            if (slotId == null)
             {
                 return _items
                     .Select(x => x.Value)
                     .OrderBy(x => x.Name);
             }
 
-            //todo:remove
-            //var temp = _items
-            //    .Where(x => x.Value.RegistryTypeId == typeId)
-            //    .ToList();
+            var matches = _items
+                .Where(x => !x.Value.RegistryTypeId.IsNullOrWhiteSpace() && slotId.StartsWith(x.Value.RegistryTypeId));
 
-            return _items
-                .Where(x => x.Value.RegistryTypeId == typeId)
+            if (!matches.Any())
+            {
+                matches = _items.Where(
+                    i => i.Value is SpecialGear specialGear
+                         && slotId.StartsWith(((ISpecialGear)specialGear.RegistryType).SlotId.ToString()));
+            }
+
+            return matches
                 .Select(x => x.Value)
                 .OrderBy(x => x.Name);
         }
@@ -284,6 +279,7 @@ namespace FullPotential.Core.Player
                 .UnionIfNotNull(changes.Spells)
                 .UnionIfNotNull(changes.Consumers)
                 .UnionIfNotNull(changes.ItemStacks)
+                .UnionIfNotNull(changes.SpecialGear)
                 .UnionIfNotNull(changes.Weapons);
 
             foreach (var item in itemsToAdd)
@@ -341,6 +337,7 @@ namespace FullPotential.Core.Player
                 .UnionIfNotNull(inventoryData.Weapons)
                 .UnionIfNotNull(inventoryData.Consumers)
                 .UnionIfNotNull(inventoryData.ItemStacks)
+                .UnionIfNotNull(inventoryData.SpecialGear)
                 .UnionIfNotNull(inventoryData.Gadgets)
                 .UnionIfNotNull(inventoryData.Spells);
 
@@ -380,6 +377,15 @@ namespace FullPotential.Core.Player
 
         private void SetEquippedItem(ItemBase item, string slotId)
         {
+            var eventArgs = new SlotChangeEventArgs(this, slotId, item?.Id);
+            _eventManager.Before(IPlayerInventory.EventIdSlotChange, eventArgs);
+
+            //todo: I think SlotChange event needs a default
+            if (eventArgs.IsDefaultHandlerCancelled)
+            {
+                return;
+            }
+
             if (_equippedItems.TryGetValue(slotId, out var equippedItem))
             {
                 equippedItem.Item = item;
@@ -406,6 +412,8 @@ namespace FullPotential.Core.Player
             {
                 _playerState.HandStatusRight.SetEquippedItem(item, item?.GetDescription(_localizer));
             }
+
+            _eventManager.After(IPlayerInventory.EventIdSlotChange, eventArgs);
         }
 
         public InventoryData GetSaveData()
@@ -430,6 +438,7 @@ namespace FullPotential.Core.Player
                 Consumers = groupedItems.FirstOrDefault(x => x.Key == typeof(Consumer))?.Select(x => x as Consumer).ToArray(),
                 Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
                 ItemStacks = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemStack))?.Select(x => x as ItemStack).ToArray(),
+                SpecialGear = groupedItems.FirstOrDefault(x => x.Key == typeof(SpecialGear))?.Select(x => x as SpecialGear).ToArray(),
                 EquippedItems = equippedItems.ToArray(),
                 ShapeMapping = shapeMapping.ToArray()
             };
@@ -480,36 +489,36 @@ namespace FullPotential.Core.Player
                     SpawnItemInHand(slotId, item, isLeftHand);
                     break;
 
-                //case SlotGameObjectName.Amulet:
-                //    InstantiateAccessory(slotGameObjectName, item, _playerState.GraphicsTransform, manipulateTransform: t => t.position += t.forward * _amuletForwardMultiplier);
-                //    break;
+                    //case SlotGameObjectName.Amulet:
+                    //    InstantiateAccessory(slotGameObjectName, item, _playerState.GraphicsTransform, manipulateTransform: t => t.position += t.forward * _amuletForwardMultiplier);
+                    //    break;
 
-                //case SlotGameObjectName.Belt:
-                //    InstantiateAccessory(slotGameObjectName, item, _playerState.GraphicsTransform);
-                //    break;
+                    //case SlotGameObjectName.Belt:
+                    //    InstantiateAccessory(slotGameObjectName, item, _playerState.GraphicsTransform);
+                    //    break;
 
-                //case SlotGameObjectName.LeftRing:
-                //    InstantiateAccessory(slotGameObjectName, item, _playerState.BodyParts.LeftArm, true);
-                //    break;
+                    //case SlotGameObjectName.LeftRing:
+                    //    InstantiateAccessory(slotGameObjectName, item, _playerState.BodyParts.LeftArm, true);
+                    //    break;
 
-                //case SlotGameObjectName.RightRing:
-                //    InstantiateAccessory(slotGameObjectName, item, _playerState.BodyParts.RightArm, true);
-                //    break;
+                    //case SlotGameObjectName.RightRing:
+                    //    InstantiateAccessory(slotGameObjectName, item, _playerState.BodyParts.RightArm, true);
+                    //    break;
 
-                //case SlotGameObjectName.Helm:
-                //    InstantiateArmor(slotGameObjectName, item, _playerState.BodyParts.Head);
-                //    break;
+                    //case SlotGameObjectName.Helm:
+                    //    InstantiateArmor(slotGameObjectName, item, _playerState.BodyParts.Head);
+                    //    break;
 
-                //case SlotGameObjectName.Barrier:
-                //case SlotGameObjectName.Chest:
-                //case SlotGameObjectName.Legs:
-                //case SlotGameObjectName.Feet:
-                //    InstantiateArmor(slotGameObjectName, item, _playerState.GraphicsTransform);
-                //    break;
+                    //case SlotGameObjectName.Barrier:
+                    //case SlotGameObjectName.Chest:
+                    //case SlotGameObjectName.Legs:
+                    //case SlotGameObjectName.Feet:
+                    //    InstantiateArmor(slotGameObjectName, item, _playerState.GraphicsTransform);
+                    //    break;
 
-                //default:
-                //    Debug.LogWarning("Not yet implemented equipping for slot " + slotId);
-                //    break;
+                    //default:
+                    //    Debug.LogWarning("Not yet implemented equipping for slot " + slotId);
+                    //    break;
             }
         }
 

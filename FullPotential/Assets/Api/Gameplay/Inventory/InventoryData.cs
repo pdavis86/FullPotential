@@ -14,6 +14,7 @@ namespace FullPotential.Api.Gameplay.Inventory
         public Weapon[] Weapons;
         public Consumer[] Consumers;
         public ItemStack[] ItemStacks;
+        public SpecialGear[] SpecialGear;
 
         public KeyValuePair<string, string>[] EquippedItems;
         public KeyValuePair<string, string>[] ShapeMapping;

@@ -485,6 +485,27 @@ namespace FullPotential.Core.Gameplay.Crafting
             return accessory;
         }
 
+        private SpecialGear GetSpecialGear(ISpecialGear craftableType, IList<ItemForCombatBase> components)
+        {
+            //todo: all attributes
+
+            var specialGear = new SpecialGear
+            {
+                RegistryType = craftableType,
+                Id = Guid.NewGuid().ToMinimisedString(),
+                Attributes = new Attributes
+                {
+                    IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
+                    Strength = ComputeAttribute(components, x => x.Attributes.Strength),
+                    Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
+                    Speed = ComputeAttribute(components, x => x.Attributes.Speed),
+                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
+                },
+            };
+            specialGear.Name = craftableType.GetType().Name;
+            return specialGear;
+        }
+
         public ItemBase GetCraftedItem(CraftableType craftableType, string typeId, bool isTwoHanded, IList<ItemForCombatBase> components)
         {
             switch (craftableType)
@@ -514,6 +535,10 @@ namespace FullPotential.Core.Gameplay.Crafting
                 case CraftableType.Accessory:
                     var craftableAccessory = _typeRegistry.GetRegisteredByTypeId<IAccessory>(typeId);
                     return GetAccessory(craftableAccessory, components);
+
+                case CraftableType.Special:
+                    var craftableSpecial = _typeRegistry.GetRegisteredByTypeId<ISpecialGear>(typeId);
+                    return GetSpecialGear(craftableSpecial, components);
 
                 default:
                     throw new Exception($"Unexpected craftable category '{craftableType}'");

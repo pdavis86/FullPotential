@@ -30,6 +30,7 @@ namespace FullPotential.Core.UI.Components
         private Dictionary<IArmor, string> _armorTypes;
         private Dictionary<ResourceType, string> _consumerTypes;
         private Dictionary<IWeapon, string> _weaponTypes;
+        private Dictionary<ISpecialGear, string> _specialTypes;
         private List<string> _handednessOptions;
         private List<int?> _optionalTwoHandedWeaponIndexes;
 
@@ -77,6 +78,7 @@ namespace FullPotential.Core.UI.Components
                 case CraftableType.Armor: return _armorTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
                 case CraftableType.Weapon: return _weaponTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
                 case CraftableType.Consumer: return _consumerTypes.ElementAt(SubTypeDropdown.value).Key.ToString();
+                case CraftableType.Special: return _specialTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
                 default: throw new InvalidOperationException($"Unknown crafting category: '{craftableType}'");
             }
         }
@@ -102,6 +104,7 @@ namespace FullPotential.Core.UI.Components
                 case CraftableType.Armor: SubTypeDropdown.AddOptions(_armorTypes.Select(x => x.Value).ToList()); break;
                 case CraftableType.Weapon: SubTypeDropdown.AddOptions(_weaponTypes.Select(x => x.Value).ToList()); break;
                 case CraftableType.Consumer: SubTypeDropdown.AddOptions(_consumerTypes.Select(x => x.Value).ToList()); break;
+                case CraftableType.Special: SubTypeDropdown.AddOptions(_specialTypes.Select(x => x.Value).ToList()); break;
                 default: throw new InvalidOperationException($"Unknown crafting type: '{typeToCraft}'");
             }
 
@@ -129,6 +132,10 @@ namespace FullPotential.Core.UI.Components
             _consumerTypes = GetDictionaryFromEnum<ResourceType>(localizer);
 
             _weaponTypes = typeRegistry.GetRegisteredTypes<IWeapon>()
+                .ToDictionary(x => x, x => localizer.Translate(x))
+                .OrderByValue();
+
+            _specialTypes = typeRegistry.GetRegisteredTypes<ISpecialGear>()
                 .ToDictionary(x => x, x => localizer.Translate(x))
                 .OrderByValue();
 

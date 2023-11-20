@@ -19,24 +19,30 @@ namespace FullPotential.Standard.EventHandlers
         {
             var slotChangeArgs = (SlotChangeEventArgs)eventArgs;
 
-            if (slotChangeArgs.SlotId != HandSlotIds.LeftHand && slotChangeArgs.SlotId != HandSlotIds.RightHand)
+            switch (slotChangeArgs.SlotId)
             {
-                return;
+                case HandSlotIds.LeftHand:
+                case HandSlotIds.RightHand:
+                    var itemInSlot = slotChangeArgs.Inventory.GetItemInSlot(slotChangeArgs.SlotId);
+                    var hasReloaderEquipped = slotChangeArgs.Inventory.HasTypeEquipped(RangedWeaponReloader.TypeIdString);
+
+                    var isActive = itemInSlot != null
+                                   && itemInSlot is Weapon weapon
+                                   && weapon.IsRanged
+                                   && !hasReloaderEquipped;
+
+                    var modHelper = DependenciesContext.Dependencies.GetService<IModHelper>();
+                    var hud = modHelper.GetGameManager().GetUserInterface().HudOverlay;
+                    var isLeftHand = slotChangeArgs.SlotId == HandSlotIds.LeftHand;
+
+                    hud.SetHandWarning(isLeftHand, isActive);
+
+                    return;
+                
+                case RangedWeaponReloader.TypeIdString:
+                    //todo:
+                    break;
             }
-
-            var itemInSlot = slotChangeArgs.Inventory.GetItemInSlot(slotChangeArgs.SlotId);
-            var hasReloaderEquipped = slotChangeArgs.Inventory.HasTypeEquipped(RangedWeaponReloader.TypeIdString);
-
-            var isActive = itemInSlot != null
-                           && itemInSlot is Weapon weapon
-                           && weapon.IsRanged
-                           && !hasReloaderEquipped;
-
-            var modHelper = DependenciesContext.Dependencies.GetService<IModHelper>();
-            var hud = modHelper.GetGameManager().GetUserInterface().HudOverlay;
-            var isLeftHand = slotChangeArgs.SlotId == HandSlotIds.LeftHand;
-
-            hud.SetHandWarning(isLeftHand, isActive);
         }
     }
 }

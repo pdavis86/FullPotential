@@ -226,7 +226,7 @@ namespace FullPotential.Api.Gameplay.Inventory
             }
 
             return _typeRegistry.GetRegisteredTypes<IArmor>().FirstOrDefault(t => t.TypeId.ToString() == slotId) != null
-                   || _typeRegistry.GetRegisteredTypes<IAccessory>().FirstOrDefault(t => t.TypeId.ToString().StartsWith(slotId)) != null
+                   || _typeRegistry.GetRegisteredTypes<IAccessory>().FirstOrDefault(t => slotId.StartsWith(t.TypeId.ToString())) != null
                    || _typeRegistry.GetRegisteredTypes<IRegisterableWithSlot>().FirstOrDefault(t => t.TypeId.ToString() == slotId) != null;
         }
 

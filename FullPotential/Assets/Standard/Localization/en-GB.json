@@ -450,6 +450,16 @@
     },
 	
 	
+    {
+      "Key": "specialgear.consolidatorreloader",
+      "Value": "Consolidator Reloader"
+    },
+    {
+      "Key": "specialgear.teleportreloader",
+      "Value": "Teleport Reloader"
+    },
+	
+	
 	{
       "Key": "noweaponreloader",
       "Value": "No weapon reloader equipped.\nRemaining ammo will be lost when you reload!"
