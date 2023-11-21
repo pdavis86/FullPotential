@@ -107,8 +107,6 @@ namespace FullPotential.Core.Player
             var equippedItem = Enumerable.Empty<ItemBase>()
                 .UnionIfNotNull(changes.Accessories)
                 .UnionIfNotNull(changes.Armor)
-                .UnionIfNotNull(changes.Gadgets)
-                .UnionIfNotNull(changes.Spells)
                 .UnionIfNotNull(changes.Consumers)
                 .UnionIfNotNull(changes.Weapons)
                 .FirstOrDefault();
@@ -275,8 +273,6 @@ namespace FullPotential.Core.Player
                 .UnionIfNotNull(changes.Loot)
                 .UnionIfNotNull(changes.Accessories)
                 .UnionIfNotNull(changes.Armor)
-                .UnionIfNotNull(changes.Gadgets)
-                .UnionIfNotNull(changes.Spells)
                 .UnionIfNotNull(changes.Consumers)
                 .UnionIfNotNull(changes.ItemStacks)
                 .UnionIfNotNull(changes.SpecialGear)
@@ -320,16 +316,6 @@ namespace FullPotential.Core.Player
                 ? inventoryData.MaxItems
                 : 30;
 
-            //Here for backwards-compatibility
-            foreach (var spell in inventoryData.Spells)
-            {
-                spell.ResourceType = ResourceType.Mana;
-            }
-            foreach (var gadget in inventoryData.Gadgets)
-            {
-                gadget.ResourceType = ResourceType.Energy;
-            }
-
             var itemsToAdd = Enumerable.Empty<ItemBase>()
                 .UnionIfNotNull(inventoryData.Loot)
                 .UnionIfNotNull(inventoryData.Accessories)
@@ -337,9 +323,7 @@ namespace FullPotential.Core.Player
                 .UnionIfNotNull(inventoryData.Weapons)
                 .UnionIfNotNull(inventoryData.Consumers)
                 .UnionIfNotNull(inventoryData.ItemStacks)
-                .UnionIfNotNull(inventoryData.SpecialGear)
-                .UnionIfNotNull(inventoryData.Gadgets)
-                .UnionIfNotNull(inventoryData.Spells);
+                .UnionIfNotNull(inventoryData.SpecialGear);
 
             foreach (var item in itemsToAdd)
             {

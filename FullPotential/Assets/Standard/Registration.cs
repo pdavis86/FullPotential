@@ -4,7 +4,6 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Modding;
-using FullPotential.Standard.EventHandlers;
 using UnityEngine;
 
 // ReSharper disable UnusedType.Global
@@ -148,8 +147,8 @@ namespace FullPotential.Standard
 
         public void RegisterEventHandlers(IEventManager eventManager)
         {
-            eventManager.Subscribe(IFighter.EventIdDamageTaken, new BarrierEventHandler());
-            eventManager.Subscribe(IInventory.EventIdSlotChange, new SlotChangeEventHandler());
+            eventManager.Subscribe(IFighter.EventIdDamageTaken, new Accessories.BarrierEventHandler());
+            eventManager.Subscribe(IInventory.EventIdSlotChange, new SpecialGear.ReloaderSlotChangeEventHandler());
         }
     }
 }

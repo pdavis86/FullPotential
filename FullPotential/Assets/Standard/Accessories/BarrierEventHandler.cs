@@ -2,7 +2,7 @@
 using FullPotential.Api.Gameplay.Events;
 using UnityEngine;
 
-namespace FullPotential.Standard.EventHandlers
+namespace FullPotential.Standard.Accessories
 {
     public class BarrierEventHandler : IEventHandler
     {

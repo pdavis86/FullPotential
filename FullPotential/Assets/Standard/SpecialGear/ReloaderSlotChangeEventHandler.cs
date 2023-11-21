@@ -1,4 +1,5 @@
 ﻿using System;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Inventory.EventArgs;
@@ -8,10 +9,13 @@ using FullPotential.Api.Modding;
 using FullPotential.Api.Ui;
 using FullPotential.Standard.SpecialSlots;
 
-namespace FullPotential.Standard.EventHandlers
+namespace FullPotential.Standard.SpecialGear
 {
-    public class SlotChangeEventHandler : IEventHandler
+    public class ReloaderSlotChangeEventHandler : IEventHandler
     {
+        private static readonly ConsolidatorReloaderEventHandler ConsolidatorEventHandler = new ConsolidatorReloaderEventHandler();
+        private static readonly TeleportReloaderEventHandler TeleportEventHandler = new TeleportReloaderEventHandler();
+
         public Action<IEventHandlerArgs> BeforeHandler => null;
 
         public Action<IEventHandlerArgs> AfterHandler => HandleAfterSlotChange;
@@ -29,7 +33,8 @@ namespace FullPotential.Standard.EventHandlers
 
             var modHelper = DependenciesContext.Dependencies.GetService<IModHelper>();
             var hud = modHelper.GetGameManager().GetUserInterface().HudOverlay;
-            var hasReloaderEquipped = slotChangeArgs.Inventory.HasTypeEquipped(RangedWeaponReloader.TypeIdString);
+            var reloaderEquipped = slotChangeArgs.Inventory.GetItemInSlot(RangedWeaponReloader.TypeIdString);
+            var hasReloaderEquipped = reloaderEquipped != null;
 
             switch (slotChangeArgs.SlotId)
             {
@@ -42,6 +47,26 @@ namespace FullPotential.Standard.EventHandlers
                 case RangedWeaponReloader.TypeIdString:
                     hud.SetHandWarning(true, GetIsActive(slotChangeArgs.Inventory, HandSlotIds.LeftHand, hasReloaderEquipped));
                     hud.SetHandWarning(false, GetIsActive(slotChangeArgs.Inventory, HandSlotIds.RightHand, hasReloaderEquipped));
+
+                    var eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
+
+                    if (hasReloaderEquipped)
+                    {
+                        if (reloaderEquipped.RegistryTypeId == ConsolidatorReloader.TypeIdString)
+                        {
+                            eventManager.Subscribe(IFighter.EventIdReload, ConsolidatorEventHandler);
+                        }
+                        else
+                        {
+                            eventManager.Subscribe(IFighter.EventIdShotFired, TeleportEventHandler);
+                        }
+                    }
+                    else
+                    {
+                        eventManager.Unsubscribe(IFighter.EventIdReload, ConsolidatorEventHandler);
+                        eventManager.Unsubscribe(IFighter.EventIdShotFired, TeleportEventHandler);
+                    }
+
                     return;
             }
         }

@@ -16,7 +16,5 @@ namespace FullPotential.Api.Gameplay.Inventory
         ItemStack TakeItemStack(string typeId, int maxSize);
 
         int GetItemStackTotal(string typeId);
-        
-        bool HasTypeEquipped(string slotId);
     }
 }

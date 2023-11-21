@@ -59,7 +59,7 @@
     <Compile Include="Assets\Standard\Weapons\Shield.cs" />
     <Compile Include="Assets\Standard\Accessories\Barrier.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Endurance.cs" />
-    <Compile Include="Assets\Standard\EventHandlers\BarrierEventHandler.cs" />
+    <Compile Include="Assets\Standard\Accessories\BarrierEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Repel.cs" />
     <Compile Include="Assets\Standard\Enemies\Behaviours\EnemyState.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Slow.cs" />
@@ -141,7 +141,7 @@
     <Compile Include="Assets\Standard\TargetingVisuals\BeamOfFlames.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicHammer2.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicDagger.cs" />
-    <Compile Include="Assets\Standard\EventHandlers\SlotChangeEventHandler.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\ReloaderSlotChangeEventHandler.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicAxe.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\StepBack.cs" />
     <Compile Include="Assets\Standard\AccessoryVisuals\LeatherBelt.cs" />
