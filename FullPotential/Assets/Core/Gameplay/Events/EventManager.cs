@@ -25,7 +25,7 @@ namespace FullPotential.Core.Gameplay.Events
             _subscriptions[eventId].OtherHandlers.Remove(handler);
         }
 
-        public void Before(string eventId, IEventHandlerArgs args)
+        public void Trigger(string eventId, IEventHandlerArgs args)
         {
             var handlerGroup = _subscriptions[eventId];
 

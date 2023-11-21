@@ -266,13 +266,13 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnReloadLeft()
         {
-            _playerState.TriggerReloadStartEvent(true);
+            _playerState.TriggerReloadEvent(true);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnReloadRight()
         {
-            _playerState.TriggerReloadStartEvent(false);
+            _playerState.TriggerReloadEvent(false);
         }
 
 #pragma warning restore IDE0051 // Remove unused private members

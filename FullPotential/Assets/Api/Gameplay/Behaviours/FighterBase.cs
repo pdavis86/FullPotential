@@ -215,19 +215,22 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return isLeftHand ? _reloadArgsLeft : _reloadArgsRight;
         }
 
-        private ShotFiredEventArgs GetShotFiredEventArgs(bool isLeftHand)
+        private ShotFiredEventArgs GetShotFiredEventArgs(bool isLeftHand, Vector3 startPosition, Vector3 endPosition)
         {
-            return isLeftHand ? _shotFiredArgsLeft : _shotFiredArgsRight;
+            var eventArgs = isLeftHand ? _shotFiredArgsLeft : _shotFiredArgsRight;
+            eventArgs.StartPosition = startPosition;
+            eventArgs.EndPosition = endPosition;
+            return eventArgs;
         }
 
-        public void TriggerReloadStartEvent(bool isLeftHand)
+        public void TriggerReloadEvent(bool isLeftHand)
         {
-            _eventManager.Before(IFighter.EventIdReload, GetReloadEventArgs(isLeftHand));
+            _eventManager.Trigger(IFighter.EventIdReload, GetReloadEventArgs(isLeftHand));
         }
 
-        public static void DefaultHandlerForReloadStartEvent(IEventHandlerArgs args)
+        public static void DefaultHandlerForReloadEvent(IEventHandlerArgs eventArgs)
         {
-            var reloadEventArgs = (ReloadEventArgs)args;
+            var reloadEventArgs = (ReloadEventArgs)eventArgs;
 
             reloadEventArgs.GetNewAmmoCount = () =>
             {
@@ -595,22 +598,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private bool UseRangedWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
         {
-            var eventArgs = GetShotFiredEventArgs(isLeftHand);
-            _eventManager.Before(IFighter.EventIdShotFired, eventArgs);
-
-            if (eventArgs.IsDefaultHandlerCancelled)
-            {
-                return false;
-            }
-
             var shotDirection = weaponInHand.GetShotDirection(LookTransform.forward);
 
             var endPos = Physics.Raycast(LookTransform.position, shotDirection, out var rangedHit, MaximumRange)
                 ? rangedHit.point
                 : handPosition + shotDirection * MaximumRange;
 
-            var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-            UsedWeaponClientRpc(handPosition, endPos, nearbyClients);
+            var eventArgs = GetShotFiredEventArgs(isLeftHand, handPosition, endPos);
+            _eventManager.Trigger(IFighter.EventIdShotFired, eventArgs);
+            _eventManager.After(IFighter.EventIdShotFired, eventArgs);
 
             if (rangedHit.transform == null)
             {
@@ -626,9 +622,21 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            _eventManager.After(IFighter.EventIdShotFired, eventArgs);
-
             return true;
+        }
+
+        public void ShotFired(Vector3 startPosition, Vector3 endPosition)
+        {
+            var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
+            UsedWeaponClientRpc(startPosition, endPosition, nearbyClients);
+        }
+
+        public static void DefaultHandlerForShotFiredEvent(IEventHandlerArgs eventArgs)
+        {
+            var shotFiredArgs = (ShotFiredEventArgs)eventArgs;
+
+            var fighter = (FighterBase)shotFiredArgs.Fighter;
+            fighter.ShotFired(shotFiredArgs.StartPosition, shotFiredArgs.EndPosition);
         }
 
         private bool UseMeleeWeapon(Weapon weaponInHand)

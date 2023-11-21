@@ -124,7 +124,7 @@ namespace FullPotential.Core.Player
                 var item = sourceKvp.Value.IsNullOrWhiteSpace() ? null : _items[sourceKvp.Value];
                 var slotId = sourceKvp.Key;
 
-                SetEquippedItem(item, slotId);
+                TriggerSlotChangeEvent(item, slotId);
                 SpawnEquippedObject(item, slotId);
             }
 
@@ -172,13 +172,13 @@ namespace FullPotential.Core.Player
 
                 _equippedItems[previousSlotId!].Item = null;
 
-                SetEquippedItem(null, slotId);
+                TriggerSlotChangeEvent(null, slotId);
             }
 
             var wasEquipped = false;
             if (previousSlotId.IsNullOrWhiteSpace() || previousSlotId != slotId)
             {
-                SetEquippedItem(item, slotId);
+                TriggerSlotChangeEvent(item, slotId);
                 wasEquipped = true;
             }
 
@@ -190,7 +190,7 @@ namespace FullPotential.Core.Player
 
                 if (item is Weapon weapon && weapon.IsTwoHanded)
                 {
-                    SetEquippedItem(null, otherHandSlotId);
+                    TriggerSlotChangeEvent(null, otherHandSlotId);
                     slotsToSend.Add(otherHandSlotId);
                 }
                 else
@@ -198,7 +198,7 @@ namespace FullPotential.Core.Player
                     var itemInOtherHand = GetItemInSlot(otherHandSlotId);
                     if (itemInOtherHand is Weapon otherWeapon && otherWeapon.IsTwoHanded)
                     {
-                        SetEquippedItem(null, otherHandSlotId);
+                        TriggerSlotChangeEvent(null, otherHandSlotId);
                         slotsToSend.Add(otherHandSlotId);
                     }
                 }
@@ -360,7 +360,7 @@ namespace FullPotential.Core.Player
 
                     var item = itemsToAdd.First(x => x.Id == kvp.Value);
 
-                    SetEquippedItem(item, slotId);
+                    TriggerSlotChangeEvent(item, slotId);
 
                     SpawnEquippedObject(item, slotId);
                 }
@@ -375,16 +375,16 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private void SetEquippedItem(ItemBase item, string slotId)
+        private void TriggerSlotChangeEvent(ItemBase item, string slotId)
         {
             var eventArgs = new SlotChangeEventArgs(this, slotId, item?.Id);
-            _eventManager.Before(IPlayerInventory.EventIdSlotChange, eventArgs);
+            _eventManager.Trigger(IPlayerInventory.EventIdSlotChange, eventArgs);
+            _eventManager.After(IPlayerInventory.EventIdSlotChange, eventArgs);
+        }
 
-            //todo: I think SlotChange event needs a default
-            if (eventArgs.IsDefaultHandlerCancelled)
-            {
-                return;
-            }
+        private void SetEquippedItem(string itemId, string slotId)
+        {
+            var item = itemId.IsNullOrWhiteSpace() ? null : _items[itemId];
 
             if (_equippedItems.TryGetValue(slotId, out var equippedItem))
             {
@@ -412,8 +412,15 @@ namespace FullPotential.Core.Player
             {
                 _playerState.HandStatusRight.SetEquippedItem(item, item?.GetDescription(_localizer));
             }
+        }
 
-            _eventManager.After(IPlayerInventory.EventIdSlotChange, eventArgs);
+        public static void DefaultHandlerForSlotChangeEvent(IEventHandlerArgs eventArgs)
+        {
+            var slotChangeEventArgs = (SlotChangeEventArgs)eventArgs;
+
+            var playerInventory = (PlayerInventory) slotChangeEventArgs.Inventory;
+
+            playerInventory.SetEquippedItem(slotChangeEventArgs.ItemId, slotChangeEventArgs.SlotId);
         }
 
         public InventoryData GetSaveData()

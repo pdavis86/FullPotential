@@ -387,14 +387,10 @@ namespace FullPotential.Core.GameManagement
         {
             var eventManager = (EventManager)DependenciesContext.Dependencies.GetService<IEventManager>();
 
-            eventManager.Register(IFighter.EventIdReload, FighterBase.DefaultHandlerForReloadStartEvent);
+            eventManager.Register(IFighter.EventIdReload, FighterBase.DefaultHandlerForReloadEvent);
             eventManager.Register(IFighter.EventIdDamageTaken, null);
-
-            //todo: ShotFired can be cancelled?
-            //todo: ShotFired should have a default?
-            eventManager.Register(IFighter.EventIdShotFired, null);
-            
-            eventManager.Register(IInventory.EventIdSlotChange, null);
+            eventManager.Register(IFighter.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEvent);
+            eventManager.Register(IInventory.EventIdSlotChange, PlayerInventory.DefaultHandlerForSlotChangeEvent);
         }
 
         #region Methods for Mods

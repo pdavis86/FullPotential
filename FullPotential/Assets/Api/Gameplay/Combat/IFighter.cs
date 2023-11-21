@@ -10,6 +10,7 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Combat
 {
+    //todo: delete IFighter in favour of just FighterBase? No reason to have both
     public interface IFighter : IDefensible, IDamageable
     {
         public const string EventIdReload = "2337f94e-5a7d-4e02-b1c8-1b5e9934a3ce";

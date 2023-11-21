@@ -4,6 +4,7 @@ using FullPotential.Api.Items.Types;
 
 namespace FullPotential.Api.Gameplay.Inventory
 {
+    //todo: delete IInventory in favour of just InventoryBase? Why have both? 
     public interface IInventory : IDefensible
     {
         public const string EventIdSlotChange = "9c7972de-4136-4825-aaa3-11925ad049ee";
