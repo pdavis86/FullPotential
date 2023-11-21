@@ -163,7 +163,8 @@ namespace FullPotential.Api.Gameplay.Inventory
 
         public bool HasTypeEquipped(string slotId)
         {
-            return _equippedItems.ContainsKey(slotId);
+            return _equippedItems.ContainsKey(slotId)
+                   && _equippedItems[slotId].Item != null;
         }
 
         public bool IsInventoryFull()
