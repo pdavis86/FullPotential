@@ -1,9 +1,9 @@
-﻿using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Obsolete;
+﻿using System;
+using FullPotential.Api.Gameplay.Effects;
 
 namespace FullPotential.Api.Registry.Effects
 {
-    public interface IStatEffect : IEffect
+    public interface IResourceEffect : IEffect
     {
         /// <summary>
         /// The underlying result of applying this effect
@@ -11,8 +11,8 @@ namespace FullPotential.Api.Registry.Effects
         AffectType AffectType { get; }
 
         /// <summary>
-        /// The stat which will be affected
+        /// The resource which will be affected
         /// </summary>
-        ResourceType StatToAffect { get; }
+        Guid ResourceTypeId { get; }
     }
 }

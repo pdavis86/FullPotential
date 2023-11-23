@@ -7,6 +7,7 @@ using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Ui;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.UI.Behaviours;
@@ -79,11 +80,16 @@ namespace FullPotential.Core.Ui.Behaviours
                 return;
             }
 
+            //todo: zzz v0.6 - use events instead of firing on every update!
+
+            //todo: generalise instead of having specific resources
             UpdateStaminaPercentage();
             UpdateHealthPercentage();
             UpdateManaPercentage();
             UpdateEnergyPercentage();
+
             UpdateHandOverlays();
+
             UpdateActiveEffects();
         }
 
@@ -109,8 +115,6 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateHandOverlays()
         {
-            //todo: zzz v0.6 do not fire on every update!
-
             UpdateHandDescription(_equippedLeftHandSummary, _playerFighter.HandStatusLeft);
             UpdateHandAmmo(_playerFighter, true);
             UpdateHandCharge(_chargeLeft, _playerFighter.HandStatusLeft);
@@ -166,14 +170,14 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateStaminaPercentage()
         {
-            var values = GetStaminaValues(_playerFighter.GetStamina(), _playerFighter.GetStaminaMax());
+            var values = GetStaminaValues(_playerFighter.GetResourceValue(ResourceTypeIds.StaminaId), _playerFighter.GetResourceMax(ResourceTypeIds.StaminaId));
             _staminaSlider.SetValues(values);
         }
 
         private void UpdateHealthPercentage()
         {
-            var health = _playerFighter.GetHealth();
-            var maxHealth = _playerFighter.GetHealthMax();
+            var health = _playerFighter.GetResourceValue(ResourceTypeIds.HealthId);
+            var maxHealth = _playerFighter.GetResourceMax(ResourceTypeIds.HealthId);
             var defence = _playerFighter.GetDefenseValue();
 
             var values = GetHealthValues(health, maxHealth, defence);
@@ -182,13 +186,13 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateManaPercentage()
         {
-            var values = GetManaValues(_playerFighter.GetMana(), _playerFighter.GetManaMax());
+            var values = GetManaValues(_playerFighter.GetResourceValue(ResourceTypeIds.ManaId), _playerFighter.GetResourceMax(ResourceTypeIds.ManaId));
             _manaSlider.SetValues(values);
         }
 
         private void UpdateEnergyPercentage()
         {
-            var values = GetEnergyValues(_playerFighter.GetEnergy(), _playerFighter.GetEnergyMax());
+            var values = GetEnergyValues(_playerFighter.GetResourceValue(ResourceTypeIds.EnergyId), _playerFighter.GetResourceMax(ResourceTypeIds.EnergyId));
             _energySlider.SetValues(values);
         }
 
@@ -234,11 +238,11 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private Color GetEffectColor(IEffect effect)
         {
-            if (effect is IStatEffect statEffect)
+            if (effect is IResourceEffect resourceEffect)
             {
-                if (statEffect.AffectType == AffectType.SingleIncrease
-                    || statEffect.AffectType == AffectType.PeriodicIncrease
-                    || statEffect.AffectType == AffectType.TemporaryMaxIncrease)
+                if (resourceEffect.AffectType == AffectType.SingleIncrease
+                    || resourceEffect.AffectType == AffectType.PeriodicIncrease
+                    || resourceEffect.AffectType == AffectType.TemporaryMaxIncrease)
                 {
                     return Color.green;
                 }

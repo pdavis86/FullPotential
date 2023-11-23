@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
-using FullPotential.Api.Obsolete;
 
 namespace FullPotential.Api.Gameplay.Player
 {
@@ -61,9 +60,9 @@ namespace FullPotential.Api.Gameplay.Player
             }
         }
 
-        public bool IsConsumingResource(ResourceType type)
+        public bool IsConsumingResource(string typeId)
         {
-            return ActiveConsumer != null && EquippedConsumer.ResourceType == type;
+            return ActiveConsumer != null && EquippedConsumer.ResourceType.TypeId.ToString() == typeId;
         }
     }
 }

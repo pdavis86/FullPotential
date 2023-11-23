@@ -11,7 +11,6 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Networking;
-using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Ui;
@@ -152,7 +151,7 @@ namespace FullPotential.Core.Player
 
         #endregion
 
-        //todo: zzz v0.5 - generalise for use in LivingEntityBase
+        //todo: zzz v0.5 - generalise for use in FighterBase
         public (bool WasEquipped, List<string> SlotsToSend) HandleSlotChange(ItemBase item, string slotId)
         {
             var slotsToSend = new List<string> { slotId };
@@ -472,7 +471,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            //todo: handle custom visuals for equipped items
+            //todo: zzz v0.4.1 - handle custom visuals for equipped items
 
             switch (slotId)
             {
@@ -542,11 +541,12 @@ namespace FullPotential.Core.Player
                     break;
 
                 case Consumer consumer:
-                    var prefab = consumer.ResourceType == ResourceType.Mana
-                        ? GameManager.Instance.Prefabs.Combat.SpellInHand
-                        : GameManager.Instance.Prefabs.Combat.GadgetInHand;
+                    //todo: where do the resource prefabs go?
+                    //var prefab = consumer.ResourceType == ResourceType.Mana
+                    //    ? GameManager.Instance.Prefabs.Combat.SpellInHand
+                    //    : GameManager.Instance.Prefabs.Combat.GadgetInHand;
 
-                    InstantiateInPlayerHand(prefab, isLeftHand, null, slotId);
+                    //InstantiateInPlayerHand(prefab, isLeftHand, null, slotId);
 
                     break;
 
@@ -577,7 +577,7 @@ namespace FullPotential.Core.Player
             _equippedItems[slotId].GameObject = newObj;
         }
 
-        //todo: InstantiateAccessory 
+        //todo: zzz v0.4.1 - InstantiateAccessory 
         //private void InstantiateAccessory(
         //    string slotId,
         //    ItemBase item,
@@ -615,7 +615,7 @@ namespace FullPotential.Core.Player
         //        });
         //}
 
-        //todo: InstantiateArmor
+        //todo: zzz v0.4.1 - InstantiateArmor
         //private void InstantiateArmor(
         //    string slotId,
         //    ItemBase item,

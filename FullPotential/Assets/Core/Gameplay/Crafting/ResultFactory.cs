@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Items;
@@ -13,6 +14,7 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
@@ -129,12 +131,12 @@ namespace FullPotential.Core.Gameplay.Crafting
                                 : debuff;
                         }
 
-                        if (x is not IStatEffect statEffect)
+                        if (x is not IResourceEffect resourceEffect)
                         {
                             return other;
                         }
 
-                        switch (statEffect.AffectType)
+                        switch (resourceEffect.AffectType)
                         {
                             case AffectType.PeriodicIncrease:
                             case AffectType.SingleIncrease:
@@ -255,7 +257,9 @@ namespace FullPotential.Core.Gameplay.Crafting
                 }
             };
 
-            var magicalLootTypes = _lootTypes.Where(x => x.ResourceConsumptionType == ResourceType.Mana).ToList();
+            //todo: too tightly coupled to resource types
+
+            var magicalLootTypes = _lootTypes.Where(x => x.ResourceTypeId == ResourceTypeIds.Mana).ToList();
 
             var isMagical = magicalLootTypes.Any() && IsSuccess(50);
             if (isMagical)
@@ -270,18 +274,20 @@ namespace FullPotential.Core.Gameplay.Crafting
                 {
                     IEffect effect;
                     var debugCounter = 0;
+
                     do
                     {
                         effect = GetRandomEffect();
                         debugCounter++;
                     }
                     while (debugCounter < 10 && (effect == null || effects.Contains(effect)));
-                    effects.Add(effect);
 
                     if (debugCounter >= 10)
                     {
                         UnityEngine.Debug.LogError("Infinite loop situation here. Go fix it!");
                     }
+
+                    effects.Add(effect);
                 }
 
                 lootDrop.Effects = effects.ToList();
@@ -292,7 +298,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             else
             {
                 lootDrop.RegistryType = _lootTypes
-                    .Where(x => x.ResourceConsumptionType == ResourceType.Energy)
+                    .Where(x => x.ResourceTypeId == ResourceTypeIds.Energy)
                     .OrderBy(_ => _random.Next())
                     .First();
             }
@@ -327,16 +333,18 @@ namespace FullPotential.Core.Gameplay.Crafting
             return min + (int)Math.Round((max - min) * Math.Pow(_random.NextDouble(), 3), 0);
         }
 
-        private Consumer GetConsumer(CraftableType craftableType, ResourceType type, IList<ItemForCombatBase> components)
+        private Consumer GetConsumer(CraftableType craftableType, string resourceTypeId, IList<ItemForCombatBase> components)
         {
             var relevantComponents = components.OfType<IHasTargetingAndShape>().ToList();
 
             var targeting = GetTargeting(relevantComponents);
 
+            var resourceType = _typeRegistry.GetRegisteredByTypeId<IResource>(resourceTypeId);
+
             var consumer = new Consumer
             {
                 Id = Guid.NewGuid().ToMinimisedString(),
-                ResourceType = type,
+                ResourceType = resourceType,
                 Targeting = targeting,
                 Shape = GetShapeOrNone(targeting, relevantComponents),
                 Attributes = new Attributes
@@ -487,7 +495,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private SpecialGear GetSpecialGear(ISpecialGear craftableType, IList<ItemForCombatBase> components)
         {
-            //todo: all attributes
+            //todo: zzz v0.4.1 - all attributes for specials
 
             var specialGear = new SpecialGear
             {
@@ -502,7 +510,10 @@ namespace FullPotential.Core.Gameplay.Crafting
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
             };
+
+            //todo: zzz v0.4.1 - better name for specials
             specialGear.Name = craftableType.GetType().Name;
+
             return specialGear;
         }
 
@@ -511,8 +522,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             switch (craftableType)
             {
                 case CraftableType.Consumer:
-                    var consumptionType = (ResourceType)Enum.Parse(typeof(ResourceType), typeId);
-                    return GetConsumer(craftableType, consumptionType, components);
+                    return GetConsumer(craftableType, typeId, components);
 
                 case CraftableType.Weapon:
                     var weaponType = _typeRegistry.GetRegisteredByTypeId<IWeapon>(typeId);

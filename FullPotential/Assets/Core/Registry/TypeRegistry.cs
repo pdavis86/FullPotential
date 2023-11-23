@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Modding;
@@ -37,6 +38,7 @@ namespace FullPotential.Core.Registry
 
             _registerTypeFunctions = new Func<object, bool>[]
             {
+                AddToRegister<IResource>,
                 AddToRegister<IAccessory>,
                 AddToRegister<IAmmunition>,
                 AddToRegister<IArmor>,
@@ -91,6 +93,11 @@ namespace FullPotential.Core.Registry
         {
             ValidateAndRegister(typeof(SpecialSlots.LeftHand));
             ValidateAndRegister(typeof(SpecialSlots.RightHand));
+
+            ValidateAndRegister(typeof(Resources.Energy));
+            ValidateAndRegister(typeof(Resources.Health));
+            ValidateAndRegister(typeof(Resources.Mana));
+            ValidateAndRegister(typeof(Resources.Stamina));
         }
 
         private void HandleModRegistration(IMod mod)

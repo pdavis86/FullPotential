@@ -242,8 +242,8 @@ namespace FullPotential.Core.Gameplay.Combat
 
             switch (effect)
             {
-                case IStatEffect statEffect:
-                    ApplyStatEffect(targetFighter, statEffect, itemUsed, sourceFighter, position, effectPercentage);
+                case IResourceEffect resourceEffect:
+                    ApplyResourceEffect(targetFighter, resourceEffect, itemUsed, sourceFighter, position, effectPercentage);
                     return;
 
                 case IAttributeEffect attributeEffect:
@@ -260,27 +260,27 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private void ApplyStatEffect(FighterBase targetFighter, IStatEffect statEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
+        private void ApplyResourceEffect(FighterBase targetFighter, IResourceEffect resourceEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
         {
-            switch (statEffect.AffectType)
+            switch (resourceEffect.AffectType)
             {
                 case AffectType.PeriodicDecrease:
                 case AffectType.PeriodicIncrease:
-                    targetFighter.ApplyPeriodicActionToStat(statEffect, itemUsed, sourceFighter, effectPercentage);
+                    targetFighter.ApplyPeriodicActionToResource(resourceEffect, itemUsed, sourceFighter, effectPercentage);
                     return;
 
                 case AffectType.SingleDecrease:
                 case AffectType.SingleIncrease:
-                    targetFighter.ApplyStatValueChange(statEffect, itemUsed, sourceFighter, position, effectPercentage);
+                    targetFighter.ApplyValueChangeToResource(resourceEffect, itemUsed, sourceFighter, position, effectPercentage);
                     return;
 
                 case AffectType.TemporaryMaxDecrease:
                 case AffectType.TemporaryMaxIncrease:
-                    targetFighter.ApplyTemporaryMaxActionToStat(statEffect, itemUsed, sourceFighter, position, effectPercentage);
+                    targetFighter.ApplyTemporaryMaxActionToResource(resourceEffect, itemUsed, sourceFighter, position, effectPercentage);
                     return;
 
                 default:
-                    Debug.LogError($"Not implemented handling for affect {statEffect.AffectType}");
+                    Debug.LogError($"Not implemented handling for affect {resourceEffect.AffectType}");
                     return;
             }
         }

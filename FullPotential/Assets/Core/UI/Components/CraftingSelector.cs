@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
-using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Weapons;
@@ -28,7 +28,7 @@ namespace FullPotential.Core.UI.Components
         private Dictionary<CraftableType, string> _craftableTypes;
         private Dictionary<IAccessory, string> _accessoryTypes;
         private Dictionary<IArmor, string> _armorTypes;
-        private Dictionary<ResourceType, string> _consumerTypes;
+        private Dictionary<IResource, string> _consumerTypes;
         private Dictionary<IWeapon, string> _weaponTypes;
         private Dictionary<ISpecialGear, string> _specialTypes;
         private List<string> _handednessOptions;
@@ -129,7 +129,9 @@ namespace FullPotential.Core.UI.Components
                 .ToDictionary(x => x, x => localizer.Translate(x))
                 .OrderByValue();
 
-            _consumerTypes = GetDictionaryFromEnum<ResourceType>(localizer);
+            _consumerTypes = typeRegistry.GetRegisteredTypes<IResource>()
+                .ToDictionary(x => x, x => localizer.Translate(x))
+                .OrderByValue();
 
             _weaponTypes = typeRegistry.GetRegisteredTypes<IWeapon>()
                 .ToDictionary(x => x, x => localizer.Translate(x))

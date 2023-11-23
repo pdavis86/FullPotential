@@ -1,5 +1,7 @@
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Ui.Components;
+using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -34,8 +36,6 @@ namespace FullPotential.Standard.Enemies.Behaviours
         {
             base.Awake();
 
-            _health.OnValueChanged += OnHealthChanged;
-
             _inventory = gameObject.AddComponent<EnemyInventory>();
 
             HealthStatSlider = _healthSliderParent.GetComponent<IStatSlider>();
@@ -50,15 +50,15 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
         #endregion
 
-        #region NetworkVariable Event Handlers
-
-        private void OnHealthChanged(int previousValue, int newValue)
+        protected override void HandleResourceListChange(NetworkListEvent<int> changeEvent)
         {
-            var values = _gameManager.GetUserInterface().HudOverlay.GetHealthValues(GetHealth(), GetHealthMax(), GetDefenseValue());
+            base.HandleResourceListChange(changeEvent);
+
+            var health = GetResourceValue(ResourceTypeIds.HealthId);
+            var healthMax = GetResourceMax(ResourceTypeIds.HealthId);
+            var values = _gameManager.GetUserInterface().HudOverlay.GetHealthValues(health, healthMax, GetDefenseValue());
             HealthStatSlider.SetValues(values);
         }
-
-        #endregion
 
         protected override void HandleDeathAfter()
         {

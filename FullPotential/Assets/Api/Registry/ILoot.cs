@@ -1,9 +1,9 @@
-﻿using FullPotential.Api.Obsolete;
+﻿using System;
 
 namespace FullPotential.Api.Registry
 {
     public interface ILoot : IRegisterable
     {
-        ResourceType? ResourceConsumptionType { get; }
+        Guid? ResourceTypeId { get; }
     }
 }

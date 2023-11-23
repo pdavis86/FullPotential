@@ -4,7 +4,6 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Player;
-using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Ui;
@@ -41,7 +40,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         // ReSharper disable InconsistentNaming
 
         protected InventoryBase _inventory;
-        protected IEventManager _eventManager;
 
         // ReSharper restore InconsistentNaming
         #endregion
@@ -78,8 +76,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected override void Awake()
         {
             base.Awake();
-
-            _eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
 
             _reloadArgsLeft = new ReloadEventArgs(this, true);
             _reloadArgsRight = new ReloadEventArgs(this, false);
@@ -194,17 +190,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #endregion
 
-        protected override bool IsConsumingEnergy()
-        {
-            return HandStatusLeft.IsConsumingResource(ResourceType.Energy)
-                   || HandStatusRight.IsConsumingResource(ResourceType.Energy);
-        }
-
-        protected override bool IsConsumingMana()
-        {
-            return HandStatusLeft.IsConsumingResource(ResourceType.Mana)
-                   || HandStatusRight.IsConsumingResource(ResourceType.Mana);
-        }
+        //protected override bool IsConsumingResource(string typeId)
+        //{
+        //    return HandStatusLeft.IsConsumingResource(typeId)
+        //           || HandStatusRight.IsConsumingResource(typeId);
+        //}
 
         public HandStatus GetHandStatus(bool isLeftHand)
         {
@@ -659,50 +649,32 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return true;
         }
 
-        private (NetworkVariable<int> Variable, int? Cost)? GetResourceVariableAndCost(Consumer consumer)
+        protected int GetResourceCost(Consumer consumer)
         {
-            //todo: zzz v0.5 - energy and mana should be registered types not named variables
-
-            switch (consumer.ResourceType)
-            {
-                case ResourceType.Mana:
-                    return (_mana, GetManaCost(consumer));
-
-                case ResourceType.Energy:
-                    return (_energy, GetEnergyCost(consumer));
-
-                default:
-                    Debug.LogError("Not yet implemented GetResourceVariable() for resource type " + consumer.ResourceType);
-                    return null;
-            }
+            //todo: zzz v0.5 - trait-based mana cost
+            return consumer.GetResourceCost();
         }
 
         private bool ConsumeResource(Consumer consumer, bool slowDrain = false, bool isTest = false)
         {
-            var tuple = GetResourceVariableAndCost(consumer);
-
-            if (!tuple.HasValue || !tuple.Value.Cost.HasValue)
-            {
-                Debug.LogError("Failed to get GetResourceVariableAndCost");
-                return false;
-            }
-
-            var resourceCost = tuple.Value.Cost.Value;
-            var resourceVariable = tuple.Value.Variable;
+            var resourceCost = GetResourceCost(consumer);
+            var resourceTypeId = consumer.ResourceType.TypeId.ToString();
 
             if (slowDrain)
             {
                 resourceCost = (int)Math.Ceiling(resourceCost / 10f) + 1;
             }
 
-            if (resourceVariable.Value < resourceCost)
+            var currentValue = GetResourceValue(resourceTypeId);
+
+            if (currentValue < resourceCost)
             {
                 return false;
             }
 
             if (!isTest)
             {
-                resourceVariable.Value -= resourceCost;
+                SetResourceValue(resourceTypeId, currentValue - resourceCost);
             }
 
             return true;

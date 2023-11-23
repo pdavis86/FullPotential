@@ -1,4 +1,5 @@
-﻿using FullPotential.Core.GameManagement;
+﻿using FullPotential.Api.Registry.Resources;
+using FullPotential.Core.GameManagement;
 using FullPotential.Core.GameManagement.Events;
 using Unity.Netcode;
 using UnityEngine;
@@ -189,7 +190,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            _playerState.IsSprinting = _playerState.GetStamina() >= _playerState.GetStaminaCost();
+            _playerState.IsSprinting = _playerState.GetResourceValue(ResourceTypeIds.StaminaId) >= _playerState.GetStaminaCost();
             _isTryingToSprint = _playerState.IsSprinting;
         }
 

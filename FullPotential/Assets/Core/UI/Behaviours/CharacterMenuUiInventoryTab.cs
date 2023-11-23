@@ -13,9 +13,9 @@ using UnityEngine;
 
 namespace FullPotential.Core.UI.Behaviours
 {
-    public class CharacterMenuUInventoryBaseTab : MonoBehaviour
+    public class CharacterMenuUiInventoryTab : MonoBehaviour
     {
-        private const string EventSource = nameof(CharacterMenuUInventoryBaseTab);
+        private const string EventSource = nameof(CharacterMenuUiInventoryTab);
 
 #pragma warning disable 0649
         [SerializeField] private GameObject _componentsContainer;

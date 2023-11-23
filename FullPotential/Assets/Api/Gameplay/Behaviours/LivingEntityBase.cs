@@ -4,19 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Constants;
-using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using TMPro;
 using Unity.Collections;
@@ -31,6 +32,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
     [RequireComponent(typeof(Rigidbody))]
     public abstract class LivingEntityBase : NetworkBehaviour
     {
+        public const string EventIdResourceValueChanged = "20b3ff1d-e8d0-438a-873d-98124f726e38";
+
         private const int VelocityThreshold = 3;
         private const int ForceThreshold = 1000;
 
@@ -55,12 +58,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected ILocalizer _localizer;
         protected ITypeRegistry _typeRegistry;
         protected ICombatService _combatService;
+        protected IEventManager _eventManager;
 
         protected readonly NetworkVariable<FixedString32Bytes> _entityName = new NetworkVariable<FixedString32Bytes>();
-        protected readonly NetworkVariable<int> _energy = new NetworkVariable<int>(100);
-        protected readonly NetworkVariable<int> _health = new NetworkVariable<int>(100);
-        protected readonly NetworkVariable<int> _mana = new NetworkVariable<int>(100);
-        protected readonly NetworkVariable<int> _stamina = new NetworkVariable<int>(100);
+        protected NetworkList<int> _resourceList;
+
+        protected List<IResource> _sortedResources;
 
         // ReSharper restore InconsistentNaming
         #endregion
@@ -73,11 +76,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private FighterBase _fighterWhoMovedMeLast;
         private Rigidbody _rb;
 
+        //todo: one action?
         //Action-related
-        private DelayedAction _replenishStamina;
-        private DelayedAction _replenishMana;
-        private DelayedAction _replenishEnergy;
-        private DelayedAction _consumeStamina;
+        //private DelayedAction _replenishStamina;
+        //private DelayedAction _replenishMana;
+        //private DelayedAction _replenishEnergy;
+        //private DelayedAction _consumeStamina;
 
         #endregion
 
@@ -98,17 +102,19 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected virtual void Awake()
         {
+            //todo: does it work if I put it first?
+            _resourceList = new NetworkList<int>();
+
             _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
+            _eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
 
-            _entityName.OnValueChanged += OnNameChanged;
-            _health.OnValueChanged += OnHealthChanged;
-            _stamina.OnValueChanged += OnStaminaChanged;
-            _energy.OnValueChanged += OnEnergyChanged;
-            _mana.OnValueChanged += OnManaChanged;
+            PopulateResourceList();
+
+            _entityName.OnValueChanged += HandleNameChange;
 
             if (!NetworkManager.Singleton.IsConnectedClient || IsServer)
             {
@@ -120,46 +126,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             AliveState = LivingEntityState.Alive;
 
-            _replenishStamina = new DelayedAction(.2f, () =>
-            {
-                if (!IsConsumingStamina() && _stamina.Value < GetStaminaMax())
-                {
-                    //todo: zzz v0.5 - trait-based stamina recharge
-                    _stamina.Value += 1;
-                }
-            });
-
-            _replenishMana = new DelayedAction(.2f, () =>
-            {
-                if (!IsConsumingMana() && _mana.Value < GetManaMax())
-                {
-                    //todo: zzz v0.5 - trait-based mana recharge
-                    _mana.Value += 1;
-                }
-            });
-
-            _replenishEnergy = new DelayedAction(.2f, () =>
-            {
-                if (!IsConsumingEnergy() && _energy.Value < GetEnergyMax())
-                {
-                    //todo: zzz v0.5 - trait-based energy recharge
-                    _energy.Value += 1;
-                }
-            });
-
-            _consumeStamina = new DelayedAction(.05f, () =>
-            {
-                if (!IsConsumingStamina())
-                {
-                    return;
-                }
-
-                var staminaCost = GetStaminaCost();
-                if (_stamina.Value >= staminaCost)
-                {
-                    _stamina.Value -= staminaCost / 2;
-                }
-            });
+            SetupResourceReplenishing();
         }
 
         public override void OnNetworkSpawn()
@@ -190,11 +157,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public override void OnDestroy()
         {
             base.OnDestroy();
-
-            _health.OnValueChanged -= OnHealthChanged;
-            _stamina.OnValueChanged -= OnStaminaChanged;
-            _energy.OnValueChanged -= OnEnergyChanged;
-            _mana.OnValueChanged -= OnManaChanged;
+            _entityName.OnValueChanged -= HandleNameChange;
+            _resourceList.OnListChanged -= HandleResourceListChange;
         }
 
         // ReSharper restore UnusedMemberHierarchy.Global
@@ -216,15 +180,86 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region NetworkVariable Handlers
 
-        private void OnNameChanged(FixedString32Bytes previousValue, FixedString32Bytes newValue)
+        private void HandleNameChange(FixedString32Bytes previousValue, FixedString32Bytes newValue)
         {
             UpdateNameOnUi();
         }
 
+        protected virtual void HandleResourceListChange(NetworkListEvent<int> changeEvent)
+        {
+            var typeId = GetResourceTypeIdFromListIndex(changeEvent.Index).TypeId.ToString();
+
+            var eventArgs = new ResourceValueChangedEventArgs(this, typeId, changeEvent.Value);
+            _eventManager.Trigger(EventIdResourceValueChanged, eventArgs);
+
+            if (_resourceList[changeEvent.Index] < 0)
+            {
+                _resourceList[changeEvent.Index] = 0;
+            }
+            else
+            {
+                var resourceMax = GetResourceMax(typeId);
+
+                if (_resourceList[changeEvent.Index] > resourceMax)
+                {
+                    _resourceList[changeEvent.Index] = resourceMax;
+                }
+            }
+
+            _eventManager.After(EventIdResourceValueChanged, eventArgs);
+        }
+
         #endregion
 
-        #region Health
+        #region Resource Management
 
+        private void SetupResourceReplenishing()
+        {
+            //todo: 
+
+            //_replenishStamina = new DelayedAction(.2f, () =>
+            //{
+            //    if (!IsConsumingStamina() && _stamina.Value < GetStaminaMax())
+            //    {
+            //        //todo: zzz v0.5 - trait-based stamina recharge
+            //        _stamina.Value += 1;
+            //    }
+            //});
+
+            //_replenishMana = new DelayedAction(.2f, () =>
+            //{
+            //    if (!IsConsumingMana() && _mana.Value < GetManaMax())
+            //    {
+            //        //todo: zzz v0.5 - trait-based mana recharge
+            //        _mana.Value += 1;
+            //    }
+            //});
+
+            //_replenishEnergy = new DelayedAction(.2f, () =>
+            //{
+            //    if (!IsConsumingEnergy() && _energy.Value < GetEnergyMax())
+            //    {
+            //        //todo: zzz v0.5 - trait-based energy recharge
+            //        _energy.Value += 1;
+            //    }
+            //});
+
+            //_consumeStamina = new DelayedAction(.05f, () =>
+            //{
+            //    if (!IsConsumingStamina())
+            //    {
+            //        return;
+            //    }
+
+            //    var staminaCost = GetStaminaCost();
+            //    if (_stamina.Value >= staminaCost)
+            //    {
+            //        _stamina.Value -= staminaCost / 2;
+            //    }
+            //});
+        }
+
+        //todo: make this happen on an event
         private void ApplyHealthChange(
             int change,
             FighterBase sourceFighter,
@@ -248,203 +283,88 @@ namespace FullPotential.Api.Gameplay.Behaviours
             //}
 
             //Do this last to ensure the entity does not die before recording the cause
-            _health.Value += change;
+            var index = GetResourceListIndexFromTypeId(ResourceTypeIds.HealthId);
+            _resourceList[index] += change;
         }
 
-        private void CheckHealth()
+        private void PopulateResourceList()
         {
+            if (_resourceList.Count > 0)
+            {
+                return;
+            }
+
+            _sortedResources = _typeRegistry.GetRegisteredTypes<IResource>()
+                .OrderBy(x => x.TypeId)
+                .ToList();
+
             if (IsServer)
             {
-                if (_health.Value <= 0)
-                {
-                    HandleDeath();
-                }
-
-                var healthMax = GetHealthMax();
-                if (_health.Value > healthMax)
-                {
-                    _health.Value = healthMax;
-                }
+                _resourceList = new NetworkList<int>(_sortedResources.Select(_ => 0));
+                _resourceList.OnListChanged += HandleResourceListChange;
             }
         }
 
-        private void OnHealthChanged(int previousValue, int newValue)
+        private IResource GetResourceTypeIdFromListIndex(int index)
         {
-            UpdateUiHealthAndDefenceValues();
-            CheckHealth();
+            return _sortedResources.ElementAt(index);
         }
 
-        public int GetHealth()
+        private int GetResourceListIndexFromTypeId(string typeId)
         {
-            CheckHealth();
-            return _health.Value;
+            return _sortedResources.FindIndex(x => x.TypeId.ToString() == typeId);
         }
 
-        public int GetHealthMax()
+        public int GetResourceValue(string typeId)
         {
-            //todo: zzz v0.5 - trait-based health max
-            return 100 + GetStatMaxAdjustment(ResourceType.Health);
+            return _resourceList[GetResourceListIndexFromTypeId(typeId)];
+        }
+
+        protected void SetResourceValue(string typeId, int newValue)
+        {
+            //todo: Initialise() has not been called on the network variable at this time
+            if (_resourceList.Count == 0)
+            {
+                PopulateResourceList();
+            }
+
+            var index = GetResourceListIndexFromTypeId(typeId);
+            _resourceList[index] = newValue;
+        }
+
+        public int GetResourceMax(string resourceTypeId)
+        {
+            //todo: zzz v0.5 - trait-based resource max
+            return 100 + GetResourceMaxAdjustment(resourceTypeId);
         }
 
         #endregion
 
-        #region Stamina
+        #region Sprint-specific
 
-        private void ApplyStaminaChange(int change)
-        {
-            _stamina.Value += change;
-        }
-
-        private void CheckStamina()
-        {
-            if (IsServer)
-            {
-                if (_stamina.Value <= 0)
-                {
-                    _stamina.Value = 0;
-                }
-
-                var staminaMax = GetStaminaMax();
-                if (_stamina.Value > staminaMax)
-                {
-                    _stamina.Value = staminaMax;
-                }
-            }
-        }
-
-        private void OnStaminaChanged(int previousValue, int newValue)
-        {
-            CheckStamina();
-        }
-
-        public int GetStamina()
-        {
-            CheckStamina();
-            return _stamina.Value;
-        }
-
-        public int GetStaminaMax()
-        {
-            //todo: zzz v0.5 - trait-based stamina max
-            return 100 + GetStatMaxAdjustment(ResourceType.Stamina);
-        }
+        //todo: how to generalise sprint-specifics
 
         public int GetStaminaCost()
         {
-            //todo: zzz v0.5 - trait-based stamina cost
+            //todo: zzz v0.5 - trait-based sprint costs
             return 10;
+        }
+
+        public float GetSprintSpeed()
+        {
+            //todo: zzz v0.5 - trait-based sprint speed
+            return 2.5f;
         }
 
         protected virtual bool IsConsumingStamina()
         {
-            if (IsSprinting && GetStamina() < GetStaminaCost())
+            if (IsSprinting && GetResourceValue(ResourceTypeIds.StaminaId) < GetStaminaCost())
             {
                 IsSprinting = false;
             }
 
             return IsSprinting;
         }
-
-        #endregion
-
-        #region Energy
-
-        private void ApplyEnergyChange(int change)
-        {
-            _energy.Value += change;
-        }
-
-        private void CheckEnergy()
-        {
-            if (IsServer)
-            {
-                if (_energy.Value <= 0)
-                {
-                    _energy.Value = 0;
-                }
-
-                var energyMax = GetEnergyMax();
-                if (_energy.Value > energyMax)
-                {
-                    _energy.Value = energyMax;
-                }
-            }
-        }
-
-        private void OnEnergyChanged(int previousValue, int newValue)
-        {
-            CheckEnergy();
-        }
-
-        public int GetEnergy()
-        {
-            CheckEnergy();
-            return _energy.Value;
-        }
-
-        public int GetEnergyMax()
-        {
-            //todo: zzz v0.5 - trait-based energy max
-            return 100 + GetStatMaxAdjustment(ResourceType.Energy);
-        }
-
-        protected int GetEnergyCost(Consumer consumer)
-        {
-            //todo: zzz v0.5 - trait-based energy cost
-            return consumer.GetResourceCost();
-        }
-
-        protected abstract bool IsConsumingEnergy();
-
-        #endregion
-
-        #region Mana
-
-        private void ApplyManaChange(int change)
-        {
-            _mana.Value += change;
-        }
-
-        private void CheckMana()
-        {
-            if (IsServer)
-            {
-                if (_mana.Value <= 0)
-                {
-                    _mana.Value = 0;
-                }
-
-                var manaMax = GetManaMax();
-                if (_mana.Value > manaMax)
-                {
-                    _mana.Value = manaMax;
-                }
-            }
-        }
-        private void OnManaChanged(int previousValue, int newValue)
-        {
-            CheckMana();
-        }
-
-        public int GetMana()
-        {
-            CheckMana();
-            return _mana.Value;
-        }
-
-        public int GetManaMax()
-        {
-            //todo: zzz v0.5 - trait-based mana max
-            return 100 + GetStatMaxAdjustment(ResourceType.Mana);
-        }
-
-        protected int GetManaCost(Consumer consumer)
-        {
-            //todo: zzz v0.5 - trait-based mana cost
-            return consumer.GetResourceCost();
-        }
-
-        protected abstract bool IsConsumingMana();
 
         #endregion
 
@@ -475,27 +395,22 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void UpdateUiHealthAndDefenceValues()
         {
-            if (!IsServer && IsOwner)
-            {
-                return;
-            }
+            //if (!IsServer && IsOwner)
+            //{
+            //    return;
+            //}
 
-            var health = GetHealth();
-            var maxHealth = GetHealthMax();
-            var defence = GetDefenseValue();
-            var values = _gameManager.GetUserInterface().HudOverlay.GetHealthValues(health, maxHealth, defence);
-            HealthStatSlider.SetValues(values);
+            //todo: 
+            //var health = GetHealth();
+            //var maxHealth = GetHealthMax();
+            //var defence = GetDefenseValue();
+            //var values = _gameManager.GetUserInterface().HudOverlay.GetHealthValues(health, maxHealth, defence);
+            //HealthStatSlider.SetValues(values);
         }
 
         #endregion
 
         #region Behaviour-related Methods
-
-        public float GetSprintSpeed()
-        {
-            //todo: zzz v0.5 - trait-based sprint speed
-            return 2.5f;
-        }
 
         private void CheckIfOffTheMap()
         {
@@ -510,11 +425,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void ReplenishAndConsume()
         {
-            _replenishStamina.TryPerformAction();
-            _replenishMana.TryPerformAction();
-            _replenishEnergy.TryPerformAction();
-
-            _consumeStamina.TryPerformAction();
+            //todo:
+            //_replenishStamina.TryPerformAction();
+            //_replenishMana.TryPerformAction();
+            //_replenishEnergy.TryPerformAction();
+            //_consumeStamina.TryPerformAction();
         }
 
         private void HandleCollision(Collision collision)
@@ -690,42 +605,42 @@ namespace FullPotential.Api.Gameplay.Behaviours
             AddOrUpdateEffect(attributeEffect, adjustedChange, expiry);
         }
 
-        public void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, float effectPercentage)
+        public void ApplyPeriodicActionToResource(IResourceEffect resourceEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, float effectPercentage)
         {
-            var (change, expiry, delay) = itemUsed.GetPeriodicStatChangeExpiryAndDelay(statEffect);
+            var (change, expiry, delay) = itemUsed.GetPeriodicResourceChangeExpiryAndDelay(resourceEffect);
             var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
-            AddOrUpdateEffect(statEffect, adjustedChange, expiry);
-            StartCoroutine(PeriodicActionToStatCoroutine(statEffect.StatToAffect, adjustedChange, sourceFighter, delay, expiry));
+            AddOrUpdateEffect(resourceEffect, adjustedChange, expiry);
+            StartCoroutine(PeriodicActionToResourceCoroutine(resourceEffect.ResourceTypeId.ToString(), adjustedChange, sourceFighter, delay, expiry));
         }
 
-        private IEnumerator PeriodicActionToStatCoroutine(ResourceType resourceType, int change, FighterBase sourceFighter, float delay, DateTime expiry)
+        private IEnumerator PeriodicActionToResourceCoroutine(string resourceTypeId, int change, FighterBase sourceFighter, float delay, DateTime expiry)
         {
             do
             {
-                ApplyStatChange(resourceType, change, sourceFighter, transform.position);
+                ApplyResourceChange(resourceTypeId, change, sourceFighter, transform.position);
                 yield return new WaitForSeconds(delay);
 
             } while (DateTime.Now < expiry);
         }
 
-        public void ApplyStatValueChange(IStatEffect statEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
+        public void ApplyValueChangeToResource(IResourceEffect resourceEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
         {
-            var change = itemUsed.GetStatChange(statEffect);
+            var change = itemUsed.GetResourceChange(resourceEffect);
             var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
 
-            AddOrUpdateEffect(statEffect, adjustedChange, DateTime.Now.AddSeconds(3));
+            AddOrUpdateEffect(resourceEffect, adjustedChange, DateTime.Now.AddSeconds(3));
 
-            ApplyStatChange(statEffect.StatToAffect, adjustedChange, sourceFighter, position);
+            ApplyResourceChange(resourceEffect.ResourceTypeId.ToString(), adjustedChange, sourceFighter, position);
         }
 
-        public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
+        public void ApplyTemporaryMaxActionToResource(IResourceEffect resourceEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
         {
-            var (change, expiry) = itemUsed.GetStatChangeAndExpiry(statEffect);
+            var (change, expiry) = itemUsed.GetResourceChangeAndExpiry(resourceEffect);
             var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
 
-            AddOrUpdateEffect(statEffect, adjustedChange, expiry);
+            AddOrUpdateEffect(resourceEffect, adjustedChange, expiry);
 
-            ApplyStatChange(statEffect.StatToAffect, adjustedChange, sourceFighter, position);
+            ApplyResourceChange(resourceEffect.ResourceTypeId.ToString(), adjustedChange, sourceFighter, position);
         }
 
         public void ApplyElementalEffect(IEffect elementalEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
@@ -754,13 +669,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 .Sum(x => x.Change * (x.Effect is IAttributeEffect attributeEffect && attributeEffect.TemporaryMaxIncrease ? 1 : -1));
         }
 
-        private int GetStatMaxAdjustment(ResourceType resourceType)
+        private int GetResourceMaxAdjustment(string resourceTypeId)
         {
             return _activeEffects
                 .Where(x =>
-                    x.Effect is IStatEffect statEffect
-                    && statEffect.StatToAffect == resourceType
-                    && statEffect.AffectType is AffectType.TemporaryMaxIncrease or AffectType.TemporaryMaxDecrease)
+                    x.Effect is IResourceEffect resourceEffect
+                    && resourceEffect.ResourceTypeId.ToString() == resourceTypeId
+                    && resourceEffect.AffectType is AffectType.TemporaryMaxIncrease or AffectType.TemporaryMaxDecrease)
                 .Sum(x => x.Change);
         }
 
@@ -772,17 +687,17 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void AddOrUpdateEffect(IEffect effect, int change, DateTime expiry)
         {
-            var statEffect = effect as IStatEffect;
+            var resourceEffect = effect as IResourceEffect;
 
-            var showExpiry = !(statEffect != null
-                && statEffect.AffectType is AffectType.SingleDecrease or AffectType.SingleIncrease);
+            var showExpiry = !(resourceEffect != null
+                && resourceEffect.AffectType is AffectType.SingleDecrease or AffectType.SingleIncrease);
 
             var effectMatch = _activeEffects.FirstOrDefault(x => x.Effect == effect);
 
             if (effectMatch != null)
             {
                 var multipleAllowed =
-                    (statEffect != null && DoesAffectAllowMultiple(statEffect.AffectType))
+                    (resourceEffect != null && DoesAffectAllowMultiple(resourceEffect.AffectType))
                     || effect is IAttributeEffect;
 
                 if (multipleAllowed)
@@ -820,35 +735,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        private void ApplyStatChange(
-            ResourceType resourceType,
-            int change,
-            FighterBase sourceFighter,
-            Vector3? position)
-        {
-            switch (resourceType)
-            {
-                case ResourceType.Energy:
-                    ApplyEnergyChange(change);
-                    return;
-
-                case ResourceType.Health:
-                    ApplyHealthChange(change, sourceFighter, position, false);
-                    return;
-
-                case ResourceType.Mana:
-                    ApplyManaChange(change);
-                    return;
-
-                case ResourceType.Stamina:
-                    ApplyStaminaChange(change);
-                    return;
-
-                default:
-                    throw new ArgumentException("Unexpected ResourceType: " + resourceType);
-            }
-        }
-
         private void RemoveExpiredEffects()
         {
             //Note: .ToList() needed to avoid the "Collection was modified" exception
@@ -863,5 +749,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
         }
 
         #endregion
+
+        private void ApplyResourceChange(
+            string resourceTypeId,
+            int change,
+            FighterBase sourceFighter,
+            Vector3? position)
+        {
+            //todo: other parmas
+            var index = GetResourceListIndexFromTypeId(resourceTypeId);
+            _resourceList[index] += change;
+        }
     }
 }
