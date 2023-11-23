@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Gameplay.Inventory;
+﻿using FullPotential.Api.Gameplay.Behaviours;
 
 // ReSharper disable ClassNeverInstantiated.Global
 

@@ -4,7 +4,7 @@ using FullPotential.Api.Items.Base;
 
 namespace FullPotential.Api.Gameplay.Inventory
 {
-    public interface IPlayerInventory : IInventory
+    public interface IPlayerInventory
     {
         List<ItemForCombatBase> GetComponentsFromIds(string[] componentIds);
 

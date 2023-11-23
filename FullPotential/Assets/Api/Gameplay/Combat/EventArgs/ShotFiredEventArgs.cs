@@ -1,4 +1,5 @@
-﻿using FullPotential.Api.Gameplay.Events;
+﻿using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Events;
 using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Combat.EventArgs
@@ -7,7 +8,7 @@ namespace FullPotential.Api.Gameplay.Combat.EventArgs
     {
         public bool IsDefaultHandlerCancelled { get; set; }
 
-        public IFighter Fighter { get; }
+        public FighterBase Fighter { get; }
 
         public bool IsLeftHand { get; }
 
@@ -15,7 +16,7 @@ namespace FullPotential.Api.Gameplay.Combat.EventArgs
 
         public Vector3 EndPosition { get; set; }
 
-        public ShotFiredEventArgs(IFighter fighter, bool isLeftHand)
+        public ShotFiredEventArgs(FighterBase fighter, bool isLeftHand)
         {
             Fighter = fighter;
             IsLeftHand = isLeftHand;

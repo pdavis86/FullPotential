@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
@@ -33,7 +34,7 @@ namespace FullPotential.Standard.Targeting
         private readonly NetworkVariable<Vector3> _startDirection = new NetworkVariable<Vector3>();
         private readonly NetworkVariable<FixedString4096Bytes> _visualsPrefabAddress = new NetworkVariable<FixedString4096Bytes>();
 
-        public IFighter SourceFighter { get; set; }
+        public FighterBase SourceFighter { get; set; }
 
         public Consumer Consumer { get; set; }
 
@@ -157,7 +158,7 @@ namespace FullPotential.Standard.Targeting
 
                     if (_isLocalOwner.Value)
                     {
-                        var sourceFighter = NetworkManager.LocalClient.PlayerObject.GetComponent<IFighter>();
+                        var sourceFighter = NetworkManager.LocalClient.PlayerObject.GetComponent<FighterBase>();
 
                         //Parent to player head so the beam looks attached to the hand
                         _visualsGameObject.transform.parent = sourceFighter.LookTransform;

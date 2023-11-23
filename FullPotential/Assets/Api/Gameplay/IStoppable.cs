@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Gameplay.Behaviours
+﻿namespace FullPotential.Api.Gameplay
 {
     public interface IStoppable
     {

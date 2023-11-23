@@ -1,7 +1,6 @@
 ﻿using System;
-using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Inventory.EventArgs;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
@@ -54,24 +53,24 @@ namespace FullPotential.Standard.SpecialGear
                     {
                         if (reloaderEquipped.RegistryTypeId == ConsolidatorReloader.TypeIdString)
                         {
-                            eventManager.Subscribe(IFighter.EventIdReload, ConsolidatorEventHandler);
+                            eventManager.Subscribe(FighterBase.EventIdReload, ConsolidatorEventHandler);
                         }
                         else
                         {
-                            eventManager.Subscribe(IFighter.EventIdShotFired, TeleportEventHandler);
+                            eventManager.Subscribe(FighterBase.EventIdShotFired, TeleportEventHandler);
                         }
                     }
                     else
                     {
-                        eventManager.Unsubscribe(IFighter.EventIdReload, ConsolidatorEventHandler);
-                        eventManager.Unsubscribe(IFighter.EventIdShotFired, TeleportEventHandler);
+                        eventManager.Unsubscribe(FighterBase.EventIdReload, ConsolidatorEventHandler);
+                        eventManager.Unsubscribe(FighterBase.EventIdShotFired, TeleportEventHandler);
                     }
 
                     return;
             }
         }
 
-        private static bool GetIsActive(IInventory inventory, string slotId, bool hasReloaderEquipped)
+        private static bool GetIsActive(InventoryBase inventory, string slotId, bool hasReloaderEquipped)
         {
             var isRangedWeapon = inventory.GetItemInSlot(slotId) is Weapon weapon && weapon.IsRanged;
             return isRangedWeapon && !hasReloaderEquipped;

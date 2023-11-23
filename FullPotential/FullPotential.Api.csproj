@@ -78,8 +78,7 @@
     <Compile Include="Assets\Api\Registry\Effects\IIsSideEffect.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\LivingEntityState.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesContext.cs" />
-    <Compile Include="Assets\Api\Gameplay\Inventory\IInventory.cs" />
-    <Compile Include="Assets\Api\Gameplay\Behaviours\IPlayerBehaviour.cs" />
+    <Compile Include="Assets\Api\Gameplay\IPlayerBehaviour.cs" />
     <Compile Include="Assets\Api\Registry\Shapes\IShape.cs" />
     <Compile Include="Assets\Api\Unity\Services\IShaderUtilities.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\ViableTarget.cs" />
@@ -98,7 +97,6 @@
     <Compile Include="Assets\Api\Input\DefaultInputActions.cs" />
     <Compile Include="Assets\Api\Utilities\ActionQueue.cs" />
     <Compile Include="Assets\Api\Ui\IHud.cs" />
-    <Compile Include="Assets\Api\Gameplay\Combat\IFighter.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Layers.cs" />
     <Compile Include="Assets\Api\Scenes\ISceneService.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\EventArgs\ShotFiredEventArgs.cs" />
@@ -108,7 +106,7 @@
     <Compile Include="Assets\Api\Registry\Gear\IHasEventHandlers.cs" />
     <Compile Include="Assets\Api\Items\Types\Consumer.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\IDefensible.cs" />
-    <Compile Include="Assets\Api\Gameplay\Inventory\InventoryBase.cs" />
+    <Compile Include="Assets\Api\Gameplay\Behaviours\InventoryBase.cs" />
     <Compile Include="Assets\Api\GameManagement\GameObjectNames.cs" />
     <Compile Include="Assets\Api\Registry\IVisuals.cs" />
     <Compile Include="Assets\Api\Gameplay\Drawing\IDrawingService.cs" />
@@ -124,7 +122,7 @@
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
     <Compile Include="Assets\Api\Scenes\SceneAttributes.cs" />
     <Compile Include="Assets\Api\Registry\Weapons\IWeaponVisuals.cs" />
-    <Compile Include="Assets\Api\Gameplay\Behaviours\IMoveable.cs" />
+    <Compile Include="Assets\Api\Gameplay\IMoveable.cs" />
     <Compile Include="Assets\Api\Items\Types\Loot.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IMovementEffect.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\MovementDirection.cs" />
@@ -157,7 +155,7 @@
     <Compile Include="Assets\Api\Gameplay\Combat\EventArgs\ReloadEventArgs.cs" />
     <Compile Include="Assets\Api\Registry\ITypeRegistry.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\IEventHandler.cs" />
-    <Compile Include="Assets\Api\Gameplay\Behaviours\IStoppable.cs" />
+    <Compile Include="Assets\Api\Gameplay\IStoppable.cs" />
     <Compile Include="Assets\Api\Networking\IRpcService.cs" />
     <Compile Include="Assets\Api\GameManagement\GameSettings.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\GuidExtensions.cs" />

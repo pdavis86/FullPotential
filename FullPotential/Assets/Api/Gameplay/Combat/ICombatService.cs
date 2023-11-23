@@ -1,4 +1,5 @@
-﻿using FullPotential.Api.Items.Base;
+﻿using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace FullPotential.Api.Gameplay.Combat
     public interface ICombatService
     {
         void ApplyEffects(
-            IFighter sourceFighter,
+            FighterBase sourceFighter,
             ItemForCombatBase itemUsed,
             GameObject target,
             Vector3? position,
@@ -17,7 +18,7 @@ namespace FullPotential.Api.Gameplay.Combat
         );
 
         int GetDamageValueFromAttack(
-            IFighter sourceFighter,
+            FighterBase sourceFighter,
             int targetDefense,
             bool addVariation = true);
 
@@ -27,13 +28,13 @@ namespace FullPotential.Api.Gameplay.Combat
             bool addVariation = true);
 
         void SpawnTargetingGameObject(
-            IFighter sourceFighter,
+            FighterBase sourceFighter,
             Consumer consumer,
             Vector3 startPosition,
             Vector3 direction);
 
         void SpawnShapeGameObject(
-            IFighter sourceFighter,
+            FighterBase sourceFighter,
             Consumer consumer,
             GameObject target,
             Vector3 fallbackPosition,

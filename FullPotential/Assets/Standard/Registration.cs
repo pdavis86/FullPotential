@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Modding;
 using UnityEngine;
 
@@ -147,8 +146,8 @@ namespace FullPotential.Standard
 
         public void RegisterEventHandlers(IEventManager eventManager)
         {
-            eventManager.Subscribe(IFighter.EventIdDamageTaken, new Accessories.BarrierEventHandler());
-            eventManager.Subscribe(IInventory.EventIdSlotChange, new SpecialGear.ReloaderSlotChangeEventHandler());
+            eventManager.Subscribe(FighterBase.EventIdDamageTaken, new Accessories.BarrierEventHandler());
+            eventManager.Subscribe(InventoryBase.EventIdSlotChange, new SpecialGear.ReloaderSlotChangeEventHandler());
         }
     }
 }

@@ -19,10 +19,12 @@ using UnityEngine;
 
 // ReSharper disable UnusedMemberHierarchy.Global
 
-namespace FullPotential.Api.Gameplay.Inventory
+namespace FullPotential.Api.Gameplay.Behaviours
 {
-    public abstract class InventoryBase : NetworkBehaviour, IInventory
+    public abstract class InventoryBase : NetworkBehaviour, IDefensible
     {
+        public const string EventIdSlotChange = "9c7972de-4136-4825-aaa3-11925ad049ee";
+
         private int _armorSlotCount;
 
         #region Protected variables

@@ -116,7 +116,7 @@ namespace FullPotential.Core.Player
             //_energy.OnValueChanged += OnEnergyChanged;
 
             PlayerInventory = GetComponent<PlayerInventory>();
-            _inventory = PlayerInventory;
+            _inventory = (InventoryBase)PlayerInventory;
             _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
 
             _userRepository = DependenciesContext.Dependencies.GetService<IUserRepository>();

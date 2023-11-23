@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Registry.Targeting;
@@ -19,7 +20,7 @@ namespace FullPotential.Standard.Targeting
 
         public string NetworkPrefabAddress => AddressablePath;
 
-        public IEnumerable<ViableTarget> GetTargets(IFighter sourceFighter, Consumer consumer)
+        public IEnumerable<ViableTarget> GetTargets(FighterBase sourceFighter, Consumer consumer)
         {
             return null;
         }

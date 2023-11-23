@@ -3,7 +3,6 @@ using System.Collections;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
@@ -17,8 +16,12 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
-    public abstract class FighterBase : LivingEntityBase, IFighter, IMoveable
+    public abstract class FighterBase : LivingEntityBase, IDefensible, IDamageable, IMoveable
     {
+        public const string EventIdReload = "2337f94e-5a7d-4e02-b1c8-1b5e9934a3ce";
+        public const string EventIdDamageTaken = "4e8f6a71-3708-47f2-bc57-36bcc5596d0c";
+        public const string EventIdShotFired = "f01cd95a-67cc-4f38-a394-5a69eaa721c6";
+
         private const int MeleeRangeLimit = 8;
         private const int ConsumerRangeLimit = 50;
         private const int MaximumRange = 100;
@@ -37,7 +40,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         #region Protected variables
         // ReSharper disable InconsistentNaming
 
-        protected IInventory _inventory;
+        protected InventoryBase _inventory;
         protected IEventManager _eventManager;
 
         // ReSharper restore InconsistentNaming
@@ -65,7 +68,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public string FighterName => _entityName.Value.ToString();
 
-        public IInventory Inventory => _inventory;
+        public InventoryBase Inventory => _inventory;
 
         #endregion
 
@@ -225,7 +228,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void TriggerReloadEvent(bool isLeftHand)
         {
-            _eventManager.Trigger(IFighter.EventIdReload, GetReloadEventArgs(isLeftHand));
+            _eventManager.Trigger(FighterBase.EventIdReload, GetReloadEventArgs(isLeftHand));
         }
 
         public static void DefaultHandlerForReloadEvent(IEventHandlerArgs eventArgs)
@@ -274,7 +277,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             handStatus.EquippedWeapon.Ammo = reloadEventArgs.GetNewAmmoCount();
             handStatus.IsReloading = false;
 
-            _eventManager.After(IFighter.EventIdReload, reloadEventArgs);
+            _eventManager.After(FighterBase.EventIdReload, reloadEventArgs);
         }
 
         #endregion
@@ -605,8 +608,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : handPosition + shotDirection * MaximumRange;
 
             var eventArgs = GetShotFiredEventArgs(isLeftHand, handPosition, endPos);
-            _eventManager.Trigger(IFighter.EventIdShotFired, eventArgs);
-            _eventManager.After(IFighter.EventIdShotFired, eventArgs);
+            _eventManager.Trigger(FighterBase.EventIdShotFired, eventArgs);
+            _eventManager.After(FighterBase.EventIdShotFired, eventArgs);
 
             if (rangedHit.transform == null)
             {
@@ -634,9 +637,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public static void DefaultHandlerForShotFiredEvent(IEventHandlerArgs eventArgs)
         {
             var shotFiredArgs = (ShotFiredEventArgs)eventArgs;
-
-            var fighter = (FighterBase)shotFiredArgs.Fighter;
-            fighter.ShotFired(shotFiredArgs.StartPosition, shotFiredArgs.EndPosition);
+            shotFiredArgs.Fighter.ShotFired(shotFiredArgs.StartPosition, shotFiredArgs.EndPosition);
         }
 
         private bool UseMeleeWeapon(Weapon weaponInHand)

@@ -70,7 +70,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
         private readonly List<ActiveEffect> _activeEffects = new List<ActiveEffect>();
 
-        private IFighter _fighterWhoMovedMeLast;
+        private FighterBase _fighterWhoMovedMeLast;
         private Rigidbody _rb;
 
         //Action-related
@@ -227,7 +227,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void ApplyHealthChange(
             int change,
-            IFighter sourceFighter,
+            FighterBase sourceFighter,
             Vector3? position,
             bool isCritical)
         {
@@ -562,13 +562,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public abstract int GetDefenseValue();
 
-        public void SetLastMover(IFighter fighter)
+        public void SetLastMover(FighterBase fighter)
         {
             _fighterWhoMovedMeLast = fighter;
         }
 
         public void TakeDamageFromFighter(
-            IFighter sourceFighter,
+            FighterBase sourceFighter,
             ItemBase itemUsed,
             Vector3? position,
             int damageDealt,
@@ -643,7 +643,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : _localizer.TranslateWithArgs("ui.alert.attack.victimkilledbyusing", victimName, _lastDamageSourceName, _lastDamageItemName);
         }
 
-        private void RecordDamageDealt(int damageDealt, IFighter sourceFighter)
+        private void RecordDamageDealt(int damageDealt, FighterBase sourceFighter)
         {
             var sourceNetworkObject = sourceFighter.GameObject.GetComponent<NetworkObject>();
             var sourceClientId = sourceNetworkObject != null ? (ulong?)sourceNetworkObject.OwnerClientId : null;
@@ -662,7 +662,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         }
 
         private void ShowHealthChangeToSourceFighter(
-            IFighter sourceFighter,
+            FighterBase sourceFighter,
             Vector3? position,
             int change,
             bool isCritical)
@@ -690,7 +690,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             AddOrUpdateEffect(attributeEffect, adjustedChange, expiry);
         }
 
-        public void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, float effectPercentage)
+        public void ApplyPeriodicActionToStat(IStatEffect statEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, float effectPercentage)
         {
             var (change, expiry, delay) = itemUsed.GetPeriodicStatChangeExpiryAndDelay(statEffect);
             var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
@@ -698,7 +698,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             StartCoroutine(PeriodicActionToStatCoroutine(statEffect.StatToAffect, adjustedChange, sourceFighter, delay, expiry));
         }
 
-        private IEnumerator PeriodicActionToStatCoroutine(ResourceType resourceType, int change, IFighter sourceFighter, float delay, DateTime expiry)
+        private IEnumerator PeriodicActionToStatCoroutine(ResourceType resourceType, int change, FighterBase sourceFighter, float delay, DateTime expiry)
         {
             do
             {
@@ -708,7 +708,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             } while (DateTime.Now < expiry);
         }
 
-        public void ApplyStatValueChange(IStatEffect statEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
+        public void ApplyStatValueChange(IStatEffect statEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
         {
             var change = itemUsed.GetStatChange(statEffect);
             var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
@@ -718,7 +718,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             ApplyStatChange(statEffect.StatToAffect, adjustedChange, sourceFighter, position);
         }
 
-        public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
+        public void ApplyTemporaryMaxActionToStat(IStatEffect statEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
         {
             var (change, expiry) = itemUsed.GetStatChangeAndExpiry(statEffect);
             var adjustedChange = (int)(_combatService.AddVariationToValue(change) * effectPercentage);
@@ -728,7 +728,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             ApplyStatChange(statEffect.StatToAffect, adjustedChange, sourceFighter, position);
         }
 
-        public void ApplyElementalEffect(IEffect elementalEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
+        public void ApplyElementalEffect(IEffect elementalEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
         {
             //todo: zzz v0.8 - ApplyElementalEffect
             //Debug.LogWarning("Not yet implemented elemental effects");
@@ -823,7 +823,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private void ApplyStatChange(
             ResourceType resourceType,
             int change,
-            IFighter sourceFighter,
+            FighterBase sourceFighter,
             Vector3? position)
         {
             switch (resourceType)

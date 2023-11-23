@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;

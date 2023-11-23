@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
@@ -45,7 +46,7 @@ namespace FullPotential.Core.Gameplay.Combat
         }
 
         public void ApplyEffects(
-            IFighter sourceFighter,
+            FighterBase sourceFighter,
             ItemForCombatBase itemUsed,
             GameObject target,
             Vector3? position,
@@ -68,11 +69,11 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (!itemHasEffects || weapon != null)
             {
-                var targetFighter = target.GetComponent<IFighter>();
+                var targetFighter = target.GetComponent<FighterBase>();
 
                 if (targetFighter == null)
                 {
-                    //Debug.LogWarning("Target is not an IFighter. Target was: " + target);
+                    //Debug.LogWarning("Target is not an FighterBase. Target was: " + target);
 
                     //todo: zzz v0.5 - make SpawnBulletHole a VisualsBehaviour on BulletTrail
                     if (weapon != null)
@@ -221,7 +222,7 @@ namespace FullPotential.Core.Gameplay.Combat
             return true;
         }
 
-        private void ApplyEffect(IFighter sourceFighter, IEffect effect, ItemForCombatBase itemUsed, GameObject targetGameObject, Vector3? position, float effectPercentage)
+        private void ApplyEffect(FighterBase sourceFighter, IEffect effect, ItemForCombatBase itemUsed, GameObject targetGameObject, Vector3? position, float effectPercentage)
         {
             if (effect is IMovementEffect movementEffect)
             {
@@ -229,11 +230,11 @@ namespace FullPotential.Core.Gameplay.Combat
                 return;
             }
 
-            var targetFighter = targetGameObject.GetComponent<IFighter>();
+            var targetFighter = targetGameObject.GetComponent<FighterBase>();
 
             if (targetFighter == null)
             {
-                //Debug.LogWarning($"Not applying {effect.TypeName} to {targetGameObject.name} because they are not an IFighter");
+                //Debug.LogWarning($"Not applying {effect.TypeName} to {targetGameObject.name} because they are not an FighterBase");
                 return;
             }
 
@@ -259,7 +260,7 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private void ApplyStatEffect(IFighter targetFighter, IStatEffect statEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
+        private void ApplyStatEffect(FighterBase targetFighter, IStatEffect statEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
         {
             switch (statEffect.AffectType)
             {
@@ -284,17 +285,17 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private void ApplyAttributeEffect(IFighter targetFighter, IAttributeEffect attributeEffect, ItemForCombatBase itemUsed, float effectPercentage)
+        private void ApplyAttributeEffect(FighterBase targetFighter, IAttributeEffect attributeEffect, ItemForCombatBase itemUsed, float effectPercentage)
         {
             targetFighter.AddAttributeModifier(attributeEffect, itemUsed, effectPercentage);
         }
 
-        private void ApplyElementalEffect(IFighter targetFighter, IEffect elementalEffect, ItemForCombatBase itemUsed, IFighter sourceFighter, Vector3? position, float effectPercentage)
+        private void ApplyElementalEffect(FighterBase targetFighter, IEffect elementalEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
         {
             targetFighter.ApplyElementalEffect(elementalEffect, itemUsed, sourceFighter, position, effectPercentage);
         }
 
-        private void ApplyMaintainDistance(ItemForCombatBase itemUsed, GameObject targetGameObject, IFighter sourceFighter)
+        private void ApplyMaintainDistance(ItemForCombatBase itemUsed, GameObject targetGameObject, FighterBase sourceFighter)
         {
             if (itemUsed is not Consumer consumer || !consumer.Targeting.IsContinuous)
             {
@@ -308,7 +309,7 @@ namespace FullPotential.Core.Gameplay.Combat
             comp.Consumer = consumer;
         }
 
-        private void ApplyMovementEffect(IFighter sourceFighter, ItemForCombatBase itemUsed, IMovementEffect movementEffect, GameObject targetGameObject, float effectPercentage)
+        private void ApplyMovementEffect(FighterBase sourceFighter, ItemForCombatBase itemUsed, IMovementEffect movementEffect, GameObject targetGameObject, float effectPercentage)
         {
             var targetRigidBody = targetGameObject.GetComponent<Rigidbody>();
 
@@ -430,7 +431,7 @@ namespace FullPotential.Core.Gameplay.Combat
             return (float)Math.Ceiling(basicValue / multiplier) + adder;
         }
 
-        private int GetDamageValueFromAttack(IFighter sourceFighter, ItemForCombatBase itemUsed, int targetDefense, bool addVariation = true)
+        private int GetDamageValueFromAttack(FighterBase sourceFighter, ItemForCombatBase itemUsed, int targetDefense, bool addVariation = true)
         {
             var weapon = itemUsed as Weapon;
 
@@ -463,7 +464,7 @@ namespace FullPotential.Core.Gameplay.Combat
             return (int)AddVariationToValue(damageDealtBasic);
         }
 
-        public int GetDamageValueFromAttack(IFighter sourceFighter, int targetDefense, bool addVariation = true)
+        public int GetDamageValueFromAttack(FighterBase sourceFighter, int targetDefense, bool addVariation = true)
         {
             return GetDamageValueFromAttack(sourceFighter, null, targetDefense, addVariation);
         }
@@ -473,7 +474,7 @@ namespace FullPotential.Core.Gameplay.Combat
             return GetDamageValueFromAttack(null, itemUsed, targetDefense, addVariation);
         }
 
-        public void SpawnTargetingGameObject(IFighter sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction)
+        public void SpawnTargetingGameObject(FighterBase sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction)
         {
             if (consumer.Targeting.NetworkPrefabAddress.IsNullOrWhiteSpace())
             {
@@ -502,7 +503,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 });
         }
 
-        public void SpawnShapeGameObject(IFighter sourceFighter, Consumer consumer, GameObject target, Vector3 fallbackPosition, Vector3 lookDirection)
+        public void SpawnShapeGameObject(FighterBase sourceFighter, Consumer consumer, GameObject target, Vector3 fallbackPosition, Vector3 lookDirection)
         {
             if (consumer.Shape == null)
             {

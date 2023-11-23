@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
@@ -25,7 +26,7 @@ namespace FullPotential.Standard.Shapes
         private float _timeSinceLastEffective;
         private float _timeBetweenEffects;
 
-        public IFighter SourceFighter { get; set; }
+        public FighterBase SourceFighter { get; set; }
 
         public Consumer Consumer { get; set; }
 

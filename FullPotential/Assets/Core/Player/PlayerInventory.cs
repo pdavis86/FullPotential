@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Inventory.EventArgs;
@@ -362,8 +363,8 @@ namespace FullPotential.Core.Player
         private void TriggerSlotChangeEvent(ItemBase item, string slotId)
         {
             var eventArgs = new SlotChangeEventArgs(this, slotId, item?.Id);
-            _eventManager.Trigger(IPlayerInventory.EventIdSlotChange, eventArgs);
-            _eventManager.After(IPlayerInventory.EventIdSlotChange, eventArgs);
+            _eventManager.Trigger(EventIdSlotChange, eventArgs);
+            _eventManager.After(EventIdSlotChange, eventArgs);
         }
 
         private void SetEquippedItem(string itemId, string slotId)

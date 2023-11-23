@@ -6,9 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
@@ -387,10 +385,10 @@ namespace FullPotential.Core.GameManagement
         {
             var eventManager = (EventManager)DependenciesContext.Dependencies.GetService<IEventManager>();
 
-            eventManager.Register(IFighter.EventIdReload, FighterBase.DefaultHandlerForReloadEvent);
-            eventManager.Register(IFighter.EventIdDamageTaken, null);
-            eventManager.Register(IFighter.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEvent);
-            eventManager.Register(IInventory.EventIdSlotChange, PlayerInventory.DefaultHandlerForSlotChangeEvent);
+            eventManager.Register(FighterBase.EventIdReload, FighterBase.DefaultHandlerForReloadEvent);
+            eventManager.Register(FighterBase.EventIdDamageTaken, null);
+            eventManager.Register(FighterBase.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEvent);
+            eventManager.Register(InventoryBase.EventIdSlotChange, PlayerInventory.DefaultHandlerForSlotChangeEvent);
         }
 
         #region Methods for Mods

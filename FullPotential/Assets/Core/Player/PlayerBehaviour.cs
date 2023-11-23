@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Crafting;

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
