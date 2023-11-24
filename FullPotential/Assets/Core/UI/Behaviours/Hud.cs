@@ -27,6 +27,9 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private GameObject _equippedLeftHand;
         [SerializeField] private GameObject _equippedRightHand;
         [SerializeField] private GameObject _crosshairs;
+        [SerializeField] private GameObject _handWarningLeft;
+        [SerializeField] private GameObject _handWarningRight;
+        [SerializeField] private GameObject _resourceBarsContainer;
         [SerializeField] private BarSlider _staminaSlider;
         [SerializeField] private BarSlider _healthSlider;
         [SerializeField] private BarSlider _manaSlider;
@@ -35,8 +38,6 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private Text _ammoRight;
         [SerializeField] private ProgressWheel _chargeLeft;
         [SerializeField] private ProgressWheel _chargeRight;
-        [SerializeField] private GameObject _handWarningLeft;
-        [SerializeField] private GameObject _handWarningRight;
 #pragma warning restore 0649
 
         private ILocalizer _localizer;
@@ -81,8 +82,6 @@ namespace FullPotential.Core.Ui.Behaviours
             }
 
             //todo: zzz v0.6 - use events instead of firing on every update!
-
-            //todo: generalise instead of having specific resources
             UpdateStaminaPercentage();
             UpdateHealthPercentage();
             UpdateManaPercentage();

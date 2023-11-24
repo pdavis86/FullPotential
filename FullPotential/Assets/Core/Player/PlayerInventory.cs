@@ -12,7 +12,6 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Registry.Gear;
-using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
@@ -402,7 +401,7 @@ namespace FullPotential.Core.Player
         {
             var slotChangeEventArgs = (SlotChangeEventArgs)eventArgs;
 
-            var playerInventory = (PlayerInventory) slotChangeEventArgs.Inventory;
+            var playerInventory = (PlayerInventory)slotChangeEventArgs.Inventory;
 
             playerInventory.SetEquippedItem(slotChangeEventArgs.ItemId, slotChangeEventArgs.SlotId);
         }
@@ -524,29 +523,25 @@ namespace FullPotential.Core.Player
             switch (item)
             {
                 case Weapon weapon:
-                    if (item.RegistryType is not IWeapon)
-                    {
-                        Debug.LogError("Item is not a weapon");
-                        return;
-                    }
-
                     _typeRegistry.LoadAddessable<GameObject>(
-                        weapon.Visuals.PrefabAddress,
-                        prefab =>
-                        {
-                            InstantiateInPlayerHand(prefab, isLeftHand, new Vector3(0, 90), slotId);
-                        }
-                    );
+                       weapon.Visuals.PrefabAddress,
+                       prefab =>
+                       {
+                           InstantiateInPlayerHand(prefab, isLeftHand, new Vector3(0, 90), slotId);
+                       });
 
                     break;
 
                 case Consumer consumer:
-                    //todo: where do the resource prefabs go?
-                    //var prefab = consumer.ResourceType == ResourceType.Mana
-                    //    ? GameManager.Instance.Prefabs.Combat.SpellInHand
-                    //    : GameManager.Instance.Prefabs.Combat.GadgetInHand;
-
-                    //InstantiateInPlayerHand(prefab, isLeftHand, null, slotId);
+                    _typeRegistry.LoadAddessable<GameObject>(
+                        consumer.ResourceType.ItemInHandDefaultPrefab,
+                        prefab =>
+                        {
+                            if (prefab != null)
+                            {
+                                InstantiateInPlayerHand(prefab, isLeftHand, null, slotId);
+                            }
+                        });
 
                     break;
 

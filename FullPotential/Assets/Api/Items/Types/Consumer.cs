@@ -21,7 +21,19 @@ namespace FullPotential.Api.Items.Types
         public const string AliasSegmentConsumer = "consumer";
         public const string AliasSegmentEffects = "effects";
 
-        public IResource ResourceType;
+        private IResource _resourceType;
+
+        public string ResourceTypeId;
+
+        public IResource ResourceType
+        {
+            get => _resourceType;
+            set
+            {
+                _resourceType = value;
+                ResourceTypeId = _resourceType?.TypeId.ToString();
+            }
+        }
 
         public int ChargePercentage { get; set; }
 

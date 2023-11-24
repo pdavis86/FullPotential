@@ -18,6 +18,7 @@ using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Constants;
+using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using TMPro;
 using Unity.Collections;
@@ -76,12 +77,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private FighterBase _fighterWhoMovedMeLast;
         private Rigidbody _rb;
 
-        //todo: one action?
         //Action-related
-        //private DelayedAction _replenishStamina;
-        //private DelayedAction _replenishMana;
-        //private DelayedAction _replenishEnergy;
-        //private DelayedAction _consumeStamina;
+        private DelayedAction _replenishResources;
+        private DelayedAction _consumeStamina;
 
         #endregion
 
@@ -102,7 +100,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected virtual void Awake()
         {
-            //todo: does it work if I put it first?
             _resourceList = new NetworkList<int>();
 
             _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
@@ -111,8 +108,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
             _eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
-
-            PopulateResourceList();
 
             _entityName.OnValueChanged += HandleNameChange;
 
@@ -126,7 +121,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             AliveState = LivingEntityState.Alive;
 
+            PopulateResourceList();
+
             SetupResourceReplenishing();
+            SetupStaminaConsumption();
         }
 
         public override void OnNetworkSpawn()
@@ -156,9 +154,19 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public override void OnDestroy()
         {
-            base.OnDestroy();
             _entityName.OnValueChanged -= HandleNameChange;
+
             _resourceList.OnListChanged -= HandleResourceListChange;
+
+            try
+            {
+                base.OnDestroy();
+            }
+            catch
+            {
+                //todo: zzz v0.6 - Remove after updating NGO and see if problem remains
+                //Do nothing. Work-around for the ObjectDisposedException: The Unity.Collections.NativeList`1[System.Int32] has been deallocated, it is not allowed to access it
+            }
         }
 
         // ReSharper restore UnusedMemberHierarchy.Global
@@ -215,51 +223,21 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void SetupResourceReplenishing()
         {
-            //todo: 
-
-            //_replenishStamina = new DelayedAction(.2f, () =>
-            //{
-            //    if (!IsConsumingStamina() && _stamina.Value < GetStaminaMax())
-            //    {
-            //        //todo: zzz v0.5 - trait-based stamina recharge
-            //        _stamina.Value += 1;
-            //    }
-            //});
-
-            //_replenishMana = new DelayedAction(.2f, () =>
-            //{
-            //    if (!IsConsumingMana() && _mana.Value < GetManaMax())
-            //    {
-            //        //todo: zzz v0.5 - trait-based mana recharge
-            //        _mana.Value += 1;
-            //    }
-            //});
-
-            //_replenishEnergy = new DelayedAction(.2f, () =>
-            //{
-            //    if (!IsConsumingEnergy() && _energy.Value < GetEnergyMax())
-            //    {
-            //        //todo: zzz v0.5 - trait-based energy recharge
-            //        _energy.Value += 1;
-            //    }
-            //});
-
-            //_consumeStamina = new DelayedAction(.05f, () =>
-            //{
-            //    if (!IsConsumingStamina())
-            //    {
-            //        return;
-            //    }
-
-            //    var staminaCost = GetStaminaCost();
-            //    if (_stamina.Value >= staminaCost)
-            //    {
-            //        _stamina.Value -= staminaCost / 2;
-            //    }
-            //});
+            _replenishResources = new DelayedAction(.2f, () =>
+            {
+                foreach (var resource in _sortedResources.Where(x => x.TypeId != ResourceTypeIds.Health))
+                {
+                    var typeId = resource.TypeId.ToString();
+                    var value = GetResourceValue(typeId);
+                    if (!IsConsumingResource(typeId) && value < GetResourceMax(typeId))
+                    {
+                        //todo: zzz v0.5 - trait-based resource recharge
+                        SetResourceValue(typeId, value + 1);
+                    }
+                }
+            });
         }
 
-        //todo: make this happen on an event
         private void ApplyHealthChange(
             int change,
             FighterBase sourceFighter,
@@ -289,20 +267,21 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void PopulateResourceList()
         {
-            if (_resourceList.Count > 0)
-            {
-                return;
-            }
-
             _sortedResources = _typeRegistry.GetRegisteredTypes<IResource>()
                 .OrderBy(x => x.TypeId)
                 .ToList();
 
-            if (IsServer)
+            if (IsClient && !IsServer)
             {
-                _resourceList = new NetworkList<int>(_sortedResources.Select(_ => 0));
-                _resourceList.OnListChanged += HandleResourceListChange;
+                return;
             }
+
+            for (var i = 0; i < _sortedResources.Count; i++)
+            {
+                _resourceList.Add(0);
+            }
+
+            _resourceList.OnListChanged += HandleResourceListChange;
         }
 
         private IResource GetResourceTypeIdFromListIndex(int index)
@@ -322,14 +301,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected void SetResourceValue(string typeId, int newValue)
         {
-            //todo: Initialise() has not been called on the network variable at this time
-            if (_resourceList.Count == 0)
-            {
-                PopulateResourceList();
-            }
-
             var index = GetResourceListIndexFromTypeId(typeId);
             _resourceList[index] = newValue;
+        }
+
+        protected void SetResourceValuesForRespawn()
+        {
+            foreach (var resource in _sortedResources)
+            {
+                SetResourceValue(resource.TypeId.ToString(), GetResourceMax(resource.TypeId.ToString()));
+            }
         }
 
         public int GetResourceMax(string resourceTypeId)
@@ -338,11 +319,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return 100 + GetResourceMaxAdjustment(resourceTypeId);
         }
 
+        protected virtual bool IsConsumingResource(string typeId)
+        {
+            return false;
+        }
+
         #endregion
 
         #region Sprint-specific
 
-        //todo: how to generalise sprint-specifics
+        //todo: zzz v0.5 - how to generalise sprint-specifics
 
         public int GetStaminaCost()
         {
@@ -364,6 +350,24 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             return IsSprinting;
+        }
+
+        private void SetupStaminaConsumption()
+        {
+            _consumeStamina = new DelayedAction(.05f, () =>
+            {
+                if (!IsConsumingStamina())
+                {
+                    return;
+                }
+
+                var staminaValue = GetResourceValue(ResourceTypeIds.StaminaId);
+                var staminaCost = GetStaminaCost();
+                if (staminaValue >= staminaCost)
+                {
+                    SetResourceValue(ResourceTypeIds.StaminaId, staminaValue - staminaCost / 2);
+                }
+            });
         }
 
         #endregion
@@ -395,17 +399,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void UpdateUiHealthAndDefenceValues()
         {
-            //if (!IsServer && IsOwner)
-            //{
-            //    return;
-            //}
+            if (!IsServer && IsOwner)
+            {
+                return;
+            }
 
-            //todo: 
-            //var health = GetHealth();
-            //var maxHealth = GetHealthMax();
-            //var defence = GetDefenseValue();
-            //var values = _gameManager.GetUserInterface().HudOverlay.GetHealthValues(health, maxHealth, defence);
-            //HealthStatSlider.SetValues(values);
+            var health = GetResourceValue(ResourceTypeIds.HealthId);
+            var maxHealth = GetResourceMax(ResourceTypeIds.HealthId);
+            var defence = GetDefenseValue();
+            var values = _gameManager.GetUserInterface().HudOverlay.GetHealthValues(health, maxHealth, defence);
+            HealthStatSlider.SetValues(values);
         }
 
         #endregion
@@ -425,11 +428,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void ReplenishAndConsume()
         {
-            //todo:
-            //_replenishStamina.TryPerformAction();
-            //_replenishMana.TryPerformAction();
-            //_replenishEnergy.TryPerformAction();
-            //_consumeStamina.TryPerformAction();
+            _replenishResources.TryPerformAction();
+            _consumeStamina.TryPerformAction();
         }
 
         private void HandleCollision(Collision collision)
@@ -756,7 +756,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
             FighterBase sourceFighter,
             Vector3? position)
         {
-            //todo: other parmas
+            //todo: zzz v0.5 health-specific code
+            if (resourceTypeId == ResourceTypeIds.HealthId)
+            {
+                ApplyHealthChange(change, sourceFighter, position, false);
+                return;
+            }
+            
             var index = GetResourceListIndexFromTypeId(resourceTypeId);
             _resourceList[index] += change;
         }

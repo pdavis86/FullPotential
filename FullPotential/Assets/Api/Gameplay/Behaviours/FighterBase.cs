@@ -190,11 +190,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #endregion
 
-        //protected override bool IsConsumingResource(string typeId)
-        //{
-        //    return HandStatusLeft.IsConsumingResource(typeId)
-        //           || HandStatusRight.IsConsumingResource(typeId);
-        //}
+        protected override bool IsConsumingResource(string typeId)
+        {
+            return HandStatusLeft.IsConsumingResource(typeId)
+                   || HandStatusRight.IsConsumingResource(typeId);
+        }
 
         public HandStatus GetHandStatus(bool isLeftHand)
         {

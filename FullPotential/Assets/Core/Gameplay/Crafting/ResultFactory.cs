@@ -14,7 +14,6 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Registry.Gear;
-using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
@@ -254,20 +253,14 @@ namespace FullPotential.Core.Gameplay.Crafting
                     Recovery = GetAttributeValue(75),
                     Duration = GetAttributeValue(75),
                     Luck = GetAttributeValue(75)
-                }
+                },
+                RegistryType = _lootTypes
+                    .OrderBy(_ => _random.Next())
+                    .First()
             };
 
-            //todo: too tightly coupled to resource types
-
-            var magicalLootTypes = _lootTypes.Where(x => x.ResourceTypeId == ResourceTypeIds.Mana).ToList();
-
-            var isMagical = magicalLootTypes.Any() && IsSuccess(50);
-            if (isMagical)
+            if (IsSuccess(50))
             {
-                lootDrop.RegistryType = magicalLootTypes
-                    .OrderBy(_ => _random.Next())
-                    .First();
-
                 var effects = new List<IEffect>();
                 var numberOfEffects = GetMinBiasedNumber(1, Math.Min(4, _effectsForLoot.Count));
                 for (var i = 1; i <= numberOfEffects; i++)
@@ -295,13 +288,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 lootDrop.Targeting = GetRandomTargetingOrNone();
                 lootDrop.Shape = GetRandomShapeOrNone();
             }
-            else
-            {
-                lootDrop.RegistryType = _lootTypes
-                    .Where(x => x.ResourceTypeId == ResourceTypeIds.Energy)
-                    .OrderBy(_ => _random.Next())
-                    .First();
-            }
+
 
             var typeTranslation = _localizer.Translate("crafting.loot.type");
             var suffix = int.Parse(lootDrop.GetNameHash().ToString().TrimStart('-').Substring(5));

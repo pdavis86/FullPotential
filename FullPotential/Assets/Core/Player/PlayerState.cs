@@ -228,11 +228,7 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         private void RespawnServerRpc()
         {
-            //todo: generalise
-            SetResourceValue(ResourceTypeIds.HealthId, GetResourceMax(ResourceTypeIds.HealthId));
-            SetResourceValue(ResourceTypeIds.StaminaId, GetResourceMax(ResourceTypeIds.StaminaId));
-            SetResourceValue(ResourceTypeIds.ManaId, GetResourceMax(ResourceTypeIds.ManaId));
-            SetResourceValue(ResourceTypeIds.EnergyId, GetResourceMax(ResourceTypeIds.EnergyId));
+            SetResourceValuesForRespawn();
 
             AliveState = LivingEntityState.Respawning;
 
@@ -476,7 +472,7 @@ namespace FullPotential.Core.Player
             }
         }
 
-        //NOTE: Need this to get over the key not found exception caused by too many RPC calls with large payloads
+        //todo: zzz v0.6 - Remove? Need this to get over the key not found exception caused by too many RPC calls with large payloads
         private IEnumerator LoadFromPlayerDataCoroutine(PlayerData playerData, ulong clientId)
         {
             var clientRpcParams = new ClientRpcParams
@@ -501,12 +497,13 @@ namespace FullPotential.Core.Player
                 var health = playerData.Resources.FirstOrDefault(x => x.Key == nameof(ResourceTypeIds.Health)).Value;
 
                 _entityName.Value = Username;
-                
-                //todo: generalise e.g. new prop for SetMaxOnRespawn
+
                 SetResourceValue(ResourceTypeIds.HealthId, health > 0 ? health : GetResourceMax(ResourceTypeIds.HealthId));
-                SetResourceValue(ResourceTypeIds.StaminaId, playerData.Resources.FirstOrDefault(x => x.Key == nameof(ResourceTypeIds.Stamina)).Value);
-                SetResourceValue(ResourceTypeIds.ManaId, playerData.Resources.FirstOrDefault(x => x.Key == nameof(ResourceTypeIds.Mana)).Value);
-                SetResourceValue(ResourceTypeIds.EnergyId, playerData.Resources.FirstOrDefault(x => x.Key == nameof(ResourceTypeIds.Energy)).Value);
+
+                foreach (var resource in _sortedResources)
+                {
+                    SetResourceValue(resource.TypeId.ToString(), playerData.Resources.FirstOrDefault(x => x.Key == resource.GetType().Name).Value);
+                }
             }
 
             try
@@ -666,14 +663,11 @@ namespace FullPotential.Core.Player
 
         public PlayerData UpdateAndReturnPlayerData()
         {
-            //todo: generalise
-            _saveData.Resources = new[]
-            {
-                new Api.Utilities.Data.KeyValuePair<string, int>(nameof(ResourceTypeIds.Energy), GetResourceValue(ResourceTypeIds.EnergyId)),
-                new Api.Utilities.Data.KeyValuePair<string, int>(nameof(ResourceTypeIds.Health), GetResourceValue(ResourceTypeIds.HealthId)),
-                new Api.Utilities.Data.KeyValuePair<string, int>(nameof(ResourceTypeIds.Mana), GetResourceValue(ResourceTypeIds.ManaId)),
-                new Api.Utilities.Data.KeyValuePair<string, int>(nameof(ResourceTypeIds.Stamina), GetResourceValue(ResourceTypeIds.StaminaId)),
-            };
+            _saveData.Resources = _sortedResources
+                .Select(resource => new Api.Utilities.Data.KeyValuePair<string, int>(
+                    resource.GetType().Name,
+                    GetResourceValue(resource.TypeId.ToString())))
+                .ToArray();
 
             _saveData.Inventory = PlayerInventory.GetSaveData();
 

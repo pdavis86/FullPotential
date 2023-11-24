@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Events;
+using UnityEngine;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Gameplay.Events
 {
+    //todo: this is global!!! It needs to be per object
     public class EventManager : IEventManager
     {
         private readonly Dictionary<string, EventHandlerGroup> _subscriptions = new Dictionary<string, EventHandlerGroup>();
@@ -27,6 +29,11 @@ namespace FullPotential.Core.Gameplay.Events
 
         public void Trigger(string eventId, IEventHandlerArgs args)
         {
+            if (!IsEventIdRegistered(eventId))
+            {
+                return;
+            }
+
             var handlerGroup = _subscriptions[eventId];
 
             args.IsDefaultHandlerCancelled = false;
@@ -42,8 +49,25 @@ namespace FullPotential.Core.Gameplay.Events
             }
         }
 
+        private bool IsEventIdRegistered(string eventId)
+        {
+            if (_subscriptions.ContainsKey(eventId))
+            {
+                return true;
+            }
+
+            Debug.LogError("No event handler has been registered for event " + eventId);
+            return false;
+
+        }
+
         public void After(string eventId, IEventHandlerArgs args)
         {
+            if (!IsEventIdRegistered(eventId))
+            {
+                return;
+            }
+
             var handlerGroup = _subscriptions[eventId];
 
             foreach (var handler in handlerGroup.OtherHandlers)

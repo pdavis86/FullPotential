@@ -7,5 +7,7 @@ namespace FullPotential.Core.Registry.Resources
     public class Health : IResource
     {
         public Guid TypeId => ResourceTypeIds.Health;
+
+        public string ItemInHandDefaultPrefab => null;
     }
 }

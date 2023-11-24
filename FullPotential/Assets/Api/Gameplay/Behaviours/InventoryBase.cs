@@ -9,6 +9,7 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
@@ -234,22 +235,36 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 item.RegistryType = _typeRegistry.GetRegistryTypeForItem(item);
             }
 
-            if (item is ItemWithTargetingAndShapeBase magicalItem && !string.IsNullOrWhiteSpace(magicalItem.TargetingTypeId))
+            if (item is ItemWithTargetingAndShapeBase withTargetingAndShape && !string.IsNullOrWhiteSpace(withTargetingAndShape.TargetingTypeId))
             {
-                magicalItem.Targeting = _typeRegistry.GetRegisteredTypes<ITargeting>()
-                    .First(x => x.TypeId.ToString() == magicalItem.TargetingTypeId);
+                withTargetingAndShape.Targeting = _typeRegistry.GetRegisteredTypes<ITargeting>()
+                    .First(x => x.TypeId.ToString() == withTargetingAndShape.TargetingTypeId);
 
-                magicalItem.TargetingVisuals = _typeRegistry.GetRegisteredTypes<ITargetingVisuals>()
-                    .FirstOrDefault(v => v.TypeId.ToString() == magicalItem.TargetingVisualsTypeId);
+                withTargetingAndShape.TargetingVisuals = _typeRegistry.GetRegisteredTypes<ITargetingVisuals>()
+                    .FirstOrDefault(v => v.TypeId.ToString() == withTargetingAndShape.TargetingVisualsTypeId);
 
-                if (!string.IsNullOrWhiteSpace(magicalItem.ShapeTypeId))
+                if (!string.IsNullOrWhiteSpace(withTargetingAndShape.ShapeTypeId))
                 {
-                    magicalItem.Shape = _typeRegistry.GetRegisteredTypes<IShape>()
-                        .First(x => x.TypeId.ToString() == magicalItem.ShapeTypeId);
+                    withTargetingAndShape.Shape = _typeRegistry.GetRegisteredTypes<IShape>()
+                        .First(x => x.TypeId.ToString() == withTargetingAndShape.ShapeTypeId);
 
-                    magicalItem.ShapeVisuals = _typeRegistry.GetRegisteredTypes<IShapeVisuals>()
-                        .FirstOrDefault(v => v.TypeId.ToString() == magicalItem.ShapeVisualsTypeId);
+                    withTargetingAndShape.ShapeVisuals = _typeRegistry.GetRegisteredTypes<IShapeVisuals>()
+                        .FirstOrDefault(v => v.TypeId.ToString() == withTargetingAndShape.ShapeVisualsTypeId);
                 }
+            }
+
+            if (item is Consumer consumer)
+            {
+                //todo: zzz v0.6 - here for fixing broken data
+                if (consumer.ResourceTypeId.IsNullOrWhiteSpace())
+                {
+                    consumer.ResourceTypeId = consumer.Name.ToLower().Contains("spell")
+                        ? ResourceTypeIds.ManaId
+                        : ResourceTypeIds.EnergyId;
+                }
+
+                consumer.ResourceType = _typeRegistry.GetRegisteredTypes<IResource>()
+                    .First(x => x.TypeId.ToString() == consumer.ResourceTypeId);
             }
 
             if (item is IHasVisuals itemWithVisuals)
