@@ -7,7 +7,6 @@ using UnityEngine;
 
 namespace FullPotential.Core.Gameplay.Events
 {
-    //todo: this is global!!! It needs to be per object
     public class EventManager : IEventManager
     {
         private readonly Dictionary<string, EventHandlerGroup> _subscriptions = new Dictionary<string, EventHandlerGroup>();
@@ -46,6 +45,10 @@ namespace FullPotential.Core.Gameplay.Events
             if (!args.IsDefaultHandlerCancelled)
             {
                 handlerGroup.DefaultHandler?.Invoke(args);
+            }
+            else if (handlerGroup.DefaultHandler == null)
+            {
+                Debug.LogError($"Tried to cancel the default handler for event {eventId} but no handler is present");
             }
         }
 

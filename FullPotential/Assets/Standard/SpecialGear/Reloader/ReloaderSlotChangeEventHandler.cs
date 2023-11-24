@@ -8,12 +8,13 @@ using FullPotential.Api.Modding;
 using FullPotential.Api.Ui;
 using FullPotential.Standard.SpecialSlots;
 
-namespace FullPotential.Standard.SpecialGear
+namespace FullPotential.Standard.SpecialGear.Reloader
 {
     public class ReloaderSlotChangeEventHandler : IEventHandler
     {
-        private static readonly ConsolidatorReloaderEventHandler ConsolidatorEventHandler = new ConsolidatorReloaderEventHandler();
-        private static readonly TeleportReloaderEventHandler TeleportEventHandler = new TeleportReloaderEventHandler();
+        private static readonly ConsolidatorReloader.ReloadEventHandler ConsolidatorReloadHandler = new ConsolidatorReloader.ReloadEventHandler();
+        private static readonly TeleportReloader.ReloadEventHandler TeleportReloadHandler = new TeleportReloader.ReloadEventHandler();
+        private static readonly TeleportReloader.ShotFiredEventHandler TeleportShotHandler = new TeleportReloader.ShotFiredEventHandler();
 
         public Action<IEventHandlerArgs> BeforeHandler => null;
 
@@ -49,21 +50,21 @@ namespace FullPotential.Standard.SpecialGear
 
                     var eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
 
+                    eventManager.Unsubscribe(FighterBase.EventIdReload, ConsolidatorReloadHandler);
+                    eventManager.Unsubscribe(FighterBase.EventIdReload, TeleportReloadHandler);
+                    eventManager.Unsubscribe(FighterBase.EventIdShotFired, TeleportShotHandler);
+
                     if (hasReloaderEquipped)
                     {
-                        if (reloaderEquipped.RegistryTypeId == ConsolidatorReloader.TypeIdString)
+                        if (reloaderEquipped.RegistryTypeId == ConsolidatorReloader.ConsolidatorReloader.TypeIdString)
                         {
-                            eventManager.Subscribe(FighterBase.EventIdReload, ConsolidatorEventHandler);
+                            eventManager.Subscribe(FighterBase.EventIdReload, ConsolidatorReloadHandler);
                         }
                         else
                         {
-                            eventManager.Subscribe(FighterBase.EventIdShotFired, TeleportEventHandler);
+                            eventManager.Subscribe(FighterBase.EventIdReload, TeleportReloadHandler);
+                            eventManager.Subscribe(FighterBase.EventIdShotFired, TeleportShotHandler);
                         }
-                    }
-                    else
-                    {
-                        eventManager.Unsubscribe(FighterBase.EventIdReload, ConsolidatorEventHandler);
-                        eventManager.Unsubscribe(FighterBase.EventIdShotFired, TeleportEventHandler);
                     }
 
                     return;

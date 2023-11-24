@@ -232,7 +232,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     if (!IsConsumingResource(typeId) && value < GetResourceMax(typeId))
                     {
                         //todo: zzz v0.5 - trait-based resource recharge
-                        SetResourceValue(typeId, value + 1);
+                        AdjustResourceValue(typeId, 1);
                     }
                 }
             });
@@ -276,9 +276,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
+            var healthIndex = _sortedResources.IndexOf(_sortedResources.First(x => x.TypeId == ResourceTypeIds.Health));
+
             for (var i = 0; i < _sortedResources.Count; i++)
             {
-                _resourceList.Add(0);
+                _resourceList.Add(i == healthIndex
+                    ? GetResourceMax(ResourceTypeIds.HealthId)
+                    : 0);
             }
 
             _resourceList.OnListChanged += HandleResourceListChange;
@@ -303,6 +307,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             var index = GetResourceListIndexFromTypeId(typeId);
             _resourceList[index] = newValue;
+        }
+
+        protected void AdjustResourceValue(string typeId, int change)
+        {
+            var index = GetResourceListIndexFromTypeId(typeId);
+            _resourceList[index] += change;
         }
 
         protected void SetResourceValuesForRespawn()
@@ -365,7 +375,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 var staminaCost = GetStaminaCost();
                 if (staminaValue >= staminaCost)
                 {
-                    SetResourceValue(ResourceTypeIds.StaminaId, staminaValue - staminaCost / 2);
+                    AdjustResourceValue(ResourceTypeIds.StaminaId, -staminaCost / 2);
                 }
             });
         }
@@ -762,7 +772,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ApplyHealthChange(change, sourceFighter, position, false);
                 return;
             }
-            
+
             var index = GetResourceListIndexFromTypeId(resourceTypeId);
             _resourceList[index] += change;
         }

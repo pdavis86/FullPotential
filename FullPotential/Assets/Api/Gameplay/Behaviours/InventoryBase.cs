@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Gameplay.Inventory.EventArgs;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
@@ -346,6 +348,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             newStack.Count = itemsRemaining;
             _items.Add(newStack.Id, newStack);
+        }
+
+        protected abstract void SetEquippedItem(string itemId, string slotId);
+
+        public static void DefaultHandlerForSlotChangeEvent(IEventHandlerArgs eventArgs)
+        {
+            var slotChangeEventArgs = (SlotChangeEventArgs)eventArgs;
+            slotChangeEventArgs.Inventory.SetEquippedItem(slotChangeEventArgs.ItemId, slotChangeEventArgs.SlotId);
         }
     }
 }

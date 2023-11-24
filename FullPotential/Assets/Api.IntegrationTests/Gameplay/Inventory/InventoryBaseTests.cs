@@ -181,6 +181,11 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
             {
                 MergeItemStacks(itemStack);
             }
+
+            protected override void SetEquippedItem(string itemId, string slotId)
+            {
+                //Nothing here
+            }
         }
     }
 }

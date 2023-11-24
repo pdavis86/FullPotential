@@ -4,17 +4,19 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Registry.Gear;
 
-namespace FullPotential.Standard.SpecialGear
+namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 {
-    public class TeleportReloader : ISpecialGear
+    public class ConsolidatorReloader : ISpecialGear
     {
-        public Guid TypeId => new Guid("80c23584-9c2b-45d0-9922-5a4cbc1616a1");
+        public const string TypeIdString = "575ed70f-f5de-4ffa-93fb-a6c1cc404f30";
+
+        public Guid TypeId => new Guid(TypeIdString);
 
         public Guid SlotId => new Guid(SpecialSlots.RangedWeaponReloader.TypeIdString);
 
         public Dictionary<string, IEventHandler> EventHandlers { get; } = new Dictionary<string, IEventHandler>
         {
-            {FighterBase.EventIdShotFired, new TeleportReloaderEventHandler()}
+            {FighterBase.EventIdReload, new ReloadEventHandler()}
         };
     }
 }

@@ -2,9 +2,9 @@
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
 
-namespace FullPotential.Standard.SpecialGear
+namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 {
-    public class ConsolidatorReloaderEventHandler : IEventHandler
+    public class ReloadEventHandler : IEventHandler
     {
         public Action<IEventHandlerArgs> BeforeHandler => HandleReloadBefore;
 

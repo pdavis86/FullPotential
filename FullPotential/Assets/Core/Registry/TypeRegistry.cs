@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Items.Base;
@@ -15,6 +16,7 @@ using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
+using FullPotential.Core.Registry.Events;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -94,10 +96,12 @@ namespace FullPotential.Core.Registry
             ValidateAndRegister(typeof(SpecialSlots.LeftHand));
             ValidateAndRegister(typeof(SpecialSlots.RightHand));
 
-            ValidateAndRegister(typeof(Resources.Energy));
             ValidateAndRegister(typeof(Resources.Health));
-            ValidateAndRegister(typeof(Resources.Mana));
             ValidateAndRegister(typeof(Resources.Stamina));
+            ValidateAndRegister(typeof(Resources.Mana));
+            ValidateAndRegister(typeof(Resources.Energy));
+
+            _eventManager.Subscribe(LivingEntityBase.EventIdResourceValueChanged, new LivingEntityDiedEventHandler());
         }
 
         private void HandleModRegistration(IMod mod)

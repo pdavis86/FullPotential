@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry.Effects;
@@ -40,6 +41,7 @@ namespace FullPotential.Core.Localization
         {
             _typeDictionary.Clear();
 
+            CacheRegisterableTypeName<IResource>();
             CacheRegisterableTypeName<IArmor>();
             CacheRegisterableTypeName<IAccessory>();
             CacheRegisterableTypeName<IWeapon>();

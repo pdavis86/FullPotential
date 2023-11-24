@@ -365,7 +365,7 @@ namespace FullPotential.Core.Player
             _eventManager.After(EventIdSlotChange, eventArgs);
         }
 
-        private void SetEquippedItem(string itemId, string slotId)
+        protected override void SetEquippedItem(string itemId, string slotId)
         {
             var item = itemId.IsNullOrWhiteSpace() ? null : _items[itemId];
 
@@ -395,15 +395,6 @@ namespace FullPotential.Core.Player
             {
                 _playerState.HandStatusRight.SetEquippedItem(item, item?.GetDescription(_localizer));
             }
-        }
-
-        public static void DefaultHandlerForSlotChangeEvent(IEventHandlerArgs eventArgs)
-        {
-            var slotChangeEventArgs = (SlotChangeEventArgs)eventArgs;
-
-            var playerInventory = (PlayerInventory)slotChangeEventArgs.Inventory;
-
-            playerInventory.SetEquippedItem(slotChangeEventArgs.ItemId, slotChangeEventArgs.SlotId);
         }
 
         public InventoryData GetSaveData()

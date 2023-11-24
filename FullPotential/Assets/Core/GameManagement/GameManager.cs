@@ -388,9 +388,9 @@ namespace FullPotential.Core.GameManagement
             eventManager.Register(FighterBase.EventIdReload, FighterBase.DefaultHandlerForReloadEvent);
             eventManager.Register(FighterBase.EventIdDamageTaken, null);
             eventManager.Register(FighterBase.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEvent);
-            eventManager.Register(InventoryBase.EventIdSlotChange, PlayerInventory.DefaultHandlerForSlotChangeEvent);
 
-            //todo: add one for handling death that is NOT the default
+            eventManager.Register(InventoryBase.EventIdSlotChange, InventoryBase.DefaultHandlerForSlotChangeEvent);
+
             eventManager.Register(LivingEntityBase.EventIdResourceValueChanged, null);
         }
 

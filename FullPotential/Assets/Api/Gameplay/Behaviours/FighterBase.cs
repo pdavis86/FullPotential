@@ -674,7 +674,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (!isTest)
             {
-                SetResourceValue(resourceTypeId, currentValue - resourceCost);
+                AdjustResourceValue(resourceTypeId, -resourceCost);
             }
 
             return true;

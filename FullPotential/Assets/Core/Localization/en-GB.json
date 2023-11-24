@@ -35,19 +35,19 @@
 	
 	
     {
-      "Key": "resourcetype.health",
+      "Key": "resource.health",
       "Value": "Health"
     },
     {
-      "Key": "resourcetype.stamina",
+      "Key": "resource.stamina",
       "Value": "Stamina"
     },
     {
-      "Key": "resourcetype.mana",
+      "Key": "resource.mana",
       "Value": "Mana"
     },
     {
-      "Key": "resourcetype.energy",
+      "Key": "resource.energy",
       "Value": "Energy"
     },
     

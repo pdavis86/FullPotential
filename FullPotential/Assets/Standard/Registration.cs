@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Modding;
+using FullPotential.Standard.SpecialGear.Reloader;
+using FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader;
+using FullPotential.Standard.SpecialGear.Reloader.TeleportReloader;
 using UnityEngine;
 
 // ReSharper disable UnusedType.Global
@@ -71,8 +74,8 @@ namespace FullPotential.Standard
                 typeof(Loot.Shard),
                 typeof(Loot.Junk),
 
-                typeof(SpecialGear.ConsolidatorReloader),
-                typeof(SpecialGear.TeleportReloader),
+                typeof(ConsolidatorReloader),
+                typeof(TeleportReloader),
 
                 typeof(SpecialSlots.RangedWeaponReloader),
 
@@ -147,7 +150,7 @@ namespace FullPotential.Standard
         public void RegisterEventHandlers(IEventManager eventManager)
         {
             eventManager.Subscribe(FighterBase.EventIdDamageTaken, new Accessories.BarrierEventHandler());
-            eventManager.Subscribe(InventoryBase.EventIdSlotChange, new SpecialGear.ReloaderSlotChangeEventHandler());
+            eventManager.Subscribe(InventoryBase.EventIdSlotChange, new ReloaderSlotChangeEventHandler());
         }
     }
 }
