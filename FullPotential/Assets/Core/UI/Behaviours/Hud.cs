@@ -2,13 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Ui;
+using FullPotential.Api.Unity.Extensions;
+using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.UI.Behaviours;
 using UnityEngine;
@@ -30,10 +34,7 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private GameObject _handWarningLeft;
         [SerializeField] private GameObject _handWarningRight;
         [SerializeField] private GameObject _resourceBarsContainer;
-        [SerializeField] private BarSlider _staminaSlider;
-        [SerializeField] private BarSlider _healthSlider;
-        [SerializeField] private BarSlider _manaSlider;
-        [SerializeField] private BarSlider _energySlider;
+        [SerializeField] private GameObject _resourceBarPrefab;
         [SerializeField] private Text _ammoLeft;
         [SerializeField] private Text _ammoRight;
         [SerializeField] private ProgressWheel _chargeLeft;
@@ -41,6 +42,7 @@ namespace FullPotential.Core.Ui.Behaviours
 #pragma warning restore 0649
 
         private ILocalizer _localizer;
+        private ITypeRegistry _typeRegistry;
 
         private string _reloadingTranslation;
 
@@ -52,6 +54,10 @@ namespace FullPotential.Core.Ui.Behaviours
         private EquippedSummary _equippedRightHandSummary;
         private Text _equippedRightHandAmmo;
         private FighterBase _playerFighter;
+        private BarSlider _staminaSlider;
+        private BarSlider _healthSlider;
+        private BarSlider _manaSlider;
+        private BarSlider _energySlider;
 
         #region Unity Events Handlers
 
@@ -59,6 +65,7 @@ namespace FullPotential.Core.Ui.Behaviours
         private void Awake()
         {
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+            _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
 
             _reloadingTranslation = _localizer.Translate("ui.hub.reloading");
 
@@ -71,6 +78,8 @@ namespace FullPotential.Core.Ui.Behaviours
             _equippedRightHandBackground = _equippedRightHand.GetComponent<Image>();
             _equippedRightHandSummary = _equippedRightHand.GetComponent<EquippedSummary>();
             _equippedRightHandAmmo = _equippedRightHand.transform.GetChild(0).GetComponent<Text>();
+
+            SetupResourceBars();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -93,6 +102,36 @@ namespace FullPotential.Core.Ui.Behaviours
         }
 
         #endregion
+
+        private void SetupResourceBars()
+        {
+            var resources = _typeRegistry.GetRegisteredTypes<IResource>();
+
+            foreach (var resource in resources)
+            {
+                var newBar = Instantiate(_resourceBarPrefab, _resourceBarsContainer.transform);
+                newBar.FindInDescendants("Fill").GetComponent<Image>().color = resource.Color.ToUnityColor();
+
+                switch (resource.TypeId.ToString())
+                {
+                    case ResourceTypeIds.HealthId:
+                        _healthSlider = newBar.GetComponent<BarSlider>();
+                        break;
+
+                    case ResourceTypeIds.StaminaId:
+                        _staminaSlider = newBar.GetComponent<BarSlider>();
+                        break;
+
+                    case ResourceTypeIds.ManaId:
+                        _manaSlider = newBar.GetComponent<BarSlider>();
+                        break;
+
+                    case ResourceTypeIds.EnergyId:
+                        _energySlider = newBar.GetComponent<BarSlider>();
+                        break;
+                }
+            }
+        }
 
         public void Initialise(FighterBase fighter)
         {
