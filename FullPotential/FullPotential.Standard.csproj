@@ -64,6 +64,7 @@
     <Compile Include="Assets\Standard\Enemies\Behaviours\EnemyState.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Slow.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Air.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\ReloadEventHandler.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicBow.cs" />
     <Compile Include="Assets\Standard\Armor\Helm.cs" />
     <Compile Include="Assets\Standard\Armor\Legs.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="Assets\Standard\Targeting\Projectile.cs" />
     <Compile Include="Assets\Standard\ShapeVisuals\WallOfFlames.cs" />
     <Compile Include="Assets\Standard\Targeting\Self.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Reloader\ConsolidatorReloader\ConsolidatorReloader.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveRight.cs" />
     <Compile Include="Assets\Standard\Loot\Junk.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Weaken.cs" />
@@ -130,9 +132,11 @@
     <Compile Include="Assets\Standard\Effects\Buffs\Focus.cs" />
     <Compile Include="Assets\Standard\AccessoryVisuals\SilverRing.cs" />
     <Compile Include="Assets\Standard\TargetingVisuals\ProjectileFlames.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Reloader\ConsolidatorReloader\ReloadEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Lethargy.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\ShortCircuit.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicSword.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\ShotFiredEventHandler.cs" />
     <Compile Include="Assets\Standard\SpecialSlots\RangedWeaponReloader.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Water.cs" />
     <Compile Include="Assets\Standard\TargetingVisuals\BeamOfFlames.cs" />
@@ -142,6 +146,7 @@
     <Compile Include="Assets\Standard\WeaponVisuals\BasicAxe.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\StepBack.cs" />
     <Compile Include="Assets\Standard\AccessoryVisuals\LeatherBelt.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\TeleportReloader.cs" />
     <Compile Include="Assets\Standard\Scenes\Behaviours\SceneObjectsLevel001.cs" />
     <Compile Include="Assets\Standard\Ammo\Bullet.cs" />
     <Compile Include="Assets\Standard\Shapes\WallBehaviour.cs" />
@@ -161,11 +166,6 @@
     <Compile Include="Assets\Standard\Effects\Movement\Attract.cs" />
     <Compile Include="Assets\Standard\Accessories\Amulet.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveLeft.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\Reloader\ConsolidatorReloader\ReloadEventHandler.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\Reloader\ConsolidatorReloader\ConsolidatorReloader.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\ShotFiredEventHandler.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\TeleportReloader.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\ReloadEventHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Standard\FullPotential.Standard.asmdef" />

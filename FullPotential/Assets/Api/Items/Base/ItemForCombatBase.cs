@@ -137,15 +137,6 @@ namespace FullPotential.Api.Items.Base
             return sb.ToString().Trim();
         }
 
-        public float GetMovementForceValue(bool adjustForGravity)
-        {
-            var force = GetHighInHighOutInRange(Attributes.Strength, 200, 500);
-
-            return adjustForGravity
-                ? force * 2f
-                : force;
-        }
-
         public virtual float GetRange()
         {
             var returnValue = Attributes.Range / 100f * 15 + 5;

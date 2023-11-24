@@ -347,8 +347,12 @@ namespace FullPotential.Core.Gameplay.Combat
             }
 
             var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
-            var force = itemUsed?.GetMovementForceValue(adjustForGravity)
-                ?? ItemForCombatBase.GetHighInHighOutInRange(sourceFighter.GetAttributeValue(AttributeAffected.Strength), 200, 500);
+            var strength = itemUsed?.Attributes.Strength ?? sourceFighter.GetAttributeValue(AttributeAffected.Strength);
+            var rawForce = ItemForCombatBase.GetHighInHighOutInRange(strength, 100, 300);
+
+            var force = adjustForGravity
+                ? rawForce * 2f
+                : rawForce;
 
             force *= effectPercentage;
 
@@ -418,10 +422,12 @@ namespace FullPotential.Core.Gameplay.Combat
                     return;
             }
 
-            targetRigidBody.AddForce(forceToApply, ForceMode.Acceleration);
+            const ForceMode forceMode = ForceMode.Force;
+
+            targetRigidBody.AddForce(forceToApply, forceMode);
 
             var nearbyClients = _rpcService.ForNearbyPlayersExcept(targetGameObject.transform.position, 0);
-            targetMoveable.ApplyMovementForceClientRpc(forceToApply, ForceMode.Acceleration, nearbyClients);
+            targetMoveable.ApplyMovementForceClientRpc(forceToApply, forceMode, nearbyClients);
         }
 
         public float AddVariationToValue(float basicValue)
