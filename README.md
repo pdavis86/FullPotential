@@ -3,8 +3,15 @@ This game allows the player to explore their abilities in a new way have drawn i
 
 
 ## Key Features
-- There is no player level. Each weapon type and spell type has its own level.
-- Components for crafting items or spells have randomly generated stats. This means you can craft any level item/spell but can only use it once you reach the required skill level.
+- There is no player level! But you do level particular skills.
+- Components for crafting items have randomly generated stats. This means you can craft any level item/spell but can only use it once you reach the required skill level.
+
+### Combat
+Choose the appropriate item for the situation
+- Ranged Weapon. Uses ammunition so be sure to have enough. Does x2 damage if two-handed.
+- Use mana/energy/other to attack, heal, buff, debuff, etc. at range or up close.
+- Melee Weapon. Does x2 damage or x4 damage if two-handed.
+- Defensive. Want to tank? Take a defensive item into battle.
 
 
 ## Feedback
@@ -20,7 +27,7 @@ This game allows the player to explore their abilities in a new way have drawn i
 ## Code Structure
 - API is the code required for any third-party development to be compliant with the game 
 - Core is the code fundamental to the game working 
-- Standard is my implementation using the API to add Scenes, Accessories, Armor, Effects, Enemies, Loot, Spells, Gadgets, and Weapons to the game 
+- Standard is my implementation using the API to add Scenes, Accessories, Armor, Consumers, Effects, Enemies, Loot, and Weapons to the game 
 
 
 ## Product Roadmap
@@ -31,7 +38,10 @@ See the [Project Trello Board](https://trello.com/b/biH6NdE0/oasis "Go to Trello
 - [x] v0.2 Core Gameplay (Additional)
 - [x] v0.3 Playable PoC
 - [ ] v0.4 Battle Improvements
-- [ ] v0.5 Playable Demo
+- [ ] v0.5 Infrastructure Improvements
+- [ ] v0.6 Code Improvements
+- [ ] v0.7 UI, Inventory, & Crafting
+- [ ] v0.8 Playable Demo
 - [ ] v0.x Zones, planets, and sectors
 
 
