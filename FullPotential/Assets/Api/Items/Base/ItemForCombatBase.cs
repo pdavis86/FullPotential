@@ -184,11 +184,11 @@ namespace FullPotential.Api.Items.Base
             return (int)Math.Ceiling(Attributes.Strength / StrengthDivisor);
         }
 
-        public int GetStatChange(IStatEffect statEffect)
+        public int GetResourceChange(IResourceEffect resourceEffect)
         {
             var change = GetAdjustedStrength();
 
-            if (statEffect.AffectType is AffectType.PeriodicDecrease or AffectType.SingleDecrease or AffectType.TemporaryMaxDecrease)
+            if (resourceEffect.AffectType is AffectType.PeriodicDecrease or AffectType.SingleDecrease or AffectType.TemporaryMaxDecrease)
             {
                 change *= -1;
             }
@@ -196,9 +196,9 @@ namespace FullPotential.Api.Items.Base
             return change;
         }
 
-        public (int Change, DateTime Expiry) GetStatChangeAndExpiry(IStatEffect statEffect)
+        public (int Change, DateTime Expiry) GetResourceChangeAndExpiry(IResourceEffect resourceEffect)
         {
-            var change = GetStatChange(statEffect);
+            var change = GetResourceChange(resourceEffect);
             var timeToLive = GetEffectDuration();
 
             return (change, DateTime.Now.AddSeconds(timeToLive));
@@ -211,9 +211,9 @@ namespace FullPotential.Api.Items.Base
             return (damagePerItem * numberOfItems) / (numberOfItems / itemsPerSecond + reloadTime);
         }
 
-        public float GetPeriodicStatDamagePerSecond(IStatEffect statEffect)
+        public float GetPeriodicStatDamagePerSecond(IResourceEffect resourceEffect)
         {
-            return GetPeriodicStatDamagePerSecond(GetStatChange(statEffect));
+            return GetPeriodicStatDamagePerSecond(GetResourceChange(resourceEffect));
         }
 
         private float GetPeriodicStatDamagePerSecond(int change)
@@ -232,12 +232,12 @@ namespace FullPotential.Api.Items.Base
             return GetDamagePerSecond((float)change / maxNumberOfTimes, minNumberOfTimes, effectsPerSecond, 0);
         }
 
-        public (int Change, DateTime Expiry, float delay) GetPeriodicStatChangeExpiryAndDelay(IStatEffect statEffect)
+        public (int Change, DateTime Expiry, float delay) GetPeriodicResourceChangeExpiryAndDelay(IResourceEffect resourceEffect)
         {
-            return GetPeriodicStatChangeExpiryAndDelay(GetStatChange(statEffect));
+            return GetPeriodicResourceChangeExpiryAndDelay(GetResourceChange(resourceEffect));
         }
 
-        public (int Change, DateTime Expiry, float delay) GetPeriodicStatChangeExpiryAndDelay(int change)
+        public (int Change, DateTime Expiry, float delay) GetPeriodicResourceChangeExpiryAndDelay(int change)
         {
             var timeToLive = GetEffectDuration();
             var delay = GetEffectTimeBetween();

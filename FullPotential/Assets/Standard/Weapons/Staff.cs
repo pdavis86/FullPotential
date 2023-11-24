@@ -5,9 +5,9 @@ namespace FullPotential.Standard.Weapons
 {
     public class Staff : IWeapon
     {
-        public Guid TypeId => new Guid("081f7708-9909-424f-bdd1-f39f487c018a");
+        public const string TypeIdString = "081f7708-9909-424f-bdd1-f39f487c018a";
 
-        public string TypeName => nameof(Staff);
+        public Guid TypeId => new Guid(TypeIdString);
 
         public bool IsDefensive => false;
 
@@ -18,9 +18,5 @@ namespace FullPotential.Standard.Weapons
         public bool AllowTwoHanded => true;
 
         public bool EnforceTwoHanded => true;
-
-        public string PrefabAddress => null;
-
-        public string PrefabAddressTwoHanded => "Standard/Prefabs/Weapons/Staff.prefab";
     }
 }

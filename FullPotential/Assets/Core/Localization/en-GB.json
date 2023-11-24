@@ -3,43 +3,14 @@
   "Name": "English (United Kingdom)",
   "Translations": [
 	{
-      "Key": "accessorytype.amulet",
-      "Value": "Amulet"
+      "Key": "slot.lefthand",
+      "Value": "Left Hand"
     },
-    {
-      "Key": "accessorytype.belt",
-      "Value": "Belt"
+	{
+      "Key": "slot.righthand",
+      "Value": "Right Hand"
     },
-    {
-      "Key": "accessorytype.ring",
-      "Value": "Ring"
-    },
-    {
-      "Key": "accessorytype.reloader",
-      "Value": "Reanged Weapon Reloader"
-    },
-
-
-    {
-      "Key": "armortype.helm",
-      "Value": "Helm"
-    },
-    {
-      "Key": "armortype.chest",
-      "Value": "Chest"
-    },
-    {
-      "Key": "armortype.legs",
-      "Value": "Legs"
-    },
-    {
-      "Key": "armortype.feet",
-      "Value": "Feet"
-    },
-    {
-      "Key": "armortype.barrier",
-      "Value": "Barrier"
-    },
+	
 	
 	{
       "Key": "craftabletype.weapon",
@@ -57,22 +28,26 @@
       "Key": "craftabletype.consumer",
       "Value": "Consumer"
     },
+    {
+      "Key": "craftabletype.special",
+      "Value": "Special"
+    },
 	
 	
     {
-      "Key": "resourcetype.health",
+      "Key": "resource.health",
       "Value": "Health"
     },
     {
-      "Key": "resourcetype.stamina",
+      "Key": "resource.stamina",
       "Value": "Stamina"
     },
     {
-      "Key": "resourcetype.mana",
+      "Key": "resource.mana",
       "Value": "Mana"
     },
     {
-      "Key": "resourcetype.energy",
+      "Key": "resource.energy",
       "Value": "Energy"
     },
     
@@ -282,34 +257,6 @@
     {
       "Key": "attribute.units.percent",
       "Value": "%"
-    },
-    
-
-    {
-      "Key": "shape.wall",
-      "Value": "Wall"
-    },
-    {
-      "Key": "shape.zone",
-      "Value": "Zone"
-    },
-
-
-    {
-      "Key": "targeting.pointtopoint",
-      "Value": "Point-to-point"
-    },
-    {
-      "Key": "targeting.projectile",
-      "Value": "Projectile"
-    },
-    {
-      "Key": "targeting.self",
-      "Value": "Self"
-    },
-    {
-      "Key": "targeting.touch",
-      "Value": "Touch"
     },
 
 
@@ -589,12 +536,6 @@
     {
       "Key": "combat.attack.critical",
       "Value": "CRIT:"
-    },
-	
-	{
-      "Key": "noweaponreloader",
-      "Value": "No weapon reloader equipped.\nRemaining ammo will be lost when you reload!"
     }
-
   ]
 }

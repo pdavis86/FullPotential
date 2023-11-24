@@ -5,7 +5,8 @@
         "Unity.Netcode.Runtime",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
-        "FullPotential.Api"
+        "FullPotential.Api",
+        "Unity.Collections"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

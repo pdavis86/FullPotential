@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
-using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Weapons;
@@ -149,11 +150,15 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
             var itemB = new ItemStack { Id = "b", Count = 5, RegistryType = _stackRegistryType1.Object };
             _inventory.Items.Add(itemB.Id, itemB);
 
+            var itemC = new ItemStack { Id = "c", Count = 5, RegistryType = _stackRegistryType1.Object };
+            _inventory.Items.Add(itemC.Id, itemC);
+
             var result = _inventory.TakeItemStack(_stackRegistryType1.Object.TypeId.ToString(), 7);
 
             Assert.IsTrue(result.Count == 7);
             Assert.IsNull(_inventory.GetItemWithId<ItemStack>(itemA.Id, false));
             Assert.IsTrue(_inventory.GetItemWithId<ItemStack>(itemB.Id).Count == 3);
+            Assert.IsTrue(_inventory.GetItemWithId<ItemStack>(itemC.Id).Count == 5);
         }
 
         [Test]
@@ -175,6 +180,11 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
             public void TriggerMergeItemStacks(ItemStack itemStack)
             {
                 MergeItemStacks(itemStack);
+            }
+
+            protected override void SetEquippedItem(string itemId, string slotId)
+            {
+                //Nothing here
             }
         }
     }

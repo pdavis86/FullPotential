@@ -1,5 +1,4 @@
 ﻿using System;
-using FullPotential.Api.Obsolete;
 
 namespace FullPotential.Core.UI.Events
 {
@@ -8,18 +7,18 @@ namespace FullPotential.Core.UI.Events
         public string EventSource { get; }
         public string DrawnShape { get; }
         public string ItemId { get; }
-        public SlotGameObjectName? SlotGameObjectName { get; }
+        public string SlotId { get; }
 
         public OnDrawingStopEventArgs(
             string eventSource,
             string drawnShape,
             string itemId,
-            SlotGameObjectName? slotGameObjectName)
+            string slotId)
         {
             EventSource = eventSource;
             DrawnShape = drawnShape;
             ItemId = itemId;
-            SlotGameObjectName = slotGameObjectName;
+            SlotId = slotId;
         }
     }
 }

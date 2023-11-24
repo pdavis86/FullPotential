@@ -7,8 +7,6 @@ namespace FullPotential.Standard.Effects.Support
     {
         public Guid TypeId => new Guid("668f5ab8-0f8d-4f8c-8e88-90eb7367d22a");
 
-        public string TypeName => nameof(Summon);
-
         public void ApplyEffect()
         {
             throw new NotImplementedException();

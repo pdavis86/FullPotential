@@ -8,8 +8,8 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Obsolete;
 using FullPotential.Api.Persistence;
+using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Services;
@@ -91,7 +91,7 @@ namespace FullPotential.Core.Player
         [HideInInspector] public string PlayerToken { get; set; }
         [HideInInspector] public string Username { get; private set; }
 
-        public IPlayerInventory Inventory { get; private set; }
+        public IPlayerInventory PlayerInventory { get; private set; }
 
         public override Transform Transform => transform;
 
@@ -115,8 +115,8 @@ namespace FullPotential.Core.Player
             //_mana.OnValueChanged += OnManaChanged;
             //_energy.OnValueChanged += OnEnergyChanged;
 
-            Inventory = GetComponent<PlayerInventory>();
-            _inventory = Inventory;
+            PlayerInventory = GetComponent<PlayerInventory>();
+            _inventory = (InventoryBase)PlayerInventory;
             _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
 
             _userRepository = DependenciesContext.Dependencies.GetService<IUserRepository>();
@@ -228,10 +228,7 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         private void RespawnServerRpc()
         {
-            _stamina.Value = GetStaminaMax();
-            _health.Value = GetHealthMax();
-            _mana.Value = GetManaMax();
-            _energy.Value = GetEnergyMax();
+            SetResourceValuesForRespawn();
 
             AliveState = LivingEntityState.Respawning;
 
@@ -453,9 +450,6 @@ namespace FullPotential.Core.Player
         {
             var playerData = _userRepository.Load(PlayerToken, null, reduced);
 
-            //todo: zzz v0.5 remove, it was for backwards compatibility
-            playerData.Resources ??= Array.Empty<Api.Utilities.Data.KeyValuePair<string, int>>();
-
             if (sendToClientId.HasValue)
             {
                 //Don't send data to the server. It already has it loaded
@@ -478,7 +472,7 @@ namespace FullPotential.Core.Player
             }
         }
 
-        //NOTE: Need this to get over the key not found exception caused by too many RPC calls with large payloads
+        //todo: zzz v0.6 - Remove? Need this to get over the key not found exception caused by too many RPC calls with large payloads
         private IEnumerator LoadFromPlayerDataCoroutine(PlayerData playerData, ulong clientId)
         {
             var clientRpcParams = new ClientRpcParams
@@ -500,13 +494,16 @@ namespace FullPotential.Core.Player
 
             if (IsServer)
             {
-                var health = playerData.Resources.FirstOrDefault(x => x.Key == nameof(ResourceType.Health)).Value;
+                var health = playerData.Resources.FirstOrDefault(x => x.Key == nameof(ResourceTypeIds.Health)).Value;
 
                 _entityName.Value = Username;
-                _energy.Value = playerData.Resources.FirstOrDefault(x => x.Key == nameof(ResourceType.Energy)).Value;
-                _health.Value = health > 0 ? health : GetHealthMax();
-                _mana.Value = playerData.Resources.FirstOrDefault(x => x.Key == nameof(ResourceType.Mana)).Value;
-                _stamina.Value = playerData.Resources.FirstOrDefault(x => x.Key == nameof(ResourceType.Stamina)).Value;
+
+                SetResourceValue(ResourceTypeIds.HealthId, health > 0 ? health : GetResourceMax(ResourceTypeIds.HealthId));
+
+                foreach (var resource in _sortedResources)
+                {
+                    SetResourceValue(resource.TypeId.ToString(), playerData.Resources.FirstOrDefault(x => x.Key == resource.GetType().Name).Value);
+                }
             }
 
             try
@@ -666,15 +663,13 @@ namespace FullPotential.Core.Player
 
         public PlayerData UpdateAndReturnPlayerData()
         {
-            _saveData.Resources = new[]
-            {
-                new Api.Utilities.Data.KeyValuePair<string, int>(nameof(ResourceType.Energy), _energy.Value),
-                new Api.Utilities.Data.KeyValuePair<string, int>(nameof(ResourceType.Health), _health.Value),
-                new Api.Utilities.Data.KeyValuePair<string, int>(nameof(ResourceType.Mana), _mana.Value),
-                new Api.Utilities.Data.KeyValuePair<string, int>(nameof(ResourceType.Stamina), _stamina.Value),
-            };
+            _saveData.Resources = _sortedResources
+                .Select(resource => new Api.Utilities.Data.KeyValuePair<string, int>(
+                    resource.GetType().Name,
+                    GetResourceValue(resource.TypeId.ToString())))
+                .ToArray();
 
-            _saveData.Inventory = Inventory.GetSaveData();
+            _saveData.Inventory = PlayerInventory.GetSaveData();
 
             return _saveData;
         }

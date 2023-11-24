@@ -57,44 +57,64 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Standard\Weapons\Shield.cs" />
+    <Compile Include="Assets\Standard\Accessories\Barrier.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Endurance.cs" />
+    <Compile Include="Assets\Standard\Accessories\BarrierEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Repel.cs" />
     <Compile Include="Assets\Standard\Enemies\Behaviours\EnemyState.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Slow.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Air.cs" />
+    <Compile Include="Assets\Standard\WeaponVisuals\BasicBow.cs" />
+    <Compile Include="Assets\Standard\Armor\Helm.cs" />
+    <Compile Include="Assets\Standard\Armor\Legs.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Poison.cs" />
+    <Compile Include="Assets\Standard\Shapes\Zone.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Hold.cs" />
-    <Compile Include="Assets\Standard\Armor\LeatherHelmet.cs" />
+    <Compile Include="Assets\Standard\ArmorVisuals\LeatherHelmet.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Stengthen.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\LifeTap.cs" />
-    <Compile Include="Assets\Standard\Armor\BasicWard.cs" />
-    <Compile Include="Assets\Standard\Shapes\ZoneOfFlames.cs" />
+    <Compile Include="Assets\Standard\AccessoryVisuals\BasicWard.cs" />
+    <Compile Include="Assets\Standard\WeaponVisuals\BasicShield.cs" />
+    <Compile Include="Assets\Standard\WeaponVisuals\BasicCrossbow.cs" />
+    <Compile Include="Assets\Standard\WeaponVisuals\BasicGun2.cs" />
+    <Compile Include="Assets\Standard\ShapeVisuals\ZoneOfFlames.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Heal.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Haste.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Fear.cs" />
+    <Compile Include="Assets\Standard\WeaponVisuals\BasicGun.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Launch.cs" />
-    <Compile Include="Assets\Standard\Armor\LeatherJerkin.cs" />
-    <Compile Include="Assets\Standard\Shapes\WallOfFlames.cs" />
+    <Compile Include="Assets\Standard\ArmorVisuals\LeatherJerkin.cs" />
+    <Compile Include="Assets\Standard\Targeting\Projectile.cs" />
+    <Compile Include="Assets\Standard\ShapeVisuals\WallOfFlames.cs" />
+    <Compile Include="Assets\Standard\Targeting\Self.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveRight.cs" />
     <Compile Include="Assets\Standard\Loot\Junk.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Weaken.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Surge.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Plummet.cs" />
-    <Compile Include="Assets\Standard\Armor\LeatherGreaves.cs" />
+    <Compile Include="Assets\Standard\TargetingVisuals\BeamVisualsBehaviour.cs" />
+    <Compile Include="Assets\Standard\ArmorVisuals\LeatherGreaves.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Reflect.cs" />
+    <Compile Include="Assets\Standard\Shapes\ZoneBehaviour.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Lunge.cs" />
     <Compile Include="Assets\Standard\Weapons\Bow.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Conjure.cs" />
     <Compile Include="Assets\Standard\Weapons\Axe.cs" />
+    <Compile Include="Assets\Standard\Accessories\Ring.cs" />
+    <Compile Include="Assets\Standard\Targeting\PointToPointBehaviour.cs" />
+    <Compile Include="Assets\Standard\Accessories\Belt.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\ManaTap.cs" />
     <Compile Include="Assets\Standard\Registration.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Ice.cs" />
     <Compile Include="Assets\Standard\Loot\Shard.cs" />
-    <Compile Include="Assets\Standard\Accessories\SilverNecklace.cs" />
+    <Compile Include="Assets\Standard\Targeting\ProjectileBehaviour.cs" />
+    <Compile Include="Assets\Standard\AccessoryVisuals\SilverNecklace.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Hurt.cs" />
+    <Compile Include="Assets\Standard\WeaponVisuals\BasicHammer.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Lightning.cs" />
     <Compile Include="Assets\Standard\Weapons\Gun.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Distract.cs" />
+    <Compile Include="Assets\Standard\WeaponVisuals\BasicSword2.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Courage.cs" />
     <Compile Include="Assets\Standard\Scenes\Behaviours\ShopInteractable.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Fire.cs" />
@@ -106,26 +126,46 @@
     <Compile Include="Assets\Standard\Effects\Support\Float.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Regeneration.cs" />
     <Compile Include="Assets\Standard\Ammo\Arrow.cs" />
-    <Compile Include="Assets\Standard\Armor\LeatherBoots.cs" />
+    <Compile Include="Assets\Standard\ArmorVisuals\LeatherBoots.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Focus.cs" />
-    <Compile Include="Assets\Standard\Accessories\SilverRing.cs" />
-    <Compile Include="Assets\Standard\Targeting\ProjectileFlames.cs" />
+    <Compile Include="Assets\Standard\AccessoryVisuals\SilverRing.cs" />
+    <Compile Include="Assets\Standard\TargetingVisuals\ProjectileFlames.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Lethargy.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\ShortCircuit.cs" />
+    <Compile Include="Assets\Standard\WeaponVisuals\BasicSword.cs" />
+    <Compile Include="Assets\Standard\SpecialSlots\RangedWeaponReloader.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Water.cs" />
+    <Compile Include="Assets\Standard\TargetingVisuals\BeamOfFlames.cs" />
+    <Compile Include="Assets\Standard\WeaponVisuals\BasicHammer2.cs" />
+    <Compile Include="Assets\Standard\WeaponVisuals\BasicDagger.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Reloader\ReloaderSlotChangeEventHandler.cs" />
+    <Compile Include="Assets\Standard\WeaponVisuals\BasicAxe.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\StepBack.cs" />
-    <Compile Include="Assets\Standard\Accessories\LeatherBelt.cs" />
+    <Compile Include="Assets\Standard\AccessoryVisuals\LeatherBelt.cs" />
     <Compile Include="Assets\Standard\Scenes\Behaviours\SceneObjectsLevel001.cs" />
     <Compile Include="Assets\Standard\Ammo\Bullet.cs" />
+    <Compile Include="Assets\Standard\Shapes\WallBehaviour.cs" />
+    <Compile Include="Assets\Standard\WeaponVisuals\BasicStaff.cs" />
     <Compile Include="Assets\Standard\Weapons\Staff.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\ManaDrain.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Earth.cs" />
+    <Compile Include="Assets\Standard\Shapes\Wall.cs" />
+    <Compile Include="Assets\Standard\Targeting\Touch.cs" />
+    <Compile Include="Assets\Standard\WeaponVisuals\BasicAxe2.cs" />
     <Compile Include="Assets\Standard\Enemies\Behaviours\EnemyInventory.cs" />
     <Compile Include="Assets\Standard\Loot\Scrap.cs" />
+    <Compile Include="Assets\Standard\Armor\Chest.cs" />
+    <Compile Include="Assets\Standard\Targeting\PointToPoint.cs" />
+    <Compile Include="Assets\Standard\Armor\Feet.cs" />
     <Compile Include="Assets\Standard\Weapons\Sword.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Attract.cs" />
+    <Compile Include="Assets\Standard\Accessories\Amulet.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveLeft.cs" />
-    <Compile Include="Assets\Standard\Accessories\ConsolidatorReloader.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Reloader\ConsolidatorReloader\ReloadEventHandler.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Reloader\ConsolidatorReloader\ConsolidatorReloader.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\ShotFiredEventHandler.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\TeleportReloader.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\ReloadEventHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Standard\FullPotential.Standard.asmdef" />
@@ -796,6 +836,9 @@
     </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Collections">
+      <HintPath>Library\ScriptAssemblies\Unity.Collections.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>

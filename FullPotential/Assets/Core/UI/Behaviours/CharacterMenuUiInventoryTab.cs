@@ -54,7 +54,7 @@ namespace FullPotential.Core.UI.Behaviours
                 null,
                 _componentsContainer,
                 _inventoryRowPrefab,
-                _playerState.Inventory,
+                _playerState.PlayerInventory,
                 null,
                 null,
                 true,
@@ -89,7 +89,7 @@ namespace FullPotential.Core.UI.Behaviours
             _characterMenuUi.DarkOverlay.SetActive(false);
             _drawingPadUi.gameObject.SetActive(false);
 
-            var success = _playerState.Inventory.SetAssignedShape(e.ItemId, e.DrawnShape);
+            var success = _playerState.PlayerInventory.SetAssignedShape(e.ItemId, e.DrawnShape);
 
             if (!success)
             {

@@ -1,18 +1,16 @@
 ﻿using System;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Obsolete;
+using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Standard.Effects.Buffs
 {
-    public class Endurance : IStatEffect
+    public class Endurance : IResourceEffect
     {
         public Guid TypeId => new Guid("29fa3077-627c-4cc2-9efc-8293ad7ce52d");
 
-        public string TypeName => nameof(Endurance);
-
         public AffectType AffectType => AffectType.TemporaryMaxIncrease;
 
-        public ResourceType StatToAffect => ResourceType.Stamina;
+        public Guid ResourceTypeId => ResourceTypeIds.Stamina;
     }
 }

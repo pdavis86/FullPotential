@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.Types;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
@@ -14,6 +16,7 @@ using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
+using FullPotential.Core.Registry.Events;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -24,24 +27,40 @@ namespace FullPotential.Core.Registry
 {
     public class TypeRegistry : ITypeRegistry
     {
-        private readonly List<IAccessoryVisuals> _accessoryVisuals = new List<IAccessoryVisuals>();
-        private readonly List<IArmorVisuals> _armorVisuals = new List<IArmorVisuals>();
-        private readonly List<ITargetingVisuals> _targetingVisuals = new List<ITargetingVisuals>();
-        private readonly List<IShapeVisuals> _shapeVisuals = new List<IShapeVisuals>();
-
-        private readonly List<IWeapon> _weaponTypes = new List<IWeapon>();
-        private readonly List<ILoot> _lootTypes = new List<ILoot>();
-        private readonly List<IAmmunition> _ammoTypes = new List<IAmmunition>();
-        private readonly List<IEffect> _effectTypes = new List<IEffect>();
-        private readonly List<ITargeting> _targetingTypes = new List<ITargeting>();
-        private readonly List<IShape> _shapeTypes = new List<IShape>();
-
-        private readonly Dictionary<string, GameObject> _loadedAddressables = new Dictionary<string, GameObject>();
+        private readonly HashSet<Guid> _registeredTypeIds = new HashSet<Guid>();
+        private readonly Dictionary<Type, IList> _registeredTypeLists = new Dictionary<Type, IList>();
+        private readonly Dictionary<string, object> _loadedAddressables = new Dictionary<string, object>();
         private readonly IEventManager _eventManager;
+        private readonly Func<object, bool>[] _registerTypeFunctions;
+        private readonly Func<object, bool>[] _registerVisualsFunctions;
 
         public TypeRegistry(IEventManager eventManager)
         {
             _eventManager = eventManager;
+
+            _registerTypeFunctions = new Func<object, bool>[]
+            {
+                AddToRegister<IResource>,
+                AddToRegister<IAccessory>,
+                AddToRegister<IAmmunition>,
+                AddToRegister<IArmor>,
+                AddToRegister<IEffect>,
+                AddToRegister<ILoot>,
+                AddToRegister<IShape>,
+                AddToRegister<ISpecialGear>,
+                AddToRegister<ITargeting>,
+                AddToRegister<IWeapon>,
+                AddToRegister<IRegisterableWithSlot>,
+            };
+
+            _registerVisualsFunctions = new Func<object, bool>[]
+            {
+                AddToRegister<IAccessoryVisuals>,
+                AddToRegister<IArmorVisuals>,
+                AddToRegister<IShapeVisuals>,
+                AddToRegister<ITargetingVisuals>,
+                AddToRegister<IWeaponVisuals>
+            };
         }
 
         public void FindAndRegisterAll(List<string> modPrefixes)
@@ -74,13 +93,15 @@ namespace FullPotential.Core.Registry
 
         private void RegisterCoreTypes()
         {
-            ValidateAndRegister(typeof(Api.Gameplay.Targeting.PointToPoint));
-            ValidateAndRegister(typeof(Api.Gameplay.Targeting.Projectile));
-            ValidateAndRegister(typeof(Api.Gameplay.Targeting.Self));
-            ValidateAndRegister(typeof(Api.Gameplay.Targeting.Touch));
+            ValidateAndRegister(typeof(SpecialSlots.LeftHand));
+            ValidateAndRegister(typeof(SpecialSlots.RightHand));
 
-            ValidateAndRegister(typeof(Api.Gameplay.Shapes.Wall));
-            ValidateAndRegister(typeof(Api.Gameplay.Shapes.Zone));
+            ValidateAndRegister(typeof(Resources.Health));
+            ValidateAndRegister(typeof(Resources.Stamina));
+            ValidateAndRegister(typeof(Resources.Mana));
+            ValidateAndRegister(typeof(Resources.Energy));
+
+            _eventManager.Subscribe(LivingEntityBase.EventIdResourceValueChanged, new LivingEntityDiedEventHandler());
         }
 
         private void HandleModRegistration(IMod mod)
@@ -90,11 +111,14 @@ namespace FullPotential.Core.Registry
                 ValidateAndRegister(t);
             }
 
-            ValidateCrossTypeLinks();
+            foreach (var t in mod.GetRegisterableVisuals())
+            {
+                ValidateAndRegisterVisuals(t);
+            }
 
             foreach (var address in mod.GetNetworkPrefabAddresses())
             {
-                LoadAddessable(address, gameObject =>
+                LoadAddessable<GameObject>(address, gameObject =>
                 {
                     var networkObject = gameObject.GetComponent<NetworkObject>();
 
@@ -138,66 +162,14 @@ namespace FullPotential.Core.Registry
                     return;
                 }
 
-                var toRegister = Activator.CreateInstance(type);
+                var objectToRegister = Activator.CreateInstance(type);
 
-                if (toRegister is IAccessoryVisuals accessory)
+                foreach (var functionToRun in _registerTypeFunctions)
                 {
-                    AddToRegister(_accessoryVisuals, accessory);
-                    return;
-                }
-
-                if (toRegister is IArmorVisuals armor)
-                {
-                    AddToRegister(_armorVisuals, armor);
-                    return;
-                }
-
-                if (toRegister is IAmmunition ammoType)
-                {
-                    AddToRegister(_ammoTypes, ammoType);
-                    return;
-                }
-
-                if (toRegister is IWeapon craftableWeapon)
-                {
-                    AddToRegister(_weaponTypes, craftableWeapon);
-                    return;
-                }
-
-                if (toRegister is ILoot loot)
-                {
-                    AddToRegister(_lootTypes, loot);
-                    return;
-                }
-
-                if (toRegister is IEffect effect)
-                {
-                    AddToRegister(_effectTypes, effect);
-                    return;
-                }
-
-                if (toRegister is ITargeting targeting)
-                {
-                    AddToRegister(_targetingTypes, targeting);
-                    return;
-                }
-
-                if (toRegister is ITargetingVisuals targetingVisuals)
-                {
-                    AddToRegister(_targetingVisuals, targetingVisuals);
-                    return;
-                }
-
-                if (toRegister is IShape shape)
-                {
-                    AddToRegister(_shapeTypes, shape);
-                    return;
-                }
-
-                if (toRegister is IShapeVisuals shapeVisuals)
-                {
-                    AddToRegister(_shapeVisuals, shapeVisuals);
-                    return;
+                    if (functionToRun(objectToRegister))
+                    {
+                        return;
+                    }
                 }
 
                 Debug.LogError($"{type.FullName} does not implement any of the valid interfaces");
@@ -208,76 +180,103 @@ namespace FullPotential.Core.Registry
             }
         }
 
-        private void AddToRegister<T>(List<T> list, T item) where T : IRegisterable
+        private void ValidateAndRegisterVisuals(Type type)
         {
-            var match = list.FirstOrDefault(x => x.TypeId == item.TypeId);
-            if (match != null)
+            try
             {
-                Debug.LogError($"A type with ID '{item.TypeId}' has already been registered");
-                return;
-            }
+                if (!typeof(IVisuals).IsAssignableFrom(type))
+                {
+                    Debug.LogError($"{type.Name} does not implement {nameof(IVisuals)}");
+                    return;
+                }
 
-            list.Add(item);
+                var objectToRegister = Activator.CreateInstance(type);
+                var objectAsVisuals = (IVisuals)objectToRegister;
+
+                if (!_registeredTypeIds.Contains(objectAsVisuals.ApplicableToTypeId))
+                {
+                    Debug.LogError($"{objectAsVisuals.GetType().FullName} refers to a type that is not registered with ID {objectAsVisuals.ApplicableToTypeId}");
+                    return;
+                }
+
+                foreach (var functionToRun in _registerVisualsFunctions)
+                {
+                    if (functionToRun(objectToRegister))
+                    {
+                        return;
+                    }
+                }
+
+                Debug.LogError($"{type.FullName} does not implement any of the valid {nameof(IVisuals)} interfaces");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"{type.FullName} failed to register: " + ex);
+            }
         }
 
-        private void ValidateCrossTypeLinks()
+        private bool AddToRegister<T>(object objectToRegister) where T : IRegisterable
         {
-            var invalidTargetingVisuals = new List<ITargetingVisuals>();
-            foreach (var targetingVisual in _targetingVisuals)
+            if (objectToRegister is not T objectAsT)
             {
-                if (_targetingTypes.FirstOrDefault(t => t.TypeId == targetingVisual.TargetingTypeId) == null)
-                {
-                    Debug.LogError($"{targetingVisual.GetType().FullName} refers to a targeting type that is not registered");
-                    invalidTargetingVisuals.Add(targetingVisual);
-                }
+                return false;
             }
 
-            foreach (var targetingVisual in invalidTargetingVisuals)
+            if (!_registeredTypeLists.ContainsKey(typeof(T)))
             {
-                _targetingVisuals.Remove(targetingVisual);
+                _registeredTypeLists.Add(typeof(T), new List<T>());
             }
 
-            var invalidShapeVisuals = new List<IShapeVisuals>();
-            foreach (var shapeVisual in _shapeVisuals)
+            var list = _registeredTypeLists[typeof(T)];
+
+            var match = list.Cast<T>().FirstOrDefault(x => x.TypeId == objectAsT.TypeId);
+            if (match != null)
             {
-                if (_shapeTypes.FirstOrDefault(t => t.TypeId == shapeVisual.ShapeTypeId) == null)
-                {
-                    Debug.LogError($"{shapeVisual.GetType().FullName} refers to a shape type that is not registered");
-                    invalidShapeVisuals.Add(shapeVisual);
-                }
+                Debug.LogError($"A type with ID '{objectAsT.TypeId}' has already been registered");
+                return true;
             }
 
-            foreach (var shapeVisual in invalidShapeVisuals)
-            {
-                _shapeVisuals.Remove(shapeVisual);
-            }
+            _registeredTypeIds.Add(objectAsT.TypeId);
+            list.Add(objectAsT);
+
+            return true;
         }
 
         public IEnumerable<T> GetRegisteredTypes<T>() where T : IRegisterable
         {
-            var interfaceName = typeof(T).Name;
-            switch (interfaceName)
+            if (!_registeredTypeLists.ContainsKey(typeof(T)))
             {
-                case nameof(IAccessoryVisuals): return (IEnumerable<T>)_accessoryVisuals;
-                case nameof(IArmorVisuals): return (IEnumerable<T>)_armorVisuals;
-                case nameof(IWeapon): return (IEnumerable<T>)_weaponTypes;
-                case nameof(ILoot): return (IEnumerable<T>)_lootTypes;
-                case nameof(IAmmunition): return (IEnumerable<T>)_ammoTypes;
-                case nameof(IEffect): return (IEnumerable<T>)_effectTypes;
-                case nameof(IShape): return (IEnumerable<T>)_shapeTypes;
-                case nameof(IShapeVisuals): return (IEnumerable<T>)_shapeVisuals;
-                case nameof(ITargeting): return (IEnumerable<T>)_targetingTypes;
-                case nameof(ITargetingVisuals): return (IEnumerable<T>)_targetingVisuals;
-                default: throw new Exception($"Unexpected type {interfaceName}");
+                throw new Exception($"Unexpected type '{typeof(T).Name}'");
             }
+
+            return _registeredTypeLists[typeof(T)].Cast<T>();
         }
 
-        public T GetRegisteredByTypeName<T>(string typeName) where T : IRegisterable
+        public T GetRegisteredByTypeId<T>(string typeId) where T : IRegisterable
         {
-            return GetRegisteredTypes<T>().FirstOrDefault(x => x.TypeName.Equals(typeName, StringComparison.OrdinalIgnoreCase));
+            return GetRegisteredTypes<T>().FirstOrDefault(x => x.TypeId.ToString() == typeId);
         }
 
-        private T GetRegisteredById<T>(string typeId) where T : IRegisterable
+        public IRegisterable GetAnyRegisteredBySlotId(string slotId)
+        {
+            var typeId = slotId.Split(";")[0];
+
+            foreach (var kvp in _registeredTypeLists)
+            {
+                var match = kvp.Value
+                    .Cast<IRegisterable>()
+                    .FirstOrDefault(x => x.TypeId.ToString() == typeId);
+
+                if (match != null)
+                {
+                    return match;
+                }
+            }
+
+            return null;
+        }
+
+        private T GetRegistryTypeById<T>(string typeId) where T : IRegisterable
         {
             var craftablesOfType = GetRegisteredTypes<T>();
 
@@ -286,7 +285,7 @@ namespace FullPotential.Core.Registry
                 return (T)(object)null;
             }
 
-            var matches = craftablesOfType.Where(x => x.TypeId == new Guid(typeId)).ToList();
+            var matches = craftablesOfType.Where(x => x.TypeId.ToString() == typeId).ToList();
 
             if (!matches.Any())
             {
@@ -301,52 +300,51 @@ namespace FullPotential.Core.Registry
             return matches.First();
         }
 
-        public IRegisterable GetRegisteredForItem(ItemBase item)
+        private IRegisterable GetItemStackRegistryType(ItemBase item)
+        {
+            return _registeredTypeLists[typeof(IAmmunition)].Cast<IAmmunition>().FirstOrDefault(x => x.TypeId.ToString() == item.RegistryTypeId);
+        }
+
+        public IRegisterable GetRegistryTypeForItem(ItemBase item)
         {
             switch (item)
             {
-                case Accessory:
-                    return GetRegisteredById<IAccessoryVisuals>(item.RegistryTypeId);
-                case Armor:
-                    return GetRegisteredById<IArmorVisuals>(item.RegistryTypeId);
-                case Weapon:
-                    return GetRegisteredById<IWeapon>(item.RegistryTypeId);
-                case Loot:
-                    return GetRegisteredById<ILoot>(item.RegistryTypeId);
+                case Api.Items.Types.Accessory:
+                    return GetRegistryTypeById<IAccessory>(item.RegistryTypeId);
+                case Api.Items.Types.Armor:
+                    return GetRegistryTypeById<IArmor>(item.RegistryTypeId);
+                case Api.Items.Types.Weapon:
+                    return GetRegistryTypeById<IWeapon>(item.RegistryTypeId);
+                case Api.Items.Types.Loot:
+                    return GetRegistryTypeById<ILoot>(item.RegistryTypeId);
+                case Api.Items.Types.ItemStack:
+                    return GetItemStackRegistryType(item);
+                case Api.Items.Types.SpecialGear:
+                    return GetRegistryTypeById<ISpecialGear>(item.RegistryTypeId);
                 default:
                     return null;
             }
         }
 
-        public List<IEffect> GetLootPossibilities()
+        public IEffect GetEffect(string typeId)
         {
-            return _effectTypes
-                .Where(x => x is not IIsSideEffect)
-                .ToList();
+            return _registeredTypeLists[typeof(IEffect)]
+                .Cast<IEffect>()
+                .FirstOrDefault(x => x.TypeId.ToString() == typeId);
         }
 
-        public IEffect GetEffect(Guid typeId)
-        {
-            return _effectTypes.FirstOrDefault(x => x.TypeId == typeId);
-        }
-
-        public IEffect GetEffect(Type type)
-        {
-            return _effectTypes.FirstOrDefault(x => x.GetType() == type);
-        }
-
-        public void LoadAddessable(string address, Action<GameObject> action)
+        public void LoadAddessable<T>(string address, Action<T> action)
         {
             //Addressables.ReleaseInstance(go) : Destroys objects created by Addressables.InstantiateAsync(address)
             //Addressables.Release(opHandle) : Remove the addressable from memory
 
             if (_loadedAddressables.TryGetValue(address, out var loadedAddressable))
             {
-                action(loadedAddressable);
+                action((T)loadedAddressable);
             }
             else
             {
-                var asyncOp = Addressables.LoadAssetAsync<GameObject>(address);
+                var asyncOp = Addressables.LoadAssetAsync<T>(address);
                 asyncOp.Completed += opHandle =>
                 {
                     var prefab = opHandle.Result;

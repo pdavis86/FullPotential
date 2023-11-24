@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Gameplay.Combat;
+﻿using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Items.Types;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Networking;
@@ -11,7 +11,7 @@ namespace FullPotential.Core.Gameplay.Combat
     public class MaintainDistance : MonoBehaviour
     {
         // ReSharper disable UnassignedField.Global
-        public IFighter SourceFighter;
+        public FighterBase SourceFighter;
         public float Distance;
         public Consumer Consumer;
         // ReSharper restore UnassignedField.Global

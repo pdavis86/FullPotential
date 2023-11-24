@@ -5,52 +5,41 @@ using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
-using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Utilities.Extensions;
 
 namespace FullPotential.Api.Items.Types
 {
     [Serializable]
-    public class Armor : ItemWithHealthBase, IDefensible
+    public class Armor : ItemWithHealthBase, IDefensible, IHasVisuals
     {
+        private IVisuals _visuals;
+
+        //Variables so they are serialized
+        // ReSharper disable MemberCanBePrivate.Global
+        // ReSharper disable NotAccessedField.Global
+        public string ArmorVisualsTypeId;
+        // ReSharper restore MemberCanBePrivate.Global
+        // ReSharper restore NotAccessedField.Global
+
+        public string VisualsTypeId => ArmorVisualsTypeId;
+
+        public IVisuals Visuals
+        {
+            get => _visuals;
+            set
+            {
+                _visuals = value;
+                ArmorVisualsTypeId = _visuals?.TypeId.ToString();
+            }
+        }
+
         public int GetDefenseValue()
         {
             return Attributes.Strength;
         }
 
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
-        {
-            return GetArmorCategory() == ArmorType.Barrier
-                ? GetBarrierDescription(localizer, levelOfDetail, itemName)
-                : GetArmorDescription(localizer, levelOfDetail, itemName);
-        }
-
-        private ArmorType GetArmorCategory()
-        {
-            if (RegistryType is not IArmorVisuals armor)
-            {
-                throw new Exception("Registry type was not IGearArmor");
-            }
-
-            return armor.Type;
-        }
-
-        private float GetRechargeDelay()
-        {
-            var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0.5f, 1.5f);
-            //Debug.Log("GetRechargeDelay: " + returnValue);
-            return returnValue;
-        }
-
-        private float GetRechargeRate()
-        {
-            var returnValue = GetHighInHighOutInRange(Attributes.Recovery, 0.5f, 1.5f);
-            //Debug.Log("GetRechargeRate: " + returnValue);
-            return returnValue;
-        }
-
-        private string GetArmorDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
         {
             var sb = new StringBuilder();
 
@@ -78,59 +67,6 @@ namespace FullPotential.Api.Items.Types
                 nameof(Attributes.Strength),
                 AliasSegmentDefensive,
                 localizer.TranslateInt(GetDefenseValue()));
-
-            return sb.ToString().Trim();
-        }
-
-        private string GetBarrierDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
-        {
-            var sb = new StringBuilder();
-
-            if (levelOfDetail == LevelOfDetail.Full)
-            {
-                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(Name))}: {itemName.OrIfNullOrWhitespace(Name)}" + "\n");
-                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {GetType().Name}" + "\n");
-            }
-
-            //todo: zzz v0.4.1 - implement armor effects
-            //if (Effects != null && Effects.Count > 0)
-            //{
-            //    var localisedEffects = Effects.Select(localizer.GetTranslatedTypeName);
-            //    sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Effects))}: {string.Join(", ", localisedEffects)}\n");
-            //}
-
-            AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
-
-            AppendToDescription(
-               sb,
-               localizer,
-               Attributes.Strength,
-               nameof(Attributes.Strength),
-               AliasSegmentDefensive,
-               localizer.TranslateInt(GetDefenseValue()));
-
-            //What does Efficiency do for a barrier?
-            //AppendToDescription(sb, localizer, Attributes.Efficiency, nameof(Attributes.Efficiency));
-
-            //todo: zzz v0.4.1 - implement borderlands-like shields
-            //AppendToDescription(
-            //    sb,
-            //    localizer,
-            //    Attributes.Speed,
-            //    nameof(Attributes.Speed),
-            //    nameof(IGearArmor.ArmorCategory.Barrier),
-            //    localizer.TranslateFloat(GetRechargeDelay()),
-            //    UnitsType.Time);
-
-            //todo: zzz v0.4.1 - implement borderlands-like shields
-            //AppendToDescription(
-            //    sb,
-            //    localizer,
-            //    Attributes.Recovery,
-            //    nameof(Attributes.Recovery),
-            //    nameof(IGearArmor.ArmorCategory.Barrier),
-            //    localizer.TranslateFloat(GetRechargeRate()),
-            //    UnitsType.UnitPerTime);
 
             return sb.ToString().Trim();
         }

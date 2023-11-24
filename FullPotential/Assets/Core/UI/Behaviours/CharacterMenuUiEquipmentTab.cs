@@ -1,15 +1,16 @@
-﻿using System;
-using FullPotential.Api.Ioc;
+﻿using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Obsolete;
+using FullPotential.Api.Registry;
+using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.Player;
-using FullPotential.Core.UI.Behaviours;
 using FullPotential.Core.Ui.Components;
+using FullPotential.Core.UI.Behaviours;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,17 +24,23 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private GameObject _componentsContainer;
         [SerializeField] private GameObject _lhs;
         [SerializeField] private GameObject _rhs;
+        [SerializeField] private GameObject _slotPrefab;
         [SerializeField] private GameObject _inventoryRowPrefab;
 #pragma warning restore 0649
 
+        private ILocalizer _localizer;
+        private ITypeRegistry _typeRegistry;
+
         private GameObject _lastClickedSlot;
         private PlayerState _playerState;
-        private ILocalizer _localizer;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+            _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
+
+            InstantiateSlots();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -43,8 +50,54 @@ namespace FullPotential.Core.Ui.Behaviours
             ResetEquipmentUi(true);
         }
 
+        private void InstantiateSlots()
+        {
+            var armorTypes = _typeRegistry.GetRegisteredTypes<IArmor>();
+
+            foreach (var slotType in armorTypes)
+            {
+                InstantiateSlot(slotType.TypeId.ToString(), slotType.SlotSpritePrefabAddress, _lhs.transform);
+            }
+
+            var accessoryTypes = _typeRegistry.GetRegisteredTypes<IAccessory>();
+            foreach (var type in accessoryTypes)
+            {
+                for (var i = 1; i <= type.SlotCount; i++)
+                {
+                    InstantiateSlot($"{type.TypeId};{i}", type.SlotSpritePrefabAddress, _rhs.transform);
+                }
+            }
+
+            foreach (var type in _typeRegistry.GetRegisteredTypes<IRegisterableWithSlot>())
+            {
+                if (type is Registry.SpecialSlots.LeftHand or Registry.SpecialSlots.RightHand)
+                {
+                    continue;
+                }
+
+                InstantiateSlot(type.TypeId.ToString(), type.SlotSpritePrefabAddress, _rhs.transform);
+            }
+        }
+
+        private void InstantiateSlot(string slotId, string spritePrefabAddress, Transform parentTransform)
+        {
+            var equipmentSlot = Instantiate(_slotPrefab, parentTransform);
+            equipmentSlot.name = slotId;
+
+            var button = equipmentSlot.GetComponent<Button>();
+            button.onClick.AddListener(() => OnSlotClick(equipmentSlot));
+
+            _typeRegistry.LoadAddessable<Sprite>(
+                spritePrefabAddress,
+                sprite =>
+                {
+                    var image = equipmentSlot.FindInDescendants("PlaceholderImage").GetComponent<Image>();
+                    image.sprite = sprite;
+                });
+        }
+
         // ReSharper disable once UnusedMember.Global
-        public void OnSlotClick(GameObject clickedObject)
+        private void OnSlotClick(GameObject clickedObject)
         {
             if (_lastClickedSlot == clickedObject)
             {
@@ -52,38 +105,21 @@ namespace FullPotential.Core.Ui.Behaviours
                 return;
             }
 
-            switch (clickedObject.name)
-            {
-                case nameof(SlotGameObjectName.Helm): LoadInventoryItems(clickedObject, SlotType.Helm); break;
-                case nameof(SlotGameObjectName.Chest): LoadInventoryItems(clickedObject, SlotType.Chest); break;
-                case nameof(SlotGameObjectName.Legs): LoadInventoryItems(clickedObject, SlotType.Legs); break;
-                case nameof(SlotGameObjectName.Feet): LoadInventoryItems(clickedObject, SlotType.Feet); break;
-                case nameof(SlotGameObjectName.Barrier): LoadInventoryItems(clickedObject, SlotType.Barrier); break;
-
-                case nameof(SlotGameObjectName.LeftHand):
-                case nameof(SlotGameObjectName.RightHand): LoadInventoryItems(clickedObject, SlotType.Hand); break;
-
-                case nameof(SlotGameObjectName.LeftRing):
-                case nameof(SlotGameObjectName.RightRing): LoadInventoryItems(clickedObject, SlotType.Ring); break;
-
-                case nameof(SlotGameObjectName.Amulet): LoadInventoryItems(clickedObject, SlotType.Amulet); break;
-                case nameof(SlotGameObjectName.Belt): LoadInventoryItems(clickedObject, SlotType.Belt); break;
-
-                case nameof(SlotGameObjectName.Reloader): LoadInventoryItems(clickedObject, SlotType.Reloader); break;
-
-                default:
-                    Debug.LogError($"Cannot handle click for slot {clickedObject.name}");
-                    return;
-            }
+            LoadInventoryItems(clickedObject, clickedObject.name);
 
             _lastClickedSlot = clickedObject;
         }
 
         private void SetSlot(GameObject slot, ItemBase item)
         {
-            var slotImage = slot.GetComponent<InventoryUiSlot>().Image;
+            var slotUi = slot.GetComponent<InventoryUiSlot>();
 
-            slotImage.color = item != null ? Color.grey : Color.clear;
+            if (slotUi == null)
+            {
+                return;
+            }
+
+            slotUi.Image.color = item != null ? Color.grey : Color.clear;
 
             var tooltip = slot.GetComponent<Tooltip>();
             if (tooltip != null)
@@ -97,25 +133,17 @@ namespace FullPotential.Core.Ui.Behaviours
                         Tooltips.ShowTooltip(item.GetDescription(_localizer));
                     };
                 }
-            }
-        }
+                else
+                {
+                    var registerable = _typeRegistry.GetAnyRegisteredBySlotId(slot.name);
+                    var translation = _localizer.Translate(registerable);
 
-        private GameObject GetSlotGameObject(string slotName)
-        {
-            var leftAttempt = _lhs.transform.Find(slotName);
-            if (leftAttempt != null)
-            {
-                return leftAttempt.gameObject;
+                    tooltip.OnPointerEnterForTooltip += _ =>
+                    {
+                        Tooltips.ShowTooltip(translation);
+                    };
+                }
             }
-
-            var rightAttempt = _rhs.FindInDescendants(slotName);
-            if (rightAttempt != null)
-            {
-                return rightAttempt.gameObject;
-            }
-
-            Debug.LogError($"Failed to find slot {slotName}");
-            return null;
         }
 
         public void ResetEquipmentUi(bool reloadSlots = false)
@@ -126,25 +154,29 @@ namespace FullPotential.Core.Ui.Behaviours
 
             if (reloadSlots)
             {
-                foreach (SlotGameObjectName slotGameObjectName in Enum.GetValues(typeof(SlotGameObjectName)))
+                foreach (Transform slot in _lhs.transform)
                 {
-                    var slotName = Enum.GetName(typeof(SlotGameObjectName), slotGameObjectName);
-                    var item = _playerState.Inventory.GetItemInSlot(slotGameObjectName);
+                    var item = _playerState.Inventory.GetItemInSlot(slot.name);
+                    SetSlot(slot.gameObject, item);
+                }
 
-                    SetSlot(GetSlotGameObject(slotName), item);
+                foreach (Transform slot in _rhs.transform)
+                {
+                    var item = _playerState.Inventory.GetItemInSlot(slot.name);
+                    SetSlot(slot.gameObject, item);
 
                     if (item is Weapon weapon && weapon.IsTwoHanded)
                     {
-                        var otherSlotName = slotGameObjectName == SlotGameObjectName.LeftHand
-                            ? SlotGameObjectName.RightHand.ToString()
-                            : SlotGameObjectName.LeftHand.ToString();
-                        SetSlot(GetSlotGameObject(otherSlotName), null);
+                        var otherSlotName = slot.name == HandSlotIds.LeftHand
+                            ? HandSlotIds.RightHand
+                            : HandSlotIds.LeftHand;
+                        SetSlot(_rhs.transform.Find(otherSlotName).gameObject, null);
                     }
                 }
             }
         }
 
-        private void LoadInventoryItems(GameObject slot, SlotType? gearCategory = null)
+        private void LoadInventoryItems(GameObject slot, string typeId)
         {
             _componentsContainer.SetActive(true);
 
@@ -152,9 +184,9 @@ namespace FullPotential.Core.Ui.Behaviours
                 slot,
                 _componentsContainer,
                 _inventoryRowPrefab,
-                _playerState.Inventory,
+                _playerState.PlayerInventory,
                 HandleRowToggle,
-                gearCategory
+                typeId
             );
         }
 
@@ -166,14 +198,8 @@ namespace FullPotential.Core.Ui.Behaviours
             {
                 Tooltips.HideTooltip();
 
-                if (!Enum.TryParse<SlotGameObjectName>(slot.name, out var slotGameObjectName))
-                {
-                    Debug.LogError($"Failed to find slot for name {slot.name}");
-                    return;
-                }
-
                 var playerInventory = (PlayerInventory)_playerState.Inventory;
-                playerInventory.EquipItemServerRpc(item.Id, slotGameObjectName);
+                playerInventory.EquipItemServerRpc(item.Id, slot.name);
             });
         }
 

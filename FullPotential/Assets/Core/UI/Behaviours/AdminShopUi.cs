@@ -73,7 +73,7 @@ namespace FullPotential.Core.UI.Behaviours
         {
             var playerState = GameManager.Instance.GetLocalPlayerGameObject().GetComponent<PlayerState>();
 
-            if (playerState.Inventory.IsInventoryFull())
+            if (playerState.PlayerInventory.IsInventoryFull())
             {
                 playerState.AlertInventoryIsFull();
                 GameManager.Instance.UserInterface.HideAllMenus();
@@ -143,7 +143,7 @@ namespace FullPotential.Core.UI.Behaviours
             {
                 var toggle = Instantiate(_nameAndTogglePrefab, _effectsScrollViewContentParent.transform);
                 var behaviour = toggle.GetComponent<NameAndToggle>();
-                behaviour.Name.text = effect.TypeName;
+                behaviour.Name.text = effect.GetType().Name;
 
                 _effectToggleBehaviours.Add(behaviour);
             }
@@ -157,7 +157,7 @@ namespace FullPotential.Core.UI.Behaviours
             {
                 var toggle = Instantiate(_nameAndTogglePrefab, _targetingScrollViewContentParent.transform);
                 var behaviour = toggle.GetComponent<NameAndToggle>();
-                behaviour.Name.text = option.TypeName;
+                behaviour.Name.text = option.GetType().Name;
 
                 _targetingToggleBehaviours.Add(behaviour);
             }
@@ -171,7 +171,7 @@ namespace FullPotential.Core.UI.Behaviours
             {
                 var toggle = Instantiate(_nameAndTogglePrefab, _shapesScrollViewContentParent.transform);
                 var behaviour = toggle.GetComponent<NameAndToggle>();
-                behaviour.Name.text = shape.TypeName;
+                behaviour.Name.text = shape.GetType().Name;
 
                 _shapeToggleBehaviours.Add(behaviour);
             }
@@ -232,7 +232,7 @@ namespace FullPotential.Core.UI.Behaviours
 
             foreach (var effect in _registeredEffects)
             {
-                var toggle = _effectToggleBehaviours.First(t => t.Name.text == effect.TypeName);
+                var toggle = _effectToggleBehaviours.First(t => t.Name.text == effect.GetType().Name);
                 if (toggle.Toggle.isOn)
                 {
                     effects.Add(effect);
@@ -246,14 +246,14 @@ namespace FullPotential.Core.UI.Behaviours
         {
             var firstToggle = _targetingToggleBehaviours.FirstOrDefault(x => x.Toggle.isOn);
             var typeName = firstToggle != null ? firstToggle.Name.text : null;
-            return _registeredTargetingOptions.FirstOrDefault(x => x.TypeName == typeName);
+            return _registeredTargetingOptions.FirstOrDefault(x => x.GetType().Name == typeName);
         }
 
         private IShape GetShape()
         {
             var firstToggle = _shapeToggleBehaviours.FirstOrDefault(x => x.Toggle.isOn);
             var typeName = firstToggle != null ? firstToggle.Name.text : null;
-            return _registeredShapes.FirstOrDefault(x => x.TypeName == typeName);
+            return _registeredShapes.FirstOrDefault(x => x.GetType().Name == typeName);
         }
 
         private Loot GetLootFromChoices()
@@ -274,7 +274,7 @@ namespace FullPotential.Core.UI.Behaviours
 
             return _resultFactory.GetCraftedItem(
                 typeToCraft,
-                _craftingSelector.GetSubTypeName(typeToCraft),
+                _craftingSelector.GetTypeId(typeToCraft),
                 _craftingSelector.IsTwoHandedSelected(),
                 new List<ItemForCombatBase> { component });
         }
@@ -296,7 +296,7 @@ namespace FullPotential.Core.UI.Behaviours
             GameManager.Instance.GetLocalPlayerGameObject().GetComponent<PlayerBehaviour>().CraftItemAsAdminServerRpc(
                 componentJson,
                 craftableType.ToString(),
-                _craftingSelector.GetSubTypeName(craftableType),
+                _craftingSelector.GetTypeId(craftableType),
                 _craftingSelector.IsTwoHandedSelected(),
                 _itemNameText.text
                 );

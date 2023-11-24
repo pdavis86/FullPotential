@@ -19,5 +19,7 @@ namespace FullPotential.Api.Ui
         (float percent, string text) GetManaValues(int mana, int maxMana);
 
         (float percent, string text) GetEnergyValues(int energy, int maxEnergy);
+
+        void SetHandWarning(bool isLeftHand, bool isActive);
     }
 }

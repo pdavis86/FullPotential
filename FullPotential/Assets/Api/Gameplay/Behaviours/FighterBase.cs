@@ -1,21 +1,26 @@
 ﻿using System;
 using System.Collections;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Gameplay.Events.Args;
-using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
-using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities;
 using Unity.Netcode;
 using UnityEngine;
 
+// ReSharper disable MemberCanBePrivate.Global
+
 namespace FullPotential.Api.Gameplay.Behaviours
 {
-    public abstract class FighterBase : LivingEntityBase, IFighter, IMoveable
+    public abstract class FighterBase : LivingEntityBase, IDefensible, IDamageable, IMoveable
     {
+        public const string EventIdReload = "2337f94e-5a7d-4e02-b1c8-1b5e9934a3ce";
+        public const string EventIdDamageTaken = "4e8f6a71-3708-47f2-bc57-36bcc5596d0c";
+        public const string EventIdShotFired = "f01cd95a-67cc-4f38-a394-5a69eaa721c6";
+
         private const int MeleeRangeLimit = 8;
         private const int ConsumerRangeLimit = 50;
         private const int MaximumRange = 100;
@@ -34,8 +39,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         #region Protected variables
         // ReSharper disable InconsistentNaming
 
-        protected IInventory _inventory;
-        protected IEventManager _eventManager;
+        protected InventoryBase _inventory;
 
         // ReSharper restore InconsistentNaming
         #endregion
@@ -48,7 +52,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private DelayedAction _consumeResource;
         private ReloadEventArgs _reloadArgsLeft;
         private ReloadEventArgs _reloadArgsRight;
-
+        private ShotFiredEventArgs _shotFiredArgsLeft;
+        private ShotFiredEventArgs _shotFiredArgsRight;
         #endregion
 
         #region Properties
@@ -61,6 +66,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public string FighterName => _entityName.Value.ToString();
 
+        public InventoryBase Inventory => _inventory;
+
         #endregion
 
         #region Unity Events Handlers
@@ -70,10 +77,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             base.Awake();
 
-            _eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
-
             _reloadArgsLeft = new ReloadEventArgs(this, true);
             _reloadArgsRight = new ReloadEventArgs(this, false);
+
+            _shotFiredArgsLeft = new ShotFiredEventArgs(this, true);
+            _shotFiredArgsRight = new ShotFiredEventArgs(this, false);
         }
 
         protected override void Start()
@@ -132,12 +140,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
         }
 
         [ServerRpc]
-        public void ReloadServerRpc(bool isLeftHand)
+        private void ReloadServerRpc(bool isLeftHand)
         {
-            var handStatus = GetHandStatus(isLeftHand);
-            var args = GetReloadEventArgs(isLeftHand);
-
-            StartCoroutine(ReloadCoroutine(handStatus, args));
+            StartCoroutine(ReloadCoroutine(GetReloadEventArgs(isLeftHand)));
 
             var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, new[] { 0ul, OwnerClientId });
             ReloadingClientRpc(isLeftHand, nearbyClients);
@@ -165,10 +170,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ClientRpc]
         private void ReloadingClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
         {
-            var handStatus = GetHandStatus(isLeftHand);
-            var args = GetReloadEventArgs(isLeftHand);
-
-            StartCoroutine(ReloadCoroutine(handStatus, args));
+            StartCoroutine(ReloadCoroutine(GetReloadEventArgs(isLeftHand)));
         }
 
         // ReSharper disable once UnusedParameter.Local
@@ -188,19 +190,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #endregion
 
-        protected override bool IsConsumingEnergy()
+        protected override bool IsConsumingResource(string typeId)
         {
-            return HandStatusLeft.IsConsumingResource(ResourceType.Energy)
-                   || HandStatusRight.IsConsumingResource(ResourceType.Energy);
+            return HandStatusLeft.IsConsumingResource(typeId)
+                   || HandStatusRight.IsConsumingResource(typeId);
         }
 
-        protected override bool IsConsumingMana()
-        {
-            return HandStatusLeft.IsConsumingResource(ResourceType.Mana)
-                   || HandStatusRight.IsConsumingResource(ResourceType.Mana);
-        }
-
-        private HandStatus GetHandStatus(bool isLeftHand)
+        public HandStatus GetHandStatus(bool isLeftHand)
         {
             return isLeftHand ? HandStatusLeft : HandStatusRight;
         }
@@ -212,30 +208,51 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return isLeftHand ? _reloadArgsLeft : _reloadArgsRight;
         }
 
-        public void TriggerReloadStartEvent(bool isLeftHand)
+        private ShotFiredEventArgs GetShotFiredEventArgs(bool isLeftHand, Vector3 startPosition, Vector3 endPosition)
         {
-            _eventManager.Trigger(EventIds.FighterReloadStart, GetReloadEventArgs(isLeftHand));
+            var eventArgs = isLeftHand ? _shotFiredArgsLeft : _shotFiredArgsRight;
+            eventArgs.StartPosition = startPosition;
+            eventArgs.EndPosition = endPosition;
+            return eventArgs;
         }
 
-        public static void HandleReloadStartEvent(IEventHandlerArgs args)
+        public void TriggerReloadEvent(bool isLeftHand)
         {
-            var reloadArgs = (ReloadEventArgs)args;
-            reloadArgs.Fighter.Reload(reloadArgs);
+            _eventManager.Trigger(FighterBase.EventIdReload, GetReloadEventArgs(isLeftHand));
         }
 
-        public void Reload(ReloadEventArgs reloadArgs)
+        public static void DefaultHandlerForReloadEvent(IEventHandlerArgs eventArgs)
         {
-            StartCoroutine(ReloadCoroutine(GetHandStatus(reloadArgs.IsLeftHand), reloadArgs));
+            var reloadEventArgs = (ReloadEventArgs)eventArgs;
 
-            ReloadServerRpc(reloadArgs.IsLeftHand);
-        }
-
-        private IEnumerator ReloadCoroutine(HandStatus handStatus, ReloadEventArgs args)
-        {
-            if (handStatus.EquippedWeapon == null)
+            reloadEventArgs.GetNewAmmoCount = () =>
             {
-                yield break;
+                var fighter = reloadEventArgs.Fighter;
+                var handStatus = fighter.GetHandStatus(reloadEventArgs.IsLeftHand);
+
+                var ammoTypeId = handStatus.EquippedWeapon.GetAmmoTypeId();
+                var ammoMax = handStatus.EquippedWeapon.GetAmmoMax();
+                return fighter.Inventory.TakeItemStack(ammoTypeId, ammoMax)?.Count ?? 0;
+            };
+
+            reloadEventArgs.Fighter.Reload(reloadEventArgs);
+        }
+
+        public void Reload(ReloadEventArgs reloadEventArgs)
+        {
+            if (GetHandStatus(reloadEventArgs.IsLeftHand).EquippedWeapon == null)
+            {
+                return;
             }
+
+            StartCoroutine(ReloadCoroutine(reloadEventArgs));
+
+            ReloadServerRpc(reloadEventArgs.IsLeftHand);
+        }
+
+        private IEnumerator ReloadCoroutine(ReloadEventArgs reloadEventArgs)
+        {
+            var handStatus = GetHandStatus(reloadEventArgs.IsLeftHand);
 
             handStatus.IsReloading = true;
 
@@ -247,14 +264,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 yield break;
             }
 
-            var ammoTypeId = handStatus.EquippedWeapon.GetAmmoTypeId();
-            var ammoMax = handStatus.EquippedWeapon.GetAmmoMax();
-            var availableAmmo = _inventory.TakeItemStack(ammoTypeId, ammoMax);
-
-            handStatus.EquippedWeapon.Ammo = availableAmmo?.Count ?? 0;
+            handStatus.EquippedWeapon.Ammo = reloadEventArgs.GetNewAmmoCount();
             handStatus.IsReloading = false;
 
-            _eventManager.Trigger(EventIds.FighterReloadEnd, args);
+            _eventManager.After(FighterBase.EventIdReload, reloadEventArgs);
         }
 
         #endregion
@@ -337,7 +350,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return true;
             }
 
-            Debug.LogWarning("Trying to attack hold an item that is not compatible");
+            //Debug.LogWarning("Trying to attack hold an item that is not compatible");
             return false;
         }
 
@@ -402,8 +415,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             var itemInHand = isLeftHand
-                ? _inventory.GetItemInSlot(SlotGameObjectName.LeftHand)
-                : _inventory.GetItemInSlot(SlotGameObjectName.RightHand);
+                ? _inventory.GetItemInSlot(HandSlotIds.LeftHand)
+                : _inventory.GetItemInSlot(HandSlotIds.RightHand);
 
             var handPosition = isLeftHand
                 ? Positions.LeftHand.position
@@ -568,20 +581,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return false;
             }
 
-            var requiredAmmo = 1 + handStatus.EquippedWeapon.Attributes.ExtraAmmoPerShot;
+            var requiredAmmo = Math.Min(
+                1 + handStatus.EquippedWeapon.Attributes.ExtraAmmoPerShot,
+                handStatus.EquippedWeapon.Ammo);
 
-            if (handStatus.EquippedWeapon.Ammo >= requiredAmmo)
-            {
-                handStatus.EquippedWeapon.Ammo -= requiredAmmo;
-                return UseRangedWeapon(handPosition, weaponInHand, requiredAmmo);
-            }
-
-            var ammoUsed = handStatus.EquippedWeapon.Ammo;
-            handStatus.EquippedWeapon.Ammo = 0;
-            return UseRangedWeapon(handPosition, weaponInHand, ammoUsed);
+            handStatus.EquippedWeapon.Ammo -= requiredAmmo;
+            return UseRangedWeapon(isLeftHand, handPosition, weaponInHand, requiredAmmo);
         }
 
-        private bool UseRangedWeapon(Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
+        private bool UseRangedWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
         {
             var shotDirection = weaponInHand.GetShotDirection(LookTransform.forward);
 
@@ -589,8 +597,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ? rangedHit.point
                 : handPosition + shotDirection * MaximumRange;
 
-            var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-            UsedWeaponClientRpc(handPosition, endPos, nearbyClients);
+            var eventArgs = GetShotFiredEventArgs(isLeftHand, handPosition, endPos);
+            _eventManager.Trigger(FighterBase.EventIdShotFired, eventArgs);
+            _eventManager.After(FighterBase.EventIdShotFired, eventArgs);
 
             if (rangedHit.transform == null)
             {
@@ -607,6 +616,18 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             return true;
+        }
+
+        public void ShotFired(Vector3 startPosition, Vector3 endPosition)
+        {
+            var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
+            UsedWeaponClientRpc(startPosition, endPosition, nearbyClients);
+        }
+
+        public static void DefaultHandlerForShotFiredEvent(IEventHandlerArgs eventArgs)
+        {
+            var shotFiredArgs = (ShotFiredEventArgs)eventArgs;
+            shotFiredArgs.Fighter.ShotFired(shotFiredArgs.StartPosition, shotFiredArgs.EndPosition);
         }
 
         private bool UseMeleeWeapon(Weapon weaponInHand)
@@ -628,50 +649,32 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return true;
         }
 
-        private (NetworkVariable<int> Variable, int? Cost)? GetResourceVariableAndCost(Consumer consumer)
+        protected int GetResourceCost(Consumer consumer)
         {
-            //todo: zzz v0.5 - energy and mana should be registered types not named variables
-
-            switch (consumer.ResourceType)
-            {
-                case ResourceType.Mana:
-                    return (_mana, GetManaCost(consumer));
-
-                case ResourceType.Energy:
-                    return (_energy, GetEnergyCost(consumer));
-
-                default:
-                    Debug.LogError("Not yet implemented GetResourceVariable() for resource type " + consumer.ResourceType);
-                    return null;
-            }
+            //todo: zzz v0.5 - trait-based mana cost
+            return consumer.GetResourceCost();
         }
 
         private bool ConsumeResource(Consumer consumer, bool slowDrain = false, bool isTest = false)
         {
-            var tuple = GetResourceVariableAndCost(consumer);
-
-            if (!tuple.HasValue || !tuple.Value.Cost.HasValue)
-            {
-                Debug.LogError("Failed to get GetResourceVariableAndCost");
-                return false;
-            }
-
-            var resourceCost = tuple.Value.Cost.Value;
-            var resourceVariable = tuple.Value.Variable;
+            var resourceCost = GetResourceCost(consumer);
+            var resourceTypeId = consumer.ResourceType.TypeId.ToString();
 
             if (slowDrain)
             {
                 resourceCost = (int)Math.Ceiling(resourceCost / 10f) + 1;
             }
 
-            if (resourceVariable.Value < resourceCost)
+            var currentValue = GetResourceValue(resourceTypeId);
+
+            if (currentValue < resourceCost)
             {
                 return false;
             }
 
             if (!isTest)
             {
-                resourceVariable.Value -= resourceCost;
+                AdjustResourceValue(resourceTypeId, -resourceCost);
             }
 
             return true;
@@ -698,10 +701,5 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         // ReSharper restore UnassignedField.Global
         #endregion
-
-        public bool HasTypeEquipped(SlotGameObjectName slotGameObjectName)
-        {
-            return _inventory.HasTypeEquipped(slotGameObjectName);
-        }
     }
 }

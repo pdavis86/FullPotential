@@ -68,8 +68,9 @@
     <Compile Include="Assets\Core\Gameplay\Drawing\DrawingService.cs" />
     <Compile Include="Assets\Core\UI\Components\EquippedSummary.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\DebuggingUi.cs" />
-    <Compile Include="Assets\Core\Gameplay\Combat\Punch.cs" />
+    <Compile Include="Assets\Core\Registry\Effects\Movement\Punch.cs" />
     <Compile Include="Assets\Core\Localization\Localizer.cs" />
+    <Compile Include="Assets\Core\Registry\SpecialSlots\LeftHand.cs" />
     <Compile Include="Assets\Core\Persistence\UserRepository.cs" />
     <Compile Include="Assets\Core\Utilities\Extensions\EnumerableExtensions.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltip.cs" />
@@ -78,7 +79,6 @@
     <Compile Include="Assets\Core\Localization\CultureAddressables.cs" />
     <Compile Include="Assets\Core\GameManagement\Prefabs.cs" />
     <Compile Include="Assets\Core\GameManagement\Data\ServerGameData.cs" />
-    <Compile Include="Assets\Core\Gameplay\Targeting\PointToPointBehaviour.cs" />
     <Compile Include="Assets\Core\GameManagement\UserInterface.cs" />
     <Compile Include="Assets\Core\Registry\TypeRegistry.cs" />
     <Compile Include="Assets\Core\Modding\ModHelper.cs" />
@@ -86,14 +86,14 @@
     <Compile Include="Assets\Core\UI\Behaviours\MainMenuUi.cs" />
     <Compile Include="Assets\Core\Unity\Services\UnityHelperUtilities.cs" />
     <Compile Include="Assets\Core\Gameplay\Events\EventHandlerGroup.cs" />
+    <Compile Include="Assets\Core\Gameplay\Tooltips\TooltipWithTranslation.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectsUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\SettingsMenuUi.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DebuggingActiveState.cs" />
+    <Compile Include="Assets\Core\Registry\Resources\Mana.cs" />
     <Compile Include="Assets\Core\UI\Components\SlideOutAlert.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DestroyOnTriggerEnter.cs" />
-    <Compile Include="Assets\Core\Gameplay\Shapes\WallBehaviour.cs" />
-    <Compile Include="Assets\Core\Gameplay\Targeting\ProjectileBehaviour.cs" />
-    <Compile Include="Assets\Core\Gameplay\Shapes\ZoneBehaviour.cs" />
+    <Compile Include="Assets\Core\Registry\Resources\Energy.cs" />
     <Compile Include="Assets\Core\UI\Components\InventoryItemsList.cs" />
     <Compile Include="Assets\Core\Player\PlayerBehaviour.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DontDestroy.cs" />
@@ -114,10 +114,10 @@
     <Compile Include="Assets\Core\UI\Components\CraftingSelector.cs" />
     <Compile Include="Assets\Core\UI\Components\NameAndValueSlider.cs" />
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsOffline.cs" />
-    <Compile Include="Assets\Core\Gameplay\Targeting\BeamVisualsBehaviour.cs" />
     <Compile Include="Assets\Core\UI\Events\OnDrawingStopEventArgs.cs" />
     <Compile Include="Assets\Core\Persistence\SettingsRepository.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ProgressWheel.cs" />
+    <Compile Include="Assets\Core\Registry\SpecialSlots\RightHand.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\TextLocalizer.cs" />
     <Compile Include="Assets\Core\GameManagement\Data\LocalGameData.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\TextMeshProLocalizer.cs" />
@@ -130,8 +130,10 @@
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiRow.cs" />
     <Compile Include="Assets\Core\Player\PlayerMovement.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectUi.cs" />
+    <Compile Include="Assets\Core\Registry\Resources\Health.cs" />
     <Compile Include="Assets\Core\Gameplay\Events\EventManager.cs" />
     <Compile Include="Assets\Core\GameManagement\Enums\ConnectStatus.cs" />
+    <Compile Include="Assets\Core\Registry\Resources\Stamina.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\StickUiToWorldPosition.cs" />
     <Compile Include="Assets\Core\GameManagement\Inventory\IInventoryDataService.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\DrawingPadUi.cs" />
@@ -139,7 +141,7 @@
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsStartup.cs" />
     <Compile Include="Assets\Core\GameManagement\AddressablesManager.cs" />
     <Compile Include="Assets\Core\GameManagement\GameManager.cs" />
-    <Compile Include="Assets\Core\Gameplay\Tooltips\TooltipWithTranslation.cs" />
+    <Compile Include="Assets\Core\Registry\Events\LivingEntityDiedEventHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Core\FullPotential.Core.asmdef" />

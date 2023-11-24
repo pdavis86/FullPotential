@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Crafting;
@@ -7,7 +8,7 @@ using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Obsolete;
+using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
@@ -195,7 +196,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.InitialiseForEquip(EventSource, SlotGameObjectName.LeftHand);
+                _drawingPadUi.InitialiseForEquip(EventSource, HandSlotIds.LeftHand);
                 _drawingPadUi.StartDrawing();
             }
         }
@@ -211,7 +212,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.StopDrawing(SlotGameObjectName.LeftHand);
+                _drawingPadUi.StopDrawing(HandSlotIds.LeftHand);
             }
 
             OnAttack(true);
@@ -222,7 +223,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.InitialiseForEquip(EventSource, SlotGameObjectName.RightHand);
+                _drawingPadUi.InitialiseForEquip(EventSource, HandSlotIds.RightHand);
                 _drawingPadUi.StartDrawing();
             }
         }
@@ -238,7 +239,7 @@ namespace FullPotential.Core.Player
         {
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.StopDrawing(SlotGameObjectName.RightHand);
+                _drawingPadUi.StopDrawing(HandSlotIds.RightHand);
             }
 
             OnAttack(false);
@@ -266,13 +267,13 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnReloadLeft()
         {
-            _playerState.TriggerReloadStartEvent(true);
+            _playerState.TriggerReloadEvent(true);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnReloadRight()
         {
-            _playerState.TriggerReloadStartEvent(false);
+            _playerState.TriggerReloadEvent(false);
         }
 
 #pragma warning restore IDE0051 // Remove unused private members
@@ -319,11 +320,11 @@ namespace FullPotential.Core.Player
         }
 
         [ServerRpc]
-        public void CraftItemServerRpc(string componentIdsCsv, string craftableTypeName, string craftableSubTypeName, bool isTwoHanded, string itemName)
+        public void CraftItemServerRpc(string componentIdsCsv, string craftableTypeName, string typeId, bool isTwoHanded, string itemName)
         {
             var componentIdArray = componentIdsCsv.Split(',');
 
-            var components = _playerState.Inventory.GetComponentsFromIds(componentIdArray);
+            var components = _playerState.PlayerInventory.GetComponentsFromIds(componentIdArray);
 
             if (components.Count != componentIdArray.Length)
             {
@@ -335,12 +336,12 @@ namespace FullPotential.Core.Player
 
             var craftedItem = _resultFactory.GetCraftedItem(
                 craftableType,
-                craftableSubTypeName,
+                typeId,
                 isTwoHanded,
                 components
             );
 
-            if (_playerState.Inventory.ValidateIsCraftable(componentIdArray, craftedItem).Any())
+            if (_playerState.PlayerInventory.ValidateIsCraftable(componentIdArray, craftedItem).Any())
             {
                 Debug.LogWarning("Someone tried cheating: validation was skipped");
                 return;
@@ -370,7 +371,7 @@ namespace FullPotential.Core.Player
         }
 
         [ServerRpc]
-        public void CraftItemAsAdminServerRpc(string serialisedLoot, string craftableTypeName, string craftableSubTypeName, bool isTwoHanded, string itemName)
+        public void CraftItemAsAdminServerRpc(string serialisedLoot, string craftableTypeName, string typeId, bool isTwoHanded, string itemName)
         {
             GameManager.Instance.CheckIsAdmin();
 
@@ -379,7 +380,7 @@ namespace FullPotential.Core.Player
 
             ((PlayerInventory)_playerState.Inventory).AddItemAsAdmin(loot);
 
-            CraftItemServerRpc(loot.Id, craftableTypeName, craftableSubTypeName, isTwoHanded, itemName);
+            CraftItemServerRpc(loot.Id, craftableTypeName, typeId, isTwoHanded, itemName);
         }
 
         [ServerRpc]
@@ -621,13 +622,13 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            if (e.SlotGameObjectName == null)
+            if (e.SlotId.IsNullOrWhiteSpace())
             {
                 Debug.LogError("No slot was set so cannot equip any item");
                 return;
             }
 
-            var item = _playerState.Inventory.GetItemFromAssignedShape(e.DrawnShape);
+            var item = _playerState.PlayerInventory.GetItemFromAssignedShape(e.DrawnShape);
 
             if (item == null)
             {
@@ -636,7 +637,7 @@ namespace FullPotential.Core.Player
             }
 
             var playerInventory = (PlayerInventory)_playerState.Inventory;
-            playerInventory.EquipItemServerRpc(item.Id, e.SlotGameObjectName.Value);
+            playerInventory.EquipItemServerRpc(item.Id, e.SlotId);
         }
 
     }

@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
-using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Utilities.Extensions;
 
 namespace FullPotential.Api.Items.Types
@@ -20,7 +21,19 @@ namespace FullPotential.Api.Items.Types
         public const string AliasSegmentConsumer = "consumer";
         public const string AliasSegmentEffects = "effects";
 
-        public ResourceType ResourceType;
+        private IResource _resourceType;
+
+        public string ResourceTypeId;
+
+        public IResource ResourceType
+        {
+            get => _resourceType;
+            set
+            {
+                _resourceType = value;
+                ResourceTypeId = _resourceType?.TypeId.ToString();
+            }
+        }
 
         public int ChargePercentage { get; set; }
 
@@ -64,8 +77,8 @@ namespace FullPotential.Api.Items.Types
             var itemDamage = GetCombatService().GetDamageValueFromAttack(this, 0, false);
 
             var healthEffects = Effects
-                .Where(e => e is IStatEffect se && se.StatToAffect == ResourceType.Health)
-                .Select(e => (IStatEffect)e)
+                .Where(e => e is IResourceEffect se && se.ResourceTypeId == ResourceTypeIds.Health)
+                .Select(e => (IResourceEffect)e)
                 .ToList();
 
             var single = healthEffects.Where(se => se.AffectType == AffectType.SingleDecrease || se.AffectType == AffectType.SingleIncrease);

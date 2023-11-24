@@ -11,8 +11,6 @@ namespace FullPotential.Standard.Ammo
 
         public Guid TypeId => new Guid(Id);
 
-        public string TypeName => nameof(Bullet);
-
         public int MaxStackSize => 500;
 
         public int MinDropCount => 100;

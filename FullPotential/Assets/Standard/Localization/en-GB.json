@@ -2,6 +2,46 @@
   "Culture": "en-GB",
   "Name": "English (United Kingdom)",
   "Translations": [
+	{
+      "Key": "accessory.amulet",
+      "Value": "Amulet"
+    },
+    {
+      "Key": "accessory.belt",
+      "Value": "Belt"
+    },
+    {
+      "Key": "accessory.ring",
+      "Value": "Ring"
+    },
+    {
+      "Key": "accessory.reloader",
+      "Value": "Ranged Weapon Reloader"
+    },
+    {
+      "Key": "accessory.barrier",
+      "Value": "Barrier"
+    },
+
+
+    {
+      "Key": "armor.helm",
+      "Value": "Helm"
+    },
+    {
+      "Key": "armor.chest",
+      "Value": "Chest"
+    },
+    {
+      "Key": "armor.legs",
+      "Value": "Legs"
+    },
+    {
+      "Key": "armor.feet",
+      "Value": "Feet"
+    },
+	
+	
     {
       "Key": "loot.scrap",
       "Value": "Scrap"
@@ -57,6 +97,34 @@
     {
       "Key": "weapon.sword",
       "Value": "Sword"
+    },
+    
+
+    {
+      "Key": "shape.wall",
+      "Value": "Wall"
+    },
+    {
+      "Key": "shape.zone",
+      "Value": "Zone"
+    },
+
+
+    {
+      "Key": "targeting.pointtopoint",
+      "Value": "Point-to-point"
+    },
+    {
+      "Key": "targeting.projectile",
+      "Value": "Projectile"
+    },
+    {
+      "Key": "targeting.self",
+      "Value": "Self"
+    },
+    {
+      "Key": "targeting.touch",
+      "Value": "Touch"
     },
     
     
@@ -379,6 +447,28 @@
     {
       "Key": "effect.stepback.description",
       "Value": "Causes your target to move backwards"
+    },
+	
+	
+    {
+      "Key": "specialgear.consolidatorreloader",
+      "Value": "Consolidator Reloader"
+    },
+    {
+      "Key": "specialgear.teleportreloader",
+      "Value": "Teleport Reloader"
+    },
+	
+	
+	{
+      "Key": "noweaponreloader",
+      "Value": "No weapon reloader equipped.\nRemaining ammo will be lost when you reload!"
+    },
+	
+	
+	{
+      "Key": "slot.rangedweaponreloader",
+      "Value": "Weapon Reloader"
     }
     
   ]

@@ -1,5 +1,4 @@
-﻿using FullPotential.Api.Gameplay.Behaviours;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Items
 {

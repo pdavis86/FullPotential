@@ -12,6 +12,7 @@ using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Core.Gameplay.Combat;
 using Moq;
@@ -113,15 +114,13 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
     }
 
     [ExcludeFromCodeCoverage]
-    public class SingleDamageEffect : IStatEffect
+    public class SingleDamageEffect : IResourceEffect
     {
         public Guid TypeId => new Guid("3fd4d8d9-6fed-4ada-85dd-408602769ee5");
 
-        public string TypeName => nameof(SingleDamageEffect);
-
         public AffectType AffectType => AffectType.SingleDecrease;
 
-        public ResourceType StatToAffect => ResourceType.Health;
+        public Guid ResourceTypeId => ResourceTypeIds.Health;
     }
 
     [ExcludeFromCodeCoverage]
@@ -129,13 +128,10 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
     {
         // ReSharper disable UnassignedGetOnlyAutoProperty
         public Guid TypeId { get; }
-        public string TypeName { get; }
-        public string PrefabAddress { get; }
         public bool IsDefensive { get; }
         public Guid? AmmunitionTypeId { get; set; }
         public bool AllowAutomatic { get; }
         public bool AllowTwoHanded { get; }
         public bool EnforceTwoHanded { get; }
-        public string PrefabAddressTwoHanded { get; }
     }
 }

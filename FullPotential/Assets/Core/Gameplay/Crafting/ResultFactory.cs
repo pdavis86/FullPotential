@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
@@ -34,9 +34,9 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private readonly List<ILoot> _lootTypes;
         private readonly List<IAmmunition> _ammoTypes;
+        private readonly List<ITargeting> _targetingTypes;
+        private readonly List<IShape> _shapeTypes;
         private readonly List<IEffect> _effectsForLoot;
-        private readonly List<ITargeting> _targetingOptions;
-        private readonly List<IShape> _shapeOptions;
 
         public ResultFactory(
             ITypeRegistry typeRegistry,
@@ -47,9 +47,12 @@ namespace FullPotential.Core.Gameplay.Crafting
 
             _lootTypes = _typeRegistry.GetRegisteredTypes<ILoot>().ToList();
             _ammoTypes = _typeRegistry.GetRegisteredTypes<IAmmunition>().ToList();
-            _effectsForLoot = _typeRegistry.GetLootPossibilities();
-            _targetingOptions = _typeRegistry.GetRegisteredTypes<ITargeting>().ToList();
-            _shapeOptions = _typeRegistry.GetRegisteredTypes<IShape>().ToList();
+            _targetingTypes = _typeRegistry.GetRegisteredTypes<ITargeting>().ToList();
+            _shapeTypes = _typeRegistry.GetRegisteredTypes<IShape>().ToList();
+
+            _effectsForLoot = _typeRegistry.GetRegisteredTypes<IEffect>()
+                .Where(x => x is not IIsSideEffect)
+                .ToList();
         }
 
         private int ComputeAttribute(IList<ItemForCombatBase> components, Func<ItemForCombatBase, int> getProp, bool allowMax = true)
@@ -100,7 +103,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 return null;
             }
 
-            return _shapeOptions.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
+            return _shapeTypes.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
         }
 
         private List<IEffect> GetEffects(CraftableType craftableType, IList<ItemForCombatBase> components, ITargeting targeting = null)
@@ -112,7 +115,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             var effects = components
                 .Where(x => x.Effects != null)
                 .SelectMany(x => x.Effects)
-                .GroupBy(x => x.TypeName)
+                .GroupBy(x => x.TypeId)
                 .Select(x => x.First());
 
             var effectTypeLookup = effects
@@ -127,12 +130,12 @@ namespace FullPotential.Core.Gameplay.Crafting
                                 : debuff;
                         }
 
-                        if (x is not IStatEffect statEffect)
+                        if (x is not IResourceEffect resourceEffect)
                         {
                             return other;
                         }
 
-                        switch (statEffect.AffectType)
+                        switch (resourceEffect.AffectType)
                         {
                             case AffectType.PeriodicIncrease:
                             case AffectType.SingleIncrease:
@@ -218,7 +221,7 @@ namespace FullPotential.Core.Gameplay.Crafting
         {
             if (IsSuccess(50))
             {
-                return _targetingOptions.ElementAt(_random.Next(0, _targetingOptions.Count));
+                return _targetingTypes.ElementAt(_random.Next(0, _targetingTypes.Count));
             }
             return null;
         }
@@ -227,7 +230,7 @@ namespace FullPotential.Core.Gameplay.Crafting
         {
             if (IsSuccess(10))
             {
-                return _shapeOptions.ElementAt(_random.Next(0, _shapeOptions.Count));
+                return _shapeTypes.ElementAt(_random.Next(0, _shapeTypes.Count));
             }
             return null;
         }
@@ -250,36 +253,34 @@ namespace FullPotential.Core.Gameplay.Crafting
                     Recovery = GetAttributeValue(75),
                     Duration = GetAttributeValue(75),
                     Luck = GetAttributeValue(75)
-                }
+                },
+                RegistryType = _lootTypes
+                    .OrderBy(_ => _random.Next())
+                    .First()
             };
 
-            var magicalLootTypes = _lootTypes.Where(x => x.ResourceConsumptionType == ResourceType.Mana).ToList();
-
-            var isMagical = magicalLootTypes.Any() && IsSuccess(50);
-            if (isMagical)
+            if (IsSuccess(50))
             {
-                lootDrop.RegistryType = magicalLootTypes
-                    .OrderBy(_ => _random.Next())
-                    .First();
-
                 var effects = new List<IEffect>();
                 var numberOfEffects = GetMinBiasedNumber(1, Math.Min(4, _effectsForLoot.Count));
                 for (var i = 1; i <= numberOfEffects; i++)
                 {
                     IEffect effect;
                     var debugCounter = 0;
+
                     do
                     {
                         effect = GetRandomEffect();
                         debugCounter++;
                     }
                     while (debugCounter < 10 && (effect == null || effects.Contains(effect)));
-                    effects.Add(effect);
 
                     if (debugCounter >= 10)
                     {
                         UnityEngine.Debug.LogError("Infinite loop situation here. Go fix it!");
                     }
+
+                    effects.Add(effect);
                 }
 
                 lootDrop.Effects = effects.ToList();
@@ -287,13 +288,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 lootDrop.Targeting = GetRandomTargetingOrNone();
                 lootDrop.Shape = GetRandomShapeOrNone();
             }
-            else
-            {
-                lootDrop.RegistryType = _lootTypes
-                    .Where(x => x.ResourceConsumptionType == ResourceType.Energy)
-                    .OrderBy(_ => _random.Next())
-                    .First();
-            }
+
 
             var typeTranslation = _localizer.Translate("crafting.loot.type");
             var suffix = int.Parse(lootDrop.GetNameHash().ToString().TrimStart('-').Substring(5));
@@ -315,7 +310,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             {
                 RegistryType = randomAmmo,
                 Id = Guid.NewGuid().ToMinimisedString(),
-                Name = $"{_localizer.Translate(randomAmmo)} ({randomCount})",
+                BaseName = _localizer.Translate(randomAmmo),
                 Count = randomCount
             };
         }
@@ -325,16 +320,18 @@ namespace FullPotential.Core.Gameplay.Crafting
             return min + (int)Math.Round((max - min) * Math.Pow(_random.NextDouble(), 3), 0);
         }
 
-        private Consumer GetConsumer(CraftableType craftableType, ResourceType type, IList<ItemForCombatBase> components)
+        private Consumer GetConsumer(CraftableType craftableType, string resourceTypeId, IList<ItemForCombatBase> components)
         {
             var relevantComponents = components.OfType<IHasTargetingAndShape>().ToList();
 
             var targeting = GetTargeting(relevantComponents);
 
+            var resourceType = _typeRegistry.GetRegisteredByTypeId<IResource>(resourceTypeId);
+
             var consumer = new Consumer
             {
                 Id = Guid.NewGuid().ToMinimisedString(),
-                ResourceType = type,
+                ResourceType = resourceType,
                 Targeting = targeting,
                 Shape = GetShapeOrNone(targeting, relevantComponents),
                 Attributes = new Attributes
@@ -446,7 +443,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Armor GetArmor(IArmorVisuals craftableType, IList<ItemForCombatBase> components)
+        private Armor GetArmor(IArmor craftableType, IList<ItemForCombatBase> components)
         {
             var armor = new Armor
             {
@@ -463,9 +460,9 @@ namespace FullPotential.Core.Gameplay.Crafting
             return armor;
         }
 
-        private Armor GetBarrier(IArmorVisuals craftableType, IList<ItemForCombatBase> components)
+        private Accessory GetAccessory(IAccessory craftableType, IList<ItemForCombatBase> components)
         {
-            var armor = new Armor
+            var accessory = new Accessory
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),
@@ -477,44 +474,45 @@ namespace FullPotential.Core.Gameplay.Crafting
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
                 },
-                Effects = GetEffects(CraftableType.Armor, components)
-            };
-            armor.Name = GetItemName(false, armor);
-            return armor;
-        }
-
-        private Accessory GetAccessory(IAccessoryVisuals craftableType, IList<ItemForCombatBase> components)
-        {
-            var accessory = new Accessory
-            {
-                RegistryType = craftableType,
-                Id = Guid.NewGuid().ToMinimisedString(),
-                Attributes = new Attributes
-                {
-                    IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength)
-                },
                 Effects = GetEffects(CraftableType.Accessory, components)
             };
             accessory.Name = GetItemName(true, accessory);
             return accessory;
         }
 
-        public ItemBase GetCraftedItem(CraftableType craftableType, string subTypeName, bool isTwoHanded, IList<ItemForCombatBase> components)
+        private SpecialGear GetSpecialGear(ISpecialGear craftableType, IList<ItemForCombatBase> components)
         {
-            //todo: weapon, armor, and accessory crafting were accidentally working because the class names matched the type names
-            //work out if they ARE visuals or they are types. I think split weapons into types with a default visuals type id
+            //todo: zzz v0.4.1 - all attributes for specials
 
-            //todo: accessory crafting needs to get behaviour
+            var specialGear = new SpecialGear
+            {
+                RegistryType = craftableType,
+                Id = Guid.NewGuid().ToMinimisedString(),
+                Attributes = new Attributes
+                {
+                    IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
+                    Strength = ComputeAttribute(components, x => x.Attributes.Strength),
+                    Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
+                    Speed = ComputeAttribute(components, x => x.Attributes.Speed),
+                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
+                },
+            };
 
+            //todo: zzz v0.4.1 - better name for specials
+            specialGear.Name = craftableType.GetType().Name;
+
+            return specialGear;
+        }
+
+        public ItemBase GetCraftedItem(CraftableType craftableType, string typeId, bool isTwoHanded, IList<ItemForCombatBase> components)
+        {
             switch (craftableType)
             {
                 case CraftableType.Consumer:
-                    var consumptionType = (ResourceType)Enum.Parse(typeof(ResourceType), subTypeName);
-                    return GetConsumer(craftableType, consumptionType, components);
+                    return GetConsumer(craftableType, typeId, components);
 
                 case CraftableType.Weapon:
-                    var weaponType = _typeRegistry.GetRegisteredByTypeName<IWeapon>(subTypeName);
+                    var weaponType = _typeRegistry.GetRegisteredByTypeId<IWeapon>(typeId);
                     if (weaponType.IsDefensive)
                     {
                         return GetDefensiveWeapon(weaponType, components, isTwoHanded);
@@ -528,14 +526,16 @@ namespace FullPotential.Core.Gameplay.Crafting
                     return GetRangedWeapon(weaponType, components, isTwoHanded);
 
                 case CraftableType.Armor:
-                    var craftableArmor = _typeRegistry.GetRegisteredByTypeName<IArmorVisuals>(subTypeName);
-                    return craftableArmor.Type == ArmorType.Barrier
-                        ? GetBarrier(craftableArmor, components)
-                        : GetArmor(craftableArmor, components);
+                    var craftableArmor = _typeRegistry.GetRegisteredByTypeId<IArmor>(typeId);
+                    return GetArmor(craftableArmor, components);
 
                 case CraftableType.Accessory:
-                    var craftableAccessory = _typeRegistry.GetRegisteredByTypeName<IAccessoryVisuals>(subTypeName);
+                    var craftableAccessory = _typeRegistry.GetRegisteredByTypeId<IAccessory>(typeId);
                     return GetAccessory(craftableAccessory, components);
+
+                case CraftableType.Special:
+                    var craftableSpecial = _typeRegistry.GetRegisteredByTypeId<ISpecialGear>(typeId);
+                    return GetSpecialGear(craftableSpecial, components);
 
                 default:
                     throw new Exception($"Unexpected craftable category '{craftableType}'");

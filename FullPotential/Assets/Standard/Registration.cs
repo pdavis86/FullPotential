@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Modding;
+using FullPotential.Standard.SpecialGear.Reloader;
+using FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader;
+using FullPotential.Standard.SpecialGear.Reloader.TeleportReloader;
 using UnityEngine;
 
 // ReSharper disable UnusedType.Global
@@ -14,37 +18,13 @@ namespace FullPotential.Standard
         {
             return new[]
             {
-                typeof(Accessories.SilverNecklace),
-                typeof(Accessories.LeatherBelt),
-                typeof(Accessories.SilverRing),
-
-                typeof(Armor.LeatherHelmet),
-                typeof(Armor.LeatherJerkin),
-                typeof(Armor.LeatherGreaves),
-                typeof(Armor.LeatherBoots),
-                typeof(Armor.BasicWard),
-                
-                typeof(Targeting.ProjectileFlames),
-
-                typeof(Shapes.WallOfFlames),
-                typeof(Shapes.ZoneOfFlames),
-
-                typeof(Loot.Scrap),
-                typeof(Loot.Shard),
-                typeof(Loot.Junk),
+                typeof(Accessories.Ring),
+                typeof(Accessories.Amulet),
+                typeof(Accessories.Barrier),
+                typeof(Accessories.Belt),
 
                 typeof(Ammo.Arrow),
                 typeof(Ammo.Bullet),
-
-                typeof(Weapons.Axe),
-                typeof(Weapons.Bow),
-                typeof(Weapons.Crossbow),
-                typeof(Weapons.Dagger),
-                typeof(Weapons.Gun),
-                typeof(Weapons.Hammer),
-                typeof(Weapons.Shield),
-                typeof(Weapons.Staff),
-                typeof(Weapons.Sword),
 
                 typeof(Effects.Buffs.Courage),
                 typeof(Effects.Buffs.Endurance),
@@ -89,37 +69,88 @@ namespace FullPotential.Standard
                 typeof(Effects.Support.Reflect),
                 typeof(Effects.Support.Float),
                 typeof(Effects.Support.Summon),
+
+                typeof(Loot.Scrap),
+                typeof(Loot.Shard),
+                typeof(Loot.Junk),
+
+                typeof(ConsolidatorReloader),
+                typeof(TeleportReloader),
+
+                typeof(SpecialSlots.RangedWeaponReloader),
+
+                typeof(Weapons.Axe),
+                typeof(Weapons.Bow),
+                typeof(Weapons.Crossbow),
+                typeof(Weapons.Dagger),
+                typeof(Weapons.Gun),
+                typeof(Weapons.Hammer),
+                typeof(Weapons.Shield),
+                typeof(Weapons.Staff),
+                typeof(Weapons.Sword),
+
+                typeof(Armor.Helm),
+                typeof(Armor.Chest),
+                typeof(Armor.Legs),
+                typeof(Armor.Feet),
+
+                typeof(Targeting.PointToPoint),
+                typeof(Targeting.Projectile),
+                typeof(Targeting.Self),
+                typeof(Targeting.Touch),
+
+                typeof(Shapes.Wall),
+                typeof(Shapes.Zone),
+        };
+        }
+
+        public IEnumerable<Type> GetRegisterableVisuals()
+        {
+            return new[]
+            {
+                typeof(AccessoryVisuals.SilverNecklace),
+                typeof(AccessoryVisuals.LeatherBelt),
+                typeof(AccessoryVisuals.SilverRing),
+                typeof(AccessoryVisuals.BasicWard),
+
+                typeof(ArmorVisuals.LeatherHelmet),
+                typeof(ArmorVisuals.LeatherJerkin),
+                typeof(ArmorVisuals.LeatherGreaves),
+                typeof(ArmorVisuals.LeatherBoots),
+
+                typeof(ShapeVisuals.WallOfFlames),
+                typeof(ShapeVisuals.ZoneOfFlames),
+
+                typeof(TargetingVisuals.BeamOfFlames),
+                typeof(TargetingVisuals.ProjectileFlames),
+
+                typeof(WeaponVisuals.BasicAxe),
+                typeof(WeaponVisuals.BasicBow),
+                typeof(WeaponVisuals.BasicCrossbow),
+                typeof(WeaponVisuals.BasicDagger),
+                typeof(WeaponVisuals.BasicGun),
+                typeof(WeaponVisuals.BasicHammer),
+                typeof(WeaponVisuals.BasicShield),
+                typeof(WeaponVisuals.BasicStaff),
+                typeof(WeaponVisuals.BasicSword),
             };
         }
 
         public IEnumerable<string> GetNetworkPrefabAddresses()
         {
-            return Array.Empty<string>();
+            return new[]
+            {
+                Shapes.Wall.AddressablePath,
+                Shapes.Zone.AddressablePath,
+                Targeting.PointToPoint.AddressablePath,
+                Targeting.Projectile.AddressablePath,
+            };
         }
 
         public void RegisterEventHandlers(IEventManager eventManager)
         {
-            //eventManager.Subscribe(EventIds.ReloadStart, new Blah());
+            eventManager.Subscribe(FighterBase.EventIdDamageTaken, new Accessories.BarrierEventHandler());
+            eventManager.Subscribe(InventoryBase.EventIdSlotChange, new ReloaderSlotChangeEventHandler());
         }
     }
-
-    //class Blah : IEventHandler
-    //{
-    //    public Func<IEventHandlerArgs, Task> BeforeEventAsync => Before;
-
-    //    public Func<IEventHandlerArgs, Task> AfterEventAsync => After;
-
-    //    private Task Before(IEventHandlerArgs args)
-    //    {
-    //        Debug.Log("Before cancelling");
-    //        args.IsDefaultHandlerCancelled = true;
-    //        return Task.CompletedTask;
-    //    }
-
-    //    private Task After(IEventHandlerArgs args)
-    //    {
-    //        Debug.Log("After");
-    //        return Task.CompletedTask;
-    //    }
-    //}
 }

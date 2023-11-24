@@ -385,8 +385,13 @@ namespace FullPotential.Core.GameManagement
         {
             var eventManager = (EventManager)DependenciesContext.Dependencies.GetService<IEventManager>();
 
-            eventManager.Register(EventIds.FighterReloadStart, FighterBase.HandleReloadStartEvent);
-            eventManager.Register(EventIds.FighterReloadEnd, null);
+            eventManager.Register(FighterBase.EventIdReload, FighterBase.DefaultHandlerForReloadEvent);
+            eventManager.Register(FighterBase.EventIdDamageTaken, null);
+            eventManager.Register(FighterBase.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEvent);
+
+            eventManager.Register(InventoryBase.EventIdSlotChange, InventoryBase.DefaultHandlerForSlotChangeEvent);
+
+            eventManager.Register(LivingEntityBase.EventIdResourceValueChanged, null);
         }
 
         #region Methods for Mods
