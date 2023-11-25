@@ -91,7 +91,6 @@
     <Compile Include="Assets\Api\Registry\Gear\ISpecialGear.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\AffectType.cs" />
     <Compile Include="Assets\Api\Items\Types\Accessory.cs" />
-    <Compile Include="Assets\Api\Gameplay\Combat\IDamageable.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\ActiveEffect.cs" />
     <Compile Include="Assets\Api\Input\DefaultInputActions.cs" />
     <Compile Include="Assets\Api\Utilities\ActionQueue.cs" />

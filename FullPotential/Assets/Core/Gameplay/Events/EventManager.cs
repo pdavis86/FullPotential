@@ -18,6 +18,12 @@ namespace FullPotential.Core.Gameplay.Events
 
         public void Subscribe(string eventId, IEventHandler handler)
         {
+            if (_subscriptions[eventId].OtherHandlers.Contains(handler))
+            {
+                Debug.LogWarning("Subscribe has been called multiple times with the same handler");
+                return;
+            }
+
             _subscriptions[eventId].OtherHandlers.Add(handler);
         }
 

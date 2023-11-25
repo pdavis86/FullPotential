@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
-    public abstract class FighterBase : LivingEntityBase, IDefensible, IDamageable, IMoveable
+    public abstract class FighterBase : LivingEntityBase, IDefensible, IMoveable
     {
         public const string EventIdReload = "2337f94e-5a7d-4e02-b1c8-1b5e9934a3ce";
         public const string EventIdDamageTaken = "4e8f6a71-3708-47f2-bc57-36bcc5596d0c";
@@ -599,8 +599,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : handPosition + shotDirection * MaximumRange;
 
             var eventArgs = GetShotFiredEventArgs(isLeftHand, handPosition, endPos);
-            _eventManager.Trigger(FighterBase.EventIdShotFired, eventArgs);
-            _eventManager.After(FighterBase.EventIdShotFired, eventArgs);
+            _eventManager.Trigger(EventIdShotFired, eventArgs);
+            _eventManager.After(EventIdShotFired, eventArgs);
 
             if (rangedHit.transform == null)
             {

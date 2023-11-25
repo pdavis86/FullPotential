@@ -12,7 +12,7 @@ namespace FullPotential.Core.Gameplay.Events
 
         public Action<IEventHandlerArgs> DefaultHandler { get; }
 
-        public List<IEventHandler> OtherHandlers { get; } = new List<IEventHandler>();
+        public HashSet<IEventHandler> OtherHandlers { get; } = new HashSet<IEventHandler>();
 
         public EventHandlerGroup(string eventId, Action<IEventHandlerArgs> defaultHandler)
         {
