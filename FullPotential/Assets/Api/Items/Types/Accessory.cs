@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
@@ -67,6 +66,11 @@ namespace FullPotential.Api.Items.Types
             sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Recovery))}: {Attributes.Recovery})\n");
 
             return sb.ToString().Trim();
+        }
+
+        public static string GetSlotId(string typeId, int index)
+        {
+            return $"{typeId};{index}";
         }
 
         private string GetBarrierDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)

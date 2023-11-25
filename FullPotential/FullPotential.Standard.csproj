@@ -137,12 +137,12 @@
     <Compile Include="Assets\Standard\Effects\Debuffs\ShortCircuit.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicSword.cs" />
     <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\ShotFiredEventHandler.cs" />
-    <Compile Include="Assets\Standard\SpecialSlots\RangedWeaponReloader.cs" />
+    <Compile Include="Assets\Standard\SpecialSlots\RangedWeaponReloaderSlot.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Water.cs" />
     <Compile Include="Assets\Standard\TargetingVisuals\BeamOfFlames.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicHammer2.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicDagger.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\Reloader\ReloaderSlotChangeEventHandler.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Reloader\SlotChangeEventHandler.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicAxe.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\StepBack.cs" />
     <Compile Include="Assets\Standard\AccessoryVisuals\LeatherBelt.cs" />
@@ -166,6 +166,9 @@
     <Compile Include="Assets\Standard\Effects\Movement\Attract.cs" />
     <Compile Include="Assets\Standard\Accessories\Amulet.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveLeft.cs" />
+    <Compile Include="Assets\Standard\Accessories\AutoAmmoBuyer\AutoAmmoBuyer.cs" />
+    <Compile Include="Assets\Standard\Accessories\AutoAmmoBuyer\ReloadEventHandler.cs" />
+    <Compile Include="Assets\Standard\Accessories\AutoAmmoBuyer\SlotChangeEventHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Standard\FullPotential.Standard.asmdef" />

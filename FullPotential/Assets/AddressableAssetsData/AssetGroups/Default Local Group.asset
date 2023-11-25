@@ -252,6 +252,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5eb315cf7251df740a8c45119362d0ed
+    m_Address: Standard/UI/Equipment/AutoAmmoBuyer.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 101452080fc0cca43abdd31fc4649980, type: 2}
   m_SchemaSet:

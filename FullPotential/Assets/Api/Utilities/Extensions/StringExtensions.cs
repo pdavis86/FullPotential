@@ -1,5 +1,7 @@
 ﻿// ReSharper disable UnusedMember.Global
 
+using System.Text;
+
 namespace FullPotential.Api.Utilities.Extensions
 {
     public static class StringExtensions
@@ -21,5 +23,19 @@ namespace FullPotential.Api.Utilities.Extensions
             return value ?? string.Empty;
         }
 
+        public static string ToSpacedString(this string value)
+        {
+            var builder = new StringBuilder();
+            foreach (var c in value)
+            {
+                if (char.IsUpper(c) && builder.Length > 0)
+                {
+                    builder.Append(' ');
+                }
+
+                builder.Append(c);
+            }
+            return builder.ToString();
+        }
     }
 }

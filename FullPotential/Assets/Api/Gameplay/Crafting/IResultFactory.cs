@@ -9,6 +9,11 @@ namespace FullPotential.Api.Gameplay.Crafting
 
         ItemBase GetAmmoDrop();
 
-        ItemBase GetCraftedItem(CraftableType craftableType, string typeId, bool isTwoHanded, IList<ItemForCombatBase> components);
+        ItemBase GetCraftedItem(
+            CraftableType craftableType,
+            string typeId,
+            string resourceTypeId,
+            bool isTwoHanded,
+            IList<ItemForCombatBase> components);
     }
 }

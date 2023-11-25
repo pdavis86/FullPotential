@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Modding;
-using FullPotential.Standard.SpecialGear.Reloader;
-using FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader;
-using FullPotential.Standard.SpecialGear.Reloader.TeleportReloader;
 using UnityEngine;
 
 // ReSharper disable UnusedType.Global
@@ -22,6 +19,7 @@ namespace FullPotential.Standard
                 typeof(Accessories.Amulet),
                 typeof(Accessories.Barrier),
                 typeof(Accessories.Belt),
+                typeof(Accessories.AutoAmmoBuyer.AutoAmmoBuyer),
 
                 typeof(Ammo.Arrow),
                 typeof(Ammo.Bullet),
@@ -74,10 +72,10 @@ namespace FullPotential.Standard
                 typeof(Loot.Shard),
                 typeof(Loot.Junk),
 
-                typeof(ConsolidatorReloader),
-                typeof(TeleportReloader),
+                typeof(SpecialGear.Reloader.ConsolidatorReloader.ConsolidatorReloader),
+                typeof(SpecialGear.Reloader.TeleportReloader.TeleportReloader),
 
-                typeof(SpecialSlots.RangedWeaponReloader),
+                typeof(SpecialSlots.RangedWeaponReloaderSlot),
 
                 typeof(Weapons.Axe),
                 typeof(Weapons.Bow),
@@ -150,7 +148,8 @@ namespace FullPotential.Standard
         public void RegisterEventHandlers(IEventManager eventManager)
         {
             eventManager.Subscribe(FighterBase.EventIdDamageTaken, new Accessories.BarrierEventHandler());
-            eventManager.Subscribe(InventoryBase.EventIdSlotChange, new ReloaderSlotChangeEventHandler());
+            eventManager.Subscribe(InventoryBase.EventIdSlotChange, new SpecialGear.Reloader.SlotChangeEventHandler());
+            eventManager.Subscribe(InventoryBase.EventIdSlotChange, new Accessories.AutoAmmoBuyer.SlotChangeEventHandler());
         }
     }
 }

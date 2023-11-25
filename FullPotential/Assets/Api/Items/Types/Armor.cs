@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;

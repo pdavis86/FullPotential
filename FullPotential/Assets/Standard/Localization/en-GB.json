@@ -22,6 +22,10 @@
       "Key": "accessory.barrier",
       "Value": "Barrier"
     },
+    {
+      "Key": "accessory.autoammobuyer",
+      "Value": "Auto Ammo Buyer"
+    },
 
 
     {
@@ -471,9 +475,12 @@
 	
 	
 	{
-      "Key": "slot.rangedweaponreloader",
+      "Key": "slot.rangedweaponreloaderslot",
       "Value": "Weapon Reloader"
-    }
-    
+    },
+	{
+      "Key": "slot.autoammobuyerslot",
+      "Value": "Auto Ammo Buyer"
+    }    
   ]
 }

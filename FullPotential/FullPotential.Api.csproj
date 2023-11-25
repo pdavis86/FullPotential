@@ -88,7 +88,6 @@
     <Compile Include="Assets\Api\Registry\Effects\ICustomEffect.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IAccessoryVisuals.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\TransformExtensions.cs" />
-    <Compile Include="Assets\Api\Gameplay\Items\LevelOfDetail.cs" />
     <Compile Include="Assets\Api\Registry\Gear\ISpecialGear.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\AffectType.cs" />
     <Compile Include="Assets\Api\Items\Types\Accessory.cs" />
@@ -103,7 +102,6 @@
     <Compile Include="Assets\Api\Utilities\Extensions\StringExtensions.cs" />
     <Compile Include="Assets\Api\Ui\Services\UiAssistant.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IResourceEffect.cs" />
-    <Compile Include="Assets\Api\Registry\Gear\IHasEventHandlers.cs" />
     <Compile Include="Assets\Api\Items\Types\Consumer.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\IDefensible.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\InventoryBase.cs" />
@@ -176,7 +174,6 @@
     <Compile Include="Assets\Api\Gameplay\Crafting\IResultFactory.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\PlayerSettings.cs" />
     <Compile Include="Assets\Api\Modding\IMod.cs" />
-    <Compile Include="Assets\Api\Gameplay\Items\DestroyStoppable.cs" />
     <Compile Include="Assets\Api\Obsolete\AttributeAffected.cs" />
     <Compile Include="Assets\Api\Unity\Constants\ShaderRenderMode.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IRegisterableWithSlot.cs" />
@@ -184,6 +181,9 @@
     <Compile Include="Assets\Api\Registry\Elements\IElement.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Tags.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\InventoryChanges.cs" />
+    <Compile Include="Assets\Api\Items\IResourceConsumer.cs" />
+    <Compile Include="Assets\Api\Items\DestroyStoppable.cs" />
+    <Compile Include="Assets\Api\Items\LevelOfDetail.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Api\FullPotential.Api.asmdef" />

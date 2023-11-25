@@ -10,7 +10,7 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.SpecialGear.Reloader
 {
-    public class ReloaderSlotChangeEventHandler : IEventHandler
+    public class SlotChangeEventHandler : IEventHandler
     {
         private static readonly ConsolidatorReloader.ReloadEventHandler ConsolidatorReloadHandler = new ConsolidatorReloader.ReloadEventHandler();
         private static readonly TeleportReloader.ReloadEventHandler TeleportReloadHandler = new TeleportReloader.ReloadEventHandler();
@@ -26,14 +26,15 @@ namespace FullPotential.Standard.SpecialGear.Reloader
 
             if (slotChangeArgs.SlotId != HandSlotIds.LeftHand
                 && slotChangeArgs.SlotId != HandSlotIds.RightHand
-                && slotChangeArgs.SlotId != RangedWeaponReloader.TypeIdString)
+                && slotChangeArgs.SlotId != RangedWeaponReloaderSlot.TypeIdString)
             {
                 return;
             }
 
             var modHelper = DependenciesContext.Dependencies.GetService<IModHelper>();
             var hud = modHelper.GetGameManager().GetUserInterface().HudOverlay;
-            var reloaderEquipped = slotChangeArgs.Inventory.GetItemInSlot(RangedWeaponReloader.TypeIdString);
+
+            var reloaderEquipped = slotChangeArgs.Inventory.GetItemInSlot(RangedWeaponReloaderSlot.TypeIdString);
             var hasReloaderEquipped = reloaderEquipped != null;
 
             switch (slotChangeArgs.SlotId)
@@ -44,7 +45,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader
                     hud.SetHandWarning(isLeftHand, GetIsActive(slotChangeArgs.Inventory, slotChangeArgs.SlotId, hasReloaderEquipped));
                     return;
 
-                case RangedWeaponReloader.TypeIdString:
+                case RangedWeaponReloaderSlot.TypeIdString:
                     hud.SetHandWarning(true, GetIsActive(slotChangeArgs.Inventory, HandSlotIds.LeftHand, hasReloaderEquipped));
                     hud.SetHandWarning(false, GetIsActive(slotChangeArgs.Inventory, HandSlotIds.RightHand, hasReloaderEquipped));
 

@@ -108,8 +108,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : null;
         }
 
+        public void GiveItemStack(ItemStack itemStack)
+        {
+            //todo: this only works server side!
+            _items.Add(itemStack.Id, itemStack);
+        }
+
         public ItemStack TakeItemStack(string typeId, int maxSize)
         {
+            //todo: this only works server side!
+
             var matches = _items
                 .Where(
                     i => i.Value is ItemStack itemStack
@@ -267,6 +275,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
                 consumer.ResourceType = _typeRegistry.GetRegisteredTypes<IResource>()
                     .First(x => x.TypeId.ToString() == consumer.ResourceTypeId);
+            }
+            else if (item is SpecialGear specialGear)
+            {
+                specialGear.ResourceType = _typeRegistry.GetRegisteredTypes<IResource>()
+                    .First(x => x.TypeId.ToString() == specialGear.ResourceTypeId);
             }
 
             if (item is IHasVisuals itemWithVisuals)

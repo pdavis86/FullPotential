@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Gameplay.Crafting;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Unity.Extensions;
@@ -88,10 +88,11 @@ namespace FullPotential.Core.Ui.Behaviours
 
             var componentIds = string.Join(',', _components.Select(x => x.Id));
             var selectedType = _craftingSelector.GetTypeToCraft();
-            var selectedSubType = _craftingSelector.GetTypeId(selectedType);
+            var selectedSubType = _craftingSelector.GetSubTypeId(selectedType);
+            var resourceTypeId = _craftingSelector.GetResourceTypeId();
             var isTwoHanded = _craftingSelector.IsTwoHandedSelected();
 
-            _playerBehaviour.CraftItemServerRpc(componentIds, selectedType.ToString(), selectedSubType, isTwoHanded, _craftName.text);
+            _playerBehaviour.CraftItemServerRpc(componentIds, selectedType.ToString(), selectedSubType, resourceTypeId, isTwoHanded, _craftName.text);
         }
 
         // ReSharper disable once MemberCanBePrivate.Global
@@ -184,7 +185,8 @@ namespace FullPotential.Core.Ui.Behaviours
 
             var craftedItem = _resultFactory.GetCraftedItem(
                 craftableType,
-                _craftingSelector.GetTypeId(craftableType),
+                _craftingSelector.GetSubTypeId(craftableType),
+                _craftingSelector.GetResourceTypeId(),
                 _craftingSelector.IsTwoHandedSelected(),
                 _components
             );

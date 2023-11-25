@@ -68,7 +68,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             var max = withValue.Max(getProp);
             var topEndSkew = max - ((max - min) / 10);
 
-            int result = allowMax
+            var result = allowMax
                 ? topEndSkew
                 : (int)Math.Round(topEndSkew - (0.009 * (topEndSkew - 50)), MidpointRounding.AwayFromZero);
 
@@ -466,6 +466,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),
+                Name = craftableType.GetType().Name.ToSpacedString(),
                 Attributes = new Attributes
                 {
                     IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
@@ -476,18 +477,23 @@ namespace FullPotential.Core.Gameplay.Crafting
                 },
                 Effects = GetEffects(CraftableType.Accessory, components)
             };
-            accessory.Name = GetItemName(true, accessory);
             return accessory;
         }
 
-        private SpecialGear GetSpecialGear(ISpecialGear craftableType, IList<ItemForCombatBase> components)
+        private SpecialGear GetSpecialGear(ISpecialGear craftableType, string resourceTypeId, IList<ItemForCombatBase> components)
         {
             //todo: zzz v0.4.1 - all attributes for specials
+
+            var resourceType = resourceTypeId.IsNullOrWhiteSpace()
+                ? null
+                : _typeRegistry.GetRegisteredByTypeId<IResource>(resourceTypeId);
 
             var specialGear = new SpecialGear
             {
                 RegistryType = craftableType,
                 Id = Guid.NewGuid().ToMinimisedString(),
+                Name = craftableType.GetType().Name.ToSpacedString(),
+                ResourceType = resourceType,
                 Attributes = new Attributes
                 {
                     IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
@@ -498,18 +504,15 @@ namespace FullPotential.Core.Gameplay.Crafting
                 },
             };
 
-            //todo: zzz v0.4.1 - better name for specials
-            specialGear.Name = craftableType.GetType().Name;
-
             return specialGear;
         }
 
-        public ItemBase GetCraftedItem(CraftableType craftableType, string typeId, bool isTwoHanded, IList<ItemForCombatBase> components)
+        public ItemBase GetCraftedItem(CraftableType craftableType, string typeId, string resourceTypeId, bool isTwoHanded, IList<ItemForCombatBase> components)
         {
             switch (craftableType)
             {
                 case CraftableType.Consumer:
-                    return GetConsumer(craftableType, typeId, components);
+                    return GetConsumer(craftableType, resourceTypeId, components);
 
                 case CraftableType.Weapon:
                     var weaponType = _typeRegistry.GetRegisteredByTypeId<IWeapon>(typeId);
@@ -535,7 +538,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 
                 case CraftableType.Special:
                     var craftableSpecial = _typeRegistry.GetRegisteredByTypeId<ISpecialGear>(typeId);
-                    return GetSpecialGear(craftableSpecial, components);
+                    return GetSpecialGear(craftableSpecial, resourceTypeId, components);
 
                 default:
                     throw new Exception($"Unexpected craftable category '{craftableType}'");

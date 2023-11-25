@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.Accessories
@@ -11,8 +9,6 @@ namespace FullPotential.Standard.Accessories
 
         public Guid TypeId => new Guid(TypeIdString);
 
-        public Dictionary<string, IEventHandler> EventHandlers => null;
-        
         public int SlotCount => 2;
 
         public string SlotSpritePrefabAddress => "Standard/UI/Equipment/Ring.png";

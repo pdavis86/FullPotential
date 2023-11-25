@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
@@ -257,6 +256,16 @@ namespace FullPotential.Api.Items.Base
         {
             var maxAccuracyAngleDeviation = (101 - GetAccuracy()) / 100f * MaximumAccuracyAngleDeviation;
             return aimDirection.AddNoiseOnAngle(-maxAccuracyAngleDeviation, maxAccuracyAngleDeviation);
+        }
+
+        public int GetResourceCost()
+        {
+            var returnValue = GetHighInLowOutInRange(Attributes.Efficiency, 5, 50);
+
+            //todo: zzz v0.5 - trait-based mana cost
+
+            //Debug.Log("GetResourceCost: " + returnValue);
+            return (int)returnValue * Math.Max(Effects?.Count ?? 1, 1);
         }
 
     }

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
@@ -12,11 +9,6 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 
         public Guid TypeId => new Guid(TypeIdString);
 
-        public Guid SlotId => new Guid(SpecialSlots.RangedWeaponReloader.TypeIdString);
-
-        public Dictionary<string, IEventHandler> EventHandlers { get; } = new Dictionary<string, IEventHandler>
-        {
-            {FighterBase.EventIdReload, new ReloadEventHandler()}
-        };
+        public Guid SlotId => new Guid(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
     }
 }

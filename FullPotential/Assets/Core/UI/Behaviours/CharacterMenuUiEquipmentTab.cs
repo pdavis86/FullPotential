@@ -64,7 +64,7 @@ namespace FullPotential.Core.Ui.Behaviours
             {
                 for (var i = 1; i <= type.SlotCount; i++)
                 {
-                    InstantiateSlot($"{type.TypeId};{i}", type.SlotSpritePrefabAddress, _rhs.transform);
+                    InstantiateSlot(Accessory.GetSlotId(type.TypeId.ToString(), i), type.SlotSpritePrefabAddress, _rhs.transform);
                 }
             }
 

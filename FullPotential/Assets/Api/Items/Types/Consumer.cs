@@ -5,7 +5,6 @@ using System.Text;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
@@ -16,7 +15,7 @@ using FullPotential.Api.Utilities.Extensions;
 namespace FullPotential.Api.Items.Types
 {
     [Serializable]
-    public class Consumer : ItemWithTargetingAndShapeBase
+    public class Consumer : ItemWithTargetingAndShapeBase, IResourceConsumer
     {
         public const string AliasSegmentConsumer = "consumer";
         public const string AliasSegmentEffects = "effects";
@@ -38,14 +37,6 @@ namespace FullPotential.Api.Items.Types
         public int ChargePercentage { get; set; }
 
         public List<IStoppable> Stoppables { get; } = new List<IStoppable>();
-
-        public int GetResourceCost()
-        {
-            var returnValue = GetHighInLowOutInRange(Attributes.Efficiency, 5, 50);
-
-            //Debug.Log("GetResourceCost: " + returnValue);
-            return (int)returnValue * Math.Max(Effects.Count, 1);
-        }
 
         public float GetProjectileSpeed()
         {

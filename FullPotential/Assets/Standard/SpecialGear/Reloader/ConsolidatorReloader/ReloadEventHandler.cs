@@ -12,9 +12,16 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 
         private void HandleReloadBefore(IEventHandlerArgs eventArgs)
         {
-            eventArgs.IsDefaultHandlerCancelled = true;
-
             var reloadEventArgs = (ReloadEventArgs)eventArgs;
+
+            var reloader = (Api.Items.Types.SpecialGear)reloadEventArgs.Fighter.Inventory.GetItemInSlot(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+
+            if (!reloadEventArgs.Fighter.ConsumeResource(reloader))
+            {
+                return;
+            }
+
+            eventArgs.IsDefaultHandlerCancelled = true;
 
             reloadEventArgs.GetNewAmmoCount = () =>
             {

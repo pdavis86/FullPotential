@@ -14,6 +14,13 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
         {
             var shotFiredEventArgs = (ShotFiredEventArgs) eventArgs;
 
+            var reloader = (Api.Items.Types.SpecialGear)shotFiredEventArgs.Fighter.Inventory.GetItemInSlot(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+
+            if (!shotFiredEventArgs.Fighter.ConsumeResource(reloader, slowDrain: true))
+            {
+                return;
+            }
+
             var fighter = shotFiredEventArgs.Fighter;
             var handStatus = fighter.GetHandStatus(shotFiredEventArgs.IsLeftHand);
 
@@ -21,7 +28,6 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
             var ammoMax = handStatus.EquippedWeapon.GetAmmoMax();
             var ammoNeeded = ammoMax - handStatus.EquippedWeapon.Ammo;
             
-            //todo: zzz v0.5 take money for each item
             fighter.Inventory.TakeItemStack(ammoTypeId, ammoNeeded);
 
             handStatus.EquippedWeapon.Ammo = ammoMax;

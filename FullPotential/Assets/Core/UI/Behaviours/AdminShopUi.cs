@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Gameplay.Crafting;
-using FullPotential.Api.Gameplay.Items;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
@@ -274,7 +274,8 @@ namespace FullPotential.Core.UI.Behaviours
 
             return _resultFactory.GetCraftedItem(
                 typeToCraft,
-                _craftingSelector.GetTypeId(typeToCraft),
+                _craftingSelector.GetSubTypeId(typeToCraft),
+                _craftingSelector.GetResourceTypeId(),
                 _craftingSelector.IsTwoHandedSelected(),
                 new List<ItemForCombatBase> { component });
         }
@@ -296,7 +297,8 @@ namespace FullPotential.Core.UI.Behaviours
             GameManager.Instance.GetLocalPlayerGameObject().GetComponent<PlayerBehaviour>().CraftItemAsAdminServerRpc(
                 componentJson,
                 craftableType.ToString(),
-                _craftingSelector.GetTypeId(craftableType),
+                _craftingSelector.GetSubTypeId(craftableType),
+                _craftingSelector.GetResourceTypeId(),
                 _craftingSelector.IsTwoHandedSelected(),
                 _itemNameText.text
                 );

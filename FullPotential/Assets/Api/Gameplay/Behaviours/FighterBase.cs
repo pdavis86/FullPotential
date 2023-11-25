@@ -4,6 +4,7 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Player;
+using FullPotential.Api.Items;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Ui;
@@ -218,7 +219,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void TriggerReloadEvent(bool isLeftHand)
         {
-            _eventManager.Trigger(FighterBase.EventIdReload, GetReloadEventArgs(isLeftHand));
+            _eventManager.Trigger(EventIdReload, GetReloadEventArgs(isLeftHand));
         }
 
         public static void DefaultHandlerForReloadEvent(IEventHandlerArgs eventArgs)
@@ -649,16 +650,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return true;
         }
 
-        protected int GetResourceCost(Consumer consumer)
+        public bool ConsumeResource(IResourceConsumer resourceConsumerUsingItem, bool slowDrain = false, bool isTest = false)
         {
-            //todo: zzz v0.5 - trait-based mana cost
-            return consumer.GetResourceCost();
-        }
-
-        private bool ConsumeResource(Consumer consumer, bool slowDrain = false, bool isTest = false)
-        {
-            var resourceCost = GetResourceCost(consumer);
-            var resourceTypeId = consumer.ResourceType.TypeId.ToString();
+            var resourceCost = resourceConsumerUsingItem.GetResourceCost();
+            var resourceTypeId = resourceConsumerUsingItem.ResourceType.TypeId.ToString();
 
             if (slowDrain)
             {
