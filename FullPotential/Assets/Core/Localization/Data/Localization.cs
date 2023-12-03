@@ -1,5 +1,5 @@
 ﻿using System;
-using FullPotential.Api.Utilities.Data;
+using FullPotential.Api.Data;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnassignedField.Global
@@ -11,6 +11,6 @@ namespace FullPotential.Core.Localization.Data
     {
         public string Culture;
         public string Name;
-        public KeyValuePair<string, string>[] Translations;
+        public SerializableKeyValuePair<string, string>[] Translations;
     }
 }

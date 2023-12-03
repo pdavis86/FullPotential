@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory;
@@ -10,16 +11,12 @@ using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
-using FullPotential.Api.Networking;
+using FullPotential.Api.Persistence;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.GameManagement.Inventory;
-using FullPotential.Core.Networking;
-using FullPotential.Core.Networking.Data;
-using FullPotential.Core.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -30,14 +27,12 @@ namespace FullPotential.Core.Player
     public class PlayerInventory : InventoryBase, IPlayerInventory
     {
         //Services
-        private IRpcService _rpcService;
-        private IInventoryDataService _inventoryDataService;
         private IEventManager _eventManager;
+        private IPersistenceService _persistenceService;
 
-        private PlayerState _playerState;
+        private PlayerFighter _playerFighter;
 
         private readonly Dictionary<string, string> _itemIdToShapeMapping = new Dictionary<string, string>();
-        private readonly FragmentedMessageReconstructor _inventoryChangesReconstructor = new FragmentedMessageReconstructor();
 
         #region Unity Events Handlers
 
@@ -46,11 +41,10 @@ namespace FullPotential.Core.Player
         {
             base.Awake();
 
-            _playerState = GetComponent<PlayerState>();
+            _playerFighter = GetComponent<PlayerFighter>();
 
-            _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
-            _inventoryDataService = DependenciesContext.Dependencies.GetService<IInventoryDataService>();
             _eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
+            _persistenceService = DependenciesContext.Dependencies.GetService<IPersistenceService>();
         }
 
         #endregion
@@ -64,88 +58,23 @@ namespace FullPotential.Core.Player
 
             var slotChange = HandleSlotChange(item, slotId);
 
-            var saveData = GetSaveData();
+            _persistenceService.QueueAsapSave(_playerFighter.Username);
 
-            GameManager.Instance.QueueAsapSave(_playerState.Username);
-
-            var invChange = new InventoryChanges
+            var invChanges = new InventoryChanges
             {
-                EquippedItems = saveData.EquippedItems.Where(x => slotChange.SlotsToSend.Contains(x.Key)).ToArray()
+                EquippedItems = _equippedItems
+                    .Where(x => slotChange.SlotsToSend.Contains(x.Key))
+                    .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value.Item?.Id))
+                    .ToArray()
             };
 
             if (slotChange.WasEquipped)
             {
-                _inventoryDataService.PopulateInventoryChangesWithItem(invChange, item);
+                PopulateInventoryChangesWithItem(invChanges, item);
             }
 
-            var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-            foreach (var message in FragmentedMessageReconstructor.GetFragmentedMessages(invChange))
-            {
-                ApplyEquipChangeClientRpc(message, nearbyClients);
-            }
-        }
-
-        #endregion
-
-        #region ClientRpc calls
-
-        // ReSharper disable once UnusedParameter.Local
-        [ClientRpc]
-        private void ApplyEquipChangeClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams)
-        {
-            var fragmentedMessage = JsonUtility.FromJson<FragmentedMessage>(fragmentedMessageJson);
-
-            _inventoryChangesReconstructor.AddMessage(fragmentedMessage);
-            if (!_inventoryChangesReconstructor.HaveAllMessages(fragmentedMessage.GroupId))
-            {
-                return;
-            }
-
-            var changes = JsonUtility.FromJson<InventoryChanges>(_inventoryChangesReconstructor.Reconstruct(fragmentedMessage.GroupId));
-
-            var equippedItem = Enumerable.Empty<ItemBase>()
-                .UnionIfNotNull(changes.Accessories)
-                .UnionIfNotNull(changes.Armor)
-                .UnionIfNotNull(changes.Consumers)
-                .UnionIfNotNull(changes.Weapons)
-                .FirstOrDefault();
-
-            if (equippedItem != null && !_items.ContainsKey(equippedItem.Id))
-            {
-                FillTypesFromIds(equippedItem);
-                _items.Add(equippedItem.Id, equippedItem);
-            }
-
-            foreach (var sourceKvp in changes.EquippedItems)
-            {
-                var item = sourceKvp.Value.IsNullOrWhiteSpace() ? null : _items[sourceKvp.Value];
-                var slotId = sourceKvp.Key;
-
-                TriggerSlotChangeEvent(item, slotId);
-                SpawnEquippedObject(item, slotId);
-            }
-
-            if (NetworkManager.LocalClientId == OwnerClientId)
-            {
-                StartCoroutine(ResetEquipmentUi());
-            }
-            else if (!IsServer)
-            {
-                var keysToRemove = new List<string>();
-                foreach (var kvp in _items)
-                {
-                    if (GetEquippedWithItemId(kvp.Key) == null)
-                    {
-                        keysToRemove.Add(kvp.Key);
-                    }
-                }
-                foreach (var key in keysToRemove)
-                {
-                    _items.Remove(key);
-                }
-            }
-
-            _playerState.UpdateUiHealthAndDefenceValues();
+            var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, 0);
+            SendInventoryChangesToClients(invChanges, nearbyClients);
         }
 
         #endregion
@@ -248,66 +177,6 @@ namespace FullPotential.Core.Player
                 .OrderBy(x => x.Name);
         }
 
-        public void ApplyInventoryChanges(InventoryChanges changes)
-        {
-            if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
-            {
-                foreach (var id in changes.IdsToRemove)
-                {
-                    _items.Remove(id);
-                }
-                _playerState.AlertOfInventoryRemovals(changes.IdsToRemove.Length);
-            }
-
-            if (IsInventoryFull())
-            {
-                _playerState.AlertInventoryIsFull();
-
-                //todo: zzz v0.7 - send to storage when inventory full
-
-                return;
-            }
-
-            var itemsToAdd = Enumerable.Empty<ItemBase>()
-                .UnionIfNotNull(changes.Loot)
-                .UnionIfNotNull(changes.Accessories)
-                .UnionIfNotNull(changes.Armor)
-                .UnionIfNotNull(changes.Consumers)
-                .UnionIfNotNull(changes.ItemStacks)
-                .UnionIfNotNull(changes.SpecialGear)
-                .UnionIfNotNull(changes.Weapons);
-
-            foreach (var item in itemsToAdd)
-            {
-                FillTypesFromIds(item);
-
-                if (item is ItemStack itemStack)
-                {
-                    MergeItemStacks(itemStack);
-                }
-                else
-                {
-                    _items.Add(item.Id, item);
-                }
-            }
-
-            var itemToAddCount = itemsToAdd.Count();
-
-            switch (itemToAddCount)
-            {
-                case 1:
-                    var alert1Text = _localizer.Translate("ui.alert.itemadded");
-                    _playerState.ShowAlertForItemsAddedToInventory(string.Format(alert1Text, itemsToAdd.First().Name));
-                    break;
-
-                default:
-                    var alert2Text = _localizer.Translate("ui.alert.itemsadded");
-                    _playerState.ShowAlertForItemsAddedToInventory(string.Format(alert2Text, itemToAddCount));
-                    break;
-            }
-
-            GameManager.Instance.QueueAsapSave(_playerState.Username);
-        }
 
         public void LoadInventory(InventoryData inventoryData)
         {
@@ -315,14 +184,7 @@ namespace FullPotential.Core.Player
                 ? inventoryData.MaxItems
                 : 30;
 
-            var itemsToAdd = Enumerable.Empty<ItemBase>()
-                .UnionIfNotNull(inventoryData.Loot)
-                .UnionIfNotNull(inventoryData.Accessories)
-                .UnionIfNotNull(inventoryData.Armor)
-                .UnionIfNotNull(inventoryData.Weapons)
-                .UnionIfNotNull(inventoryData.Consumers)
-                .UnionIfNotNull(inventoryData.ItemStacks)
-                .UnionIfNotNull(inventoryData.SpecialGear);
+            var itemsToAdd = inventoryData.GetAllItems();
 
             foreach (var item in itemsToAdd)
             {
@@ -341,7 +203,13 @@ namespace FullPotential.Core.Player
 
                     var slotId = kvp.Key;
 
-                    var item = itemsToAdd.First(x => x.Id == kvp.Value);
+                    var item = itemsToAdd.FirstOrDefault(x => x.Id == kvp.Value);
+
+                    if (item == null)
+                    {
+                        Debug.LogWarning($"Item {kvp.Value} is missing");
+                        continue;
+                    }
 
                     TriggerSlotChangeEvent(item, slotId);
 
@@ -362,7 +230,6 @@ namespace FullPotential.Core.Player
         {
             var eventArgs = new SlotChangeEventArgs(this, slotId, item?.Id);
             _eventManager.Trigger(EventIdSlotChange, eventArgs);
-            _eventManager.After(EventIdSlotChange, eventArgs);
         }
 
         protected override void SetEquippedItem(string itemId, string slotId)
@@ -389,40 +256,90 @@ namespace FullPotential.Core.Player
 
             if (slotId == HandSlotIds.LeftHand)
             {
-                _playerState.HandStatusLeft.SetEquippedItem(item, item?.GetDescription(_localizer));
+                _playerFighter.HandStatusLeft.EquippedItemId = item?.Id;
+                _playerFighter.StopActiveConsumerBehaviour(_playerFighter.HandStatusLeft);
             }
             else if (slotId == HandSlotIds.RightHand)
             {
-                _playerState.HandStatusRight.SetEquippedItem(item, item?.GetDescription(_localizer));
+                _playerFighter.HandStatusRight.EquippedItemId = item?.Id;
+                _playerFighter.StopActiveConsumerBehaviour(_playerFighter.HandStatusRight);
             }
         }
 
-        public InventoryData GetSaveData()
+        protected override void ApplyEquippedItemChanges(SerializableKeyValuePair<string, string>[] equippedItems)
         {
-            var groupedItems = _items
-                .Select(x => x.Value)
-                .GroupBy(x => x.GetType());
-
-            var equippedItems = _equippedItems
-                .Where(x => !(x.Value?.Item?.Id.IsNullOrWhiteSpace() ?? false))
-                .Select(x => new Api.Utilities.Data.KeyValuePair<string, string>(x.Key, x.Value.Item?.Id));
-
-            var shapeMapping = _itemIdToShapeMapping
-                .Select(x => new Api.Utilities.Data.KeyValuePair<string, string>(x.Key, x.Value));
-
-            return new InventoryData
+            if (equippedItems == null || !equippedItems.Any())
             {
-                MaxItems = _maxItemCount,
-                Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(Loot))?.Select(x => x as Loot).ToArray(),
-                Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray(),
-                Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
-                Consumers = groupedItems.FirstOrDefault(x => x.Key == typeof(Consumer))?.Select(x => x as Consumer).ToArray(),
-                Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
-                ItemStacks = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemStack))?.Select(x => x as ItemStack).ToArray(),
-                SpecialGear = groupedItems.FirstOrDefault(x => x.Key == typeof(SpecialGear))?.Select(x => x as SpecialGear).ToArray(),
-                EquippedItems = equippedItems.ToArray(),
-                ShapeMapping = shapeMapping.ToArray()
-            };
+                return;
+            }
+
+            foreach (var sourceKvp in equippedItems)
+            {
+                var item = sourceKvp.Value.IsNullOrWhiteSpace() ? null : _items[sourceKvp.Value];
+                var slotId = sourceKvp.Key;
+
+                TriggerSlotChangeEvent(item, slotId);
+                SpawnEquippedObject(item, slotId);
+            }
+
+            if (NetworkManager.LocalClientId == OwnerClientId)
+            {
+                StartCoroutine(ResetEquipmentUi());
+            }
+            else if (!IsServer)
+            {
+                var keysToRemove = new List<string>();
+                foreach (var kvp in _items)
+                {
+                    if (GetEquippedWithItemId(kvp.Key) == null)
+                    {
+                        keysToRemove.Add(kvp.Key);
+                    }
+                }
+                foreach (var key in keysToRemove)
+                {
+                    _items.Remove(key);
+                }
+            }
+
+            _playerFighter.UpdateUiHealthAndDefenceValues();
+        }
+
+        protected override void NotifyOfItemsAdded(IEnumerable<ItemBase> itemsAdded)
+        {
+            var itemsAddedCount = itemsAdded.Count();
+
+            switch (itemsAddedCount)
+            {
+                case 0:
+                    return;
+
+                case 1:
+                    var alert1Text = _localizer.Translate("ui.alert.itemadded");
+                    _playerFighter.ShowAlertForItemsAddedToInventory(string.Format(alert1Text, itemsAdded.First().Name));
+                    break;
+
+                default:
+                    var alert2Text = _localizer.Translate("ui.alert.itemsadded");
+                    _playerFighter.ShowAlertForItemsAddedToInventory(string.Format(alert2Text, itemsAddedCount));
+                    break;
+            }
+
+            //bug: why is hand ammo not updating?
+        }
+
+        protected override void NotifyOfInventoryFull()
+        {
+            _playerFighter.AlertInventoryIsFull();
+
+            //todo: zzz v0.7 - send to storage when inventory full
+        }
+
+        protected override void NotifyOfItemsRemoved(IEnumerable<ItemBase> itemsRemoved)
+        {
+            var countRemoved = itemsRemoved.Count(x => x is not ItemStack);
+
+            _playerFighter.AlertOfInventoryRemovals(countRemoved);
         }
 
         public KeyValuePair<string, EquippedItem>? GetEquippedWithItemId(string itemId)
@@ -544,11 +461,11 @@ namespace FullPotential.Core.Player
 
         private void InstantiateInPlayerHand(GameObject prefab, bool isLeftHand, Vector3? rotation, string slotId)
         {
-            var newObj = Instantiate(prefab, _playerState.InFrontOfPlayer.transform);
+            var newObj = Instantiate(prefab, _playerFighter.InFrontOfPlayer.transform);
 
             newObj.transform.localPosition = isLeftHand
-                ? _playerState.Positions.LeftHand.localPosition
-                : _playerState.Positions.RightHand.localPosition;
+                ? _playerFighter.Positions.LeftHand.localPosition
+                : _playerFighter.Positions.RightHand.localPosition;
 
             if (rotation.HasValue)
             {
@@ -557,7 +474,7 @@ namespace FullPotential.Core.Player
 
             if (IsOwner)
             {
-                newObj.SetGameLayerRecursive(_playerState.InFrontOfPlayer.layer);
+                newObj.SetGameLayerRecursive(_playerFighter.InFrontOfPlayer.layer);
             }
 
             _equippedItems[slotId].GameObject = newObj;
@@ -681,6 +598,34 @@ namespace FullPotential.Core.Player
         private string GetShapeCodeWithoutLengths(string shapeCode)
         {
             return Regex.Replace(shapeCode, "(:\\d+)", string.Empty);
+        }
+
+        public InventoryData GetInventorySaveData()
+        {
+            var groupedItems = _items
+                .Select(x => x.Value)
+                .GroupBy(x => x.GetType());
+
+            var equippedItems = _equippedItems
+                .Where(x => !(x.Value?.Item?.Id.IsNullOrWhiteSpace() ?? false))
+                .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value.Item?.Id));
+
+            var shapeMapping = _itemIdToShapeMapping
+                .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value));
+
+            return new InventoryData
+            {
+                MaxItems = _maxItemCount,
+                Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(Loot))?.Select(x => x as Loot).ToArray(),
+                Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray(),
+                Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
+                Consumers = groupedItems.FirstOrDefault(x => x.Key == typeof(Consumer))?.Select(x => x as Consumer).ToArray(),
+                Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
+                ItemStacks = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemStack))?.Select(x => x as ItemStack).ToArray(),
+                SpecialGear = groupedItems.FirstOrDefault(x => x.Key == typeof(SpecialGear))?.Select(x => x as SpecialGear).ToArray(),
+                EquippedItems = equippedItems.ToArray(),
+                ShapeMapping = shapeMapping.ToArray()
+            };
         }
     }
 }

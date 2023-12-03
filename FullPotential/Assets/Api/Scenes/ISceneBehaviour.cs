@@ -1,5 +1,4 @@
-﻿using Unity.Netcode;
-using UnityEngine;
+﻿using UnityEngine;
 
 // ReSharper disable UnusedParameter.Global
 
@@ -16,7 +15,5 @@ namespace FullPotential.Api.Scenes
         SpawnPoint GetSpawnPoint();
 
         void HandleEnemyDeath();
-
-        void MakeAnnouncementClientRpc(string announcement, ClientRpcParams clientRpcParams);
     }
 }

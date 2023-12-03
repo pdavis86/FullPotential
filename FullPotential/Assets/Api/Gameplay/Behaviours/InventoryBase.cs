@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.EventArgs;
@@ -9,9 +10,11 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Networking;
+using FullPotential.Api.Obsolete.Networking;
+using FullPotential.Api.Obsolete.Networking.Data;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
-using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
@@ -21,12 +24,15 @@ using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable UnusedMemberHierarchy.Global
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
     public abstract class InventoryBase : NetworkBehaviour, IDefensible
     {
         public const string EventIdSlotChange = "9c7972de-4136-4825-aaa3-11925ad049ee";
+
+        private IFragmentedMessageReconstructor _inventoryChangesReconstructor;
 
         private int _armorSlotCount;
 
@@ -40,6 +46,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         //Services
         protected ITypeRegistry _typeRegistry;
         protected ILocalizer _localizer;
+        protected IRpcService _rpcService;
 
         // ReSharper restore InconsistentNaming
         #endregion
@@ -53,11 +60,137 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+            _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
 
             _armorSlotCount = _typeRegistry.GetRegisteredTypes<IArmor>().Count();
+
+            var fmrf = DependenciesContext.Dependencies.GetService<IFragmentedMessageReconstructorFactory>();
+            _inventoryChangesReconstructor = fmrf.Create();
         }
 
         #endregion
+
+        #region RPC Calls
+
+        public void SendInventoryChangesToClient(InventoryChanges changes)
+        {
+            if (IsHost && OwnerClientId == NetworkManager.Singleton.LocalClientId)
+            {
+                return;
+            }
+
+            SendInventoryChangesToClients(changes, _rpcService.ForPlayer(OwnerClientId));
+        }
+
+        protected void SendInventoryChangesToClients(InventoryChanges changes, ClientRpcParams rpcParams)
+        {
+            if (!IsServer)
+            {
+                return;
+            }
+
+            foreach (var message in _inventoryChangesReconstructor.GetFragmentedMessages(changes))
+            {
+                HandleChangeMessageFragmentClientRpc(message, rpcParams);
+            }
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        [ClientRpc]
+        private void HandleChangeMessageFragmentClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams)
+        {
+            var fragmentedMessage = JsonUtility.FromJson<FragmentedMessage>(fragmentedMessageJson);
+
+            _inventoryChangesReconstructor.AddMessage(fragmentedMessage);
+            if (!_inventoryChangesReconstructor.HaveAllMessages(fragmentedMessage.GroupId))
+            {
+                return;
+            }
+
+            var changes = JsonUtility.FromJson<InventoryChanges>(_inventoryChangesReconstructor.Reconstruct(fragmentedMessage.GroupId));
+            ApplyInventoryChanges(changes);
+        }
+
+        #endregion
+
+        public void ApplyInventoryChanges(InventoryChanges changes)
+        {
+            if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
+            {
+                var itemsRemoved = new List<ItemBase>();
+                foreach (var id in changes.IdsToRemove)
+                {
+                    itemsRemoved.Add(_items[id]);
+                    _items.Remove(id);
+                }
+
+                NotifyOfItemsRemoved(itemsRemoved);
+            }
+
+            if (IsInventoryFull())
+            {
+                NotifyOfInventoryFull();
+                return;
+            }
+
+            var nonItemStacks = changes.GetNonItemStacks().ToList();
+
+            var itemsToAdd = new List<ItemBase>();
+
+            foreach (var item in nonItemStacks)
+            {
+                FillTypesFromIds(item);
+
+                if (_items.ContainsKey(item.Id))
+                {
+                    UpdateExistingItem(item);
+                }
+                else
+                {
+                    _items.Add(item.Id, item);
+                    itemsToAdd.Add(item);
+                }
+            }
+
+            if (changes.ItemStacks != null && changes.ItemStacks.Any())
+            {
+                foreach (var itemStack in changes.ItemStacks)
+                {
+                    FillTypesFromIds(itemStack);
+
+                    if (IsServer)
+                    {
+                        var newStack = MergeItemStacks(itemStack);
+                        if (newStack != null)
+                        {
+                            itemsToAdd.Add(newStack);
+                        }
+                    }
+                    else if (_items.ContainsKey(itemStack.Id))
+                    {
+                        UpdateExistingItem(itemStack);
+                    }
+                    else
+                    {
+                        _items.Add(itemStack.Id, itemStack);
+                        itemsToAdd.Add(itemStack);
+                    }
+                }
+            }
+
+            NotifyOfItemsAdded(itemsToAdd);
+
+            ApplyEquippedItemChanges(changes.EquippedItems);
+
+            SendInventoryChangesToClient(changes);
+        }
+
+        private void UpdateExistingItem(ItemBase newItem)
+        {
+            var newJson = JsonUtility.ToJson(newItem);
+            var oldItem = _items[newItem.Id];
+            JsonUtility.FromJsonOverwrite(newJson, oldItem);
+        }
 
         public int GetDefenseValue()
         {
@@ -108,15 +241,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : null;
         }
 
-        public void GiveItemStack(ItemStack itemStack)
+        public (int countTaken, InventoryChanges invChanges) TakeCountFromItemStacks(string typeId, int count)
         {
-            //todo: this only works server side!
-            _items.Add(itemStack.Id, itemStack);
-        }
-
-        public ItemStack TakeItemStack(string typeId, int maxSize)
-        {
-            //todo: this only works server side!
+            if (!IsServer)
+            {
+                Debug.LogError("TakeCountFromItemStacks called client-side");
+                return (0, null);
+            }
 
             var matches = _items
                 .Where(
@@ -127,41 +258,47 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (!matches.Any())
             {
-                return null;
+                return (0, null);
             }
 
-            var returnStack = new ItemStack
-            {
-                Id = Guid.NewGuid().ToMinimisedString(),
-                RegistryTypeId = matches.First().RegistryTypeId,
-                RegistryType = matches.First().RegistryType
-            };
-
-            var countRemaining = maxSize;
+            var stacksChanged = new List<ItemStack>();
+            var idsToRemove = new List<string>();
+            var countRemaining = count;
 
             foreach (var itemStack in matches)
             {
                 if (countRemaining >= itemStack.Count)
                 {
-                    returnStack.Count += itemStack.Count;
                     countRemaining -= itemStack.Count;
                     _items.Remove(itemStack.Id);
+                    idsToRemove.Add(itemStack.Id);
                     continue;
                 }
 
-                returnStack.Count += countRemaining;
-
                 itemStack.Count -= countRemaining;
+                countRemaining = 0;
 
                 if (itemStack.Count == 0)
                 {
                     _items.Remove(itemStack.Id);
                 }
+                else
+                {
+                    stacksChanged.Add(itemStack);
+                }
 
-                return returnStack;
+                break;
             }
 
-            return returnStack;
+            var countTaken = count - countRemaining;
+
+            var invChanges = new InventoryChanges
+            {
+                IdsToRemove = idsToRemove.ToArray(),
+                ItemStacks = stacksChanged.ToArray()
+            };
+
+            return (countTaken, invChanges);
         }
 
         public int GetItemStackTotal(string typeId)
@@ -265,14 +402,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (item is Consumer consumer)
             {
-                //todo: zzz v0.6 - here for fixing broken data
-                if (consumer.ResourceTypeId.IsNullOrWhiteSpace())
-                {
-                    consumer.ResourceTypeId = consumer.Name.ToLower().Contains("spell")
-                        ? ResourceTypeIds.ManaId
-                        : ResourceTypeIds.EnergyId;
-                }
-
                 consumer.ResourceType = _typeRegistry.GetRegisteredTypes<IResource>()
                     .First(x => x.TypeId.ToString() == consumer.ResourceTypeId);
             }
@@ -322,8 +451,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        protected void MergeItemStacks(ItemStack newStack)
+        private ItemStack MergeItemStacks(ItemStack newStack)
         {
+            if (!IsServer)
+            {
+                Debug.LogError("MergeItemStacks called client-side");
+                return null;
+            }
+
             var partiallyFullStacks = _items
                 .Where(
                     i => i.Value is ItemStack oldStack
@@ -333,8 +468,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (!partiallyFullStacks.Any())
             {
+                if (_items.ContainsKey(newStack.Id))
+                {
+                    _items[newStack.Id] = newStack;
+                    return null;
+                }
+
                 _items.Add(newStack.Id, newStack);
-                return;
+                return newStack;
             }
 
             var itemsRemaining = newStack.Count;
@@ -354,21 +495,48 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 break;
             }
 
-            if (itemsRemaining <= 0)
+            if (itemsRemaining > 0)
             {
-                return;
+                newStack.Count = itemsRemaining;
+
+                if (_items.ContainsKey(newStack.Id))
+                {
+                    _items[newStack.Id] = newStack;
+                    return null;
+                }
+
+                _items.Add(newStack.Id, newStack);
+                return newStack;
             }
 
-            newStack.Count = itemsRemaining;
-            _items.Add(newStack.Id, newStack);
+            return null;
         }
 
-        protected abstract void SetEquippedItem(string itemId, string slotId);
+        public void PopulateInventoryChangesWithItem(InventoryChanges invChanges, ItemBase item)
+        {
+            var itemType = item.GetType();
+            invChanges.Accessories = itemType == typeof(Accessory) ? new[] { item as Accessory } : null;
+            invChanges.Armor = itemType == typeof(Armor) ? new[] { item as Armor } : null;
+            invChanges.Consumers = itemType == typeof(Consumer) ? new[] { item as Consumer } : null;
+            invChanges.Weapons = itemType == typeof(Weapon) ? new[] { item as Weapon } : null;
+            invChanges.ItemStacks = itemType == typeof(ItemStack) ? new[] { item as ItemStack } : null;
+            invChanges.SpecialGear = itemType == typeof(SpecialGear) ? new[] { item as SpecialGear } : null;
+        }
 
         public static void DefaultHandlerForSlotChangeEvent(IEventHandlerArgs eventArgs)
         {
             var slotChangeEventArgs = (SlotChangeEventArgs)eventArgs;
             slotChangeEventArgs.Inventory.SetEquippedItem(slotChangeEventArgs.ItemId, slotChangeEventArgs.SlotId);
         }
+
+        protected abstract void SetEquippedItem(string itemId, string slotId);
+
+        protected abstract void ApplyEquippedItemChanges(SerializableKeyValuePair<string, string>[] equippedItems);
+
+        protected abstract void NotifyOfItemsAdded(IEnumerable<ItemBase> itemsAdded);
+
+        protected abstract void NotifyOfInventoryFull();
+
+        protected abstract void NotifyOfItemsRemoved(IEnumerable<ItemBase> itemsRemoved);
     }
 }

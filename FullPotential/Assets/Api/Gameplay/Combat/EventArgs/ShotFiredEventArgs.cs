@@ -16,6 +16,8 @@ namespace FullPotential.Api.Gameplay.Combat.EventArgs
 
         public Vector3 EndPosition { get; set; }
 
+        public int AmmoUsed { get; set; }
+
         public ShotFiredEventArgs(FighterBase fighter, bool isLeftHand)
         {
             Fighter = fighter;

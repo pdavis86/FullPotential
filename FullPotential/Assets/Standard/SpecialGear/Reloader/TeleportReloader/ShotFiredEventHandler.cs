@@ -1,14 +1,22 @@
 ﻿using System;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Items.Types;
+using FullPotential.Api.Ui;
+using Unity.Netcode;
+
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 {
     public class ShotFiredEventHandler : IEventHandler
     {
-        public Action<IEventHandlerArgs> BeforeHandler => HandleShotFired;
+        public NetworkLocation Location => NetworkLocation.Server;
 
-        public Action<IEventHandlerArgs> AfterHandler => null;
+        public Action<IEventHandlerArgs> BeforeHandler => null;
+
+        public Action<IEventHandlerArgs> AfterHandler => HandleShotFired;
 
         private void HandleShotFired(IEventHandlerArgs eventArgs)
         {
@@ -16,21 +24,27 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 
             var reloader = (Api.Items.Types.SpecialGear)shotFiredEventArgs.Fighter.Inventory.GetItemInSlot(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
-            if (!shotFiredEventArgs.Fighter.ConsumeResource(reloader, slowDrain: true))
+            if (reloader == null || reloader.RegistryTypeId != TeleportReloader.TypeIdString)
+            {
+                return;
+            }
+
+            if (!shotFiredEventArgs.Fighter.ConsumeResource(reloader, true, !NetworkManager.Singleton.IsServer))
             {
                 return;
             }
 
             var fighter = shotFiredEventArgs.Fighter;
-            var handStatus = fighter.GetHandStatus(shotFiredEventArgs.IsLeftHand);
 
-            var ammoTypeId = handStatus.EquippedWeapon.GetAmmoTypeId();
-            var ammoMax = handStatus.EquippedWeapon.GetAmmoMax();
-            var ammoNeeded = ammoMax - handStatus.EquippedWeapon.Ammo;
+            var slotId = shotFiredEventArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
+            var equippedWeapon = (Weapon)fighter.Inventory.GetItemInSlot(slotId);
+
+            var ammoMax = equippedWeapon.GetAmmoMax();
+            var ammoNeeded = ammoMax - equippedWeapon.Ammo;
             
-            fighter.Inventory.TakeItemStack(ammoTypeId, ammoNeeded);
+            var reloadEventArgs = new ReloadEventArgs(fighter, shotFiredEventArgs.IsLeftHand);
 
-            handStatus.EquippedWeapon.Ammo = ammoMax;
+            FighterBase.ReloadAndUpdateClientInventory(reloadEventArgs, ammoNeeded);
         }
     }
 }

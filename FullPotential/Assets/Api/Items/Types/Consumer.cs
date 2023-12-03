@@ -55,7 +55,7 @@ namespace FullPotential.Api.Items.Types
             return returnValue;
         }
 
-        //todo: zzz v0.4.1 - remove SoG cooldown if not necessary
+        //todo: zzz v0.4.1 - cooldown instead of charge for some consumers?
         //public float GetCooldownTime()
         //{
         //    var returnValue = GetHighInLowOutInRange(Attributes.Recovery, 0, 2);
@@ -63,22 +63,20 @@ namespace FullPotential.Api.Items.Types
         //    return returnValue;
         //}
 
-        public float GetDps()
+        public float GetResourceChangePerSecond()
         {
-            var itemDamage = GetCombatService().GetDamageValueFromAttack(this, 0, false);
-
             var healthEffects = Effects
                 .Where(e => e is IResourceEffect se && se.ResourceTypeId == ResourceTypeIds.Health)
                 .Select(e => (IResourceEffect)e)
                 .ToList();
 
-            var single = healthEffects.Where(se => se.AffectType == AffectType.SingleDecrease || se.AffectType == AffectType.SingleIncrease);
-            var singleDamage = single.Count() * itemDamage;
+            var singleEffects = healthEffects.Where(se => se.AffectType == AffectType.SingleDecrease || se.AffectType == AffectType.SingleIncrease);
+            var singleChangeSum = singleEffects.Sum(GetResourceChange);
 
-            var periodic = healthEffects.Where(se => se.AffectType == AffectType.PeriodicDecrease || se.AffectType == AffectType.PeriodicIncrease);
-            var periodicDamage = periodic.Sum(GetPeriodicStatDamagePerSecond) * -1;
+            var periodicEffects = healthEffects.Where(se => se.AffectType == AffectType.PeriodicDecrease || se.AffectType == AffectType.PeriodicIncrease);
+            var periodicChangeSum = periodicEffects.Sum(GetPeriodicStatDamagePerSecond) * -1;
 
-            return singleDamage + periodicDamage;
+            return singleChangeSum + periodicChangeSum;
         }
 
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
@@ -145,7 +143,7 @@ namespace FullPotential.Api.Items.Types
                 localizer.TranslateFloat(GetChargeTime()),
                 UnitsType.Time);
 
-            //todo: zzz v0.4.1 - Commented out until I decide what to do with cooldown
+            //todo: zzz v0.4.1 - cooldown instead of charge for some consumers?
             //AppendToDescription(
             //    sb,
             //    localizer,
@@ -173,14 +171,18 @@ namespace FullPotential.Api.Items.Types
                 localizer.TranslateFloat(GetEffectTimeBetween()),
                 UnitsType.Time);
 
-            AppendToDescription(
-                sb,
-                localizer,
-                Attributes.Strength,
-                nameof(Attributes.Strength),
-                AliasSegmentItem,
-                localizer.TranslateFloat(GetDps()),
-                UnitsType.UnitPerTime);
+            var changePerSecond = GetResourceChangePerSecond();
+            if (changePerSecond != 0)
+            {
+                AppendToDescription(
+                    sb,
+                    localizer,
+                    Attributes.Strength,
+                    nameof(Attributes.Strength),
+                    AliasSegmentConsumer,
+                    localizer.TranslateFloat(changePerSecond),
+                    UnitsType.UnitPerTime);
+            }
 
             return sb.ToString().Trim();
         }

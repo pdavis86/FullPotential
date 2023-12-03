@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Events;
+using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -45,7 +46,10 @@ namespace FullPotential.Core.Gameplay.Events
 
             foreach (var handler in handlerGroup.OtherHandlers)
             {
-                handler.BeforeHandler?.Invoke(args);
+                if (ShouldHandlerRun(handler))
+                {
+                    handler.BeforeHandler?.Invoke(args);
+                }
             }
 
             if (!args.IsDefaultHandlerCancelled)
@@ -54,7 +58,30 @@ namespace FullPotential.Core.Gameplay.Events
             }
             else if (handlerGroup.DefaultHandler == null)
             {
-                Debug.LogError($"Tried to cancel the default handler for event {eventId} but no handler is present");
+                Debug.LogWarning($"Tried to cancel the default handler for event {eventId} but no handler is present");
+            }
+
+            foreach (var handler in handlerGroup.OtherHandlers)
+            {
+                if (ShouldHandlerRun(handler))
+                {
+                    handler.AfterHandler?.Invoke(args);
+                }
+            }
+        }
+
+        private bool ShouldHandlerRun(IEventHandler handler)
+        {
+            switch (handler.Location)
+            {
+                case NetworkLocation.Server:
+                    return NetworkManager.Singleton.IsServer;
+
+                case NetworkLocation.Client:
+                    return NetworkManager.Singleton.IsClient;
+
+                default:
+                    return true;
             }
         }
 
@@ -68,21 +95,6 @@ namespace FullPotential.Core.Gameplay.Events
             Debug.LogError("No event handler has been registered for event " + eventId);
             return false;
 
-        }
-
-        public void After(string eventId, IEventHandlerArgs args)
-        {
-            if (!IsEventIdRegistered(eventId))
-            {
-                return;
-            }
-
-            var handlerGroup = _subscriptions[eventId];
-
-            foreach (var handler in handlerGroup.OtherHandlers)
-            {
-                handler.AfterHandler?.Invoke(args);
-            }
         }
     }
 }

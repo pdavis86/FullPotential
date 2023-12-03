@@ -33,7 +33,7 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
 
         public override void OnNetworkSpawn()
         {
-            bool isClientOnly = IsClient && !IsServer;
+            var isClientOnly = IsClient && !IsServer;
             if (!IsOwner && isClientOnly)
             {
                 enabled = false;

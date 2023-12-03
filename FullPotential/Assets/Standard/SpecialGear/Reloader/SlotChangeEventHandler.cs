@@ -2,27 +2,39 @@
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.EventArgs;
-using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Ui;
 using FullPotential.Standard.SpecialSlots;
+using Unity.Netcode;
+
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.SpecialGear.Reloader
 {
     public class SlotChangeEventHandler : IEventHandler
     {
-        private static readonly ConsolidatorReloader.ReloadEventHandler ConsolidatorReloadHandler = new ConsolidatorReloader.ReloadEventHandler();
-        private static readonly TeleportReloader.ReloadEventHandler TeleportReloadHandler = new TeleportReloader.ReloadEventHandler();
-        private static readonly TeleportReloader.ShotFiredEventHandler TeleportShotHandler = new TeleportReloader.ShotFiredEventHandler();
+        private readonly IHud _hud;
+
+        public NetworkLocation Location => NetworkLocation.Client;
 
         public Action<IEventHandlerArgs> BeforeHandler => null;
 
         public Action<IEventHandlerArgs> AfterHandler => HandleAfterSlotChange;
 
+        public SlotChangeEventHandler(IModHelper modHelper)
+        {
+            _hud = modHelper.GetGameManager().GetUserInterface().HudOverlay;
+        }
+
         private void HandleAfterSlotChange(IEventHandlerArgs eventArgs)
         {
             var slotChangeArgs = (SlotChangeEventArgs)eventArgs;
+
+            if (slotChangeArgs.Inventory.OwnerClientId != NetworkManager.Singleton.LocalClientId)
+            {
+                return;
+            }
 
             if (slotChangeArgs.SlotId != HandSlotIds.LeftHand
                 && slotChangeArgs.SlotId != HandSlotIds.RightHand
@@ -31,8 +43,6 @@ namespace FullPotential.Standard.SpecialGear.Reloader
                 return;
             }
 
-            var modHelper = DependenciesContext.Dependencies.GetService<IModHelper>();
-            var hud = modHelper.GetGameManager().GetUserInterface().HudOverlay;
 
             var reloaderEquipped = slotChangeArgs.Inventory.GetItemInSlot(RangedWeaponReloaderSlot.TypeIdString);
             var hasReloaderEquipped = reloaderEquipped != null;
@@ -42,32 +52,12 @@ namespace FullPotential.Standard.SpecialGear.Reloader
                 case HandSlotIds.LeftHand:
                 case HandSlotIds.RightHand:
                     var isLeftHand = slotChangeArgs.SlotId == HandSlotIds.LeftHand;
-                    hud.SetHandWarning(isLeftHand, GetIsActive(slotChangeArgs.Inventory, slotChangeArgs.SlotId, hasReloaderEquipped));
+                    _hud.SetHandWarning(isLeftHand, GetIsActive(slotChangeArgs.Inventory, slotChangeArgs.SlotId, hasReloaderEquipped));
                     return;
 
                 case RangedWeaponReloaderSlot.TypeIdString:
-                    hud.SetHandWarning(true, GetIsActive(slotChangeArgs.Inventory, HandSlotIds.LeftHand, hasReloaderEquipped));
-                    hud.SetHandWarning(false, GetIsActive(slotChangeArgs.Inventory, HandSlotIds.RightHand, hasReloaderEquipped));
-
-                    var eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
-
-                    eventManager.Unsubscribe(FighterBase.EventIdReload, ConsolidatorReloadHandler);
-                    eventManager.Unsubscribe(FighterBase.EventIdReload, TeleportReloadHandler);
-                    eventManager.Unsubscribe(FighterBase.EventIdShotFired, TeleportShotHandler);
-
-                    if (hasReloaderEquipped)
-                    {
-                        if (reloaderEquipped.RegistryTypeId == ConsolidatorReloader.ConsolidatorReloader.TypeIdString)
-                        {
-                            eventManager.Subscribe(FighterBase.EventIdReload, ConsolidatorReloadHandler);
-                        }
-                        else
-                        {
-                            eventManager.Subscribe(FighterBase.EventIdReload, TeleportReloadHandler);
-                            eventManager.Subscribe(FighterBase.EventIdShotFired, TeleportShotHandler);
-                        }
-                    }
-
+                    _hud.SetHandWarning(true, GetIsActive(slotChangeArgs.Inventory, HandSlotIds.LeftHand, hasReloaderEquipped));
+                    _hud.SetHandWarning(false, GetIsActive(slotChangeArgs.Inventory, HandSlotIds.RightHand, hasReloaderEquipped));
                     return;
             }
         }

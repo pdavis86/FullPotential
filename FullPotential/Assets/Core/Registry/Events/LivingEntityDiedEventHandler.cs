@@ -3,10 +3,14 @@ using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Registry.Resources;
 
+// ReSharper disable ClassNeverInstantiated.Global
+
 namespace FullPotential.Core.Registry.Events
 {
     public class LivingEntityDiedEventHandler : IEventHandler
     {
+        public NetworkLocation Location => NetworkLocation.Server;
+
         public Action<IEventHandlerArgs> BeforeHandler => null;
 
         public Action<IEventHandlerArgs> AfterHandler => HandleAfterResourceValueChanged;

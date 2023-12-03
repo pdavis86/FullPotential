@@ -1,5 +1,5 @@
 ﻿using System;
-using FullPotential.Api.GameManagement;
+using FullPotential.Api.Data;
 
 namespace FullPotential.Core.GameManagement.Events
 {

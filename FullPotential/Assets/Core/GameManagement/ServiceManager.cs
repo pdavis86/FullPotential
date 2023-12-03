@@ -10,7 +10,7 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<Api.Scenes.ISceneService, Environment.SceneService>(true);
 
             //Singleton
-            DependenciesContext.Dependencies.Register<Inventory.IInventoryDataService, Inventory.InventoryDataService>();
+            DependenciesContext.Dependencies.Register<Api.Persistence.IPersistenceService, Persistence.PersistenceService>();
             DependenciesContext.Dependencies.Register<Api.Persistence.IUserRepository, Persistence.UserRepository>();
             DependenciesContext.Dependencies.Register<Api.Gameplay.Crafting.IResultFactory, Gameplay.Crafting.ResultFactory>();
             DependenciesContext.Dependencies.Register<Api.Localization.ILocalizer, Localization.Localizer>();
@@ -24,6 +24,7 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<Api.Unity.Services.IUnityHelperUtilities, Unity.Services.UnityHelperUtilities>();
             DependenciesContext.Dependencies.Register<Api.Unity.Services.IShaderUtilities, Unity.Services.ShaderUtilities>();
             DependenciesContext.Dependencies.Register<Api.Gameplay.Events.IEventManager, Gameplay.Events.EventManager>();
+            DependenciesContext.Dependencies.Register<Api.Obsolete.Networking.IFragmentedMessageReconstructorFactory, Api.Obsolete.Networking.FragmentedMessageReconstructorFactory>();
         }
     }
 }

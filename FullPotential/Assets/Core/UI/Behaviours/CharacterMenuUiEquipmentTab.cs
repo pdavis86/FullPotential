@@ -32,7 +32,7 @@ namespace FullPotential.Core.Ui.Behaviours
         private ITypeRegistry _typeRegistry;
 
         private GameObject _lastClickedSlot;
-        private PlayerState _playerState;
+        private PlayerFighter _playerFighter;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -46,7 +46,7 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
-            _playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>();
+            _playerFighter = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerFighter>();
             ResetEquipmentUi(true);
         }
 
@@ -156,13 +156,13 @@ namespace FullPotential.Core.Ui.Behaviours
             {
                 foreach (Transform slot in _lhs.transform)
                 {
-                    var item = _playerState.Inventory.GetItemInSlot(slot.name);
+                    var item = _playerFighter.Inventory.GetItemInSlot(slot.name);
                     SetSlot(slot.gameObject, item);
                 }
 
                 foreach (Transform slot in _rhs.transform)
                 {
-                    var item = _playerState.Inventory.GetItemInSlot(slot.name);
+                    var item = _playerFighter.Inventory.GetItemInSlot(slot.name);
                     SetSlot(slot.gameObject, item);
 
                     if (item is Weapon weapon && weapon.IsTwoHanded)
@@ -184,7 +184,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 slot,
                 _componentsContainer,
                 _inventoryRowPrefab,
-                _playerState.PlayerInventory,
+                _playerFighter.PlayerInventory,
                 HandleRowToggle,
                 typeId
             );
@@ -198,7 +198,7 @@ namespace FullPotential.Core.Ui.Behaviours
             {
                 Tooltips.HideTooltip();
 
-                var playerInventory = (PlayerInventory)_playerState.Inventory;
+                var playerInventory = (PlayerInventory)_playerFighter.Inventory;
                 playerInventory.EquipItemServerRpc(item.Id, slot.name);
             });
         }

@@ -2,12 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.Data;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Obsolete.Networking;
+using FullPotential.Api.Obsolete.Networking.Data;
 using FullPotential.Api.Persistence;
 using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Ui.Components;
@@ -17,8 +20,6 @@ using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Environment;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Networking;
-using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Ui.Components;
 using Unity.Netcode;
 using UnityEngine;
@@ -28,7 +29,7 @@ using UnityEngine.Networking;
 
 namespace FullPotential.Core.Player
 {
-    public class PlayerState : FighterBase, IPlayerFighter
+    public class PlayerFighter : FighterBase, IPlayerFighter
     {
         private const string LoadingScreenGameObjectName = "LoadingScreen";
 
@@ -51,9 +52,11 @@ namespace FullPotential.Core.Player
         private IUserRepository _userRepository;
         private IUnityHelperUtilities _unityHelperUtilities;
         private IShaderUtilities _shaderUtilities;
+        private IPersistenceService _persistenceService;
 
         //Data
-        private PlayerData _saveData;
+        private PlayerSettings _playerSettings;
+        private bool _inventoryLoadedSuccessfully;
 
         #endregion
 
@@ -68,7 +71,6 @@ namespace FullPotential.Core.Player
         [SerializeField] private GameObject _playerCamera;
         [SerializeField] private BarSlider _healthSlider;
         public GameObject InFrontOfPlayer;
-        public Transform GraphicsTransform;
 #pragma warning restore 0649
         // ReSharper restore UnassignedField.Global
         #endregion
@@ -122,6 +124,7 @@ namespace FullPotential.Core.Player
             _userRepository = DependenciesContext.Dependencies.GetService<IUserRepository>();
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
             _shaderUtilities = DependenciesContext.Dependencies.GetService<IShaderUtilities>();
+            _persistenceService = DependenciesContext.Dependencies.GetService<IPersistenceService>();
 
             HealthStatSlider = _healthSlider;
         }
@@ -205,7 +208,7 @@ namespace FullPotential.Core.Player
         {
             if (IsServer)
             {
-                GameManager.Instance.SavePlayerData(_saveData);
+                _persistenceService.SavePlayerData(GetPlayerSaveData());
             }
         }
 
@@ -251,11 +254,11 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         private void UpdatePlayerSettingsServerRpc(PlayerSettings playerSettings)
         {
-            GameManager.Instance.QueueAsapSave(Username);
+            _persistenceService.QueueAsapSave(Username);
 
-            _saveData.Settings = playerSettings;
+            _playerSettings = playerSettings;
 
-            UpdatePlayerSettings(_saveData.Settings);
+            UpdatePlayerSettings(_playerSettings);
         }
 
         #endregion
@@ -286,15 +289,13 @@ namespace FullPotential.Core.Player
         {
             var sceneService = _gameManager.GetSceneBehaviour().GetSceneService();
 
-            var startingPosition = sceneService.GetPositionOnSolidObject(position);
-
             var prefab = GameManager.Instance.Prefabs.Environment.LootChest;
-            var go = Instantiate(prefab, startingPosition, transform.rotation * Quaternion.Euler(0, 90, 0));
+            var go = Instantiate(prefab, position, transform.rotation * Quaternion.Euler(0, 90, 0));
 
-            go.transform.position = sceneService.GetHeightAdjustedPosition(startingPosition, go);
+            go.transform.position = sceneService.GetHeightAdjustedPosition(position, go);
 
             go.transform.parent = GameManager.Instance.GetSceneBehaviour().GetTransform();
-            go.name = "Loot Chest " + id;
+            go.name += " " + id;
 
             var lootScript = go.GetComponent<LootInteractable>();
             lootScript.UnclaimedLootId = id;
@@ -317,7 +318,7 @@ namespace FullPotential.Core.Player
                         _aliveStateChanges.PlayForwards(false);
                     }
 
-                    GraphicsTransform.gameObject.SetActive(false);
+                    _graphicsTransform.gameObject.SetActive(false);
 
                     break;
 
@@ -367,7 +368,7 @@ namespace FullPotential.Core.Player
 
                     _positionAfterRespawn = transform.position;
 
-                    GraphicsTransform.gameObject.SetActive(true);
+                    _graphicsTransform.gameObject.SetActive(true);
                     RigidBody.isKinematic = false;
 
                     break;
@@ -468,7 +469,7 @@ namespace FullPotential.Core.Player
 
                 var msg = _localizer.Translate("ui.alert.playerjoined");
                 var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, OwnerClientId);
-                GameManager.Instance.GetSceneBehaviour().MakeAnnouncementClientRpc(string.Format(msg, Username), nearbyClients);
+                ShowHudAlertClientRpc(string.Format(msg, Username), nearbyClients);
             }
         }
 
@@ -480,7 +481,7 @@ namespace FullPotential.Core.Player
                 Send = new ClientRpcSendParams { TargetClientIds = new[] { clientId } }
             };
 
-            foreach (var message in FragmentedMessageReconstructor.GetFragmentedMessages(playerData))
+            foreach (var message in _loadPlayerDataReconstructor.GetFragmentedMessages(playerData))
             {
                 LoadPlayerDataClientRpc(message, clientRpcParams);
                 yield return null;
@@ -494,16 +495,15 @@ namespace FullPotential.Core.Player
 
             if (IsServer)
             {
-                var health = playerData.Resources.FirstOrDefault(x => x.Key == nameof(ResourceTypeIds.Health)).Value;
-
                 _entityName.Value = Username;
 
+                var nonHealthResources = GetResources().Where(x => x.TypeId != ResourceTypeIds.Health);
+                SetResourceInitialValues(nonHealthResources.ToDictionary(
+                    resource => resource.TypeId.ToString(),
+                    resource => playerData.Resources.FirstOrDefault(x => x.Key == resource.GetType().Name).Value));
+                
+                var health = playerData.Resources.FirstOrDefault(kvp => kvp.Key == nameof(ResourceTypeIds.Health)).Value;
                 SetResourceValue(ResourceTypeIds.HealthId, health > 0 ? health : GetResourceMax(ResourceTypeIds.HealthId));
-
-                foreach (var resource in _sortedResources)
-                {
-                    SetResourceValue(resource.TypeId.ToString(), playerData.Resources.FirstOrDefault(x => x.Key == resource.GetType().Name).Value);
-                }
             }
 
             try
@@ -517,7 +517,8 @@ namespace FullPotential.Core.Player
                 playerData.InventoryLoadedSuccessfully = false;
             }
 
-            _saveData = playerData;
+            _playerSettings = playerData.Settings;
+            _inventoryLoadedSuccessfully = playerData.InventoryLoadedSuccessfully;
 
             UpdateUiHealthAndDefenceValues();
         }
@@ -661,38 +662,42 @@ namespace FullPotential.Core.Player
             BodyParts.RightArm.GetComponent<MeshRenderer>().material = material;
         }
 
-        public PlayerData UpdateAndReturnPlayerData()
-        {
-            _saveData.Resources = _sortedResources
-                .Select(resource => new Api.Utilities.Data.KeyValuePair<string, int>(
-                    resource.GetType().Name,
-                    GetResourceValue(resource.TypeId.ToString())))
-                .ToArray();
-
-            _saveData.Inventory = PlayerInventory.GetSaveData();
-
-            return _saveData;
-        }
-
         #region UI Updates
 
         public void ShowAlertForItemsAddedToInventory(string alertText)
         {
-            GameManager.Instance.GetSceneBehaviour().MakeAnnouncementClientRpc(alertText, _clientRpcParams);
+            ShowHudAlertClientRpc(alertText, _clientRpcParams);
         }
 
         public void AlertOfInventoryRemovals(int itemsRemovedCount)
         {
             var message = _localizer.Translate("ui.alert.itemsremoved");
-            GameManager.Instance.GetSceneBehaviour().MakeAnnouncementClientRpc(string.Format(message, itemsRemovedCount), _clientRpcParams);
+            ShowHudAlertClientRpc(string.Format(message, itemsRemovedCount), _clientRpcParams);
         }
 
         public void AlertInventoryIsFull()
         {
-            GameManager.Instance.GetSceneBehaviour().MakeAnnouncementClientRpc(_localizer.Translate("ui.alert.itemsatmax"), _clientRpcParams);
+            ShowHudAlertClientRpc(_localizer.Translate("ui.alert.itemsatmax"), _clientRpcParams);
         }
 
         #endregion
 
+        public PlayerData GetPlayerSaveData()
+        {
+            var saveData = new PlayerData
+            {
+                Username = Username,
+                Settings = _playerSettings,
+                Resources = GetResources()
+                    .Select(resource => new SerializableKeyValuePair<string, int>(
+                        resource.GetType().Name,
+                        GetResourceValue(resource.TypeId.ToString())))
+                    .ToArray(),
+                Inventory = ((PlayerInventory)PlayerInventory).GetInventorySaveData(),
+                InventoryLoadedSuccessfully = _inventoryLoadedSuccessfully
+            };
+
+            return saveData;
+        }
     }
 }

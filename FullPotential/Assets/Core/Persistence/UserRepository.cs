@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Persistence;
 using UnityEngine;
@@ -51,7 +51,7 @@ namespace FullPotential.Core.Persistence
                 {
                     Username = username,
                     Settings = new PlayerSettings(),
-                    Resources = Array.Empty<Api.Utilities.Data.KeyValuePair<string, int>>(),
+                    Resources = Array.Empty<SerializableKeyValuePair<string, int>>(),
                     Inventory = new InventoryData()
                 };
             }

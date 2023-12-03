@@ -35,7 +35,7 @@ namespace FullPotential.Core.UI.Behaviours
         [SerializeField] private GameObject _targetingScrollViewContentParent;
         [SerializeField] private GameObject _shapesScrollViewContentParent;
         [SerializeField] private Text _resultsText;
-        [SerializeField] private Text _itemNameText;
+        [SerializeField] private InputField _itemNameInputField;
 #pragma warning restore 0649
 
         private IResultFactory _resultFactory;
@@ -71,7 +71,7 @@ namespace FullPotential.Core.UI.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
-            var playerState = GameManager.Instance.GetLocalPlayerGameObject().GetComponent<PlayerState>();
+            var playerState = GameManager.Instance.GetLocalPlayerGameObject().GetComponent<PlayerFighter>();
 
             if (playerState.PlayerInventory.IsInventoryFull())
             {
@@ -87,7 +87,7 @@ namespace FullPotential.Core.UI.Behaviours
             ResetSliders();
             ResetToggles();
             _resultsText.text = null;
-            _itemNameText.text = null;
+            _itemNameInputField.text = null;
         }
 
         private void InstantiateAttributeControls()
@@ -284,7 +284,7 @@ namespace FullPotential.Core.UI.Behaviours
         public void DisplayResultsText()
         {
             var item = GetCraftableItem();
-            _resultsText.text = item.GetDescription(_localizer, LevelOfDetail.Full, _itemNameText.text);
+            _resultsText.text = item.GetDescription(_localizer, LevelOfDetail.Full, _itemNameInputField.text);
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -300,7 +300,7 @@ namespace FullPotential.Core.UI.Behaviours
                 _craftingSelector.GetSubTypeId(craftableType),
                 _craftingSelector.GetResourceTypeId(),
                 _craftingSelector.IsTwoHandedSelected(),
-                _itemNameText.text
+                _itemNameInputField.text
                 );
 
             ResetUi();

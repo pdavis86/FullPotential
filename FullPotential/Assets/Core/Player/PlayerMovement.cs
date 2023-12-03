@@ -26,7 +26,7 @@ namespace FullPotential.Core.Player
 #pragma warning restore 0649
 
         private Rigidbody _rb;
-        private PlayerState _playerState;
+        private PlayerFighter _playerFighter;
 
         //Variables for capturing input
         private Vector2 _moveVal;
@@ -55,7 +55,7 @@ namespace FullPotential.Core.Player
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
-            _playerState = GetComponent<PlayerState>();
+            _playerFighter = GetComponent<PlayerFighter>();
 
             _maxDistanceToBeStanding = gameObject.GetComponent<Collider>().bounds.extents.y + 0.1f;
 
@@ -186,12 +186,12 @@ namespace FullPotential.Core.Player
         {
             if (!isTryingToSprint)
             {
-                _playerState.IsSprinting = false;
+                _playerFighter.IsSprinting = false;
                 return;
             }
 
-            _playerState.IsSprinting = _playerState.GetResourceValue(ResourceTypeIds.StaminaId) >= _playerState.GetStaminaCost();
-            _isTryingToSprint = _playerState.IsSprinting;
+            _playerFighter.IsSprinting = _playerFighter.GetResourceValue(ResourceTypeIds.StaminaId) >= _playerFighter.GetStaminaCost();
+            _isTryingToSprint = _playerFighter.IsSprinting;
         }
 
         private void MoveAndLook(Vector2 moveVal, Vector2 lookVal, bool isTryingToSprint)
@@ -203,9 +203,9 @@ namespace FullPotential.Core.Player
 
                 UpdateSprintingState(isTryingToSprint);
 
-                if (_playerState.IsSprinting)
+                if (_playerFighter.IsSprinting)
                 {
-                    var sprintSpeed = _playerState.GetSprintSpeed();
+                    var sprintSpeed = _playerFighter.GetSprintSpeed();
                     moveForwards *= moveVal.y > 0 ? sprintSpeed : sprintSpeed / 2;
                     moveSideways *= sprintSpeed / 2;
                 }
@@ -272,7 +272,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            if (_isTryingToSprint != _playerState.IsSprinting)
+            if (_isTryingToSprint != _playerFighter.IsSprinting)
             {
                 UpdateSprintStateServerRpc(_isTryingToSprint);
             }

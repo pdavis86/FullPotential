@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.GameManagement;
+﻿using FullPotential.Api.Data;
 using FullPotential.Api.Persistence;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Localization;

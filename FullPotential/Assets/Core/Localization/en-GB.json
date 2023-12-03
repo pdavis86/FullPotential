@@ -168,9 +168,13 @@
     },
 	
 	
-    {
+	{
       "Key": "attribute.alias.item.strength",
       "Value": "Est. DPS"
+    },
+    {
+      "Key": "attribute.alias.consumer.strength",
+      "Value": "Est. Change"
     },
     {
       "Key": "attribute.alias.item.range",

@@ -1,14 +1,13 @@
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Ui.Components;
-using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.Enemies.Behaviours
 {
-    public class EnemyState : FighterBase
+    public class EnemyFighter : FighterBase
     {
         #region Inspector Variables
         // ReSharper disable UnassignedField.Compiler
@@ -41,24 +40,15 @@ namespace FullPotential.Standard.Enemies.Behaviours
             HealthStatSlider = _healthSliderParent.GetComponent<IStatSlider>();
         }
 
-        protected override void Start()
+        public override void OnNetworkSpawn()
         {
-            base.Start();
+            base.OnNetworkSpawn();
 
+            SetResourceValue(ResourceTypeIds.HealthId, 100);
             UpdateUiHealthAndDefenceValues();
         }
 
         #endregion
-
-        protected override void HandleResourceListChange(NetworkListEvent<int> changeEvent)
-        {
-            base.HandleResourceListChange(changeEvent);
-
-            var health = GetResourceValue(ResourceTypeIds.HealthId);
-            var healthMax = GetResourceMax(ResourceTypeIds.HealthId);
-            var values = _gameManager.GetUserInterface().HudOverlay.GetHealthValues(health, healthMax, GetDefenseValue());
-            HealthStatSlider.SetValues(values);
-        }
 
         protected override void HandleDeathAfter()
         {

@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.GameManagement;
+﻿using FullPotential.Api.Data;
 
 namespace FullPotential.Api.Persistence
 {

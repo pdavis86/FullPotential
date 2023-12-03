@@ -140,7 +140,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 TextureUrl = _skinUrlInput.text
             };
 
-            var playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>();
+            var playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerFighter>();
             playerState.UpdatePlayerSettings(playerSettings);
         }
 
@@ -202,7 +202,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void LoadPlayerSettings()
         {
-            var playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>();
+            var playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerFighter>();
             _skinUrlInput.text = playerState.TextureUrl;
         }
 

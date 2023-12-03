@@ -6,6 +6,8 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
@@ -153,28 +155,28 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateHandOverlays()
         {
-            UpdateHandDescription(_equippedLeftHandSummary, _playerFighter.HandStatusLeft);
-            UpdateHandAmmo(_playerFighter, true);
-            UpdateHandCharge(_chargeLeft, _playerFighter.HandStatusLeft);
+            var leftItem = _playerFighter.Inventory.GetItemInSlot(HandSlotIds.LeftHand);
+            UpdateHandDescription(_equippedLeftHandSummary, leftItem);
+            UpdateHandAmmo(_playerFighter.HandStatusLeft, leftItem, true);
+            UpdateHandCharge(_chargeLeft, leftItem);
 
-            UpdateHandDescription(_equippedRightHandSummary, _playerFighter.HandStatusRight);
-            UpdateHandAmmo(_playerFighter, false);
-            UpdateHandCharge(_chargeRight, _playerFighter.HandStatusRight);
+            var rightItem = _playerFighter.Inventory.GetItemInSlot(HandSlotIds.RightHand);
+            UpdateHandDescription(_equippedRightHandSummary, rightItem);
+            UpdateHandAmmo(_playerFighter.HandStatusRight, rightItem, false);
+            UpdateHandCharge(_chargeRight, rightItem);
         }
 
-        private void UpdateHandDescription(EquippedSummary equippedSummary, HandStatus handStatus)
+        private void UpdateHandDescription(EquippedSummary equippedSummary, ItemBase item)
         {
-            equippedSummary.SetContents(handStatus.EquippedItemDescription);
+            equippedSummary.SetContents(item?.GetDescription(_localizer));
         }
 
-        private void UpdateHandAmmo(FighterBase fighter, bool isLeftHand)
+        private void UpdateHandAmmo(HandStatus handStatus, ItemBase item, bool isLeftHand)
         {
-            var handStatus = isLeftHand ? fighter.HandStatusLeft : fighter.HandStatusRight;
             var ammoText = isLeftHand ? _ammoLeft : _ammoRight;
 
-            if (handStatus == null
-                || handStatus.EquippedWeapon == null
-                || !handStatus.EquippedWeapon.IsRanged)
+            if (item is not Weapon weapon
+                || !weapon.IsRanged)
             {
                 ammoText.gameObject.SetActive(false);
                 return;
@@ -187,12 +189,12 @@ namespace FullPotential.Core.Ui.Behaviours
 
             ammoText.text = handStatus.IsReloading
                 ? _reloadingTranslation
-                : $"{handStatus.EquippedWeapon.Ammo}/{handStatus.EquippedWeapon.GetAmmoMax()} ({_playerFighter.GetAvailableAmmo(isLeftHand)})";
+                : $"{weapon.Ammo}/{weapon.GetAmmoMax()} ({_playerFighter.GetAvailableAmmo(isLeftHand)})";
         }
 
-        private void UpdateHandCharge(ProgressWheel chargeWheel, HandStatus handStatus)
+        private void UpdateHandCharge(ProgressWheel chargeWheel, ItemBase item)
         {
-            if (handStatus == null || handStatus.EquippedConsumer == null)
+            if (item is not Consumer consumer)
             {
                 chargeWheel.gameObject.SetActive(false);
                 return;
@@ -203,7 +205,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 chargeWheel.gameObject.SetActive(true);
             }
 
-            chargeWheel.Slider.value = handStatus.EquippedConsumer.ChargePercentage / 100f;
+            chargeWheel.Slider.value = consumer.ChargePercentage / 100f;
         }
 
         private void UpdateStaminaPercentage()

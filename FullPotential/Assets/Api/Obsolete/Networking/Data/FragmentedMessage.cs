@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FullPotential.Core.Networking.Data
+namespace FullPotential.Api.Obsolete.Networking.Data
 {
     [Serializable]
     public struct FragmentedMessage

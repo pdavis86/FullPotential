@@ -25,7 +25,7 @@ namespace FullPotential.Core.UI.Behaviours
         //Services
         private ILocalizer _localizer;
 
-        private PlayerState _playerState;
+        private PlayerFighter _playerFighter;
         private CharacterMenuUi _characterMenuUi;
         private DrawingPadUi _drawingPadUi;
 
@@ -34,7 +34,7 @@ namespace FullPotential.Core.UI.Behaviours
         {
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
 
-            _playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>();
+            _playerFighter = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerFighter>();
 
             _characterMenuUi = GameManager.Instance.UserInterface.CharacterMenu.GetComponent<CharacterMenuUi>();
             _drawingPadUi = GameManager.Instance.UserInterface.DrawingPad.GetComponent<DrawingPadUi>();
@@ -54,7 +54,7 @@ namespace FullPotential.Core.UI.Behaviours
                 null,
                 _componentsContainer,
                 _inventoryRowPrefab,
-                _playerState.PlayerInventory,
+                _playerFighter.PlayerInventory,
                 null,
                 null,
                 true,
@@ -89,7 +89,7 @@ namespace FullPotential.Core.UI.Behaviours
             _characterMenuUi.DarkOverlay.SetActive(false);
             _drawingPadUi.gameObject.SetActive(false);
 
-            var success = _playerState.PlayerInventory.SetAssignedShape(e.ItemId, e.DrawnShape);
+            var success = _playerFighter.PlayerInventory.SetAssignedShape(e.ItemId, e.DrawnShape);
 
             if (!success)
             {

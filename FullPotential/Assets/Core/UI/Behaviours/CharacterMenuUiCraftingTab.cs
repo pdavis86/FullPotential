@@ -31,7 +31,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private readonly List<ItemForCombatBase> _components = new List<ItemForCombatBase>();
 
-        private PlayerState _playerState;
+        private PlayerFighter _playerFighter;
         private PlayerBehaviour _playerBehaviour;
 
         private IResultFactory _resultFactory;
@@ -40,8 +40,8 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerState>();
-            _playerBehaviour = _playerState.gameObject.GetComponent<PlayerBehaviour>();
+            _playerFighter = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerFighter>();
+            _playerBehaviour = _playerFighter.gameObject.GetComponent<PlayerBehaviour>();
 
             _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
@@ -98,7 +98,7 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once MemberCanBePrivate.Global
         public void AddComponent(string itemId)
         {
-            var item = _playerState.Inventory.GetItemWithId<ItemForCombatBase>(itemId);
+            var item = _playerFighter.Inventory.GetItemWithId<ItemForCombatBase>(itemId);
 
             if (item == null)
             {
@@ -143,7 +143,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 null,
                 _componentsContainer,
                 _inventoryRowPrefab,
-                _playerState.PlayerInventory,
+                _playerFighter.PlayerInventory,
                 HandleRowToggle,
                 null,
                 false
@@ -191,7 +191,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 _components
             );
 
-            var errors = _playerState.PlayerInventory.ValidateIsCraftable(_components.Select(x => x.Id).ToArray(), craftedItem);
+            var errors = _playerFighter.PlayerInventory.ValidateIsCraftable(_components.Select(x => x.Id).ToArray(), craftedItem);
             if (errors.Any())
             {
                 _craftErrors.text = string.Join(System.Environment.NewLine, errors);

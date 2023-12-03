@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.EventArgs;
@@ -16,6 +17,7 @@ using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Resources;
+using FullPotential.Api.Scenes;
 using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities;
@@ -43,6 +45,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         // ReSharper disable InconsistentNaming
 
         [SerializeField] private TextMeshProUGUI _nameTag;
+        [SerializeField] protected Transform _graphicsTransform;
 
         // ReSharper restore InconsistentNaming
 #pragma warning restore 0649
@@ -60,11 +63,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected ITypeRegistry _typeRegistry;
         protected ICombatService _combatService;
         protected IEventManager _eventManager;
+        protected ISceneService _sceneService;
 
         protected readonly NetworkVariable<FixedString32Bytes> _entityName = new NetworkVariable<FixedString32Bytes>();
-        protected NetworkList<int> _resourceList;
-
-        protected List<IResource> _sortedResources;
+        private readonly NetworkVariable<FixedString4096Bytes> _encodedResourceValues = new NetworkVariable<FixedString4096Bytes>();
 
         // ReSharper restore InconsistentNaming
         #endregion
@@ -73,6 +75,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
         private readonly List<ActiveEffect> _activeEffects = new List<ActiveEffect>();
+        private readonly Dictionary<string, int> _resourceValueCache = new Dictionary<string, int>();
+
+        private IEnumerable<IResource> _sortedResources;
 
         private FighterBase _fighterWhoMovedMeLast;
         private Rigidbody _rb;
@@ -100,28 +105,22 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected virtual void Awake()
         {
-            _resourceList = new NetworkList<int>();
-
             _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
             _eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
+            _sceneService = _gameManager.GetSceneBehaviour().GetSceneService();
+
+            PopulateResourceList();
 
             _entityName.OnValueChanged += HandleNameChange;
-
-            if (!NetworkManager.Singleton.IsConnectedClient || IsServer)
-            {
-                InvokeRepeating(nameof(CheckIfOffTheMap), 1, 1);
-            }
         }
 
         protected virtual void Start()
         {
             AliveState = LivingEntityState.Alive;
-
-            PopulateResourceList();
 
             SetupResourceReplenishing();
             SetupStaminaConsumption();
@@ -130,6 +129,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+
+            if (IsServer)
+            {
+                InvokeRepeating(nameof(CheckIfOffTheMap), 1, 1);
+            }
+
+            _encodedResourceValues.OnValueChanged += HandleEncodedResourcesChange;
 
             UpdateNameOnUi();
         }
@@ -156,7 +162,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             _entityName.OnValueChanged -= HandleNameChange;
 
-            _resourceList.OnListChanged -= HandleResourceListChange;
+            _encodedResourceValues.OnValueChanged -= HandleEncodedResourcesChange;
 
             try
             {
@@ -184,6 +190,18 @@ namespace FullPotential.Api.Gameplay.Behaviours
             AddOrUpdateEffect(effect, change, expiry);
         }
 
+        // ReSharper disable once UnusedParameter.Global
+        [ClientRpc]
+        protected void ShowHudAlertClientRpc(string announcement, ClientRpcParams clientRpcParams)
+        {
+            if (announcement.IsNullOrWhiteSpace())
+            {
+                return;
+            }
+
+            _gameManager.GetUserInterface().HudOverlay.ShowAlert(announcement);
+        }
+
         #endregion
 
         #region NetworkVariable Handlers
@@ -193,39 +211,49 @@ namespace FullPotential.Api.Gameplay.Behaviours
             UpdateNameOnUi();
         }
 
-        protected virtual void HandleResourceListChange(NetworkListEvent<int> changeEvent)
+        protected virtual void HandleEncodedResourcesChange(FixedString4096Bytes previousValue, FixedString4096Bytes newValue)
         {
-            var typeId = GetResourceTypeIdFromListIndex(changeEvent.Index).TypeId.ToString();
+            //todo: zzz v0.9 Poor network performance. This fires a LOT e.g. stamina recharging. Maybe don't send recharge updates?
 
-            var eventArgs = new ResourceValueChangedEventArgs(this, typeId, changeEvent.Value);
-            _eventManager.Trigger(EventIdResourceValueChanged, eventArgs);
+            var newValues = newValue.Value.Split(";");
 
-            if (_resourceList[changeEvent.Index] < 0)
+            var oldValues = previousValue.Value.IsNullOrWhiteSpace()
+                ? new string[newValues.Length]
+                : previousValue.Value.Split(";");
+
+            for (var i = 0; i < newValues.Length; i++)
             {
-                _resourceList[changeEvent.Index] = 0;
-            }
-            else
-            {
-                var resourceMax = GetResourceMax(typeId);
-
-                if (_resourceList[changeEvent.Index] > resourceMax)
+                if (oldValues[i] != newValues[i])
                 {
-                    _resourceList[changeEvent.Index] = resourceMax;
+                    var typeId = _resourceValueCache.ElementAt(i).Key;
+
+                    _resourceValueCache[typeId] = int.Parse(newValues[i]);
+
+                    var eventArgs = new ResourceValueChangedEventArgs(this, typeId, _resourceValueCache[typeId]);
+                    _eventManager.Trigger(EventIdResourceValueChanged, eventArgs);
+
+                    if (typeId == ResourceTypeIds.HealthId)
+                    {
+                        UpdateUiHealthAndDefenceValues();
+                    }
                 }
             }
-
-            _eventManager.After(EventIdResourceValueChanged, eventArgs);
         }
 
         #endregion
 
         #region Resource Management
 
+        protected IEnumerable<IResource> GetResources()
+        {
+            return _sortedResources;
+        }
+
         private void SetupResourceReplenishing()
         {
             _replenishResources = new DelayedAction(.2f, () =>
             {
-                foreach (var resource in _sortedResources.Where(x => x.TypeId != ResourceTypeIds.Health))
+                foreach (var resource in GetResources().Where(x => x.TypeId != ResourceTypeIds.Health))
                 {
                     var typeId = resource.TypeId.ToString();
                     var value = GetResourceValue(typeId);
@@ -238,12 +266,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
             });
         }
 
-        private void ApplyHealthChange(
+        public void ApplyHealthChange(
             int change,
             FighterBase sourceFighter,
+            ItemBase itemUsed,
             Vector3? position,
             bool isCritical)
         {
+            _lastDamageSourceName = sourceFighter != null ? sourceFighter.FighterName : null;
+            _lastDamageItemName = itemUsed?.Name.OrIfNullOrWhitespace(_localizer.Translate("ui.alert.attack.noitem"));
+
             if (sourceFighter != null)
             {
                 //Debug.Log($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
@@ -261,65 +293,95 @@ namespace FullPotential.Api.Gameplay.Behaviours
             //}
 
             //Do this last to ensure the entity does not die before recording the cause
-            var index = GetResourceListIndexFromTypeId(ResourceTypeIds.HealthId);
-            _resourceList[index] += change;
+            AdjustResourceValue(ResourceTypeIds.HealthId, change);
         }
 
         private void PopulateResourceList()
         {
             _sortedResources = _typeRegistry.GetRegisteredTypes<IResource>()
-                .OrderBy(x => x.TypeId)
-                .ToList();
+                .OrderBy(x => x.TypeId);
 
-            if (IsClient && !IsServer)
+            foreach (var resource in _sortedResources)
+            {
+                _resourceValueCache.Add(resource.TypeId.ToString(), 9999);
+            }
+
+            if (!IsServer)
             {
                 return;
             }
 
-            var healthIndex = _sortedResources.IndexOf(_sortedResources.First(x => x.TypeId == ResourceTypeIds.Health));
-
-            for (var i = 0; i < _sortedResources.Count; i++)
+            int healthIndex;
+            for (healthIndex = 0; healthIndex < _resourceValueCache.Count; healthIndex++)
             {
-                _resourceList.Add(i == healthIndex
-                    ? GetResourceMax(ResourceTypeIds.HealthId)
-                    : 0);
+
             }
 
-            _resourceList.OnListChanged += HandleResourceListChange;
-        }
+            var sb = new StringBuilder();
+            for (var i = 0; i < _resourceValueCache.Count; i++)
+            {
+                sb.Append(_resourceValueCache.ElementAt(i).Key == ResourceTypeIds.HealthId
+                    ? GetResourceMax(ResourceTypeIds.HealthId)
+                    : 0);
+                sb.Append(";");
+            }
 
-        private IResource GetResourceTypeIdFromListIndex(int index)
-        {
-            return _sortedResources.ElementAt(index);
-        }
-
-        private int GetResourceListIndexFromTypeId(string typeId)
-        {
-            return _sortedResources.FindIndex(x => x.TypeId.ToString() == typeId);
+            _encodedResourceValues.Value = sb.ToString();
         }
 
         public int GetResourceValue(string typeId)
         {
-            return _resourceList[GetResourceListIndexFromTypeId(typeId)];
+            return _resourceValueCache[typeId];
         }
 
-        protected void SetResourceValue(string typeId, int newValue)
+        protected int ClampResourceValue(string typeId, int value)
         {
-            var index = GetResourceListIndexFromTypeId(typeId);
-            _resourceList[index] = newValue;
+            if (value < 0)
+            {
+                value = 0;
+            }
+            else
+            {
+                var resourceMax = GetResourceMax(typeId);
+
+                if (value > resourceMax)
+                {
+                    value = resourceMax;
+                }
+            }
+
+            return value;
         }
 
         protected void AdjustResourceValue(string typeId, int change)
         {
-            var index = GetResourceListIndexFromTypeId(typeId);
-            _resourceList[index] += change;
+            var currentValue = GetResourceValue(typeId);
+            currentValue = ClampResourceValue(typeId, currentValue);
+            SetResourceValue(typeId, currentValue + change);
+        }
+
+        protected void SetResourceInitialValues(Dictionary<string, int> values)
+        {
+            foreach (var kvp in values)
+            {
+                _resourceValueCache[kvp.Key] = ClampResourceValue(kvp.Key, kvp.Value);
+            }
+        }
+
+        protected void SetResourceValue(string typeId, int newValue)
+        {
+            newValue = ClampResourceValue(typeId, newValue);
+            _resourceValueCache[typeId] = newValue;
+
+            var newEncodeValue = string.Join(";", _resourceValueCache.Select(x => x.Value.ToString()));
+            _encodedResourceValues.Value = newEncodeValue;
         }
 
         protected void SetResourceValuesForRespawn()
         {
-            foreach (var resource in _sortedResources)
+            foreach (var kvp in _resourceValueCache)
             {
-                SetResourceValue(resource.TypeId.ToString(), GetResourceMax(resource.TypeId.ToString()));
+                SetResourceValue(kvp.Key, GetResourceMax(kvp.Key));
             }
         }
 
@@ -409,7 +471,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void UpdateUiHealthAndDefenceValues()
         {
-            if (!IsServer && IsOwner)
+            if (!IsClient)
             {
                 return;
             }
@@ -478,7 +540,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _lastDamageItemName = null;
             _lastDamageSourceName = cause;
 
-            ApplyHealthChange(healthChange, _fighterWhoMovedMeLast, contactPoint.point, false);
+            ApplyHealthChange(healthChange, _fighterWhoMovedMeLast, null, contactPoint.point, false);
         }
 
         #endregion
@@ -492,18 +554,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _fighterWhoMovedMeLast = fighter;
         }
 
-        public void TakeDamageFromFighter(
-            FighterBase sourceFighter,
-            ItemBase itemUsed,
-            Vector3? position,
-            int damageDealt,
-            bool isCritical)
-        {
-            _lastDamageSourceName = sourceFighter != null ? sourceFighter.FighterName : null;
-            _lastDamageItemName = itemUsed?.Name.OrIfNullOrWhitespace(_localizer.Translate("ui.alert.attack.noitem"));
-            ApplyHealthChange(damageDealt, sourceFighter, position, isCritical);
-        }
-
         public virtual void HandleDeath()
         {
             if (AliveState == LivingEntityState.Dead)
@@ -513,7 +563,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             AliveState = LivingEntityState.Dead;
 
+            _graphicsTransform.gameObject.SetActive(false);
+
             GetComponent<Collider>().enabled = false;
+
+            var lootPosition = _sceneService.GetPositionOnSolidObject(transform.position);
 
             foreach (var (clientId, _) in _damageTaken)
             {
@@ -523,14 +577,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
 
                 var playerState = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.GetComponent<IPlayerFighter>();
-                playerState.SpawnLootChest(transform.position);
+                playerState.SpawnLootChest(lootPosition);
             }
 
             _damageTaken.Clear();
 
             var deathMessage = GetDeathMessage(name);
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-            _gameManager.GetSceneBehaviour().MakeAnnouncementClientRpc(deathMessage, nearbyClients);
+            ShowHudAlertClientRpc(deathMessage, nearbyClients);
 
             StopAllCoroutines();
             _activeEffects.Clear();
@@ -627,7 +681,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             do
             {
-                ApplyResourceChange(resourceTypeId, change, sourceFighter, transform.position);
+                ApplyEffectChangeToResource(resourceTypeId, change, sourceFighter, null, transform.position);
                 yield return new WaitForSeconds(delay);
 
             } while (DateTime.Now < expiry);
@@ -640,7 +694,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             AddOrUpdateEffect(resourceEffect, adjustedChange, DateTime.Now.AddSeconds(3));
 
-            ApplyResourceChange(resourceEffect.ResourceTypeId.ToString(), adjustedChange, sourceFighter, position);
+            ApplyEffectChangeToResource(resourceEffect.ResourceTypeId.ToString(), adjustedChange, sourceFighter, itemUsed, position);
         }
 
         public void ApplyTemporaryMaxActionToResource(IResourceEffect resourceEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
@@ -650,15 +704,17 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             AddOrUpdateEffect(resourceEffect, adjustedChange, expiry);
 
-            ApplyResourceChange(resourceEffect.ResourceTypeId.ToString(), adjustedChange, sourceFighter, position);
+            ApplyEffectChangeToResource(resourceEffect.ResourceTypeId.ToString(), adjustedChange, sourceFighter, itemUsed, position);
         }
 
+        // ReSharper disable UnusedParameter.Global
         public void ApplyElementalEffect(IEffect elementalEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
         {
             //todo: zzz v0.8 - ApplyElementalEffect
             //Debug.LogWarning("Not yet implemented elemental effects");
-            ApplyHealthChange(-5, sourceFighter, position, false);
+            ApplyHealthChange(-5, sourceFighter, null, position, false);
         }
+        // ReSharper restore UnusedParameter.Global
 
         public List<ActiveEffect> GetActiveEffects()
         {
@@ -760,21 +816,20 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #endregion
 
-        private void ApplyResourceChange(
+        private void ApplyEffectChangeToResource(
             string resourceTypeId,
             int change,
             FighterBase sourceFighter,
+            ItemBase itemUsed,
             Vector3? position)
         {
-            //todo: zzz v0.5 health-specific code
             if (resourceTypeId == ResourceTypeIds.HealthId)
             {
-                ApplyHealthChange(change, sourceFighter, position, false);
+                ApplyHealthChange(change, sourceFighter, itemUsed, position, false);
                 return;
             }
 
-            var index = GetResourceListIndexFromTypeId(resourceTypeId);
-            _resourceList[index] += change;
+            AdjustResourceValue(resourceTypeId, change);
         }
     }
 }

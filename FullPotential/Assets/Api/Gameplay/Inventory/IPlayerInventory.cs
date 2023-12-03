@@ -16,8 +16,6 @@ namespace FullPotential.Api.Gameplay.Inventory
 
         KeyValuePair<string, EquippedItem>? GetEquippedWithItemId(string itemId);
 
-        InventoryData GetSaveData();
-
         bool IsInventoryFull();
 
         string GetAssignedShape(string itemId);

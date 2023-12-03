@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Linq;
+using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Crafting;
-using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Obsolete.Networking;
+using FullPotential.Api.Obsolete.Networking.Data;
+using FullPotential.Api.Persistence;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.GameManagement.Inventory;
 using FullPotential.Core.Gameplay.Tooltips;
-using FullPotential.Core.Networking;
-using FullPotential.Core.Networking.Data;
 using FullPotential.Core.UI.Behaviours;
 using FullPotential.Core.UI.Events;
 using FullPotential.Core.Utilities.UtilityBehaviours;
@@ -42,14 +42,14 @@ namespace FullPotential.Core.Player
 
         //Services
         private IResultFactory _resultFactory;
-        private IInventoryDataService _inventoryDataService;
         private ILocalizer _localizer;
+        private IPersistenceService _persistenceService;
 
         private bool _hasMenuOpen;
         private UserInterface _userInterface;
         private bool _toggleGameMenu;
         private bool _toggleCharacterMenu;
-        private PlayerState _playerState;
+        private PlayerFighter _playerFighter;
         private PlayerMovement _playerMovement;
         private Interactable _focusedInteractable;
         private Camera _sceneCamera;
@@ -63,12 +63,12 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _playerState = GetComponent<PlayerState>();
+            _playerFighter = GetComponent<PlayerFighter>();
             _playerMovement = GetComponent<PlayerMovement>();
 
             _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
-            _inventoryDataService = DependenciesContext.Dependencies.GetService<IInventoryDataService>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+            _persistenceService = DependenciesContext.Dependencies.GetService<IPersistenceService>();
 
             _drawingPadUi = GameManager.Instance.UserInterface.DrawingPad.GetComponent<DrawingPadUi>();
 
@@ -87,11 +87,6 @@ namespace FullPotential.Core.Player
 
             _userInterface.Hud.SetActive(true);
 
-            if (Debug.isDebugBuild)
-            {
-                _userInterface.DebuggingOverlay.SetActive(true);
-            }
-
             _sceneCamera = Camera.main;
             if (_sceneCamera != null)
             {
@@ -99,16 +94,13 @@ namespace FullPotential.Core.Player
             }
 
             //Avoids weapons clipping with other objects
-            _playerState.InFrontOfPlayer.transform.parent = _inFrontOfPlayerCamera.transform;
-            _playerState.InFrontOfPlayer.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
+            _playerFighter.InFrontOfPlayer.transform.parent = _inFrontOfPlayerCamera.transform;
+            _playerFighter.InFrontOfPlayer.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
 
             _inFrontOfPlayerCamera.gameObject.SetActive(true);
             _playerCamera.gameObject.SetActive(true);
 
-            if (IsClient)
-            {
-                Camera.main.fieldOfView = GameManager.Instance.GameSettings.FieldOfView;
-            }
+            SetupLocalClient();
         }
 
         public override void OnNetworkSpawn()
@@ -127,6 +119,7 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
+            //todo: zzz v0.6 stop using Update
             UpdateMenuStates();
         }
 
@@ -154,12 +147,11 @@ namespace FullPotential.Core.Player
         #endregion
 
         #region Input Event Handlers
-#pragma warning disable IDE0051 // Remove unused private members
 
         // ReSharper disable once UnusedMember.Local
         private void OnInteract()
         {
-            if (_hasMenuOpen)
+            if (IsNoUiInteractionPermitted())
             {
                 return;
             }
@@ -204,7 +196,7 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnAttackHoldLeft()
         {
-            OnAttackHold(true);
+            HandleAttackHold(true);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -214,8 +206,10 @@ namespace FullPotential.Core.Player
             {
                 _drawingPadUi.StopDrawing(HandSlotIds.LeftHand);
             }
-
-            OnAttack(true);
+            else
+            {
+                HandleAttack(true);
+            }
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -231,7 +225,7 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnAttackHoldRight()
         {
-            OnAttackHold(false);
+            HandleAttackHold(false);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -241,14 +235,16 @@ namespace FullPotential.Core.Player
             {
                 _drawingPadUi.StopDrawing(HandSlotIds.RightHand);
             }
-
-            OnAttack(false);
+            else
+            {
+                HandleAttack(false);
+            }
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnShowCursorStart()
         {
-            if (_hasMenuOpen)
+            if (IsNoUiInteractionPermitted())
             {
                 return;
             }
@@ -267,16 +263,15 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnReloadLeft()
         {
-            _playerState.TriggerReloadEvent(true);
+            _playerFighter.TriggerReloadFromClient(true);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnReloadRight()
         {
-            _playerState.TriggerReloadEvent(false);
+            _playerFighter.TriggerReloadFromClient(false);
         }
 
-#pragma warning restore IDE0051 // Remove unused private members
         #endregion
 
         #region ServerRpc calls
@@ -324,7 +319,7 @@ namespace FullPotential.Core.Player
         {
             var componentIdArray = componentIdsCsv.Split(',');
 
-            var components = _playerState.PlayerInventory.GetComponentsFromIds(componentIdArray);
+            var components = _playerFighter.PlayerInventory.GetComponentsFromIds(componentIdArray);
 
             if (components.Count != componentIdArray.Length)
             {
@@ -342,7 +337,7 @@ namespace FullPotential.Core.Player
                 components
             );
 
-            if (_playerState.PlayerInventory.ValidateIsCraftable(componentIdArray, craftedItem).Any())
+            if (_playerFighter.PlayerInventory.ValidateIsCraftable(componentIdArray, craftedItem).Any())
             {
                 Debug.LogWarning("Someone tried cheating: validation was skipped");
                 return;
@@ -358,15 +353,15 @@ namespace FullPotential.Core.Player
                 IdsToRemove = componentIdArray
             };
 
-            _inventoryDataService.PopulateInventoryChangesWithItem(invChange, craftedItem);
+            _playerFighter.Inventory.PopulateInventoryChangesWithItem(invChange, craftedItem);
 
-            ApplyInventoryChanges(invChange);
+            ApplyInventoryChangesAfterCrafting(invChange);
 
             if (OwnerClientId != 0)
             {
-                foreach (var message in FragmentedMessageReconstructor.GetFragmentedMessages(invChange))
+                foreach (var message in _inventoryChangesReconstructor.GetFragmentedMessages(invChange))
                 {
-                    ApplyInventoryChangesClientRpc(message, _clientRpcParams);
+                    ApplyInventoryChangesAfterCraftingClientRpc(message, _clientRpcParams);
                 }
             }
         }
@@ -379,7 +374,7 @@ namespace FullPotential.Core.Player
             var loot = JsonUtility.FromJson<Loot>(serialisedLoot);
             loot.Id = Guid.NewGuid().ToMinimisedString();
 
-            ((PlayerInventory)_playerState.Inventory).AddItemAsAdmin(loot);
+            ((PlayerInventory)_playerFighter.Inventory).AddItemAsAdmin(loot);
 
             CraftItemServerRpc(loot.Id, craftableTypeName, typeId, resourceTypeId, isTwoHanded, itemName);
         }
@@ -389,7 +384,7 @@ namespace FullPotential.Core.Player
         {
             var skipIdCheck = Debug.isDebugBuild && id == "justgimmieloot";
 
-            if (!skipIdCheck && !_playerState.ClaimLoot(id))
+            if (!skipIdCheck && !_playerFighter.ClaimLoot(id))
             {
                 return;
             }
@@ -410,13 +405,13 @@ namespace FullPotential.Core.Player
                 };
             }
 
-            ApplyInventoryChanges(invChange);
+            ApplyInventoryChangesAfterCrafting(invChange);
 
             if (OwnerClientId != 0)
             {
-                foreach (var message in FragmentedMessageReconstructor.GetFragmentedMessages(invChange))
+                foreach (var message in _inventoryChangesReconstructor.GetFragmentedMessages(invChange))
                 {
-                    ApplyInventoryChangesClientRpc(message, _clientRpcParams);
+                    ApplyInventoryChangesAfterCraftingClientRpc(message, _clientRpcParams);
                 }
             }
         }
@@ -427,7 +422,7 @@ namespace FullPotential.Core.Player
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        private void ApplyInventoryChangesClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams)
+        private void ApplyInventoryChangesAfterCraftingClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams)
         {
             var fragmentedMessage = JsonUtility.FromJson<FragmentedMessage>(fragmentedMessageJson);
 
@@ -438,7 +433,7 @@ namespace FullPotential.Core.Player
             }
 
             var changes = JsonUtility.FromJson<InventoryChanges>(_inventoryChangesReconstructor.Reconstruct(fragmentedMessage.GroupId));
-            ApplyInventoryChanges(changes);
+            ApplyInventoryChangesAfterCrafting(changes);
         }
 
         // ReSharper disable once UnusedParameter.Global
@@ -533,9 +528,11 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private void ApplyInventoryChanges(InventoryChanges changes)
+        private void ApplyInventoryChangesAfterCrafting(InventoryChanges changes)
         {
-            ((PlayerInventory)_playerState.Inventory).ApplyInventoryChanges(changes);
+            _playerFighter.Inventory.ApplyInventoryChanges(changes);
+
+            _persistenceService.QueueAsapSave(_playerFighter.Username);
 
             if (changes.IdsToRemove != null && changes.IdsToRemove.Length > 0)
             {
@@ -580,30 +577,29 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private void OnAttackHold(bool isLeftHand)
+        private void HandleAttackHold(bool isLeftHand)
         {
-            if (_hasMenuOpen || _playerState.AliveState != LivingEntityState.Alive)
+            if (IsNoUiInteractionPermitted())
             {
                 return;
             }
 
-            if (IsServer || _playerState.TryToAttackHold(isLeftHand))
-            {
-                _playerState.TryToAttackHoldServerRpc(isLeftHand);
-            }
+            _playerFighter.TryToAttackHold(isLeftHand);
         }
 
-        private void OnAttack(bool isLeftHand)
+        private void HandleAttack(bool isLeftHand)
         {
-            if (_hasMenuOpen || _playerState.AliveState != LivingEntityState.Alive)
+            if (IsNoUiInteractionPermitted())
             {
                 return;
             }
 
-            if (IsServer || _playerState.TryToAttack(isLeftHand))
-            {
-                _playerState.TryToAttackServerRpc(isLeftHand);
-            }
+            _playerFighter.TriggerAttackFromClient(isLeftHand);
+        }
+
+        private bool IsNoUiInteractionPermitted()
+        {
+            return _hasMenuOpen || _playerFighter.AliveState != LivingEntityState.Alive;
         }
 
         private static void RefreshCraftingWindow()
@@ -629,7 +625,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            var item = _playerState.PlayerInventory.GetItemFromAssignedShape(e.DrawnShape);
+            var item = _playerFighter.PlayerInventory.GetItemFromAssignedShape(e.DrawnShape);
 
             if (item == null)
             {
@@ -637,9 +633,23 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            var playerInventory = (PlayerInventory)_playerState.Inventory;
+            var playerInventory = (PlayerInventory)_playerFighter.Inventory;
             playerInventory.EquipItemServerRpc(item.Id, e.SlotId);
         }
 
+        private void SetupLocalClient()
+        {
+            if (!IsClient)
+            {
+                return;
+            }
+
+            if (Debug.isDebugBuild)
+            {
+                _userInterface.DebuggingOverlay.SetActive(true);
+            }
+
+            Camera.main.fieldOfView = GameManager.Instance.GameSettings.FieldOfView;
+        }
     }
 }

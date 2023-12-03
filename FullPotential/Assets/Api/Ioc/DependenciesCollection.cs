@@ -89,26 +89,31 @@ namespace FullPotential.Api.Ioc
             return newInstance;
         }
 
-        private object CreateInstance(Type serviceType)
+        private object CreateInstance(Type typeToCreate)
         {
-            var injectionMethod = serviceType.GetMethod(InjectionMethodName);
+            var injectionMethod = typeToCreate.GetMethod(InjectionMethodName);
             if (injectionMethod != null)
             {
-                return MethodInjection(serviceType, injectionMethod);
+                return MethodInjection(typeToCreate, injectionMethod);
             }
 
-            return ConstructorInjection(serviceType);
+            return ConstructorInjection(typeToCreate);
         }
 
-        private object ConstructorInjection(Type serviceType)
+        public T CreateInstance<T>()
+        {
+            return (T)CreateInstance(typeof(T));
+        }
+
+        private object ConstructorInjection(Type typeToCreate)
         {
             object newInstance;
 
-            var constructors = serviceType.GetConstructors();
+            var constructors = typeToCreate.GetConstructors();
 
             if (constructors.Length > 1)
             {
-                Debug.LogError($"'{serviceType}' has more than one constructor");
+                Debug.LogError($"'{typeToCreate}' has more than one constructor");
                 return null;
             }
 
@@ -122,7 +127,7 @@ namespace FullPotential.Api.Ioc
                 {
                     if (!_registry.ContainsKey(param.ParameterType))
                     {
-                        Debug.LogError($"'{serviceType}' takes a parameter of '{param.ParameterType}' but this type is not registered");
+                        Debug.LogError($"'{typeToCreate}' takes a parameter of '{param.ParameterType}' but this type is not registered");
                     }
                     args.Add(GetServiceInternal(param.ParameterType));
                 }
@@ -131,15 +136,15 @@ namespace FullPotential.Api.Ioc
             }
             else
             {
-                newInstance = Activator.CreateInstance(serviceType);
+                newInstance = Activator.CreateInstance(typeToCreate);
             }
 
             return newInstance;
         }
 
-        private object MethodInjection(Type serviceType, MethodInfo injectionMethod)
+        private object MethodInjection(Type typeToCreate, MethodInfo injectionMethod)
         {
-            var newInstance = Activator.CreateInstance(serviceType);
+            var newInstance = Activator.CreateInstance(typeToCreate);
 
             var parameters = injectionMethod.GetParameters();
 
@@ -150,7 +155,7 @@ namespace FullPotential.Api.Ioc
                 {
                     if (!_registry.ContainsKey(param.ParameterType))
                     {
-                        Debug.LogError($"'{serviceType}' takes a parameter of '{param.ParameterType}' but this type is not registered");
+                        Debug.LogError($"'{typeToCreate}' takes a parameter of '{param.ParameterType}' but this type is not registered");
                     }
                     args.Add(GetServiceInternal(param.ParameterType));
                 }

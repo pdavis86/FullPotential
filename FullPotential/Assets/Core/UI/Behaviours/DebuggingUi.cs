@@ -55,8 +55,6 @@ namespace FullPotential.Core.Ui.Behaviours
                     ? _hostString
                     : (int)(networkStats.LastRtt * 1000) + " ms";
 
-
-
                 _pingText.text = pingTime + "\n" + _framePerSecond;
             }
         }

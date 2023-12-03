@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using FullPotential.Api.Data;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Persistence;
@@ -58,14 +58,13 @@ namespace FullPotential.Core.GameManagement
         //Services
         private IUserRepository _userRepository;
         private ISettingsRepository _settingsRepository;
+        private IPersistenceService _persistenceService;
         private ILocalizer _localizer;
         private IUnityHelperUtilities _unityHelperUtilities;
 
         //Variables
-        private bool _isSaving;
         private NetworkObject _playerPrefabNetObj;
         private DelayedAction _periodicSave;
-        private List<string> _asapSaveUsernames;
         private bool _serverHasBeenStarted;
         private Transform _playersParentTransform;
 
@@ -96,6 +95,7 @@ namespace FullPotential.Core.GameManagement
             _settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
+            _persistenceService = DependenciesContext.Dependencies.GetService<IPersistenceService>();
 
             RegisterEvents();
 
@@ -125,7 +125,6 @@ namespace FullPotential.Core.GameManagement
         private void Start()
         {
             _periodicSave = new DelayedAction(15f, () => SavePlayerData(), false);
-            _asapSaveUsernames = new List<string>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -255,7 +254,6 @@ namespace FullPotential.Core.GameManagement
         public void Disconnect()
         {
             _periodicSave = null;
-            _asapSaveUsernames.Clear();
 
             if (NetworkManager.Singleton.IsServer)
             {
@@ -295,86 +293,12 @@ namespace FullPotential.Core.GameManagement
 
         private void SavePlayerData(bool allData = false)
         {
-            if (!NetworkManager.Singleton.IsServer)
-            {
-                Debug.LogWarning("Tried saving when not on the server");
-                return;
-            }
-
-            if (_isSaving)
-            {
-                Debug.LogWarning("Already saving");
-                return;
-            }
-
-            //Debug.Log("Checking if anything to save. allData: " + allData);
-
-            var playerDataCollection = new List<PlayerData>();
-            foreach (var kvp in NetworkManager.Singleton.ConnectedClients)
-            {
-                if (!ServerGameDataStore.ClientIdToUsername.ContainsKey(kvp.Key))
-                {
-                    Debug.LogWarning($"Could not find username for client {kvp.Key}");
-                    continue;
-                }
-
-                if (allData || _asapSaveUsernames.Contains(ServerGameDataStore.ClientIdToUsername[kvp.Key]))
-                {
-                    playerDataCollection.Add(kvp.Value.PlayerObject.GetComponent<PlayerState>().UpdateAndReturnPlayerData());
-                }
-            }
-
-            if (!playerDataCollection.Any())
-            {
-                return;
-            }
-
-            _isSaving = true;
-
-            try
-            {
-                var tasks = playerDataCollection.Select(x => Task.Run(() => SavePlayerData(x)));
-                Task.Run(async () => await Task.WhenAll(tasks))
-                    .GetAwaiter()
-                    .GetResult();
-            }
-            finally
-            {
-                _isSaving = false;
-            }
-        }
-
-        public void QueueAsapSave(string username)
-        {
-            if (!_asapSaveUsernames.Contains(username))
-            {
-                _asapSaveUsernames.Add(username);
-            }
-        }
-
-        public void SavePlayerData(PlayerData playerData)
-        {
-            if (!NetworkManager.Singleton.IsServer)
-            {
-                Debug.LogError($"Tried to save player data for '{playerData.Username}' when not on the server");
-            }
-
-            if (!playerData.InventoryLoadedSuccessfully)
-            {
-                Debug.LogWarning($"Not saving player data for '{playerData.Username}' because the load failed");
-                return;
-            }
-
-            //Debug.Log($"Saving player data for {playerData.Username}");
-
-            _userRepository.Save(playerData);
-
-            _asapSaveUsernames.Remove(playerData.Username);
+            _persistenceService.SaveBatchPlayerData(ServerGameDataStore.ClientIdToUsername, allData);
         }
 
         public void CheckIsAdmin()
         {
-            //Disabled while still building game
+            //todo: zzz v0.9 re-enable CheckIsAdmin()
             //if (!admin)
             //{
             //    throw new Exception("You are not an admin so cannot perform that action");
@@ -385,13 +309,13 @@ namespace FullPotential.Core.GameManagement
         {
             var eventManager = (EventManager)DependenciesContext.Dependencies.GetService<IEventManager>();
 
+            eventManager.Register(LivingEntityBase.EventIdResourceValueChanged, null);
+
             eventManager.Register(FighterBase.EventIdReload, FighterBase.DefaultHandlerForReloadEvent);
             eventManager.Register(FighterBase.EventIdDamageTaken, null);
             eventManager.Register(FighterBase.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEvent);
 
             eventManager.Register(InventoryBase.EventIdSlotChange, InventoryBase.DefaultHandlerForSlotChangeEvent);
-
-            eventManager.Register(LivingEntityBase.EventIdResourceValueChanged, null);
         }
 
         #region Methods for Mods
@@ -456,7 +380,7 @@ namespace FullPotential.Core.GameManagement
             var newPosition = sceneService.GetHeightAdjustedPosition(position, playerNetObj.GetComponent<Collider>());
             playerNetObj.transform.position = newPosition;
 
-            var playerState = playerNetObj.GetComponent<PlayerState>();
+            var playerState = playerNetObj.GetComponent<PlayerFighter>();
             playerState.PlayerToken = playerToken;
 
             playerNetObj.SpawnAsPlayerObject(serverRpcParams.Receive.SenderClientId);

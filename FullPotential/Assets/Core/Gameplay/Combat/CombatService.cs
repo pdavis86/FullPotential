@@ -102,7 +102,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     damageToDeal *= 2;
                 }
 
-                targetFighter.TakeDamageFromFighter(sourceFighter, itemUsed, position, (int)damageToDeal, isCritical);
+                targetFighter.ApplyHealthChange((int)damageToDeal, sourceFighter, itemUsed, position, isCritical);
 
                 if (weapon == null)
                 {
@@ -211,7 +211,7 @@ namespace FullPotential.Core.Gameplay.Combat
                         return false;
                     }
 
-                    if (target.GetComponent<PlayerState>() != null)
+                    if (target.GetComponent<PlayerFighter>() != null)
                     {
                         //Debug.Log("Cannot target players");
                         return false;

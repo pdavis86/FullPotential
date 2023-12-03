@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FullPotential.Api.Obsolete.Networking.Data;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Core.Networking.Data;
 using UnityEngine;
 
-namespace FullPotential.Core.Networking
+namespace FullPotential.Api.Obsolete.Networking
 {
-    public class FragmentedMessageReconstructor
+    public class FragmentedMessageReconstructor : IFragmentedMessageReconstructor
     {
         private readonly Dictionary<string, List<FragmentedMessage>> _messageGroups = new Dictionary<string, List<FragmentedMessage>>();
 
-        public static IEnumerable<string> GetFragmentedMessages(object payload, int chunkSize = 1000)
+        public IEnumerable<string> GetFragmentedMessages(object payload, int chunkSize = 1000)
         {
             var json = JsonUtility.ToJson(payload);
             var groupId = Guid.NewGuid().ToMinimisedString();

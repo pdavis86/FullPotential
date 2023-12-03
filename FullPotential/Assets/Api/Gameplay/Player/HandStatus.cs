@@ -1,17 +1,12 @@
 ﻿using System.Collections;
-using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.Types;
 
 namespace FullPotential.Api.Gameplay.Player
 {
     public class HandStatus
     {
-
-        public string EquippedItemDescription { get; private set; }
+        public string EquippedItemId { get; set; }
 
         #region Weapon
-
-        public Weapon EquippedWeapon { get; private set; }
 
         public bool IsReloading { get; set; }
 
@@ -21,48 +16,13 @@ namespace FullPotential.Api.Gameplay.Player
 
         #region Consumer
 
-        public Consumer EquippedConsumer { get; private set; }
-
         public IEnumerator ChargeEnumerator { get; set; }
 
-        public Consumer ActiveConsumer { get; set; }
+        public string ActiveConsumerId { get; set; }
 
+        //todo: zzz v0.4.1 - cooldown instead of charge for some consumers?
         //public IEnumerator CooldownEnumerator { get; set; }
 
         #endregion
-
-        public void SetEquippedItem(ItemBase item, string description)
-        {
-            if (ActiveConsumer != null)
-            {
-                ActiveConsumer.StopStoppables();
-                ActiveConsumer = null;
-            }
-
-            EquippedItemDescription = description;
-
-            switch (item)
-            {
-                case Weapon weapon:
-                    EquippedWeapon = weapon;
-                    EquippedConsumer = null;
-                    break;
-
-                case Consumer consumer:
-                    EquippedWeapon = null;
-                    EquippedConsumer = consumer;
-                    break;
-
-                default:
-                    EquippedWeapon = null;
-                    EquippedConsumer = null;
-                    break;
-            }
-        }
-
-        public bool IsConsumingResource(string typeId)
-        {
-            return ActiveConsumer != null && EquippedConsumer.ResourceType.TypeId.ToString() == typeId;
-        }
     }
 }

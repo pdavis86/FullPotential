@@ -72,10 +72,7 @@
     <Compile Include="Assets\Core\Localization\Localizer.cs" />
     <Compile Include="Assets\Core\Registry\SpecialSlots\LeftHand.cs" />
     <Compile Include="Assets\Core\Persistence\UserRepository.cs" />
-    <Compile Include="Assets\Core\Utilities\Extensions\EnumerableExtensions.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltip.cs" />
-    <Compile Include="Assets\Core\Networking\Data\FragmentedMessage.cs" />
-    <Compile Include="Assets\Core\GameManagement\Inventory\InventoryDataService.cs" />
     <Compile Include="Assets\Core\Localization\CultureAddressables.cs" />
     <Compile Include="Assets\Core\GameManagement\Prefabs.cs" />
     <Compile Include="Assets\Core\GameManagement\Data\ServerGameData.cs" />
@@ -101,15 +98,15 @@
     <Compile Include="Assets\Core\Localization\Data\Localization.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\MaintainDistance.cs" />
     <Compile Include="Assets\Core\GameManagement\Events\GameSettingsUpdatedEventArgs.cs" />
-    <Compile Include="Assets\Core\Player\PlayerState.cs" />
+    <Compile Include="Assets\Core\Player\PlayerFighter.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltips.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiSlot.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiInventoryTab.cs" />
-    <Compile Include="Assets\Core\Networking\FragmentedMessageReconstructor.cs" />
     <Compile Include="Assets\Core\GameManagement\JoinOrHostGame.cs" />
     <Compile Include="Assets\Core\UI\Components\BarSlider.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiEquipmentTab.cs" />
     <Compile Include="Assets\Core\Environment\LootInteractable.cs" />
+    <Compile Include="Assets\Core\Persistence\PersistenceService.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\AdminShopUi.cs" />
     <Compile Include="Assets\Core\Utilities\Static\DefaultSceneLoader.cs" />
     <Compile Include="Assets\Core\UI\Components\CraftingSelector.cs" />
@@ -136,7 +133,6 @@
     <Compile Include="Assets\Core\GameManagement\Enums\ConnectStatus.cs" />
     <Compile Include="Assets\Core\Registry\Resources\Stamina.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\StickUiToWorldPosition.cs" />
-    <Compile Include="Assets\Core\GameManagement\Inventory\IInventoryDataService.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\DrawingPadUi.cs" />
     <Compile Include="Assets\Core\GameManagement\ServiceManager.cs" />
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsStartup.cs" />

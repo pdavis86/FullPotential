@@ -4,7 +4,6 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Unity.Services;
-using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.Enemies.Behaviours;
 using Unity.Netcode;
 using UnityEngine;
@@ -90,18 +89,6 @@ namespace FullPotential.Standard.Scenes.Behaviours
             _gameManager.SpawnPlayerNetworkObject(playerToken, position, rotation, serverRpcParams);
         }
 
-        // ReSharper disable once UnusedParameter.Global
-        [ClientRpc]
-        public void MakeAnnouncementClientRpc(string announcement, ClientRpcParams clientRpcParams)
-        {
-            if (announcement.IsNullOrWhiteSpace())
-            {
-                return;
-            }
-
-            _gameManager.GetUserInterface().HudOverlay.ShowAlert(announcement);
-        }
-
         private void SpawnEnemy()
         {
             var chosenSpawnPoint = GetSpawnPoint();
@@ -115,12 +102,14 @@ namespace FullPotential.Standard.Scenes.Behaviours
             enemyNetObj.transform.parent = transform;
 
             _enemyCounter++;
-            enemyNetObj.GetComponent<EnemyState>().SetName("Enemy " + _enemyCounter);
+
+            var enemyState = enemyNetObj.GetComponent<EnemyFighter>();
+            enemyState.SetName("Enemy " + _enemyCounter);
         }
 
         public void HandleEnemyDeath()
         {
-            if (NetworkManager.Singleton.IsServer)
+            if (IsServer)
             {
                 SpawnEnemy();
             }

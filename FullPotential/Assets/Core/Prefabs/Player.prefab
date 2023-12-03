@@ -737,6 +737,7 @@ GameObject:
   - component: {fileID: 7392779647204144591}
   - component: {fileID: 7392779647204144589}
   - component: {fileID: 7392779647204144588}
+  - component: {fileID: 5090998256337987531}
   m_Layer: 0
   m_Name: PlayerCamera
   m_TagString: MainCamera
@@ -810,6 +811,32 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7392779647204144590}
   m_Enabled: 1
+--- !u!114 &5090998256337987531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7392779647204144590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b20b0fbc6bfc0634e95ef2ec63f1e0e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 0
+  SyncPositionY: 0
+  SyncPositionZ: 0
+  SyncRotAngleX: 1
+  SyncRotAngleY: 0
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  InLocalSpace: 0
+  Interpolate: 1
 --- !u!1 &7392779647605690763
 GameObject:
   m_ObjectHideFlags: 0
@@ -1025,7 +1052,7 @@ MonoBehaviour:
   _playerCamera: {fileID: 7392779647204144590}
   _healthSlider: {fileID: 155634429994666516}
   InFrontOfPlayer: {fileID: 3124563880166737475}
-  GraphicsTransform: {fileID: 7392779646582606286}
+  _graphicsTransform: {fileID: 7392779646582606286}
 --- !u!114 &1201570389013236167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1071,7 +1098,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d78daeeb1ec05df4b90fa44c9fb0148e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _amuletForwardMultiplier: 0.2
 --- !u!114 &7867810801410850028
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1324,7 +1350,6 @@ GameObject:
   - component: {fileID: 7392779648629048435}
   - component: {fileID: 7392779648629048399}
   - component: {fileID: 7392779648629048398}
-  - component: {fileID: 3889464632743820598}
   m_Layer: 0
   m_Name: Head
   m_TagString: Untagged
@@ -1399,32 +1424,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &3889464632743820598
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7392779648629048434}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b20b0fbc6bfc0634e95ef2ec63f1e0e1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  InLocalSpace: 0
-  Interpolate: 1
 --- !u!1 &8329820012052210567
 GameObject:
   m_ObjectHideFlags: 0

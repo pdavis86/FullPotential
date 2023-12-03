@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections;
+using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities;
+using FullPotential.Api.Utilities.Extensions;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -91,19 +94,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             _consumeResource = new DelayedAction(.5f, () =>
             {
-                if (HandStatusLeft.ActiveConsumer != null
-                    && !ConsumeResource(HandStatusLeft.EquippedConsumer, HandStatusLeft.EquippedConsumer.Targeting.IsContinuous))
-                {
-                    StopActiveConsumerBehaviour(HandStatusLeft);
-                    StopActiveConsumerBehaviourClientRpc(true, _rpcService.ForNearbyPlayers(transform.position));
-                }
-
-                if (HandStatusRight.ActiveConsumer != null
-                    && !ConsumeResource(HandStatusRight.EquippedConsumer, HandStatusRight.EquippedConsumer.Targeting.IsContinuous))
-                {
-                    StopActiveConsumerBehaviour(HandStatusRight);
-                    StopActiveConsumerBehaviourClientRpc(false, _rpcService.ForNearbyPlayers(transform.position));
-                }
+                CheckIfActiveConsumerNeedsToStop(true);
+                CheckIfActiveConsumerNeedsToStop(false);
             });
         }
 
@@ -131,22 +123,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
         }
 
         [ServerRpc]
-        public void TryToAttackServerRpc(bool isLeftHand)
+        public void AttackWithItemInHandServerRpc(bool isLeftHand)
         {
-            if (TryToAttack(isLeftHand))
-            {
-                var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, new[] { 0ul, OwnerClientId });
-                TryToAttackClientRpc(isLeftHand, nearbyClients);
-            }
+            AttackWithItemInHand(isLeftHand);
         }
 
         [ServerRpc]
-        private void ReloadServerRpc(bool isLeftHand)
+        public void ReloadServerRpc(bool isLeftHand)
         {
-            StartCoroutine(ReloadCoroutine(GetReloadEventArgs(isLeftHand)));
-
-            var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, new[] { 0ul, OwnerClientId });
-            ReloadingClientRpc(isLeftHand, nearbyClients);
+            Reload(GetReloadEventArgs(isLeftHand));
         }
 
         #endregion
@@ -162,16 +147,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        private void TryToAttackClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
+        private void ReloadFinishedClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
         {
-            TryToAttack(isLeftHand);
-        }
-
-        // ReSharper disable once UnusedParameter.Local
-        [ClientRpc]
-        private void ReloadingClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
-        {
-            StartCoroutine(ReloadCoroutine(GetReloadEventArgs(isLeftHand)));
+            var handStatus = GetHandStatus(isLeftHand);
+            handStatus.IsReloading = false;
         }
 
         // ReSharper disable once UnusedParameter.Local
@@ -191,17 +170,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #endregion
 
-        protected override bool IsConsumingResource(string typeId)
-        {
-            return HandStatusLeft.IsConsumingResource(typeId)
-                   || HandStatusRight.IsConsumingResource(typeId);
-        }
-
-        public HandStatus GetHandStatus(bool isLeftHand)
-        {
-            return isLeftHand ? HandStatusLeft : HandStatusRight;
-        }
-
         #region Reloading
 
         private ReloadEventArgs GetReloadEventArgs(bool isLeftHand)
@@ -209,69 +177,86 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return isLeftHand ? _reloadArgsLeft : _reloadArgsRight;
         }
 
-        private ShotFiredEventArgs GetShotFiredEventArgs(bool isLeftHand, Vector3 startPosition, Vector3 endPosition)
+        public void TriggerReloadFromClient(bool isLeftHand)
         {
-            var eventArgs = isLeftHand ? _shotFiredArgsLeft : _shotFiredArgsRight;
-            eventArgs.StartPosition = startPosition;
-            eventArgs.EndPosition = endPosition;
-            return eventArgs;
-        }
+            var handStatus = GetHandStatus(isLeftHand);
 
-        public void TriggerReloadEvent(bool isLeftHand)
-        {
-            _eventManager.Trigger(EventIdReload, GetReloadEventArgs(isLeftHand));
+            handStatus.IsReloading = true;
+
+            ReloadServerRpc(isLeftHand);
         }
 
         public static void DefaultHandlerForReloadEvent(IEventHandlerArgs eventArgs)
         {
-            var reloadEventArgs = (ReloadEventArgs)eventArgs;
-
-            reloadEventArgs.GetNewAmmoCount = () =>
-            {
-                var fighter = reloadEventArgs.Fighter;
-                var handStatus = fighter.GetHandStatus(reloadEventArgs.IsLeftHand);
-
-                var ammoTypeId = handStatus.EquippedWeapon.GetAmmoTypeId();
-                var ammoMax = handStatus.EquippedWeapon.GetAmmoMax();
-                return fighter.Inventory.TakeItemStack(ammoTypeId, ammoMax)?.Count ?? 0;
-            };
-
-            reloadEventArgs.Fighter.Reload(reloadEventArgs);
-        }
-
-        public void Reload(ReloadEventArgs reloadEventArgs)
-        {
-            if (GetHandStatus(reloadEventArgs.IsLeftHand).EquippedWeapon == null)
+            if (!NetworkManager.Singleton.IsServer)
             {
                 return;
             }
 
-            StartCoroutine(ReloadCoroutine(reloadEventArgs));
+            var reloadEventArgs = (ReloadEventArgs)eventArgs;
 
-            ReloadServerRpc(reloadEventArgs.IsLeftHand);
+            var slotId = reloadEventArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
+            var itemInSlot = reloadEventArgs.Fighter.Inventory.GetItemInSlot(slotId);
+
+            if (itemInSlot is not Weapon weapon)
+            {
+                return;
+            }
+
+            //Lose any remaining ammo
+            weapon.Ammo = 0;
+
+            ReloadAndUpdateClientInventory(reloadEventArgs, weapon.GetAmmoMax());
+        }
+
+        private void Reload(ReloadEventArgs reloadEventArgs)
+        {
+            StartCoroutine(ReloadCoroutine(reloadEventArgs));
         }
 
         private IEnumerator ReloadCoroutine(ReloadEventArgs reloadEventArgs)
         {
-            var handStatus = GetHandStatus(reloadEventArgs.IsLeftHand);
+            var slotId = reloadEventArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
+            var itemInSlot = reloadEventArgs.Fighter.Inventory.GetItemInSlot(slotId);
 
-            handStatus.IsReloading = true;
-
-            yield return new WaitForSeconds(handStatus.EquippedWeapon.GetReloadTime());
-
-            //Fighter may have died during the wait
-            if (!handStatus.IsReloading)
+            if (itemInSlot is not Weapon weapon)
             {
                 yield break;
             }
 
-            handStatus.EquippedWeapon.Ammo = reloadEventArgs.GetNewAmmoCount();
-            handStatus.IsReloading = false;
+            yield return new WaitForSeconds(weapon.GetReloadTime());
 
-            _eventManager.After(FighterBase.EventIdReload, reloadEventArgs);
+            _eventManager.Trigger(EventIdReload, reloadEventArgs);
+
+            ReloadFinishedClientRpc(reloadEventArgs.IsLeftHand, _rpcService.ForPlayer(OwnerClientId));
         }
 
         #endregion
+
+        protected override bool IsConsumingResource(string typeId)
+        {
+            return IsHandItemConsumingResource(true, typeId)
+                || IsHandItemConsumingResource(false, typeId);
+        }
+
+        private bool IsHandItemConsumingResource(bool isLeftHand, string typeId)
+        {
+            var handStatus = GetHandStatus(isLeftHand);
+
+            return !handStatus.ActiveConsumerId.IsNullOrWhiteSpace()
+                   && GetItemInHand(isLeftHand) is Consumer consumer
+                   && consumer.ResourceType.TypeId.ToString() == typeId;
+        }
+
+        private ItemBase GetItemInHand(bool isLeftHand)
+        {
+            return Inventory.GetItemInSlot(isLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand);
+        }
+
+        public HandStatus GetHandStatus(bool isLeftHand)
+        {
+            return isLeftHand ? HandStatusLeft : HandStatusRight;
+        }
 
         public int GetAttributeValue(AttributeAffected attributeAffected)
         {
@@ -320,52 +305,71 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public int GetAvailableAmmo(bool isLeftHand)
         {
-            var handStatus = GetHandStatus(isLeftHand);
-            var ammoTypeId = handStatus.EquippedWeapon.GetAmmoTypeId();
+            var weapon = (Weapon)GetItemInHand(isLeftHand);
+            var ammoTypeId = weapon.GetAmmoTypeId();
             return _inventory.GetItemStackTotal(ammoTypeId);
         }
 
-        public bool TryToAttackHold(bool isLeftHand)
+        public void TryToAttackHold(bool isLeftHand)
         {
-            var leftOrRight = GetHandStatus(isLeftHand);
+            //todo: zzz v0.9 Prevent player cheating by sending the ServerRpc calls themselves
 
-            if (leftOrRight.EquippedConsumer != null)
+            var item = GetItemInHand(isLeftHand);
+            var handStatus = GetHandStatus(isLeftHand);
+
+            if (item is Consumer consumer)
             {
-                if (!ConsumeResource(leftOrRight.EquippedConsumer, isTest: true))
+                if (!ConsumeResource(consumer, isTest: true))
                 {
-                    return false;
+                    return;
                 }
 
-                var timeToCharge = leftOrRight.EquippedConsumer.GetChargeTime();
-                leftOrRight.ChargeEnumerator = ConsumerChargeCoroutine(leftOrRight, DateTime.Now.AddSeconds(timeToCharge));
-                StartCoroutine(leftOrRight.ChargeEnumerator);
+                if (!IsHost)
+                {
+                    TryToAttackHoldServerRpc(isLeftHand);
+                }
 
-                return true;
+                var timeToCharge = consumer.GetChargeTime();
+                handStatus.ChargeEnumerator = ConsumerChargeCoroutine(isLeftHand, DateTime.Now.AddSeconds(timeToCharge));
+                StartCoroutine(handStatus.ChargeEnumerator);
+
+                return;
             }
 
-            if (leftOrRight.EquippedWeapon != null
-                && leftOrRight.EquippedWeapon.Attributes.IsAutomatic)
+            if (item is Weapon weapon
+                && weapon.Attributes.IsAutomatic)
             {
-                leftOrRight.RapidFireEnumerator = AutomaticWeaponFire(leftOrRight, leftOrRight.EquippedWeapon.GetDelayBetweenShots(), isLeftHand);
-                StartCoroutine(leftOrRight.RapidFireEnumerator);
-                return true;
+                if (!IsHost)
+                {
+                    TryToAttackHoldServerRpc(isLeftHand);
+                }
+
+                handStatus.RapidFireEnumerator = AutomaticWeaponFire(weapon, isLeftHand);
+                StartCoroutine(handStatus.RapidFireEnumerator);
             }
 
             //Debug.LogWarning("Trying to attack hold an item that is not compatible");
-            return false;
         }
 
-        private IEnumerator ConsumerChargeCoroutine(HandStatus handStatus, DateTime deadline)
+        private IEnumerator ConsumerChargeCoroutine(bool isLeftHand, DateTime deadline)
         {
             var millisecondsUntilDone = (deadline - DateTime.Now).TotalMilliseconds;
 
             //var sw = System.Diagnostics.Stopwatch.StartNew();
 
-            while (handStatus.EquippedConsumer.ChargePercentage < 100)
+            var item = GetItemInHand(isLeftHand);
+            var handStatus = GetHandStatus(isLeftHand);
+
+            if (item is not Consumer consumer)
+            {
+                yield break;
+            }
+
+            while (consumer.ChargePercentage < 100)
             {
                 yield return new WaitForSeconds(0.01F);
                 var millisecondsRemaining = (deadline - DateTime.Now).TotalMilliseconds;
-                handStatus.EquippedConsumer.ChargePercentage = 100 - (int)(millisecondsRemaining / millisecondsUntilDone * 100);
+                consumer.ChargePercentage = 100 - (int)(millisecondsRemaining / millisecondsUntilDone * 100);
             }
 
             //Debug.Log("Charged in: " + sw.ElapsedMilliseconds + "ms");
@@ -373,7 +377,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             handStatus.ChargeEnumerator = null;
         }
 
-        //todo: zzz v0.4.1 - remove SoG cooldown if not necessary
+        //todo: zzz v0.4.1 - cooldown instead of charge for some consumers?
         //private IEnumerator SpellOrGadgetCooldownCoroutine(HandStatus handStatus, int startPercentage, DateTime deadline)
         //{
         //    var millisecondsUntilDone = (deadline - DateTime.Now).TotalMilliseconds;
@@ -399,16 +403,23 @@ namespace FullPotential.Api.Gameplay.Behaviours
         //    handStatus.CooldownEnumerator = null;
         //}
 
-        private IEnumerator AutomaticWeaponFire(HandStatus handStatus, float delay, bool isLeftHand)
+        private IEnumerator AutomaticWeaponFire(Weapon weapon, bool isLeftHand)
         {
-            while (handStatus?.EquippedWeapon != null && handStatus.EquippedWeapon.Ammo > 0)
+            var delay = weapon.GetDelayBetweenShots();
+
+            while (weapon.Ammo > 0)
             {
-                TryToAttack(isLeftHand, true);
+                AttackWithItemInHand(isLeftHand, true);
                 yield return new WaitForSeconds(delay);
             }
         }
 
-        public bool TryToAttack(bool isLeftHand, bool isAutoFire = false)
+        public void TriggerAttackFromClient(bool isLeftHand)
+        {
+            AttackWithItemInHandServerRpc(isLeftHand);
+        }
+
+        public bool AttackWithItemInHand(bool isLeftHand, bool isAutoFire = false)
         {
             if (AliveState != LivingEntityState.Alive)
             {
@@ -419,25 +430,28 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ? _inventory.GetItemInSlot(HandSlotIds.LeftHand)
                 : _inventory.GetItemInSlot(HandSlotIds.RightHand);
 
-            var handPosition = isLeftHand
-                ? Positions.LeftHand.position
-                : Positions.RightHand.position;
+            bool wasAttackSuccessful;
 
             switch (itemInHand)
             {
                 case null:
-                    return Punch();
+                    wasAttackSuccessful = Punch();
+                    break;
 
                 case Consumer consumer:
-                    return UseConsumer(isLeftHand, handPosition, consumer);
+                    wasAttackSuccessful = UseConsumer(isLeftHand, consumer);
+                    break;
 
                 case Weapon weaponInHand:
-                    return UseWeapon(isLeftHand, handPosition, weaponInHand, isAutoFire);
+                    wasAttackSuccessful = UseWeapon(isLeftHand, weaponInHand, isAutoFire);
+                    break;
 
                 default:
                     Debug.LogWarning("Not implemented attack for " + itemInHand.Name + " yet");
                     return false;
             }
+
+            return wasAttackSuccessful;
         }
 
         private bool Punch()
@@ -453,64 +467,46 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return true;
         }
 
-        private bool StopActiveConsumerBehaviour(HandStatus handStatus)
+        public bool StopActiveConsumerBehaviour(HandStatus handStatus)
         {
-            if (handStatus.ActiveConsumer == null)
+            if (handStatus.ActiveConsumerId.IsNullOrWhiteSpace())
             {
                 return false;
             }
 
-            StartConsumerCooldown(handStatus);
+            var activeConsumer = Inventory.GetItemWithId<Consumer>(handStatus.ActiveConsumerId);
+            activeConsumer.StopStoppables();
 
-            handStatus.ActiveConsumer.StopStoppables();
-            handStatus.ActiveConsumer = null;
+            handStatus.ActiveConsumerId = null;
 
             return true;
         }
 
-        //todo: zzz v0.4.1 - remove SoG cooldown if not necessary
-        private void StartConsumerCooldown(HandStatus handStatus)
-        {
-            handStatus.EquippedConsumer.ChargePercentage = 0;
-
-            //var timeToCooldown = handStatus.EquippedSpellOrGadget.ChargePercentage / 100f * handStatus.EquippedSpellOrGadget.GetCooldownTime();
-            //handStatus.CooldownEnumerator = SpellOrGadgetCooldownCoroutine(handStatus, handStatus.EquippedSpellOrGadget.ChargePercentage, DateTime.Now.AddSeconds(timeToCooldown));
-            //StartCoroutine(handStatus.CooldownEnumerator);
-        }
-
-        private bool UseConsumer(bool isLeftHand, Vector3 handPosition, Consumer consumer)
+        private bool UseConsumer(bool isLeftHand, Consumer consumer)
         {
             if (consumer == null)
             {
                 return false;
             }
 
-            var leftOrRight = GetHandStatus(isLeftHand);
+            var handStatus = GetHandStatus(isLeftHand);
 
-            if (StopActiveConsumerBehaviour(leftOrRight))
+            if (StopActiveConsumerBehaviour(handStatus))
             {
                 //Return true as the action also needs performing on the server
                 return true;
             }
 
-            if (leftOrRight.EquippedConsumer.ChargePercentage < 100)
+            if (consumer.ChargePercentage < 100)
             {
-                //Debug.Log("Charge was not finished");
-
-                if (leftOrRight.ChargeEnumerator != null)
+                if (handStatus.ChargeEnumerator != null)
                 {
-                    StopCoroutine(leftOrRight.ChargeEnumerator);
-                    StartConsumerCooldown(leftOrRight);
+                    StopCoroutine(handStatus.ChargeEnumerator);
+                    consumer.ChargePercentage = 0;
                 }
 
                 return false;
             }
-
-            //if (leftOrRight.CooldownEnumerator != null)
-            //{
-            //    //Debug.Log("Still cooling down");
-            //    return false;
-            //}
 
             if (!ConsumeResource(consumer, isTest: true))
             {
@@ -519,21 +515,25 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (consumer.Targeting.IsContinuous)
             {
-                leftOrRight.ActiveConsumer = consumer;
+                handStatus.ActiveConsumerId = consumer.Id;
             }
             else
             {
-                StartConsumerCooldown(leftOrRight);
+                consumer.ChargePercentage = 0;
             }
-
-            var attackDirection = Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, ConsumerRangeLimit)
-                ? (hit.point - handPosition).normalized
-                : LookTransform.forward;
 
             if (!IsServer)
             {
                 return true;
             }
+
+            var handPosition = isLeftHand
+                ? Positions.LeftHand.position
+                : Positions.RightHand.position;
+
+            var attackDirection = Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, ConsumerRangeLimit)
+                ? (hit.point - handPosition).normalized
+                : LookTransform.forward;
 
             ConsumeResource(consumer);
 
@@ -559,7 +559,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return true;
         }
 
-        private bool UseWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand, bool isAutoFire)
+        private bool UseWeapon(bool isLeftHand, Weapon weaponInHand, bool isAutoFire)
         {
             var handStatus = isLeftHand
                 ? HandStatusLeft
@@ -572,35 +572,41 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return true;
             }
 
-            if (!weaponInHand.IsRanged || handStatus.EquippedWeapon == null)
+            if (!weaponInHand.IsRanged)
             {
                 return UseMeleeWeapon(weaponInHand);
             }
 
-            if (handStatus.EquippedWeapon.Ammo == 0 || handStatus.IsReloading)
+            return UseRangedWeapon(isLeftHand, handStatus, weaponInHand);
+        }
+
+        private bool UseRangedWeapon(bool isLeftHand, HandStatus handStatus, Weapon weaponInHand)
+        {
+            if (weaponInHand.Ammo == 0 || handStatus.IsReloading)
             {
                 return false;
             }
 
-            var requiredAmmo = Math.Min(
-                1 + handStatus.EquippedWeapon.Attributes.ExtraAmmoPerShot,
-                handStatus.EquippedWeapon.Ammo);
+            var handPosition = isLeftHand
+                ? Positions.LeftHand.position
+                : Positions.RightHand.position;
 
-            handStatus.EquippedWeapon.Ammo -= requiredAmmo;
-            return UseRangedWeapon(isLeftHand, handPosition, weaponInHand, requiredAmmo);
-        }
-
-        private bool UseRangedWeapon(bool isLeftHand, Vector3 handPosition, Weapon weaponInHand, int ammoUsed)
-        {
             var shotDirection = weaponInHand.GetShotDirection(LookTransform.forward);
 
             var endPos = Physics.Raycast(LookTransform.position, shotDirection, out var rangedHit, MaximumRange)
                 ? rangedHit.point
                 : handPosition + shotDirection * MaximumRange;
 
-            var eventArgs = GetShotFiredEventArgs(isLeftHand, handPosition, endPos);
+            var ammoUsed = Math.Min(
+                1 + weaponInHand.Attributes.ExtraAmmoPerShot,
+                weaponInHand.Ammo);
+
+            var eventArgs = isLeftHand ? _shotFiredArgsLeft : _shotFiredArgsRight;
+            eventArgs.StartPosition = handPosition;
+            eventArgs.EndPosition = endPos;
+            eventArgs.AmmoUsed = ammoUsed;
+
             _eventManager.Trigger(EventIdShotFired, eventArgs);
-            _eventManager.After(EventIdShotFired, eventArgs);
 
             if (rangedHit.transform == null)
             {
@@ -628,7 +634,26 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public static void DefaultHandlerForShotFiredEvent(IEventHandlerArgs eventArgs)
         {
             var shotFiredArgs = (ShotFiredEventArgs)eventArgs;
-            shotFiredArgs.Fighter.ShotFired(shotFiredArgs.StartPosition, shotFiredArgs.EndPosition);
+
+            if (!shotFiredArgs.Fighter.IsServer)
+            {
+                return;
+            }
+
+            var fighter = shotFiredArgs.Fighter;
+
+            var slotId = shotFiredArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
+            var equippedWeapon = (Weapon)fighter.Inventory.GetItemInSlot(slotId);
+
+            equippedWeapon.Ammo -= shotFiredArgs.AmmoUsed;
+
+            var invChanges = new InventoryChanges
+            {
+                Weapons = new[] { equippedWeapon }
+            };
+            fighter.Inventory.SendInventoryChangesToClient(invChanges);
+
+            fighter.ShotFired(shotFiredArgs.StartPosition, shotFiredArgs.EndPosition);
         }
 
         private bool UseMeleeWeapon(Weapon weaponInHand)
@@ -696,5 +721,48 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         // ReSharper restore UnassignedField.Global
         #endregion
+
+        private void CheckIfActiveConsumerNeedsToStop(bool isLeftHand)
+        {
+            var handStatus = GetHandStatus(isLeftHand);
+
+            if (handStatus.ActiveConsumerId.IsNullOrWhiteSpace())
+            {
+                return;
+            }
+
+            var consumer = Inventory.GetItemWithId<Consumer>(handStatus.ActiveConsumerId);
+
+            if (ConsumeResource(consumer, consumer.Targeting.IsContinuous))
+            {
+                return;
+            }
+
+            StopActiveConsumerBehaviour(handStatus);
+            StopActiveConsumerBehaviourClientRpc(isLeftHand, _rpcService.ForNearbyPlayers(transform.position));
+        }
+
+        public static void ReloadAndUpdateClientInventory(ReloadEventArgs eventArgs, int ammoNeeded)
+        {
+            var fighter = eventArgs.Fighter;
+
+            var slotId = eventArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
+            var equippedWeapon = (Weapon)fighter.Inventory.GetItemInSlot(slotId);
+
+            var ammoTypeId = equippedWeapon.GetAmmoTypeId();
+
+            var (countTaken, invChanges) = fighter.Inventory.TakeCountFromItemStacks(ammoTypeId, ammoNeeded);
+
+            if (invChanges == null)
+            {
+                return;
+            }
+
+            equippedWeapon.Ammo += countTaken;
+
+            invChanges.Weapons = new[] { equippedWeapon };
+
+            fighter.Inventory.SendInventoryChangesToClient(invChanges);
+        }
     }
 }
