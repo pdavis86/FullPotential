@@ -18,7 +18,7 @@ namespace FullPotential.Standard
             {
                 typeof(Accessories.Ring),
                 typeof(Accessories.Amulet),
-                typeof(Accessories.Barrier),
+                typeof(Accessories.Barrier.Barrier),
                 typeof(Accessories.Belt),
                 typeof(Accessories.AutoAmmoBuyer.AutoAmmoBuyer),
 
@@ -153,7 +153,7 @@ namespace FullPotential.Standard
             eventManager.Subscribe(FighterBase.EventIdReload, CreateInstance<SpecialGear.Reloader.TeleportReloader.ReloadEventHandler>());
             eventManager.Subscribe(FighterBase.EventIdShotFired, CreateInstance<SpecialGear.Reloader.TeleportReloader.ShotFiredEventHandler>());
             eventManager.Subscribe(InventoryBase.EventIdSlotChange, CreateInstance<SpecialGear.Reloader.SlotChangeEventHandler>());
-            eventManager.Subscribe(FighterBase.EventIdDamageTaken, CreateInstance<Accessories.BarrierEventHandler>());
+            eventManager.Subscribe(LivingEntityBase.EventIdDamageTaken, CreateInstance<Accessories.Barrier.DamageTakenEventHandler>());
         }
 
         private static T CreateInstance<T>()

@@ -36,6 +36,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
     public abstract class LivingEntityBase : NetworkBehaviour
     {
         public const string EventIdResourceValueChanged = "20b3ff1d-e8d0-438a-873d-98124f726e38";
+        public const string EventIdDamageTaken = "4e8f6a71-3708-47f2-bc57-36bcc5596d0c";
 
         private const int VelocityThreshold = 3;
         private const int ForceThreshold = 1000;
@@ -294,6 +295,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             //Do this last to ensure the entity does not die before recording the cause
             AdjustResourceValue(ResourceTypeIds.HealthId, change);
+
+            _eventManager.Trigger(EventIdDamageTaken, new DamageTakenEventArgs(this));
         }
 
         private void PopulateResourceList()

@@ -1,7 +1,7 @@
 ﻿using System;
 using FullPotential.Api.Registry.Gear;
 
-namespace FullPotential.Standard.Accessories
+namespace FullPotential.Standard.Accessories.Barrier
 {
     public class Barrier : IAccessory
     {

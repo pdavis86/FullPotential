@@ -1,6 +1,6 @@
 ﻿using System;
 using FullPotential.Api.Registry.Gear;
-using FullPotential.Standard.Accessories;
+using FullPotential.Standard.Accessories.Barrier;
 
 namespace FullPotential.Standard.AccessoryVisuals
 {

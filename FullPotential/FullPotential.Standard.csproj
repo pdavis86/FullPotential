@@ -57,9 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Standard\Weapons\Shield.cs" />
-    <Compile Include="Assets\Standard\Accessories\Barrier.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Endurance.cs" />
-    <Compile Include="Assets\Standard\Accessories\BarrierEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Repel.cs" />
     <Compile Include="Assets\Standard\Enemies\Behaviours\EnemyFighter.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Slow.cs" />
@@ -168,6 +166,8 @@
     <Compile Include="Assets\Standard\Effects\Movement\Attract.cs" />
     <Compile Include="Assets\Standard\Accessories\Amulet.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveLeft.cs" />
+    <Compile Include="Assets\Standard\Accessories\Barrier\DamageTakenEventHandler.cs" />
+    <Compile Include="Assets\Standard\Accessories\Barrier\Barrier.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Standard\FullPotential.Standard.asmdef" />
