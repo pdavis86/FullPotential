@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -202,12 +203,13 @@ namespace FullPotential.Core.Player
                     }
 
                     var slotId = kvp.Key;
+                    var itemId = kvp.Value;
 
-                    var item = itemsToAdd.FirstOrDefault(x => x.Id == kvp.Value);
+                    var item = itemsToAdd.FirstOrDefault(x => x.Id == itemId);
 
                     if (item == null)
                     {
-                        Debug.LogWarning($"Item {kvp.Value} is missing");
+                        Debug.LogWarning($"Item {itemId} is missing");
                         continue;
                     }
 
@@ -340,6 +342,12 @@ namespace FullPotential.Core.Player
             var countRemoved = itemsRemoved.Count(x => x is not ItemStack);
 
             _playerFighter.AlertOfInventoryRemovals(countRemoved);
+
+            var craftingUi = GameManager.Instance.UserInterface.GetCharacterMenuUiCraftingTab();
+            if (craftingUi.gameObject.activeSelf)
+            {
+                craftingUi.ResetUi();
+            }
         }
 
         public KeyValuePair<string, EquippedItem>? GetEquippedWithItemId(string itemId)

@@ -8,9 +8,6 @@ using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Obsolete.Networking;
-using FullPotential.Api.Obsolete.Networking.Data;
-using FullPotential.Api.Persistence;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
@@ -43,7 +40,6 @@ namespace FullPotential.Core.Player
         //Services
         private IResultFactory _resultFactory;
         private ILocalizer _localizer;
-        private IPersistenceService _persistenceService;
 
         private bool _hasMenuOpen;
         private UserInterface _userInterface;
@@ -53,10 +49,8 @@ namespace FullPotential.Core.Player
         private PlayerMovement _playerMovement;
         private Interactable _focusedInteractable;
         private Camera _sceneCamera;
-        private ClientRpcParams _clientRpcParams;
         private DrawingPadUi _drawingPadUi;
 
-        private readonly FragmentedMessageReconstructor _inventoryChangesReconstructor = new FragmentedMessageReconstructor();
 
         #region Unity Event handlers
 
@@ -68,7 +62,6 @@ namespace FullPotential.Core.Player
 
             _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
-            _persistenceService = DependenciesContext.Dependencies.GetService<IPersistenceService>();
 
             _drawingPadUi = GameManager.Instance.UserInterface.DrawingPad.GetComponent<DrawingPadUi>();
 
@@ -101,13 +94,6 @@ namespace FullPotential.Core.Player
             _playerCamera.gameObject.SetActive(true);
 
             SetupLocalClient();
-        }
-
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
-
-            _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -348,22 +334,14 @@ namespace FullPotential.Core.Player
                 craftedItem.Name = itemName;
             }
 
-            var invChange = new InventoryChanges
+            var invChanges = new InventoryChanges
             {
                 IdsToRemove = componentIdArray
             };
 
-            _playerFighter.Inventory.PopulateInventoryChangesWithItem(invChange, craftedItem);
+            _playerFighter.Inventory.PopulateInventoryChangesWithItem(invChanges, craftedItem);
 
-            ApplyInventoryChangesAfterCrafting(invChange);
-
-            if (OwnerClientId != 0)
-            {
-                foreach (var message in _inventoryChangesReconstructor.GetFragmentedMessages(invChange))
-                {
-                    ApplyInventoryChangesAfterCraftingClientRpc(message, _clientRpcParams);
-                }
-            }
+            _playerFighter.Inventory.ApplyInventoryChanges(invChanges);
         }
 
         [ServerRpc]
@@ -372,7 +350,7 @@ namespace FullPotential.Core.Player
             GameManager.Instance.CheckIsAdmin();
 
             var loot = JsonUtility.FromJson<Loot>(serialisedLoot);
-            loot.Id = Guid.NewGuid().ToMinimisedString();
+            loot.Id = Guid.NewGuid().ToString();
 
             ((PlayerInventory)_playerFighter.Inventory).AddItemAsAdmin(loot);
 
@@ -389,52 +367,28 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            InventoryChanges invChange;
+            InventoryChanges invChanges;
             if (_random.Next(1, 3) == 1)
             {
-                invChange = new InventoryChanges
+                invChanges = new InventoryChanges
                 {
                     ItemStacks = new[] { _resultFactory.GetAmmoDrop() as ItemStack }
                 };
             }
             else
             {
-                invChange = new InventoryChanges
+                invChanges = new InventoryChanges
                 {
                     Loot = new[] { _resultFactory.GetLootDrop() as Loot },
                 };
             }
 
-            ApplyInventoryChangesAfterCrafting(invChange);
-
-            if (OwnerClientId != 0)
-            {
-                foreach (var message in _inventoryChangesReconstructor.GetFragmentedMessages(invChange))
-                {
-                    ApplyInventoryChangesAfterCraftingClientRpc(message, _clientRpcParams);
-                }
-            }
+            _playerFighter.Inventory.ApplyInventoryChanges(invChanges);
         }
 
         #endregion
 
         #region ClientRpc calls
-
-        // ReSharper disable once UnusedParameter.Local
-        [ClientRpc]
-        private void ApplyInventoryChangesAfterCraftingClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams)
-        {
-            var fragmentedMessage = JsonUtility.FromJson<FragmentedMessage>(fragmentedMessageJson);
-
-            _inventoryChangesReconstructor.AddMessage(fragmentedMessage);
-            if (!_inventoryChangesReconstructor.HaveAllMessages(fragmentedMessage.GroupId))
-            {
-                return;
-            }
-
-            var changes = JsonUtility.FromJson<InventoryChanges>(_inventoryChangesReconstructor.Reconstruct(fragmentedMessage.GroupId));
-            ApplyInventoryChangesAfterCrafting(changes);
-        }
 
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
@@ -528,18 +482,6 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private void ApplyInventoryChangesAfterCrafting(InventoryChanges changes)
-        {
-            _playerFighter.Inventory.ApplyInventoryChanges(changes);
-
-            _persistenceService.QueueAsapSave(_playerFighter.Username);
-
-            if (changes.IdsToRemove != null && changes.IdsToRemove.Length > 0)
-            {
-                RefreshCraftingWindow();
-            }
-        }
-
         private Ray GetLookDirectionRay()
         {
             return _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
@@ -600,16 +542,6 @@ namespace FullPotential.Core.Player
         private bool IsNoUiInteractionPermitted()
         {
             return _hasMenuOpen || _playerFighter.AliveState != LivingEntityState.Alive;
-        }
-
-        private static void RefreshCraftingWindow()
-        {
-            var craftingUi = GameManager.Instance.UserInterface.GetCharacterMenuUiCraftingTab();
-
-            if (craftingUi.gameObject.activeSelf)
-            {
-                craftingUi.ResetUi();
-            }
         }
 
         private void HandleOnDrawingStop(object sender, OnDrawingStopEventArgs e)
