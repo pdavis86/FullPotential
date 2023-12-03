@@ -90,7 +90,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Properties
 
-        protected abstract IStatSlider HealthStatSlider { get; set; }
+        protected abstract IBarSlider HealthBarSlider { get; set; }
 
         public Rigidbody RigidBody => _rb == null ? _rb = GetComponent<Rigidbody>() : _rb;
 
@@ -478,9 +478,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var health = GetResourceValue(ResourceTypeIds.HealthId);
             var maxHealth = GetResourceMax(ResourceTypeIds.HealthId);
-            var defence = GetDefenseValue();
-            var values = _gameManager.GetUserInterface().HudOverlay.GetHealthValues(health, maxHealth, defence);
-            HealthStatSlider.SetValues(values);
+            var extra = $" (D{GetDefenseValue()})";
+            var values = _gameManager.GetUserInterface().HudOverlay.GetSliderBarValues(health, maxHealth, extra);
+            HealthBarSlider.UpdateValues(values.text, values.percent, 1);
         }
 
         #endregion

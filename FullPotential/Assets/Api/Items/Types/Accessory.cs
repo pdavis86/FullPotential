@@ -42,7 +42,7 @@ namespace FullPotential.Api.Items.Types
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {GetType().Name}" + "\n");
             }
 
-            //todo: zzz v0.4.1 - implement accessory effects
+            //todo: zzz v0.8 - implement accessory triggers and traits
             //if (Effects != null && Effects.Count > 0)
             //{
             //    var localisedEffects = Effects.Select(localizer.GetTranslatedTypeName);
@@ -51,19 +51,11 @@ namespace FullPotential.Api.Items.Types
 
             AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
 
-            //todo: zzz v0.4.1 - implement accessory attributes
-
-            //AppendToDescription(sb, localizer, Attributes.Strength, nameof(Attributes.Strength));
-            sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Strength))}: {Attributes.Strength})\n");
-
-            //AppendToDescription(sb, localizer, Attributes.Strength, nameof(Attributes.Strength));
-            sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Efficiency))}: {Attributes.Efficiency})\n");
-
-            //AppendToDescription(sb, localizer, Attributes.Strength, nameof(Attributes.Strength));
-            sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Speed))}: {Attributes.Speed})\n");
-
-            //AppendToDescription(sb, localizer, Attributes.Strength, nameof(Attributes.Strength));
-            sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Recovery))}: {Attributes.Recovery})\n");
+            //todo: zzz v0.8 - implement accessory triggers and traits
+            //sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Strength))}: {Attributes.Strength})\n");
+            //sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Efficiency))}: {Attributes.Efficiency})\n");
+            //sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Speed))}: {Attributes.Speed})\n");
+            //sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Recovery))}: {Attributes.Recovery})\n");
 
             return sb.ToString().Trim();
         }

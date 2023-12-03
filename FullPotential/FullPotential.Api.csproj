@@ -65,7 +65,7 @@
     <Compile Include="Assets\Api\Unity\Extensions\Vector2Extensions.cs" />
     <Compile Include="Assets\Api\Modding\IModHelper.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\ColliderExtensions.cs" />
-    <Compile Include="Assets\Api\Ui\Components\IStatSlider.cs" />
+    <Compile Include="Assets\Api\Ui\Components\IBarSlider.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\ICombatService.cs" />
     <Compile Include="Assets\Api\Unity\Services\IUnityHelperUtilities.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IPlayerInventory.cs" />

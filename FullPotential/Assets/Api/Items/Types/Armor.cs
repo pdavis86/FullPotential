@@ -48,7 +48,7 @@ namespace FullPotential.Api.Items.Types
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {GetType().Name}" + "\n");
             }
 
-            //todo: zzz v0.4.1 - implement armor effects
+            //todo: zzz v0.8 - implement armor triggers and traits
             //if (Effects != null && Effects.Count > 0)
             //{
             //    var localisedEffects = Effects.Select(localizer.GetTranslatedTypeName);
@@ -56,8 +56,6 @@ namespace FullPotential.Api.Items.Types
             //}
 
             AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
-            AppendToDescription(sb, localizer, Attributes.IsAutomatic, nameof(Attributes.IsAutomatic));
-            AppendToDescription(sb, localizer, Attributes.ExtraAmmoPerShot, nameof(Attributes.ExtraAmmoPerShot));
 
             AppendToDescription(
                 sb,

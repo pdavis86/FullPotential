@@ -101,7 +101,7 @@ namespace FullPotential.Core.Player
 
         public override Transform LookTransform => _playerCamera.transform;
 
-        protected override IStatSlider HealthStatSlider { get; set; }
+        protected override IBarSlider HealthBarSlider { get; set; }
 
         #endregion
 
@@ -126,7 +126,7 @@ namespace FullPotential.Core.Player
             _shaderUtilities = DependenciesContext.Dependencies.GetService<IShaderUtilities>();
             _persistenceService = DependenciesContext.Dependencies.GetService<IPersistenceService>();
 
-            HealthStatSlider = _healthSlider;
+            HealthBarSlider = _healthSlider;
         }
 
         // ReSharper disable once UnusedMember.Local

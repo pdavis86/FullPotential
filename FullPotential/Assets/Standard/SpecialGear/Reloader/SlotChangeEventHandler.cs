@@ -2,11 +2,14 @@
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.EventArgs;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Modding;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Ui;
 using FullPotential.Standard.SpecialSlots;
 using Unity.Netcode;
+using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -15,6 +18,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader
     public class SlotChangeEventHandler : IEventHandler
     {
         private readonly IHud _hud;
+        private GameObject _handWarningPrefab;
 
         public NetworkLocation Location => NetworkLocation.Client;
 
@@ -22,9 +26,13 @@ namespace FullPotential.Standard.SpecialGear.Reloader
 
         public Action<IEventHandlerArgs> AfterHandler => HandleAfterSlotChange;
 
-        public SlotChangeEventHandler(IModHelper modHelper)
+        public SlotChangeEventHandler(IModHelper modHelper, ITypeRegistry typeRegistry)
         {
             _hud = modHelper.GetGameManager().GetUserInterface().HudOverlay;
+
+            typeRegistry.LoadAddessable<GameObject>(
+                "Standard/UI/Equipment/HandWarning.prefab",
+                prefab => _handWarningPrefab = prefab);
         }
 
         private void HandleAfterSlotChange(IEventHandlerArgs eventArgs)
@@ -43,29 +51,36 @@ namespace FullPotential.Standard.SpecialGear.Reloader
                 return;
             }
 
-
             var reloaderEquipped = slotChangeArgs.Inventory.GetItemInSlot(RangedWeaponReloaderSlot.TypeIdString);
-            var hasReloaderEquipped = reloaderEquipped != null;
 
             switch (slotChangeArgs.SlotId)
             {
                 case HandSlotIds.LeftHand:
                 case HandSlotIds.RightHand:
                     var isLeftHand = slotChangeArgs.SlotId == HandSlotIds.LeftHand;
-                    _hud.SetHandWarning(isLeftHand, GetIsActive(slotChangeArgs.Inventory, slotChangeArgs.SlotId, hasReloaderEquipped));
+                    AddOrRemoveHandIcon(slotChangeArgs.Inventory, slotChangeArgs.SlotId, reloaderEquipped, isLeftHand);
                     return;
 
                 case RangedWeaponReloaderSlot.TypeIdString:
-                    _hud.SetHandWarning(true, GetIsActive(slotChangeArgs.Inventory, HandSlotIds.LeftHand, hasReloaderEquipped));
-                    _hud.SetHandWarning(false, GetIsActive(slotChangeArgs.Inventory, HandSlotIds.RightHand, hasReloaderEquipped));
+                    AddOrRemoveHandIcon(slotChangeArgs.Inventory, HandSlotIds.LeftHand, reloaderEquipped, true);
+                    AddOrRemoveHandIcon(slotChangeArgs.Inventory, HandSlotIds.RightHand, reloaderEquipped, false);
                     return;
             }
         }
 
-        private static bool GetIsActive(InventoryBase inventory, string slotId, bool hasReloaderEquipped)
+        private void AddOrRemoveHandIcon(InventoryBase inventory, string slotId, ItemBase reloaderEquipped, bool isLeftHand)
         {
+            var iconId = $"{slotId};ReloaderWarning";
             var isRangedWeapon = inventory.GetItemInSlot(slotId) is Weapon weapon && weapon.IsRanged;
-            return isRangedWeapon && !hasReloaderEquipped;
+
+            if (isRangedWeapon && reloaderEquipped == null)
+            {
+                _hud.AddHandIcon(iconId, isLeftHand, _handWarningPrefab);
+            }
+            else
+            {
+                _hud.RemoveHandIcon(iconId);
+            }
         }
     }
 }

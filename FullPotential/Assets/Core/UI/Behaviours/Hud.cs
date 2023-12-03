@@ -11,7 +11,6 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
@@ -33,8 +32,8 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private GameObject _equippedLeftHand;
         [SerializeField] private GameObject _equippedRightHand;
         [SerializeField] private GameObject _crosshairs;
-        [SerializeField] private GameObject _handWarningLeft;
-        [SerializeField] private GameObject _handWarningRight;
+        [SerializeField] private GameObject _handIconContainerLeft;
+        [SerializeField] private GameObject _handIconContainerRight;
         [SerializeField] private GameObject _resourceBarsContainer;
         [SerializeField] private GameObject _resourceBarPrefab;
         [SerializeField] private Text _ammoLeft;
@@ -42,6 +41,9 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private ProgressWheel _chargeLeft;
         [SerializeField] private ProgressWheel _chargeRight;
 #pragma warning restore 0649
+
+        private readonly Dictionary<string, GameObject> _progressBars = new Dictionary<string, GameObject>();
+        private readonly Dictionary<string, GameObject> _handIcons = new Dictionary<string, GameObject>();
 
         private ILocalizer _localizer;
         private ITypeRegistry _typeRegistry;
@@ -56,10 +58,6 @@ namespace FullPotential.Core.Ui.Behaviours
         private EquippedSummary _equippedRightHandSummary;
         private Text _equippedRightHandAmmo;
         private FighterBase _playerFighter;
-        private BarSlider _staminaSlider;
-        private BarSlider _healthSlider;
-        private BarSlider _manaSlider;
-        private BarSlider _energySlider;
 
         #region Unity Events Handlers
 
@@ -93,47 +91,12 @@ namespace FullPotential.Core.Ui.Behaviours
             }
 
             //todo: zzz v0.6 - use events instead of firing on every update!
-            UpdateStaminaPercentage();
-            UpdateHealthPercentage();
-            UpdateManaPercentage();
-            UpdateEnergyPercentage();
-
+            UpdateResourceBars();
             UpdateHandOverlays();
-
             UpdateActiveEffects();
         }
 
         #endregion
-
-        private void SetupResourceBars()
-        {
-            var resources = _typeRegistry.GetRegisteredTypes<IResource>();
-
-            foreach (var resource in resources)
-            {
-                var newBar = Instantiate(_resourceBarPrefab, _resourceBarsContainer.transform);
-                newBar.FindInDescendants("Fill").GetComponent<Image>().color = resource.Color.ToUnityColor();
-
-                switch (resource.TypeId.ToString())
-                {
-                    case ResourceTypeIds.HealthId:
-                        _healthSlider = newBar.GetComponent<BarSlider>();
-                        break;
-
-                    case ResourceTypeIds.StaminaId:
-                        _staminaSlider = newBar.GetComponent<BarSlider>();
-                        break;
-
-                    case ResourceTypeIds.ManaId:
-                        _manaSlider = newBar.GetComponent<BarSlider>();
-                        break;
-
-                    case ResourceTypeIds.EnergyId:
-                        _energySlider = newBar.GetComponent<BarSlider>();
-                        break;
-                }
-            }
-        }
 
         public void Initialise(FighterBase fighter)
         {
@@ -151,6 +114,75 @@ namespace FullPotential.Core.Ui.Behaviours
             var alert = Instantiate(_alertPrefab, _alertsContainer.transform);
 
             alert.GetComponent<SlideOutAlert>().Text.text = alertText;
+        }
+
+        public void ToggleDrawingMode(bool isOn)
+        {
+            _crosshairs.SetActive(!isOn);
+
+            var newAlpha = isOn ? 1 : 0.5f;
+
+            _equippedLeftHandBackground.color = ChangeColorAlpha(_equippedLeftHandBackground.color, newAlpha);
+
+            _equippedLeftHandAmmo.color = ChangeColorAlpha(_equippedLeftHandAmmo.color, newAlpha);
+
+            _equippedRightHandBackground.color = ChangeColorAlpha(_equippedRightHandBackground.color, newAlpha);
+
+            _equippedRightHandAmmo.color = ChangeColorAlpha(_equippedRightHandAmmo.color, newAlpha);
+        }
+
+        public (float percent, string text) GetSliderBarValues(float currentValue, float maxValue, string extra)
+        {
+            return (currentValue / maxValue, $"{currentValue}/{maxValue}" + extra);
+        }
+
+        public void AddSliderBar(string id, Color color)
+        {
+            var newBar = Instantiate(_resourceBarPrefab, _resourceBarsContainer.transform);
+            newBar.FindInDescendants("Fill").GetComponent<Image>().color = color;
+
+            _progressBars.Add(id, newBar);
+        }
+
+        public void UpdateSliderBar(string id, string text, float value, float maxValue)
+        {
+            var slider = _progressBars[id].GetComponent<BarSlider>();
+            slider.UpdateValues(text, value, maxValue);
+        }
+
+        public void RemoveSliderBar(string id)
+        {
+            var obj = _resourceBarsContainer.transform.Find(id);
+            Destroy(obj);
+
+            _progressBars.Remove(id);
+        }
+
+        public void AddHandIcon(string id, bool isLeftHand, GameObject prefab)
+        {
+            if (_handIcons.ContainsKey(id))
+            {
+                return;
+            }
+
+            var container = isLeftHand ? _handIconContainerLeft : _handIconContainerRight;
+            var newIcon = Instantiate(prefab, container.transform);
+
+            _handIcons.Add(id, newIcon);
+        }
+
+        public void RemoveHandIcon(string id)
+        {
+            if (!_handIcons.ContainsKey(id))
+            {
+                return;
+            }
+
+            var icon = _handIcons[id];
+
+            Destroy(icon);
+
+            _handIcons.Remove(id);
         }
 
         private void UpdateHandOverlays()
@@ -206,34 +238,6 @@ namespace FullPotential.Core.Ui.Behaviours
             }
 
             chargeWheel.Slider.value = consumer.ChargePercentage / 100f;
-        }
-
-        private void UpdateStaminaPercentage()
-        {
-            var values = GetStaminaValues(_playerFighter.GetResourceValue(ResourceTypeIds.StaminaId), _playerFighter.GetResourceMax(ResourceTypeIds.StaminaId));
-            _staminaSlider.SetValues(values);
-        }
-
-        private void UpdateHealthPercentage()
-        {
-            var health = _playerFighter.GetResourceValue(ResourceTypeIds.HealthId);
-            var maxHealth = _playerFighter.GetResourceMax(ResourceTypeIds.HealthId);
-            var defence = _playerFighter.GetDefenseValue();
-
-            var values = GetHealthValues(health, maxHealth, defence);
-            _healthSlider.SetValues(values);
-        }
-
-        private void UpdateManaPercentage()
-        {
-            var values = GetManaValues(_playerFighter.GetResourceValue(ResourceTypeIds.ManaId), _playerFighter.GetResourceMax(ResourceTypeIds.ManaId));
-            _manaSlider.SetValues(values);
-        }
-
-        private void UpdateEnergyPercentage()
-        {
-            var values = GetEnergyValues(_playerFighter.GetResourceValue(ResourceTypeIds.EnergyId), _playerFighter.GetResourceMax(ResourceTypeIds.EnergyId));
-            _energySlider.SetValues(values);
         }
 
         private void UpdateActiveEffects()
@@ -303,54 +307,36 @@ namespace FullPotential.Core.Ui.Behaviours
             return results;
         }
 
-        public void ToggleDrawingMode(bool isOn)
-        {
-            _crosshairs.SetActive(!isOn);
-
-            var newAlpha = isOn ? 1 : 0.5f;
-
-            _equippedLeftHandBackground.color = ChangeColorAlpha(_equippedLeftHandBackground.color, newAlpha);
-
-            _equippedLeftHandAmmo.color = ChangeColorAlpha(_equippedLeftHandAmmo.color, newAlpha);
-
-            _equippedRightHandBackground.color = ChangeColorAlpha(_equippedRightHandBackground.color, newAlpha);
-
-            _equippedRightHandAmmo.color = ChangeColorAlpha(_equippedRightHandAmmo.color, newAlpha);
-        }
-
         private Color ChangeColorAlpha(Color originalColor, float alpha)
         {
             return new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
         }
 
-        public (float percent, string text) GetStaminaValues(int stamina, int maxStamina)
+        private void SetupResourceBars()
         {
-            var newStamina = (float)stamina / maxStamina;
-            return (newStamina, $"{stamina}/{maxStamina}");
+            var resources = _typeRegistry.GetRegisteredTypes<IResource>();
+
+            foreach (var resource in resources)
+            {
+                AddSliderBar(resource.TypeId.ToString(), resource.Color.ToUnityColor());
+            }
         }
 
-        public (float percent, string text) GetHealthValues(int health, int maxHealth, int defence)
+        private void UpdateResourceBars()
         {
-            var newHealth = (float)health / maxHealth;
-            return (newHealth, $"{health}/{maxHealth} (D{defence})");
-        }
+            var resources = _typeRegistry.GetRegisteredTypes<IResource>();
 
-        public (float percent, string text) GetManaValues(int mana, int maxMana)
-        {
-            var newMana = (float)mana / maxMana;
-            return (newMana, $"{mana}/{maxMana}");
-        }
+            foreach (var resource in resources)
+            {
+                var id = resource.TypeId.ToString();
 
-        public (float percent, string text) GetEnergyValues(int energy, int maxEnergy)
-        {
-            var newEnergy = (float)energy / maxEnergy;
-            return (newEnergy, $"{energy}/{maxEnergy}");
-        }
+                var value = _playerFighter.GetResourceValue(id);
+                var max = _playerFighter.GetResourceMax(id);
 
-        public void SetHandWarning(bool isLeftHand, bool isActive)
-        {
-            var handWarningObject = isLeftHand ? _handWarningLeft : _handWarningRight;
-            handWarningObject.SetActive(isActive);
+                var (percent, text) = GetSliderBarValues(value, max, null);
+
+                UpdateSliderBar(id, text, percent, 1);
+            }
         }
     }
 }

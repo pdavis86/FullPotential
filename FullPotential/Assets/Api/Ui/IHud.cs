@@ -1,4 +1,5 @@
 ﻿using FullPotential.Api.Gameplay.Behaviours;
+using UnityEngine;
 
 // ReSharper disable UnusedMemberInSuper.Global
 
@@ -12,14 +13,16 @@ namespace FullPotential.Api.Ui
 
         void ToggleDrawingMode(bool isOn);
 
-        (float percent, string text) GetStaminaValues(int stamina, int maxStamina);
+        (float percent, string text) GetSliderBarValues(float currentValue, float maxValue, string extra);
 
-        (float percent, string text) GetHealthValues(int health, int maxHealth, int defence);
+        void AddSliderBar(string id, Color color);
 
-        (float percent, string text) GetManaValues(int mana, int maxMana);
+        void UpdateSliderBar(string id, string text, float value, float maxValue);
 
-        (float percent, string text) GetEnergyValues(int energy, int maxEnergy);
+        void RemoveSliderBar(string id);
 
-        void SetHandWarning(bool isLeftHand, bool isActive);
+        void AddHandIcon(string id, bool isLeftHand, GameObject prefab);
+
+        void RemoveHandIcon(string id);
     }
 }

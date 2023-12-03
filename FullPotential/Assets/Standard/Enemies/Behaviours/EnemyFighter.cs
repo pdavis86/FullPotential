@@ -25,7 +25,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
         public override Transform LookTransform => transform;
 
-        protected override IStatSlider HealthStatSlider { get; set; }
+        protected override IBarSlider HealthBarSlider { get; set; }
 
         #endregion
 
@@ -37,7 +37,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
 
             _inventory = gameObject.AddComponent<EnemyInventory>();
 
-            HealthStatSlider = _healthSliderParent.GetComponent<IStatSlider>();
+            HealthBarSlider = _healthSliderParent.GetComponent<IBarSlider>();
         }
 
         public override void OnNetworkSpawn()
