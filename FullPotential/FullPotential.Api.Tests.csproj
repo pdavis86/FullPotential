@@ -56,7 +56,6 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Api.Tests\Utilities\Extensions\GuidExtensionsTests.cs" />
     <Compile Include="Assets\Api.Tests\Ioc\DependenciesCollectionTests.cs" />
     <Compile Include="Assets\Api.Tests\Ioc\MethodInjectionExample.cs" />
     <Compile Include="Assets\Api.Tests\Ioc\ConstructorInjectionExample.cs" />

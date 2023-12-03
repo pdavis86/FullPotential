@@ -7,7 +7,6 @@ using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Ui;
-using FullPotential.Api.Utilities.Extensions;
 using Unity.Netcode;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -66,7 +65,7 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
             var newItemStack = new ItemStack
             {
                 RegistryType = ammoType,
-                Id = Guid.NewGuid().ToMinimisedString(),
+                Id = Guid.NewGuid().ToString(),
                 BaseName = _localizer.Translate(ammoType),
                 Count = ammoType.MaxStackSize
             };

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FullPotential.Api.Obsolete.Networking.Data;
-using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 
 namespace FullPotential.Api.Obsolete.Networking
@@ -15,7 +14,7 @@ namespace FullPotential.Api.Obsolete.Networking
         public IEnumerable<string> GetFragmentedMessages(object payload, int chunkSize = 1000)
         {
             var json = JsonUtility.ToJson(payload);
-            var groupId = Guid.NewGuid().ToMinimisedString();
+            var groupId = Guid.NewGuid().ToString();
             var groupStartDateTime = DateTime.UtcNow.ToString("u");
             var fragmentCount = (int)Math.Ceiling((float)json.Length / 1000);
 

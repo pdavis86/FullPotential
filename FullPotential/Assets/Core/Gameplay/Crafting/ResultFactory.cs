@@ -239,7 +239,7 @@ namespace FullPotential.Core.Gameplay.Crafting
         {
             var lootDrop = new Loot
             {
-                Id = Guid.NewGuid().ToMinimisedString(),
+                Id = Guid.NewGuid().ToString(),
                 Attributes = new Attributes
                 {
                     IsSoulbound = IsSuccess(10),
@@ -309,7 +309,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return new ItemStack
             {
                 RegistryType = randomAmmo,
-                Id = Guid.NewGuid().ToMinimisedString(),
+                Id = Guid.NewGuid().ToString(),
                 BaseName = _localizer.Translate(randomAmmo),
                 Count = randomCount
             };
@@ -330,7 +330,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 
             var consumer = new Consumer
             {
-                Id = Guid.NewGuid().ToMinimisedString(),
+                Id = Guid.NewGuid().ToString(),
                 ResourceType = resourceType,
                 Targeting = targeting,
                 Shape = GetShapeOrNone(targeting, relevantComponents),
@@ -382,7 +382,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             var weapon = new Weapon
             {
                 RegistryType = craftableType,
-                Id = Guid.NewGuid().ToMinimisedString(),
+                Id = Guid.NewGuid().ToString(),
                 IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
                 Attributes = new Attributes
                 {
@@ -402,7 +402,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             var weapon = new Weapon
             {
                 RegistryType = craftableType,
-                Id = Guid.NewGuid().ToMinimisedString(),
+                Id = Guid.NewGuid().ToString(),
                 IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
                 Attributes = new Attributes
                 {
@@ -428,7 +428,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             var weapon = new Weapon
             {
                 RegistryType = craftableType,
-                Id = Guid.NewGuid().ToMinimisedString(),
+                Id = Guid.NewGuid().ToString(),
                 IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
                 Attributes = new Attributes
                 {
@@ -448,7 +448,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             var armor = new Armor
             {
                 RegistryType = craftableType,
-                Id = Guid.NewGuid().ToMinimisedString(),
+                Id = Guid.NewGuid().ToString(),
                 Attributes = new Attributes
                 {
                     IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
@@ -465,7 +465,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             var accessory = new Accessory
             {
                 RegistryType = craftableType,
-                Id = Guid.NewGuid().ToMinimisedString(),
+                Id = Guid.NewGuid().ToString(),
                 Name = craftableType.GetType().Name.ToSpacedString(),
                 Attributes = new Attributes
                 {
@@ -491,7 +491,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             var specialGear = new SpecialGear
             {
                 RegistryType = craftableType,
-                Id = Guid.NewGuid().ToMinimisedString(),
+                Id = Guid.NewGuid().ToString(),
                 Name = craftableType.GetType().Name.ToSpacedString(),
                 ResourceType = resourceType,
                 Attributes = new Attributes

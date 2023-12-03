@@ -612,7 +612,7 @@ namespace FullPotential.Core.Player
         {
             ClearExpiredLoot();
 
-            var id = Guid.NewGuid().ToMinimisedString();
+            var id = Guid.NewGuid().ToString();
 
             _unclaimedLoot.Add(id, DateTime.UtcNow.AddHours(1));
 

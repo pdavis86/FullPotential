@@ -167,7 +167,6 @@
     <Compile Include="Assets\Api\Networking\IRpcService.cs" />
     <Compile Include="Assets\Api\Data\GameSettings.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\NetworkLocation.cs" />
-    <Compile Include="Assets\Api\Utilities\Extensions\GuidExtensions.cs" />
     <Compile Include="Assets\Api\Registry\Armor\ArmorTypeIds.cs" />
     <Compile Include="Assets\Api\Utilities\DelayedAction.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\FighterBase.cs" />
