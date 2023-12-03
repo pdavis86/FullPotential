@@ -73,7 +73,7 @@ namespace FullPotential.Core.Player
                 PopulateInventoryChangesWithItem(invChanges, item);
             }
 
-            var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, 0);
+            var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             SendInventoryChangesToClients(invChanges, nearbyClients);
         }
 

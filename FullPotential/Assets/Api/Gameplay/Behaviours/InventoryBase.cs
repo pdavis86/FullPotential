@@ -62,10 +62,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
 
-            _armorSlotCount = _typeRegistry.GetRegisteredTypes<IArmor>().Count();
+            _inventoryChangesReconstructor = DependenciesContext.Dependencies.GetService<IFragmentedMessageReconstructorFactory>().Create();
 
-            var fmrf = DependenciesContext.Dependencies.GetService<IFragmentedMessageReconstructorFactory>();
-            _inventoryChangesReconstructor = fmrf.Create();
+            _armorSlotCount = _typeRegistry.GetRegisteredTypes<IArmor>().Count();
         }
 
         #endregion
@@ -108,12 +107,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             var changes = JsonUtility.FromJson<InventoryChanges>(_inventoryChangesReconstructor.Reconstruct(fragmentedMessage.GroupId));
-            ApplyInventoryChanges(changes);
+            ApplyInventoryChanges(changes, true);
         }
 
         #endregion
 
-        public void ApplyInventoryChanges(InventoryChanges changes)
+        public void ApplyInventoryChanges(InventoryChanges changes, bool isFromClientRpc = false)
         {
             if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
             {
@@ -182,7 +181,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             ApplyEquippedItemChanges(changes.EquippedItems);
 
-            SendInventoryChangesToClient(changes);
+            if (!isFromClientRpc)
+            {
+                SendInventoryChangesToClient(changes);
+            }
         }
 
         private void UpdateExistingItem(ItemBase newItem)
