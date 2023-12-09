@@ -466,6 +466,10 @@
       "Key": "specialgear.teleportreloader",
       "Value": "Teleport Reloader"
     },
+    {
+      "Key": "specialgear.barrier",
+      "Value": "Barrier"
+    },
 	
 	
 	{
@@ -481,6 +485,24 @@
 	{
       "Key": "slot.autoammobuyerslot",
       "Value": "Auto Ammo Buyer"
-    }    
+    },
+	{
+      "Key": "slot.barrierslot",
+      "Value": "Barrier"
+    },
+	
+	
+    {
+      "Key": "attribute.alias.barrier.speed",
+      "Value": "Recharge delay"
+    },
+    {
+      "Key": "attribute.alias.barrier.recovery",
+      "Value": "Recharge rate"
+    },
+    {
+      "Key": "attribute.resourceconsumptiontype",
+      "Value": "Consumes"
+    }
   ]
 }

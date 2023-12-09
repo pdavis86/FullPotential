@@ -49,7 +49,7 @@ namespace FullPotential.Api.Items.Base
             return attributeValue / 100f * (max - min) + min;
         }
 
-        public float GetHighInLowOutInRange(int attributeValue, float min, float max)
+        public static float GetHighInLowOutInRange(int attributeValue, float min, float max)
         {
             return (101 - attributeValue) / 100f * (max - min) + min;
         }
@@ -91,7 +91,7 @@ namespace FullPotential.Api.Items.Base
             }
         }
 
-        protected void AppendToDescription(StringBuilder builder, ILocalizer localizer, int attributeValue, string attributeName, string aliasSegment, string aliasValue, UnitsType? unitsType = null)
+        public void AppendToDescription(StringBuilder builder, ILocalizer localizer, int attributeValue, string attributeName, string aliasSegment, string aliasValue, UnitsType? unitsType = null)
         {
             if (attributeValue == 0)
             {
@@ -111,7 +111,7 @@ namespace FullPotential.Api.Items.Base
             if (levelOfDetail == LevelOfDetail.Full)
             {
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(Name))}: {itemName.OrIfNullOrWhitespace(Name)}" + "\n");
-                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {GetType().Name}" + "\n");
+                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {localizer.Translate(TranslationType.ItemType, GetType().Name)}" + "\n");
             }
 
             if (Effects != null && Effects.Count > 0)
@@ -166,6 +166,18 @@ namespace FullPotential.Api.Items.Base
         public float GetEffectTimeBetween()
         {
             var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0.5f, 1.5f);
+            return returnValue;
+        }
+
+        public float GetRechargeDelay()
+        {
+            var returnValue = GetHighInLowOutInRange(Attributes.Recovery, 0.5f, 3f);
+            return returnValue;
+        }
+
+        public int GetRechargeRate()
+        {
+            var returnValue = (int)ItemForCombatBase.GetHighInLowOutInRange(Attributes.Speed, 1, 10);
             return returnValue;
         }
 

@@ -60,6 +60,10 @@
       "Key": "item.registrytype",
       "Value": "Type"
     },
+    {
+      "Key": "item.resourcetype",
+      "Value": "Consumes"
+    },
 
 
     {
@@ -162,19 +166,11 @@
       "Key": "attribute.luck",
       "Value": "Luck"
     },
-    {
-      "Key": "attribute.resourceconsumptiontype",
-      "Value": "Consumes"
-    },
 	
 	
 	{
       "Key": "attribute.alias.item.strength",
       "Value": "Est. DPS"
-    },
-    {
-      "Key": "attribute.alias.consumer.strength",
-      "Value": "Est. Change"
     },
     {
       "Key": "attribute.alias.item.range",
@@ -190,8 +186,12 @@
       "Key": "attribute.alias.defensiveitem.strength",
       "Value": "Defence"
     },
-    
-    
+	
+	
+    {
+      "Key": "attribute.alias.consumer.strength",
+      "Value": "Est. change"
+    },
     {
       "Key": "attribute.alias.consumer.efficiency",
       "Value": "Resource cost"
@@ -238,16 +238,6 @@
       "Key": "attribute.alias.meleeweapon.recovery",
       "Value": "Cooldown Time"
     },
-	
-	
-    {
-      "Key": "attribute.alias.barrier.speed",
-      "Value": "Recharge Delay"
-    },
-    {
-      "Key": "attribute.alias.barrier.recovery",
-      "Value": "Recharge Rate"
-    },
     
     
     {
@@ -261,6 +251,10 @@
     {
       "Key": "attribute.units.percent",
       "Value": "%"
+    },
+    {
+      "Key": "attribute.units.distance",
+      "Value": "m"
     },
 
 

@@ -232,7 +232,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #endregion
 
-        protected override bool IsConsumingResource(string typeId)
+        public override bool IsConsumingResource(string typeId)
         {
             return IsHandItemConsumingResource(true, typeId)
                 || IsHandItemConsumingResource(false, typeId);

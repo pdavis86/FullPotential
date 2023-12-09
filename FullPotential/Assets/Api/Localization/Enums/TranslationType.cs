@@ -8,5 +8,6 @@
         CraftingHandedness,
         CraftingNamePrefix,
         Item,
+        ItemType,
     }
 }

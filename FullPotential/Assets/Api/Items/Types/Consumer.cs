@@ -86,7 +86,7 @@ namespace FullPotential.Api.Items.Types
             if (levelOfDetail == LevelOfDetail.Full)
             {
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(Name))}: {itemName.OrIfNullOrWhitespace(Name)}" + "\n");
-                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {GetType().Name}" + "\n");
+                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {localizer.Translate(TranslationType.ItemType, GetType().Name)}" + "\n");
             }
 
             if (Targeting != null)
@@ -123,7 +123,8 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Range,
                 nameof(Attributes.Range),
                 AliasSegmentItem,
-                localizer.TranslateFloat(GetRangeForDisplay()));
+                localizer.TranslateFloat(GetRangeForDisplay()),
+                UnitsType.Distance);
 
             AppendToDescription(
                 sb,

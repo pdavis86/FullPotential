@@ -8,7 +8,6 @@ using System.Text;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Registry;
@@ -102,7 +101,7 @@ namespace FullPotential.Core.Registry
             ValidateAndRegister(typeof(Resources.Mana));
             ValidateAndRegister(typeof(Resources.Energy));
 
-            _eventManager.Subscribe(LivingEntityBase.EventIdResourceValueChanged, DependenciesContext.Dependencies.CreateInstance<LivingEntityDiedEventHandler>());
+            _eventManager.Subscribe<LivingEntityDiedEventHandler>(LivingEntityBase.EventIdResourceValueChanged);
         }
 
         private void HandleModRegistration(IMod mod)

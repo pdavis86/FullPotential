@@ -309,8 +309,10 @@ namespace FullPotential.Core.GameManagement
         {
             var eventManager = (EventManager)DependenciesContext.Dependencies.GetService<IEventManager>();
 
+            //todo: missing default handler
             eventManager.Register(LivingEntityBase.EventIdResourceValueChanged, null);
-            eventManager.Register(LivingEntityBase.EventIdDamageTaken, null);
+
+            eventManager.Register(LivingEntityBase.EventIdHealthChange, LivingEntityBase.DefaultHandlerForHealthChangeEvent);
 
             eventManager.Register(FighterBase.EventIdReload, FighterBase.DefaultHandlerForReloadEvent);
             eventManager.Register(FighterBase.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEvent);

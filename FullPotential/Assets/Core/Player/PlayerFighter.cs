@@ -500,7 +500,7 @@ namespace FullPotential.Core.Player
                 var nonHealthResources = GetResources().Where(x => x.TypeId != ResourceTypeIds.Health);
                 SetResourceInitialValues(nonHealthResources.ToDictionary(
                     resource => resource.TypeId.ToString(),
-                    resource => playerData.Resources.FirstOrDefault(x => x.Key == resource.GetType().Name).Value));
+                    resource => playerData.Resources.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value));
                 
                 var health = playerData.Resources.FirstOrDefault(kvp => kvp.Key == nameof(ResourceTypeIds.Health)).Value;
                 SetResourceValue(ResourceTypeIds.HealthId, health > 0 ? health : GetResourceMax(ResourceTypeIds.HealthId));
@@ -690,7 +690,7 @@ namespace FullPotential.Core.Player
                 Settings = _playerSettings,
                 Resources = GetResources()
                     .Select(resource => new SerializableKeyValuePair<string, int>(
-                        resource.GetType().Name,
+                        resource.TypeId.ToString(),
                         GetResourceValue(resource.TypeId.ToString())))
                     .ToArray(),
                 Inventory = ((PlayerInventory)PlayerInventory).GetInventorySaveData(),

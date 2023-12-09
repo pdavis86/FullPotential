@@ -4,6 +4,7 @@
     {
         Time,
         UnitPerTime,
-        Percent
+        Percent,
+        Distance
     }
 }

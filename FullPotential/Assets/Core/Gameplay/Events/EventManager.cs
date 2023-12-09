@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Ioc;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -17,20 +18,11 @@ namespace FullPotential.Core.Gameplay.Events
             _subscriptions.Add(eventId, new EventHandlerGroup(eventId, defaultHandler));
         }
 
-        public void Subscribe(string eventId, IEventHandler handler)
+        public void Subscribe<T>(string eventId)
+            where T : IEventHandler
         {
-            if (_subscriptions[eventId].OtherHandlers.Contains(handler))
-            {
-                Debug.LogWarning("Subscribe has been called multiple times with the same handler");
-                return;
-            }
-
+            var handler = DependenciesContext.Dependencies.CreateInstance<T>();
             _subscriptions[eventId].OtherHandlers.Add(handler);
-        }
-
-        public void Unsubscribe(string eventId, IEventHandler handler)
-        {
-            _subscriptions[eventId].OtherHandlers.Remove(handler);
         }
 
         public void Trigger(string eventId, IEventHandlerArgs args)

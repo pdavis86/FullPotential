@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Ioc;
 using FullPotential.Api.Modding;
 using UnityEngine;
 
@@ -18,7 +17,6 @@ namespace FullPotential.Standard
             {
                 typeof(Accessories.Ring),
                 typeof(Accessories.Amulet),
-                typeof(Accessories.Barrier.Barrier),
                 typeof(Accessories.Belt),
                 typeof(Accessories.AutoAmmoBuyer.AutoAmmoBuyer),
 
@@ -73,9 +71,13 @@ namespace FullPotential.Standard
                 typeof(Loot.Shard),
                 typeof(Loot.Junk),
 
+                typeof(Resources.BarrierChargeResource),
+
+                typeof(SpecialGear.Barrier.Barrier),
                 typeof(SpecialGear.Reloader.ConsolidatorReloader.ConsolidatorReloader),
                 typeof(SpecialGear.Reloader.TeleportReloader.TeleportReloader),
 
+                typeof(SpecialSlots.BarrierSlot),
                 typeof(SpecialSlots.RangedWeaponReloaderSlot),
 
                 typeof(Weapons.Axe),
@@ -148,17 +150,12 @@ namespace FullPotential.Standard
 
         public void RegisterEventHandlers(IEventManager eventManager)
         {
-            eventManager.Subscribe(FighterBase.EventIdReload, CreateInstance<Accessories.AutoAmmoBuyer.ReloadEventHandler>());
-            eventManager.Subscribe(FighterBase.EventIdReload, CreateInstance<SpecialGear.Reloader.ConsolidatorReloader.ReloadEventHandler>());
-            eventManager.Subscribe(FighterBase.EventIdReload, CreateInstance<SpecialGear.Reloader.TeleportReloader.ReloadEventHandler>());
-            eventManager.Subscribe(FighterBase.EventIdShotFired, CreateInstance<SpecialGear.Reloader.TeleportReloader.ShotFiredEventHandler>());
-            eventManager.Subscribe(InventoryBase.EventIdSlotChange, CreateInstance<SpecialGear.Reloader.SlotChangeEventHandler>());
-            eventManager.Subscribe(LivingEntityBase.EventIdDamageTaken, CreateInstance<Accessories.Barrier.DamageTakenEventHandler>());
-        }
-
-        private static T CreateInstance<T>()
-        {
-            return DependenciesContext.Dependencies.CreateInstance<T>();
+            eventManager.Subscribe<Accessories.AutoAmmoBuyer.ReloadEventHandler>(FighterBase.EventIdReload);
+            eventManager.Subscribe<SpecialGear.Barrier.HealthChangeEventHandler>(LivingEntityBase.EventIdHealthChange);
+            eventManager.Subscribe<SpecialGear.Reloader.ConsolidatorReloader.ReloadEventHandler>(FighterBase.EventIdReload);
+            eventManager.Subscribe<SpecialGear.Reloader.TeleportReloader.ReloadEventHandler>(FighterBase.EventIdReload);
+            eventManager.Subscribe<SpecialGear.Reloader.TeleportReloader.ShotFiredEventHandler>(FighterBase.EventIdShotFired);
+            eventManager.Subscribe<SpecialGear.Reloader.SlotChangeEventHandler>(InventoryBase.EventIdSlotChange);
         }
     }
 }

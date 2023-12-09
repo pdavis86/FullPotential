@@ -166,6 +166,7 @@ namespace FullPotential.Core.UI.Components
                 .OrderByValue();
 
             _resourceTypes = typeRegistry.GetRegisteredTypes<IResource>()
+                .Where(r => r.IsCraftable)
                 .ToDictionary(x => x, x => localizer.Translate(x))
                 .OrderByValue();
 

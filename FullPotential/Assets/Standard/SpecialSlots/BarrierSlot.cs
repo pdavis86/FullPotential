@@ -1,15 +1,13 @@
 ﻿using System;
 using FullPotential.Api.Registry.Gear;
 
-namespace FullPotential.Standard.Accessories.Barrier
+namespace FullPotential.Standard.SpecialSlots
 {
-    public class Barrier : IAccessory
+    public class BarrierSlot : IRegisterableWithSlot
     {
-        public const string TypeIdString = "17a6e875-cccd-46f0-b525-fe15cfdd8096";
+        public const string TypeIdString = "29adbef1-8fe2-47c2-8e91-da33ed83a6c7";
 
         public Guid TypeId => new Guid(TypeIdString);
-
-        public int SlotCount => 1;
 
         public string SlotSpritePrefabAddress => "Standard/UI/Equipment/Barrier.png";
     }

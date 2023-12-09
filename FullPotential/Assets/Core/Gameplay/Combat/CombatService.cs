@@ -102,7 +102,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     damageToDeal *= 2;
                 }
 
-                targetFighter.ApplyHealthChange((int)damageToDeal, sourceFighter, itemUsed, position, isCritical);
+                targetFighter.TriggerHealthChangeEvent((int)damageToDeal, sourceFighter, itemUsed, position, isCritical);
 
                 if (weapon == null)
                 {

@@ -36,7 +36,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
     public abstract class LivingEntityBase : NetworkBehaviour
     {
         public const string EventIdResourceValueChanged = "20b3ff1d-e8d0-438a-873d-98124f726e38";
-        public const string EventIdDamageTaken = "4e8f6a71-3708-47f2-bc57-36bcc5596d0c";
+        public const string EventIdHealthChange = "4e8f6a71-3708-47f2-bc57-36bcc5596d0c";
 
         private const int VelocityThreshold = 3;
         private const int ForceThreshold = 1000;
@@ -252,41 +252,56 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void SetupResourceReplenishing()
         {
+            //todo: every resource is .2. Fix this
             _replenishResources = new DelayedAction(.2f, () =>
             {
-                foreach (var resource in GetResources().Where(x => x.TypeId != ResourceTypeIds.Health))
+                foreach (var resource in GetResources())
                 {
-                    var typeId = resource.TypeId.ToString();
-                    var value = GetResourceValue(typeId);
-                    if (!IsConsumingResource(typeId) && value < GetResourceMax(typeId))
-                    {
-                        //todo: zzz v0.5 - trait-based resource recharge
-                        AdjustResourceValue(typeId, 1);
-                    }
+                    resource.ReplenishBehaviour(this);
                 }
             });
         }
 
-        public void ApplyHealthChange(
+        public static void DefaultHandlerForHealthChangeEvent(IEventHandlerArgs eventArgs)
+        {
+            var healthChangeArgs = (HealthChangeEventArgs)eventArgs;
+
+            healthChangeArgs.LivingEntity.ApplyHealthChange(healthChangeArgs);
+        }
+
+        public void TriggerHealthChangeEvent(
             int change,
             FighterBase sourceFighter,
             ItemBase itemUsed,
             Vector3? position,
             bool isCritical)
         {
-            _lastDamageSourceName = sourceFighter != null ? sourceFighter.FighterName : null;
-            _lastDamageItemName = itemUsed?.Name.OrIfNullOrWhitespace(_localizer.Translate("ui.alert.attack.noitem"));
+            var healthChangeArgs = new HealthChangeEventArgs(
+                this,
+                change,
+                sourceFighter,
+                itemUsed,
+                position,
+                isCritical);
 
-            if (sourceFighter != null)
+            _eventManager.Trigger(EventIdHealthChange, healthChangeArgs);
+        }
+
+        public void ApplyHealthChange(HealthChangeEventArgs healthChangeArgs)
+        {
+            _lastDamageSourceName = healthChangeArgs.SourceFighter != null ? healthChangeArgs.SourceFighter.FighterName : null;
+            _lastDamageItemName = healthChangeArgs.ItemUsed?.Name.OrIfNullOrWhitespace(_localizer.Translate("ui.alert.attack.noitem"));
+
+            if (healthChangeArgs.SourceFighter != null)
             {
                 //Debug.Log($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
 
-                if (change < 0)
+                if (healthChangeArgs.Change < 0)
                 {
-                    RecordDamageDealt(change * -1, sourceFighter);
+                    RecordDamageDealt(healthChangeArgs.Change * -1, healthChangeArgs.SourceFighter);
                 }
 
-                ShowHealthChangeToSourceFighter(sourceFighter, position, change, isCritical);
+                ShowHealthChangeToSourceFighter(healthChangeArgs.SourceFighter, healthChangeArgs.Position, healthChangeArgs.Change, healthChangeArgs.IsCritical);
             }
             //else
             //{
@@ -294,9 +309,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             //}
 
             //Do this last to ensure the entity does not die before recording the cause
-            AdjustResourceValue(ResourceTypeIds.HealthId, change);
-
-            _eventManager.Trigger(EventIdDamageTaken, new DamageTakenEventArgs(this));
+            AdjustResourceValue(ResourceTypeIds.HealthId, healthChangeArgs.Change);
         }
 
         private void PopulateResourceList()
@@ -356,7 +369,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return value;
         }
 
-        protected void AdjustResourceValue(string typeId, int change)
+        public void AdjustResourceValue(string typeId, int change)
         {
             var currentValue = GetResourceValue(typeId);
             currentValue = ClampResourceValue(typeId, currentValue);
@@ -390,11 +403,17 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public int GetResourceMax(string resourceTypeId)
         {
+            //todo: replace this - var capacity = barrier.Attributes.Strength
+            if (resourceTypeId == "9f026e17-d313-4402-9da6-c5b002e26c64")
+            {
+                return 1000;
+            }
+
             //todo: zzz v0.5 - trait-based resource max
             return 100 + GetResourceMaxAdjustment(resourceTypeId);
         }
 
-        protected virtual bool IsConsumingResource(string typeId)
+        public virtual bool IsConsumingResource(string typeId)
         {
             return false;
         }
@@ -543,7 +562,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _lastDamageItemName = null;
             _lastDamageSourceName = cause;
 
-            ApplyHealthChange(healthChange, _fighterWhoMovedMeLast, null, contactPoint.point, false);
+            TriggerHealthChangeEvent(healthChange, _fighterWhoMovedMeLast, null, contactPoint.point, false);
         }
 
         #endregion
@@ -715,7 +734,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             //todo: zzz v0.8 - ApplyElementalEffect
             //Debug.LogWarning("Not yet implemented elemental effects");
-            ApplyHealthChange(-5, sourceFighter, null, position, false);
+            TriggerHealthChangeEvent(-5, sourceFighter, null, position, false);
         }
         // ReSharper restore UnusedParameter.Global
 
@@ -828,7 +847,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             if (resourceTypeId == ResourceTypeIds.HealthId)
             {
-                ApplyHealthChange(change, sourceFighter, itemUsed, position, false);
+                TriggerHealthChangeEvent(change, sourceFighter, itemUsed, position, false);
                 return;
             }
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using FullPotential.Api.Items;
+using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
@@ -10,5 +12,10 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
         public Guid TypeId => new Guid(TypeIdString);
 
         public Guid SlotId => new Guid(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+
+        public string OverrideItemDescription(Api.Items.Types.SpecialGear specialGear, ILocalizer localizer, LevelOfDetail levelOfDetail)
+        {
+            return null;
+        }
     }
 }
