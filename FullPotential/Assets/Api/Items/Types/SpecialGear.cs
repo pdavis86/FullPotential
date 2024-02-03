@@ -1,19 +1,29 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
+using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Utilities.Extensions;
 
 namespace FullPotential.Api.Items.Types
 {
     [Serializable]
-    public class SpecialGear : ItemWithHealthBase, IResourceConsumer
+    public class SpecialGear : ItemWithHealthBase, IResourceConsumer, IHasVisuals
     {
         private IResource _resourceType;
+        private IVisuals _visuals;
 
+        //Variables so they are serialized
+        // ReSharper disable MemberCanBePrivate.Global
+        // ReSharper disable NotAccessedField.Global
+        public string CustomVisualsTypeId;
+        // ReSharper restore MemberCanBePrivate.Global
+        // ReSharper restore NotAccessedField.Global
         public string ResourceTypeId;
 
         public IResource ResourceType
@@ -26,11 +36,23 @@ namespace FullPotential.Api.Items.Types
             }
         }
 
-        //public SerializableKeyValuePair<string, string>[] CustomData;
+        public string VisualsTypeId => CustomVisualsTypeId;
+
+        public IVisuals Visuals
+        {
+            get => _visuals;
+            set
+            {
+                _visuals = value;
+                CustomVisualsTypeId = _visuals?.TypeId.ToString();
+            }
+        }
+
+        public SerializableKeyValuePair<string, string>[] CustomData = Array.Empty<SerializableKeyValuePair<string, string>>();
 
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
         {
-            var specialType = (ISpecialGear) RegistryType;
+            var specialType = (ISpecialGear)RegistryType;
             var descriptionOverride = specialType.OverrideItemDescription(this, localizer, levelOfDetail);
 
             if (!descriptionOverride.IsNullOrWhiteSpace())
@@ -43,7 +65,7 @@ namespace FullPotential.Api.Items.Types
             if (levelOfDetail == LevelOfDetail.Full)
             {
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(Name))}: {itemName.OrIfNullOrWhitespace(Name)}" + "\n");
-                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {localizer.Translate(TranslationType.ItemType, GetType().Name)}" + "\n");
+                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {localizer.Translate(TranslationType.ItemType, RegistryType.GetType().Name)}" + "\n");
             }
 
             if (ResourceType != null)
@@ -62,24 +84,28 @@ namespace FullPotential.Api.Items.Types
             return sb.ToString().Trim();
         }
 
-        //public void SetCustomData(string key, string value)
-        //{
-        //    int i;
-        //    for (i = 0; i < CustomData.Length; i++)
-        //    {
-        //        if (CustomData[i].Key != key)
-        //        {
-        //            continue;
-        //        }
+        public void SetCustomData(string key, string value)
+        {
+            int i;
+            for (i = 0; i < CustomData.Length; i++)
+            {
+                if (CustomData[i].Key != key)
+                {
+                    continue;
+                }
 
-        //        CustomData[i].Value = value;
-        //        break;
-        //    }
-        //}
+                CustomData[i].Value = value;
+                return;
+            }
 
-        //public string GetCustomData(string key)
-        //{
-        //    return CustomData.FirstOrDefault(kvp => kvp.Key == key).Value;
-        //}
+            Array.Resize(ref CustomData, CustomData.Length + 1);
+
+            CustomData[CustomData.Length - 1] = new SerializableKeyValuePair<string, string>(key, value);
+        }
+
+        public string GetCustomData(string key)
+        {
+            return CustomData.FirstOrDefault(kvp => kvp.Key == key).Value;
+        }
     }
 }

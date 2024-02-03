@@ -252,7 +252,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void SetupResourceReplenishing()
         {
-            //todo: every resource is .2. Fix this
+            //todo: zzz v0.5 - every resource replenish fires every .2 seconds. Fix this
             _replenishResources = new DelayedAction(.2f, () =>
             {
                 foreach (var resource in GetResources())
@@ -403,12 +403,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public int GetResourceMax(string resourceTypeId)
         {
-            //todo: replace this - var capacity = barrier.Attributes.Strength
-            if (resourceTypeId == "9f026e17-d313-4402-9da6-c5b002e26c64")
-            {
-                return 1000;
-            }
-
             //todo: zzz v0.5 - trait-based resource max
             return 100 + GetResourceMaxAdjustment(resourceTypeId);
         }

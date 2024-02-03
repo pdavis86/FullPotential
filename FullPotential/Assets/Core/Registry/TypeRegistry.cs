@@ -59,7 +59,8 @@ namespace FullPotential.Core.Registry
                 AddToRegister<IArmorVisuals>,
                 AddToRegister<IShapeVisuals>,
                 AddToRegister<ITargetingVisuals>,
-                AddToRegister<IWeaponVisuals>
+                AddToRegister<IWeaponVisuals>,
+                AddToRegister<ISpecialGearVisuals>
             };
         }
 

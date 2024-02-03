@@ -171,7 +171,7 @@ namespace FullPotential.Api.Items.Base
 
         public float GetRechargeDelay()
         {
-            var returnValue = GetHighInLowOutInRange(Attributes.Recovery, 0.5f, 3f);
+            var returnValue = GetHighInLowOutInRange(Attributes.Recovery, 0.5f, 5f);
             return returnValue;
         }
 

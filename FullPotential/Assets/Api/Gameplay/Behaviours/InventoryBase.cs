@@ -420,11 +420,17 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     case Weapon:
                         SetItemVisuals<IWeaponVisuals>(itemWithVisuals, item);
                         break;
+
                     case Armor:
                         SetItemVisuals<IArmorVisuals>(itemWithVisuals, item);
                         break;
+
                     case Accessory:
                         SetItemVisuals<IAccessoryVisuals>(itemWithVisuals, item);
+                        break;
+
+                    case SpecialGear:
+                        SetItemVisuals<ISpecialGearVisuals>(itemWithVisuals, item);
                         break;
                 }
             }

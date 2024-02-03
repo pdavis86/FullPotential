@@ -110,19 +110,5 @@ namespace FullPotential.Api.Items.Types
 
             return sb.ToString().Trim();
         }
-
-        private float GetRechargeDelay()
-        {
-            var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0.5f, 1.5f);
-            //Debug.Log("GetRechargeDelay: " + returnValue);
-            return returnValue;
-        }
-
-        private float GetRechargeRate()
-        {
-            var returnValue = GetHighInHighOutInRange(Attributes.Recovery, 0.5f, 1.5f);
-            //Debug.Log("GetRechargeRate: " + returnValue);
-            return returnValue;
-        }
     }
 }

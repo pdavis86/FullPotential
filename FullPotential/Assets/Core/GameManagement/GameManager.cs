@@ -309,7 +309,7 @@ namespace FullPotential.Core.GameManagement
         {
             var eventManager = (EventManager)DependenciesContext.Dependencies.GetService<IEventManager>();
 
-            //todo: missing default handler
+            //todo: missing default EventIdResourceValueChanged handler
             eventManager.Register(LivingEntityBase.EventIdResourceValueChanged, null);
 
             eventManager.Register(LivingEntityBase.EventIdHealthChange, LivingEntityBase.DefaultHandlerForHealthChangeEvent);

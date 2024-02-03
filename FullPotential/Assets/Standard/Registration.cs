@@ -112,7 +112,6 @@ namespace FullPotential.Standard
                 typeof(AccessoryVisuals.SilverNecklace),
                 typeof(AccessoryVisuals.LeatherBelt),
                 typeof(AccessoryVisuals.SilverRing),
-                typeof(AccessoryVisuals.BasicWard),
 
                 typeof(ArmorVisuals.LeatherHelmet),
                 typeof(ArmorVisuals.LeatherJerkin),
@@ -134,6 +133,8 @@ namespace FullPotential.Standard
                 typeof(WeaponVisuals.BasicShield),
                 typeof(WeaponVisuals.BasicStaff),
                 typeof(WeaponVisuals.BasicSword),
+
+                typeof(SpecialGearVisuals.BasicWard),
             };
         }
 

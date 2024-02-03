@@ -487,7 +487,7 @@ namespace FullPotential.Core.Player
             _equippedItems[slotId].GameObject = newObj;
         }
 
-        //todo: zzz v0.4.1 - InstantiateAccessory 
+        //todo: zzz v0.4.1 - InstantiateAccessory visuals
         //private void InstantiateAccessory(
         //    string slotId,
         //    ItemBase item,
@@ -525,7 +525,7 @@ namespace FullPotential.Core.Player
         //        });
         //}
 
-        //todo: zzz v0.4.1 - InstantiateArmor
+        //todo: zzz v0.4.1 - InstantiateArmor visuals
         //private void InstantiateArmor(
         //    string slotId,
         //    ItemBase item,
@@ -550,6 +550,8 @@ namespace FullPotential.Core.Player
         //            _equippedItems[slotId].GameObject = newObj;
         //        });
         //}
+
+        //todo: zzz v0.4.1 - InstantiateSpecialGear visuals
 
         public void AddItemAsAdmin(ItemBase item)
         {

@@ -1,10 +1,9 @@
-﻿using System;
-using FullPotential.Api.Gameplay.Behaviours;
+﻿using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Standard.Resources;
 using FullPotential.Standard.SpecialSlots;
-using UnityEngine;
+using System;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -12,6 +11,8 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 {
     public class HealthChangeEventHandler : IEventHandler
     {
+        public const string CustomDataKeyLastHit = "LastHit";
+
         public NetworkLocation Location => NetworkLocation.Server;
 
         public Action<IEventHandlerArgs> BeforeHandler => HandleBeforeHealthChange;
@@ -39,13 +40,13 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 return;
             }
 
-            var barrierCharge = targetFighter.GetResourceValue(barrier.ResourceTypeId);
+            barrier.SetCustomData(CustomDataKeyLastHit, DateTime.UtcNow.ToString("u"));
+
+            var barrierCharge = targetFighter.GetResourceValue(BarrierChargeResource.TypeIdString);
 
             if (barrierCharge <= 0)
             {
-                //todo: remove
-                Debug.Log("Barrier depleted. Taking full damage");
-
+                //Debug.Log("Barrier depleted. Taking full damage");
                 return;
             }
 
@@ -53,16 +54,12 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             if (barrierCharge < Math.Abs(healthChangeArgs.Change))
             {
-                //todo: remove
-                Debug.Log("Barrier nearly depleted. Taking partial damage");
-
+                //Debug.Log("Barrier nearly depleted. Taking partial damage");
                 healthChangeArgs.Change += barrierCharge;
                 return;
             }
 
-            //todo: remove
-            Debug.Log("Barrier OK. Taking no damage");
-
+            //Debug.Log("Barrier OK. Taking no damage");
             eventArgs.IsDefaultHandlerCancelled = true;
         }
     }

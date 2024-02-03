@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Text;
 using FullPotential.Api.Items;
-using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
@@ -25,7 +25,6 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             {
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(specialGear.Name))}: {specialGear.Name}" + "\n");
 
-                //todo: these item.type translations are just duplicating existing ones
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(specialGear.RegistryType))}: {localizer.Translate(TranslationType.ItemType, GetType().Name)}" + "\n");
             }
 

@@ -2,6 +2,8 @@
 using System.Drawing;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Standard.SpecialGear.Barrier;
 using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.Resources
@@ -40,18 +42,25 @@ namespace FullPotential.Standard.Resources
                 return;
             }
 
-            //todo: delay
-            var rechargeDelay = barrier.GetRechargeDelay();
-            //int.Parse(barrier.GetCustomData(CustomDataBarrierCharge).OrIfNullOrWhitespace("0"));
-            //private const string CustomDataBarrierCharge = "ChargeValue";
+            var lastHit = barrier.GetCustomData(HealthChangeEventHandler.CustomDataKeyLastHit);
+
+            if (!lastHit.IsNullOrWhiteSpace())
+            {
+                var rechargeDelay = barrier.GetRechargeDelay();
+
+                if (DateTime.TryParse(lastHit, out var lastHitDateTime)
+                    && (DateTime.UtcNow - lastHitDateTime).TotalSeconds < rechargeDelay)
+                {
+                    return;
+                }
+            }
 
             //Consume item resource (-2 to overcome replenish of 1)
             livingEntity.AdjustResourceValue(barrier.ResourceTypeId, -2);
 
             //Replenish barrier resource
             //todo: zzz v0.5 - trait-based resource recharge
-            var rechargeRate = barrier.GetRechargeRate();
-            livingEntity.AdjustResourceValue(TypeIdString, rechargeRate);
+            livingEntity.AdjustResourceValue(TypeIdString, barrier.GetRechargeRate());
         }
     }
 }
