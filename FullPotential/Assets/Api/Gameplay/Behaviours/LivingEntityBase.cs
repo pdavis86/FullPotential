@@ -37,16 +37,21 @@ namespace FullPotential.Api.Gameplay.Behaviours
     {
         public const string EventIdResourceValueChanged = "20b3ff1d-e8d0-438a-873d-98124f726e38";
         public const string EventIdHealthChange = "4e8f6a71-3708-47f2-bc57-36bcc5596d0c";
+        public const string EventIdHealthChangeClientOnly = "29f14f37-2a27-4453-a382-dc311fe7755e";
 
         private const int VelocityThreshold = 3;
         private const int ForceThreshold = 1000;
+
+        private readonly NetworkVariable<FixedString4096Bytes> _encodedResourceValues = new NetworkVariable<FixedString4096Bytes>();
 
         #region Inspector Variables
 #pragma warning disable 0649
         // ReSharper disable InconsistentNaming
 
+        // ReSharper disable UnassignedField.Global
         [SerializeField] private TextMeshProUGUI _nameTag;
         [SerializeField] protected Transform _graphicsTransform;
+        // ReSharper restore UnassignedField.Global
 
         // ReSharper restore InconsistentNaming
 #pragma warning restore 0649
@@ -67,7 +72,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected ISceneService _sceneService;
 
         protected readonly NetworkVariable<FixedString32Bytes> _entityName = new NetworkVariable<FixedString32Bytes>();
-        private readonly NetworkVariable<FixedString4096Bytes> _encodedResourceValues = new NetworkVariable<FixedString4096Bytes>();
+
+        protected InventoryBase _inventory;
 
         // ReSharper restore InconsistentNaming
         #endregion
@@ -98,6 +104,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public LivingEntityState AliveState { get; protected set; }
 
         public bool IsSprinting { get; set; }
+
+        public InventoryBase Inventory => _inventory;
 
         #endregion
 
@@ -236,6 +244,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     if (typeId == ResourceTypeIds.HealthId)
                     {
                         UpdateUiHealthAndDefenceValues();
+
+                        //todo: is this ok?
+                        var healthChangeArgs = new HealthChangeEventArgs(this, 0, null, null, null, false);
+                        _eventManager.Trigger(EventIdHealthChangeClientOnly, healthChangeArgs);
                     }
                 }
             }
@@ -325,12 +337,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             if (!IsServer)
             {
                 return;
-            }
-
-            int healthIndex;
-            for (healthIndex = 0; healthIndex < _resourceValueCache.Count; healthIndex++)
-            {
-
             }
 
             var sb = new StringBuilder();

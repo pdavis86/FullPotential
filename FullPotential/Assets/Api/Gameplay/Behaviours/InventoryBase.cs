@@ -546,5 +546,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected abstract void NotifyOfInventoryFull();
 
         protected abstract void NotifyOfItemsRemoved(IEnumerable<ItemBase> itemsRemoved);
+
+        public void ToggleEquippedItemVisuals(string slotId, bool show)
+        {
+            if (!_equippedItems.ContainsKey(slotId)
+                || _equippedItems[slotId].GameObject == null)
+            {
+                return;
+            }
+
+            _equippedItems[slotId].GameObject.SetActive(show);
+        }
     }
 }

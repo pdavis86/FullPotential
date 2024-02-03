@@ -213,6 +213,21 @@ namespace FullPotential.Core.GameManagement
             }
         }
 
+        // ReSharper disable once UnusedMember.Global
+        public void SignOut()
+        {
+            GameManager.Instance.LocalGameDataStore.PlayerToken = null;
+
+            _gameDetailsContainer.SetActive(false);
+            _signInContainer.SetActive(true);
+            
+            if (_signinFirstInput != null)
+            {
+                _username = _signinFirstInput.text;
+                _signinFirstInput.Select();
+            }
+        }
+
         private void ShowAnyError()
         {
             if (GameManager.Instance.LocalGameDataStore.HasDisconnected && !_gameDetailsError.gameObject.activeInHierarchy)

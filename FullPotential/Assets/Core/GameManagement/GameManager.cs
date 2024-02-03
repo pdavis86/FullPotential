@@ -312,7 +312,9 @@ namespace FullPotential.Core.GameManagement
             //todo: missing default EventIdResourceValueChanged handler
             eventManager.Register(LivingEntityBase.EventIdResourceValueChanged, null);
 
+            //todo: why does this need a separate event? Just use EventIdResourceValueChanged?
             eventManager.Register(LivingEntityBase.EventIdHealthChange, LivingEntityBase.DefaultHandlerForHealthChangeEvent);
+            eventManager.Register(LivingEntityBase.EventIdHealthChangeClientOnly, null);
 
             eventManager.Register(FighterBase.EventIdReload, FighterBase.DefaultHandlerForReloadEvent);
             eventManager.Register(FighterBase.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEvent);

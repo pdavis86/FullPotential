@@ -493,11 +493,11 @@
 	
 	
     {
-      "Key": "attribute.alias.barrier.speed",
+      "Key": "attribute.alias.barrier.recovery",
       "Value": "Recharge delay"
     },
     {
-      "Key": "attribute.alias.barrier.recovery",
+      "Key": "attribute.alias.barrier.speed",
       "Value": "Recharge rate"
     },
     {

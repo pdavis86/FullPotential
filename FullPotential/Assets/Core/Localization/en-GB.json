@@ -266,6 +266,10 @@
       "Key": "ui.save",
       "Value": "Save"
     },
+    {
+      "Key": "ui.signout",
+      "Value": "Sign Out"
+    },
 
 
     {

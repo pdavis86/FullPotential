@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,8 +13,10 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Persistence;
+using FullPotential.Api.Registry.Armor;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Ui;
+using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
@@ -80,7 +83,7 @@ namespace FullPotential.Core.Player
         #endregion
 
         //todo: zzz v0.5 - generalise for use in FighterBase
-        public (bool WasEquipped, List<string> SlotsToSend) HandleSlotChange(ItemBase item, string slotId)
+        private (bool WasEquipped, List<string> SlotsToSend) HandleSlotChange(ItemBase item, string slotId)
         {
             var slotsToSend = new List<string> { slotId };
 
@@ -326,7 +329,7 @@ namespace FullPotential.Core.Player
                     break;
             }
 
-            //bug: why is hand ammo not updating?
+            //todo: why is hand ammo not updating?
         }
 
         protected override void NotifyOfInventoryFull()
@@ -378,52 +381,60 @@ namespace FullPotential.Core.Player
         {
             DespawnEquippedObject(slotId);
 
-            var isLeftHand = slotId == HandSlotIds.LeftHand;
-
             if (item == null)
             {
                 return;
             }
 
-            //todo: zzz v0.4.1 - handle custom visuals for equipped items
+            if (item is SpecialGear)
+            {
+                InstantiateCustomGearVisuals(slotId, item);
+                return;
+            }
+
+            //todo: generalise for accessories
 
             switch (slotId)
             {
                 case HandSlotIds.LeftHand:
                 case HandSlotIds.RightHand:
+                    var isLeftHand = slotId == HandSlotIds.LeftHand;
                     SpawnItemInHand(slotId, item, isLeftHand);
                     break;
 
-                    //case SlotGameObjectName.Amulet:
-                    //    InstantiateAccessory(slotGameObjectName, item, _playerState.GraphicsTransform, manipulateTransform: t => t.position += t.forward * _amuletForwardMultiplier);
-                    //    break;
+                case "ddeafb61-0163-4888-b355-16a37d3a33b5" + ";1": //SlotGameObjectName.Amulet:
+                    const float amuletForwardMultiplier = 0.2f;
+                    InstantiateAccessoryVisuals(slotId, item, _playerFighter.GraphicsTransform, manipulateTransform: t => t.position += t.forward * amuletForwardMultiplier);
+                    break;
 
-                    //case SlotGameObjectName.Belt:
-                    //    InstantiateAccessory(slotGameObjectName, item, _playerState.GraphicsTransform);
-                    //    break;
+                case "6d4bce60-dda6-4a88-82fd-c2b086065c8b" + ";1": //SlotGameObjectName.Belt:
+                    InstantiateAccessoryVisuals(slotId, item, _playerFighter.GraphicsTransform);
+                    break;
 
-                    //case SlotGameObjectName.LeftRing:
-                    //    InstantiateAccessory(slotGameObjectName, item, _playerState.BodyParts.LeftArm, true);
-                    //    break;
+                case "b74b00f9-9cf1-4758-9e22-b4fbd4d1cea0" + ";1": //SlotGameObjectName.LeftRing:
+                    InstantiateAccessoryVisuals(slotId, item, _playerFighter.BodyParts.LeftArm, true);
+                    break;
 
-                    //case SlotGameObjectName.RightRing:
-                    //    InstantiateAccessory(slotGameObjectName, item, _playerState.BodyParts.RightArm, true);
-                    //    break;
+                case "b74b00f9-9cf1-4758-9e22-b4fbd4d1cea0" + ";2": //SlotGameObjectName.RightRing:
+                    InstantiateAccessoryVisuals(slotId, item, _playerFighter.BodyParts.RightArm, true);
+                    break;
 
-                    //case SlotGameObjectName.Helm:
-                    //    InstantiateArmor(slotGameObjectName, item, _playerState.BodyParts.Head);
-                    //    break;
+                case "0d6f6511-352d-4303-9c25-b7b21c34ec59" + ";1": //AutoAmmoBuyer
+                    break;
 
-                    //case SlotGameObjectName.Barrier:
-                    //case SlotGameObjectName.Chest:
-                    //case SlotGameObjectName.Legs:
-                    //case SlotGameObjectName.Feet:
-                    //    InstantiateArmor(slotGameObjectName, item, _playerState.GraphicsTransform);
-                    //    break;
+                case ArmorTypeIds.HelmId:
+                    InstantiateArmorVisuals(slotId, item, _playerFighter.BodyParts.Head);
+                    break;
 
-                    //default:
-                    //    Debug.LogWarning("Not yet implemented equipping for slot " + slotId);
-                    //    break;
+                case ArmorTypeIds.ChestId:
+                case ArmorTypeIds.LegsId:
+                case ArmorTypeIds.FeetId:
+                    InstantiateArmorVisuals(slotId, item, _playerFighter.GraphicsTransform);
+                    break;
+
+                default:
+                    Debug.LogWarning("Not yet implemented equipping for slot " + slotId);
+                    break;
             }
         }
 
@@ -487,71 +498,106 @@ namespace FullPotential.Core.Player
             _equippedItems[slotId].GameObject = newObj;
         }
 
-        //todo: zzz v0.4.1 - InstantiateAccessory visuals
-        //private void InstantiateAccessory(
-        //    string slotId,
-        //    ItemBase item,
-        //    Transform parentTransform,
-        //    bool showsOnPlayerCamera = false,
-        //    Action<Transform> manipulateTransform = null)
-        //{
-        //    var thisClient = NetworkManager.LocalClientId == OwnerClientId;
+        private void InstantiateAccessoryVisuals(
+            string slotId,
+            ItemBase item,
+            Transform parentTransform,
+            bool showsOnPlayerCamera = false,
+            Action<Transform> manipulateTransform = null)
+        {
+            var thisClient = NetworkManager.LocalClientId == OwnerClientId;
 
-        //    if (!showsOnPlayerCamera && thisClient)
-        //    {
-        //        return;
-        //    }
+            if (!showsOnPlayerCamera && thisClient)
+            {
+                return;
+            }
 
-        //    if (item is not Accessory accessoryItem)
-        //    {
-        //        Debug.LogError("Item is not an accessory");
-        //        return;
-        //    }
+            if (item is not Accessory accessoryItem)
+            {
+                Debug.LogError("Item is not an accessory");
+                return;
+            }
 
-        //    _typeRegistry.LoadAddessable(
-        //        accessoryItem.Visuals.PrefabAddress,
-        //        prefab =>
-        //        {
-        //            var newObj = Instantiate(prefab, parentTransform);
+            if (accessoryItem.Visuals == null)
+            {
+                return;
+            }
 
-        //            manipulateTransform?.Invoke(newObj.transform);
+            _typeRegistry.LoadAddessable<GameObject>(
+                accessoryItem.Visuals.PrefabAddress,
+                prefab =>
+                {
+                    var newObj = Instantiate(prefab, parentTransform);
 
-        //            if (showsOnPlayerCamera && thisClient)
-        //            {
-        //                newObj.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
-        //            }
+                    manipulateTransform?.Invoke(newObj.transform);
 
-        //            _equippedItems[slotId].GameObject = newObj;
-        //        });
-        //}
+                    if (showsOnPlayerCamera && thisClient)
+                    {
+                        newObj.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
+                    }
 
-        //todo: zzz v0.4.1 - InstantiateArmor visuals
-        //private void InstantiateArmor(
-        //    string slotId,
-        //    ItemBase item,
-        //    Transform parentTransform)
-        //{
-        //    if (item is not Armor armorItem)
-        //    {
-        //        Debug.LogError("Item is not armor");
-        //        return;
-        //    }
+                    _equippedItems[slotId].GameObject = newObj;
+                });
+        }
 
-        //    if (NetworkManager.LocalClientId == OwnerClientId)
-        //    {
-        //        return;
-        //    }
+        private void InstantiateArmorVisuals(
+            string slotId,
+            ItemBase item,
+            Transform parentTransform)
+        {
+            if (item is not Armor armorItem)
+            {
+                Debug.LogError("Item is not armor");
+                return;
+            }
 
-        //    _typeRegistry.LoadAddessable(
-        //        armorItem.Visuals.PrefabAddress,
-        //        prefab =>
-        //        {
-        //            var newObj = Instantiate(prefab, parentTransform);
-        //            _equippedItems[slotId].GameObject = newObj;
-        //        });
-        //}
+            if (NetworkManager.LocalClientId == OwnerClientId)
+            {
+                return;
+            }
 
-        //todo: zzz v0.4.1 - InstantiateSpecialGear visuals
+            if (armorItem.Visuals == null)
+            {
+                return;
+            }
+
+            _typeRegistry.LoadAddessable<GameObject>(
+                armorItem.Visuals.PrefabAddress,
+                prefab =>
+                {
+                    var newObj = Instantiate(prefab, parentTransform);
+                    _equippedItems[slotId].GameObject = newObj;
+                });
+        }
+
+        private void InstantiateCustomGearVisuals(
+            string slotId,
+            ItemBase item)
+        {
+            if (item is not SpecialGear specialGearItem)
+            {
+                Debug.LogError("Item is not special gear");
+                return;
+            }
+
+            if (NetworkManager.LocalClientId == OwnerClientId)
+            {
+                return;
+            }
+
+            if (specialGearItem.Visuals == null)
+            {
+                return;
+            }
+
+            _typeRegistry.LoadAddessable<GameObject>(
+                specialGearItem.Visuals.PrefabAddress,
+                prefab =>
+                {
+                    var newObj = Instantiate(prefab, _playerFighter.GraphicsTransform);
+                    _equippedItems[slotId].GameObject = newObj;
+                });
+        }
 
         public void AddItemAsAdmin(ItemBase item)
         {

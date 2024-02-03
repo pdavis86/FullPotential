@@ -1,15 +1,15 @@
-﻿using FullPotential.Api.Gameplay.Behaviours;
+﻿using System;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Standard.Resources;
 using FullPotential.Standard.SpecialSlots;
-using System;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class HealthChangeEventHandler : IEventHandler
+    public class ServerHealthChangeEventHandler : IEventHandler
     {
         public const string CustomDataKeyLastHit = "LastHit";
 

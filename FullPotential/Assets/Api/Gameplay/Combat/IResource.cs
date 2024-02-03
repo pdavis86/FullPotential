@@ -7,12 +7,12 @@ namespace FullPotential.Api.Gameplay.Combat
 {
     public interface IResource : IRegisterable
     {
-        public Color Color { get; }
+        Color Color { get; }
 
         bool IsCraftable { get; }
 
-        public string ItemInHandDefaultPrefab { get; }
+        string ItemInHandDefaultPrefab { get; }
 
-        public Action<LivingEntityBase> ReplenishBehaviour { get; }
+        Action<LivingEntityBase> ReplenishBehaviour { get; }
     }
 }

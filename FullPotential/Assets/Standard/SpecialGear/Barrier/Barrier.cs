@@ -4,7 +4,6 @@ using FullPotential.Api.Items;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
@@ -34,8 +33,8 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             specialGear.AppendToDescription(
                 sb,
                 localizer,
-                specialGear.Attributes.Speed,
-                nameof(Attributes.Speed),
+                specialGear.Attributes.Recovery,
+                nameof(Attributes.Recovery),
                 nameof(Barrier),
                 localizer.TranslateFloat(specialGear.GetRechargeDelay()),
                 UnitsType.Time);
@@ -43,8 +42,8 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             specialGear.AppendToDescription(
                 sb,
                 localizer,
-                specialGear.Attributes.Recovery,
-                nameof(Attributes.Recovery),
+                specialGear.Attributes.Speed,
+                nameof(Attributes.Speed),
                 nameof(Barrier),
                 localizer.TranslateFloat(specialGear.GetRechargeRate()),
                 UnitsType.UnitPerTime);

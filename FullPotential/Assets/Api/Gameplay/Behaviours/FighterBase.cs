@@ -39,14 +39,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         // ReSharper restore InconsistentNaming
         #endregion
 
-        #region Protected variables
-        // ReSharper disable InconsistentNaming
-
-        protected InventoryBase _inventory;
-
-        // ReSharper restore InconsistentNaming
-        #endregion
-
         #region Other Variables
 
         public readonly HandStatus HandStatusLeft = new HandStatus();
@@ -68,8 +60,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public abstract GameObject GameObject { get; }
 
         public string FighterName => _entityName.Value.ToString();
-
-        public InventoryBase Inventory => _inventory;
 
         #endregion
 

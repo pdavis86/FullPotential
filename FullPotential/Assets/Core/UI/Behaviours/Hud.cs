@@ -44,6 +44,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private readonly Dictionary<string, GameObject> _progressBars = new Dictionary<string, GameObject>();
         private readonly Dictionary<string, GameObject> _handIcons = new Dictionary<string, GameObject>();
+        private readonly List<string> _hiddenSliders = new List<string>();
 
         private ILocalizer _localizer;
         private ITypeRegistry _typeRegistry;
@@ -58,6 +59,7 @@ namespace FullPotential.Core.Ui.Behaviours
         private EquippedSummary _equippedRightHandSummary;
         private Text _equippedRightHandAmmo;
         private FighterBase _playerFighter;
+        private IEnumerable<IResource> _resources;
 
         #region Unity Events Handlers
 
@@ -138,6 +140,11 @@ namespace FullPotential.Core.Ui.Behaviours
 
         public void AddSliderBar(string id, Color color)
         {
+            if (_progressBars.ContainsKey(id))
+            {
+                return;
+            }
+
             var newBar = Instantiate(_resourceBarPrefab, _resourceBarsContainer.transform);
             newBar.FindInDescendants("Fill").GetComponent<Image>().color = color;
 
@@ -147,15 +154,22 @@ namespace FullPotential.Core.Ui.Behaviours
         public void UpdateSliderBar(string id, string text, float value, float maxValue)
         {
             var slider = _progressBars[id].GetComponent<BarSlider>();
+
             slider.UpdateValues(text, value, maxValue);
+
+            slider.gameObject.SetActive(!_hiddenSliders.Contains(id));
         }
 
-        public void RemoveSliderBar(string id)
+        public void ToggleSliderBar(string id, bool show)
         {
-            var obj = _resourceBarsContainer.transform.Find(id);
-            Destroy(obj);
-
-            _progressBars.Remove(id);
+            if (show)
+            {
+                _hiddenSliders.Remove(id);
+            }
+            else if (!_hiddenSliders.Contains(id))
+            {
+                _hiddenSliders.Add(id);
+            }
         }
 
         public void AddHandIcon(string id, bool isLeftHand, GameObject prefab)
@@ -210,13 +224,13 @@ namespace FullPotential.Core.Ui.Behaviours
             if (item is not Weapon weapon
                 || !weapon.IsRanged)
             {
-                ammoText.gameObject.SetActive(false);
+                ammoText.transform.parent.gameObject.SetActive(false);
                 return;
             }
 
             if (!ammoText.gameObject.activeInHierarchy)
             {
-                ammoText.gameObject.SetActive(true);
+                ammoText.transform.parent.gameObject.SetActive(true);
             }
 
             ammoText.text = handStatus.IsReloading
@@ -314,9 +328,9 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void SetupResourceBars()
         {
-            var resources = _typeRegistry.GetRegisteredTypes<IResource>();
+            _resources = _typeRegistry.GetRegisteredTypes<IResource>();
 
-            foreach (var resource in resources)
+            foreach (var resource in _resources)
             {
                 AddSliderBar(resource.TypeId.ToString(), resource.Color.ToUnityColor());
             }
@@ -324,9 +338,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateResourceBars()
         {
-            var resources = _typeRegistry.GetRegisteredTypes<IResource>();
-
-            foreach (var resource in resources)
+            foreach (var resource in _resources)
             {
                 var id = resource.TypeId.ToString();
 

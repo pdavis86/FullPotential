@@ -177,7 +177,7 @@ namespace FullPotential.Api.Items.Base
 
         public int GetRechargeRate()
         {
-            var returnValue = (int)ItemForCombatBase.GetHighInLowOutInRange(Attributes.Speed, 1, 10);
+            var returnValue = (int)GetHighInLowOutInRange(Attributes.Speed, 1, 10);
             return returnValue;
         }
 

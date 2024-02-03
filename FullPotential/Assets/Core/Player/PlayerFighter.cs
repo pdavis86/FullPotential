@@ -101,6 +101,8 @@ namespace FullPotential.Core.Player
 
         public override Transform LookTransform => _playerCamera.transform;
 
+        public Transform GraphicsTransform => _graphicsTransform;
+
         protected override IBarSlider HealthBarSlider { get; set; }
 
         #endregion

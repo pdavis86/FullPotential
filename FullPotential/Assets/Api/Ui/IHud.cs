@@ -15,11 +15,9 @@ namespace FullPotential.Api.Ui
 
         (float percent, string text) GetSliderBarValues(float currentValue, float maxValue, string extra);
 
-        void AddSliderBar(string id, Color color);
-
         void UpdateSliderBar(string id, string text, float value, float maxValue);
 
-        void RemoveSliderBar(string id);
+        void ToggleSliderBar(string id, bool show);
 
         void AddHandIcon(string id, bool isLeftHand, GameObject prefab);
 
