@@ -96,7 +96,7 @@
     <Compile Include="Assets\Standard\Effects\Movement\Plummet.cs" />
     <Compile Include="Assets\Standard\TargetingVisuals\BeamVisualsBehaviour.cs" />
     <Compile Include="Assets\Standard\ArmorVisuals\LeatherGreaves.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\Barrier\HealthChangeEventHandler.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Barrier\DamageDealtEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Reflect.cs" />
     <Compile Include="Assets\Standard\Shapes\ZoneBehaviour.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Lunge.cs" />

@@ -1,5 +1,4 @@
 ﻿using System;
-using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Standard.Resources;
@@ -9,17 +8,17 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class HealthChangeEventHandler : IEventHandler
+    public class DamageDealtEventHandler : IEventHandler
     {
         public const string CustomDataKeyLastHit = "LastHit";
 
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Action<IEventHandlerArgs> BeforeHandler => HandleBeforeHealthChange;
+        public Action<IEventHandlerArgs> BeforeHandler => HandleBeforeDamageDealt;
 
         public Action<IEventHandlerArgs> AfterHandler => null;
 
-        private void HandleBeforeHealthChange(IEventHandlerArgs eventArgs)
+        private void HandleBeforeDamageDealt(IEventHandlerArgs eventArgs)
         {
             var healthChangeArgs = (DamageDealtEventArgs)eventArgs;
 
@@ -28,12 +27,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 return;
             }
 
-            if (healthChangeArgs.LivingEntity is not FighterBase targetFighter)
-            {
-                return;
-            }
-
-            var barrier = (Api.Items.Types.SpecialGear)targetFighter.Inventory.GetItemInSlot(BarrierSlot.TypeIdString);
+            var barrier = (Api.Items.Types.SpecialGear)healthChangeArgs.LivingEntity.Inventory.GetItemInSlot(BarrierSlot.TypeIdString);
 
             if (barrier == null)
             {
@@ -42,7 +36,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             barrier.SetCustomData(CustomDataKeyLastHit, DateTime.UtcNow.ToString("u"));
 
-            var barrierCharge = targetFighter.GetResourceValue(BarrierChargeResource.TypeIdString);
+            var barrierCharge = healthChangeArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString);
 
             if (barrierCharge <= 0)
             {
