@@ -314,7 +314,7 @@ namespace FullPotential.Core.GameManagement
 
             //todo: why does this need a separate event? Just use EventIdResourceValueChanged?
             eventManager.Register(LivingEntityBase.EventIdHealthChange, LivingEntityBase.DefaultHandlerForHealthChangeEvent);
-            eventManager.Register(LivingEntityBase.EventIdHealthChangeClientOnly, null);
+            eventManager.Register(LivingEntityBase.EventIdResourceValueChangedClientOnly, null);
 
             eventManager.Register(FighterBase.EventIdReload, FighterBase.DefaultHandlerForReloadEvent);
             eventManager.Register(FighterBase.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEvent);

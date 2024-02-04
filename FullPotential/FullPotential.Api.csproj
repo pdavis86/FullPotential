@@ -147,6 +147,7 @@
     <Compile Include="Assets\Api\Scenes\SpawnPoint.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\EventArgs\SlotChangeEventArgs.cs" />
     <Compile Include="Assets\Api\Data\PlayerData.cs" />
+    <Compile Include="Assets\Api\Registry\Gear\ISpecialGearVisuals.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingVisuals.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\EquippedItem.cs" />
     <Compile Include="Assets\Api\Ui\Services\IUiAssistant.cs" />
@@ -191,7 +192,6 @@
     <Compile Include="Assets\Api\Registry\Elements\IElement.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Tags.cs" />
     <Compile Include="Assets\Api\Data\InventoryChanges.cs" />
-    <Compile Include="Assets\Api\Registry\Gear\ISpecialGearVisuals.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Api\FullPotential.Api.asmdef" />

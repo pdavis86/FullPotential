@@ -18,13 +18,19 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         private void HandleAfterHealthChange(IEventHandlerArgs eventArgs)
         {
-            var healthChangeArgs = (HealthChangeEventArgs)eventArgs;
+            var resourceChangeArgs = (ResourceValueChangedEventArgs)eventArgs;
+
+            if (resourceChangeArgs.ResourceTypeId != BarrierChargeResource.TypeIdString)
+            {
+                return;
+            }
 
             //todo: resource values should be stored on player or item then displayed on HUD
 
-            var showVisuals = healthChangeArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString) > 0;
+            var remainingCharge = resourceChangeArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString);
+            var showVisuals = remainingCharge > 0;
 
-            healthChangeArgs.LivingEntity.Inventory.ToggleEquippedItemVisuals(BarrierSlot.TypeIdString, showVisuals);
+            resourceChangeArgs.LivingEntity.Inventory.ToggleEquippedItemVisuals(BarrierSlot.TypeIdString, showVisuals);
         }
     }
 }

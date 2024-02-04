@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FullPotential.Api.IntegrationTests", "FullPotential.Api.IntegrationTests.csproj", "{FF6C143C-CEB8-81BE-A794-FE099653FDCA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParrelSync", "ParrelSync.csproj", "{BF121977-286D-DAA1-BFC2-80AC95FB2F30}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FullPotential.Api.Tests", "FullPotential.Api.Tests.csproj", "{B0B02D91-C3AD-031B-84F3-3AC93048CF89}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{453978F3-28EB-C3BB-D217-8F8EE36F874A}"
@@ -43,6 +45,10 @@ Global
 		{FF6C143C-CEB8-81BE-A794-FE099653FDCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF6C143C-CEB8-81BE-A794-FE099653FDCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF6C143C-CEB8-81BE-A794-FE099653FDCA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF121977-286D-DAA1-BFC2-80AC95FB2F30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF121977-286D-DAA1-BFC2-80AC95FB2F30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF121977-286D-DAA1-BFC2-80AC95FB2F30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF121977-286D-DAA1-BFC2-80AC95FB2F30}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B0B02D91-C3AD-031B-84F3-3AC93048CF89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B0B02D91-C3AD-031B-84F3-3AC93048CF89}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0B02D91-C3AD-031B-84F3-3AC93048CF89}.Release|Any CPU.ActiveCfg = Release|Any CPU

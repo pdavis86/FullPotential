@@ -101,10 +101,12 @@
     <Compile Include="Assets\Standard\Shapes\ZoneBehaviour.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Lunge.cs" />
     <Compile Include="Assets\Standard\Weapons\Bow.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Barrier\ClientHealthChangeEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Conjure.cs" />
     <Compile Include="Assets\Standard\Weapons\Axe.cs" />
     <Compile Include="Assets\Standard\Accessories\AutoAmmoBuyer\AutoAmmoBuyer.cs" />
     <Compile Include="Assets\Standard\Accessories\Ring.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Barrier\SlotChangeEventHandler.cs" />
     <Compile Include="Assets\Standard\Resources\BarrierChargeResource.cs" />
     <Compile Include="Assets\Standard\Targeting\PointToPointBehaviour.cs" />
     <Compile Include="Assets\Standard\Accessories\Belt.cs" />
@@ -170,8 +172,6 @@
     <Compile Include="Assets\Standard\Effects\Movement\Attract.cs" />
     <Compile Include="Assets\Standard\Accessories\Amulet.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveLeft.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\Barrier\SlotChangeEventHandler.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\Barrier\ClientHealthChangeEventHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Standard\FullPotential.Standard.asmdef" />

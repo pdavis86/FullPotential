@@ -21,7 +21,10 @@ Choose the appropriate item for the situation
 
 
 ## Dependencies
-- Requires the TextMeshPro package to be reinstalled
+- TextMeshPro
+- Conifers
+- ADG_Textures
+- (optional) ParrelSync
 
 
 ## Code Structure

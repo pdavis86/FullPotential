@@ -903,6 +903,10 @@
       <Project>{43710FCF-424C-9753-7C2B-BE346A181B02}</Project>
       <Name>FullPotential.Core.Tests</Name>
     </ProjectReference>
+    <ProjectReference Include="ParrelSync.csproj">
+      <Project>{BF121977-286D-DAA1-BFC2-80AC95FB2F30}</Project>
+      <Name>ParrelSync</Name>
+    </ProjectReference>
     <ProjectReference Include="FullPotential.Standard.csproj">
       <Project>{F272141B-5CCC-CCE4-2E8B-FED8D9A3AE94}</Project>
       <Name>FullPotential.Standard</Name>
