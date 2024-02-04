@@ -401,9 +401,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected void SetResourceValuesForRespawn()
         {
-            foreach (var kvp in _resourceValueCache)
+            var resourceKeys = _resourceValueCache.Keys.ToList();
+            foreach (var resourceId in resourceKeys)
             {
-                SetResourceValue(kvp.Key, GetResourceMax(kvp.Key));
+                SetResourceValue(resourceId, GetResourceMax(resourceId));
             }
         }
 
