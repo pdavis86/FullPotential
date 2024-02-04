@@ -42,7 +42,7 @@ namespace FullPotential.Standard.Resources
                 return;
             }
 
-            var lastHit = barrier.GetCustomData(ServerHealthChangeEventHandler.CustomDataKeyLastHit);
+            var lastHit = barrier.GetCustomData(HealthChangeEventHandler.CustomDataKeyLastHit);
 
             if (!lastHit.IsNullOrWhiteSpace())
             {

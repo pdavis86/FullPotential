@@ -96,12 +96,12 @@
     <Compile Include="Assets\Standard\Effects\Movement\Plummet.cs" />
     <Compile Include="Assets\Standard\TargetingVisuals\BeamVisualsBehaviour.cs" />
     <Compile Include="Assets\Standard\ArmorVisuals\LeatherGreaves.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\Barrier\ServerHealthChangeEventHandler.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Barrier\HealthChangeEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Reflect.cs" />
     <Compile Include="Assets\Standard\Shapes\ZoneBehaviour.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Lunge.cs" />
     <Compile Include="Assets\Standard\Weapons\Bow.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\Barrier\ClientHealthChangeEventHandler.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Barrier\ResourceValueChangedEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Conjure.cs" />
     <Compile Include="Assets\Standard\Weapons\Axe.cs" />
     <Compile Include="Assets\Standard\Accessories\AutoAmmoBuyer\AutoAmmoBuyer.cs" />

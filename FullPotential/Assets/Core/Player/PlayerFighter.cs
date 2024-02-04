@@ -233,7 +233,7 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         private void RespawnServerRpc()
         {
-            SetResourceValuesForRespawn();
+            SetServerResourceValuesForRespawn();
 
             AliveState = LivingEntityState.Respawning;
 
@@ -505,7 +505,7 @@ namespace FullPotential.Core.Player
                     resource => playerData.Resources.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value));
                 
                 var health = playerData.Resources.FirstOrDefault(kvp => kvp.Key == nameof(ResourceTypeIds.Health)).Value;
-                SetResourceValue(ResourceTypeIds.HealthId, health > 0 ? health : GetResourceMax(ResourceTypeIds.HealthId));
+                SetServerResourceValue(ResourceTypeIds.HealthId, health > 0 ? health : GetResourceMax(ResourceTypeIds.HealthId));
             }
 
             try

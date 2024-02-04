@@ -309,11 +309,11 @@ namespace FullPotential.Core.GameManagement
         {
             var eventManager = (EventManager)DependenciesContext.Dependencies.GetService<IEventManager>();
 
-            //todo: missing default EventIdResourceValueChanged handler
+            //NOTE: No default EventIdResourceValueChanged handler because it changes a NetworkVariable
             eventManager.Register(LivingEntityBase.EventIdResourceValueChanged, null);
+            eventManager.Register(LivingEntityBase.EventIdDamageDealt, LivingEntityBase.DefaultHandlerForDamageDealtEvent);
 
-            //todo: why does this need a separate event? Just use EventIdResourceValueChanged?
-            eventManager.Register(LivingEntityBase.EventIdHealthChange, LivingEntityBase.DefaultHandlerForHealthChangeEvent);
+            //todo: keep?
             eventManager.Register(LivingEntityBase.EventIdResourceValueChangedClientOnly, null);
 
             eventManager.Register(FighterBase.EventIdReload, FighterBase.DefaultHandlerForReloadEvent);

@@ -76,7 +76,7 @@
     <Compile Include="Assets\Api\Gameplay\Combat\EventArgs\ResourceValueChangedEventArgs.cs" />
     <Compile Include="Assets\Api\Items\IHasTargetingAndShape.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IIsSideEffect.cs" />
-    <Compile Include="Assets\Api\Gameplay\Combat\EventArgs\HealthChangeEventArgs.cs" />
+    <Compile Include="Assets\Api\Gameplay\Combat\EventArgs\DamageDealtEventArgs.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\LivingEntityState.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesContext.cs" />
     <Compile Include="Assets\Api\Items\DestroyStoppable.cs" />

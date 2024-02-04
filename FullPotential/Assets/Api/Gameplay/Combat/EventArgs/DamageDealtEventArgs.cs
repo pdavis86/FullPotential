@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Combat.EventArgs
 {
-    public class HealthChangeEventArgs : IEventHandlerArgs
+    public class DamageDealtEventArgs : IEventHandlerArgs
     {
         public bool IsDefaultHandlerCancelled { get; set; }
 
@@ -21,7 +21,7 @@ namespace FullPotential.Api.Gameplay.Combat.EventArgs
 
         public bool IsCritical { get; set; }
 
-        public HealthChangeEventArgs(
+        public DamageDealtEventArgs(
             LivingEntityBase livingEntity,
             int change,
             FighterBase sourceFighter,

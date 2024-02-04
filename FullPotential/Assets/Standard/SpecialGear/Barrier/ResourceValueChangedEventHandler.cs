@@ -8,15 +8,15 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class ClientHealthChangeEventHandler : IEventHandler
+    public class ResourceValueChangedEventHandler : IEventHandler
     {
         public NetworkLocation Location => NetworkLocation.Client;
 
         public Action<IEventHandlerArgs> BeforeHandler => null;
 
-        public Action<IEventHandlerArgs> AfterHandler => HandleAfterHealthChange;
+        public Action<IEventHandlerArgs> AfterHandler => HandleAfterResourceValueChanged;
 
-        private void HandleAfterHealthChange(IEventHandlerArgs eventArgs)
+        private void HandleAfterResourceValueChanged(IEventHandlerArgs eventArgs)
         {
             var resourceChangeArgs = (ResourceValueChangedEventArgs)eventArgs;
 

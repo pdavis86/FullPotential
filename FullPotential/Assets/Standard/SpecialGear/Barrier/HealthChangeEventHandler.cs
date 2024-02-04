@@ -9,7 +9,7 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class ServerHealthChangeEventHandler : IEventHandler
+    public class HealthChangeEventHandler : IEventHandler
     {
         public const string CustomDataKeyLastHit = "LastHit";
 
@@ -21,7 +21,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         private void HandleBeforeHealthChange(IEventHandlerArgs eventArgs)
         {
-            var healthChangeArgs = (HealthChangeEventArgs)eventArgs;
+            var healthChangeArgs = (DamageDealtEventArgs)eventArgs;
 
             if (healthChangeArgs.Change >= 0)
             {
