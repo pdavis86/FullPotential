@@ -153,7 +153,7 @@ namespace FullPotential.Standard
         {
             eventManager.Subscribe<Accessories.AutoAmmoBuyer.ReloadEventHandler>(FighterBase.EventIdReload);
             eventManager.Subscribe<SpecialGear.Barrier.DamageDealtEventHandler>(LivingEntityBase.EventIdDamageDealt);
-            eventManager.Subscribe<SpecialGear.Barrier.ResourceValueChangedEventHandler>(LivingEntityBase.EventIdResourceValueChangedClientOnly);
+            eventManager.Subscribe<SpecialGear.Barrier.ResourceValueChangedEventHandler>(LivingEntityBase.EventIdResourceValueChanged);
             eventManager.Subscribe<SpecialGear.Reloader.ConsolidatorReloader.ReloadEventHandler>(FighterBase.EventIdReload);
             eventManager.Subscribe<SpecialGear.Reloader.TeleportReloader.ReloadEventHandler>(FighterBase.EventIdReload);
             eventManager.Subscribe<SpecialGear.Reloader.TeleportReloader.ShotFiredEventHandler>(FighterBase.EventIdShotFired);

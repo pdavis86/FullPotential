@@ -313,9 +313,6 @@ namespace FullPotential.Core.GameManagement
             eventManager.Register(LivingEntityBase.EventIdResourceValueChanged, null);
             eventManager.Register(LivingEntityBase.EventIdDamageDealt, LivingEntityBase.DefaultHandlerForDamageDealtEvent);
 
-            //todo: keep?
-            eventManager.Register(LivingEntityBase.EventIdResourceValueChangedClientOnly, null);
-
             eventManager.Register(FighterBase.EventIdReload, FighterBase.DefaultHandlerForReloadEvent);
             eventManager.Register(FighterBase.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEvent);
 

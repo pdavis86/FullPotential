@@ -37,7 +37,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
     {
         public const string EventIdResourceValueChanged = "20b3ff1d-e8d0-438a-873d-98124f726e38";
         public const string EventIdDamageDealt = "4e8f6a71-3708-47f2-bc57-36bcc5596d0c";
-        public const string EventIdResourceValueChangedClientOnly = "29f14f37-2a27-4453-a382-dc311fe7755e";
 
         private const int VelocityThreshold = 3;
         private const int ForceThreshold = 1000;
@@ -243,10 +242,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
                 var eventArgs = new ResourceValueChangedEventArgs(this, typeId, _resourceValueCache[typeId]);
                 _eventManager.Trigger(EventIdResourceValueChanged, eventArgs);
-
-                //todo: is this ok?
-                Console.WriteLine("Triggering event");
-                _eventManager.Trigger(EventIdResourceValueChangedClientOnly, eventArgs);
 
                 //todo: use an event instead
                 if (typeId == ResourceTypeIds.HealthId)
