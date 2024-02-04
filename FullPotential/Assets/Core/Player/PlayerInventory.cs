@@ -232,7 +232,7 @@ namespace FullPotential.Core.Player
 
         private void TriggerSlotChangeEvent(ItemBase item, string slotId)
         {
-            var eventArgs = new SlotChangeEventArgs(this, slotId, item?.Id);
+            var eventArgs = new SlotChangeEventArgs(this, _playerFighter, slotId, item?.Id);
             _eventManager.Trigger(EventIdSlotChange, eventArgs);
         }
 

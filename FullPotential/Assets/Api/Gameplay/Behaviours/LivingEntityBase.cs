@@ -403,7 +403,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        protected void SetServerResourceValue(string typeId, int newValue)
+        public void SetServerResourceValue(string typeId, int newValue)
         {
             newValue = ClampResourceValue(typeId, newValue);
             _resourceValueCache[typeId] = newValue;

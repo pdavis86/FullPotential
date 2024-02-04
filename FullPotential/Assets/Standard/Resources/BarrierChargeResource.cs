@@ -35,18 +35,18 @@ namespace FullPotential.Standard.Resources
                 return;
             }
 
-            var barrier = (Api.Items.Types.SpecialGear)targetFighter.Inventory.GetItemInSlot(BarrierSlot.TypeIdString);
+            var equippedBarrier = (Api.Items.Types.SpecialGear)targetFighter.Inventory.GetItemInSlot(BarrierSlot.TypeIdString);
 
-            if (barrier == null)
+            if (equippedBarrier == null)
             {
                 return;
             }
 
-            var lastHit = barrier.GetCustomData(DamageDealtEventHandler.CustomDataKeyLastHit);
+            var lastHit = equippedBarrier.GetCustomData(DamageDealtEventHandler.CustomDataKeyLastHit);
 
             if (!lastHit.IsNullOrWhiteSpace())
             {
-                var rechargeDelay = barrier.GetRechargeDelay();
+                var rechargeDelay = equippedBarrier.GetRechargeDelay();
 
                 if (DateTime.TryParse(lastHit, out var lastHitDateTime)
                     && (DateTime.UtcNow - lastHitDateTime).TotalSeconds < rechargeDelay)
@@ -56,11 +56,11 @@ namespace FullPotential.Standard.Resources
             }
 
             //Consume item resource (-2 to overcome replenish of 1)
-            livingEntity.AdjustResourceValue(barrier.ResourceTypeId, -2);
+            livingEntity.AdjustResourceValue(equippedBarrier.ResourceTypeId, -2);
 
             //Replenish barrier resource
             //todo: zzz v0.5 - trait-based resource recharge
-            livingEntity.AdjustResourceValue(TypeIdString, barrier.GetRechargeRate());
+            livingEntity.AdjustResourceValue(TypeIdString, equippedBarrier.GetRechargeRate());
         }
     }
 }

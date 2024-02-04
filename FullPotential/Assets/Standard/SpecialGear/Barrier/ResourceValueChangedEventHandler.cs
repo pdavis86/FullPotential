@@ -25,8 +25,6 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 return;
             }
 
-            //todo: resource values should be stored on player or item then displayed on HUD
-
             var remainingCharge = resourceChangeArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString);
             var showVisuals = remainingCharge > 0;
 

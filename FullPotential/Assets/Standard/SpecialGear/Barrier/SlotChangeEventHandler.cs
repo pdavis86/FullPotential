@@ -32,11 +32,6 @@ namespace FullPotential.Standard.SpecialGear.Barrier
         {
             var slotChangeArgs = (SlotChangeEventArgs)eventArgs;
 
-            if (slotChangeArgs.Inventory.OwnerClientId != NetworkManager.Singleton.LocalClientId)
-            {
-                return;
-            }
-
             if (slotChangeArgs.SlotId != BarrierSlot.TypeIdString)
             {
                 return;
@@ -44,7 +39,15 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             var isBarrierEquipped = slotChangeArgs.Inventory.GetItemInSlot(BarrierSlot.TypeIdString) != null;
 
-            _hud.ToggleSliderBar(BarrierChargeResource.TypeIdString, isBarrierEquipped);
+            if (slotChangeArgs.Inventory.OwnerClientId == NetworkManager.Singleton.LocalClientId)
+            {
+                _hud.ToggleSliderBar(BarrierChargeResource.TypeIdString, isBarrierEquipped);
+            }
+
+            if (NetworkManager.Singleton.IsServer && !isBarrierEquipped)
+            {
+                slotChangeArgs.LivingEntity.SetServerResourceValue(BarrierChargeResource.TypeIdString, 0);
+            }
         }
     }
 }
