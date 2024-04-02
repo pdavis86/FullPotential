@@ -119,6 +119,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 var itemsRemoved = new List<ItemBase>();
                 foreach (var id in changes.IdsToRemove)
                 {
+                    if (!_items.ContainsKey(id))
+                    {
+                        Debug.LogWarning($"Could not remove item with ID {id}. Was this admin crafting?");
+                        continue;
+                    }
+
                     itemsRemoved.Add(_items[id]);
                     _items.Remove(id);
                 }

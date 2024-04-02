@@ -458,8 +458,12 @@
     },
 	
 	
-    {
+	{
       "Key": "item.type.consolidatorreloader",
+      "Value": "Consolidator Reloader"
+    },
+    {
+      "Key": "specialgear.consolidatorreloader",
       "Value": "Consolidator Reloader"
     },
     {
@@ -467,7 +471,15 @@
       "Value": "Teleport Reloader"
     },
     {
+      "Key": "specialgear.teleportreloader",
+      "Value": "Teleport Reloader"
+    },
+    {
       "Key": "item.type.barrier",
+      "Value": "Barrier"
+    },
+    {
+      "Key": "specialgear.barrier",
       "Value": "Barrier"
     },
 	
