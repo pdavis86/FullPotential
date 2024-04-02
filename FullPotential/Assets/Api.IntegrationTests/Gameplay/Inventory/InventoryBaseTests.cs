@@ -106,18 +106,18 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
         [Test]
         public void ApplyInventoryChanges_GivenSpansMultipleStacks_FillsSpace()
         {
-            var existingItem1 = new ItemStack { Id = "a", Count = 1, RegistryType = _stackRegistryType1.Object };
+            var existingItem1 = new ItemStack { Id = "a", Count = 4, RegistryType = _stackRegistryType2.Object };
             _inventory.Items.Add(existingItem1.Id, existingItem1);
 
-            var existingItem2 = new ItemStack { Id = "b", Count = 1, RegistryType = _stackRegistryType1.Object };
+            var existingItem2 = new ItemStack { Id = "b", Count = 1, RegistryType = _stackRegistryType2.Object };
             _inventory.Items.Add(existingItem2.Id, existingItem2);
 
-            var newItem1 = new ItemStack { Id = "c", Count = 2, RegistryType = _stackRegistryType1.Object };
+            var newItem1 = new ItemStack { Id = "c", Count = 2, RegistryType = _stackRegistryType2.Object };
 
             _inventory.ApplyInventoryChanges(new InventoryChanges { ItemStacks = new[] { newItem1 } });
 
             Assert.IsTrue(_inventory.Items.Count == 2);
-            Assert.IsTrue(existingItem1.Count == 2);
+            Assert.IsTrue(existingItem1.Count == 5);
             Assert.IsTrue(existingItem2.Count == 2);
         }
 
@@ -164,30 +164,31 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
         }
 
         [Test]
-        public void TakeCountFromItemStacks_GivenPartialMatches_RemovesItemStacks()
+        public void TakeCountFromItemStacks_GivenPartialMatches_RemovesItemStacksSmallestToLargest()
         {
-            var itemA = new ItemStack { Id = "a", Count = 5, RegistryType = _stackRegistryType1.Object };
+            var itemA = new ItemStack { Id = "a", Count = 4, RegistryType = _stackRegistryType1.Object };
             _inventory.Items.Add(itemA.Id, itemA);
 
-            var itemB = new ItemStack { Id = "b", Count = 5, RegistryType = _stackRegistryType1.Object };
+            var itemB = new ItemStack { Id = "b", Count = 3, RegistryType = _stackRegistryType1.Object };
             _inventory.Items.Add(itemB.Id, itemB);
 
-            var itemC = new ItemStack { Id = "c", Count = 5, RegistryType = _stackRegistryType1.Object };
+            var itemC = new ItemStack { Id = "c", Count = 2, RegistryType = _stackRegistryType1.Object };
             _inventory.Items.Add(itemC.Id, itemC);
 
             var (countTaken, invChanges) = _inventory.TakeCountFromItemStacks(_stackRegistryType1.Object.TypeId.ToString(), 7);
 
             Assert.IsTrue(countTaken == 7);
 
-            Assert.IsTrue(invChanges.IdsToRemove.Length == 1);
-            Assert.IsTrue(invChanges.IdsToRemove[0] == itemA.Id);
+            Assert.IsTrue(invChanges.IdsToRemove.Length == 2);
+            Assert.IsTrue(invChanges.IdsToRemove[0] == itemC.Id);
+            Assert.IsTrue(invChanges.IdsToRemove[1] == itemB.Id);
             Assert.IsTrue(invChanges.ItemStacks.Length == 1);
-            Assert.IsTrue(invChanges.ItemStacks[0].Id == itemB.Id);
-            Assert.IsTrue(invChanges.ItemStacks[0].Count == 3);
+            Assert.IsTrue(invChanges.ItemStacks[0].Id == itemA.Id);
+            Assert.IsTrue(invChanges.ItemStacks[0].Count == 2);
 
-            Assert.IsTrue(_inventory.GetItemWithId<ItemStack>(itemA.Id, false) == null);
-            Assert.IsTrue(_inventory.GetItemWithId<ItemStack>(itemB.Id).Count == 3);
-            Assert.IsTrue(_inventory.GetItemWithId<ItemStack>(itemC.Id).Count == 5);
+            Assert.IsTrue(_inventory.GetItemWithId<ItemStack>(itemA.Id).Count == 2);
+            Assert.IsTrue(_inventory.GetItemWithId<ItemStack>(itemB.Id, false) == null);
+            Assert.IsTrue(_inventory.GetItemWithId<ItemStack>(itemC.Id, false) == null);
         }
 
         [Test]

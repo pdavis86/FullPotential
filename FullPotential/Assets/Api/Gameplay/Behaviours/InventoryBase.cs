@@ -126,6 +126,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 NotifyOfItemsRemoved(itemsRemoved);
             }
 
+            //todo: zzz v0.6 can still take item stacks when inventory is full if there is space
             if (IsInventoryFull())
             {
                 NotifyOfInventoryFull();
@@ -256,7 +257,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     i => i.Value is ItemStack itemStack
                     && itemStack.RegistryTypeId == typeId)
                 .Select(i => (ItemStack)i.Value)
-                .OrderByDescending(i => i.Count);
+                .OrderBy(i => i.Count);
 
             if (!matches.Any())
             {
@@ -500,6 +501,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
 
                 partiallyFullStack.Count += itemsRemaining;
+                itemsRemaining = 0;
                 break;
             }
 

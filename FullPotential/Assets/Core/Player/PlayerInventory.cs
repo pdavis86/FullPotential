@@ -328,8 +328,6 @@ namespace FullPotential.Core.Player
                     _playerFighter.ShowAlertForItemsAddedToInventory(string.Format(alert2Text, itemsAddedCount));
                     break;
             }
-
-            //todo: why is hand ammo not updating?
         }
 
         protected override void NotifyOfInventoryFull()
@@ -392,7 +390,17 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            //todo: generalise for accessories
+            if (item is Accessory)
+            {
+                InstantiateAccessoryVisuals(slotId, item);
+                return;
+            }
+
+            if (item is Armor)
+            {
+                InstantiateArmorVisuals(slotId, item);
+                return;
+            }
 
             switch (slotId)
             {
@@ -400,36 +408,6 @@ namespace FullPotential.Core.Player
                 case HandSlotIds.RightHand:
                     var isLeftHand = slotId == HandSlotIds.LeftHand;
                     SpawnItemInHand(slotId, item, isLeftHand);
-                    break;
-
-                case "ddeafb61-0163-4888-b355-16a37d3a33b5" + ";1": //SlotGameObjectName.Amulet:
-                    const float amuletForwardMultiplier = 0.2f;
-                    InstantiateAccessoryVisuals(slotId, item, _playerFighter.GraphicsTransform, manipulateTransform: t => t.position += t.forward * amuletForwardMultiplier);
-                    break;
-
-                case "6d4bce60-dda6-4a88-82fd-c2b086065c8b" + ";1": //SlotGameObjectName.Belt:
-                    InstantiateAccessoryVisuals(slotId, item, _playerFighter.GraphicsTransform);
-                    break;
-
-                case "b74b00f9-9cf1-4758-9e22-b4fbd4d1cea0" + ";1": //SlotGameObjectName.LeftRing:
-                    InstantiateAccessoryVisuals(slotId, item, _playerFighter.BodyParts.LeftArm, true);
-                    break;
-
-                case "b74b00f9-9cf1-4758-9e22-b4fbd4d1cea0" + ";2": //SlotGameObjectName.RightRing:
-                    InstantiateAccessoryVisuals(slotId, item, _playerFighter.BodyParts.RightArm, true);
-                    break;
-
-                case "0d6f6511-352d-4303-9c25-b7b21c34ec59" + ";1": //AutoAmmoBuyer
-                    break;
-
-                case ArmorTypeIds.HelmId:
-                    InstantiateArmorVisuals(slotId, item, _playerFighter.BodyParts.Head);
-                    break;
-
-                case ArmorTypeIds.ChestId:
-                case ArmorTypeIds.LegsId:
-                case ArmorTypeIds.FeetId:
-                    InstantiateArmorVisuals(slotId, item, _playerFighter.GraphicsTransform);
                     break;
 
                 default:
@@ -500,11 +478,36 @@ namespace FullPotential.Core.Player
 
         private void InstantiateAccessoryVisuals(
             string slotId,
-            ItemBase item,
-            Transform parentTransform,
-            bool showsOnPlayerCamera = false,
-            Action<Transform> manipulateTransform = null)
+            ItemBase item)
         {
+            Transform parentTransform = null;
+            var showsOnPlayerCamera = false;
+            Action<Transform> manipulateTransform = null;
+
+            //todo: zzz v0.6 - remove special cases
+            switch (slotId)
+            {
+                case "ddeafb61-0163-4888-b355-16a37d3a33b5" + ";1": //SlotGameObjectName.Amulet:
+                    const float amuletForwardMultiplier = 0.2f;
+                    parentTransform = _playerFighter.GraphicsTransform;
+                    manipulateTransform = t => t.position += t.forward * amuletForwardMultiplier;
+                    break;
+
+                case "6d4bce60-dda6-4a88-82fd-c2b086065c8b" + ";1": //SlotGameObjectName.Belt:
+                    parentTransform = _playerFighter.GraphicsTransform;
+                    break;
+
+                case "b74b00f9-9cf1-4758-9e22-b4fbd4d1cea0" + ";1": //SlotGameObjectName.LeftRing:
+                    parentTransform = _playerFighter.BodyParts.LeftArm;
+                    showsOnPlayerCamera = true;
+                    break;
+
+                case "b74b00f9-9cf1-4758-9e22-b4fbd4d1cea0" + ";2": //SlotGameObjectName.RightRing:
+                    parentTransform = _playerFighter.BodyParts.RightArm;
+                    showsOnPlayerCamera = true;
+                    break;
+            }
+
             var thisClient = NetworkManager.LocalClientId == OwnerClientId;
 
             if (!showsOnPlayerCamera && thisClient)
@@ -542,9 +545,24 @@ namespace FullPotential.Core.Player
 
         private void InstantiateArmorVisuals(
             string slotId,
-            ItemBase item,
-            Transform parentTransform)
+            ItemBase item)
         {
+            Transform parentTransform = null;
+
+            //todo: zzz v0.6 - remove special cases
+            switch (slotId)
+            {
+                case ArmorTypeIds.HelmId:
+                    parentTransform = _playerFighter.BodyParts.Head;
+                    break;
+
+                case ArmorTypeIds.ChestId:
+                case ArmorTypeIds.LegsId:
+                case ArmorTypeIds.FeetId:
+                    parentTransform = _playerFighter.GraphicsTransform;
+                    break;
+            }
+
             if (item is not Armor armorItem)
             {
                 Debug.LogError("Item is not armor");

@@ -96,7 +96,6 @@
     <Compile Include="Assets\Standard\Effects\Movement\Plummet.cs" />
     <Compile Include="Assets\Standard\TargetingVisuals\BeamVisualsBehaviour.cs" />
     <Compile Include="Assets\Standard\ArmorVisuals\LeatherGreaves.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\Barrier\DamageDealtEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Reflect.cs" />
     <Compile Include="Assets\Standard\Shapes\ZoneBehaviour.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Lunge.cs" />
@@ -157,6 +156,7 @@
     <Compile Include="Assets\Standard\Ammo\Bullet.cs" />
     <Compile Include="Assets\Standard\Shapes\WallBehaviour.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicStaff.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Barrier\DamageDealtEventHandler.cs" />
     <Compile Include="Assets\Standard\Weapons\Staff.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\ManaDrain.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Earth.cs" />
