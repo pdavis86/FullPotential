@@ -121,7 +121,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
             _sceneService = _gameManager.GetSceneBehaviour().GetSceneService();
 
-            PopulateServerResourceList();
+            PopulateResourceValueCache();
+            _encodedResourceValues.OnValueChanged += HandleEncodedResourcesChange;
 
             _entityName.OnValueChanged += HandleNameChange;
         }
@@ -143,9 +144,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 InvokeRepeating(nameof(CheckIfOffTheMap), 1, 1);
             }
 
-            _encodedResourceValues.OnValueChanged += HandleEncodedResourcesChange;
-
             UpdateNameOnUi();
+            UpdateResourceValues();
         }
 
         protected virtual void FixedUpdate()
@@ -223,26 +223,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             //todo: zzz v0.9 Poor network performance. This fires a LOT e.g. stamina recharging. Maybe don't send recharge updates?
 
-            var newValues = newValue.Value.Split(";");
-
-            var oldValues = previousValue.Value.IsNullOrWhiteSpace()
-                ? new string[newValues.Length]
-                : previousValue.Value.Split(";");
-
-            for (var i = 0; i < newValues.Length; i++)
-            {
-                if (oldValues[i] == newValues[i])
-                {
-                    continue;
-                }
-
-                var typeId = _resourceValueCache.ElementAt(i).Key;
-
-                _resourceValueCache[typeId] = int.Parse(newValues[i]);
-
-                var eventArgs = new ResourceValueChangedEventArgs(this, typeId, _resourceValueCache[typeId]);
-                _eventManager.Trigger(EventIdResourceValueChanged, eventArgs);
-            }
+            UpdateResourceValues();
         }
 
         #endregion
@@ -331,7 +312,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             AdjustResourceValue(ResourceTypeIds.HealthId, damageDealtEventArgs.Change);
         }
 
-        private void PopulateServerResourceList()
+        private void PopulateResourceValueCache()
         {
             _sortedResources = _typeRegistry.GetRegisteredTypes<IResource>()
                 .OrderBy(x => x.TypeId);
@@ -340,22 +321,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 _resourceValueCache.Add(resource.TypeId.ToString(), 9999);
             }
-
-            if (!IsServer)
-            {
-                return;
-            }
-
-            var sb = new StringBuilder();
-            for (var i = 0; i < _resourceValueCache.Count; i++)
-            {
-                sb.Append(_resourceValueCache.ElementAt(i).Key == ResourceTypeIds.HealthId
-                    ? GetResourceMax(ResourceTypeIds.HealthId)
-                    : 0);
-                sb.Append(";");
-            }
-
-            _encodedResourceValues.Value = sb.ToString();
         }
 
         public int GetResourceValue(string typeId)
@@ -386,7 +351,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             var currentValue = GetResourceValue(typeId);
             currentValue = ClampResourceValue(typeId, currentValue);
-            SetServerResourceValue(typeId, currentValue + change);
+            SetServerResourceValueAndSend(typeId, currentValue + change);
         }
 
         protected void SetResourceInitialValues(Dictionary<string, int> values)
@@ -397,11 +362,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        public void SetServerResourceValue(string typeId, int newValue)
+        public void SetServerResourceValueAndSend(string typeId, int newValue)
         {
             newValue = ClampResourceValue(typeId, newValue);
             _resourceValueCache[typeId] = newValue;
 
+            SendServerResourceValuesToClients();
+        }
+
+        protected void SendServerResourceValuesToClients()
+        {
             var newEncodeValue = string.Join(";", _resourceValueCache.Select(x => x.Value.ToString()));
             _encodedResourceValues.Value = newEncodeValue;
         }
@@ -411,7 +381,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var resourceKeys = _resourceValueCache.Keys.ToList();
             foreach (var resourceId in resourceKeys)
             {
-                SetServerResourceValue(resourceId, GetResourceMax(resourceId));
+                SetServerResourceValueAndSend(resourceId, GetResourceMax(resourceId));
             }
         }
 
@@ -497,6 +467,26 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             gameObject.name = displayName;
             _nameTag.text = displayName;
+        }
+
+        private void UpdateResourceValues()
+        {
+            var newValues = _encodedResourceValues.Value.ToString().Split(";");
+
+            for (var i = 0; i < newValues.Length; i++)
+            {
+                if (newValues[i].IsNullOrWhiteSpace())
+                {
+                    continue;
+                }
+
+                var typeId = _resourceValueCache.ElementAt(i).Key;
+
+                _resourceValueCache[typeId] = int.Parse(newValues[i]);
+
+                var eventArgs = new ResourceValueChangedEventArgs(this, typeId, _resourceValueCache[typeId]);
+                _eventManager.Trigger(EventIdResourceValueChanged, eventArgs);
+            }
         }
 
         public void UpdateUiHealthAndDefenceValues()
