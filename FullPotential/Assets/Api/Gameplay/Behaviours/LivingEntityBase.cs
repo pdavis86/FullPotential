@@ -8,6 +8,7 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Gameplay.LivingEntity;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
@@ -124,6 +125,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
             PopulateServerResourceList();
 
             _entityName.OnValueChanged += HandleNameChange;
+
+            _eventManager.Subscribe<ResourceValueChangedEventHandler>(EventIdResourceValueChanged);
         }
 
         protected virtual void Start()
@@ -242,12 +245,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
                 var eventArgs = new ResourceValueChangedEventArgs(this, typeId, _resourceValueCache[typeId]);
                 _eventManager.Trigger(EventIdResourceValueChanged, eventArgs);
-
-                //todo: use an event instead
-                if (typeId == ResourceTypeIds.HealthId)
-                {
-                    UpdateUiHealthAndDefenceValues();
-                }
             }
         }
 
