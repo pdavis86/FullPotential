@@ -7,8 +7,6 @@ namespace FullPotential.Standard.Effects.Elements
     {
         public Guid TypeId => new Guid("80f913d3-0969-42e1-8f32-8ac54c1b3203");
 
-        public string LingeringTypeName => "Shock";
-
         public Type Opposite => typeof(Water);
     }
 }

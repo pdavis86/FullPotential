@@ -64,51 +64,5 @@ namespace FullPotential.Api.Items.Types
         {
             return $"{typeId};{index}";
         }
-
-        private string GetBarrierDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
-        {
-            var sb = new StringBuilder();
-
-            if (levelOfDetail == LevelOfDetail.Full)
-            {
-                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(Name))}: {itemName.OrIfNullOrWhitespace(Name)}" + "\n");
-                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {localizer.Translate(TranslationType.ItemType, GetType().Name)}" + "\n");
-            }
-
-            AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
-
-            AppendToDescription(
-               sb,
-               localizer,
-               Attributes.Strength,
-               nameof(Attributes.Strength),
-               AliasSegmentDefensive,
-               localizer.TranslateInt(Attributes.Strength));
-
-            //What does Efficiency do for a barrier?
-            //AppendToDescription(sb, localizer, Attributes.Efficiency, nameof(Attributes.Efficiency));
-
-            //todo: zzz v0.4.1 - implement borderlands-like shields
-            //AppendToDescription(
-            //    sb,
-            //    localizer,
-            //    Attributes.Speed,
-            //    nameof(Attributes.Speed),
-            //    nameof(IGearArmor.ArmorCategory.Barrier),
-            //    localizer.TranslateFloat(GetRechargeDelay()),
-            //    UnitsType.Time);
-
-            //todo: zzz v0.4.1 - implement borderlands-like shields
-            //AppendToDescription(
-            //    sb,
-            //    localizer,
-            //    Attributes.Recovery,
-            //    nameof(Attributes.Recovery),
-            //    nameof(IGearArmor.ArmorCategory.Barrier),
-            //    localizer.TranslateFloat(GetRechargeRate()),
-            //    UnitsType.UnitPerTime);
-
-            return sb.ToString().Trim();
-        }
     }
 }

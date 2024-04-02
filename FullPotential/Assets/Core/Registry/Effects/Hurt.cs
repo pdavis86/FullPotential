@@ -3,7 +3,7 @@ using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Resources;
 
-namespace FullPotential.Standard.Effects.Support
+namespace FullPotential.Core.Registry.Effects
 {
     public class Hurt : IResourceEffect
     {

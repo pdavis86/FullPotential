@@ -1,7 +1,7 @@
 ﻿using System;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Standard.Resources;
 
 namespace FullPotential.Standard.Effects.Debuffs
 {
@@ -11,6 +11,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public AffectType AffectType => AffectType.TemporaryMaxDecrease;
 
-        public Guid ResourceTypeId => ResourceTypeIds.Mana;
+        public Guid ResourceTypeId => Mana.Id;
     }
 }

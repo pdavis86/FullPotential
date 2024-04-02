@@ -61,8 +61,6 @@ namespace FullPotential.Standard
                 typeof(Effects.Movement.StepBack),
 
                 typeof(Effects.Support.Conjure),
-                typeof(Effects.Support.Heal),
-                typeof(Effects.Support.Hurt),
                 typeof(Effects.Support.Reflect),
                 typeof(Effects.Support.Float),
                 typeof(Effects.Support.Summon),
@@ -71,6 +69,8 @@ namespace FullPotential.Standard
                 typeof(Loot.Shard),
                 typeof(Loot.Junk),
 
+                typeof(Resources.Mana),
+                typeof(Resources.Energy),
                 typeof(Resources.BarrierChargeResource),
 
                 typeof(SpecialGear.Barrier.Barrier),
@@ -98,7 +98,7 @@ namespace FullPotential.Standard
                 typeof(Targeting.PointToPoint),
                 typeof(Targeting.Projectile),
                 typeof(Targeting.Self),
-                typeof(Targeting.Touch),
+                typeof(Targeting.WithinReach),
 
                 typeof(Shapes.Wall),
                 typeof(Shapes.Zone),

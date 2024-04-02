@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
 namespace FullPotential.Api.Gameplay.Player
 {
     public class HandStatus

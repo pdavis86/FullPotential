@@ -9,13 +9,5 @@ namespace FullPotential.Api.Registry.Resources
 
         public const string StaminaId = "1947b057-7b63-4737-8535-59ff613b2dd8";
         public static readonly Guid Stamina = new Guid(StaminaId);
-
-        //todo: zzz v0.6 - after generalising UI move mana and energy into Standard
-
-        public const string ManaId = "378443ee-7942-4cd5-977d-818ee03333e9";
-        public static readonly Guid Mana = new Guid(ManaId);
-
-        public const string EnergyId = "89ec3ecf-badb-4e55-91b0-b288ca358010";
-        public static readonly Guid Energy = new Guid(EnergyId);
     }
 }

@@ -7,8 +7,6 @@ namespace FullPotential.Standard.Effects.Elements
     {
         public Guid TypeId => new Guid("533bfd89-696d-497c-9e7f-d0629bfbc0d0");
 
-        public string LingeringTypeName => "Immobilise";
-
         public Type Opposite => typeof(Air);
     }
 }

@@ -7,8 +7,6 @@ namespace FullPotential.Api.Registry.Elements
 {
     public interface IElement : IEffect
     {
-        string LingeringTypeName { get; }
-
         Type Opposite { get; }
     }
 }

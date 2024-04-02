@@ -78,11 +78,11 @@
     <Compile Include="Assets\Standard\WeaponVisuals\BasicCrossbow.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicGun2.cs" />
     <Compile Include="Assets\Standard\ShapeVisuals\ZoneOfFlames.cs" />
-    <Compile Include="Assets\Standard\Effects\Support\Heal.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Haste.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Fear.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicGun.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Launch.cs" />
+    <Compile Include="Assets\Standard\Resources\Mana.cs" />
     <Compile Include="Assets\Standard\ArmorVisuals\LeatherJerkin.cs" />
     <Compile Include="Assets\Standard\Targeting\Projectile.cs" />
     <Compile Include="Assets\Standard\ShapeVisuals\WallOfFlames.cs" />
@@ -116,7 +116,6 @@
     <Compile Include="Assets\Standard\Targeting\ProjectileBehaviour.cs" />
     <Compile Include="Assets\Standard\SpecialGear\Barrier\Barrier.cs" />
     <Compile Include="Assets\Standard\AccessoryVisuals\SilverNecklace.cs" />
-    <Compile Include="Assets\Standard\Effects\Support\Hurt.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicHammer.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Lightning.cs" />
     <Compile Include="Assets\Standard\Weapons\Gun.cs" />
@@ -132,6 +131,7 @@
     <Compile Include="Assets\Standard\Weapons\Dagger.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Float.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Regeneration.cs" />
+    <Compile Include="Assets\Standard\Resources\Energy.cs" />
     <Compile Include="Assets\Standard\Ammo\Arrow.cs" />
     <Compile Include="Assets\Standard\ArmorVisuals\LeatherBoots.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Focus.cs" />
@@ -161,7 +161,7 @@
     <Compile Include="Assets\Standard\Effects\Debuffs\ManaDrain.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Earth.cs" />
     <Compile Include="Assets\Standard\Shapes\Wall.cs" />
-    <Compile Include="Assets\Standard\Targeting\Touch.cs" />
+    <Compile Include="Assets\Standard\Targeting\WithinReach.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicAxe2.cs" />
     <Compile Include="Assets\Standard\Enemies\Behaviours\EnemyInventory.cs" />
     <Compile Include="Assets\Standard\Loot\Scrap.cs" />

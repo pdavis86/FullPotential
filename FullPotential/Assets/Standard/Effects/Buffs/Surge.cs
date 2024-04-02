@@ -1,7 +1,7 @@
 ﻿using System;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Standard.Resources;
 
 namespace FullPotential.Standard.Effects.Buffs
 {
@@ -11,6 +11,6 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public AffectType AffectType => AffectType.TemporaryMaxIncrease;
 
-        public Guid ResourceTypeId => ResourceTypeIds.Energy;
+        public Guid ResourceTypeId => Energy.Id;
     }
 }

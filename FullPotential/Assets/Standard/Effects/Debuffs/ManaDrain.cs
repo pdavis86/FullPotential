@@ -1,8 +1,8 @@
 ﻿using System;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Registry.Resources;
 using FullPotential.Standard.Effects.Buffs;
+using FullPotential.Standard.Resources;
 
 namespace FullPotential.Standard.Effects.Debuffs
 {
@@ -12,7 +12,7 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public AffectType AffectType => AffectType.PeriodicDecrease;
 
-        public Guid ResourceTypeId => ResourceTypeIds.Mana;
+        public Guid ResourceTypeId => Mana.Id;
 
         public Guid SideEffectTypeId => new Guid(ManaTap.TypeIdString);
     }

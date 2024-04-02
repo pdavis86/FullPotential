@@ -99,8 +99,9 @@ namespace FullPotential.Core.Registry
 
             ValidateAndRegister(typeof(Resources.Health));
             ValidateAndRegister(typeof(Resources.Stamina));
-            ValidateAndRegister(typeof(Resources.Mana));
-            ValidateAndRegister(typeof(Resources.Energy));
+
+            ValidateAndRegister(typeof(Effects.Heal));
+            ValidateAndRegister(typeof(Effects.Hurt));
 
             _eventManager.Subscribe<LivingEntityDiedEventHandler>(LivingEntityBase.EventIdResourceValueChanged);
             _eventManager.Subscribe<LivingEntityHealthChangedEventHandler>(LivingEntityBase.EventIdResourceValueChanged);

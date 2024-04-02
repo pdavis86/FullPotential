@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Targeting
 {
-    public class Touch : ITargeting
+    public class WithinReach : ITargeting
     {
         public const string TypeIdString = "144cc142-2e64-476f-b3a6-de57cc3abd05";
 

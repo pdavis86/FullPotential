@@ -39,12 +39,6 @@ namespace FullPotential.Core.Player
         private float _currentCameraRotationX;
         private float _maxDistanceToBeStanding;
         private bool _isMidJump;
-        //private Vector3 _previousPosition;
-        //private Quaternion _previousRotation;
-        //private Vector3 _previousLook;
-
-        //Services
-        //private IRpcService _rpcService;
 
         //Others
         private UserInterface _userInterface;
@@ -59,8 +53,6 @@ namespace FullPotential.Core.Player
 
             _maxDistanceToBeStanding = gameObject.GetComponent<Collider>().bounds.extents.y + 0.1f;
 
-            //_rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
-
             _userInterface = GameManager.Instance.UserInterface;
 
             GameManager.Instance.GameSettingsUpdated += OnGameSettingsUpdated;
@@ -72,9 +64,6 @@ namespace FullPotential.Core.Player
             _smoothLook = Vector2.zero;
             _currentCameraRotationX = 0;
             _isMidJump = false;
-            //_previousPosition = transform.position;
-            //_previousRotation = transform.rotation;
-            //_previousLook = _playerCamera.transform.localEulerAngles;
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -142,40 +131,7 @@ namespace FullPotential.Core.Player
             UpdateSprintingState(isTryingToSprint);
         }
 
-        //[ServerRpc]
-        //private void ApplyMovementServerRpc(Vector3 position, Quaternion rotation, Vector3 lookDirection, bool isTryingToJump, bool isTryingToSprint)
-        //{
-        //    ApplyMovementToLocalObject(position, rotation, lookDirection, isTryingToJump, isTryingToSprint);
-
-        //    //todo: zzz v0.5 - check players are not cheating their movement values
-
-        //    var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, new[] { 0ul, OwnerClientId });
-        //    ApplyMovementClientRpc(position, rotation, lookDirection, isTryingToJump, isTryingToSprint, nearbyClients);
-        //}
-
-        //// ReSharper disable once UnusedParameter.Local
-        //[ClientRpc]
-        //private void ApplyMovementClientRpc(Vector3 position, Quaternion rotation, Vector3 lookDirection, bool isTryingToJump, bool isTryingToSprint, ClientRpcParams clientRpcParams)
-        //{
-        //    ApplyMovementToLocalObject(position, rotation, lookDirection, isTryingToJump, isTryingToSprint);
-        //}
-
         #endregion
-
-        //private void ApplyMovementToLocalObject(Vector3 position, Quaternion rotation, Vector3 lookDirection, bool isTryingToJump, bool isTryingToSprint)
-        //{
-        //    var adjustedPosition = _isMidJump
-        //        ? new Vector3(position.x, transform.position.y, position.z)
-        //        : position;
-
-        //    transform.SetPositionAndRotation(adjustedPosition, rotation);
-
-        //    _playerCamera.transform.localEulerAngles = lookDirection;
-
-        //    UpdateSprintingState(isTryingToSprint);
-
-        //    Jump(isTryingToJump);
-        //}
 
         private bool IsOnSolidObject()
         {
@@ -264,9 +220,6 @@ namespace FullPotential.Core.Player
 
         private void ApplyMovementFromInputs()
         {
-            //const float positionThreshold = 0.01f;
-            //const float rotationThreshold = 0.01f;
-
             if (_userInterface.IsAnyMenuOpen())
             {
                 return;
@@ -280,23 +233,6 @@ namespace FullPotential.Core.Player
             MoveAndLook(_moveVal, _lookVal, _isTryingToSprint);
 
             Jump();
-
-            //var positionDiff = Mathf.Abs((_previousPosition - transform.position).magnitude);
-            //var rotationDiff = Mathf.Abs((_previousRotation * Quaternion.Inverse(transform.rotation)).y);
-            //var lookDiff = Mathf.Abs((_previousLook - _playerCamera.transform.localEulerAngles).magnitude);
-
-            //if (positionDiff > positionThreshold
-            //    || rotationDiff > rotationThreshold
-            //    || lookDiff > rotationThreshold
-            //    || _isTryingToSprint
-            //    || initiateAJump)
-            //{
-            //    ApplyMovementServerRpc(transform.position, transform.rotation, _playerCamera.transform.localEulerAngles, _isTryingToJump, _isTryingToSprint);
-
-            //    _previousPosition = transform.position;
-            //    _previousRotation = transform.rotation;
-            //    _previousLook = _playerCamera.transform.localEulerAngles;
-            //}
         }
 
     }

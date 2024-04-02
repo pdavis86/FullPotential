@@ -2,13 +2,16 @@
 using System.Drawing;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Registry.Resources;
 
-namespace FullPotential.Core.Registry.Resources
+namespace FullPotential.Standard.Resources
 {
     public class Energy : IResource
     {
-        public Guid TypeId => ResourceTypeIds.Energy;
+        private const string EnergyId = "89ec3ecf-badb-4e55-91b0-b288ca358010";
+
+        public static readonly Guid Id = new Guid(EnergyId);
+
+        public Guid TypeId => Id;
 
         public Color Color => Color.FromArgb(25, 118, 64);
 
@@ -20,11 +23,11 @@ namespace FullPotential.Core.Registry.Resources
 
         private void PerformReplenish(LivingEntityBase livingEntity)
         {
-            if (!livingEntity.IsConsumingResource(ResourceTypeIds.EnergyId)
-                && livingEntity.GetResourceValue(ResourceTypeIds.EnergyId) < livingEntity.GetResourceMax(ResourceTypeIds.EnergyId))
+            if (!livingEntity.IsConsumingResource(EnergyId)
+                && livingEntity.GetResourceValue(EnergyId) < livingEntity.GetResourceMax(EnergyId))
             {
                 //todo: zzz v0.5 - trait-based resource recharge
-                livingEntity.AdjustResourceValue(ResourceTypeIds.EnergyId, 1);
+                livingEntity.AdjustResourceValue(EnergyId, 1);
             }
         }
     }
