@@ -49,7 +49,7 @@ namespace FullPotential.Standard.Resources
                 var rechargeDelay = equippedBarrier.GetRechargeDelay();
 
                 if (DateTime.TryParse(lastHit, out var lastHitDateTime)
-                    && (DateTime.UtcNow - lastHitDateTime).TotalSeconds < rechargeDelay)
+                    && (DateTime.UtcNow - lastHitDateTime.ToUniversalTime()).TotalSeconds < rechargeDelay)
                 {
                     return;
                 }

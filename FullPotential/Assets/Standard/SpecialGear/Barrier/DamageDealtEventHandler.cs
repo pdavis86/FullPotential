@@ -34,8 +34,6 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 return;
             }
 
-            barrier.SetCustomData(CustomDataKeyLastHit, DateTime.UtcNow.ToString("u"));
-
             var barrierCharge = healthChangeArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString);
 
             if (barrierCharge <= 0)
@@ -43,6 +41,8 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 //Debug.Log("Barrier depleted. Taking full damage");
                 return;
             }
+
+            barrier.SetCustomData(CustomDataKeyLastHit, DateTime.UtcNow.ToString("u"));
 
             healthChangeArgs.LivingEntity.AdjustResourceValue(BarrierChargeResource.TypeIdString, healthChangeArgs.Change);
 
