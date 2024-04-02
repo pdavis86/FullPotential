@@ -103,6 +103,7 @@ namespace FullPotential.Core.Registry
             ValidateAndRegister(typeof(Resources.Energy));
 
             _eventManager.Subscribe<LivingEntityDiedEventHandler>(LivingEntityBase.EventIdResourceValueChanged);
+            _eventManager.Subscribe<LivingEntityHealthChangedEventHandler>(LivingEntityBase.EventIdResourceValueChanged);
         }
 
         private void HandleModRegistration(IMod mod)

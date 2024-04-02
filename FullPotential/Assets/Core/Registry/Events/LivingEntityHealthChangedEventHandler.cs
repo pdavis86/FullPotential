@@ -5,9 +5,9 @@ using FullPotential.Api.Registry.Resources;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 
-namespace FullPotential.Api.Gameplay.LivingEntity
+namespace FullPotential.Core.Registry.Events
 {
-    internal class ResourceValueChangedEventHandler : IEventHandler
+    internal class LivingEntityHealthChangedEventHandler : IEventHandler
     {
         public NetworkLocation Location => NetworkLocation.Client;
 
