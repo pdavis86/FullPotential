@@ -509,7 +509,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void CheckIfOffTheMap()
         {
-            if (AliveState != LivingEntityState.Dead
+            if (AliveState == LivingEntityState.Alive
                 && transform.position.y < _gameManager.GetSceneBehaviour().Attributes.LowestYValue)
             {
                 _lastDamageItemName = null;

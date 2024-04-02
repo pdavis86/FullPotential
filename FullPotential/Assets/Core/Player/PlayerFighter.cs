@@ -44,6 +44,7 @@ namespace FullPotential.Core.Player
         private Vector3 _positionAfterRespawn;
         private float _myHeight;
         private MeshRenderer _bodyMeshRenderer;
+        private bool _isReadyToBecomeVulnerable;
 
         //Action-related
         private ActionQueue<bool> _aliveStateChanges;
@@ -239,8 +240,6 @@ namespace FullPotential.Core.Player
 
             var spawnPoint = GameManager.Instance.GetSceneBehaviour().GetSpawnPoint();
 
-            PlayerSpawnStateChange(AliveState, spawnPoint.Position, spawnPoint.Rotation);
-
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             PlayerSpawnStateChangeClientRpc(AliveState, spawnPoint.Position, spawnPoint.Rotation, nearbyClients);
         }
@@ -424,6 +423,11 @@ namespace FullPotential.Core.Player
 
         private void BecomeVulnerable()
         {
+            if (!IsServer)
+            {
+                return;
+            }
+
             if (AliveState is LivingEntityState.Dead or LivingEntityState.Alive)
             {
                 return;
@@ -437,14 +441,18 @@ namespace FullPotential.Core.Player
 
             var distanceMoved = Vector3.Distance(transform.position, _positionAfterRespawn);
 
-            if (distanceMoved > 1)
+            if (!_isReadyToBecomeVulnerable)
             {
+                _isReadyToBecomeVulnerable = distanceMoved < 1;
+            }
+            else if (distanceMoved > 1)
+            {
+                _isReadyToBecomeVulnerable = false;
                 AliveState = LivingEntityState.Alive;
-
-                PlayerSpawnStateChange(AliveState, Vector3.zero, Quaternion.identity);
 
                 var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
                 PlayerSpawnStateChangeClientRpc(AliveState, Vector3.zero, Quaternion.identity, nearbyClients);
+
                 _positionAfterRespawn = Vector3.zero;
             }
         }
@@ -503,7 +511,7 @@ namespace FullPotential.Core.Player
                 SetResourceInitialValues(nonHealthResources.ToDictionary(
                     resource => resource.TypeId.ToString(),
                     resource => playerData.Resources.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value));
-                
+
                 var health = playerData.Resources.FirstOrDefault(kvp => kvp.Key == nameof(ResourceTypeIds.Health)).Value;
                 SetServerResourceValueAndSend(ResourceTypeIds.HealthId, health > 0 ? health : GetResourceMax(ResourceTypeIds.HealthId));
             }
@@ -604,8 +612,6 @@ namespace FullPotential.Core.Player
 
         protected override void HandleDeathAfter()
         {
-            PlayerSpawnStateChange(AliveState, Vector3.zero, Quaternion.identity);
-
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             PlayerSpawnStateChangeClientRpc(AliveState, Vector3.zero, Quaternion.identity, nearbyClients);
         }
