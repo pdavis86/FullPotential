@@ -482,7 +482,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private SpecialGear GetSpecialGear(ISpecialGear craftableType, string resourceTypeId, IList<ItemForCombatBase> components)
         {
-            //todo: zzz v0.4.1 - all attributes for specials
+            //todo: zzz v0.4 - all attributes for specials
 
             var resourceType = resourceTypeId.IsNullOrWhiteSpace()
                 ? null

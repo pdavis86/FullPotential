@@ -57,7 +57,10 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 
             var ammoRemaining = fighter.Inventory.GetItemStackTotal(ammoTypeId);
 
-            if (ammoRemaining >= equippedWeapon.GetAmmoMax())
+            //todo: zzz v0.9 - check if enough money for buying an ammo ItemStack
+            var hasEnoughMoney = ammoRemaining > -1;
+
+            if (ammoRemaining >= equippedWeapon.GetAmmoMax() || !hasEnoughMoney)
             {
                 return;
             }
@@ -70,12 +73,15 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
                 Count = ammoType.MaxStackSize
             };
 
-            fighter.Inventory.ApplyInventoryChanges(new InventoryChanges
+            var addedToInventory = fighter.Inventory.ApplyInventoryChanges(new InventoryChanges
             {
                 ItemStacks = new[] { newItemStack }
             });
 
-            //todo: zzz v0.5 take money for ammo ItemStack
+            if (addedToInventory)
+            {
+                //todo: zzz v0.9 - take money for ammo ItemStack
+            }
         }
     }
 }

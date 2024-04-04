@@ -274,7 +274,7 @@ namespace FullPotential.Api.Items.Base
         {
             var returnValue = GetHighInLowOutInRange(Attributes.Efficiency, 5, 50);
 
-            //todo: zzz v0.5 - trait-based mana cost
+            //todo: zzz v0.4 - trait-based mana cost
 
             //Debug.Log("GetResourceCost: " + returnValue);
             return (int)returnValue * Math.Max(Effects?.Count ?? 1, 1);

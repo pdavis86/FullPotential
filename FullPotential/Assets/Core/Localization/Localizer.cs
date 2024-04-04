@@ -106,7 +106,7 @@ namespace FullPotential.Core.Localization
 
             foreach (var item in data.Translations)
             {
-                //todo: zzz v0.4.1 - translations should be prefixed with the mod name to prevent overwriting?
+                //todo: zzz v0.4 - translations should be prefixed with the mod name to prevent overwriting?
 
                 if (_translations.ContainsKey(item.Key))
                 {

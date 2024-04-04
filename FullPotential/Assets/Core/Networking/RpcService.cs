@@ -10,7 +10,7 @@ namespace FullPotential.Core.Networking
 {
     public class RpcService : IRpcService
     {
-        //todo: zzz v0.9 - We suggest developers cache their ulong[] variables or use an array pool to cycle ulong[] instances so that it would cause less heap allocations.
+        //todo: zzz v0.6 - We suggest developers cache their ulong[] variables or use an array pool to cycle ulong[] instances so that it would cause less heap allocations.
 
         public ClientRpcParams ForPlayer(ulong clientId)
         {

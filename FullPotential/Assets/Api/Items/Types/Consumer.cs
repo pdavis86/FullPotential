@@ -55,7 +55,7 @@ namespace FullPotential.Api.Items.Types
             return returnValue;
         }
 
-        //todo: zzz v0.4.1 - cooldown instead of charge for some consumers?
+        //todo: cooldown instead of charge for some consumers?
         //public float GetCooldownTime()
         //{
         //    var returnValue = GetHighInLowOutInRange(Attributes.Recovery, 0, 2);
@@ -144,7 +144,7 @@ namespace FullPotential.Api.Items.Types
                 localizer.TranslateFloat(GetChargeTime()),
                 UnitsType.Time);
 
-            //todo: zzz v0.4.1 - cooldown instead of charge for some consumers?
+            //todo: cooldown instead of charge for some consumers?
             //AppendToDescription(
             //    sb,
             //    localizer,

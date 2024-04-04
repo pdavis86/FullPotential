@@ -112,7 +112,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #endregion
 
-        public void ApplyInventoryChanges(InventoryChanges changes, bool isFromClientRpc = false)
+        public bool ApplyInventoryChanges(InventoryChanges changes, bool isFromClientRpc = false)
         {
             if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
             {
@@ -132,11 +132,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 NotifyOfItemsRemoved(itemsRemoved);
             }
 
-            //todo: zzz v0.6 can still take item stacks when inventory is full if there is space
+            //todo: zzz v0.6 - can still take item stacks when inventory is full if there is space
             if (IsInventoryFull())
             {
                 NotifyOfInventoryFull();
-                return;
+                return false;
             }
 
             var nonItemStacks = changes.GetNonItemStacks().ToList();
@@ -192,6 +192,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 SendInventoryChangesToClient(changes);
             }
+
+            return true;
         }
 
         private void UpdateExistingItem(ItemBase newItem)

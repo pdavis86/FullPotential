@@ -149,10 +149,10 @@ namespace FullPotential.Api.Items.Types
 
             AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
 
-            //todo: zzz v0.4.1 - what does Speed do for a defensive weapon?
+            //todo: what does Speed do for a defensive weapon?
             //AppendToDescription(sb, localizer, Attributes.Speed, nameof(Attributes.Speed));
 
-            //todo: zzz v0.4.1 - what does Recovery do for a defensive weapon?
+            //todo: what does Recovery do for a defensive weapon?
             //AppendToDescription(sb, localizer, Attributes.Recovery, nameof(Attributes.Recovery));
 
             AppendToDescription(
@@ -163,7 +163,7 @@ namespace FullPotential.Api.Items.Types
                 AliasSegmentDefensive,
                 localizer.TranslateInt(GetDefenseValue()));
 
-            //todo: zzz v0.4.1 - Implement melee with a shield
+            //todo: Implement melee with a shield
             //AppendToDescription(
             //    sb,
             //    localizer,
@@ -254,15 +254,6 @@ namespace FullPotential.Api.Items.Types
                     AliasSegmentRanged,
                     localizer.TranslateInt(GetAmmoMax()));
             }
-
-            //All ranged weapons have maximum range
-            //AppendToDescription(
-            //    sb,
-            //    localizer,
-            //    Attributes.Range,
-            //    nameof(Attributes.Range),
-            //    AliasSegmentItem,
-            //    localizer.TranslateFloat(GetRange()));
 
             AppendToDescription(
                 sb,

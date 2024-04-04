@@ -483,7 +483,7 @@ namespace FullPotential.Core.Player
             }
         }
 
-        //todo: zzz v0.6 - Remove? Need this to get over the key not found exception caused by too many RPC calls with large payloads
+        //todo: zzz v0.5 - Remove? Need this to get over the key not found exception caused by too many RPC calls with large payloads
         private IEnumerator LoadFromPlayerDataCoroutine(PlayerData playerData, ulong clientId)
         {
             var clientRpcParams = new ClientRpcParams

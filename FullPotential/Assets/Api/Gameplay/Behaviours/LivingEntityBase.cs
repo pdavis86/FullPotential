@@ -177,7 +177,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
             catch
             {
-                //todo: zzz v0.6 - Remove after updating NGO and see if problem remains
+                //todo: zzz v0.5 - Remove after updating NGO and see if problem remains
                 //Do nothing. Work-around for the ObjectDisposedException: The Unity.Collections.NativeList`1[System.Int32] has been deallocated, it is not allowed to access it
             }
         }
@@ -220,7 +220,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected virtual void HandleEncodedResourcesChange(FixedString4096Bytes previousValue, FixedString4096Bytes newValue)
         {
-            //todo: zzz v0.9 Poor network performance. This fires a LOT e.g. stamina recharging. Maybe don't send recharge updates?
+            //todo: zzz v0.5 - Poor network performance. This fires a LOT e.g. stamina recharging. Maybe don't send recharge updates?
 
             UpdateResourceValues();
         }
@@ -236,7 +236,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void SetupResourceReplenishing()
         {
-            //todo: zzz v0.5 - every resource replenish fires every .2 seconds. Fix this
+            //todo: zzz v0.4 - every resource replenish fires every .2 seconds. Fix this
             _replenishResources = new DelayedAction(.2f, () =>
             {
                 foreach (var resource in GetResources())
@@ -386,7 +386,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public int GetResourceMax(string resourceTypeId)
         {
-            //todo: zzz v0.5 - trait-based resource max
+            //todo: zzz v0.4 - trait-based resource max
             return 100 + GetResourceMaxAdjustment(resourceTypeId);
         }
 
@@ -399,17 +399,17 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Sprint-specific
 
-        //todo: zzz v0.5 - how to generalise sprint-specifics
+        //todo: how to generalise sprint-specifics
 
         public int GetStaminaCost()
         {
-            //todo: zzz v0.5 - trait-based sprint costs
+            //todo: zzz v0.4 - trait-based sprint costs
             return 10;
         }
 
         public float GetSprintSpeed()
         {
-            //todo: zzz v0.5 - trait-based sprint speed
+            //todo: zzz v0.4 - trait-based sprint speed
             return 2.5f;
         }
 
@@ -711,7 +711,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         // ReSharper disable UnusedParameter.Global
         public void ApplyElementalEffect(IEffect elementalEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
         {
-            //todo: zzz v0.8 - ApplyElementalEffect
+            //todo: ApplyElementalEffect
             //Debug.LogWarning("Not yet implemented elemental effects");
             TriggerDamageDealtEvent(-5, sourceFighter, null, position, false);
         }

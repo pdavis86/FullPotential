@@ -6,11 +6,12 @@ This game allows the player to explore their abilities in a new way have drawn i
 - There is no player level! But you do level particular skills.
 - Components for crafting items have randomly generated stats. This means you can craft any level item/spell but can only use it once you reach the required skill level.
 
+
 ### Combat
 Choose the appropriate item for the situation
 - Ranged Weapon. Uses ammunition so be sure to have enough. Does x2 damage if two-handed.
-- Use mana/energy/other to attack, heal, buff, debuff, etc. at range or up close.
-- Melee Weapon. Does x2 damage or x4 damage if two-handed.
+- Consume a resource (e.g. mana, energy, etc.) to attack, heal, buff, debuff, etc. at range or up close. Takes time to prepare.
+- Melee Weapon. Does x2 damage or x4 damage if two-handed. Takes time to cooldown.
 - Defensive. Want to tank? Take a defensive item into battle.
 
 

@@ -301,7 +301,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void TryToAttackHold(bool isLeftHand)
         {
-            //todo: zzz v0.9 Prevent player cheating by sending the ServerRpc calls themselves
+            //todo: zzz v0.8 - Prevent player cheating by sending the ServerRpc calls themselves
 
             var item = GetItemInHand(isLeftHand);
             var handStatus = GetHandStatus(isLeftHand);

@@ -298,7 +298,7 @@ namespace FullPotential.Core.GameManagement
 
         public void CheckIsAdmin()
         {
-            //todo: zzz v0.9 re-enable CheckIsAdmin()
+            //todo: zzz v0.8 - re-enable CheckIsAdmin()
             //if (!admin)
             //{
             //    throw new Exception("You are not an admin so cannot perform that action");

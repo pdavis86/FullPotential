@@ -75,7 +75,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 {
                     //Debug.LogWarning("Target is not an FighterBase. Target was: " + target);
 
-                    //todo: zzz v0.5 - make SpawnBulletHole a VisualsBehaviour on BulletTrail
+                    //todo: make SpawnBulletHole a VisualsBehaviour on BulletTrail
                     if (weapon != null)
                     {
                         if (weapon.IsRanged)
@@ -139,8 +139,8 @@ namespace FullPotential.Core.Gameplay.Combat
             GameObject target,
             Vector3? position)
         {
-            //todo: zzz v0.4.1 - SpawnBulletHole should be client-side only
-            //todo: zzz v0.5 - SpawnBulletHole only works for box colliders that line up with the X and Z alias
+            //todo: SpawnBulletHole should be client-side only
+            //todo: SpawnBulletHole only works for box colliders that line up with the X and Z alias
 
             if (!position.HasValue)
             {

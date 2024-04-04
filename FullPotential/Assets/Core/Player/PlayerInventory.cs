@@ -82,7 +82,7 @@ namespace FullPotential.Core.Player
 
         #endregion
 
-        //todo: zzz v0.5 - generalise for use in FighterBase
+        //todo: generalise for use in FighterBase
         private (bool WasEquipped, List<string> SlotsToSend) HandleSlotChange(ItemBase item, string slotId)
         {
             var slotsToSend = new List<string> { slotId };
