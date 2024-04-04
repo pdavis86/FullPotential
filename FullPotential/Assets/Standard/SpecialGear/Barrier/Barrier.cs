@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using FullPotential.Api.Items;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
@@ -36,7 +37,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 specialGear.Attributes.Recovery,
                 nameof(Attributes.Recovery),
                 nameof(Barrier),
-                localizer.TranslateFloat(specialGear.GetRechargeDelay()),
+                localizer.TranslateFloat(GetRechargeDelay(specialGear)),
                 UnitsType.Time);
 
             specialGear.AppendToDescription(
@@ -45,10 +46,22 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 specialGear.Attributes.Speed,
                 nameof(Attributes.Speed),
                 nameof(Barrier),
-                localizer.TranslateFloat(specialGear.GetRechargeRate()),
+                localizer.TranslateFloat(GetRechargeRate(specialGear)),
                 UnitsType.UnitPerTime);
 
             return sb.ToString().Trim();
+        }
+
+        public static float GetRechargeDelay(Api.Items.Types.SpecialGear specialGear)
+        {
+            var returnValue = ItemForCombatBase.GetHighInLowOutInRange(specialGear.Attributes.Recovery, 0.5f, 5f);
+            return returnValue;
+        }
+
+        public static int GetRechargeRate(Api.Items.Types.SpecialGear specialGear)
+        {
+            var returnValue = (int)ItemForCombatBase.GetHighInLowOutInRange(specialGear.Attributes.Speed, 1, 10);
+            return returnValue;
         }
     }
 }

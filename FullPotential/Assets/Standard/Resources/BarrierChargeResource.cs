@@ -46,7 +46,7 @@ namespace FullPotential.Standard.Resources
 
             if (!lastHit.IsNullOrWhiteSpace())
             {
-                var rechargeDelay = equippedBarrier.GetRechargeDelay();
+                var rechargeDelay = Barrier.GetRechargeDelay(equippedBarrier);
 
                 if (DateTime.TryParse(lastHit, out var lastHitDateTime)
                     && (DateTime.UtcNow - lastHitDateTime.ToUniversalTime()).TotalSeconds < rechargeDelay)
@@ -60,7 +60,7 @@ namespace FullPotential.Standard.Resources
 
             //Replenish barrier resource
             //todo: zzz v0.4 - trait-based resource recharge
-            livingEntity.AdjustResourceValue(TypeIdString, equippedBarrier.GetRechargeRate());
+            livingEntity.AdjustResourceValue(TypeIdString, Barrier.GetRechargeRate(equippedBarrier));
         }
     }
 }

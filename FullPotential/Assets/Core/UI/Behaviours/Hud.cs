@@ -233,7 +233,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 ammoText.transform.parent.gameObject.SetActive(true);
             }
 
-            ammoText.text = handStatus.IsReloading
+            ammoText.text = handStatus.IsBusy
                 ? _reloadingTranslation
                 : $"{weapon.Ammo}/{weapon.GetAmmoMax()} ({_playerFighter.GetAvailableAmmo(isLeftHand)})";
         }

@@ -1,30 +1,17 @@
 ﻿using System.Collections;
 
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-
 namespace FullPotential.Api.Gameplay.Player
 {
     public class HandStatus
     {
-        public string EquippedItemId { get; set; }
+        public bool IsBusy { get; set; }
 
-        #region Weapon
+        public bool IsConsumingResource { get; set; }
 
-        public bool IsReloading { get; set; }
+        public IEnumerator PreActionEnumerator { get; set; }
 
-        public IEnumerator RapidFireEnumerator { get; set; }
+        public IEnumerator IntraActionEnumerator { get; set; }
 
-        #endregion
-
-        #region Consumer
-
-        public IEnumerator ChargeEnumerator { get; set; }
-
-        public string ActiveConsumerId { get; set; }
-
-        //todo: zzz v0.4.1 - cooldown instead of charge for some consumers?
-        //public IEnumerator CooldownEnumerator { get; set; }
-
-        #endregion
+        public IEnumerator PostActionEnumerator { get; set; }
     }
 }

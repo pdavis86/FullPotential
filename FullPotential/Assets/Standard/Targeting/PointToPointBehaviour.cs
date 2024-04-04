@@ -59,7 +59,7 @@ namespace FullPotential.Standard.Targeting
             }
 
             _applyEffectsAction = new DelayedAction(
-                Consumer.GetEffectTimeBetween(),
+                Consumer.GetChargeTime(),
                 ApplyEffectsOnHit);
 
             _maxBeamLength = Consumer.GetRange();

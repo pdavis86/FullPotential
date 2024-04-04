@@ -18,7 +18,6 @@ namespace FullPotential.Api.Items.Types
     public class Consumer : ItemWithTargetingAndShapeBase, IResourceConsumer
     {
         public const string AliasSegmentConsumer = "consumer";
-        public const string AliasSegmentEffects = "effects";
 
         private IResource _resourceType;
 
@@ -47,21 +46,6 @@ namespace FullPotential.Api.Items.Types
             //Debug.Log("GetProjectileSpeed: " + returnValue);
             return returnValue;
         }
-
-        public float GetChargeTime()
-        {
-            var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0, 2);
-            //Debug.Log("GetChargeTime: " + returnValue);
-            return returnValue;
-        }
-
-        //todo: cooldown instead of charge for some consumers?
-        //public float GetCooldownTime()
-        //{
-        //    var returnValue = GetHighInLowOutInRange(Attributes.Recovery, 0, 2);
-        //    //Debug.Log("GetSogChargeTime: " + returnValue);
-        //    return returnValue;
-        //}
 
         public float GetResourceChangePerSecond()
         {
@@ -144,15 +128,14 @@ namespace FullPotential.Api.Items.Types
                 localizer.TranslateFloat(GetChargeTime()),
                 UnitsType.Time);
 
-            //todo: cooldown instead of charge for some consumers?
-            //AppendToDescription(
-            //    sb,
-            //    localizer,
-            //    Attributes.Recovery,
-            //    nameof(Attributes.Recovery),
-            //    AliasSegmentSog,
-            //    localizer.TranslateFloat(GetCooldownTime()),
-            //    UnitsType.Time);
+            AppendToDescription(
+                sb,
+                localizer,
+                Attributes.Recovery,
+                nameof(Attributes.Recovery),
+                AliasSegmentConsumer,
+                localizer.TranslateFloat(GetCooldownTime()),
+                UnitsType.Time);
 
             AppendToDescription(
                 sb,
@@ -161,15 +144,6 @@ namespace FullPotential.Api.Items.Types
                 nameof(Attributes.Duration),
                 AliasSegmentConsumer,
                 localizer.TranslateFloat(GetEffectDuration()),
-                UnitsType.Time);
-
-            AppendToDescription(
-                sb,
-                localizer,
-                Attributes.Speed,
-                nameof(Attributes.Speed),
-                AliasSegmentEffects,
-                localizer.TranslateFloat(GetEffectTimeBetween()),
                 UnitsType.Time);
 
             var changePerSecond = GetResourceChangePerSecond();

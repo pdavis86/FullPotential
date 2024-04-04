@@ -75,7 +75,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 {
                     //Debug.LogWarning("Target is not an FighterBase. Target was: " + target);
 
-                    //todo: make SpawnBulletHole a VisualsBehaviour on BulletTrail
+                    //todo: SpawnBulletHole should be a VisualsBehaviour on BulletTrail
                     if (weapon != null)
                     {
                         if (weapon.IsRanged)

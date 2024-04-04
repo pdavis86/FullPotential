@@ -224,25 +224,35 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return (int)Math.Floor((float)defenseSum / _armorSlotCount);
         }
 
-        public T GetItemWithId<T>(string id, bool logIfNotFound = true) where T : ItemBase
+        private T CastItemAsType<T>(ItemBase item, bool logIfNotFound, string identifierName, string id) where T : ItemBase
         {
-            var item = _items.FirstOrDefault(x => x.Value.Id == id).Value;
-
             if (item == null)
             {
                 if (logIfNotFound)
                 {
-                    Debug.LogError($"Could not find the item with ID '{id}'");
+                    Debug.LogError($"Could not find the item with {identifierName} '{id}'");
                 }
                 return null;
             }
 
             if (item is not T castAsType)
             {
-                throw new Exception($"Item '{id}' was not of the correct type: {typeof(T).Name}");
+                throw new Exception($"Item '{item.Id}' was not of the correct type: {typeof(T).Name}");
             }
 
             return castAsType;
+        }
+
+        public T GetItemWithId<T>(string id, bool logIfNotFound = true) where T : ItemBase
+        {
+            var item = _items.FirstOrDefault(x => x.Value.Id == id).Value;
+            return CastItemAsType<T>(item, logIfNotFound, "ID", id);
+        }
+
+        public T GetItemInSlot<T>(string slotId, bool logIfNotFound = true) where T : ItemBase
+        {
+            var item = GetItemInSlot(slotId);
+            return CastItemAsType<T>(item, logIfNotFound, "slot ID", slotId);
         }
 
         public ItemBase GetItemInSlot(string slotId)

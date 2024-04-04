@@ -44,6 +44,7 @@ namespace FullPotential.Api.Items.Base
             }
         }
 
+        //todo: move these static methods
         public static float GetHighInHighOutInRange(int attributeValue, float min, float max)
         {
             return attributeValue / 100f * (max - min) + min;
@@ -136,10 +137,10 @@ namespace FullPotential.Api.Items.Base
             return sb.ToString().Trim();
         }
 
+        //todo: rename, this is not just range
         public virtual float GetRange()
         {
             var returnValue = Attributes.Range / 100f * 15 + 5;
-            //Debug.Log("GetProjectileRange: " + returnValue);
             return returnValue;
         }
 
@@ -149,35 +150,31 @@ namespace FullPotential.Api.Items.Base
             return GetRange() * 0.6f;
         }
 
+        //todo: remove?
         public virtual float GetAccuracy()
         {
             var returnValue = Attributes.Accuracy;
-            //Debug.Log("GetAccuracy: " + returnValue);
             return returnValue;
         }
 
+        //todo: rename, this is not just duration
         public float GetEffectDuration()
         {
             var returnValue = Attributes.Duration / 10f;
-            //Debug.Log("GetDuration: " + returnValue);
             return returnValue;
         }
 
-        public float GetEffectTimeBetween()
+        //todo: rename
+        public float GetChargeTime()
         {
-            var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0.5f, 1.5f);
+            var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0.5f, 2);
             return returnValue;
         }
 
-        public float GetRechargeDelay()
+        //todo: rename
+        public float GetCooldownTime()
         {
-            var returnValue = GetHighInLowOutInRange(Attributes.Recovery, 0.5f, 5f);
-            return returnValue;
-        }
-
-        public int GetRechargeRate()
-        {
-            var returnValue = (int)GetHighInLowOutInRange(Attributes.Speed, 1, 10);
+            var returnValue = GetHighInLowOutInRange(Attributes.Recovery, 0.5f, 2);
             return returnValue;
         }
 
@@ -221,7 +218,7 @@ namespace FullPotential.Api.Items.Base
         private float GetPeriodicStatDamagePerSecond(int change)
         {
             var effectDuration = GetEffectDuration();
-            var timeBetweenEffects = GetEffectTimeBetween();
+            var timeBetweenEffects = GetChargeTime();
             var maxNumberOfTimes = (int)Mathf.Ceil(effectDuration / timeBetweenEffects);
             var minNumberOfTimes = (int)Mathf.Floor(effectDuration / timeBetweenEffects);
             var effectsPerSecond = 1 / timeBetweenEffects;
@@ -242,7 +239,7 @@ namespace FullPotential.Api.Items.Base
         public (int Change, DateTime Expiry, float delay) GetPeriodicResourceChangeExpiryAndDelay(int change)
         {
             var timeToLive = GetEffectDuration();
-            var delay = GetEffectTimeBetween();
+            var delay = GetChargeTime();
 
             var changeOverTimeRaw = GetPeriodicStatDamagePerSecond(change);
             var changeOverTime = Math.Sign(changeOverTimeRaw) * (int)Mathf.Ceil(Mathf.Abs(changeOverTimeRaw));
@@ -270,13 +267,13 @@ namespace FullPotential.Api.Items.Base
             return aimDirection.AddNoiseOnAngle(-maxAccuracyAngleDeviation, maxAccuracyAngleDeviation);
         }
 
+        //todo: move this, feels in the wrong place
         public int GetResourceCost()
         {
             var returnValue = GetHighInLowOutInRange(Attributes.Efficiency, 5, 50);
 
             //todo: zzz v0.4 - trait-based mana cost
 
-            //Debug.Log("GetResourceCost: " + returnValue);
             return (int)returnValue * Math.Max(Effects?.Count ?? 1, 1);
         }
 

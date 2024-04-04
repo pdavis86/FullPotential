@@ -258,16 +258,9 @@ namespace FullPotential.Core.Player
                 });
             }
 
-            if (slotId == HandSlotIds.LeftHand)
-            {
-                _playerFighter.HandStatusLeft.EquippedItemId = item?.Id;
-                _playerFighter.StopActiveConsumerBehaviour(_playerFighter.HandStatusLeft);
-            }
-            else if (slotId == HandSlotIds.RightHand)
-            {
-                _playerFighter.HandStatusRight.EquippedItemId = item?.Id;
-                _playerFighter.StopActiveConsumerBehaviour(_playerFighter.HandStatusRight);
-            }
+            _playerFighter.StopActiveConsumerBehaviour(slotId == HandSlotIds.LeftHand
+                ? _playerFighter.HandStatusLeft
+                : _playerFighter.HandStatusRight);
         }
 
         protected override void ApplyEquippedItemChanges(SerializableKeyValuePair<string, string>[] equippedItems)
