@@ -89,6 +89,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 //Debug.Log($"Applying just damage (no effects) to {targetFighter.FighterName}");
 
+                //todo: damage should be an effect, not its own separate thing
                 var damageToDeal = GetDamageValueFromAttack(sourceFighter, itemUsed, targetFighter.GetDefenseValue()) * -1 * effectPercentage;
 
                 var sourceFighterCriticalHitChance = sourceFighter.GetCriticalHitChance();
@@ -139,10 +140,9 @@ namespace FullPotential.Core.Gameplay.Combat
             GameObject target,
             Vector3? position)
         {
-            //todo: SpawnBulletHole should be client-side only
-            //todo: SpawnBulletHole only works for box colliders that line up with the X and Z alias
+            //todo: zzz v0.9 - SpawnBulletHole only works for box colliders that line up with the X and Z alias
 
-            if (!position.HasValue)
+            if (!position.HasValue || !NetworkManager.Singleton.IsClient)
             {
                 return;
             }

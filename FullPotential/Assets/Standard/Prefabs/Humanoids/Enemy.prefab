@@ -95,6 +95,7 @@ GameObject:
   - component: {fileID: 145446360085616435}
   - component: {fileID: 145446360085616434}
   - component: {fileID: 932535565815066983}
+  - component: {fileID: 7475315898356338626}
   - component: {fileID: 2712974170162580787}
   - component: {fileID: 7703066307255388887}
   m_Layer: 0
@@ -173,6 +174,18 @@ MonoBehaviour:
     LeftArm: {fileID: 0}
     RightArm: {fileID: 0}
   _healthSliderParent: {fileID: 7812412749593226826}
+--- !u!114 &7475315898356338626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 145446360085616433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c4e02878ebd8354395a2e85d6c6bdfc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &2712974170162580787
 MonoBehaviour:
   m_ObjectHideFlags: 0

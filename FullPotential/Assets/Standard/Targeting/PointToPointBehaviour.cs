@@ -62,7 +62,7 @@ namespace FullPotential.Standard.Targeting
                 Consumer.GetChargeUpTime(),
                 ApplyEffectsOnHit);
 
-            _maxBeamLength = Consumer.GetRange();
+            _maxBeamLength = Consumer.GetAdjustedRange();
 
             _isLocalOwner.Value = SourceFighter.OwnerClientId == NetworkManager.Singleton.LocalClientId;
 

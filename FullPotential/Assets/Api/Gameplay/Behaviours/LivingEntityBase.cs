@@ -399,8 +399,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Sprint-specific
 
-        //todo: how to generalise sprint-specifics
-
         public int GetStaminaCost()
         {
             //todo: zzz v0.4 - trait-based sprint costs

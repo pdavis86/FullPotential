@@ -42,11 +42,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected Dictionary<string, ItemBase> _items;
         protected int _maxItemCount;
         protected Dictionary<string, EquippedItem> _equippedItems;
+        protected LivingEntityBase _livingEntity;
 
         //Services
         protected ITypeRegistry _typeRegistry;
         protected ILocalizer _localizer;
         protected IRpcService _rpcService;
+        private IEventManager _eventManager;
 
         // ReSharper restore InconsistentNaming
         #endregion
@@ -61,10 +63,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
+            _eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
 
             _inventoryChangesReconstructor = DependenciesContext.Dependencies.GetService<IFragmentedMessageReconstructorFactory>().Create();
 
             _armorSlotCount = _typeRegistry.GetRegisteredTypes<IArmor>().Count();
+
+            _livingEntity = GetComponent<LivingEntityBase>();
         }
 
         #endregion
@@ -549,6 +554,65 @@ namespace FullPotential.Api.Gameplay.Behaviours
             invChanges.Weapons = itemType == typeof(Weapon) ? new[] { item as Weapon } : null;
             invChanges.ItemStacks = itemType == typeof(ItemStack) ? new[] { item as ItemStack } : null;
             invChanges.SpecialGear = itemType == typeof(SpecialGear) ? new[] { item as SpecialGear } : null;
+        }
+
+        protected (bool WasEquipped, List<string> SlotsToSend) HandleSlotChange(ItemBase item, string slotId)
+        {
+            var slotsToSend = new List<string> { slotId };
+
+            var previousKvp = _equippedItems
+                .FirstOrDefault(x => x.Value.Item != null && x.Value?.Item.Id == item.Id);
+
+            var previousSlotId = previousKvp.Value != null ? previousKvp.Key : null;
+
+            if (!previousSlotId.IsNullOrWhiteSpace())
+            {
+                if (previousSlotId != slotId)
+                {
+                    slotsToSend.Add(previousSlotId);
+                }
+
+                _equippedItems[previousSlotId!].Item = null;
+
+                TriggerSlotChangeEvent(null, slotId);
+            }
+
+            var wasEquipped = false;
+            if (previousSlotId.IsNullOrWhiteSpace() || previousSlotId != slotId)
+            {
+                TriggerSlotChangeEvent(item, slotId);
+                wasEquipped = true;
+            }
+
+            if (slotId == HandSlotIds.LeftHand || slotId == HandSlotIds.RightHand)
+            {
+                var otherHandSlotId = slotId == HandSlotIds.LeftHand
+                    ? HandSlotIds.RightHand
+                    : HandSlotIds.LeftHand;
+
+                if (item is Weapon weapon && weapon.IsTwoHanded)
+                {
+                    TriggerSlotChangeEvent(null, otherHandSlotId);
+                    slotsToSend.Add(otherHandSlotId);
+                }
+                else
+                {
+                    var itemInOtherHand = GetItemInSlot(otherHandSlotId);
+                    if (itemInOtherHand is Weapon otherWeapon && otherWeapon.IsTwoHanded)
+                    {
+                        TriggerSlotChangeEvent(null, otherHandSlotId);
+                        slotsToSend.Add(otherHandSlotId);
+                    }
+                }
+            }
+
+            return (wasEquipped, slotsToSend);
+        }
+
+        protected void TriggerSlotChangeEvent(ItemBase item, string slotId)
+        {
+            var eventArgs = new SlotChangeEventArgs(this, _livingEntity, slotId, item?.Id);
+            _eventManager.Trigger(EventIdSlotChange, eventArgs);
         }
 
         public static void DefaultHandlerForSlotChangeEvent(IEventHandlerArgs eventArgs)

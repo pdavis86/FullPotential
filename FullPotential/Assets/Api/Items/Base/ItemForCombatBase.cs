@@ -44,7 +44,6 @@ namespace FullPotential.Api.Items.Base
             }
         }
 
-        //todo: move these static methods
         public static float GetHighInHighOutInRange(int attributeValue, float min, float max)
         {
             return attributeValue / 100f * (max - min) + min;
@@ -136,27 +135,23 @@ namespace FullPotential.Api.Items.Base
             return sb.ToString().Trim();
         }
 
-        //todo: rename, this is not just range
-        public virtual float GetRange()
+        public float GetAdjustedRange()
         {
             var returnValue = Attributes.Range / 100f * 15 + 5;
             return returnValue;
         }
 
-        public virtual float GetRangeForDisplay()
+        public float GetRangeForDisplay()
         {
             //Rough translation from Unity units to metres
-            return GetRange() * 0.6f;
+            return GetAdjustedRange() * 0.6f;
         }
 
-        //todo: remove?
-        public virtual float GetAccuracy()
+        public float GetAccuracy()
         {
-            var returnValue = Attributes.Accuracy;
-            return returnValue;
+            return Attributes.Accuracy;
         }
 
-        //todo: rename, this is not just duration
         public float GetEffectDuration()
         {
             var returnValue = Attributes.Duration / 10f;
@@ -268,7 +263,6 @@ namespace FullPotential.Api.Items.Base
             return aimDirection.AddNoiseOnAngle(-maxAccuracyAngleDeviation, maxAccuracyAngleDeviation);
         }
 
-        //todo: move this, feels in the wrong place
         public int GetResourceCost()
         {
             var returnValue = GetHighInLowOutInRange(Attributes.Efficiency, 5, 50);
@@ -277,6 +271,5 @@ namespace FullPotential.Api.Items.Base
 
             return (int)returnValue * Math.Max(Effects?.Count ?? 1, 1);
         }
-
     }
 }

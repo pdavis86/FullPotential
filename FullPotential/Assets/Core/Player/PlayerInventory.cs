@@ -5,9 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory;
-using FullPotential.Api.Gameplay.Inventory.EventArgs;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
@@ -30,7 +28,6 @@ namespace FullPotential.Core.Player
     public class PlayerInventory : InventoryBase, IPlayerInventory
     {
         //Services
-        private IEventManager _eventManager;
         private IPersistenceService _persistenceService;
 
         private PlayerFighter _playerFighter;
@@ -46,7 +43,6 @@ namespace FullPotential.Core.Player
 
             _playerFighter = GetComponent<PlayerFighter>();
 
-            _eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
             _persistenceService = DependenciesContext.Dependencies.GetService<IPersistenceService>();
         }
 
@@ -81,60 +77,6 @@ namespace FullPotential.Core.Player
         }
 
         #endregion
-
-        //todo: generalise for use in FighterBase
-        private (bool WasEquipped, List<string> SlotsToSend) HandleSlotChange(ItemBase item, string slotId)
-        {
-            var slotsToSend = new List<string> { slotId };
-
-            var previousKvp = _equippedItems
-                .FirstOrDefault(x => x.Value.Item != null && x.Value?.Item.Id == item.Id);
-
-            var previousSlotId = previousKvp.Value != null ? previousKvp.Key : null;
-
-            if (!previousSlotId.IsNullOrWhiteSpace())
-            {
-                if (previousSlotId != slotId)
-                {
-                    slotsToSend.Add(previousSlotId);
-                }
-
-                _equippedItems[previousSlotId!].Item = null;
-
-                TriggerSlotChangeEvent(null, slotId);
-            }
-
-            var wasEquipped = false;
-            if (previousSlotId.IsNullOrWhiteSpace() || previousSlotId != slotId)
-            {
-                TriggerSlotChangeEvent(item, slotId);
-                wasEquipped = true;
-            }
-
-            if (slotId == HandSlotIds.LeftHand || slotId == HandSlotIds.RightHand)
-            {
-                var otherHandSlotId = slotId == HandSlotIds.LeftHand
-                    ? HandSlotIds.RightHand
-                    : HandSlotIds.LeftHand;
-
-                if (item is Weapon weapon && weapon.IsTwoHanded)
-                {
-                    TriggerSlotChangeEvent(null, otherHandSlotId);
-                    slotsToSend.Add(otherHandSlotId);
-                }
-                else
-                {
-                    var itemInOtherHand = GetItemInSlot(otherHandSlotId);
-                    if (itemInOtherHand is Weapon otherWeapon && otherWeapon.IsTwoHanded)
-                    {
-                        TriggerSlotChangeEvent(null, otherHandSlotId);
-                        slotsToSend.Add(otherHandSlotId);
-                    }
-                }
-            }
-
-            return (wasEquipped, slotsToSend);
-        }
 
         private IEnumerator ResetEquipmentUi()
         {
@@ -228,12 +170,6 @@ namespace FullPotential.Core.Player
                     _itemIdToShapeMapping.Add(kvp.Key, kvp.Value);
                 }
             }
-        }
-
-        private void TriggerSlotChangeEvent(ItemBase item, string slotId)
-        {
-            var eventArgs = new SlotChangeEventArgs(this, _playerFighter, slotId, item?.Id);
-            _eventManager.Trigger(EventIdSlotChange, eventArgs);
         }
 
         protected override void SetEquippedItem(string itemId, string slotId)
