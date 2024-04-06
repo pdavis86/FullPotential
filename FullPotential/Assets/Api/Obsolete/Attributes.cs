@@ -7,7 +7,6 @@
         //i.e. dictionary of attributes
         //so it is easier to add attributes in the future or in mods
 
-        public bool IsSoulbound;
         public bool IsAutomatic;
         public byte ExtraAmmoPerShot;
 
@@ -23,7 +22,6 @@
         public int GetNameHash()
         {
             var hash = 101;
-            hash = hash * 103 + IsSoulbound.GetHashCode();
             hash = hash * 107 + IsAutomatic.GetHashCode();
             hash = hash * 109 + ExtraAmmoPerShot.GetHashCode();
 

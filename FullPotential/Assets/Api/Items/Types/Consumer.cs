@@ -89,8 +89,6 @@ namespace FullPotential.Api.Items.Types
                 sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Effects))}: {string.Join(", ", localisedEffects)}\n");
             }
 
-            AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
-
             var resourceConsumptionType = localizer.Translate(ResourceType);
 
             AppendToDescription(

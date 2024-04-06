@@ -49,8 +49,6 @@ namespace FullPotential.Api.Items.Types
             //    sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Effects))}: {string.Join(", ", localisedEffects)}\n");
             //}
 
-            AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
-
             //todo: zzz v0.4 - implement accessory triggers and traits
             //sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Strength))}: {Attributes.Strength})\n");
             //sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Efficiency))}: {Attributes.Efficiency})\n");

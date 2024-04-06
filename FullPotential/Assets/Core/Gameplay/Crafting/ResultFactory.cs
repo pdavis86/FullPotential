@@ -242,7 +242,6 @@ namespace FullPotential.Core.Gameplay.Crafting
                 Id = Guid.NewGuid().ToString(),
                 Attributes = new Attributes
                 {
-                    IsSoulbound = IsSuccess(10),
                     IsAutomatic = IsSuccess(50),
                     ExtraAmmoPerShot = IsSuccess(20) ? Convert.ToByte(_random.Next(1, MaxExtraAmmo + 1)) : (byte)0,
                     Strength = GetAttributeValue(75),
@@ -336,7 +335,6 @@ namespace FullPotential.Core.Gameplay.Crafting
                 Shape = GetShapeOrNone(targeting, relevantComponents),
                 Attributes = new Attributes
                 {
-                    IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
                     Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
                     Range = ComputeAttribute(components, x => x.Attributes.Range),
@@ -386,7 +384,6 @@ namespace FullPotential.Core.Gameplay.Crafting
                 IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
                 Attributes = new Attributes
                 {
-                    IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
@@ -406,7 +403,6 @@ namespace FullPotential.Core.Gameplay.Crafting
                 IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
                 Attributes = new Attributes
                 {
-                    IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
                     IsAutomatic = craftableType.AllowAutomatic && components.Any(x => x.Attributes.IsAutomatic),
                     ExtraAmmoPerShot = components.FirstOrDefault(x => x.Attributes.ExtraAmmoPerShot > 0)?.Attributes.ExtraAmmoPerShot ?? 0,
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
@@ -432,7 +428,6 @@ namespace FullPotential.Core.Gameplay.Crafting
                 IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
                 Attributes = new Attributes
                 {
-                    IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
                     Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
@@ -451,7 +446,6 @@ namespace FullPotential.Core.Gameplay.Crafting
                 Id = Guid.NewGuid().ToString(),
                 Attributes = new Attributes
                 {
-                    IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength)
                 },
                 Effects = GetEffects(CraftableType.Armor, components)
@@ -469,7 +463,6 @@ namespace FullPotential.Core.Gameplay.Crafting
                 Name = craftableType.GetType().Name.ToSpacedString(),
                 Attributes = new Attributes
                 {
-                    IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
                     Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
@@ -496,7 +489,6 @@ namespace FullPotential.Core.Gameplay.Crafting
                 ResourceType = resourceType,
                 Attributes = new Attributes
                 {
-                    IsSoulbound = components.Any(x => x.Attributes.IsSoulbound),
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
                     Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),

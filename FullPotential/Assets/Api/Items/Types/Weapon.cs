@@ -147,8 +147,6 @@ namespace FullPotential.Api.Items.Types
                 sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Effects))}: {string.Join(", ", localisedEffects)}\n");
             }
 
-            AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
-
             //todo: what does Speed do for a defensive weapon?
             //AppendToDescription(sb, localizer, Attributes.Speed, nameof(Attributes.Speed));
 
@@ -191,8 +189,6 @@ namespace FullPotential.Api.Items.Types
                 var localisedEffects = Effects.Select(localizer.Translate);
                 sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Effects))}: {string.Join(", ", localisedEffects)}\n");
             }
-
-            AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
 
             AppendToDescription(
                 sb,
@@ -240,7 +236,6 @@ namespace FullPotential.Api.Items.Types
                 sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Effects))}: {string.Join(", ", localisedEffects)}\n");
             }
 
-            AppendToDescription(sb, localizer, Attributes.IsSoulbound, nameof(Attributes.IsSoulbound));
             AppendToDescription(sb, localizer, Attributes.IsAutomatic, nameof(Attributes.IsAutomatic));
             AppendToDescription(sb, localizer, Attributes.ExtraAmmoPerShot, nameof(Attributes.ExtraAmmoPerShot));
 
