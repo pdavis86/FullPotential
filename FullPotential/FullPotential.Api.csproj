@@ -107,7 +107,7 @@
     <Compile Include="Assets\Api\Gameplay\Combat\IDefensible.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\InventoryBase.cs" />
     <Compile Include="Assets\Api\GameManagement\GameObjectNames.cs" />
-    <Compile Include="Assets\Api\Registry\IVisuals.cs" />
+    <Compile Include="Assets\Api\Registry\IItemVisuals.cs" />
     <Compile Include="Assets\Api\Obsolete\Networking\FragmentedMessageReconstructor.cs" />
     <Compile Include="Assets\Api\Gameplay\Drawing\IDrawingService.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\ArrayExtensions.cs" />
@@ -160,7 +160,7 @@
     <Compile Include="Assets\Api\Obsolete\Networking\FragmentedMessageReconstructorFactory.cs" />
     <Compile Include="Assets\Api\Registry\Weapons\IAmmunition.cs" />
     <Compile Include="Assets\Api\Items\Types\SpecialGear.cs" />
-    <Compile Include="Assets\Api\Registry\IHasVisuals.cs" />
+    <Compile Include="Assets\Api\Registry\IHasItemVisuals.cs" />
     <Compile Include="Assets\Api\Persistence\IPersistenceService.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\EventArgs\ReloadEventArgs.cs" />
     <Compile Include="Assets\Api\Registry\ITypeRegistry.cs" />

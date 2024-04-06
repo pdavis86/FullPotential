@@ -1,5 +1,4 @@
-﻿using FullPotential.Api.Registry.Targeting;
-using UnityEngine;
+﻿using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 

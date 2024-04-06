@@ -187,14 +187,14 @@ namespace FullPotential.Core.Registry
         {
             try
             {
-                if (!typeof(IVisuals).IsAssignableFrom(type))
+                if (!typeof(IItemVisuals).IsAssignableFrom(type))
                 {
-                    Debug.LogError($"{type.Name} does not implement {nameof(IVisuals)}");
+                    Debug.LogError($"{type.Name} does not implement {nameof(IItemVisuals)}");
                     return;
                 }
 
                 var objectToRegister = Activator.CreateInstance(type);
-                var objectAsVisuals = (IVisuals)objectToRegister;
+                var objectAsVisuals = (IItemVisuals)objectToRegister;
 
                 if (!_registeredTypeIds.Contains(objectAsVisuals.ApplicableToTypeId))
                 {
@@ -210,7 +210,7 @@ namespace FullPotential.Core.Registry
                     }
                 }
 
-                Debug.LogError($"{type.FullName} does not implement any of the valid {nameof(IVisuals)} interfaces");
+                Debug.LogError($"{type.FullName} does not implement any of the valid {nameof(IItemVisuals)} interfaces");
             }
             catch (Exception ex)
             {

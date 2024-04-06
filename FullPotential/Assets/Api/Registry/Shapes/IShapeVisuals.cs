@@ -1,6 +1,6 @@
 ﻿namespace FullPotential.Api.Registry.Shapes
 {
-    public interface IShapeVisuals : IVisuals
+    public interface IShapeVisuals : IItemVisuals
     {
     }
 }

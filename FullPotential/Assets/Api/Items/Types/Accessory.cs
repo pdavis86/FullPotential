@@ -9,9 +9,9 @@ using FullPotential.Api.Utilities.Extensions;
 namespace FullPotential.Api.Items.Types
 {
     [Serializable]
-    public class Accessory : ItemWithHealthBase, IHasVisuals
+    public class Accessory : ItemWithHealthBase, IHasItemVisuals
     {
-        private IVisuals _visuals;
+        private IItemVisuals _visuals;
 
         //Variables so they are serialized
         // ReSharper disable MemberCanBePrivate.Global
@@ -22,7 +22,7 @@ namespace FullPotential.Api.Items.Types
 
         public string VisualsTypeId => AccessoryVisualsTypeId;
 
-        public IVisuals Visuals
+        public IItemVisuals Visuals
         {
             get => _visuals;
             set

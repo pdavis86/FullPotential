@@ -11,14 +11,14 @@ using FullPotential.Api.Utilities.Extensions;
 namespace FullPotential.Api.Items.Types
 {
     [Serializable]
-    public class Weapon : ItemWithHealthBase, IHasChargeUpOrCooldown, IHasVisuals
+    public class Weapon : ItemWithHealthBase, IHasChargeUpOrCooldown, IHasItemVisuals
     {
         public const float DefensiveWeaponDpsMultiplier = 0.1f;
 
         private const string AliasSegmentMelee = "MeleeWeapon";
         private const string AliasSegmentRanged = "RangedWeapon";
 
-        private IVisuals _visuals;
+        private IItemVisuals _visuals;
 
         //Variables so they are serialized
         // ReSharper disable MemberCanBePrivate.Global
@@ -41,7 +41,7 @@ namespace FullPotential.Api.Items.Types
 
         public int ChargePercentage { get; set; }
 
-        public IVisuals Visuals
+        public IItemVisuals Visuals
         {
             get => _visuals;
             set

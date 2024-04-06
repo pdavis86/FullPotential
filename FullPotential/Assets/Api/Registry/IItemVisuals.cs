@@ -2,7 +2,7 @@
 
 namespace FullPotential.Api.Registry
 {
-    public interface IVisuals : IRegisterable, IHasPrefab
+    public interface IItemVisuals : IRegisterable, IHasPrefab
     {
         Guid ApplicableToTypeId { get; }
     }

@@ -1,9 +1,9 @@
 ﻿namespace FullPotential.Api.Registry
 {
-    public interface IHasVisuals
+    public interface IHasItemVisuals
     {
         string VisualsTypeId { get; }
 
-        IVisuals Visuals { set; }
+        IItemVisuals Visuals { set; }
     }
 }

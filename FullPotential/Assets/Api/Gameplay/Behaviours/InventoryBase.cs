@@ -437,7 +437,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     .First(x => x.TypeId.ToString() == specialGear.ResourceTypeId);
             }
 
-            if (item is IHasVisuals itemWithVisuals)
+            if (item is IHasItemVisuals itemWithVisuals)
             {
                 switch (item)
                 {
@@ -468,8 +468,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        private void SetItemVisuals<T>(IHasVisuals itemWithVisuals, ItemBase item)
-            where T : IVisuals
+        private void SetItemVisuals<T>(IHasItemVisuals itemWithVisuals, ItemBase item)
+            where T : IItemVisuals
         {
             if (itemWithVisuals.VisualsTypeId.IsNullOrWhiteSpace())
             {
