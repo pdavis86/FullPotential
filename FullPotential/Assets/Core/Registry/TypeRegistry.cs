@@ -38,6 +38,7 @@ namespace FullPotential.Core.Registry
         {
             _eventManager = eventManager;
 
+            //todo: rename these interfaces with a "Type" suffix
             _registerTypeFunctions = new Func<object, bool>[]
             {
                 AddToRegister<IResource>,

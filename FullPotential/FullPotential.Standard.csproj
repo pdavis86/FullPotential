@@ -172,6 +172,9 @@
     <Compile Include="Assets\Standard\Effects\Movement\Attract.cs" />
     <Compile Include="Assets\Standard\Accessories\Amulet.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveLeft.cs" />
+    <Compile Include="Assets\Standard\TargetingVisuals\ITargetingVisualsBehaviour.cs" />
+    <Compile Include="Assets\Standard\WeaponExtras\ShotFiredEventHandler.cs" />
+    <Compile Include="Assets\Standard\WeaponExtras\ProjectileWithTrail.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Standard\FullPotential.Standard.asmdef" />

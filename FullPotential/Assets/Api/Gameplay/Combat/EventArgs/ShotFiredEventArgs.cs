@@ -18,6 +18,8 @@ namespace FullPotential.Api.Gameplay.Combat.EventArgs
 
         public int AmmoUsed { get; set; }
 
+        public GameObject ObjectHit { get; set; }
+
         public ShotFiredEventArgs(FighterBase fighter, bool isLeftHand)
         {
             Fighter = fighter;

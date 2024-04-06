@@ -9,7 +9,5 @@ namespace FullPotential.Api.Ui
         GameObject InteractionBubbleOverlay { get; }
 
         void OpenCustomMenu(GameObject menuGameObject);
-
-        void SpawnProjectileTrail(Vector3 startPosition, Vector3 endPosition);
     }
 }

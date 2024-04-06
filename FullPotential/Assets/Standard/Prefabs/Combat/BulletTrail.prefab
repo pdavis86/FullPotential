@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9088893870269587452}
   - component: {fileID: 4760440558627554860}
-  - component: {fileID: 1111202073188473290}
+  - component: {fileID: 7286155814972670150}
   m_Layer: 0
   m_Name: BulletTrail
   m_TagString: Untagged
@@ -133,7 +133,7 @@ TrailRenderer:
   m_MinVertexDistance: 0.1
   m_Autodestruct: 0
   m_Emitting: 1
---- !u!114 &1111202073188473290
+--- !u!114 &7286155814972670150
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -142,11 +142,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 4563083350583329192}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5d4d2f3ca8c7e140a061691f29dc4f8, type: 3}
+  m_Script: {fileID: 11500000, guid: 12adf440fad9b774d8f82dce540a49bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   TargetPosition: {x: 0, y: 0, z: 0}
   Speed: 0
+  ObjectHit: {fileID: 0}
 --- !u!1 &8300759334712747758
 GameObject:
   m_ObjectHideFlags: 0

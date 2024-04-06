@@ -159,6 +159,7 @@ namespace FullPotential.Standard
             eventManager.Subscribe<SpecialGear.Reloader.TeleportReloader.ShotFiredEventHandler>(FighterBase.EventIdShotFired);
             eventManager.Subscribe<SpecialGear.Reloader.SlotChangeEventHandler>(InventoryBase.EventIdSlotChange);
             eventManager.Subscribe<SpecialGear.Barrier.SlotChangeEventHandler>(InventoryBase.EventIdSlotChange);
+            eventManager.Subscribe<WeaponExtras.ShotFiredEventHandler>(FighterBase.EventIdShotFired);
         }
     }
 }

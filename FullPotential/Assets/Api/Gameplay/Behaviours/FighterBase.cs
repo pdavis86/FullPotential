@@ -130,13 +130,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        private void UsedWeaponClientRpc(Vector3 startPosition, Vector3 endPosition, ClientRpcParams clientRpcParams)
-        {
-            _gameManager.GetUserInterface().SpawnProjectileTrail(startPosition, endPosition);
-        }
-
-        // ReSharper disable once UnusedParameter.Local
-        [ClientRpc]
         private void ReloadFinishedClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
         {
             var handStatus = GetHandStatus(isLeftHand);
@@ -589,6 +582,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             eventArgs.StartPosition = handPosition;
             eventArgs.EndPosition = endPos;
             eventArgs.AmmoUsed = ammoUsed;
+            eventArgs.ObjectHit = rangedHit.transform?.gameObject;
 
             _eventManager.Trigger(EventIdShotFired, eventArgs);
 
@@ -604,12 +598,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     _combatService.ApplyEffects(this, weaponInHand, rangedHit.transform.gameObject, rangedHit.point, 1);
                 }
             }
-        }
-
-        public void ShotFired(Vector3 startPosition, Vector3 endPosition)
-        {
-            var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-            UsedWeaponClientRpc(startPosition, endPosition, nearbyClients);
         }
 
         public static void DefaultHandlerForShotFiredEvent(IEventHandlerArgs eventArgs)
@@ -633,8 +621,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 Weapons = new[] { equippedWeapon }
             };
             fighter.Inventory.SendInventoryChangesToClient(invChanges);
-
-            fighter.ShotFired(shotFiredArgs.StartPosition, shotFiredArgs.EndPosition);
         }
 
         private void UseMeleeWeapon(bool isLeftHand, Weapon weaponInHand)
