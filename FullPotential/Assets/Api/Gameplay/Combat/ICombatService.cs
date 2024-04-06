@@ -17,16 +17,6 @@ namespace FullPotential.Api.Gameplay.Combat
             float effectPercentage
         );
 
-        int GetDamageValueFromAttack(
-            FighterBase sourceFighter,
-            int targetDefense,
-            bool addVariation = true);
-
-        int GetDamageValueFromAttack(
-            ItemForCombatBase itemUsed,
-            int targetDefense,
-            bool addVariation = true);
-
         void SpawnTargetingGameObject(
             FighterBase sourceFighter,
             Consumer consumer,
@@ -40,6 +30,9 @@ namespace FullPotential.Api.Gameplay.Combat
             Vector3 fallbackPosition,
             Vector3 lookDirection);
 
-        float AddVariationToValue(float basicValue);
+        int GetDamageValueFromAttack(
+            FighterBase sourceFighter,
+            ItemForCombatBase itemUsed,
+            int targetDefense);
     }
 }

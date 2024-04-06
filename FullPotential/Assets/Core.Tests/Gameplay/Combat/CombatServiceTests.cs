@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
@@ -12,9 +11,9 @@ using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Core.Gameplay.Combat;
+using FullPotential.Core.Registry.Effects;
 using Moq;
 using NUnit.Framework;
 
@@ -28,7 +27,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
         [SetUp]
         public void Setup()
         {
-            _singleDamageEffect = new SingleDamageEffect();
+            _singleDamageEffect = new Hurt();
 
             DependenciesContext.Dependencies.ResetForTesting();
 
@@ -89,7 +88,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
 
         private int GetDamage(ItemForCombatBase item)
         {
-            return _combatService.GetDamageValueFromAttack(item, 0, false);
+            return _combatService.GetDamageValueFromAttack(null, item, 0);
         }
 
         private Weapon GetMeleeWeapon(bool isTwoHanded, Attributes attributes)
@@ -111,16 +110,6 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
                 IsTwoHanded = isTwoHanded
             };
         }
-    }
-
-    [ExcludeFromCodeCoverage]
-    public class SingleDamageEffect : IResourceEffect
-    {
-        public Guid TypeId => new Guid("3fd4d8d9-6fed-4ada-85dd-408602769ee5");
-
-        public AffectType AffectType => AffectType.SingleDecrease;
-
-        public Guid ResourceTypeId => ResourceTypeIds.Health;
     }
 
     [ExcludeFromCodeCoverage]

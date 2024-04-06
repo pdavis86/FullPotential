@@ -29,7 +29,7 @@ namespace FullPotential.Api.Items.Types
 
         public int Ammo;
 
-        public IWeapon WeaponType => (IWeapon) RegistryType;
+        public IWeapon WeaponType => (IWeapon)RegistryType;
 
         public bool IsRanged => WeaponType.AmmunitionTypeId != null;
 
@@ -85,7 +85,7 @@ namespace FullPotential.Api.Items.Types
 
         public float GetMeleeDps(float multiplier)
         {
-            var damage = GetCombatService().GetDamageValueFromAttack(this, 0, false);
+            var damage = GetCombatService().GetDamageValueFromAttack(null, this, 0);
 
             var windUp = GetChargeUpTime();
             var timeForTwoAttacks = windUp + GetCooldownTime() + windUp;
@@ -95,7 +95,7 @@ namespace FullPotential.Api.Items.Types
 
         public float GetRangedDps()
         {
-            var damage = GetCombatService().GetDamageValueFromAttack(this, 0, false);
+            var damage = GetCombatService().GetDamageValueFromAttack(null, this, 0);
             return GetDamagePerSecond(damage, GetAmmoMax(), GetAmmoPerSecond(), GetReloadTime());
         }
 
@@ -110,7 +110,7 @@ namespace FullPotential.Api.Items.Types
             {
                 return GetDefensiveWeaponDescription(localizer, levelOfDetail, itemName);
             }
-            
+
             if (IsMelee)
             {
                 return GetMeleeWeaponDescription(localizer, levelOfDetail, itemName);

@@ -68,7 +68,7 @@
     <Compile Include="Assets\Core\Gameplay\Drawing\DrawingService.cs" />
     <Compile Include="Assets\Core\UI\Components\EquippedSummary.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\DebuggingUi.cs" />
-    <Compile Include="Assets\Core\Registry\Effects\Movement\Punch.cs" />
+    <Compile Include="Assets\Core\Registry\Effects\Push.cs" />
     <Compile Include="Assets\Core\Localization\Localizer.cs" />
     <Compile Include="Assets\Core\Registry\SpecialSlots\LeftHand.cs" />
     <Compile Include="Assets\Core\Persistence\UserRepository.cs" />

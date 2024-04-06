@@ -38,7 +38,6 @@ namespace FullPotential.Core.Registry
         {
             _eventManager = eventManager;
 
-            //todo: rename these interfaces with a "Type" suffix
             _registerTypeFunctions = new Func<object, bool>[]
             {
                 AddToRegister<IResource>,
@@ -103,6 +102,7 @@ namespace FullPotential.Core.Registry
 
             ValidateAndRegister(typeof(Effects.Heal));
             ValidateAndRegister(typeof(Effects.Hurt));
+            ValidateAndRegister(typeof(Effects.Push));
 
             _eventManager.Subscribe<LivingEntityDiedEventHandler>(LivingEntityBase.EventIdResourceValueChanged);
             _eventManager.Subscribe<LivingEntityHealthChangedEventHandler>(LivingEntityBase.EventIdResourceValueChanged);
