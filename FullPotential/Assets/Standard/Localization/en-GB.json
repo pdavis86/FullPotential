@@ -131,8 +131,8 @@
       "Value": "Self"
     },
     {
-      "Key": "targeting.touch",
-      "Value": "Touch"
+      "Key": "targeting.withinreach",
+      "Value": "Within Reach"
     },
     
     

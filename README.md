@@ -11,7 +11,7 @@ This game allows the player to explore their abilities in a new way have drawn i
 Choose the appropriate item for the situation
 - Ranged Weapon. Uses ammunition so be sure to have enough. Does x2 damage if two-handed.
 - Consume a resource (e.g. mana, energy, etc.) to attack, heal, buff, debuff, etc. at range or up close. Takes time to prepare.
-- Melee Weapon. Does x2 damage or x4 damage if two-handed. Takes time to cooldown.
+- Melee Weapon. Does x2 damage or x4 damage if two-handed. Takes time to wind up and cooldown.
 - Defensive. Want to tank? Take a defensive item into battle.
 
 

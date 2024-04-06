@@ -163,18 +163,20 @@ namespace FullPotential.Api.Items.Base
             return returnValue;
         }
 
-        //todo: rename
-        public float GetChargeTime()
+        private float GetChargeUpOrCooldownTime(int attributeValue)
         {
-            var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0.5f, 2);
+            var returnValue = GetHighInLowOutInRange(attributeValue, 0.05f, 2f);
             return returnValue;
         }
 
-        //todo: rename
+        public float GetChargeUpTime()
+        {
+            return GetChargeUpOrCooldownTime(Attributes.Speed);
+        }
+
         public float GetCooldownTime()
         {
-            var returnValue = GetHighInLowOutInRange(Attributes.Recovery, 0.5f, 2);
-            return returnValue;
+            return GetChargeUpOrCooldownTime(Attributes.Recovery);
         }
 
         private int GetAdjustedStrength()
@@ -217,7 +219,7 @@ namespace FullPotential.Api.Items.Base
         private float GetPeriodicStatDamagePerSecond(int change)
         {
             var effectDuration = GetEffectDuration();
-            var timeBetweenEffects = GetChargeTime();
+            var timeBetweenEffects = GetChargeUpTime();
             var maxNumberOfTimes = (int)Mathf.Ceil(effectDuration / timeBetweenEffects);
             var minNumberOfTimes = (int)Mathf.Floor(effectDuration / timeBetweenEffects);
             var effectsPerSecond = 1 / timeBetweenEffects;
@@ -238,7 +240,7 @@ namespace FullPotential.Api.Items.Base
         public (int Change, DateTime Expiry, float delay) GetPeriodicResourceChangeExpiryAndDelay(int change)
         {
             var timeToLive = GetEffectDuration();
-            var delay = GetChargeTime();
+            var delay = GetChargeUpTime();
 
             var changeOverTimeRaw = GetPeriodicStatDamagePerSecond(change);
             var changeOverTime = Math.Sign(changeOverTimeRaw) * (int)Mathf.Ceil(Mathf.Abs(changeOverTimeRaw));

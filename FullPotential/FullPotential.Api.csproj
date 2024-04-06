@@ -192,6 +192,7 @@
     <Compile Include="Assets\Api\Registry\Elements\IElement.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Tags.cs" />
     <Compile Include="Assets\Api\Data\InventoryChanges.cs" />
+    <Compile Include="Assets\Api\Items\IHasChargeUpOrCooldown.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Api\FullPotential.Api.asmdef" />

@@ -6,6 +6,7 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
@@ -240,7 +241,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateHandCharge(ProgressWheel chargeWheel, ItemBase item)
         {
-            if (item is not Consumer consumer)
+            if (item is not IHasChargeUpOrCooldown hasChargeUpOrCooldown)
             {
                 chargeWheel.gameObject.SetActive(false);
                 return;
@@ -251,7 +252,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 chargeWheel.gameObject.SetActive(true);
             }
 
-            chargeWheel.Slider.value = consumer.ChargePercentage / 100f;
+            chargeWheel.Slider.value = hasChargeUpOrCooldown.ChargePercentage / 100f;
         }
 
         private void UpdateActiveEffects()

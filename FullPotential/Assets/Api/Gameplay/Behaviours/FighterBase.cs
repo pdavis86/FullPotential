@@ -305,31 +305,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var item = GetItemInHand(isLeftHand);
             var handStatus = GetHandStatus(isLeftHand);
 
-            if (item is Consumer consumer)
-            {
-                if (!ConsumeResource(consumer, isTest: true))
-                {
-                    return;
-                }
-
-                if (!IsHost)
-                {
-                    TryToAttackHoldServerRpc(isLeftHand);
-                }
-
-                if (handStatus.PostActionEnumerator != null)
-                {
-                    StopCoroutine(handStatus.PostActionEnumerator);
-                }
-                
-                handStatus.PreActionEnumerator = ConsumerChargeCoroutine(consumer);
-                handStatus.PostActionEnumerator = ConsumerCooldownCoroutine(consumer);
-
-                StartCoroutine(handStatus.PreActionEnumerator);
-
-                return;
-            }
-
             if (item is Weapon weapon
                 && weapon.Attributes.IsAutomatic)
             {
@@ -340,44 +315,78 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
                 handStatus.IntraActionEnumerator = AutomaticWeaponFire(weapon, isLeftHand);
                 StartCoroutine(handStatus.IntraActionEnumerator);
+                return;
             }
 
-            //Debug.LogWarning("Trying to attack hold an item that is not compatible");
+            if (item is Consumer consumer)
+            {
+                if (!ConsumeResource(consumer, isTest: true))
+                {
+                    return;
+                }
+            }
+
+            if (item is not IHasChargeUpOrCooldown hasChargeUpOrCooldown)
+            {
+                //Debug.LogWarning("Trying to attack hold an item that is not compatible");
+                return;
+            }
+
+            if (!IsHost)
+            {
+                TryToAttackHoldServerRpc(isLeftHand);
+            }
+
+            //Still cooling down
+            if (hasChargeUpOrCooldown.ChargePercentage > 0)
+            {
+                return;
+            }
+
+            if (handStatus.PostActionEnumerator != null)
+            {
+                StopCoroutine(handStatus.PostActionEnumerator);
+            }
+
+            handStatus.PreActionEnumerator = ChargeUpCoroutine(hasChargeUpOrCooldown);
+            handStatus.PostActionEnumerator = CooldownCoroutine(hasChargeUpOrCooldown);
+
+            StartCoroutine(handStatus.PreActionEnumerator);
         }
 
-        private IEnumerator ConsumerChargeCoroutine(Consumer consumer)
+        private IEnumerator ChargeUpCoroutine(IHasChargeUpOrCooldown item)
         {
-            var secondsToTake = consumer.GetChargeTime();
-            var secondsUntilDone = secondsToTake * (100 - consumer.ChargePercentage) / 100f;
+            var secondsToTake = item.GetChargeUpTime();
+            var secondsUntilDone = secondsToTake * (100 - item.ChargePercentage) / 100f;
             var elapsedSeconds = secondsToTake - secondsUntilDone;
 
             //var sw = System.Diagnostics.Stopwatch.StartNew();
 
-            while (consumer.ChargePercentage < 100)
+            while (item.ChargePercentage < 100)
             {
                 yield return new WaitForSeconds(ChargeGaugeUpdateSeconds);
-                
+
                 elapsedSeconds += ChargeGaugeUpdateSeconds;
-                consumer.ChargePercentage = (int)(elapsedSeconds / secondsToTake * 100);
+                item.ChargePercentage = (int)(elapsedSeconds / secondsToTake * 100);
             }
 
             //Debug.Log($"Charged in: {sw.ElapsedMilliseconds}ms and should have taken {secondsUntilDone}s");
         }
 
-        private IEnumerator ConsumerCooldownCoroutine(Consumer consumer)
+        private IEnumerator CooldownCoroutine(IHasChargeUpOrCooldown item)
         {
-            var secondsToTake = consumer.GetCooldownTime();
-            var secondsUntilDone = secondsToTake * consumer.ChargePercentage / 100f;
+            var secondsToTake = item.GetCooldownTime();
+            var secondsUntilDone = secondsToTake * item.ChargePercentage / 100f;
             var elapsedSeconds = secondsToTake - secondsUntilDone;
 
             //var sw = System.Diagnostics.Stopwatch.StartNew();
 
-            while (consumer.ChargePercentage > 0)
+            while (item.ChargePercentage > 0)
             {
                 yield return new WaitForSeconds(ChargeGaugeUpdateSeconds);
-                
+
                 elapsedSeconds += ChargeGaugeUpdateSeconds;
-                consumer.ChargePercentage = 100 - (int)(elapsedSeconds / secondsToTake * 100);
+                item.ChargePercentage = 100 - (int)(elapsedSeconds / secondsToTake * 100);
             }
 
             //Debug.Log($"Cooled in: {sw.ElapsedMilliseconds}ms and should have taken {secondsUntilDone}s");
@@ -497,7 +506,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 handStatus.IsConsumingResource = true;
             }
 
-            StartCoroutine(handStatus.PostActionEnumerator);
+            consumer.ChargePercentage = 0;
 
             if (!IsServer)
             {
@@ -549,14 +558,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
             if (weaponInHand.IsRanged)
             {
                 UseRangedWeapon(isLeftHand, handStatus, weaponInHand);
+                return;
             }
 
-            if (weaponInHand.IsDefensive)
-            {
-                UseMeleeWeapon(weaponInHand, 0.5f);
-            }
-
-            UseMeleeWeapon(weaponInHand, 1);
+            UseMeleeWeapon(isLeftHand, weaponInHand);
         }
 
         private void UseRangedWeapon(bool isLeftHand, HandStatus handStatus, Weapon weaponInHand)
@@ -632,12 +637,29 @@ namespace FullPotential.Api.Gameplay.Behaviours
             fighter.ShotFired(shotFiredArgs.StartPosition, shotFiredArgs.EndPosition);
         }
 
-        private void UseMeleeWeapon(Weapon weaponInHand, float effectPercentage)
+        private void UseMeleeWeapon(bool isLeftHand, Weapon weaponInHand)
         {
+            var handStatus = GetHandStatus(isLeftHand);
+
+            if (weaponInHand.ChargePercentage < 100)
+            {
+                if (handStatus.PreActionEnumerator != null)
+                {
+                    StopCoroutine(handStatus.PreActionEnumerator);
+                    StartCoroutine(handStatus.PostActionEnumerator);
+                }
+
+                return;
+            }
+
+            StartCoroutine(handStatus.PostActionEnumerator);
+
             if (!IsServer)
             {
                 return;
             }
+
+            var effectPercentage = weaponInHand.IsDefensive ? Weapon.DefensiveWeaponDpsMultiplier : 1;
 
             if (Physics.Raycast(LookTransform.position, LookTransform.forward, out var meleeHit, MeleeRangeLimit))
             {

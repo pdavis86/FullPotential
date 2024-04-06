@@ -60,7 +60,7 @@ namespace FullPotential.Standard.Shapes
 
             Invoke(nameof(DestroyGameObjectAndChildren), Consumer.GetEffectDuration());
 
-            _timeBetweenEffects = Consumer.GetChargeTime();
+            _timeBetweenEffects = Consumer.GetChargeUpTime();
             _timeSinceLastEffective = _timeBetweenEffects;
 
             _visualsPrefabAddress.Value = !string.IsNullOrWhiteSpace(Consumer.ShapeVisuals?.PrefabAddress)

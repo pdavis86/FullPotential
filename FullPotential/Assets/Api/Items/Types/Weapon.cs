@@ -11,8 +11,10 @@ using FullPotential.Api.Utilities.Extensions;
 namespace FullPotential.Api.Items.Types
 {
     [Serializable]
-    public class Weapon : ItemWithHealthBase, IHasVisuals
+    public class Weapon : ItemWithHealthBase, IHasChargeUpOrCooldown, IHasVisuals
     {
+        public const float DefensiveWeaponDpsMultiplier = 0.1f;
+
         private const string AliasSegmentMelee = "MeleeWeapon";
         private const string AliasSegmentRanged = "RangedWeapon";
 
@@ -37,6 +39,8 @@ namespace FullPotential.Api.Items.Types
 
         public string VisualsTypeId => WeaponVisualsTypeId;
 
+        public int ChargePercentage { get; set; }
+
         public IVisuals Visuals
         {
             get => _visuals;
@@ -51,28 +55,12 @@ namespace FullPotential.Api.Items.Types
         {
             const int ammoCap = 100;
             var returnValue = (int)(Attributes.Efficiency / 100f * ammoCap);
-            //Debug.Log("GetAmmoMax: " + returnValue);
-            return returnValue;
-        }
-
-        public float GetMeleeRecoveryTime()
-        {
-            var returnValue = GetHighInLowOutInRange(Attributes.Recovery, 0.5f, 5);
-            //Debug.Log("GetMeleeRecoveryTime: " + returnValue);
             return returnValue;
         }
 
         public float GetReloadTime()
         {
             var returnValue = GetHighInLowOutInRange(Attributes.Recovery, 0.5f, 5);
-            //Debug.Log("GetReloadTime: " + returnValue);
-            return returnValue;
-        }
-
-        public float GetMeleeWindUpTime()
-        {
-            var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0.05f, 0.5f);
-            //Debug.Log("GetMeleeWindUpTime: " + returnValue);
             return returnValue;
         }
 
@@ -95,14 +83,14 @@ namespace FullPotential.Api.Items.Types
                 : Attributes.Strength;
         }
 
-        public float GetMeleeDps()
+        public float GetMeleeDps(float multiplier)
         {
             var damage = GetCombatService().GetDamageValueFromAttack(this, 0, false);
 
-            var windUp = GetMeleeWindUpTime();
-            var timeForTwoAttacks = windUp + GetMeleeRecoveryTime() + windUp;
+            var windUp = GetChargeUpTime();
+            var timeForTwoAttacks = windUp + GetCooldownTime() + windUp;
 
-            return damage * 2 / timeForTwoAttacks;
+            return damage * 2 / timeForTwoAttacks * multiplier;
         }
 
         public float GetRangedDps()
@@ -147,12 +135,6 @@ namespace FullPotential.Api.Items.Types
                 sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Effects))}: {string.Join(", ", localisedEffects)}\n");
             }
 
-            //todo: what does Speed do for a defensive weapon?
-            //AppendToDescription(sb, localizer, Attributes.Speed, nameof(Attributes.Speed));
-
-            //todo: what does Recovery do for a defensive weapon?
-            //AppendToDescription(sb, localizer, Attributes.Recovery, nameof(Attributes.Recovery));
-
             AppendToDescription(
                 sb,
                 localizer,
@@ -161,15 +143,32 @@ namespace FullPotential.Api.Items.Types
                 AliasSegmentDefensive,
                 localizer.TranslateInt(GetDefenseValue()));
 
-            //todo: Implement melee with a shield
-            //AppendToDescription(
-            //    sb,
-            //    localizer,
-            //    Attributes.Strength,
-            //    nameof(Attributes.Strength),
-            //    AliasSegmentItem,
-            //    localizer.TranslateFloat(GetMeleeDps()),
-            //    UnitsType.UnitPerTime);
+            AppendToDescription(
+                sb,
+                localizer,
+                Attributes.Speed,
+                nameof(Attributes.Speed),
+                AliasSegmentMelee,
+                localizer.TranslateFloat(GetChargeUpTime()),
+                UnitsType.UnitPerTime);
+
+            AppendToDescription(
+                sb,
+                localizer,
+                Attributes.Recovery,
+                nameof(Attributes.Recovery),
+                AliasSegmentMelee,
+                localizer.TranslateFloat(GetCooldownTime()),
+                UnitsType.UnitPerTime);
+
+            AppendToDescription(
+                sb,
+                localizer,
+                Attributes.Strength,
+                nameof(Attributes.Strength),
+                AliasSegmentItem,
+                localizer.TranslateFloat(GetMeleeDps(DefensiveWeaponDpsMultiplier)),
+                UnitsType.UnitPerTime);
 
             return sb.ToString().Trim();
         }
@@ -193,10 +192,10 @@ namespace FullPotential.Api.Items.Types
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.Efficiency,
-                nameof(Attributes.Efficiency),
+                Attributes.Speed,
+                nameof(Attributes.Speed),
                 AliasSegmentMelee,
-                localizer.TranslateFloat(GetMeleeWindUpTime()),
+                localizer.TranslateFloat(GetChargeUpTime()),
                 UnitsType.UnitPerTime);
 
             AppendToDescription(
@@ -205,7 +204,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Recovery,
                 nameof(Attributes.Recovery),
                 AliasSegmentMelee,
-                localizer.TranslateFloat(GetMeleeRecoveryTime()),
+                localizer.TranslateFloat(GetCooldownTime()),
                 UnitsType.UnitPerTime);
 
             AppendToDescription(
@@ -214,7 +213,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Strength,
                 nameof(Attributes.Strength),
                 AliasSegmentItem,
-                localizer.TranslateFloat(GetMeleeDps()),
+                localizer.TranslateFloat(GetMeleeDps(1)),
                 UnitsType.UnitPerTime);
 
             return sb.ToString().Trim();

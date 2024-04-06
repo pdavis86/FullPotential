@@ -15,7 +15,7 @@ using FullPotential.Api.Utilities.Extensions;
 namespace FullPotential.Api.Items.Types
 {
     [Serializable]
-    public class Consumer : ItemWithTargetingAndShapeBase, IResourceConsumer
+    public class Consumer : ItemWithTargetingAndShapeBase, IResourceConsumer, IHasChargeUpOrCooldown
     {
         public const string AliasSegmentConsumer = "consumer";
 
@@ -123,7 +123,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Speed,
                 nameof(Attributes.Speed),
                 AliasSegmentConsumer,
-                localizer.TranslateFloat(GetChargeTime()),
+                localizer.TranslateFloat(GetChargeUpTime()),
                 UnitsType.Time);
 
             AppendToDescription(
