@@ -6,7 +6,9 @@ namespace FullPotential.Standard.Armor
 {
     public class Helm : IArmor
     {
-        public Guid TypeId => ArmorTypeIds.Helm;
+        private static readonly Guid Id = new Guid(ArmorTypeIds.HelmId);
+
+        public Guid TypeId => Id;
 
         public string SlotSpritePrefabAddress => "Standard/UI/Equipment/Helm.png";
     }

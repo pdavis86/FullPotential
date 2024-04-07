@@ -7,10 +7,12 @@ namespace FullPotential.Standard.Effects.Debuffs
 {
     public class Lethargy : IResourceEffect
     {
-        public Guid TypeId => new Guid("260ff724-0708-42fa-81ab-45af911e6daf");
+        private static readonly Guid Id = new Guid("260ff724-0708-42fa-81ab-45af911e6daf");
+
+        public Guid TypeId => Id;
 
         public AffectType AffectType => AffectType.TemporaryMaxDecrease;
 
-        public Guid ResourceTypeId => ResourceTypeIds.Stamina;
+        public string ResourceTypeIdString => ResourceTypeIds.StaminaId;
     }
 }

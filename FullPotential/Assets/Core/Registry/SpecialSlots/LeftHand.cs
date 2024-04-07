@@ -6,7 +6,9 @@ namespace FullPotential.Core.Registry.SpecialSlots
 {
     public class LeftHand : IRegisterableWithSlot
     {
-        public Guid TypeId => new Guid(HandSlotIds.LeftHand);
+        private static readonly Guid Id = new Guid(HandSlotIds.LeftHand);
+
+        public Guid TypeId => Id;
 
         public string SlotSpritePrefabAddress => "Core/UI/Equipment/LeftHand.png";
     }

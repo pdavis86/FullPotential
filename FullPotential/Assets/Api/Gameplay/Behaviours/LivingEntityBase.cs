@@ -243,7 +243,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 foreach (var resource in GetResources())
                 {
-                    resource.ReplenishBehaviour(this);
+                    resource.ReplenishBehaviour?.Invoke(this);
                 }
             });
         }
@@ -674,7 +674,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private IEnumerator PeriodicActionToResourceCoroutine(IResourceEffect resourceEffect, int change, float delay, DateTime expiry)
         {
-            var resourceTypeId = resourceEffect.ResourceTypeId.ToString();
+            var resourceTypeId = resourceEffect.ResourceTypeIdString;
 
             do
             {
@@ -686,13 +686,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void ApplySingleValueChangeToResource(IResourceEffect resourceEffect, int change)
         {
-            AdjustResourceValue(resourceEffect.ResourceTypeId.ToString(), change);
+            AdjustResourceValue(resourceEffect.ResourceTypeIdString, change);
             //todo: maybe don't do this? - AddOrUpdateEffect(resourceEffect, change, DateTime.Now.AddSeconds(SingleResourceChangeEffectDisplaySeconds));
         }
 
         public void ApplyTemporaryMaxActionToResource(IResourceEffect resourceEffect, int change, DateTime expiry)
         {
-            AdjustResourceValue(resourceEffect.ResourceTypeId.ToString(), change);
+            AdjustResourceValue(resourceEffect.ResourceTypeIdString, change);
             AddOrUpdateEffect(resourceEffect, change, expiry);
         }
 
@@ -726,7 +726,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return _activeEffects
                 .Where(x =>
                     x.Effect is IResourceEffect resourceEffect
-                    && resourceEffect.ResourceTypeId.ToString() == resourceTypeId
+                    && resourceEffect.ResourceTypeIdString == resourceTypeId
                     && resourceEffect.AffectType is AffectType.TemporaryMaxIncrease or AffectType.TemporaryMaxDecrease)
                 .Sum(x => x.Change);
         }

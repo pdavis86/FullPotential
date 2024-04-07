@@ -117,7 +117,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
         {
             return new Weapon
             {
-                RegistryType = new TestWeaponType { AmmunitionTypeId = new Guid("8c25a561-7321-4599-b30c-0ef1bf94ad1c") },
+                RegistryType = new TestWeaponType { AmmunitionTypeIdString = "8c25a561-7321-4599-b30c-0ef1bf94ad1c" },
                 Attributes = attributes,
                 IsTwoHanded = isTwoHanded,
                 MainEffectComputation = new HurtEffectComputation(Mock.Of<ITypeRegistry>())
@@ -131,7 +131,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
         // ReSharper disable UnassignedGetOnlyAutoProperty
         public Guid TypeId { get; }
         public bool IsDefensive { get; }
-        public Guid? AmmunitionTypeId { get; set; }
+        public string AmmunitionTypeIdString { get; set; }
         public bool AllowAutomatic { get; }
         public bool AllowTwoHanded { get; }
         public bool EnforceTwoHanded { get; }

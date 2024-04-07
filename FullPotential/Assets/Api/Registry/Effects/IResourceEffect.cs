@@ -1,5 +1,4 @@
-﻿using System;
-using FullPotential.Api.Gameplay.Effects;
+﻿using FullPotential.Api.Gameplay.Effects;
 
 namespace FullPotential.Api.Registry.Effects
 {
@@ -11,8 +10,8 @@ namespace FullPotential.Api.Registry.Effects
         AffectType AffectType { get; }
 
         /// <summary>
-        /// The resource which will be affected
+        /// The Id of the resource type which will be affected
         /// </summary>
-        Guid ResourceTypeId { get; }
+        string ResourceTypeIdString { get; }
     }
 }

@@ -63,7 +63,7 @@ namespace FullPotential.Standard.Targeting
             _visualsPrefabAddress.Value = !string.IsNullOrWhiteSpace(Consumer.TargetingVisuals?.PrefabAddress)
                 ? Consumer.TargetingVisuals.PrefabAddress
                 : _typeRegistry.GetRegisteredTypes<ITargetingVisuals>()
-                    .FirstOrDefault(v => v.ApplicableToTypeId.ToString() == Projectile.TypeIdString)
+                    .FirstOrDefault(v => v.ApplicableToTypeIdString.ToString() == Projectile.TypeIdString)
                     ?.PrefabAddress ?? string.Empty;
         }
 

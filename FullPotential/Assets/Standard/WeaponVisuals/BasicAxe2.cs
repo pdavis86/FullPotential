@@ -6,10 +6,12 @@ namespace FullPotential.Standard.WeaponVisuals
 {
     public class BasicAxe2 : IWeaponVisuals
     {
-        public Guid TypeId => new Guid("ac8a55d8-6304-47d6-a35d-eecb0319d1ad");
+        private static readonly Guid Id = new Guid("ac8a55d8-6304-47d6-a35d-eecb0319d1ad");
+
+        public Guid TypeId => Id;
 
         public string PrefabAddress => "Standard/Prefabs/Weapons/Axe2.prefab";
 
-        public Guid ApplicableToTypeId => new Guid(Axe.TypeIdString);
+        public string ApplicableToTypeIdString => Axe.TypeIdString;
     }
 }

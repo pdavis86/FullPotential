@@ -9,10 +9,12 @@ namespace FullPotential.Standard.Effects.Buffs
     {
         public const string TypeIdString = "eabd80bd-e4aa-4d58-be24-9ec8106b2c9c";
 
-        public Guid TypeId => new Guid(TypeIdString);
+        public Guid TypeId => Id;
+
+        private static readonly Guid Id = new Guid(TypeIdString);
 
         public AffectType AffectType => AffectType.PeriodicIncrease;
 
-        public Guid ResourceTypeId => ResourceTypeIds.Health;
+        public string ResourceTypeIdString => ResourceTypeIds.HealthId;
     }
 }

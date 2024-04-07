@@ -271,7 +271,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public int GetAvailableAmmo(bool isLeftHand)
         {
             var weapon = (Weapon)GetItemInHand(isLeftHand);
-            var ammoTypeId = weapon.GetAmmoTypeId();
+            var ammoTypeId = weapon.WeaponType.AmmunitionTypeIdString;
             return _inventory.GetItemStackTotal(ammoTypeId);
         }
 
@@ -713,7 +713,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var slotId = eventArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
             var equippedWeapon = (Weapon)fighter.Inventory.GetItemInSlot(slotId);
 
-            var ammoTypeId = equippedWeapon.GetAmmoTypeId();
+            var ammoTypeId = equippedWeapon.WeaponType.AmmunitionTypeIdString;
 
             var (countTaken, invChanges) = fighter.Inventory.TakeCountFromItemStacks(ammoTypeId, ammoNeeded);
 

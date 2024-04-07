@@ -50,7 +50,7 @@ namespace FullPotential.Api.Items.Types
         public float GetResourceChangePerSecond()
         {
             var healthEffects = Effects
-                .Where(e => e is IResourceEffect se && se.ResourceTypeId == ResourceTypeIds.Health)
+                .Where(e => e is IResourceEffect se && se.ResourceTypeIdString == ResourceTypeIds.HealthId)
                 .Select(e => (IResourceEffect)e)
                 .ToList();
 

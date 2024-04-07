@@ -6,10 +6,12 @@ namespace FullPotential.Standard.SpecialGearVisuals
 {
     public class BasicWard : ISpecialGearVisuals
     {
-        public Guid TypeId => new Guid("c2dbfd42-9a5b-4b0b-ba90-6b02ab710859");
+        private static readonly Guid Id = new Guid("c2dbfd42-9a5b-4b0b-ba90-6b02ab710859");
+
+        public Guid TypeId => Id;
 
         public string PrefabAddress => "Standard/Prefabs/Armor/Barrier.prefab";
 
-        public Guid ApplicableToTypeId => new Guid(Barrier.TypeIdString);
+        public string ApplicableToTypeIdString => Barrier.TypeIdString;
     }
 }

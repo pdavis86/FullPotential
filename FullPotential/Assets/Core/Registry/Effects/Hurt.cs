@@ -7,11 +7,12 @@ namespace FullPotential.Core.Registry.Effects
 {
     public class Hurt : IResourceEffect
     {
-        public Guid TypeId => new Guid(EffectTypeIds.HurtId);
+        private static readonly Guid Id = new Guid(EffectTypeIds.HurtId);
+
+        public Guid TypeId => Id;
 
         public AffectType AffectType => AffectType.SingleDecrease;
 
-        //todo: when referencing other Guids, use string. Then remove all public static readonly Guid
-        public Guid ResourceTypeId => ResourceTypeIds.Health;
+        public string ResourceTypeIdString => ResourceTypeIds.HealthId;
     }
 }

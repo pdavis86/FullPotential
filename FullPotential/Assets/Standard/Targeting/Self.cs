@@ -11,7 +11,9 @@ namespace FullPotential.Standard.Targeting
     {
         public const string TypeIdString = "b7cd2ff2-e054-4955-bde9-38b3b6b9a1bf";
 
-        public Guid TypeId => new Guid(TypeIdString);
+        private static readonly Guid Id = new Guid(TypeIdString);
+
+        public Guid TypeId => Id;
 
         public bool CanHaveShape => true;
 

@@ -7,7 +7,9 @@ namespace FullPotential.Standard.Accessories
     {
         public const string TypeIdString = "6d4bce60-dda6-4a88-82fd-c2b086065c8b";
 
-        public Guid TypeId => new Guid(TypeIdString);
+        private static readonly Guid Id = new Guid(TypeIdString);
+
+        public Guid TypeId => Id;
 
         public int SlotCount => 1;
 

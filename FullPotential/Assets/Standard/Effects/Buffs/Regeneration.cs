@@ -7,10 +7,12 @@ namespace FullPotential.Standard.Effects.Buffs
 {
     public class Regeneration : IResourceEffect
     {
-        public Guid TypeId => new Guid("158d1f0e-994d-49f7-a649-33ff336b8309");
+        private static readonly Guid Id = new Guid("158d1f0e-994d-49f7-a649-33ff336b8309");
+
+        public Guid TypeId => Id;
 
         public AffectType AffectType => AffectType.PeriodicIncrease;
 
-        public Guid ResourceTypeId => ResourceTypeIds.Health;
+        public string ResourceTypeIdString => ResourceTypeIds.HealthId;
     }
 }

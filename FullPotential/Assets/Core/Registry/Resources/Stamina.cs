@@ -8,9 +8,12 @@ namespace FullPotential.Core.Registry.Resources
 {
     public class Stamina : IResource
     {
-        public Guid TypeId => ResourceTypeIds.Stamina;
+        private static readonly Guid Id = new Guid(ResourceTypeIds.StaminaId);
+        private static readonly Color ResourceColor = Color.FromArgb(39, 80, 147);
 
-        public Color Color => Color.FromArgb(39, 80, 147);
+        public Guid TypeId => Id;
+
+        public Color Color => ResourceColor;
 
         public bool IsCraftable => true;
 

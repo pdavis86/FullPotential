@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FullPotential.Api.Registry.Weapons
+﻿namespace FullPotential.Api.Registry.Weapons
 {
     public interface IWeapon : IRegisterable
     {
@@ -12,7 +10,7 @@ namespace FullPotential.Api.Registry.Weapons
         /// <summary>
         /// Optional, what type of ammunition is used
         /// </summary>
-        Guid? AmmunitionTypeId { get; }
+        string AmmunitionTypeIdString { get; }
 
         /// <summary>
         /// Whether the weapon has the capability of automatic fire

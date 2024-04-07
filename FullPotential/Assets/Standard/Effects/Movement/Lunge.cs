@@ -6,7 +6,9 @@ namespace FullPotential.Standard.Effects.Movement
 {
     public class Lunge : IMovementEffect
     {
-        public Guid TypeId => new Guid("f5daeb39-3a24-4920-ae9e-589550bbc3b4");
+        private static readonly Guid Id = new Guid("f5daeb39-3a24-4920-ae9e-589550bbc3b4");
+
+        public Guid TypeId => Id;
 
         public MovementDirection Direction => MovementDirection.Forwards;
     }

@@ -114,7 +114,7 @@ namespace FullPotential.Core.Player
             {
                 matches = _items.Where(
                     i => i.Value is SpecialGear specialGear
-                         && slotId.StartsWith(((ISpecialGear)specialGear.RegistryType).SlotId.ToString()));
+                         && slotId.StartsWith(((ISpecialGear)specialGear.RegistryType).SlotIdString));
             }
 
             return matches

@@ -13,9 +13,11 @@ namespace FullPotential.Standard.SpecialGear.Barrier
     {
         public const string TypeIdString = "17a6e875-cccd-46f0-b525-fe15cfdd8096";
 
-        public Guid TypeId => new Guid(TypeIdString);
+        private static readonly Guid Id = new Guid(TypeIdString);
 
-        public Guid SlotId => new Guid(SpecialSlots.BarrierSlot.TypeIdString);
+        public Guid TypeId => Id;
+
+        public string SlotIdString => SpecialSlots.BarrierSlot.TypeIdString;
 
         public string OverrideItemDescription(Api.Items.Types.SpecialGear specialGear, ILocalizer localizer, LevelOfDetail levelOfDetail)
         {

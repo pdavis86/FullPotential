@@ -6,7 +6,9 @@ namespace FullPotential.Standard.Effects.Debuffs
 {
     public class Slow : IAttributeEffect
     {
-        public Guid TypeId => new Guid("1a082fdc-22cd-44d6-83eb-ea504370937a");
+        private static readonly Guid Id = new Guid("1a082fdc-22cd-44d6-83eb-ea504370937a");
+
+        public Guid TypeId => Id;
 
         public bool TemporaryMaxIncrease => false;
 

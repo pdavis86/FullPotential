@@ -8,12 +8,14 @@ namespace FullPotential.Standard.Effects.Debuffs
 {
     public class ManaDrain : IResourceEffect, IHasSideEffect
     {
-        public Guid TypeId => new Guid("e1ab10b2-fcae-4f25-a11f-ac5aeeadbdce");
+        private static readonly Guid Id = new Guid("e1ab10b2-fcae-4f25-a11f-ac5aeeadbdce");
+
+        public Guid TypeId => Id;
 
         public AffectType AffectType => AffectType.PeriodicDecrease;
 
-        public Guid ResourceTypeId => Mana.Id;
+        public string ResourceTypeIdString => Mana.TypeIdString;
 
-        public Guid SideEffectTypeId => new Guid(ManaTap.TypeIdString);
+        public string SideEffectTypeIdString => ManaTap.TypeIdString;
     }
 }

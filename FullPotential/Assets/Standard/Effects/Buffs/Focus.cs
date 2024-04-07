@@ -7,10 +7,12 @@ namespace FullPotential.Standard.Effects.Buffs
 {
     public class Focus : IResourceEffect
     {
-        public Guid TypeId => new Guid("d19cde18-e5dd-4fc2-b14f-da7daa5014d4");
+        private static readonly Guid Id = new Guid("d19cde18-e5dd-4fc2-b14f-da7daa5014d4");
+
+        public Guid TypeId => Id;
 
         public AffectType AffectType => AffectType.TemporaryMaxIncrease;
 
-        public Guid ResourceTypeId => Mana.Id;
+        public string ResourceTypeIdString => Mana.TypeIdString;
     }
 }

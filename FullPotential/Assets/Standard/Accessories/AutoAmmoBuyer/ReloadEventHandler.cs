@@ -52,7 +52,7 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
             var slotId = reloadEventArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
             var equippedWeapon = (Weapon)fighter.Inventory.GetItemInSlot(slotId);
 
-            var ammoTypeId = equippedWeapon.GetAmmoTypeId();
+            var ammoTypeId = equippedWeapon.WeaponType.AmmunitionTypeIdString;
             var ammoType = _typeRegistry.GetRegisteredByTypeId<IAmmunition>(ammoTypeId);
 
             var ammoRemaining = fighter.Inventory.GetItemStackTotal(ammoTypeId);

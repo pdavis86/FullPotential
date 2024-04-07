@@ -7,13 +7,14 @@ namespace FullPotential.Standard.Resources
 {
     public class Energy : IResource
     {
-        private const string EnergyId = "89ec3ecf-badb-4e55-91b0-b288ca358010";
+        public const string TypeIdString = "89ec3ecf-badb-4e55-91b0-b288ca358010";
 
-        public static readonly Guid Id = new Guid(EnergyId);
+        private static readonly Guid Id = new Guid(TypeIdString);
+        private static readonly Color ResourceColor = Color.FromArgb(25, 118, 64);
 
         public Guid TypeId => Id;
 
-        public Color Color => Color.FromArgb(25, 118, 64);
+        public Color Color => ResourceColor;
 
         public bool IsCraftable => true;
 
@@ -23,11 +24,11 @@ namespace FullPotential.Standard.Resources
 
         private void PerformReplenish(LivingEntityBase livingEntity)
         {
-            if (!livingEntity.IsConsumingResource(EnergyId)
-                && livingEntity.GetResourceValue(EnergyId) < livingEntity.GetResourceMax(EnergyId))
+            if (!livingEntity.IsConsumingResource(TypeIdString)
+                && livingEntity.GetResourceValue(TypeIdString) < livingEntity.GetResourceMax(TypeIdString))
             {
                 //todo: zzz v0.4 - trait-based resource recharge
-                livingEntity.AdjustResourceValue(EnergyId, 1);
+                livingEntity.AdjustResourceValue(TypeIdString, 1);
             }
         }
     }

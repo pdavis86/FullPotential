@@ -7,9 +7,11 @@ namespace FullPotential.Standard.Ammo
 {
     public class Arrow : IAmmunition
     {
-        internal const string Id = "d84c2b09-f6b2-48cf-a781-c1025cdc56be";
+        public const string TypeIdString = "d84c2b09-f6b2-48cf-a781-c1025cdc56be";
 
-        public Guid TypeId => new Guid(Id);
+        private static readonly Guid Id = new Guid(TypeIdString);
+
+        public Guid TypeId => Id;
 
         public int MaxStackSize => 50;
 

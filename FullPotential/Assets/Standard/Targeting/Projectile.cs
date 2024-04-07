@@ -12,7 +12,9 @@ namespace FullPotential.Standard.Targeting
         public const string TypeIdString = "6e41729e-bb21-44f8-8fb9-b9ad48c0e680";
         public const string AddressablePath = "Standard/Prefabs/Targeting/Projectile.prefab";
 
-        public Guid TypeId => new Guid(TypeIdString);
+        private static readonly Guid Id = new Guid(TypeIdString);
+
+        public Guid TypeId => Id;
 
         public bool CanHaveShape => true;
 

@@ -513,7 +513,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                         return GetDefensiveWeapon(weaponType, components, isTwoHanded);
                     }
 
-                    if (weaponType.AmmunitionTypeId == null)
+                    if (weaponType.AmmunitionTypeIdString == null)
                     {
                         return GetMeleeWeapon(weaponType, components, isTwoHanded);
                     }

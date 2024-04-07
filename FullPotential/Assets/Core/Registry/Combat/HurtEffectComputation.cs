@@ -16,7 +16,9 @@ namespace FullPotential.Core.Registry.Combat
     {
         private readonly ITypeRegistry _typeRegistry;
 
-        public Guid TypeId => new Guid("c06fd4bf-a006-4fa2-966e-8f368c680818");
+        private static readonly Guid Id = new Guid("c06fd4bf-a006-4fa2-966e-8f368c680818");
+
+        public Guid TypeId => Id;
 
         public string EffectTypeId => EffectTypeIds.HurtId;
 

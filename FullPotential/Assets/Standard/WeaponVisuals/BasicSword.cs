@@ -6,10 +6,12 @@ namespace FullPotential.Standard.WeaponVisuals
 {
     public class BasicSword : IWeaponVisuals
     {
-        public Guid TypeId => new Guid("6cc25369-bc33-44c7-b168-2e38844c5713");
+        private static readonly Guid Id = new Guid("6cc25369-bc33-44c7-b168-2e38844c5713");
+
+        public Guid TypeId => Id;
 
         public string PrefabAddress => "Standard/Prefabs/Weapons/Sword.prefab";
 
-        public Guid ApplicableToTypeId => new Guid(Sword.TypeIdString);
+        public string ApplicableToTypeIdString => Sword.TypeIdString;
     }
 }

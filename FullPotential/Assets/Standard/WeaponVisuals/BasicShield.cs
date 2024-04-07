@@ -6,11 +6,12 @@ namespace FullPotential.Standard.WeaponVisuals
 {
     public class BasicShield : IWeaponVisuals
     {
-        public Guid TypeId => new Guid("d2e35462-acb4-41bc-940b-2fe0324cfac6");
+        private static readonly Guid Id = new Guid("d2e35462-acb4-41bc-940b-2fe0324cfac6");
 
+        public Guid TypeId => Id;
 
         public string PrefabAddress => "Standard/Prefabs/Weapons/Shield.prefab";
 
-        public Guid ApplicableToTypeId => new Guid(Shield.TypeIdString);
+        public string ApplicableToTypeIdString => Shield.TypeIdString;
     }
 }

@@ -31,9 +31,9 @@ namespace FullPotential.Api.Items.Types
 
         public IWeapon WeaponType => (IWeapon)RegistryType;
 
-        public bool IsRanged => WeaponType.AmmunitionTypeId != null;
+        public bool IsRanged => WeaponType.AmmunitionTypeIdString != null;
 
-        public bool IsMelee => WeaponType.AmmunitionTypeId == null;
+        public bool IsMelee => WeaponType.AmmunitionTypeIdString == null;
 
         public bool IsDefensive => WeaponType.IsDefensive;
 
@@ -90,11 +90,6 @@ namespace FullPotential.Api.Items.Types
         {
             var damage = MainEffectComputation.GetAttackResult(null, this, null, false).Change;
             return GetDamagePerSecond(damage, GetAmmoMax(), GetAmmoPerSecond(), GetReloadTime());
-        }
-
-        public string GetAmmoTypeId()
-        {
-            return WeaponType.AmmunitionTypeId!.Value.ToString();
         }
 
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)

@@ -7,9 +7,11 @@ namespace FullPotential.Standard.Ammo
 {
     public class Bullet : IAmmunition
     {
-        internal const string Id = "130cc39d-e7db-4b8b-bb09-53a5d68fa05d";
+        public const string TypeIdString = "130cc39d-e7db-4b8b-bb09-53a5d68fa05d";
 
-        public Guid TypeId => new Guid(Id);
+        private static readonly Guid Id = new Guid(TypeIdString);
+
+        public Guid TypeId => Id;
 
         public int MaxStackSize => 500;
 

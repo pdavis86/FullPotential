@@ -6,7 +6,9 @@ namespace FullPotential.Standard.Effects.Movement
 {
     public class Launch : IMovementEffect
     {
-        public Guid TypeId => new Guid("a2cb2a03-3684-450d-a1cb-6396dc96ab48");
+        private static readonly Guid Id = new Guid("a2cb2a03-3684-450d-a1cb-6396dc96ab48");
+
+        public Guid TypeId => Id;
 
         public MovementDirection Direction => MovementDirection.Up;
     }

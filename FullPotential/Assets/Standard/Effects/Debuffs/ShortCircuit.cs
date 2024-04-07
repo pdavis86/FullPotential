@@ -7,10 +7,12 @@ namespace FullPotential.Standard.Effects.Debuffs
 {
     public class ShortCircuit : IResourceEffect
     {
-        public Guid TypeId => new Guid("434fc4a7-dcbc-44b8-86d6-5815a42eea0b");
+        private static readonly Guid Id = new Guid("434fc4a7-dcbc-44b8-86d6-5815a42eea0b");
+
+        public Guid TypeId => Id;
 
         public AffectType AffectType => AffectType.TemporaryMaxDecrease;
 
-        public Guid ResourceTypeId => Energy.Id;
+        public string ResourceTypeIdString => Energy.TypeIdString;
     }
 }

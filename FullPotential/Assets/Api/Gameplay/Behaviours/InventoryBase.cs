@@ -468,7 +468,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             if (itemWithVisuals.VisualsTypeId.IsNullOrWhiteSpace())
             {
                 itemWithVisuals.Visuals = _typeRegistry.GetRegisteredTypes<T>()
-                    .FirstOrDefault(v => v.ApplicableToTypeId == item.RegistryType.TypeId);
+                    .FirstOrDefault(v => v.ApplicableToTypeIdString == item.RegistryType.TypeId.ToString());
             }
             else
             {

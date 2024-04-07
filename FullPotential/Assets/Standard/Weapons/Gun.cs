@@ -8,11 +8,13 @@ namespace FullPotential.Standard.Weapons
     {
         public const string TypeIdString = "9b5a211a-07d2-4e5c-b8b8-639dbfb807e9";
 
-        public Guid TypeId => new Guid(TypeIdString);
+        private static readonly Guid Id = new Guid(TypeIdString);
+
+        public Guid TypeId => Id;
 
         public bool IsDefensive => false;
 
-        public Guid? AmmunitionTypeId => new Guid(Bullet.Id);
+        public string AmmunitionTypeIdString => Bullet.TypeIdString;
 
         public bool AllowAutomatic => true;
 

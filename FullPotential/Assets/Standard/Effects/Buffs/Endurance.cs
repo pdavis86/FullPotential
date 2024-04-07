@@ -7,10 +7,12 @@ namespace FullPotential.Standard.Effects.Buffs
 {
     public class Endurance : IResourceEffect
     {
-        public Guid TypeId => new Guid("29fa3077-627c-4cc2-9efc-8293ad7ce52d");
+        private static readonly Guid Id = new Guid("29fa3077-627c-4cc2-9efc-8293ad7ce52d");
+
+        public Guid TypeId => Id;
 
         public AffectType AffectType => AffectType.TemporaryMaxIncrease;
 
-        public Guid ResourceTypeId => ResourceTypeIds.Stamina;
+        public string ResourceTypeIdString => ResourceTypeIds.StaminaId;
     }
 }

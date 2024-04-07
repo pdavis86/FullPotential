@@ -6,7 +6,9 @@ namespace FullPotential.Standard.Effects.Movement
 {
     public class Repel : IMovementEffect
     {
-        public Guid TypeId => new Guid("82fbd978-4df8-4108-b1b6-b1452712f9c3");
+        private static readonly Guid Id = new Guid("82fbd978-4df8-4108-b1b6-b1452712f9c3");
+
+        public Guid TypeId => Id;
 
         public MovementDirection Direction => MovementDirection.AwayFromSource;
     }

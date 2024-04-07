@@ -28,7 +28,7 @@ namespace FullPotential.Core.Registry
 {
     public class TypeRegistry : ITypeRegistry
     {
-        private readonly HashSet<Guid> _registeredTypeIds = new HashSet<Guid>();
+        private readonly HashSet<string> _registeredTypeIds = new HashSet<string>();
         private readonly Dictionary<Type, IList> _registeredTypeLists = new Dictionary<Type, IList>();
         private readonly Dictionary<string, object> _loadedAddressables = new Dictionary<string, object>();
         private readonly IEventManager _eventManager;
@@ -201,9 +201,9 @@ namespace FullPotential.Core.Registry
                 var objectToRegister = DependenciesContext.Dependencies.CreateInstance(type);
                 var objectAsVisuals = (IItemVisuals)objectToRegister;
 
-                if (!_registeredTypeIds.Contains(objectAsVisuals.ApplicableToTypeId))
+                if (!_registeredTypeIds.Contains(objectAsVisuals.ApplicableToTypeIdString))
                 {
-                    Debug.LogError($"{objectAsVisuals.GetType().FullName} refers to a type that is not registered with ID {objectAsVisuals.ApplicableToTypeId}");
+                    Debug.LogError($"{objectAsVisuals.GetType().FullName} refers to a type that is not registered with ID {objectAsVisuals.ApplicableToTypeIdString}");
                     return;
                 }
 
@@ -244,7 +244,7 @@ namespace FullPotential.Core.Registry
                 return true;
             }
 
-            _registeredTypeIds.Add(objectAsT.TypeId);
+            _registeredTypeIds.Add(objectAsT.TypeId.ToString());
             list.Add(objectAsT);
 
             return true;

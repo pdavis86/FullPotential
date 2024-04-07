@@ -8,12 +8,14 @@ namespace FullPotential.Standard.Effects.Debuffs
 {
     public class LifeDrain : IResourceEffect, IHasSideEffect
     {
-        public Guid TypeId => new Guid("fe828022-b20d-4204-a6ff-8fada0e75bb5");
+        private static readonly Guid Id = new Guid("fe828022-b20d-4204-a6ff-8fada0e75bb5");
+
+        public Guid TypeId => Id;
 
         public AffectType AffectType => AffectType.PeriodicDecrease;
 
-        public Guid ResourceTypeId => ResourceTypeIds.Health;
+        public string ResourceTypeIdString => ResourceTypeIds.HealthId;
 
-        public Guid SideEffectTypeId => new Guid(LifeTap.TypeIdString);
+        public string SideEffectTypeIdString => LifeTap.TypeIdString;
     }
 }

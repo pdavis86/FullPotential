@@ -20,6 +20,7 @@ using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Environment;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.Registry.Resources;
 using FullPotential.Core.Ui.Components;
 using Unity.Netcode;
 using UnityEngine;
@@ -507,12 +508,12 @@ namespace FullPotential.Core.Player
             {
                 _entityName.Value = Username;
 
-                var nonHealthResources = GetResources().Where(x => x.TypeId != ResourceTypeIds.Health);
+                var nonHealthResources = GetResources().Where(x => x.TypeId.ToString() != ResourceTypeIds.HealthId);
                 SetResourceInitialValues(nonHealthResources.ToDictionary(
                     resource => resource.TypeId.ToString(),
                     resource => playerData.Resources.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value));
 
-                var health = playerData.Resources.FirstOrDefault(kvp => kvp.Key == nameof(ResourceTypeIds.Health)).Value;
+                var health = playerData.Resources.FirstOrDefault(kvp => kvp.Key == nameof(Health)).Value;
                 SetServerResourceValueAndSend(ResourceTypeIds.HealthId, health > 0 ? health : GetResourceMax(ResourceTypeIds.HealthId));
             }
 

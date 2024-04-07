@@ -12,9 +12,12 @@ namespace FullPotential.Standard.Resources
     {
         public const string TypeIdString = "9f026e17-d313-4402-9da6-c5b002e26c64";
 
-        public Guid TypeId => new Guid(TypeIdString);
+        private static readonly Guid Id = new Guid(TypeIdString);
+        private static readonly Color ResourceColor = Color.FromArgb(255, 255, 0);
 
-        public Color Color => Color.FromArgb(255, 255, 0);
+        public Guid TypeId => Id;
+
+        public Color Color => ResourceColor;
 
         public bool IsCraftable => false;
 

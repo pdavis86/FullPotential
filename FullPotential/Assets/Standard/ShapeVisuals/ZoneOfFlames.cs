@@ -6,10 +6,12 @@ namespace FullPotential.Standard.ShapeVisuals
 {
     public class ZoneOfFlames : IShapeVisuals
     {
-        public Guid TypeId => new Guid("ac703f12-4d5c-4b76-98f9-045c10b40fd0");
+        private static readonly Guid Id = new Guid("ac703f12-4d5c-4b76-98f9-045c10b40fd0");
+
+        public Guid TypeId => Id;
 
         public string PrefabAddress => "Standard/Prefabs/Shapes/ZoneVisuals.prefab";
 
-        public Guid ApplicableToTypeId => new Guid(Zone.TypeIdString);
+        public string ApplicableToTypeIdString => Zone.TypeIdString;
     }
 }

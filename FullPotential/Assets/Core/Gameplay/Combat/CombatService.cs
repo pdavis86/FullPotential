@@ -89,7 +89,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 if (sourceFighter != null && effect is IHasSideEffect withSideEffect)
                 {
-                    var sideEffect = _typeRegistry.GetEffect(withSideEffect.SideEffectTypeId.ToString());
+                    var sideEffect = _typeRegistry.GetEffect(withSideEffect.SideEffectTypeIdString);
                     ApplyEffect(null, sideEffect, itemUsed, sourceFighter.GameObject, position, effectPercentage);
                 }
             }
@@ -164,7 +164,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             //Special case for health decrease to fire the HealthChangedEvent
             if (effect is IResourceEffect resourceEffect
-                && resourceEffect.ResourceTypeId == ResourceTypeIds.Health)
+                && resourceEffect.ResourceTypeIdString == ResourceTypeIds.HealthId)
             {
                 if (resourceEffect.AffectType == AffectType.SingleDecrease)
                 {

@@ -7,13 +7,14 @@ namespace FullPotential.Standard.Resources
 {
     public class Mana : IResource
     {
-        private const string ManaId = "378443ee-7942-4cd5-977d-818ee03333e9";
+        public const string TypeIdString = "378443ee-7942-4cd5-977d-818ee03333e9";
 
-        public static readonly Guid Id = new Guid(ManaId);
+        private static readonly Guid Id = new Guid(TypeIdString);
+        private static readonly Color ResourceColor = Color.FromArgb(185, 36, 158);
 
         public Guid TypeId => Id;
 
-        public Color Color => Color.FromArgb(185, 36, 158);
+        public Color Color => ResourceColor;
 
         public bool IsCraftable => true;
 
@@ -23,11 +24,11 @@ namespace FullPotential.Standard.Resources
 
         private void PerformReplenish(LivingEntityBase livingEntity)
         {
-            if (!livingEntity.IsConsumingResource(ManaId)
-                && livingEntity.GetResourceValue(ManaId) < livingEntity.GetResourceMax(ManaId))
+            if (!livingEntity.IsConsumingResource(TypeIdString)
+                && livingEntity.GetResourceValue(TypeIdString) < livingEntity.GetResourceMax(TypeIdString))
             {
                 //todo: zzz v0.4 - trait-based resource recharge
-                livingEntity.AdjustResourceValue(ManaId, 1);
+                livingEntity.AdjustResourceValue(TypeIdString, 1);
             }
         }
     }

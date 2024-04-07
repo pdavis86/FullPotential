@@ -8,14 +8,17 @@ namespace FullPotential.Core.Registry.Resources
 {
     public class Health : IResource
     {
-        public Guid TypeId => ResourceTypeIds.Health;
+        private static readonly Guid Id = new Guid(ResourceTypeIds.HealthId);
+        private static readonly Color ResourceColor = Color.FromArgb(156, 42, 50);
 
-        public Color Color => Color.FromArgb(156, 42, 50);
+        public Guid TypeId => Id;
+
+        public Color Color => ResourceColor;
 
         public bool IsCraftable => true;
 
         public string ItemInHandDefaultPrefab => null;
 
-        public Action<LivingEntityBase> ReplenishBehaviour => _ => { };
+        public Action<LivingEntityBase> ReplenishBehaviour => null;
     }
 }
