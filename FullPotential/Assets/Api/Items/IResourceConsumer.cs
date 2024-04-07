@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Gameplay.Combat;
+﻿using FullPotential.Api.Registry.Gameplay;
 
 namespace FullPotential.Api.Items
 {

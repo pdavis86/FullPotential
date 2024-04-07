@@ -29,10 +29,5 @@ namespace FullPotential.Api.Gameplay.Combat
             GameObject target,
             Vector3 fallbackPosition,
             Vector3 lookDirection);
-
-        int GetDamageValueFromAttack(
-            FighterBase sourceFighter,
-            ItemForCombatBase itemUsed,
-            int targetDefense);
     }
 }

@@ -311,7 +311,7 @@ namespace FullPotential.Core.GameManagement
 
             //NOTE: No default EventIdResourceValueChanged handler because it changes a NetworkVariable
             eventManager.Register(LivingEntityBase.EventIdResourceValueChanged, null);
-            eventManager.Register(LivingEntityBase.EventIdDamageDealt, LivingEntityBase.DefaultHandlerForDamageDealtEvent);
+            eventManager.Register(LivingEntityBase.EventIdHealthValueChanged, LivingEntityBase.DefaultHandlerForHealthChangedEvent);
 
             eventManager.Register(FighterBase.EventIdReload, FighterBase.DefaultHandlerForReloadEvent);
             eventManager.Register(FighterBase.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEvent);

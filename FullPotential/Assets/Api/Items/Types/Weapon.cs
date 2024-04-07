@@ -76,16 +76,9 @@ namespace FullPotential.Api.Items.Types
             return 1 / GetDelayBetweenShots();
         }
 
-        public int GetDefenseValue()
-        {
-            return IsTwoHanded
-                ? Attributes.Strength * 2
-                : Attributes.Strength;
-        }
-
         public float GetMeleeDps(float multiplier)
         {
-            var damage = GetCombatService().GetDamageValueFromAttack(null, this, 0);
+            var damage = MainEffectComputation.GetAttackResult(null, this, null, false).Change;
 
             var windUp = GetChargeUpTime();
             var timeForTwoAttacks = windUp + GetCooldownTime() + windUp;
@@ -95,7 +88,7 @@ namespace FullPotential.Api.Items.Types
 
         public float GetRangedDps()
         {
-            var damage = GetCombatService().GetDamageValueFromAttack(null, this, 0);
+            var damage = MainEffectComputation.GetAttackResult(null, this, null, false).Change;
             return GetDamagePerSecond(damage, GetAmmoMax(), GetAmmoPerSecond(), GetReloadTime());
         }
 
@@ -141,7 +134,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Strength,
                 nameof(Attributes.Strength),
                 AliasSegmentDefensive,
-                localizer.TranslateInt(GetDefenseValue()));
+                localizer.TranslateInt(Attributes.Strength));
 
             AppendToDescription(
                 sb,

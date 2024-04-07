@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.SpecialGear.Barrier;
 using FullPotential.Standard.SpecialSlots;
@@ -42,7 +42,7 @@ namespace FullPotential.Standard.Resources
                 return;
             }
 
-            var lastHit = equippedBarrier.GetCustomData(DamageDealtEventHandler.CustomDataKeyLastHit);
+            var lastHit = equippedBarrier.GetCustomData(HealthChangeEventHandler.CustomDataKeyLastHit);
 
             if (!lastHit.IsNullOrWhiteSpace())
             {

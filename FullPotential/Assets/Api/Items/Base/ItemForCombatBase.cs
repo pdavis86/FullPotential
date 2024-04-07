@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
@@ -24,8 +22,6 @@ namespace FullPotential.Api.Items.Base
 
         private const float MaximumAccuracyAngleDeviation = 4;
 
-        private ICombatService _combatService;
-
         public Attributes Attributes;
         public string[] EffectIds;
         public bool IsTwoHanded;
@@ -43,6 +39,9 @@ namespace FullPotential.Api.Items.Base
                 EffectIds = _effects.Select(x => x.TypeId.ToString()).ToArray();
             }
         }
+        
+        //todo: this should be a list
+        public IEffectComputation MainEffectComputation { get; set; }
 
         public static float GetHighInHighOutInRange(int attributeValue, float min, float max)
         {
@@ -63,16 +62,6 @@ namespace FullPotential.Api.Items.Base
             hash = hash * 113 + Attributes.GetHashCode();
             hash = hash * 127 + (EffectIds != null ? string.Join(null, EffectIds) : string.Empty).GetHashCode();
             return hash;
-        }
-
-        protected ICombatService GetCombatService()
-        {
-            if (!DependenciesContext.Dependencies.IsReady())
-            {
-                return null;
-            }
-
-            return _combatService ??= DependenciesContext.Dependencies.GetService<ICombatService>();
         }
 
         protected void AppendToDescription(StringBuilder builder, ILocalizer localizer, bool attributeValue, string attributeName)

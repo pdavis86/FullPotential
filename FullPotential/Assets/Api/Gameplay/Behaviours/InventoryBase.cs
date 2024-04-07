@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Data;
-using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.EventArgs;
 using FullPotential.Api.Gameplay.Player;
@@ -14,6 +13,8 @@ using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete.Networking;
 using FullPotential.Api.Obsolete.Networking.Data;
 using FullPotential.Api.Registry;
+using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
@@ -28,13 +29,11 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
-    public abstract class InventoryBase : NetworkBehaviour, IDefensible
+    public abstract class InventoryBase : NetworkBehaviour
     {
         public const string EventIdSlotChange = "9c7972de-4136-4825-aaa3-11925ad049ee";
 
         private IFragmentedMessageReconstructor _inventoryChangesReconstructor;
-
-        private int _armorSlotCount;
 
         #region Protected variables
         // ReSharper disable InconsistentNaming
@@ -66,8 +65,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
 
             _inventoryChangesReconstructor = DependenciesContext.Dependencies.GetService<IFragmentedMessageReconstructorFactory>().Create();
-
-            _armorSlotCount = _typeRegistry.GetRegisteredTypes<IArmor>().Count();
 
             _livingEntity = GetComponent<LivingEntityBase>();
         }
@@ -206,27 +203,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var newJson = JsonUtility.ToJson(newItem);
             var oldItem = _items[newItem.Id];
             JsonUtility.FromJsonOverwrite(newJson, oldItem);
-        }
-
-        public int GetDefenseValue()
-        {
-            var defenseSum = 0;
-
-            foreach (var kvp in _equippedItems)
-            {
-                if (kvp.Value.Item?.Id == null)
-                {
-                    continue;
-                }
-
-                var item = GetItemWithId<ItemBase>(kvp.Value.Item.Id);
-                if (item is IDefensible defensibleItem)
-                {
-                    defenseSum += defensibleItem.GetDefenseValue();
-                }
-            }
-
-            return (int)Math.Floor((float)defenseSum / _armorSlotCount);
         }
 
         private T CastItemAsType<T>(ItemBase item, bool logIfNotFound, string identifierName, string id) where T : ItemBase
@@ -464,6 +440,24 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 if (combatItem.EffectIds != null && combatItem.EffectIds.Length > 0 && combatItem.Effects == null)
                 {
                     combatItem.Effects = combatItem.EffectIds.Select(x => _typeRegistry.GetEffect(x)).ToList();
+                }
+
+                //For backwards compatibility
+                combatItem.Effects ??= new List<IEffect>();
+                if (!combatItem.Effects.Any())
+                {
+                    combatItem.Effects.Add(_typeRegistry.GetEffect(EffectTypeIds.HurtId));
+                }
+
+                var allEffectComputations = _typeRegistry.GetRegisteredTypes<IEffectComputation>();
+                foreach (var effect in combatItem.Effects)
+                {
+                    var computation = allEffectComputations.FirstOrDefault(x => x.EffectTypeId == effect.TypeId.ToString());
+                    if (computation != null)
+                    {
+                        combatItem.MainEffectComputation = computation;
+                        break;
+                    }
                 }
             }
         }

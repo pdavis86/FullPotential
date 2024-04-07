@@ -88,6 +88,7 @@
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectsUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\SettingsMenuUi.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DebuggingActiveState.cs" />
+    <Compile Include="Assets\Core\Registry\Combat\HurtEffectComputation.cs" />
     <Compile Include="Assets\Core\UI\Components\SlideOutAlert.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DestroyOnTriggerEnter.cs" />
     <Compile Include="Assets\Core\UI\Components\InventoryItemsList.cs" />

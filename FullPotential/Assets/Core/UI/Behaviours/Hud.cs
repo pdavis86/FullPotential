@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
@@ -12,6 +11,7 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
@@ -241,7 +241,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateHandCharge(ProgressWheel chargeWheel, ItemBase item)
         {
-            //todo: this is a hack. This of a better way
+            //todo: this is a hack. Think of a better way
             var rangedWeapon = item is Weapon weapon && weapon.IsRanged;
 
             if (rangedWeapon || item is not IHasChargeUpOrCooldown hasChargeUpOrCooldown)

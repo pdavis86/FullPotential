@@ -2,11 +2,11 @@
 using System.Linq;
 using System.Text;
 using FullPotential.Api.Data;
-using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry;
+using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Utilities.Extensions;
 

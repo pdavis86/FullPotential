@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Resources;
 
 namespace FullPotential.Core.Registry.Resources

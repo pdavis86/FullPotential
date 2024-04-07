@@ -15,6 +15,7 @@ using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Ui.Components;
@@ -35,11 +36,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
     public abstract class LivingEntityBase : NetworkBehaviour
     {
         public const string EventIdResourceValueChanged = "20b3ff1d-e8d0-438a-873d-98124f726e38";
-        public const string EventIdDamageDealt = "4e8f6a71-3708-47f2-bc57-36bcc5596d0c";
+        public const string EventIdHealthValueChanged = "4e8f6a71-3708-47f2-bc57-36bcc5596d0c";
 
         private const int VelocityThreshold = 3;
         private const int ForceThreshold = 1000;
-        private const int SingleResourceChangeEffectDisplaySeconds = 3;
+        //private const int SingleResourceChangeEffectDisplaySeconds = 3;
 
         private readonly NetworkVariable<FixedString4096Bytes> _encodedResourceValues = new NetworkVariable<FixedString4096Bytes>();
 
@@ -247,21 +248,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
             });
         }
 
-        public static void DefaultHandlerForDamageDealtEvent(IEventHandlerArgs eventArgs)
-        {
-            var healthChangeArgs = (DamageDealtEventArgs)eventArgs;
-
-            healthChangeArgs.LivingEntity.RecordDamageDealt(healthChangeArgs);
-        }
-
-        public void TriggerDamageDealtEvent(
+        public void TriggerHealthChangedEvent(
             int change,
             FighterBase sourceFighter,
             ItemBase itemUsed,
             Vector3? position,
             bool isCritical)
         {
-            var damageDealtEventArgs = new DamageDealtEventArgs(
+            var healthChangeEventArgs = new HealthChangeEventArgs(
                 this,
                 change,
                 sourceFighter,
@@ -269,26 +263,34 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 position,
                 isCritical);
 
-            _eventManager.Trigger(EventIdDamageDealt, damageDealtEventArgs);
+            _eventManager.Trigger(EventIdHealthValueChanged, healthChangeEventArgs);
         }
 
-        public void RecordDamageDealt(DamageDealtEventArgs damageDealtEventArgs)
+        public static void DefaultHandlerForHealthChangedEvent(IEventHandlerArgs eventArgs)
         {
-            _lastDamageSourceName = damageDealtEventArgs.SourceFighter != null ? damageDealtEventArgs.SourceFighter.FighterName : null;
-            _lastDamageItemName = damageDealtEventArgs.ItemUsed?.Name.OrIfNullOrWhitespace(_localizer.Translate("ui.alert.attack.noitem"));
+            var healthChangeArgs = (HealthChangeEventArgs)eventArgs;
 
-            if (damageDealtEventArgs.SourceFighter != null)
+            healthChangeArgs.LivingEntity.ApplyHealthChange(healthChangeArgs);
+        }
+
+        //todo: can this be generalised?
+        public void ApplyHealthChange(HealthChangeEventArgs healthChangeEventArgs)
+        {
+            _lastDamageSourceName = healthChangeEventArgs.SourceFighter != null ? healthChangeEventArgs.SourceFighter.FighterName : null;
+            _lastDamageItemName = healthChangeEventArgs.ItemUsed?.Name.OrIfNullOrWhitespace(_localizer.Translate("ui.alert.attack.noitem"));
+
+            if (healthChangeEventArgs.SourceFighter != null)
             {
                 //Debug.Log($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
 
-                if (damageDealtEventArgs.Change < 0)
+                if (healthChangeEventArgs.Change < 0)
                 {
-                    var sourceNetworkObject = damageDealtEventArgs.SourceFighter.GameObject.GetComponent<NetworkObject>();
+                    var sourceNetworkObject = healthChangeEventArgs.SourceFighter.GameObject.GetComponent<NetworkObject>();
                     var sourceClientId = sourceNetworkObject != null ? (ulong?)sourceNetworkObject.OwnerClientId : null;
 
-                    if (sourceClientId != null && !damageDealtEventArgs.SourceFighter.Equals(this))
+                    if (sourceClientId != null && !healthChangeEventArgs.SourceFighter.Equals(this))
                     {
-                        var damageDealt = damageDealtEventArgs.Change * -1;
+                        var damageDealt = healthChangeEventArgs.Change * -1;
 
                         if (_damageTaken.ContainsKey(sourceClientId.Value))
                         {
@@ -301,7 +303,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     }
                 }
 
-                ShowHealthChangeToSourceFighter(damageDealtEventArgs.SourceFighter, damageDealtEventArgs.Position, damageDealtEventArgs.Change, damageDealtEventArgs.IsCritical);
+                ShowHealthChangeToSourceFighter(healthChangeEventArgs.SourceFighter, healthChangeEventArgs.Position, healthChangeEventArgs.Change, healthChangeEventArgs.IsCritical);
             }
             //else
             //{
@@ -309,7 +311,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             //}
 
             //Do this last to ensure the entity does not die before recording the cause
-            AdjustResourceValue(ResourceTypeIds.HealthId, damageDealtEventArgs.Change);
+            AdjustResourceValue(ResourceTypeIds.HealthId, healthChangeEventArgs.Change);
         }
 
         private void PopulateResourceValueCache()
@@ -496,8 +498,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var health = GetResourceValue(ResourceTypeIds.HealthId);
             var maxHealth = GetResourceMax(ResourceTypeIds.HealthId);
-            var extra = $" (D{GetDefenseValue()})";
-            var values = _gameManager.GetUserInterface().HudOverlay.GetSliderBarValues(health, maxHealth, extra);
+            var values = _gameManager.GetUserInterface().HudOverlay.GetSliderBarValues(health, maxHealth, null);
             HealthBarSlider.UpdateValues(values.text, values.percent, 1);
         }
 
@@ -558,14 +559,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _lastDamageItemName = null;
             _lastDamageSourceName = cause;
 
-            TriggerDamageDealtEvent(healthChange, _fighterWhoMovedMeLast, null, contactPoint.point, false);
+            TriggerHealthChangedEvent(healthChange, _fighterWhoMovedMeLast, null, contactPoint.point, false);
         }
 
         #endregion
 
         #region Combat-related methods
-
-        public abstract int GetDefenseValue();
 
         public void SetLastMover(FighterBase fighter)
         {
@@ -688,7 +687,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public void ApplySingleValueChangeToResource(IResourceEffect resourceEffect, int change)
         {
             AdjustResourceValue(resourceEffect.ResourceTypeId.ToString(), change);
-            AddOrUpdateEffect(resourceEffect, change, DateTime.Now.AddSeconds(SingleResourceChangeEffectDisplaySeconds));
+            //todo: maybe don't do this? - AddOrUpdateEffect(resourceEffect, change, DateTime.Now.AddSeconds(SingleResourceChangeEffectDisplaySeconds));
         }
 
         public void ApplyTemporaryMaxActionToResource(IResourceEffect resourceEffect, int change, DateTime expiry)
@@ -697,14 +696,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
             AddOrUpdateEffect(resourceEffect, change, expiry);
         }
 
-        // ReSharper disable UnusedParameter.Global
-        public void ApplyElementalEffect(IEffect elementalEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, float effectPercentage)
+        public void ApplyElementalEffect(IEffect elementalEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, int change)
         {
             //todo: ApplyElementalEffect
-            //Debug.LogWarning("Not yet implemented elemental effects");
-            TriggerDamageDealtEvent(-5, sourceFighter, null, position, false);
+            Debug.LogWarning("Not yet implemented elemental effects");
         }
-        // ReSharper restore UnusedParameter.Global
 
         public List<ActiveEffect> GetActiveEffects()
         {

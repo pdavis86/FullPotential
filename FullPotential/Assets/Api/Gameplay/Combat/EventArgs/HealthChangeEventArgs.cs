@@ -5,7 +5,12 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Combat.EventArgs
 {
-    public class DamageDealtEventArgs : IEventHandlerArgs
+    /// <summary>
+    /// HealthChangeEvent is a special case event
+    /// Not only does it apply the health change (or allow you to cancel it)
+    /// But it also manages the showing of damage/heal indicators
+    /// </summary>
+    public class HealthChangeEventArgs : IEventHandlerArgs
     {
         public bool IsDefaultHandlerCancelled { get; set; }
 
@@ -21,7 +26,7 @@ namespace FullPotential.Api.Gameplay.Combat.EventArgs
 
         public bool IsCritical { get; set; }
 
-        public DamageDealtEventArgs(
+        public HealthChangeEventArgs(
             LivingEntityBase livingEntity,
             int change,
             FighterBase sourceFighter,

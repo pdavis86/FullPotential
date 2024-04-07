@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
-    public abstract class FighterBase : LivingEntityBase, IDefensible, IMoveable
+    public abstract class FighterBase : LivingEntityBase, IMoveable
     {
         private const float ChargeGaugeUpdateSeconds = 0.05f;
 
@@ -255,24 +255,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 default:
                     throw new Exception("Not yet implemented GetAttributeValue() for " + attributeAffected);
             }
-        }
-
-        public float GetCriticalHitChance()
-        {
-            var luckValue = GetAttributeValue(AttributeAffected.Luck);
-
-            if (luckValue < 20)
-            {
-                return 0;
-            }
-
-            //e.g. 50 luck would mean a 50/5 = 10% chance
-            return luckValue / 5f;
-        }
-
-        public override int GetDefenseValue()
-        {
-            return _inventory.GetDefenseValue();
         }
 
         public override void HandleDeath()

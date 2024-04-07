@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
@@ -10,7 +9,7 @@ using FullPotential.Api.Utilities.Extensions;
 namespace FullPotential.Api.Items.Types
 {
     [Serializable]
-    public class Armor : ItemWithHealthBase, IDefensible, IHasItemVisuals
+    public class Armor : ItemWithHealthBase, IHasItemVisuals
     {
         private IItemVisuals _visuals;
 
@@ -31,11 +30,6 @@ namespace FullPotential.Api.Items.Types
                 _visuals = value;
                 ArmorVisualsTypeId = _visuals?.TypeId.ToString();
             }
-        }
-
-        public int GetDefenseValue()
-        {
-            return Attributes.Strength;
         }
 
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
@@ -61,7 +55,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Strength,
                 nameof(Attributes.Strength),
                 AliasSegmentDefensive,
-                localizer.TranslateInt(GetDefenseValue()));
+                localizer.TranslateInt(Attributes.Strength));
 
             return sb.ToString().Trim();
         }

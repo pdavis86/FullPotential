@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FullPotential.Api.Gameplay;
-using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Utilities.Extensions;
 

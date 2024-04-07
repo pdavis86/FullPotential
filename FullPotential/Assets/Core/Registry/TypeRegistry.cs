@@ -6,12 +6,13 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
@@ -51,6 +52,7 @@ namespace FullPotential.Core.Registry
                 AddToRegister<ITargeting>,
                 AddToRegister<IWeapon>,
                 AddToRegister<IRegisterableWithSlot>,
+                AddToRegister<IEffectComputation>,
             };
 
             _registerVisualsFunctions = new Func<object, bool>[]
@@ -103,6 +105,8 @@ namespace FullPotential.Core.Registry
             ValidateAndRegister(typeof(Effects.Heal));
             ValidateAndRegister(typeof(Effects.Hurt));
             ValidateAndRegister(typeof(Effects.Push));
+
+            ValidateAndRegister(typeof(Combat.HurtEffectComputation));
 
             _eventManager.Subscribe<LivingEntityDiedEventHandler>(LivingEntityBase.EventIdResourceValueChanged);
             _eventManager.Subscribe<LivingEntityHealthChangedEventHandler>(LivingEntityBase.EventIdResourceValueChanged);
@@ -166,7 +170,7 @@ namespace FullPotential.Core.Registry
                     return;
                 }
 
-                var objectToRegister = Activator.CreateInstance(type);
+                var objectToRegister = DependenciesContext.Dependencies.CreateInstance(type);
 
                 foreach (var functionToRun in _registerTypeFunctions)
                 {
@@ -194,7 +198,7 @@ namespace FullPotential.Core.Registry
                     return;
                 }
 
-                var objectToRegister = Activator.CreateInstance(type);
+                var objectToRegister = DependenciesContext.Dependencies.CreateInstance(type);
                 var objectAsVisuals = (IItemVisuals)objectToRegister;
 
                 if (!_registeredTypeIds.Contains(objectAsVisuals.ApplicableToTypeId))

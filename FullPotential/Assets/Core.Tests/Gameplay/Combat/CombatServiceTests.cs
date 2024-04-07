@@ -13,6 +13,7 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Core.Gameplay.Combat;
+using FullPotential.Core.Registry.Combat;
 using FullPotential.Core.Registry.Effects;
 using Moq;
 using NUnit.Framework;
@@ -67,10 +68,10 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
                 Luck = 50
             };
 
-            var consumerSingleDamage = new Consumer { Attributes = allFifty, Effects = new List<IEffect> { _singleDamageEffect } };
+            var consumerSingleDamage = GetConsumer(allFifty, new List<IEffect> { _singleDamageEffect });
             Assert.AreEqual((int)expectedBaseDamage, GetDamage(consumerSingleDamage));
 
-            var consumerMultipleEffects = new Consumer { Attributes = allFifty, Effects = new List<IEffect> { _singleDamageEffect, _singleDamageEffect } };
+            var consumerMultipleEffects = GetConsumer(allFifty, new List<IEffect> { _singleDamageEffect, _singleDamageEffect });
             Assert.AreEqual((int)expectedBaseDamage, GetDamage(consumerMultipleEffects));
 
             var meleeOneHandedWeapon = GetMeleeWeapon(false, allFifty);
@@ -88,7 +89,17 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
 
         private int GetDamage(ItemForCombatBase item)
         {
-            return _combatService.GetDamageValueFromAttack(null, item, 0);
+            return item.MainEffectComputation.GetAttackResult(null, item, null, false).Change;
+        }
+
+        private Consumer GetConsumer(Attributes attributes, List<IEffect> effects)
+        {
+            return new Consumer
+            {
+                Attributes = attributes, 
+                Effects = effects,
+                MainEffectComputation = new HurtEffectComputation(Mock.Of<ITypeRegistry>())
+            };
         }
 
         private Weapon GetMeleeWeapon(bool isTwoHanded, Attributes attributes)
@@ -97,7 +108,8 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
             {
                 RegistryType = new TestWeaponType(),
                 Attributes = attributes,
-                IsTwoHanded = isTwoHanded
+                IsTwoHanded = isTwoHanded,
+                MainEffectComputation = new HurtEffectComputation(Mock.Of<ITypeRegistry>())
             };
         }
 
@@ -107,7 +119,8 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
             {
                 RegistryType = new TestWeaponType { AmmunitionTypeId = new Guid("8c25a561-7321-4599-b30c-0ef1bf94ad1c") },
                 Attributes = attributes,
-                IsTwoHanded = isTwoHanded
+                IsTwoHanded = isTwoHanded,
+                MainEffectComputation = new HurtEffectComputation(Mock.Of<ITypeRegistry>())
             };
         }
     }

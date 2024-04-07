@@ -64,6 +64,7 @@
     <Compile Include="Assets\Standard\Effects\Elements\Air.cs" />
     <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\ReloadEventHandler.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicBow.cs" />
+    <Compile Include="Assets\Standard\WeaponExtras\ProjectileWithTrail.cs" />
     <Compile Include="Assets\Standard\Armor\Helm.cs" />
     <Compile Include="Assets\Standard\Armor\Legs.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Poison.cs" />
@@ -81,10 +82,12 @@
     <Compile Include="Assets\Standard\Effects\Buffs\Haste.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Fear.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicGun.cs" />
+    <Compile Include="Assets\Standard\WeaponExtras\ShotFiredEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Launch.cs" />
     <Compile Include="Assets\Standard\Resources\Mana.cs" />
     <Compile Include="Assets\Standard\ArmorVisuals\LeatherJerkin.cs" />
     <Compile Include="Assets\Standard\Targeting\Projectile.cs" />
+    <Compile Include="Assets\Standard\TargetingVisuals\ITargetingVisualsBehaviour.cs" />
     <Compile Include="Assets\Standard\ShapeVisuals\WallOfFlames.cs" />
     <Compile Include="Assets\Standard\Targeting\Self.cs" />
     <Compile Include="Assets\Standard\SpecialGear\Reloader\ConsolidatorReloader\ConsolidatorReloader.cs" />
@@ -156,7 +159,7 @@
     <Compile Include="Assets\Standard\Ammo\Bullet.cs" />
     <Compile Include="Assets\Standard\Shapes\WallBehaviour.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicStaff.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\Barrier\DamageDealtEventHandler.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Barrier\HealthChangeEventHandler.cs" />
     <Compile Include="Assets\Standard\Weapons\Staff.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\ManaDrain.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Earth.cs" />
@@ -172,9 +175,6 @@
     <Compile Include="Assets\Standard\Effects\Movement\Attract.cs" />
     <Compile Include="Assets\Standard\Accessories\Amulet.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveLeft.cs" />
-    <Compile Include="Assets\Standard\TargetingVisuals\ITargetingVisualsBehaviour.cs" />
-    <Compile Include="Assets\Standard\WeaponExtras\ShotFiredEventHandler.cs" />
-    <Compile Include="Assets\Standard\WeaponExtras\ProjectileWithTrail.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Standard\FullPotential.Standard.asmdef" />

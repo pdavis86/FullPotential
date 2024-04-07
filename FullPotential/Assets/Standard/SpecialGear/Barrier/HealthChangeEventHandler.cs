@@ -8,19 +8,19 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class DamageDealtEventHandler : IEventHandler
+    public class HealthChangeEventHandler : IEventHandler
     {
         public const string CustomDataKeyLastHit = "LastHit";
 
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Action<IEventHandlerArgs> BeforeHandler => HandleBeforeDamageDealt;
+        public Action<IEventHandlerArgs> BeforeHandler => HandleBeforeHealthChange;
 
         public Action<IEventHandlerArgs> AfterHandler => null;
 
-        private void HandleBeforeDamageDealt(IEventHandlerArgs eventArgs)
+        private void HandleBeforeHealthChange(IEventHandlerArgs eventArgs)
         {
-            var healthChangeArgs = (DamageDealtEventArgs)eventArgs;
+            var healthChangeArgs = (HealthChangeEventArgs)eventArgs;
 
             if (healthChangeArgs.Change >= 0)
             {

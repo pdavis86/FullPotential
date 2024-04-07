@@ -89,7 +89,7 @@ namespace FullPotential.Api.Ioc
             return newInstance;
         }
 
-        private object CreateInstance(Type typeToCreate)
+        public object CreateInstance(Type typeToCreate)
         {
             var injectionMethod = typeToCreate.GetMethod(InjectionMethodName);
             if (injectionMethod != null)
