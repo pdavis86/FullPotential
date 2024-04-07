@@ -58,7 +58,6 @@
   <ItemGroup>
     <Compile Include="Assets\Api\Unity\Extensions\GameObjectExtensions.cs" />
     <Compile Include="Assets\Api\Persistence\ISettingsRepository.cs" />
-    <Compile Include="Assets\Api\Registry\Targeting\ITargetingVisualsBehaviour.cs" />
     <Compile Include="Assets\Api\Registry\ILoot.cs" />
     <Compile Include="Assets\Api\Registry\IRegisterable.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\DictionaryExtensions.cs" />

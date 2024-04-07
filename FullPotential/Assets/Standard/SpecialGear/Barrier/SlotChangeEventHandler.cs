@@ -46,7 +46,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             if (NetworkManager.Singleton.IsServer && !isBarrierEquipped)
             {
-                slotChangeArgs.LivingEntity.SetServerResourceValueAndSend(BarrierChargeResource.TypeIdString, 0);
+                slotChangeArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, 0, 0);
             }
         }
     }

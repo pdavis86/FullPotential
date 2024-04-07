@@ -35,12 +35,6 @@ namespace FullPotential.Core.Gameplay.Combat
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            if (Consumer.ChargePercentage != 100)
-            {
-                Cleanup();
-                return;
-            }
-
             _targetPositionGameObject.transform.position = SourceFighter.Transform.position + (SourceFighter.LookTransform.forward * Distance);
         }
 
@@ -65,6 +59,8 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private void Cleanup()
         {
+            SourceFighter.StopActiveConsumerBehaviour(Consumer);
+
             if (_cnt != null)
             {
                 _cnt.IsServerAuthoritative = false;

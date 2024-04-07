@@ -89,7 +89,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
 
         private int GetDamage(ItemForCombatBase item)
         {
-            return item.MainEffectComputation.GetAttackResult(null, item, null, false).Change;
+            return item.MainEffectComputation.GetCombatResult(null, item, null).Change;
         }
 
         private Consumer GetConsumer(Attributes attributes, List<IEffect> effects)

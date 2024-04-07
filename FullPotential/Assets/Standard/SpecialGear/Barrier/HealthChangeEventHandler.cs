@@ -1,6 +1,7 @@
 ﻿using System;
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Registry.Resources;
 using FullPotential.Standard.Resources;
 using FullPotential.Standard.SpecialSlots;
 
@@ -20,21 +21,22 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         private void HandleBeforeHealthChange(IEventHandlerArgs eventArgs)
         {
-            var healthChangeArgs = (HealthChangeEventArgs)eventArgs;
+            var resourceChangeArgs = (ResourceValueChangedEventArgs)eventArgs;
 
-            if (healthChangeArgs.Change >= 0)
+            if (resourceChangeArgs.ResourceTypeId != ResourceTypeIds.HealthId
+                || resourceChangeArgs.Change >= 0)
             {
                 return;
             }
 
-            var barrier = (Api.Items.Types.SpecialGear)healthChangeArgs.LivingEntity.Inventory.GetItemInSlot(BarrierSlot.TypeIdString);
+            var barrier = (Api.Items.Types.SpecialGear)resourceChangeArgs.LivingEntity.Inventory.GetItemInSlot(BarrierSlot.TypeIdString);
 
             if (barrier == null)
             {
                 return;
             }
 
-            var barrierCharge = healthChangeArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString);
+            var barrierCharge = resourceChangeArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString);
 
             if (barrierCharge <= 0)
             {
@@ -44,12 +46,12 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             barrier.SetCustomData(CustomDataKeyLastHit, DateTime.UtcNow.ToString("u"));
 
-            healthChangeArgs.LivingEntity.AdjustResourceValue(BarrierChargeResource.TypeIdString, healthChangeArgs.Change);
+            resourceChangeArgs.LivingEntity.AdjustResourceValue(BarrierChargeResource.TypeIdString, resourceChangeArgs.Change);
 
-            if (barrierCharge < Math.Abs(healthChangeArgs.Change))
+            if (barrierCharge < Math.Abs(resourceChangeArgs.Change))
             {
                 //Debug.Log("Barrier nearly depleted. Taking partial damage");
-                healthChangeArgs.Change += barrierCharge;
+                resourceChangeArgs.Change += barrierCharge;
                 return;
             }
 

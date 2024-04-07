@@ -22,12 +22,14 @@ namespace FullPotential.Core.Registry.Combat
 
         public string EffectTypeId => EffectTypeIds.HurtId;
 
+        public bool CanBeCriticalHit => true;
+
         public HurtEffectComputation(ITypeRegistry typeRegistry)
         {
             _typeRegistry = typeRegistry;
         }
-
-        public CombatResult GetAttackResult(FighterBase sourceFighter, ItemForCombatBase itemUsed, FighterBase targetFighter, bool canBeCriticalHit)
+        
+        public CombatResult GetCombatResult(FighterBase sourceFighter, ItemForCombatBase itemUsed, FighterBase targetFighter)
         {
             float attackStrength = itemUsed?.Attributes.Strength ?? sourceFighter.GetAttributeValue(AttributeAffected.Strength);
             var targetDefence = targetFighter != null ? GetTargetDefenceValue(targetFighter) : 0;
@@ -55,7 +57,7 @@ namespace FullPotential.Core.Registry.Combat
 
             var isCritical = false;
 
-            if (canBeCriticalHit)
+            if (CanBeCriticalHit && sourceFighter != null)
             {
                 var sourceFighterCriticalHitChance = GetSourceCriticalHitChance(sourceFighter);
                 var criticalTestValue = UnityEngine.Random.Range(0, 101);

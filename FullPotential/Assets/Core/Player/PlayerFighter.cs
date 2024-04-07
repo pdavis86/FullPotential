@@ -514,7 +514,8 @@ namespace FullPotential.Core.Player
                     resource => playerData.Resources.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value));
 
                 var health = playerData.Resources.FirstOrDefault(kvp => kvp.Key == nameof(Health)).Value;
-                SetServerResourceValueAndSend(ResourceTypeIds.HealthId, health > 0 ? health : GetResourceMax(ResourceTypeIds.HealthId));
+                var newValue = health > 0 ? health : GetResourceMax(ResourceTypeIds.HealthId);
+                TriggerResourceValueUpdate(ResourceTypeIds.HealthId, 0, newValue);
             }
 
             try

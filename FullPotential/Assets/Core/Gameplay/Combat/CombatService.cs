@@ -95,6 +95,7 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
+        //todo: replace with immunity to effect
         private bool IsEffectAllowed(ItemForCombatBase itemUsed, GameObject target, IEffect effect)
         {
             if (itemUsed is Consumer consumer
@@ -160,28 +161,31 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private CombatResult GetCombatResult(FighterBase sourceFighter, IEffect effect, ItemForCombatBase itemUsed, FighterBase targetFighter, Vector3? position, int change, float effectPercentage)
         {
-            //todo: is there a way to remove the HealthChangedEvent special case? If so, remove CombatResult.IsHandled
+            var resourceEffect = effect as IResourceEffect;
+            
+            var combatResult = itemUsed?.MainEffectComputation?.GetCombatResult(sourceFighter, itemUsed, targetFighter);
 
-            //Special case for health decrease to fire the HealthChangedEvent
-            if (effect is IResourceEffect resourceEffect
-                && resourceEffect.ResourceTypeIdString == ResourceTypeIds.HealthId)
+            var adjustedChange = combatResult != null
+                ? (int)(AddVariationToValue(combatResult.Change) * effectPercentage)
+                : (int)(AddVariationToValue(change) * effectPercentage);
+
+            if (change < 0 && adjustedChange > 0)
             {
-                if (resourceEffect.EffectActionType == EffectActionType.SingleDecrease)
-                {
-                    var singleResult = itemUsed.MainEffectComputation.GetAttackResult(sourceFighter, itemUsed, targetFighter, true);
-                    var singleAdjusted = (int)(AddVariationToValue(singleResult.Change) * effectPercentage) * -1;
-                    targetFighter.TriggerHealthChangedEvent(singleAdjusted, sourceFighter, itemUsed, position, singleResult.IsCriticalHit);
-                }
-                else
-                {
-                    var healChange = (int)(AddVariationToValue(change) * effectPercentage);
-                    targetFighter.TriggerHealthChangedEvent(healChange, sourceFighter, itemUsed, position, false);
-                }
-
-                return new CombatResult { IsHandled = true };
+                adjustedChange *= -1;
             }
 
-            var adjustedChange = (int)(AddVariationToValue(change) * effectPercentage);
+            //Special case for health decrease
+            if (resourceEffect != null
+                && resourceEffect.ResourceTypeIdString == ResourceTypeIds.HealthId)
+            {
+                targetFighter.SetLastDamageValues(sourceFighter, itemUsed, adjustedChange);
+
+                if (sourceFighter != null)
+                {
+                    var isCritical = combatResult != null && combatResult.IsCriticalHit;
+                    targetFighter.ShowHealthChangeToSourceFighter(sourceFighter, position, change, isCritical);
+                }
+            }
 
             return new CombatResult { Change = adjustedChange };
         }
@@ -194,30 +198,21 @@ namespace FullPotential.Core.Gameplay.Combat
                 case EffectActionType.PeriodicIncrease:
                     var (periodicChange, periodicExpiry, periodicDelay) = itemUsed.GetPeriodicResourceChangeExpiryAndDelay(resourceEffect);
                     var periodicCombatResult = GetCombatResult(sourceFighter, resourceEffect, itemUsed, targetFighter, position, periodicChange, effectPercentage);
-                    if (!periodicCombatResult.IsHandled)
-                    {
-                        targetFighter.ApplyPeriodicActionToResource(resourceEffect, periodicCombatResult.Change, periodicDelay, periodicExpiry);
-                    }
+                    targetFighter.ApplyPeriodicActionToResource(resourceEffect, periodicCombatResult.Change, periodicDelay, periodicExpiry);
                     return;
 
                 case EffectActionType.SingleDecrease:
                 case EffectActionType.SingleIncrease:
                     var singleChange = itemUsed.GetResourceChange(resourceEffect);
                     var singleCombatResult = GetCombatResult(sourceFighter, resourceEffect, itemUsed, targetFighter, position, singleChange, effectPercentage);
-                    if (!singleCombatResult.IsHandled)
-                    {
-                        targetFighter.ApplySingleValueChangeToResource(resourceEffect, singleCombatResult.Change);
-                    }
+                    targetFighter.ApplySingleValueChangeToResource(resourceEffect, singleCombatResult.Change);
                     return;
 
                 case EffectActionType.TemporaryMaxDecrease:
                 case EffectActionType.TemporaryMaxIncrease:
                     var (maxChange, maxExpiry) = itemUsed.GetResourceChangeAndExpiry(resourceEffect);
                     var maxCombatResult = GetCombatResult(sourceFighter, resourceEffect, itemUsed, targetFighter, position, maxChange, effectPercentage);
-                    if (!maxCombatResult.IsHandled)
-                    {
-                        targetFighter.ApplyTemporaryMaxActionToResource(resourceEffect, maxCombatResult.Change, maxExpiry);
-                    }
+                    targetFighter.ApplyTemporaryMaxActionToResource(resourceEffect, maxCombatResult.Change, maxExpiry);
                     return;
 
                 default:
@@ -230,19 +225,13 @@ namespace FullPotential.Core.Gameplay.Combat
         {
             var (change, expiry) = itemUsed.GetAttributeChangeAndExpiry(attributeEffect);
             var attributeCombatResult = GetCombatResult(sourceFighter, attributeEffect, itemUsed, targetFighter, position, change, effectPercentage);
-            if (!attributeCombatResult.IsHandled)
-            {
-                targetFighter.AddAttributeModifier(attributeEffect, attributeCombatResult.Change, expiry);
-            }
+            targetFighter.AddAttributeModifier(attributeEffect, attributeCombatResult.Change, expiry);
         }
 
         private void ApplyElementalEffect(FighterBase sourceFighter, IEffect elementalEffect, ItemForCombatBase itemUsed, FighterBase targetFighter, Vector3? position, float effectPercentage)
         {
             var elementCombatResult = GetCombatResult(sourceFighter, elementalEffect, itemUsed, targetFighter, position, 0, effectPercentage);
-            if (!elementCombatResult.IsHandled)
-            {
-                targetFighter.ApplyElementalEffect(elementalEffect, itemUsed, sourceFighter, position, elementCombatResult.Change);
-            }
+            targetFighter.ApplyElementalEffect(elementalEffect, itemUsed, sourceFighter, position, elementCombatResult.Change);
         }
 
         private void ApplyMaintainDistance(ItemForCombatBase itemUsed, GameObject targetGameObject, FighterBase sourceFighter)
@@ -306,7 +295,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             force *= effectPercentage;
 
-            //todo: adjust value for immunities
+            //todo: adjust value for immunities, e.g. players are immune to Hold
 
             Vector3 forceToApply;
 

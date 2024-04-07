@@ -309,9 +309,9 @@ namespace FullPotential.Core.GameManagement
         {
             var eventManager = (EventManager)DependenciesContext.Dependencies.GetService<IEventManager>();
 
-            //NOTE: No default EventIdResourceValueChanged handler because it changes a NetworkVariable
-            eventManager.Register(LivingEntityBase.EventIdResourceValueChanged, null);
-            eventManager.Register(LivingEntityBase.EventIdHealthValueChanged, LivingEntityBase.DefaultHandlerForHealthChangedEvent);
+            //NOTE: Before and after events because the code is updating a NetworkVariable
+            eventManager.Register(LivingEntityBase.EventIdResourceValueChangeBefore, LivingEntityBase.DefaultHandlerForResourceValueBeforeChangeEvent);
+            eventManager.Register(LivingEntityBase.EventIdResourceValueChangeAfter, null);
 
             eventManager.Register(FighterBase.EventIdReload, FighterBase.DefaultHandlerForReloadEvent);
             eventManager.Register(FighterBase.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEvent);

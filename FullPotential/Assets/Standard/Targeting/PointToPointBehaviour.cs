@@ -10,6 +10,7 @@ using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Standard.TargetingVisuals;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -95,7 +96,7 @@ namespace FullPotential.Standard.Targeting
                 return;
             }
 
-            var anythingSolid =~ LayerMask.GetMask(Layers.NonSolid);
+            var anythingSolid = ~LayerMask.GetMask(Layers.NonSolid);
 
             if (Physics.Raycast(SourceFighter.LookTransform.position, SourceFighter.LookTransform.forward, out var hit, _maxBeamLength, anythingSolid))
             {

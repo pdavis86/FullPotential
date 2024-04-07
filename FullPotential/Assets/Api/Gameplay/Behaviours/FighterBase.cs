@@ -439,6 +439,42 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : HandSlotIds.RightHand;
 
             var activeConsumer = Inventory.GetItemInSlot<Consumer>(slotId);
+
+            return StopActiveConsumerBehaviour(handStatus, activeConsumer);
+        }
+
+        public bool StopActiveConsumerBehaviour(Consumer consumer)
+        {
+            HandStatus handStatus;
+
+            var activeConsumer = Inventory.GetItemInSlot<Consumer>(HandSlotIds.LeftHand);
+
+            if (activeConsumer != consumer)
+            {
+                activeConsumer = Inventory.GetItemInSlot<Consumer>(HandSlotIds.RightHand);
+
+                if (activeConsumer != consumer)
+                {
+                    return false;
+                }
+
+                handStatus = HandStatusRight;
+            }
+            else
+            {
+                handStatus = HandStatusLeft;
+            }
+
+            return StopActiveConsumerBehaviour(handStatus, activeConsumer);
+        }
+
+        private bool StopActiveConsumerBehaviour(HandStatus handStatus, Consumer activeConsumer)
+        {
+            if (!handStatus.IsConsumingResource)
+            {
+                return false;
+            }
+
             activeConsumer.StopStoppables();
 
             handStatus.IsConsumingResource = false;

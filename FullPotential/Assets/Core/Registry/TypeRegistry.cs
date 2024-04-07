@@ -108,8 +108,8 @@ namespace FullPotential.Core.Registry
 
             ValidateAndRegister(typeof(Combat.HurtEffectComputation));
 
-            _eventManager.Subscribe<LivingEntityDiedEventHandler>(LivingEntityBase.EventIdResourceValueChanged);
-            _eventManager.Subscribe<LivingEntityHealthChangedEventHandler>(LivingEntityBase.EventIdResourceValueChanged);
+            _eventManager.Subscribe<LivingEntityDiedEventHandler>(LivingEntityBase.EventIdResourceValueChangeAfter);
+            _eventManager.Subscribe<LivingEntityHealthChangedEventHandler>(LivingEntityBase.EventIdResourceValueChangeAfter);
         }
 
         private void HandleModRegistration(IMod mod)

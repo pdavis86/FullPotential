@@ -35,8 +35,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
     [RequireComponent(typeof(Rigidbody))]
     public abstract class LivingEntityBase : NetworkBehaviour
     {
-        public const string EventIdResourceValueChanged = "20b3ff1d-e8d0-438a-873d-98124f726e38";
-        public const string EventIdHealthValueChanged = "4e8f6a71-3708-47f2-bc57-36bcc5596d0c";
+        public const string EventIdResourceValueChangeBefore = "34372a74-abf3-44eb-8598-4427a82f29ab";
+        public const string EventIdResourceValueChangeAfter = "20b3ff1d-e8d0-438a-873d-98124f726e38";
 
         private const int VelocityThreshold = 3;
         private const int ForceThreshold = 1000;
@@ -248,70 +248,34 @@ namespace FullPotential.Api.Gameplay.Behaviours
             });
         }
 
-        public void TriggerHealthChangedEvent(
-            int change,
-            FighterBase sourceFighter,
-            ItemBase itemUsed,
-            Vector3? position,
-            bool isCritical)
+        public void SetLastDamageValues(FighterBase sourceFighter, ItemForCombatBase itemUsed, int change)
         {
-            var healthChangeEventArgs = new HealthChangeEventArgs(
-                this,
-                change,
-                sourceFighter,
-                itemUsed,
-                position,
-                isCritical);
+            _lastDamageSourceName = sourceFighter != null ? sourceFighter.FighterName : null;
+            _lastDamageItemName = itemUsed?.Name.OrIfNullOrWhitespace(_localizer.Translate("ui.alert.attack.noitem"));
 
-            _eventManager.Trigger(EventIdHealthValueChanged, healthChangeEventArgs);
-        }
+            //Debug.Log($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
 
-        public static void DefaultHandlerForHealthChangedEvent(IEventHandlerArgs eventArgs)
-        {
-            var healthChangeArgs = (HealthChangeEventArgs)eventArgs;
-
-            healthChangeArgs.LivingEntity.ApplyHealthChange(healthChangeArgs);
-        }
-
-        //todo: can this be generalised?
-        public void ApplyHealthChange(HealthChangeEventArgs healthChangeEventArgs)
-        {
-            _lastDamageSourceName = healthChangeEventArgs.SourceFighter != null ? healthChangeEventArgs.SourceFighter.FighterName : null;
-            _lastDamageItemName = healthChangeEventArgs.ItemUsed?.Name.OrIfNullOrWhitespace(_localizer.Translate("ui.alert.attack.noitem"));
-
-            if (healthChangeEventArgs.SourceFighter != null)
+            if (sourceFighter == null)
             {
-                //Debug.Log($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
-
-                if (healthChangeEventArgs.Change < 0)
-                {
-                    var sourceNetworkObject = healthChangeEventArgs.SourceFighter.GameObject.GetComponent<NetworkObject>();
-                    var sourceClientId = sourceNetworkObject != null ? (ulong?)sourceNetworkObject.OwnerClientId : null;
-
-                    if (sourceClientId != null && !healthChangeEventArgs.SourceFighter.Equals(this))
-                    {
-                        var damageDealt = healthChangeEventArgs.Change * -1;
-
-                        if (_damageTaken.ContainsKey(sourceClientId.Value))
-                        {
-                            _damageTaken[sourceClientId.Value] += damageDealt;
-                        }
-                        else
-                        {
-                            _damageTaken.Add(sourceClientId.Value, damageDealt);
-                        }
-                    }
-                }
-
-                ShowHealthChangeToSourceFighter(healthChangeEventArgs.SourceFighter, healthChangeEventArgs.Position, healthChangeEventArgs.Change, healthChangeEventArgs.IsCritical);
+                return;
             }
-            //else
-            //{
-            //    Debug.Log("No source fighter found when trying to apply health change. Did they sign out?");
-            //}
 
-            //Do this last to ensure the entity does not die before recording the cause
-            AdjustResourceValue(ResourceTypeIds.HealthId, healthChangeEventArgs.Change);
+            var sourceNetworkObject = sourceFighter.GameObject.GetComponent<NetworkObject>();
+            var sourceClientId = sourceNetworkObject != null ? (ulong?)sourceNetworkObject.OwnerClientId : null;
+
+            if (sourceClientId != null && !sourceFighter.Equals(this))
+            {
+                var damageDealt = change * -1;
+
+                if (_damageTaken.ContainsKey(sourceClientId.Value))
+                {
+                    _damageTaken[sourceClientId.Value] += damageDealt;
+                }
+                else
+                {
+                    _damageTaken.Add(sourceClientId.Value, damageDealt);
+                }
+            }
         }
 
         private void PopulateResourceValueCache()
@@ -353,7 +317,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             var currentValue = GetResourceValue(typeId);
             currentValue = ClampResourceValue(typeId, currentValue);
-            SetServerResourceValueAndSend(typeId, currentValue + change);
+            TriggerResourceValueUpdate(typeId, currentValue, currentValue + change);
         }
 
         protected void SetResourceInitialValues(Dictionary<string, int> values)
@@ -364,7 +328,19 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        public void SetServerResourceValueAndSend(string typeId, int newValue)
+        public void TriggerResourceValueUpdate(string typeId, int oldValue, int newValue)
+        {
+            var eventArgs = new ResourceValueChangedEventArgs(this, typeId, newValue, newValue - oldValue);
+            _eventManager.Trigger(EventIdResourceValueChangeBefore, eventArgs);
+        }
+
+        public static void DefaultHandlerForResourceValueBeforeChangeEvent(IEventHandlerArgs eventArgs)
+        {
+            var changedArgs = (ResourceValueChangedEventArgs)eventArgs;
+            changedArgs.LivingEntity.SetServerResourceValueAndSend(changedArgs.ResourceTypeId, changedArgs.NewValue);
+        }
+        
+        internal void SetServerResourceValueAndSend(string typeId, int newValue)
         {
             newValue = ClampResourceValue(typeId, newValue);
             _resourceValueCache[typeId] = newValue;
@@ -383,7 +359,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var resourceKeys = _resourceValueCache.Keys.ToList();
             foreach (var resourceId in resourceKeys)
             {
-                SetServerResourceValueAndSend(resourceId, GetResourceMax(resourceId));
+                TriggerResourceValueUpdate(resourceId, 0, GetResourceMax(resourceId));
             }
         }
 
@@ -482,10 +458,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
                 var typeId = _resourceValueCache.ElementAt(i).Key;
 
+                var oldValue = _resourceValueCache[typeId];
                 _resourceValueCache[typeId] = int.Parse(newValues[i]);
 
-                var eventArgs = new ResourceValueChangedEventArgs(this, typeId, _resourceValueCache[typeId]);
-                _eventManager.Trigger(EventIdResourceValueChanged, eventArgs);
+                var eventArgs = new ResourceValueChangedEventArgs(this, typeId, _resourceValueCache[typeId], oldValue - _resourceValueCache[typeId]);
+                _eventManager.Trigger(EventIdResourceValueChangeAfter, eventArgs);
             }
         }
 
@@ -550,6 +527,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             //Debug.Log($"{name} collided with {collision.gameObject.name} at velocity {collision.relativeVelocity} with force {force} with cause {cause}");
 
+            var health = GetResourceValue(ResourceTypeIds.HealthId);
+
             var healthChangeRaw = isVelocityDamage
                 ? Vector3.Dot(contactPoint.normal, collision.relativeVelocity)
                 : force.magnitude / 700;
@@ -559,7 +538,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _lastDamageItemName = null;
             _lastDamageSourceName = cause;
 
-            TriggerHealthChangedEvent(healthChange, _fighterWhoMovedMeLast, null, contactPoint.point, false);
+            SetLastDamageValues(_fighterWhoMovedMeLast, null, healthChange);
+
+            if (_fighterWhoMovedMeLast != null)
+            {
+                ShowHealthChangeToSourceFighter(_fighterWhoMovedMeLast, contactPoint.point, healthChange, false);
+            }
+
+            TriggerResourceValueUpdate(ResourceTypeIds.HealthId, health, health + healthChange);
         }
 
         #endregion
@@ -639,7 +625,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : _localizer.TranslateWithArgs("ui.alert.attack.victimkilledbyusing", victimName, _lastDamageSourceName, _lastDamageItemName);
         }
 
-        private void ShowHealthChangeToSourceFighter(
+        public void ShowHealthChangeToSourceFighter(
             FighterBase sourceFighter,
             Vector3? position,
             int change,

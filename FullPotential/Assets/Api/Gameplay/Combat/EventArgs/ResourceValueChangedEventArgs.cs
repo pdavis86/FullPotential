@@ -13,11 +13,14 @@ namespace FullPotential.Api.Gameplay.Combat.EventArgs
 
         public int NewValue { get; }
 
-        public ResourceValueChangedEventArgs(LivingEntityBase livingEntity, string resourceTypeId, int newValue)
+        public int Change { get; set; }
+
+        public ResourceValueChangedEventArgs(LivingEntityBase livingEntity, string resourceTypeId, int newValue, int change)
         {
             LivingEntity = livingEntity;
             ResourceTypeId = resourceTypeId;
             NewValue = newValue;
+            Change = change;
         }
     }
 }
