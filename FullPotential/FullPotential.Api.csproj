@@ -93,7 +93,7 @@
     <Compile Include="Assets\Api\Registry\Gear\IAccessoryVisuals.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\TransformExtensions.cs" />
     <Compile Include="Assets\Api\Registry\Gear\ISpecialGear.cs" />
-    <Compile Include="Assets\Api\Gameplay\Effects\AffectType.cs" />
+    <Compile Include="Assets\Api\Gameplay\Effects\EffectActionType.cs" />
     <Compile Include="Assets\Api\Items\Types\Accessory.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\ActiveEffect.cs" />
     <Compile Include="Assets\Api\Input\DefaultInputActions.cs" />

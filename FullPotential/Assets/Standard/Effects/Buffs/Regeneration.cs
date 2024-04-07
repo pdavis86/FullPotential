@@ -11,7 +11,7 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public Guid TypeId => Id;
 
-        public AffectType AffectType => AffectType.PeriodicIncrease;
+        public EffectActionType EffectActionType => EffectActionType.PeriodicIncrease;
 
         public string ResourceTypeIdString => ResourceTypeIds.HealthId;
     }

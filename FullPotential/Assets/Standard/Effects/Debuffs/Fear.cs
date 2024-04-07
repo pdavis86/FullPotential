@@ -11,7 +11,7 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public Guid TypeId => Id;
 
-        public AffectType AffectType => AffectType.TemporaryMaxDecrease;
+        public EffectActionType EffectActionType => EffectActionType.TemporaryMaxDecrease;
 
         public string ResourceTypeIdString => ResourceTypeIds.HealthId;
     }

@@ -166,7 +166,7 @@ namespace FullPotential.Core.Gameplay.Combat
             if (effect is IResourceEffect resourceEffect
                 && resourceEffect.ResourceTypeIdString == ResourceTypeIds.HealthId)
             {
-                if (resourceEffect.AffectType == AffectType.SingleDecrease)
+                if (resourceEffect.EffectActionType == EffectActionType.SingleDecrease)
                 {
                     var singleResult = itemUsed.MainEffectComputation.GetAttackResult(sourceFighter, itemUsed, targetFighter, true);
                     var singleAdjusted = (int)(AddVariationToValue(singleResult.Change) * effectPercentage) * -1;
@@ -188,10 +188,10 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private void ApplyResourceEffect(FighterBase sourceFighter, IResourceEffect resourceEffect, ItemForCombatBase itemUsed, FighterBase targetFighter, Vector3? position, float effectPercentage)
         {
-            switch (resourceEffect.AffectType)
+            switch (resourceEffect.EffectActionType)
             {
-                case AffectType.PeriodicDecrease:
-                case AffectType.PeriodicIncrease:
+                case EffectActionType.PeriodicDecrease:
+                case EffectActionType.PeriodicIncrease:
                     var (periodicChange, periodicExpiry, periodicDelay) = itemUsed.GetPeriodicResourceChangeExpiryAndDelay(resourceEffect);
                     var periodicCombatResult = GetCombatResult(sourceFighter, resourceEffect, itemUsed, targetFighter, position, periodicChange, effectPercentage);
                     if (!periodicCombatResult.IsHandled)
@@ -200,8 +200,8 @@ namespace FullPotential.Core.Gameplay.Combat
                     }
                     return;
 
-                case AffectType.SingleDecrease:
-                case AffectType.SingleIncrease:
+                case EffectActionType.SingleDecrease:
+                case EffectActionType.SingleIncrease:
                     var singleChange = itemUsed.GetResourceChange(resourceEffect);
                     var singleCombatResult = GetCombatResult(sourceFighter, resourceEffect, itemUsed, targetFighter, position, singleChange, effectPercentage);
                     if (!singleCombatResult.IsHandled)
@@ -210,8 +210,8 @@ namespace FullPotential.Core.Gameplay.Combat
                     }
                     return;
 
-                case AffectType.TemporaryMaxDecrease:
-                case AffectType.TemporaryMaxIncrease:
+                case EffectActionType.TemporaryMaxDecrease:
+                case EffectActionType.TemporaryMaxIncrease:
                     var (maxChange, maxExpiry) = itemUsed.GetResourceChangeAndExpiry(resourceEffect);
                     var maxCombatResult = GetCombatResult(sourceFighter, resourceEffect, itemUsed, targetFighter, position, maxChange, effectPercentage);
                     if (!maxCombatResult.IsHandled)
@@ -221,7 +221,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     return;
 
                 default:
-                    Debug.LogError($"Not implemented handling for affect type {resourceEffect.AffectType}");
+                    Debug.LogError($"Not implemented handling for affect type {resourceEffect.EffectActionType}");
                     return;
             }
         }

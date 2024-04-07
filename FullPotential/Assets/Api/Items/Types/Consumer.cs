@@ -54,10 +54,10 @@ namespace FullPotential.Api.Items.Types
                 .Select(e => (IResourceEffect)e)
                 .ToList();
 
-            var singleEffects = healthEffects.Where(se => se.AffectType == AffectType.SingleDecrease || se.AffectType == AffectType.SingleIncrease);
+            var singleEffects = healthEffects.Where(se => se.EffectActionType == EffectActionType.SingleDecrease || se.EffectActionType == EffectActionType.SingleIncrease);
             var singleChangeSum = singleEffects.Sum(GetResourceChange);
 
-            var periodicEffects = healthEffects.Where(se => se.AffectType == AffectType.PeriodicDecrease || se.AffectType == AffectType.PeriodicIncrease);
+            var periodicEffects = healthEffects.Where(se => se.EffectActionType == EffectActionType.PeriodicDecrease || se.EffectActionType == EffectActionType.PeriodicIncrease);
             var periodicChangeSum = periodicEffects.Sum(GetPeriodicStatDamagePerSecond) * -1;
 
             return singleChangeSum + periodicChangeSum;

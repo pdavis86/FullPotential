@@ -727,14 +727,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 .Where(x =>
                     x.Effect is IResourceEffect resourceEffect
                     && resourceEffect.ResourceTypeIdString == resourceTypeId
-                    && resourceEffect.AffectType is AffectType.TemporaryMaxIncrease or AffectType.TemporaryMaxDecrease)
+                    && resourceEffect.EffectActionType is EffectActionType.TemporaryMaxIncrease or EffectActionType.TemporaryMaxDecrease)
                 .Sum(x => x.Change);
         }
 
-        private bool DoesAffectAllowMultiple(AffectType affectType)
+        private bool DoesActionTypeAllowMultiple(EffectActionType effectActionType)
         {
-            return affectType == AffectType.TemporaryMaxIncrease
-                || affectType == AffectType.TemporaryMaxDecrease;
+            return effectActionType == EffectActionType.TemporaryMaxIncrease
+                || effectActionType == EffectActionType.TemporaryMaxDecrease;
         }
 
         private void AddOrUpdateEffect(IEffect effect, int change, DateTime expiry)
@@ -742,14 +742,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var resourceEffect = effect as IResourceEffect;
 
             var showExpiry = !(resourceEffect != null
-                && resourceEffect.AffectType is AffectType.SingleDecrease or AffectType.SingleIncrease);
+                && resourceEffect.EffectActionType is EffectActionType.SingleDecrease or EffectActionType.SingleIncrease);
 
             var effectMatch = _activeEffects.FirstOrDefault(x => x.Effect == effect);
 
             if (effectMatch != null)
             {
                 var multipleAllowed =
-                    (resourceEffect != null && DoesAffectAllowMultiple(resourceEffect.AffectType))
+                    (resourceEffect != null && DoesActionTypeAllowMultiple(resourceEffect.EffectActionType))
                     || effect is IAttributeEffect;
 
                 if (multipleAllowed)

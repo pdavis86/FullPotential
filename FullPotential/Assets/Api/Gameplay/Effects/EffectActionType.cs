@@ -1,7 +1,6 @@
 ﻿namespace FullPotential.Api.Gameplay.Effects
 {
-    //todo: needs renaming as a verb cannot have a type
-    public enum AffectType
+    public enum EffectActionType
     {
         SingleIncrease,
         SingleDecrease,

@@ -7,7 +7,7 @@ namespace FullPotential.Api.Registry.Effects
         /// <summary>
         /// The underlying result of applying this effect
         /// </summary>
-        AffectType AffectType { get; }
+        EffectActionType EffectActionType { get; }
 
         /// <summary>
         /// The Id of the resource type which will be affected

@@ -11,7 +11,7 @@ namespace FullPotential.Core.Registry.Effects
 
         public Guid TypeId => Id;
 
-        public AffectType AffectType => AffectType.SingleIncrease;
+        public EffectActionType EffectActionType => EffectActionType.SingleIncrease;
 
         public string ResourceTypeIdString => ResourceTypeIds.HealthId;
     }

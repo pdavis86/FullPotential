@@ -172,7 +172,7 @@ namespace FullPotential.Api.Items.Base
         {
             var change = GetAdjustedStrength();
 
-            if (resourceEffect.AffectType is AffectType.PeriodicDecrease or AffectType.SingleDecrease or AffectType.TemporaryMaxDecrease)
+            if (resourceEffect.EffectActionType is EffectActionType.PeriodicDecrease or EffectActionType.SingleDecrease or EffectActionType.TemporaryMaxDecrease)
             {
                 change *= -1;
             }

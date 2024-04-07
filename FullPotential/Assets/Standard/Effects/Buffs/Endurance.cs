@@ -11,7 +11,7 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public Guid TypeId => Id;
 
-        public AffectType AffectType => AffectType.TemporaryMaxIncrease;
+        public EffectActionType EffectActionType => EffectActionType.TemporaryMaxIncrease;
 
         public string ResourceTypeIdString => ResourceTypeIds.StaminaId;
     }

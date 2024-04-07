@@ -12,7 +12,7 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public Guid TypeId => Id;
 
-        public AffectType AffectType => AffectType.PeriodicDecrease;
+        public EffectActionType EffectActionType => EffectActionType.PeriodicDecrease;
 
         public string ResourceTypeIdString => Mana.TypeIdString;
 
