@@ -39,9 +39,6 @@ namespace FullPotential.Api.Items.Base
                 EffectIds = _effects.Select(x => x.TypeId.ToString()).ToArray();
             }
         }
-        
-        //todo: this should be a list
-        public IEffectComputation MainEffectComputation { get; set; }
 
         public static float GetHighInHighOutInRange(int attributeValue, float min, float max)
         {

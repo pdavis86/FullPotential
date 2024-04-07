@@ -24,6 +24,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
     {
         private ICombatService _combatService;
         private IEffect _singleDamageEffect;
+        private HurtEffectComputation _hurtEffectComputation;
 
         [SetUp]
         public void Setup()
@@ -48,6 +49,8 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
             _combatService = new CombatService(
                 Mock.Of<ITypeRegistry>(),
                 Mock.Of<IRpcService>());
+
+            _hurtEffectComputation = new HurtEffectComputation(Mock.Of<ITypeRegistry>());
         }
 
         [Test]
@@ -89,7 +92,8 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
 
         private int GetDamage(ItemForCombatBase item)
         {
-            return item.MainEffectComputation.GetCombatResult(null, item, null).Change;
+            var damage = _hurtEffectComputation.GetCombatResult(null, item, null).Change;
+            return damage;
         }
 
         private Consumer GetConsumer(Attributes attributes, List<IEffect> effects)
@@ -97,8 +101,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
             return new Consumer
             {
                 Attributes = attributes, 
-                Effects = effects,
-                MainEffectComputation = new HurtEffectComputation(Mock.Of<ITypeRegistry>())
+                Effects = effects
             };
         }
 
@@ -108,8 +111,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
             {
                 RegistryType = new TestWeaponType(),
                 Attributes = attributes,
-                IsTwoHanded = isTwoHanded,
-                MainEffectComputation = new HurtEffectComputation(Mock.Of<ITypeRegistry>())
+                IsTwoHanded = isTwoHanded
             };
         }
 
@@ -119,8 +121,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
             {
                 RegistryType = new TestWeaponType { AmmunitionTypeIdString = "8c25a561-7321-4599-b30c-0ef1bf94ad1c" },
                 Attributes = attributes,
-                IsTwoHanded = isTwoHanded,
-                MainEffectComputation = new HurtEffectComputation(Mock.Of<ITypeRegistry>())
+                IsTwoHanded = isTwoHanded
             };
         }
     }

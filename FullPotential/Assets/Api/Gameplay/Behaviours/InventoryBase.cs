@@ -448,17 +448,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 {
                     combatItem.Effects.Add(_typeRegistry.GetEffect(EffectTypeIds.HurtId));
                 }
-
-                var allEffectComputations = _typeRegistry.GetRegisteredTypes<IEffectComputation>();
-                foreach (var effect in combatItem.Effects)
-                {
-                    var computation = allEffectComputations.FirstOrDefault(x => x.EffectTypeId == effect.TypeId.ToString());
-                    if (computation != null)
-                    {
-                        combatItem.MainEffectComputation = computation;
-                        break;
-                    }
-                }
             }
         }
 

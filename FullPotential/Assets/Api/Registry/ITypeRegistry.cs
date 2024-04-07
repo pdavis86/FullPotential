@@ -11,13 +11,15 @@ namespace FullPotential.Api.Registry
     {
         IEnumerable<T> GetRegisteredTypes<T>() where T : IRegisterable;
 
-        T GetRegisteredByTypeId<T>(string typeId) where T : IRegisterable;
+        T GetRegisteredByTypeId<T>(string typeIdString) where T : IRegisterable;
 
-        IRegisterable GetAnyRegisteredBySlotId(string typeId);
+        IRegisterable GetAnyRegisteredBySlotId(string typeIdString);
 
         IRegisterable GetRegistryTypeForItem(ItemBase item);
 
         IEffect GetEffect(string typeId);
+        
+        IEffectComputation GetEffectComputation(string effectTypeIdString);
 
         void LoadAddessable<T>(string address, Action<T> action);
     }

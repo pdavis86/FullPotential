@@ -260,14 +260,14 @@ namespace FullPotential.Core.Registry
             return _registeredTypeLists[typeof(T)].Cast<T>();
         }
 
-        public T GetRegisteredByTypeId<T>(string typeId) where T : IRegisterable
+        public T GetRegisteredByTypeId<T>(string typeIdString) where T : IRegisterable
         {
-            return GetRegisteredTypes<T>().FirstOrDefault(x => x.TypeId.ToString() == typeId);
+            return GetRegisteredTypes<T>().FirstOrDefault(x => x.TypeId.ToString() == typeIdString);
         }
 
-        public IRegisterable GetAnyRegisteredBySlotId(string slotId)
+        public IRegisterable GetAnyRegisteredBySlotId(string typeIdString)
         {
-            var typeId = slotId.Split(";")[0];
+            var typeId = typeIdString.Split(";")[0];
 
             foreach (var kvp in _registeredTypeLists)
             {
@@ -341,6 +341,12 @@ namespace FullPotential.Core.Registry
                 .FirstOrDefault(x => x.TypeId.ToString() == typeId);
         }
 
+        public IEffectComputation GetEffectComputation(string effectTypeIdString)
+        {
+            var allEffectComputations = GetRegisteredTypes<IEffectComputation>();
+            return allEffectComputations.FirstOrDefault(x => x.EffectTypeId == effectTypeIdString);
+        }
+
         public void LoadAddessable<T>(string address, Action<T> action)
         {
             //Addressables.ReleaseInstance(go) : Destroys objects created by Addressables.InstantiateAsync(address)
@@ -363,6 +369,5 @@ namespace FullPotential.Core.Registry
                 };
             }
         }
-
     }
 }

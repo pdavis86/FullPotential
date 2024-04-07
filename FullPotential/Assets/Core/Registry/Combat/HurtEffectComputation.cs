@@ -93,6 +93,8 @@ namespace FullPotential.Core.Registry.Combat
 
         private int GetTargetDefenceValue(FighterBase targetFighter)
         {
+            //todo: replace with sum of Strength of items with resistance to Hurt
+
             var armorItems = _typeRegistry
                 .GetRegisteredTypes<IArmor>()
                 .Select(x => targetFighter.Inventory.GetItemInSlot<Armor>(x.TypeId.ToString(), false));
@@ -102,27 +104,5 @@ namespace FullPotential.Core.Registry.Combat
                 .Sum(a => a.Attributes.Strength);
             return (int)Math.Floor((float)sum / armorItems.Count());
         }
-
-        //todo: maybe re-instate this?
-        //public int GetDefenseValue()
-        //{
-        //    var defenseSum = 0;
-
-        //    foreach (var kvp in _equippedItems)
-        //    {
-        //        if (kvp.Value.Item?.Id == null)
-        //        {
-        //            continue;
-        //        }
-
-        //        var item = GetItemWithId<ItemBase>(kvp.Value.Item.Id);
-        //        if (item is IDefensible defensibleItem)
-        //        {
-        //            defenseSum += defensibleItem.GetDefenseValue();
-        //        }
-        //    }
-
-        //    return (int)Math.Floor((float)defenseSum / _armorSlotCount);
-        //}
     }
 }

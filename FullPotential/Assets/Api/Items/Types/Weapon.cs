@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
@@ -18,16 +19,22 @@ namespace FullPotential.Api.Items.Types
         private const string AliasSegmentMelee = "MeleeWeapon";
         private const string AliasSegmentRanged = "RangedWeapon";
 
+        private static ITypeRegistry _typeRegistry;
+
         private IItemVisuals _visuals;
 
         //Variables so they are serialized
         // ReSharper disable MemberCanBePrivate.Global
         // ReSharper disable NotAccessedField.Global
         public string WeaponVisualsTypeId;
+        public int Ammo;
         // ReSharper restore MemberCanBePrivate.Global
         // ReSharper restore NotAccessedField.Global
 
-        public int Ammo;
+        private int _baseDamage = -1;
+        private float _meleeDps = -1;
+        private float _defensiveDps = -1;
+        private float _rangedDps = -1;
 
         public IWeapon WeaponType => (IWeapon)RegistryType;
 
@@ -76,20 +83,46 @@ namespace FullPotential.Api.Items.Types
             return 1 / GetDelayBetweenShots();
         }
 
-        public float GetMeleeDps(float multiplier)
+        public float GetMeleeDps()
         {
-            var damage = MainEffectComputation.GetCombatResult(null, this, null).Change;
+            if (_meleeDps >= 0)
+            {
+                return _meleeDps;
+            }
 
             var windUp = GetChargeUpTime();
             var timeForTwoAttacks = windUp + GetCooldownTime() + windUp;
 
-            return damage * 2 / timeForTwoAttacks * multiplier;
+            _meleeDps = GetBaseDamage() * 2 / timeForTwoAttacks;
+
+            return _meleeDps;
+        }
+
+        public float GetDefensiveDps()
+        {
+            if (_defensiveDps >= 0)
+            {
+                return _defensiveDps;
+            }
+
+            var windUp = GetChargeUpTime();
+            var timeForTwoAttacks = windUp + GetCooldownTime() + windUp;
+
+            _defensiveDps = GetBaseDamage() * 2 / timeForTwoAttacks * DefensiveWeaponDpsMultiplier;
+
+            return _defensiveDps;
         }
 
         public float GetRangedDps()
         {
-            var damage = MainEffectComputation.GetCombatResult(null, this, null).Change;
-            return GetDamagePerSecond(damage, GetAmmoMax(), GetAmmoPerSecond(), GetReloadTime());
+            if (_rangedDps >= 0)
+            {
+                return _rangedDps;
+            }
+
+            _rangedDps = GetDamagePerSecond(GetBaseDamage(), GetAmmoMax(), GetAmmoPerSecond(), GetReloadTime());
+
+            return _rangedDps;
         }
 
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
@@ -155,7 +188,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Strength,
                 nameof(Attributes.Strength),
                 AliasSegmentItem,
-                localizer.TranslateFloat(GetMeleeDps(DefensiveWeaponDpsMultiplier)),
+                localizer.TranslateFloat(GetDefensiveDps()),
                 UnitsType.UnitPerTime);
 
             return sb.ToString().Trim();
@@ -201,7 +234,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Strength,
                 nameof(Attributes.Strength),
                 AliasSegmentItem,
-                localizer.TranslateFloat(GetMeleeDps(1)),
+                localizer.TranslateFloat(GetMeleeDps()),
                 UnitsType.UnitPerTime);
 
             return sb.ToString().Trim();
@@ -274,6 +307,32 @@ namespace FullPotential.Api.Items.Types
                 UnitsType.UnitPerTime);
 
             return sb.ToString().Trim();
+        }
+
+        private int GetBaseDamage()
+        {
+            if (_baseDamage >= 0)
+            {
+                return _baseDamage;
+            }
+
+            _typeRegistry ??= DependenciesContext.Dependencies.GetService<ITypeRegistry>();
+
+            var baseDamage = 0;
+
+            foreach (var effect in Effects)
+            {
+                var effectComputation = _typeRegistry.GetEffectComputation(effect.TypeId.ToString());
+
+                if (effectComputation != null)
+                {
+                    baseDamage += effectComputation.GetCombatResult(null, this, null).Change;
+                }
+            }
+
+            _baseDamage = baseDamage;
+
+            return baseDamage;
         }
     }
 }

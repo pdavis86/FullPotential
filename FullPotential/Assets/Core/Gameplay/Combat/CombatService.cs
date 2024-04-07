@@ -162,8 +162,10 @@ namespace FullPotential.Core.Gameplay.Combat
         private CombatResult GetCombatResult(FighterBase sourceFighter, IEffect effect, ItemForCombatBase itemUsed, FighterBase targetFighter, Vector3? position, int change, float effectPercentage)
         {
             var resourceEffect = effect as IResourceEffect;
-            
-            var combatResult = itemUsed?.MainEffectComputation?.GetCombatResult(sourceFighter, itemUsed, targetFighter);
+
+            var effectComputation = _typeRegistry.GetEffectComputation(effect.TypeId.ToString());
+
+            var combatResult = effectComputation?.GetCombatResult(sourceFighter, itemUsed, targetFighter);
 
             var adjustedChange = combatResult != null
                 ? (int)(AddVariationToValue(combatResult.Change) * effectPercentage)

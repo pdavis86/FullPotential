@@ -40,7 +40,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private const int VelocityThreshold = 3;
         private const int ForceThreshold = 1000;
-        //private const int SingleResourceChangeEffectDisplaySeconds = 3;
+        private const int SingleResourceChangeEffectDisplaySeconds = 3;
 
         private readonly NetworkVariable<FixedString4096Bytes> _encodedResourceValues = new NetworkVariable<FixedString4096Bytes>();
 
@@ -673,7 +673,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public void ApplySingleValueChangeToResource(IResourceEffect resourceEffect, int change)
         {
             AdjustResourceValue(resourceEffect.ResourceTypeIdString, change);
-            //todo: maybe don't do this? - AddOrUpdateEffect(resourceEffect, change, DateTime.Now.AddSeconds(SingleResourceChangeEffectDisplaySeconds));
+
+            //Special case for single damage effect
+            var hideEffectFromFighter = resourceEffect.EffectActionType == EffectActionType.SingleDecrease
+                && resourceEffect.ResourceTypeIdString == ResourceTypeIds.HealthId;
+
+            if (!hideEffectFromFighter)
+            {
+                AddOrUpdateEffect(resourceEffect, change, DateTime.Now.AddSeconds(SingleResourceChangeEffectDisplaySeconds));
+            }
         }
 
         public void ApplyTemporaryMaxActionToResource(IResourceEffect resourceEffect, int change, DateTime expiry)
