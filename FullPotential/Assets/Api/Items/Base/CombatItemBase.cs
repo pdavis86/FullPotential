@@ -14,7 +14,7 @@ using UnityEngine;
 namespace FullPotential.Api.Items.Base
 {
     [Serializable]
-    public abstract class ItemForCombatBase : ItemBase
+    public abstract class CombatItemBase : ItemBase
     {
         public const float StrengthDivisor = 4;
         public const string AliasSegmentItem = "item";

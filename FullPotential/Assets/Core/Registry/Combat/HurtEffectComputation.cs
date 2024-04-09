@@ -29,7 +29,7 @@ namespace FullPotential.Core.Registry.Combat
             _typeRegistry = typeRegistry;
         }
         
-        public CombatResult GetCombatResult(FighterBase sourceFighter, ItemForCombatBase itemUsed, FighterBase targetFighter)
+        public CombatResult GetCombatResult(FighterBase sourceFighter, CombatItemBase itemUsed, FighterBase targetFighter)
         {
             float attackStrength = itemUsed?.Attributes.Strength ?? sourceFighter.GetAttributeValue(AttributeAffected.Strength);
             var targetDefence = targetFighter != null ? GetTargetDefenceValue(targetFighter) : 0;
@@ -43,7 +43,7 @@ namespace FullPotential.Core.Registry.Combat
             }
 
             //Even a small attack can still do damage
-            var damage = Mathf.Ceil(attackStrength * defenceRatio / ItemForCombatBase.StrengthDivisor);
+            var damage = Mathf.Ceil(attackStrength * defenceRatio / CombatItemBase.StrengthDivisor);
 
             if (weapon != null && weapon.IsTwoHanded)
             {

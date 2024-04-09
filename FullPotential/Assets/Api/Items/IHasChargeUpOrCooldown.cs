@@ -2,6 +2,8 @@
 {
     public interface IHasChargeUpOrCooldown
     {
+        bool IsChargePercentageUsed { get; }
+
         int ChargePercentage { get; set; }
 
         float GetChargeUpTime();

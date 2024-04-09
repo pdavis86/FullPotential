@@ -16,7 +16,7 @@ namespace FullPotential.Api.Registry.Effects
 
         CombatResult GetCombatResult(
             FighterBase sourceFighter,
-            ItemForCombatBase itemUsed,
+            CombatItemBase itemUsed,
             FighterBase targetFighter);
     }
 }

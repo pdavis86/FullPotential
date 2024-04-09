@@ -12,7 +12,7 @@ using FullPotential.Api.Utilities.Extensions;
 namespace FullPotential.Api.Items.Types
 {
     [Serializable]
-    public class Weapon : ItemWithHealthBase, IHasChargeUpOrCooldown, IHasItemVisuals
+    public class Weapon : CombatItemBase, IHasItemVisuals, IHasChargeUpOrCooldown
     {
         public const float DefensiveWeaponDpsMultiplier = 0.1f;
 
@@ -45,6 +45,8 @@ namespace FullPotential.Api.Items.Types
         public bool IsDefensive => WeaponType.IsDefensive;
 
         public string VisualsTypeId => WeaponVisualsTypeId;
+
+        public bool IsChargePercentageUsed => !IsRanged;
 
         public int ChargePercentage { get; set; }
 

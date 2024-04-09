@@ -318,13 +318,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return _items.Count >= _maxItemCount;
         }
 
-        public List<ItemForCombatBase> GetComponentsFromIds(string[] componentIds)
+        public List<CombatItemBase> GetComponentsFromIds(string[] componentIds)
         {
             //Check that the components are actually in the player's inventory and load them in the order they are given
-            var components = new List<ItemForCombatBase>();
+            var components = new List<CombatItemBase>();
             foreach (var id in componentIds)
             {
-                var match = GetItemWithId<ItemForCombatBase>(id);
+                var match = GetItemWithId<CombatItemBase>(id);
                 if (match != null)
                 {
                     components.Add(match);
@@ -435,7 +435,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            if (item is ItemForCombatBase combatItem)
+            if (item is CombatItemBase combatItem)
             {
                 if (combatItem.EffectIds != null && combatItem.EffectIds.Length > 0 && combatItem.Effects == null)
                 {

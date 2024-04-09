@@ -29,7 +29,7 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private GameObject _inventoryRowPrefab;
 #pragma warning restore 0649
 
-        private readonly List<ItemForCombatBase> _components = new List<ItemForCombatBase>();
+        private readonly List<CombatItemBase> _components = new List<CombatItemBase>();
 
         private PlayerFighter _playerFighter;
         private PlayerBehaviour _playerBehaviour;
@@ -98,7 +98,7 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once MemberCanBePrivate.Global
         public void AddComponent(string itemId)
         {
-            var item = _playerFighter.Inventory.GetItemWithId<ItemForCombatBase>(itemId);
+            var item = _playerFighter.Inventory.GetItemWithId<CombatItemBase>(itemId);
 
             if (item == null)
             {

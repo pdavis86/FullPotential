@@ -248,7 +248,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             });
         }
 
-        public void SetLastDamageValues(FighterBase sourceFighter, ItemForCombatBase itemUsed, int change)
+        public void SetLastDamageValues(FighterBase sourceFighter, CombatItemBase itemUsed, int change)
         {
             _lastDamageSourceName = sourceFighter != null ? sourceFighter.FighterName : null;
             _lastDamageItemName = itemUsed?.Name.OrIfNullOrWhitespace(_localizer.Translate("ui.alert.attack.noitem"));
@@ -690,7 +690,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             AddOrUpdateEffect(resourceEffect, change, expiry);
         }
 
-        public void ApplyElementalEffect(IEffect elementalEffect, ItemForCombatBase itemUsed, FighterBase sourceFighter, Vector3? position, int change)
+        public void ApplyElementalEffect(IEffect elementalEffect, CombatItemBase itemUsed, FighterBase sourceFighter, Vector3? position, int change)
         {
             //todo: ApplyElementalEffect
             Debug.LogWarning("Not yet implemented elemental effects");

@@ -241,10 +241,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateHandCharge(ProgressWheel chargeWheel, ItemBase item)
         {
-            //todo: this is a hack. Think of a better way
-            var rangedWeapon = item is Weapon weapon && weapon.IsRanged;
-
-            if (rangedWeapon || item is not IHasChargeUpOrCooldown hasChargeUpOrCooldown)
+            if (item is not IHasChargeUpOrCooldown hasChargeUpOrCooldown || !hasChargeUpOrCooldown.IsChargePercentageUsed)
             {
                 chargeWheel.gameObject.SetActive(false);
                 return;

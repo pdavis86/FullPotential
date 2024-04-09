@@ -13,7 +13,7 @@ using FullPotential.Api.Utilities.Extensions;
 namespace FullPotential.Api.Items.Types
 {
     [Serializable]
-    public class SpecialGear : ItemWithHealthBase, IResourceConsumer, IHasItemVisuals
+    public class SpecialGear : CombatItemBase, IResourceConsumer, IHasItemVisuals
     {
         private IResource _resourceType;
         private IItemVisuals _visuals;

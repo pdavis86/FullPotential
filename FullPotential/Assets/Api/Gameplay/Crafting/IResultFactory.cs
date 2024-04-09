@@ -14,6 +14,6 @@ namespace FullPotential.Api.Gameplay.Crafting
             string typeId,
             string resourceTypeId,
             bool isTwoHanded,
-            IList<ItemForCombatBase> components);
+            IList<CombatItemBase> components);
     }
 }

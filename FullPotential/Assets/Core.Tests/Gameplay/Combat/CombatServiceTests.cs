@@ -90,7 +90,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
             Assert.AreEqual((int)(expectedBaseDamage * 2 / rangedTwoHandedWeapon.GetAmmoPerSecond()), GetDamage(rangedTwoHandedWeapon));
         }
 
-        private int GetDamage(ItemForCombatBase item)
+        private int GetDamage(CombatItemBase item)
         {
             var damage = _hurtEffectComputation.GetCombatResult(null, item, null).Change;
             return damage;

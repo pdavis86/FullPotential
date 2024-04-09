@@ -9,7 +9,7 @@ using FullPotential.Api.Utilities.Extensions;
 namespace FullPotential.Api.Items.Types
 {
     [Serializable]
-    public class Accessory : ItemWithHealthBase, IHasItemVisuals
+    public class Accessory : CombatItemBase, IHasItemVisuals
     {
         private IItemVisuals _visuals;
 

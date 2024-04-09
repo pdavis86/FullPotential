@@ -56,13 +56,13 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public static float GetRechargeDelay(Api.Items.Types.SpecialGear specialGear)
         {
-            var returnValue = ItemForCombatBase.GetHighInLowOutInRange(specialGear.Attributes.Recovery, 0.5f, 5f);
+            var returnValue = CombatItemBase.GetHighInLowOutInRange(specialGear.Attributes.Recovery, 0.5f, 5f);
             return returnValue;
         }
 
         public static int GetRechargeRate(Api.Items.Types.SpecialGear specialGear)
         {
-            var returnValue = (int)ItemForCombatBase.GetHighInLowOutInRange(specialGear.Attributes.Speed, 1, 10);
+            var returnValue = (int)CombatItemBase.GetHighInLowOutInRange(specialGear.Attributes.Speed, 1, 10);
             return returnValue;
         }
     }

@@ -55,7 +55,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 .ToList();
         }
 
-        private int ComputeAttribute(IList<ItemForCombatBase> components, Func<ItemForCombatBase, int> getProp, bool allowMax = true)
+        private int ComputeAttribute(IList<CombatItemBase> components, Func<CombatItemBase, int> getProp, bool allowMax = true)
         {
             var withValue = components.Where(x => getProp(x) > 0).ToList();
 
@@ -106,7 +106,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return _shapeTypes.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
         }
 
-        private List<IEffect> GetEffects(CraftableType craftableType, IList<ItemForCombatBase> components, ITargeting targeting = null)
+        private List<IEffect> GetEffects(CraftableType craftableType, IList<CombatItemBase> components, ITargeting targeting = null)
         {
             const string buff = "Buff";
             const string debuff = "Debuff";
@@ -319,7 +319,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return min + (int)Math.Round((max - min) * Math.Pow(_random.NextDouble(), 3), 0);
         }
 
-        private Consumer GetConsumer(CraftableType craftableType, string resourceTypeId, IList<ItemForCombatBase> components)
+        private Consumer GetConsumer(CraftableType craftableType, string resourceTypeId, IList<CombatItemBase> components)
         {
             var relevantComponents = components.OfType<IHasTargetingAndShape>().ToList();
 
@@ -367,7 +367,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return _localizer.Translate(TranslationType.CraftingNamePrefix, isAttack ? "attack" : "defence");
         }
 
-        private string GetItemName(bool isAttack, ItemForCombatBase item, string customSuffix = null)
+        private string GetItemName(bool isAttack, CombatItemBase item, string customSuffix = null)
         {
             var suffix = string.IsNullOrWhiteSpace(customSuffix)
                 ? _localizer.Translate(item.RegistryType)
@@ -375,7 +375,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return $"{GetItemNamePrefix(isAttack)} {item.Attributes.Strength} {suffix}";
         }
 
-        private Weapon GetMeleeWeapon(IWeapon craftableType, IList<ItemForCombatBase> components, bool isTwoHanded)
+        private Weapon GetMeleeWeapon(IWeapon craftableType, IList<CombatItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon
             {
@@ -394,7 +394,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Weapon GetRangedWeapon(IWeapon craftableType, IList<ItemForCombatBase> components, bool isTwoHanded)
+        private Weapon GetRangedWeapon(IWeapon craftableType, IList<CombatItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon
             {
@@ -419,7 +419,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Weapon GetDefensiveWeapon(IWeapon craftableType, IList<ItemForCombatBase> components, bool isTwoHanded)
+        private Weapon GetDefensiveWeapon(IWeapon craftableType, IList<CombatItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon
             {
@@ -438,7 +438,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Armor GetArmor(IArmor craftableType, IList<ItemForCombatBase> components)
+        private Armor GetArmor(IArmor craftableType, IList<CombatItemBase> components)
         {
             var armor = new Armor
             {
@@ -454,7 +454,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return armor;
         }
 
-        private Accessory GetAccessory(IAccessory craftableType, IList<ItemForCombatBase> components)
+        private Accessory GetAccessory(IAccessory craftableType, IList<CombatItemBase> components)
         {
             var accessory = new Accessory
             {
@@ -473,7 +473,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return accessory;
         }
 
-        private SpecialGear GetSpecialGear(ISpecialGear craftableType, string resourceTypeId, IList<ItemForCombatBase> components)
+        private SpecialGear GetSpecialGear(ISpecialGear craftableType, string resourceTypeId, IList<CombatItemBase> components)
         {
             //todo: zzz v0.4 - all attributes for specials
 
@@ -499,7 +499,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return specialGear;
         }
 
-        public ItemBase GetCraftedItem(CraftableType craftableType, string typeId, string resourceTypeId, bool isTwoHanded, IList<ItemForCombatBase> components)
+        public ItemBase GetCraftedItem(CraftableType craftableType, string typeId, string resourceTypeId, bool isTwoHanded, IList<CombatItemBase> components)
         {
             switch (craftableType)
             {

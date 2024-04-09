@@ -51,7 +51,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
         public void ApplyEffects(
             FighterBase sourceFighter,
-            ItemForCombatBase itemUsed,
+            CombatItemBase itemUsed,
             GameObject target,
             Vector3? position,
             float effectPercentage
@@ -96,7 +96,7 @@ namespace FullPotential.Core.Gameplay.Combat
         }
 
         //todo: replace with immunity to effect
-        private bool IsEffectAllowed(ItemForCombatBase itemUsed, GameObject target, IEffect effect)
+        private bool IsEffectAllowed(CombatItemBase itemUsed, GameObject target, IEffect effect)
         {
             if (itemUsed is Consumer consumer
                 && consumer.Targeting.IsContinuous)
@@ -121,7 +121,7 @@ namespace FullPotential.Core.Gameplay.Combat
             return true;
         }
 
-        private void ApplyEffect(FighterBase sourceFighter, IEffect effect, ItemForCombatBase itemUsed, GameObject targetGameObject, Vector3? position, float effectPercentage)
+        private void ApplyEffect(FighterBase sourceFighter, IEffect effect, CombatItemBase itemUsed, GameObject targetGameObject, Vector3? position, float effectPercentage)
         {
             if (effect is IMovementEffect movementEffect)
             {
@@ -159,7 +159,7 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private CombatResult GetCombatResult(FighterBase sourceFighter, IEffect effect, ItemForCombatBase itemUsed, FighterBase targetFighter, Vector3? position, int change, float effectPercentage)
+        private CombatResult GetCombatResult(FighterBase sourceFighter, IEffect effect, CombatItemBase itemUsed, FighterBase targetFighter, Vector3? position, int change, float effectPercentage)
         {
             var resourceEffect = effect as IResourceEffect;
 
@@ -192,7 +192,7 @@ namespace FullPotential.Core.Gameplay.Combat
             return new CombatResult { Change = adjustedChange };
         }
 
-        private void ApplyResourceEffect(FighterBase sourceFighter, IResourceEffect resourceEffect, ItemForCombatBase itemUsed, FighterBase targetFighter, Vector3? position, float effectPercentage)
+        private void ApplyResourceEffect(FighterBase sourceFighter, IResourceEffect resourceEffect, CombatItemBase itemUsed, FighterBase targetFighter, Vector3? position, float effectPercentage)
         {
             switch (resourceEffect.EffectActionType)
             {
@@ -223,20 +223,20 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private void ApplyAttributeEffect(FighterBase sourceFighter, IAttributeEffect attributeEffect, ItemForCombatBase itemUsed, FighterBase targetFighter, Vector3? position, float effectPercentage)
+        private void ApplyAttributeEffect(FighterBase sourceFighter, IAttributeEffect attributeEffect, CombatItemBase itemUsed, FighterBase targetFighter, Vector3? position, float effectPercentage)
         {
             var (change, expiry) = itemUsed.GetAttributeChangeAndExpiry(attributeEffect);
             var attributeCombatResult = GetCombatResult(sourceFighter, attributeEffect, itemUsed, targetFighter, position, change, effectPercentage);
             targetFighter.AddAttributeModifier(attributeEffect, attributeCombatResult.Change, expiry);
         }
 
-        private void ApplyElementalEffect(FighterBase sourceFighter, IEffect elementalEffect, ItemForCombatBase itemUsed, FighterBase targetFighter, Vector3? position, float effectPercentage)
+        private void ApplyElementalEffect(FighterBase sourceFighter, IEffect elementalEffect, CombatItemBase itemUsed, FighterBase targetFighter, Vector3? position, float effectPercentage)
         {
             var elementCombatResult = GetCombatResult(sourceFighter, elementalEffect, itemUsed, targetFighter, position, 0, effectPercentage);
             targetFighter.ApplyElementalEffect(elementalEffect, itemUsed, sourceFighter, position, elementCombatResult.Change);
         }
 
-        private void ApplyMaintainDistance(ItemForCombatBase itemUsed, GameObject targetGameObject, FighterBase sourceFighter)
+        private void ApplyMaintainDistance(CombatItemBase itemUsed, GameObject targetGameObject, FighterBase sourceFighter)
         {
             if (itemUsed is not Consumer consumer || !consumer.Targeting.IsContinuous)
             {
@@ -250,7 +250,7 @@ namespace FullPotential.Core.Gameplay.Combat
             comp.Consumer = consumer;
         }
 
-        private void ApplyMovementEffect(FighterBase sourceFighter, ItemForCombatBase itemUsed, IMovementEffect movementEffect, GameObject targetGameObject, float effectPercentage)
+        private void ApplyMovementEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IMovementEffect movementEffect, GameObject targetGameObject, float effectPercentage)
         {
             var targetRigidBody = targetGameObject.GetComponent<Rigidbody>();
 
@@ -289,7 +289,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
             var strength = itemUsed?.Attributes.Strength ?? sourceFighter.GetAttributeValue(AttributeAffected.Strength);
-            var rawForce = ItemForCombatBase.GetHighInHighOutInRange(strength, 100, 300);
+            var rawForce = CombatItemBase.GetHighInHighOutInRange(strength, 100, 300);
 
             var force = adjustForGravity
                 ? rawForce * 2f

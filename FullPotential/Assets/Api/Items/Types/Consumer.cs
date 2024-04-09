@@ -33,6 +33,8 @@ namespace FullPotential.Api.Items.Types
             }
         }
 
+        public bool IsChargePercentageUsed => true;
+
         public int ChargePercentage { get; set; }
 
         public List<IStoppable> Stoppables { get; } = new List<IStoppable>();

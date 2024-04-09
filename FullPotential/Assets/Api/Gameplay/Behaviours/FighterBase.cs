@@ -301,7 +301,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            if (item is not IHasChargeUpOrCooldown hasChargeUpOrCooldown)
+            if (item is not IHasChargeUpOrCooldown hasChargeUpOrCooldown || !hasChargeUpOrCooldown.IsChargePercentageUsed)
             {
                 //Debug.LogWarning("Trying to attack hold an item that is not compatible");
                 return;

@@ -11,7 +11,7 @@ namespace FullPotential.Api.Gameplay.Combat
     {
         void ApplyEffects(
             FighterBase sourceFighter,
-            ItemForCombatBase itemUsed,
+            CombatItemBase itemUsed,
             GameObject target,
             Vector3? position,
             float effectPercentage
