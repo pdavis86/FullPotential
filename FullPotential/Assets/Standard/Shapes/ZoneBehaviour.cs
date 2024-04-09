@@ -85,6 +85,8 @@ namespace FullPotential.Standard.Shapes
             {
                 return;
             }
+
+            ApplyEffects(other);
         }
 
         private void ApplyEffects(Collider other)
