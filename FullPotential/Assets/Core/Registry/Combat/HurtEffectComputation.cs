@@ -22,17 +22,15 @@ namespace FullPotential.Core.Registry.Combat
 
         public string EffectTypeId => EffectTypeIds.HurtId;
 
-        public bool CanBeCriticalHit => true;
-
         public HurtEffectComputation(ITypeRegistry typeRegistry)
         {
             _typeRegistry = typeRegistry;
         }
         
-        public CombatResult GetCombatResult(FighterBase sourceFighter, CombatItemBase itemUsed, FighterBase targetFighter)
+        public CombatResult GetCombatResult(FighterBase sourceFighter, CombatItemBase itemUsed, LivingEntityBase targetLivingEntity)
         {
             float attackStrength = itemUsed?.Attributes.Strength ?? sourceFighter.GetAttributeValue(AttributeAffected.Strength);
-            var targetDefence = targetFighter != null ? GetTargetDefenceValue(targetFighter) : 0;
+            var targetDefence = targetLivingEntity != null ? GetTargetDefenceValue(targetLivingEntity) : 0;
             var defenceRatio = 100f / (100 + targetDefence);
 
             var weapon = itemUsed as Weapon;
@@ -57,7 +55,7 @@ namespace FullPotential.Core.Registry.Combat
 
             var isCritical = false;
 
-            if (CanBeCriticalHit && sourceFighter != null)
+            if (sourceFighter != null)
             {
                 var sourceFighterCriticalHitChance = GetSourceCriticalHitChance(sourceFighter);
                 var criticalTestValue = UnityEngine.Random.Range(0, 101);
@@ -91,13 +89,13 @@ namespace FullPotential.Core.Registry.Combat
             return luckValue / 5f;
         }
 
-        private int GetTargetDefenceValue(FighterBase targetFighter)
+        private int GetTargetDefenceValue(LivingEntityBase targetLivingEntity)
         {
             //todo: replace with sum of Strength of items with resistance to Hurt
 
             var armorItems = _typeRegistry
                 .GetRegisteredTypes<IArmor>()
-                .Select(x => targetFighter.Inventory.GetItemInSlot<Armor>(x.TypeId.ToString(), false));
+                .Select(x => targetLivingEntity.Inventory.GetItemInSlot<Armor>(x.TypeId.ToString(), false));
 
             var sum = armorItems
                 .Where(x => x != null)

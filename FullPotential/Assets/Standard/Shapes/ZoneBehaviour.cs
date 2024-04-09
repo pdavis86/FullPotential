@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
@@ -20,7 +19,6 @@ namespace FullPotential.Standard.Shapes
         private const float DistanceFromGround = 1f;
 
         private readonly NetworkVariable<FixedString4096Bytes> _visualsPrefabAddress = new NetworkVariable<FixedString4096Bytes>();
-        private readonly List<Collider> _colliders = new List<Collider>();
 
         private ICombatService _combatService;
         private ITypeRegistry _typeRegistry;
@@ -61,26 +59,12 @@ namespace FullPotential.Standard.Shapes
             Invoke(nameof(DestroyGameObjectAndChildren), Consumer.GetEffectDuration());
 
             _timeBetweenEffects = Consumer.GetChargeUpTime();
-            _timeSinceLastEffective = _timeBetweenEffects;
 
             _visualsPrefabAddress.Value = !string.IsNullOrWhiteSpace(Consumer.ShapeVisuals?.PrefabAddress)
                 ? Consumer.ShapeVisuals.PrefabAddress
                 : _typeRegistry.GetRegisteredTypes<IShapeVisuals>()
                     .FirstOrDefault(v => v.ApplicableToTypeIdString.ToString() == Zone.TypeIdString)
                     ?.PrefabAddress ?? string.Empty;
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void OnTriggerEnter(Collider other)
-        {
-            _colliders.Add(other);
-            ApplyEffects(other);
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void OnTriggerExit(Collider other)
-        {
-            _colliders.Remove(other);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -101,19 +85,16 @@ namespace FullPotential.Standard.Shapes
             {
                 return;
             }
-
-            _timeSinceLastEffective = 0;
-
-            ApplyEffects(other);
         }
 
         private void ApplyEffects(Collider other)
         {
+            _timeSinceLastEffective = 0;
+
             var position = other.ClosestPointOnBounds(transform.position);
             var adjustedPosition = position + new Vector3(0, DistanceFromGround);
 
-            var effectPercentage = 1f / _colliders.Count(c => c != null);
-            _combatService.ApplyEffects(SourceFighter, Consumer, other.gameObject, adjustedPosition, effectPercentage);
+            _combatService.ApplyEffects(SourceFighter, Consumer, other.gameObject, adjustedPosition, 1);
         }
 
         private void HandleVisualsPrefabAddressValueChanged(FixedString4096Bytes previousValue, FixedString4096Bytes newValue)

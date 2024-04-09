@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
@@ -18,7 +17,6 @@ namespace FullPotential.Standard.Shapes
     public class WallBehaviour : NetworkBehaviour, IShapeBehaviour
     {
         private readonly NetworkVariable<FixedString4096Bytes> _visualsPrefabAddress = new NetworkVariable<FixedString4096Bytes>();
-        private readonly List<Collider> _colliders = new List<Collider>();
 
         private ICombatService _combatService;
         private ITypeRegistry _typeRegistry;
@@ -69,19 +67,6 @@ namespace FullPotential.Standard.Shapes
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void OnTriggerEnter(Collider other)
-        {
-            _colliders.Add(other);
-            ApplyEffects(other);
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void OnTriggerExit(Collider other)
-        {
-            _colliders.Remove(other);
-        }
-
-        // ReSharper disable once UnusedMember.Local
         private void OnTriggerStay(Collider other)
         {
             if (!IsServer)
@@ -100,15 +85,14 @@ namespace FullPotential.Standard.Shapes
                 return;
             }
 
-            _timeSinceLastEffective = 0;
-
             ApplyEffects(other);
         }
 
         private void ApplyEffects(Collider other)
         {
-            var effectPercentage = 1f / _colliders.Count(c => c != null);
-            _combatService.ApplyEffects(SourceFighter, Consumer, other.gameObject, other.ClosestPointOnBounds(transform.position), effectPercentage);
+            _timeSinceLastEffective = 0;
+
+            _combatService.ApplyEffects(SourceFighter, Consumer, other.gameObject, other.ClosestPointOnBounds(transform.position), 1);
         }
 
         private void HandleVisualsPrefabAddressValueChanged(FixedString4096Bytes previousValue, FixedString4096Bytes newValue)

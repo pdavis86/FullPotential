@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
@@ -168,12 +167,6 @@ namespace FullPotential.Api.Items.Base
         public int GetResourceChange(IResourceEffect resourceEffect)
         {
             var change = GetAdjustedStrength();
-
-            if (resourceEffect.EffectActionType is EffectActionType.PeriodicDecrease or EffectActionType.SingleDecrease or EffectActionType.TemporaryMaxDecrease)
-            {
-                change *= -1;
-            }
-
             return change;
         }
 
@@ -229,14 +222,9 @@ namespace FullPotential.Api.Items.Base
             return (changeOverTime, DateTime.Now.AddSeconds(timeToLive), delay);
         }
 
-        public (int Change, DateTime Expiry) GetAttributeChangeAndExpiry(IAttributeEffect attributeEffect)
+        public (int Change, DateTime Expiry) GetAttributeChangeAndExpiry()
         {
             var change = GetAdjustedStrength();
-
-            if (!attributeEffect.TemporaryMaxIncrease)
-            {
-                change *= -1;
-            }
 
             var timeToLive = GetEffectDuration();
 

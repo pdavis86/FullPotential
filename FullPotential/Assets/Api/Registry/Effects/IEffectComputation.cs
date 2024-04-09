@@ -12,11 +12,8 @@ namespace FullPotential.Api.Registry.Effects
     {
         string EffectTypeId { get; }
 
-        bool CanBeCriticalHit { get; }
-
-        CombatResult GetCombatResult(
-            FighterBase sourceFighter,
+        CombatResult GetCombatResult(FighterBase sourceFighter,
             CombatItemBase itemUsed,
-            FighterBase targetFighter);
+            LivingEntityBase targetLivingEntity);
     }
 }

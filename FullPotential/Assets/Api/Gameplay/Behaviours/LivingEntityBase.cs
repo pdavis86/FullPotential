@@ -41,6 +41,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private const int VelocityThreshold = 3;
         private const int ForceThreshold = 1000;
         private const int SingleResourceChangeEffectDisplaySeconds = 3;
+        private const string EncodedValueSeparator = ";";
 
         private readonly NetworkVariable<FixedString4096Bytes> _encodedResourceValues = new NetworkVariable<FixedString4096Bytes>();
 
@@ -146,7 +147,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             UpdateNameOnUi();
-            UpdateResourceValues();
+            UpdateResourceValuesFromEncodedValue();
         }
 
         protected virtual void FixedUpdate()
@@ -224,7 +225,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             //todo: zzz v0.5 - Poor network performance. This fires a LOT e.g. stamina recharging. Maybe don't send recharge updates?
 
-            UpdateResourceValues();
+            UpdateResourceValuesFromEncodedValue();
         }
 
         #endregion
@@ -339,7 +340,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var changedArgs = (ResourceValueChangedEventArgs)eventArgs;
             changedArgs.LivingEntity.SetServerResourceValueAndSend(changedArgs.ResourceTypeId, changedArgs.NewValue);
         }
-        
+
         internal void SetServerResourceValueAndSend(string typeId, int newValue)
         {
             newValue = ClampResourceValue(typeId, newValue);
@@ -350,7 +351,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected void SendServerResourceValuesToClients()
         {
-            var newEncodeValue = string.Join(";", _resourceValueCache.Select(x => x.Value.ToString()));
+            var newEncodeValue = string.Join(EncodedValueSeparator, _resourceValueCache.Select(x => x.Value.ToString()));
             _encodedResourceValues.Value = newEncodeValue;
         }
 
@@ -445,9 +446,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _nameTag.text = displayName;
         }
 
-        private void UpdateResourceValues()
+        private void UpdateResourceValuesFromEncodedValue()
         {
-            var newValues = _encodedResourceValues.Value.ToString().Split(";");
+            var newValues = _encodedResourceValues.Value.ToString().Split(EncodedValueSeparator);
 
             for (var i = 0; i < newValues.Length; i++)
             {
@@ -652,42 +653,56 @@ namespace FullPotential.Api.Gameplay.Behaviours
             AddOrUpdateEffect(attributeEffect, change, expiry);
         }
 
-        public void ApplyPeriodicActionToResource(IResourceEffect resourceEffect, int change, float delay, DateTime expiry)
+        public void ApplyPeriodicActionToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffect resourceEffect, Vector3? position, float effectPercentage)
         {
-            AddOrUpdateEffect(resourceEffect, change, expiry);
-            StartCoroutine(PeriodicActionToResourceCoroutine(resourceEffect, change, delay, expiry));
+            var (periodicChange, periodicExpiry, periodicDelay) = itemUsed.GetPeriodicResourceChangeExpiryAndDelay(resourceEffect);
+            StartCoroutine(PeriodicActionToResourceCoroutine(sourceFighter, itemUsed, resourceEffect, position, effectPercentage, periodicChange, periodicDelay, periodicExpiry));
         }
 
-        private IEnumerator PeriodicActionToResourceCoroutine(IResourceEffect resourceEffect, int change, float delay, DateTime expiry)
+        private IEnumerator PeriodicActionToResourceCoroutine(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffect resourceEffect, Vector3? position, float effectPercentage, int change, float delay, DateTime expiry)
         {
-            var resourceTypeId = resourceEffect.ResourceTypeIdString;
-
             do
             {
-                AdjustResourceValue(resourceTypeId, change);
+                ApplySingleValueChangeToResourceInternal(sourceFighter, itemUsed, resourceEffect, position, change, effectPercentage);
                 yield return new WaitForSeconds(delay);
 
             } while (DateTime.Now < expiry);
         }
 
-        public void ApplySingleValueChangeToResource(IResourceEffect resourceEffect, int change)
+        public void ApplySingleValueChangeToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffect resourceEffect, Vector3? position, float effectPercentage)
         {
-            AdjustResourceValue(resourceEffect.ResourceTypeIdString, change);
-
-            //Special case for single damage effect
-            var hideEffectFromFighter = resourceEffect.EffectActionType == EffectActionType.SingleDecrease
-                && resourceEffect.ResourceTypeIdString == ResourceTypeIds.HealthId;
-
-            if (!hideEffectFromFighter)
-            {
-                AddOrUpdateEffect(resourceEffect, change, DateTime.Now.AddSeconds(SingleResourceChangeEffectDisplaySeconds));
-            }
+            var singleChange = itemUsed.GetResourceChange(resourceEffect);
+            ApplySingleValueChangeToResourceInternal(sourceFighter, itemUsed, resourceEffect, position, singleChange, effectPercentage);
         }
 
-        public void ApplyTemporaryMaxActionToResource(IResourceEffect resourceEffect, int change, DateTime expiry)
+        private void ApplySingleValueChangeToResourceInternal(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffect resourceEffect, Vector3? position, int change, float effectPercentage)
         {
-            AdjustResourceValue(resourceEffect.ResourceTypeIdString, change);
-            AddOrUpdateEffect(resourceEffect, change, expiry);
+            var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, resourceEffect, this, position, change, effectPercentage);
+
+            if (resourceEffect.ResourceTypeIdString == ResourceTypeIds.HealthId)
+            {
+                if (combatResult.Change < 0)
+                {
+                    SetLastDamageValues(sourceFighter, itemUsed, combatResult.Change);
+                }
+
+                //todo: zzz v0.7 - generalise so other types of change can be shown
+                if (sourceFighter != null)
+                {
+                    ShowHealthChangeToSourceFighter(sourceFighter, position, combatResult.Change, combatResult.IsCriticalHit);
+                }
+            }
+
+            AdjustResourceValue(resourceEffect.ResourceTypeIdString, combatResult.Change);
+            AddOrUpdateEffect(resourceEffect, combatResult.Change, DateTime.Now.AddSeconds(SingleResourceChangeEffectDisplaySeconds));
+        }
+
+        public void ApplyTemporaryMaxActionToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffect resourceEffect, Vector3? position, float effectPercentage)
+        {
+            var (maxChange, maxExpiry) = itemUsed.GetResourceChangeAndExpiry(resourceEffect);
+            var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, resourceEffect, this, position, maxChange, effectPercentage);
+            AdjustResourceValue(resourceEffect.ResourceTypeIdString, combatResult.Change);
+            AddOrUpdateEffect(resourceEffect, combatResult.Change, maxExpiry);
         }
 
         public void ApplyElementalEffect(IEffect elementalEffect, CombatItemBase itemUsed, FighterBase sourceFighter, Vector3? position, int change)
@@ -734,6 +749,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private void AddOrUpdateEffect(IEffect effect, int change, DateTime expiry)
         {
             var resourceEffect = effect as IResourceEffect;
+
+            //todo: zzz v0.7 - Add health single decrease effect to a UI options list that can be changed
+            var hideEffectFromFighter = resourceEffect != null
+                && resourceEffect.EffectActionType == EffectActionType.SingleDecrease
+                && resourceEffect.ResourceTypeIdString == ResourceTypeIds.HealthId;
+
+            if (hideEffectFromFighter)
+            {
+                return;
+            }
 
             var showExpiry = !(resourceEffect != null
                 && resourceEffect.EffectActionType is EffectActionType.SingleDecrease or EffectActionType.SingleIncrease);
