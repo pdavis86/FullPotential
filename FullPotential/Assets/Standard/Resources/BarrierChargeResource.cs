@@ -62,7 +62,7 @@ namespace FullPotential.Standard.Resources
             livingEntity.AdjustResourceValue(equippedBarrier.ResourceTypeId, -2);
 
             //Replenish barrier resource
-            //todo: zzz v0.4 - trait-based resource recharge
+            //todo: zzz v0.8 - trait-based resource recharge
             livingEntity.AdjustResourceValue(TypeIdString, Barrier.GetRechargeRate(equippedBarrier));
         }
     }

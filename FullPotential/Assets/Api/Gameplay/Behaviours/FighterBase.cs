@@ -243,7 +243,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public int GetAttributeValue(AttributeAffected attributeAffected)
         {
-            //todo: zzz v0.4 - trait-based attributes
+            //todo: zzz v0.8 - trait-based attributes
             switch (attributeAffected)
             {
                 case AttributeAffected.Strength:

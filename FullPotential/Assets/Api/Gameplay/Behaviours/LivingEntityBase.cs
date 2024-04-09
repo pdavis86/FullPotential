@@ -365,7 +365,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public int GetResourceMax(string resourceTypeId)
         {
-            //todo: zzz v0.4 - trait-based resource max
+            //todo: zzz v0.8 - trait-based resource max
             return 100 + GetResourceMaxAdjustment(resourceTypeId);
         }
 
@@ -380,13 +380,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public int GetStaminaCost()
         {
-            //todo: zzz v0.4 - trait-based sprint costs
+            //todo: zzz v0.8 - trait-based sprint costs
             return 10;
         }
 
         public float GetSprintSpeed()
         {
-            //todo: zzz v0.4 - trait-based sprint speed
+            //todo: zzz v0.8 - trait-based sprint speed
             return 2.5f;
         }
 

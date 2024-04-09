@@ -27,7 +27,7 @@ namespace FullPotential.Standard.Resources
             if (!livingEntity.IsConsumingResource(TypeIdString)
                 && livingEntity.GetResourceValue(TypeIdString) < livingEntity.GetResourceMax(TypeIdString))
             {
-                //todo: zzz v0.4 - trait-based resource recharge
+                //todo: zzz v0.8 - trait-based resource recharge
                 livingEntity.AdjustResourceValue(TypeIdString, 1);
             }
         }
