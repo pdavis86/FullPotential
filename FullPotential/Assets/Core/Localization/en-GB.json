@@ -537,6 +537,16 @@
     {
       "Key": "combat.attack.critical",
       "Value": "CRIT:"
+    },
+	
+	
+	{
+      "Key": "effect.push",
+      "Value": "Push"
+    },
+    {
+      "Key": "effect.push.description",
+      "Value": "Pushes a target away from the source"
     }
   ]
 }
