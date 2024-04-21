@@ -9,7 +9,8 @@
         "Unity.InputSystem",
         "Unity.TextMeshPro",
         "Unity.ResourceManager",
-        "FullPotential.Api"
+        "FullPotential.Api",
+        "Unity.Networking.Transport"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -28,7 +28,7 @@ namespace FullPotential.Core.Gameplay.Combat
             _cnt = gameObject.GetComponent<ClientNetworkTransform>();
             if (_cnt != null)
             {
-                _cnt.IsServerAuthoritative = true;
+                _cnt.SetServerAuthoritative(true);
             }
         }
 
@@ -63,7 +63,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (_cnt != null)
             {
-                _cnt.IsServerAuthoritative = false;
+                _cnt.SetServerAuthoritative(false);
             }
 
             Destroy(_targetPositionGameObject);

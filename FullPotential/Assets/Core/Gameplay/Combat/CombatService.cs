@@ -371,7 +371,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             //force *= effectPercentage;
 
-            //todo: adjust value for immunities, e.g. players are immune to Hold
+            //todo: zzz v0.8 - adjust value for immunities, e.g. players are immune to Hold
 
             Vector3 forceToApply;
 

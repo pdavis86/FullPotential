@@ -174,15 +174,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             _encodedResourceValues.OnValueChanged -= HandleEncodedResourcesChange;
 
-            try
-            {
-                base.OnDestroy();
-            }
-            catch
-            {
-                //todo: zzz v0.5 - Remove after updating NGO and see if problem remains
-                //Do nothing. Work-around for the ObjectDisposedException: The Unity.Collections.NativeList`1[System.Int32] has been deallocated, it is not allowed to access it
-            }
+            base.OnDestroy();
         }
 
         // ReSharper restore UnusedMemberHierarchy.Global
