@@ -135,9 +135,6 @@ namespace FullPotential.Core.Registry
                         return;
                     }
 
-                    //todo: zzz v0.5 - use gameObject.GetHashCode().ToString() instead of address in GenerateHash() to get the "NetworkConfig mismatch" issue
-                    // then you can figure out how to tell the client that just tried to join
-
                     //Work-around for https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/1499
                     var hashFiledInfo = typeof(NetworkObject).GetField("GlobalObjectIdHash", BindingFlags.NonPublic | BindingFlags.Instance);
                     hashFiledInfo!.SetValue(networkObject, GenerateHash(address));

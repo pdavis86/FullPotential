@@ -6,10 +6,9 @@ using FullPotential.Api.Localization;
 using FullPotential.Api.Persistence;
 using FullPotential.Api.Ui.Services;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Core.GameManagement.Enums;
 using FullPotential.Core.Networking.Data;
 using Unity.Netcode;
-using Unity.Netcode.Transports.UNET;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -43,7 +42,7 @@ namespace FullPotential.Core.GameManagement
         private IUiAssistant _uiAssistant;
 
         private NetworkManager _networkManager;
-        private UNetTransport _networkTransport;
+        private UnityTransport _networkTransport;
 
         private string _onlineSceneName;
         private string _username;
@@ -65,7 +64,7 @@ namespace FullPotential.Core.GameManagement
         private void Start()
         {
             _networkManager = NetworkManager.Singleton;
-            _networkTransport = _networkManager.GetComponent<UNetTransport>();
+            _networkTransport = _networkManager.GetComponent<UnityTransport>();
             _onlineSceneName = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(2));
 
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
@@ -251,34 +250,26 @@ namespace FullPotential.Core.GameManagement
             }
         }
 
-        private void SetNetworkAddressAndPort(bool isHosting = false)
+        private void SetNetworkAddressAndPort()
         {
-            _networkTransport.ConnectAddress = !string.IsNullOrWhiteSpace(_networkAddress)
+            var address = !string.IsNullOrWhiteSpace(_networkAddress)
                 ? _networkAddress
                 : "127.0.0.1";
 
-            var desiredPort = int.TryParse(_networkPort, out var port)
+            var desiredPort = ushort.TryParse(_networkPort, out var port)
                 ? port
-                : 7777;
+                : (ushort)7777;
 
-            if (isHosting)
-            {
-                _networkTransport.ServerListenPort = desiredPort;
-            }
-            else
-            {
-                _networkTransport.ConnectPort = desiredPort;
-            }
-
+            _networkTransport.SetConnectionData(address, desiredPort);
         }
 
         private void HostGameInternal()
         {
             _gameDetailsError.gameObject.SetActive(false);
 
-            SetNetworkAddressAndPort(true);
+            SetNetworkAddressAndPort();
 
-            if (!IsPortFree(_networkTransport.ServerListenPort))
+            if (!IsPortFree(_networkTransport.ConnectionData.ListenEndPoint.Port))
             {
                 _gameDetailsError.text = _localizer.Translate("ui.connect.portnotfree");
                 _gameDetailsError.gameObject.SetActive(true);
@@ -318,9 +309,6 @@ namespace FullPotential.Core.GameManagement
             _joinAttempt = DateTime.UtcNow;
             _networkManager.StartClient();
 
-            _networkManager.CustomMessagingManager.UnregisterNamedMessageHandler(nameof(SetDisconnectReasonClientCustomMessage));
-            _networkManager.CustomMessagingManager.RegisterNamedMessageHandler(nameof(SetDisconnectReasonClientCustomMessage), SetDisconnectReasonClientCustomMessage);
-
             _gameDetailsContainer.SetActive(false);
             _joiningMessage.SetActive(true);
 
@@ -357,15 +345,5 @@ namespace FullPotential.Core.GameManagement
 
             } while (true);
         }
-
-        public void SetDisconnectReasonClientCustomMessage(ulong clientId, FastBufferReader reader)
-        {
-            reader.ReadValueSafe(out ConnectStatus status);
-
-            Debug.LogWarning($"Server refused connection with status {status}");
-
-            GameManager.Instance.LocalGameDataStore.DisconnectReason = status.ToString();
-        }
-
     }
 }

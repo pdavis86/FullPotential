@@ -42,7 +42,7 @@ namespace FullPotential.Core.Ui.Behaviours
         private void Awake()
         {
             _availableResolutions = Screen.resolutions
-                .Where(x => x.refreshRate == 60)
+                .Where(x => (int)x.refreshRateRatio.value == 60)
                 .Distinct()
                 .ToArray();
 

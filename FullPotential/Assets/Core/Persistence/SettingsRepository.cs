@@ -1,6 +1,5 @@
 ﻿using FullPotential.Api.Data;
 using FullPotential.Api.Persistence;
-using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Localization;
 using UnityEngine;
 
@@ -27,16 +26,6 @@ namespace FullPotential.Core.Persistence
                     Culture = Localizer.DefaultCulture
                 };
             }
-
-            //todo: zzz v0.5 - Remove GameSettings.Username backwards compat
-#pragma warning disable CS0618
-            if (!gameSettings.Username.IsNullOrWhiteSpace() &&
-                gameSettings.LastSigninUsername.IsNullOrWhiteSpace())
-            {
-                gameSettings.LastSigninUsername = gameSettings.Username;
-                gameSettings.Username = null;
-            }
-#pragma warning restore CS0618
 
             if (gameSettings.LookSensitivity == 0)
             {

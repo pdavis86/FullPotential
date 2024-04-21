@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -18,13 +17,11 @@ using FullPotential.Api.Unity.Services;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement.Data;
-using FullPotential.Core.GameManagement.Enums;
 using FullPotential.Core.GameManagement.Events;
 using FullPotential.Core.Gameplay.Events;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Player;
 using FullPotential.Core.Registry;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -113,8 +110,8 @@ namespace FullPotential.Core.GameManagement
 
             InputActions = new DefaultInputActions();
 
-            NetworkManager.Singleton.ConnectionApprovalCallback += OnApprovalCheck;
-            NetworkManager.Singleton.OnClientDisconnectCallback += OnDisconnectedFromServer;
+            NetworkManager.Singleton.ConnectionApprovalCallback += HandleAfterApprovalCheck;
+            NetworkManager.Singleton.OnClientDisconnectCallback += HandleAfterDisconnectedFromServer;
 
             _playerPrefabNetObj = Prefabs.Player.GetComponent<NetworkObject>();
 
@@ -140,7 +137,7 @@ namespace FullPotential.Core.GameManagement
             }
         }
 
-        private void OnApprovalCheck(NetworkManager.ConnectionApprovalRequest approvalRequest, NetworkManager.ConnectionApprovalResponse approvalResponse)
+        private void HandleAfterApprovalCheck(NetworkManager.ConnectionApprovalRequest approvalRequest, NetworkManager.ConnectionApprovalResponse approvalResponse)
         {
             if (approvalRequest.ClientNetworkId == NetworkManager.Singleton.LocalClientId)
             {
@@ -167,10 +164,8 @@ namespace FullPotential.Core.GameManagement
                 {
                     Debug.LogWarning($"User {playerUsername} is already connected");
 
-                    //todo: zzz v0.5 - reject reason does not seem to work yet. Approve so we can send a disconnect reason
-                    approvalResponse.Approved = true;
-                    SendServerToClientSetDisconnectReason(approvalRequest.ClientNetworkId, ConnectStatus.LoggedInAgain);
-                    StartCoroutine(WaitToDisconnect(approvalRequest.ClientNetworkId));
+                    //todo: translate
+                    approvalResponse.Reason = "You are already connected";
 
                     return;
                 }
@@ -184,10 +179,8 @@ namespace FullPotential.Core.GameManagement
             {
                 Debug.LogWarning("Client tried to connect with an incompatible version");
 
-                //todo: zzz v0.5 - reject reason does not seem to work yet. Approve so we can send a disconnect reason
-                approvalResponse.Approved = true;
-                SendServerToClientSetDisconnectReason(approvalRequest.ClientNetworkId, ConnectStatus.VersionMismatch);
-                StartCoroutine(WaitToDisconnect(approvalRequest.ClientNetworkId));
+                //todo: translate
+                approvalResponse.Reason = "You game version is incompatible with the server";
 
                 return;
             }
@@ -195,7 +188,7 @@ namespace FullPotential.Core.GameManagement
             approvalResponse.Approved = true;
         }
 
-        private void OnDisconnectedFromServer(ulong clientId)
+        private void HandleAfterDisconnectedFromServer(ulong clientId)
         {
             if (NetworkManager.Singleton.IsServer)
             {
@@ -204,6 +197,7 @@ namespace FullPotential.Core.GameManagement
             else
             {
                 LocalGameDataStore.HasDisconnected = true;
+                LocalGameDataStore.DisconnectReason = NetworkManager.Singleton.DisconnectReason;
 
                 if (SceneManager.GetActiveScene().buildIndex != 1)
                 {
@@ -213,19 +207,6 @@ namespace FullPotential.Core.GameManagement
         }
 
         #endregion
-
-        private void SendServerToClientSetDisconnectReason(ulong clientId, ConnectStatus status)
-        {
-            var writer = new FastBufferWriter(sizeof(ConnectStatus), Allocator.Temp);
-            writer.WriteValueSafe(status);
-            NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(nameof(JoinOrHostGame.SetDisconnectReasonClientCustomMessage), clientId, writer);
-        }
-
-        private IEnumerator WaitToDisconnect(ulong clientId)
-        {
-            yield return new WaitForSeconds(0.5f);
-            NetworkManager.Singleton.DisconnectClient(clientId);
-        }
 
         public async Task SetCultureAsync(string cultureCode)
         {

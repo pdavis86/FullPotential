@@ -2,7 +2,7 @@
 
 namespace FullPotential.Api.Items.Types
 {
-    //todo: zzz v0.5 - Loot should no inherit from CombatItemBase
+    //todo: zzz v0.6 - Loot should not inherit from CombatItemBase
     [System.Serializable]
     public class Loot : ItemWithTargetingAndShapeBase
     {
