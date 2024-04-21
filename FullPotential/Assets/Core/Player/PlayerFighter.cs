@@ -32,8 +32,6 @@ namespace FullPotential.Core.Player
 {
     public class PlayerFighter : FighterBase, IPlayerFighter
     {
-        private const string LoadingScreenGameObjectName = "LoadingScreen";
-
         #region Variables
 
         private ClientRpcParams _clientRpcParams;
@@ -141,7 +139,7 @@ namespace FullPotential.Core.Player
             if (IsOwner)
             {
                 _unityHelperUtilities.GetObjectAtRoot(GameObjectNames.SceneCanvas).transform
-                    .Find(LoadingScreenGameObjectName).gameObject
+                    .Find(GameObjectNames.LoadingScreen).gameObject
                     .SetActive(false);
 
                 GameManager.Instance.LocalGameDataStore.PlayerGameObject = gameObject;
@@ -484,7 +482,7 @@ namespace FullPotential.Core.Player
             }
         }
 
-        //todo: zzz v0.5 - Remove? Need this to get over the key not found exception caused by too many RPC calls with large payloads
+        //todo: Remove? Need this to get over the key not found exception caused by too many RPC calls with large payloads
         private IEnumerator LoadFromPlayerDataCoroutine(PlayerData playerData, ulong clientId)
         {
             var clientRpcParams = new ClientRpcParams

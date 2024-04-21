@@ -169,7 +169,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Strength,
                 nameof(Attributes.Strength),
                 AliasSegmentDefensive,
-                localizer.TranslateInt(Attributes.Strength));
+                localizer.Translate(Attributes.Strength));
 
             AppendToDescription(
                 sb,
@@ -177,7 +177,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Speed,
                 nameof(Attributes.Speed),
                 AliasSegmentMelee,
-                localizer.TranslateFloat(GetChargeUpTime()),
+                localizer.Translate(GetChargeUpTime()),
                 UnitsType.UnitPerTime);
 
             AppendToDescription(
@@ -186,7 +186,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Recovery,
                 nameof(Attributes.Recovery),
                 AliasSegmentMelee,
-                localizer.TranslateFloat(GetCooldownTime()),
+                localizer.Translate(GetCooldownTime()),
                 UnitsType.UnitPerTime);
 
             AppendToDescription(
@@ -195,7 +195,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Strength,
                 nameof(Attributes.Strength),
                 AliasSegmentItem,
-                localizer.TranslateFloat(GetDefensiveDps()),
+                localizer.Translate(GetDefensiveDps()),
                 UnitsType.UnitPerTime);
 
             return sb.ToString().Trim();
@@ -223,7 +223,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Speed,
                 nameof(Attributes.Speed),
                 AliasSegmentMelee,
-                localizer.TranslateFloat(GetChargeUpTime()),
+                localizer.Translate(GetChargeUpTime()),
                 UnitsType.UnitPerTime);
 
             AppendToDescription(
@@ -232,7 +232,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Recovery,
                 nameof(Attributes.Recovery),
                 AliasSegmentMelee,
-                localizer.TranslateFloat(GetCooldownTime()),
+                localizer.Translate(GetCooldownTime()),
                 UnitsType.UnitPerTime);
 
             AppendToDescription(
@@ -241,7 +241,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Strength,
                 nameof(Attributes.Strength),
                 AliasSegmentItem,
-                localizer.TranslateFloat(GetMeleeDps()),
+                localizer.Translate(GetMeleeDps()),
                 UnitsType.UnitPerTime);
 
             return sb.ToString().Trim();
@@ -274,7 +274,7 @@ namespace FullPotential.Api.Items.Types
                     Attributes.Efficiency,
                     nameof(Attributes.Efficiency),
                     AliasSegmentRanged,
-                    localizer.TranslateInt(GetAmmoMax()));
+                    localizer.Translate(GetAmmoMax()));
             }
 
             AppendToDescription(
@@ -283,7 +283,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Accuracy,
                 nameof(Attributes.Accuracy),
                 AliasSegmentItem,
-                localizer.TranslateFloat(Attributes.Accuracy),
+                localizer.Translate(Attributes.Accuracy),
                 UnitsType.Percent);
 
             AppendToDescription(
@@ -292,7 +292,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Speed,
                 nameof(Attributes.Speed),
                 AliasSegmentRanged,
-                localizer.TranslateFloat(GetAmmoPerSecond()),
+                localizer.Translate(GetAmmoPerSecond()),
                 UnitsType.UnitPerTime);
 
             AppendToDescription(
@@ -301,7 +301,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Recovery,
                 nameof(Attributes.Recovery),
                 AliasSegmentRanged,
-                localizer.TranslateFloat(GetReloadTime()),
+                localizer.Translate(GetReloadTime()),
                 UnitsType.Time);
 
             AppendToDescription(
@@ -310,7 +310,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Strength,
                 nameof(Attributes.Strength),
                 AliasSegmentItem,
-                localizer.TranslateFloat(GetRangedDps()),
+                localizer.Translate(GetRangedDps()),
                 UnitsType.UnitPerTime);
 
             return sb.ToString().Trim();

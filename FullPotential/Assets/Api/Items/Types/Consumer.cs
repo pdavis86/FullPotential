@@ -111,7 +111,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Range,
                 nameof(Attributes.Range),
                 AliasSegmentItem,
-                localizer.TranslateFloat(GetRangeForDisplay()),
+                localizer.Translate(GetRangeForDisplay()),
                 UnitsType.Distance);
 
             AppendToDescription(
@@ -120,7 +120,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Accuracy,
                 nameof(Attributes.Accuracy),
                 AliasSegmentItem,
-                localizer.TranslateFloat(Attributes.Accuracy),
+                localizer.Translate(Attributes.Accuracy),
                 UnitsType.Percent);
 
             AppendToDescription(
@@ -129,7 +129,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Speed,
                 nameof(Attributes.Speed),
                 AliasSegmentConsumer,
-                localizer.TranslateFloat(GetChargeUpTime()),
+                localizer.Translate(GetChargeUpTime()),
                 UnitsType.Time);
 
             AppendToDescription(
@@ -138,7 +138,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Recovery,
                 nameof(Attributes.Recovery),
                 AliasSegmentConsumer,
-                localizer.TranslateFloat(GetCooldownTime()),
+                localizer.Translate(GetCooldownTime()),
                 UnitsType.Time);
 
             AppendToDescription(
@@ -147,7 +147,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Duration,
                 nameof(Attributes.Duration),
                 AliasSegmentConsumer,
-                localizer.TranslateFloat(GetEffectDuration()),
+                localizer.Translate(GetEffectDuration()),
                 UnitsType.Time);
 
             var changePerSecond = GetResourceChangePerSecond();
@@ -159,7 +159,7 @@ namespace FullPotential.Api.Items.Types
                     Attributes.Strength,
                     nameof(Attributes.Strength),
                     AliasSegmentConsumer,
-                    localizer.TranslateFloat(changePerSecond),
+                    localizer.Translate(changePerSecond),
                     UnitsType.UnitPerTime);
             }
 

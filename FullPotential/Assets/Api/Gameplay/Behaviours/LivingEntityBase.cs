@@ -215,7 +215,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected virtual void HandleEncodedResourcesChange(FixedString4096Bytes previousValue, FixedString4096Bytes newValue)
         {
-            //todo: zzz v0.5 - Poor network performance. This fires a LOT e.g. stamina recharging. Maybe don't send recharge updates?
+            //todo: Poor network performance. This fires a LOT e.g. stamina recharging. Maybe don't send recharge updates?
 
             UpdateResourceValuesFromEncodedValue();
         }
@@ -609,24 +609,24 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 {
                     return _lastDamageItemName.IsNullOrWhiteSpace()
                         ? _localizer.Translate("ui.alert.attack.youkilledyourself")
-                        : _localizer.TranslateWithArgs("ui.alert.attack.youkilledyourselfusing", _lastDamageItemName);
+                        : _localizer.Translate("ui.alert.attack.youkilledyourselfusing", _lastDamageItemName);
                 }
 
                 return _lastDamageItemName.IsNullOrWhiteSpace()
-                    ? _localizer.TranslateWithArgs("ui.alert.attack.youwerekilledby", _lastDamageSourceName)
-                    : _localizer.TranslateWithArgs("ui.alert.attack.youwerekilledbyusing", _lastDamageSourceName, _lastDamageItemName);
+                    ? _localizer.Translate("ui.alert.attack.youwerekilledby", _lastDamageSourceName)
+                    : _localizer.Translate("ui.alert.attack.youwerekilledbyusing", _lastDamageSourceName, _lastDamageItemName);
             }
 
             if (_lastDamageSourceName == victimName)
             {
                 return _lastDamageItemName.IsNullOrWhiteSpace()
-                    ? _localizer.TranslateWithArgs("ui.alert.attack.victimsuicide", victimName)
-                    : _localizer.TranslateWithArgs("ui.alert.attack.victimsuicideusing", victimName, _lastDamageItemName);
+                    ? _localizer.Translate("ui.alert.attack.victimsuicide", victimName)
+                    : _localizer.Translate("ui.alert.attack.victimsuicideusing", victimName, _lastDamageItemName);
             }
 
             return _lastDamageItemName.IsNullOrWhiteSpace()
-                ? _localizer.TranslateWithArgs("ui.alert.attack.victimkilledby", victimName, _lastDamageSourceName)
-                : _localizer.TranslateWithArgs("ui.alert.attack.victimkilledbyusing", victimName, _lastDamageSourceName, _lastDamageItemName);
+                ? _localizer.Translate("ui.alert.attack.victimkilledby", victimName, _lastDamageSourceName)
+                : _localizer.Translate("ui.alert.attack.victimkilledbyusing", victimName, _lastDamageSourceName, _lastDamageItemName);
         }
 
         public void ShowHealthChangeToSourceFighter(

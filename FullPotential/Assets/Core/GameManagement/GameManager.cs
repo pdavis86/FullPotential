@@ -163,9 +163,8 @@ namespace FullPotential.Core.GameManagement
                 if (NetworkManager.Singleton.ConnectedClients.ContainsKey(originalClientId))
                 {
                     Debug.LogWarning($"User {playerUsername} is already connected");
-
-                    //todo: translate
-                    approvalResponse.Reason = "You are already connected";
+                    
+                    approvalResponse.Reason = _localizer.Translate("ui.connect.alreadyconnected");
 
                     return;
                 }
@@ -179,8 +178,7 @@ namespace FullPotential.Core.GameManagement
             {
                 Debug.LogWarning("Client tried to connect with an incompatible version");
 
-                //todo: translate
-                approvalResponse.Reason = "You game version is incompatible with the server";
+                approvalResponse.Reason = _localizer.Translate("ui.connect.incompatible");
 
                 return;
             }
