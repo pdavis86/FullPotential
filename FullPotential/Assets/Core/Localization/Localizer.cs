@@ -197,17 +197,17 @@ namespace FullPotential.Core.Localization
             return "Unexpected IRegisterable type";
         }
 
-        public string TranslateWithArgs(string id, params object[] arguments)
+        public string Translate(string id, params object[] arguments)
         {
             return string.Format(Translate(id), arguments);
         }
 
-        public string TranslateInt(int input)
+        public string Translate(int input)
         {
             return input.ToString();
         }
 
-        public string TranslateFloat(float input, int decimalPlaces = 1)
+        public string Translate(float input, int decimalPlaces = 1)
         {
             var rounded = Math.Round(input, decimalPlaces);
             return rounded.ToString(CurrentCulture);

@@ -55,7 +55,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Strength,
                 nameof(Attributes.Strength),
                 AliasSegmentDefensive,
-                localizer.TranslateInt(Attributes.Strength));
+                localizer.Translate(Attributes.Strength));
 
             return sb.ToString().Trim();
         }

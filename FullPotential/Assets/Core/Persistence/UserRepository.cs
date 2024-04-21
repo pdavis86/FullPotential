@@ -11,14 +11,8 @@ namespace FullPotential.Core.Persistence
 {
     public class UserRepository : IUserRepository
     {
-        private readonly bool _isDebugBuild;
-        private readonly string _persistentDataPath;
-
-        public UserRepository()
-        {
-            _isDebugBuild = Debug.isDebugBuild;
-            _persistentDataPath = Application.persistentDataPath;
-        }
+        private readonly bool _isDebugBuild = Debug.isDebugBuild;
+        private readonly string _persistentDataPath = Application.persistentDataPath;
 
         public string SignIn(string username, string password)
         {
@@ -31,13 +25,13 @@ namespace FullPotential.Core.Persistence
 
         public string GetUsernameFromToken(string token)
         {
-            //todo: zzz v0.5 - Username and token are never the same
+            //todo: Username and token are never the same
             return token;
         }
 
         public PlayerData Load(string token, string username, bool reduced)
         {
-            //todo: zzz v0.5 - Username and token are never the same
+            //todo: Username and token are never the same
             if (string.IsNullOrWhiteSpace(username))
             {
                 username = token;

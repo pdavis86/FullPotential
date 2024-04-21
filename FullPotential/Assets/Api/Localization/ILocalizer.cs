@@ -23,11 +23,11 @@ namespace FullPotential.Api.Localization
 
         string Translate(IRegisterable registeredItem);
 
-        string TranslateWithArgs(string id, params object[] arguments);
+        string Translate(string id, params object[] arguments);
 
-        string TranslateInt(int number);
+        string Translate(int number);
 
-        string TranslateFloat(float number, int decimalPlaces = 1);
+        string Translate(float number, int decimalPlaces = 1);
 
         Dictionary<T, string> GetDictionaryFromEnum<T>(TranslationType translationType, bool sort = true) where T : Enum;
     }

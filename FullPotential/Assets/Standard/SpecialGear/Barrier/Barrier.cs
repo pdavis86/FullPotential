@@ -39,7 +39,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 specialGear.Attributes.Recovery,
                 nameof(Attributes.Recovery),
                 nameof(Barrier),
-                localizer.TranslateFloat(GetRechargeDelay(specialGear)),
+                localizer.Translate(GetRechargeDelay(specialGear)),
                 UnitsType.Time);
 
             specialGear.AppendToDescription(
@@ -48,7 +48,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 specialGear.Attributes.Speed,
                 nameof(Attributes.Speed),
                 nameof(Barrier),
-                localizer.TranslateFloat(GetRechargeRate(specialGear)),
+                localizer.Translate(GetRechargeRate(specialGear)),
                 UnitsType.UnitPerTime);
 
             return sb.ToString().Trim();

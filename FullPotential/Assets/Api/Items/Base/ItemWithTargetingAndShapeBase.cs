@@ -3,7 +3,7 @@ using FullPotential.Api.Registry.Targeting;
 
 namespace FullPotential.Api.Items.Base
 {
-    //todo: zzz v0.5 - Remove all the Serializable nonsense and make this an interface instead of an abstract class
+    //todo: Remove all the Serializable nonsense and make this an interface instead of an abstract class
     public abstract class ItemWithTargetingAndShapeBase : CombatItemBase, IHasTargetingAndShape
     {
         private ITargeting _targeting;

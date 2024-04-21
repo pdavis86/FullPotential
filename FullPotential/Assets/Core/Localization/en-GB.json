@@ -326,16 +326,20 @@
       "Value": "Failed to join game"
     },
     {
-      "Key": "ui.connect.disconnected",
-      "Value": "The server disconnected you"
-    },
-    {
       "Key": "ui.connect.portnotfree",
       "Value": "Port is in use"
     },
     {
-      "Key": "ui.connect.joinrejected",
-      "Value": "Connection rejected: {0}"
+      "Key": "ui.connect.disconnected",
+      "Value": "The server disconnected you"
+    },
+    {
+      "Key": "ui.connect.alreadyconnected",
+      "Value": "You are already connected"
+    },
+    {
+      "Key": "ui.connect.incompatible",
+      "Value": "Your game version is incompatible with the server"
     },
 
 
