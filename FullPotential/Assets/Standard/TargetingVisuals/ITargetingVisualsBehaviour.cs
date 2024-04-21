@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+// ReSharper disable UnusedMember.Global
+
 namespace FullPotential.Standard.TargetingVisuals
 {
     public interface ITargetingVisualsBehaviour

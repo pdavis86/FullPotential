@@ -343,6 +343,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         internal void SetServerResourceValueAndSend(string typeId, int newValue)
         {
+            if (!IsServer)
+            {
+                return;
+            }
+
             newValue = ClampResourceValue(typeId, newValue);
             _resourceValueCache[typeId] = newValue;
 

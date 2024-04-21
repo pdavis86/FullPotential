@@ -283,12 +283,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
             if (item is Weapon weapon
                 && weapon.Attributes.IsAutomatic)
             {
-                if (!IsHost)
+                if (!IsServer)
                 {
                     TryToAttackHoldServerRpc(isLeftHand);
                 }
 
-                handStatus.IntraActionEnumerator = AutomaticWeaponFire(weapon, isLeftHand);
+                handStatus.IntraActionEnumerator = AutomaticWeaponFireEnumerator(weapon, isLeftHand);
                 StartCoroutine(handStatus.IntraActionEnumerator);
                 return;
             }
@@ -307,7 +307,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            if (!IsHost)
+            if (!IsServer)
             {
                 TryToAttackHoldServerRpc(isLeftHand);
             }
@@ -323,13 +323,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 StopCoroutine(handStatus.PostActionEnumerator);
             }
 
-            handStatus.PreActionEnumerator = ChargeUpCoroutine(itemWithCharge);
-            handStatus.PostActionEnumerator = CooldownCoroutine(itemWithCharge);
+            handStatus.PreActionEnumerator = ChargeUpEnumerator(itemWithCharge);
+            handStatus.PostActionEnumerator = CooldownEnumerator(itemWithCharge);
 
             StartCoroutine(handStatus.PreActionEnumerator);
         }
 
-        private IEnumerator ChargeUpCoroutine(IHasCharge item)
+        private IEnumerator ChargeUpEnumerator(IHasCharge item)
         {
             var secondsToTake = item.GetChargeUpTime();
             var secondsUntilDone = secondsToTake * (100 - item.ChargePercentage) / 100f;
@@ -348,7 +348,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             //Debug.Log($"Charged in: {sw.ElapsedMilliseconds}ms and should have taken {secondsUntilDone}s");
         }
 
-        private IEnumerator CooldownCoroutine(IHasCharge item)
+        private IEnumerator CooldownEnumerator(IHasCharge item)
         {
             var secondsToTake = item.GetCooldownTime();
             var secondsUntilDone = secondsToTake * item.ChargePercentage / 100f;
@@ -367,7 +367,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             //Debug.Log($"Cooled in: {sw.ElapsedMilliseconds}ms and should have taken {secondsUntilDone}s");
         }
 
-        private IEnumerator AutomaticWeaponFire(Weapon weapon, bool isLeftHand)
+        private IEnumerator AutomaticWeaponFireEnumerator(Weapon weapon, bool isLeftHand)
         {
             var delay = weapon.GetDelayBetweenShots();
 
@@ -384,13 +384,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (item is IHasCharge itemWithCharge
                 && itemWithCharge.IsChargePercentageUsed
-                && itemWithCharge.ChargePercentage == 0)
+                && itemWithCharge.ChargePercentage <= 0)
             {
                 TryToAttackHold(isLeftHand, item);
                 return;
             }
 
-            AttackWithItemInHandServerRpc(isLeftHand);
+            AttackWithItemInHand(isLeftHand);
         }
 
         public void TriggerAttackHoldFromClient(bool isLeftHand)
@@ -427,6 +427,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 default:
                     Debug.LogWarning("Not implemented attack for " + itemInHand.Name + " yet");
                     return;
+            }
+
+            if (!IsServer)
+            {
+                AttackWithItemInHandServerRpc(isLeftHand);
             }
         }
 
