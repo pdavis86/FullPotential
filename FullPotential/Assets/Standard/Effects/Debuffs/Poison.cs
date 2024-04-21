@@ -1,7 +1,7 @@
 ﻿using System;
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Registry.Resources;
 
 namespace FullPotential.Standard.Effects.Debuffs
 {

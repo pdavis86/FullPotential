@@ -12,6 +12,7 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
@@ -52,7 +53,7 @@ namespace FullPotential.Core.Registry
                 AddToRegister<ITargeting>,
                 AddToRegister<IWeapon>,
                 AddToRegister<IRegisterableWithSlot>,
-                AddToRegister<IEffectComputation>,
+                AddToRegister<IElement>,
             };
 
             _registerVisualsFunctions = new Func<object, bool>[]
@@ -105,8 +106,6 @@ namespace FullPotential.Core.Registry
             ValidateAndRegister(typeof(Effects.Heal));
             ValidateAndRegister(typeof(Effects.Hurt));
             ValidateAndRegister(typeof(Effects.Push));
-
-            ValidateAndRegister(typeof(Combat.HurtEffectComputation));
 
             _eventManager.Subscribe<LivingEntityDiedEventHandler>(LivingEntityBase.EventIdResourceValueChangeAfter);
             _eventManager.Subscribe<LivingEntityHealthChangedEventHandler>(LivingEntityBase.EventIdResourceValueChangeAfter);
@@ -332,19 +331,6 @@ namespace FullPotential.Core.Registry
                 default:
                     return null;
             }
-        }
-
-        public IEffect GetEffect(string typeId)
-        {
-            return _registeredTypeLists[typeof(IEffect)]
-                .Cast<IEffect>()
-                .FirstOrDefault(x => x.TypeId.ToString() == typeId);
-        }
-
-        public IEffectComputation GetEffectComputation(string effectTypeIdString)
-        {
-            var allEffectComputations = GetRegisteredTypes<IEffectComputation>();
-            return allEffectComputations.FirstOrDefault(x => x.EffectTypeId == effectTypeIdString);
         }
 
         public void LoadAddessable<T>(string address, Action<T> action)

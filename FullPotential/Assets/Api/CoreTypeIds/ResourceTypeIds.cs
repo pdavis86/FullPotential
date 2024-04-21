@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Registry.Resources
+﻿namespace FullPotential.Api.CoreTypeIds
 {
     public static class ResourceTypeIds
     {

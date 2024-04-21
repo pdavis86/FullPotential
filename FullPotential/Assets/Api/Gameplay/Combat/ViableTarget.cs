@@ -7,7 +7,5 @@ namespace FullPotential.Api.Gameplay.Combat
         public GameObject GameObject { get; set; }
 
         public Vector3 Position { get; set; }
-
-        public float EffectPercentage { get; set; }
     }
 }

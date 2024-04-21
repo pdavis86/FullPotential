@@ -1,6 +1,6 @@
 ﻿namespace FullPotential.Api.Items
 {
-    public interface IHasChargeUpOrCooldown
+    public interface IHasCharge
     {
         bool IsChargePercentageUsed { get; }
 

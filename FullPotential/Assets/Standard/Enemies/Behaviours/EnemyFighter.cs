@@ -1,5 +1,5 @@
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Ui.Components;
 using UnityEngine;
 

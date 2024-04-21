@@ -106,7 +106,7 @@
     <Compile Include="Assets\Api\Gameplay\Behaviours\InventoryBase.cs" />
     <Compile Include="Assets\Api\GameManagement\GameObjectNames.cs" />
     <Compile Include="Assets\Api\Registry\IItemVisuals.cs" />
-    <Compile Include="Assets\Api\Registry\Effects\EffectTypeIds.cs" />
+    <Compile Include="Assets\Api\CoreTypeIds\EffectTypeIds.cs" />
     <Compile Include="Assets\Api\Obsolete\Networking\FragmentedMessageReconstructor.cs" />
     <Compile Include="Assets\Api\Gameplay\Drawing\IDrawingService.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\ArrayExtensions.cs" />
@@ -115,6 +115,7 @@
     <Compile Include="Assets\Api\Registry\Gameplay\IResource.cs" />
     <Compile Include="Assets\Api\Persistence\IUserRepository.cs" />
     <Compile Include="Assets\Api\Ui\HandSlotIds.cs" />
+    <Compile Include="Assets\Api\Items\IHasCharge.cs" />
     <Compile Include="Assets\Api\Items\Base\CombatItemBase.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingBehaviour.cs" />
     <Compile Include="Assets\Api\Obsolete\Attributes.cs" />
@@ -139,7 +140,7 @@
     <Compile Include="Assets\Api\Ioc\Dependency.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargeting.cs" />
     <Compile Include="Assets\Api\Scenes\ISceneBehaviour.cs" />
-    <Compile Include="Assets\Api\Registry\Resources\ResourceTypeIds.cs" />
+    <Compile Include="Assets\Api\CoreTypeIds\ResourceTypeIds.cs" />
     <Compile Include="Assets\Api\Registry\Shapes\IShapeBehaviour.cs" />
     <Compile Include="Assets\Api\Obsolete\Networking\IFragmentedMessageReconstructorFactory.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector3Extensions.cs" />
@@ -158,7 +159,6 @@
     <Compile Include="Assets\Api\Ui\IUserInterface.cs" />
     <Compile Include="Assets\Api\Obsolete\Networking\FragmentedMessageReconstructorFactory.cs" />
     <Compile Include="Assets\Api\Registry\Weapons\IAmmunition.cs" />
-    <Compile Include="Assets\Api\Registry\Effects\IEffectComputation.cs" />
     <Compile Include="Assets\Api\Items\Types\SpecialGear.cs" />
     <Compile Include="Assets\Api\Registry\IHasItemVisuals.cs" />
     <Compile Include="Assets\Api\Persistence\IPersistenceService.cs" />
@@ -169,7 +169,7 @@
     <Compile Include="Assets\Api\Networking\IRpcService.cs" />
     <Compile Include="Assets\Api\Data\GameSettings.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\NetworkLocation.cs" />
-    <Compile Include="Assets\Api\Registry\Armor\ArmorTypeIds.cs" />
+    <Compile Include="Assets\Api\CoreTypeIds\ArmorTypeIds.cs" />
     <Compile Include="Assets\Api\Utilities\DelayedAction.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\FighterBase.cs" />
     <Compile Include="Assets\Api\Registry\IHasPrefab.cs" />
@@ -191,7 +191,7 @@
     <Compile Include="Assets\Api\Registry\Elements\IElement.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Tags.cs" />
     <Compile Include="Assets\Api\Data\InventoryChanges.cs" />
-    <Compile Include="Assets\Api\Items\IHasChargeUpOrCooldown.cs" />
+    <Compile Include="Assets\Api\Utilities\MathsHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Api\FullPotential.Api.asmdef" />

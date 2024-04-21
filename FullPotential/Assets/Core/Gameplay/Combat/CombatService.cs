@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
@@ -12,11 +13,12 @@ using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Registry.Elements;
+using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
+using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
@@ -52,9 +54,7 @@ namespace FullPotential.Core.Gameplay.Combat
             FighterBase sourceFighter,
             CombatItemBase itemUsed,
             GameObject target,
-            Vector3? position,
-            float effectPercentage
-        )
+            Vector3? position)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
@@ -64,7 +64,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (itemUsed == null)
             {
-                ApplyMovementEffect(sourceFighter, null, _pushEffect, target, effectPercentage);
+                ApplyMovementEffect(sourceFighter, null, _pushEffect, target);
             }
 
             var itemUsedEffects = itemUsed?.Effects ?? new List<IEffect>();
@@ -84,12 +84,12 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 //Debug.Log($"Applying effect {effect.TypeName} to {target.name}");
 
-                ApplyEffect(sourceFighter, itemUsed, effect, target, position, effectPercentage);
+                ApplyEffect(sourceFighter, itemUsed, effect, target, position);
 
                 if (sourceFighter != null && effect is IHasSideEffect withSideEffect)
                 {
-                    var sideEffect = _typeRegistry.GetEffect(withSideEffect.SideEffectTypeIdString);
-                    ApplyEffect(null, itemUsed, sideEffect, sourceFighter.GameObject, position, effectPercentage);
+                    var sideEffect = _typeRegistry.GetRegisteredByTypeId<IEffect>(withSideEffect.SideEffectTypeIdString);
+                    ApplyEffect(null, itemUsed, sideEffect, sourceFighter.GameObject, position);
                 }
             }
         }
@@ -115,11 +115,11 @@ namespace FullPotential.Core.Gameplay.Combat
             return true;
         }
 
-        private void ApplyEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IEffect effect, GameObject targetGameObject, Vector3? position, float effectPercentage)
+        private void ApplyEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IEffect effect, GameObject targetGameObject, Vector3? position)
         {
             if (effect is IMovementEffect movementEffect)
             {
-                ApplyMovementEffect(sourceFighter, itemUsed, movementEffect, targetGameObject, effectPercentage);
+                ApplyMovementEffect(sourceFighter, itemUsed, movementEffect, targetGameObject);
                 return;
             }
 
@@ -136,15 +136,11 @@ namespace FullPotential.Core.Gameplay.Combat
             switch (effect)
             {
                 case IResourceEffect resourceEffect:
-                    ApplyResourceEffect(sourceFighter, itemUsed, resourceEffect, targetFighter, position, effectPercentage);
+                    ApplyResourceEffect(sourceFighter, itemUsed, resourceEffect, targetFighter, position);
                     return;
 
                 case IAttributeEffect attributeEffect:
-                    ApplyAttributeEffect(sourceFighter, itemUsed, attributeEffect, targetFighter, position, effectPercentage);
-                    return;
-
-                case IElement elementalEffect:
-                    ApplyElementalEffect(sourceFighter, itemUsed, elementalEffect, targetFighter, position, effectPercentage);
+                    ApplyAttributeEffect(sourceFighter, itemUsed, attributeEffect, targetFighter, position);
                     return;
 
                 default:
@@ -152,48 +148,151 @@ namespace FullPotential.Core.Gameplay.Combat
                     return;
             }
         }
-
-        public CombatResult GetCombatResult(FighterBase sourceFighter, CombatItemBase itemUsed, IEffect effect, LivingEntityBase targetLivingEntity, Vector3? position, int change, float effectPercentage)
+        private float GetSourceCriticalHitChance(FighterBase sourceFighter)
         {
-            var effectComputation = _typeRegistry.GetEffectComputation(effect.TypeId.ToString());
-            var combatResult = effectComputation?.GetCombatResult(sourceFighter, itemUsed, targetLivingEntity);
+            var luckValue = sourceFighter.GetAttributeValue(AttributeAffected.Luck);
 
-            var adjustedChange = combatResult != null
-                ? (int)(AddVariationToValue(combatResult.Change) * effectPercentage)
-                : (int)(AddVariationToValue(change) * effectPercentage);
-
-            var resourceEffect = effect as IResourceEffect;
-
-            if (resourceEffect?.EffectActionType is EffectActionType.PeriodicDecrease or EffectActionType.SingleDecrease or EffectActionType.TemporaryMaxDecrease)
+            if (luckValue < 20)
             {
-                adjustedChange *= -1;
+                return 0;
             }
 
-            if (effect is IAttributeEffect attributeEffect && !attributeEffect.TemporaryMaxIncrease)
-            {
-                adjustedChange *= -1;
-            }
-
-            return new CombatResult { Change = adjustedChange };
+            //e.g. 50 luck would mean a 50/5 = 10% chance
+            return luckValue / 5f;
         }
 
-        private void ApplyResourceEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffect resourceEffect, FighterBase targetFighter, Vector3? position, float effectPercentage)
+        public float GetEffectBaseChange(FighterBase sourceFighter, CombatItemBase itemUsed, IEffect effect, bool isCriticalHit)
+        {
+            var resourceEffect = effect as IResourceEffect;
+
+            var isPeriodic = resourceEffect?.EffectActionType is EffectActionType.PeriodicDecrease or EffectActionType.PeriodicIncrease;
+
+            float change;
+
+            if (itemUsed == null)
+            {
+                if (sourceFighter != null)
+                {
+                    change = LivingEntityBase.GetAdjustedStrength(sourceFighter.GetAttributeValue(AttributeAffected.Strength));
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+            else
+            {
+                change = isPeriodic
+                    ? itemUsed.GetPeriodicEffectValueChange()
+                    : itemUsed.GetSingleEffectValueChange();
+            }
+
+            var weapon = itemUsed as Weapon;
+
+            if (weapon != null && weapon.IsRanged)
+            {
+                change /= weapon.GetAmmoPerSecond();
+            }
+
+            if (isCriticalHit)
+            {
+                change *= 2;
+            }
+
+            if (itemUsed != null && itemUsed.IsTwoHanded)
+            {
+                change *= 2;
+            }
+
+            if (weapon != null && weapon.IsMelee)
+            {
+                change *= 2;
+            }
+
+            return change;
+        }
+
+        public CombatResult GetCombatResult(FighterBase sourceFighter, CombatItemBase itemUsed, IEffect effect, LivingEntityBase targetLivingEntity)
+        {
+            var isCriticalHit = false;
+            if (sourceFighter != null)
+            {
+                var sourceFighterCriticalHitChance = GetSourceCriticalHitChance(sourceFighter);
+                var criticalTestValue = UnityEngine.Random.Range(0, 101);
+                isCriticalHit = criticalTestValue <= sourceFighterCriticalHitChance;
+            }
+
+            var change = GetEffectBaseChange(sourceFighter, itemUsed, effect, isCriticalHit);
+
+            var effectivePercentage = GetEffectivePercentage(targetLivingEntity);
+
+            var adjustedChange = AddVariationToValue(change * effectivePercentage);
+
+            switch (effect)
+            {
+                case IResourceEffect resourceEffect:
+                {
+                    if (resourceEffect.EffectActionType is EffectActionType.PeriodicDecrease or EffectActionType.SingleDecrease or EffectActionType.TemporaryMaxDecrease)
+                    {
+                        adjustedChange *= -1;
+                    }
+
+                    break;
+                }
+                case IAttributeEffect attributeEffect:
+                {
+                    if (!attributeEffect.IsTemporaryMaxIncrease)
+                    {
+                        adjustedChange *= -1;
+                    }
+
+                    break;
+                }
+            }
+
+            return new CombatResult 
+            { 
+                Change = adjustedChange,
+                IsCriticalHit = isCriticalHit
+            };
+        }
+
+        private float GetEffectivePercentage(LivingEntityBase targetLivingEntity)
+        {
+            //todo: zzz v0.8 - replace with sum of Strength of items with resistance to Hurt
+
+            var armorItems = _typeRegistry
+                .GetRegisteredTypes<IArmor>()
+                .Select(x => targetLivingEntity.Inventory.GetItemInSlot<Armor>(x.TypeId.ToString(), false));
+
+            var sum = armorItems
+                .Where(x => x != null)
+                .Sum(a => a.Attributes.Strength);
+
+            var targetDefenceValue = (int)Math.Floor((float)sum / armorItems.Count());
+
+            var targetDefence = targetLivingEntity != null ? targetDefenceValue : 0;
+            var defenceRatio = 100f / (100 + targetDefence);
+            return defenceRatio;
+        }
+
+        private void ApplyResourceEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffect resourceEffect, FighterBase targetFighter, Vector3? position)
         {
             switch (resourceEffect.EffectActionType)
             {
                 case EffectActionType.PeriodicDecrease:
                 case EffectActionType.PeriodicIncrease:
-                    targetFighter.ApplyPeriodicActionToResource(sourceFighter, itemUsed, resourceEffect, position, effectPercentage);
+                    targetFighter.ApplyPeriodicActionToResource(sourceFighter, itemUsed, resourceEffect, position);
                     return;
 
                 case EffectActionType.SingleDecrease:
                 case EffectActionType.SingleIncrease:
-                    targetFighter.ApplySingleValueChangeToResource(sourceFighter, itemUsed, resourceEffect, position, effectPercentage);
+                    targetFighter.ApplySingleValueChangeToResource(sourceFighter, itemUsed, resourceEffect, position);
                     return;
 
                 case EffectActionType.TemporaryMaxDecrease:
                 case EffectActionType.TemporaryMaxIncrease:
-                    targetFighter.ApplyTemporaryMaxActionToResource(sourceFighter, itemUsed, resourceEffect, position, effectPercentage);
+                    targetFighter.ApplyTemporaryMaxActionToResource(sourceFighter, itemUsed, resourceEffect, position);
                     return;
 
                 default:
@@ -202,17 +301,11 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private void ApplyAttributeEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IAttributeEffect attributeEffect, FighterBase targetFighter, Vector3? position, float effectPercentage)
+        private void ApplyAttributeEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IAttributeEffect attributeEffect, FighterBase targetFighter, Vector3? position)
         {
-            var (change, expiry) = itemUsed.GetAttributeChangeAndExpiry();
-            var attributeCombatResult = GetCombatResult(sourceFighter, itemUsed, attributeEffect, targetFighter, position, change, effectPercentage);
-            targetFighter.AddAttributeModifier(attributeEffect, attributeCombatResult.Change, expiry);
-        }
-
-        private void ApplyElementalEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IEffect elementalEffect, FighterBase targetFighter, Vector3? position, float effectPercentage)
-        {
-            var elementCombatResult = GetCombatResult(sourceFighter, itemUsed, elementalEffect, targetFighter, position, 0, effectPercentage);
-            targetFighter.ApplyElementalEffect(elementalEffect, itemUsed, sourceFighter, position, elementCombatResult.Change);
+            var expiry = DateTime.Now.AddSeconds(itemUsed.GetEffectDuration());
+            var attributeCombatResult = GetCombatResult(sourceFighter, itemUsed, attributeEffect, targetFighter);
+            targetFighter.AddAttributeModifier(attributeEffect, attributeCombatResult.Change, expiry, position);
         }
 
         private void ApplyMaintainDistance(FighterBase sourceFighter, CombatItemBase itemUsed, GameObject targetGameObject)
@@ -229,7 +322,7 @@ namespace FullPotential.Core.Gameplay.Combat
             comp.Consumer = consumer;
         }
 
-        private void ApplyMovementEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IMovementEffect movementEffect, GameObject targetGameObject, float effectPercentage)
+        private void ApplyMovementEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IMovementEffect movementEffect, GameObject targetGameObject)
         {
             var targetRigidBody = targetGameObject.GetComponent<Rigidbody>();
 
@@ -268,13 +361,15 @@ namespace FullPotential.Core.Gameplay.Combat
 
             var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
             var strength = itemUsed?.Attributes.Strength ?? sourceFighter.GetAttributeValue(AttributeAffected.Strength);
-            var rawForce = CombatItemBase.GetHighInHighOutInRange(strength, 100, 300);
+            var rawForce = MathsHelper.GetHighInHighOutInRange(strength, 100, 300);
 
             var force = adjustForGravity
                 ? rawForce * 2f
                 : rawForce;
 
-            force *= effectPercentage;
+            //var effectPercentage = weaponInHand.IsDefensive ? Weapon.DefensiveWeaponDpsMultiplier : 1;
+
+            //force *= effectPercentage;
 
             //todo: adjust value for immunities, e.g. players are immune to Hold
 

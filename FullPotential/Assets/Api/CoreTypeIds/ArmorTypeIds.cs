@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Registry.Armor
+﻿namespace FullPotential.Api.CoreTypeIds
 {
     public static class ArmorTypeIds
     {

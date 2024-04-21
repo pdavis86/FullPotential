@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Text;
 using FullPotential.Api.Items;
-using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Utilities;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
@@ -56,13 +56,13 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public static float GetRechargeDelay(Api.Items.Types.SpecialGear specialGear)
         {
-            var returnValue = CombatItemBase.GetHighInLowOutInRange(specialGear.Attributes.Recovery, 0.5f, 5f);
+            var returnValue = MathsHelper.GetHighInLowOutInRange(specialGear.Attributes.Recovery, 0.5f, 5f);
             return returnValue;
         }
 
         public static int GetRechargeRate(Api.Items.Types.SpecialGear specialGear)
         {
-            var returnValue = (int)CombatItemBase.GetHighInLowOutInRange(specialGear.Attributes.Speed, 1, 10);
+            var returnValue = (int)MathsHelper.GetHighInLowOutInRange(specialGear.Attributes.Speed, 1, 10);
             return returnValue;
         }
     }

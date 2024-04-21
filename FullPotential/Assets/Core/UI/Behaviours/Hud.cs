@@ -241,7 +241,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateHandCharge(ProgressWheel chargeWheel, ItemBase item)
         {
-            if (item is not IHasChargeUpOrCooldown hasChargeUpOrCooldown || !hasChargeUpOrCooldown.IsChargePercentageUsed)
+            if (item is not IHasCharge itemWithCharge || !itemWithCharge.IsChargePercentageUsed)
             {
                 chargeWheel.gameObject.SetActive(false);
                 return;
@@ -252,7 +252,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 chargeWheel.gameObject.SetActive(true);
             }
 
-            chargeWheel.Slider.value = hasChargeUpOrCooldown.ChargePercentage / 100f;
+            chargeWheel.Slider.value = itemWithCharge.ChargePercentage / 100f;
         }
 
         private void UpdateActiveEffects()

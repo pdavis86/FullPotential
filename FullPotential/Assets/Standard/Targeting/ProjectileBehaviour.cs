@@ -87,7 +87,7 @@ namespace FullPotential.Standard.Targeting
 
             _collisionDetected = true;
 
-            _combatService.ApplyEffects(SourceFighter, Consumer, other.gameObject, other.ClosestPointOnBounds(transform.position), 1);
+            _combatService.ApplyEffects(SourceFighter, Consumer, other.gameObject, other.ClosestPointOnBounds(transform.position));
 
             _combatService.SpawnShapeGameObject(SourceFighter, Consumer, other.gameObject, other.ClosestPointOnBounds(transform.position), Direction);
 

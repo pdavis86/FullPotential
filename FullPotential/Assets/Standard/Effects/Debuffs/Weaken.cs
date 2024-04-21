@@ -10,7 +10,7 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public Guid TypeId => Id;
 
-        public bool TemporaryMaxIncrease => false;
+        public bool IsTemporaryMaxIncrease => false;
 
         public AttributeAffected AttributeAffectedToAffect => AttributeAffected.Strength;
     }

@@ -11,7 +11,6 @@ using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Registry.Elements;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
@@ -125,56 +124,44 @@ namespace FullPotential.Core.Gameplay.Crafting
                     {
                         if (x is IAttributeEffect attributeEffect)
                         {
-                            return attributeEffect.TemporaryMaxIncrease
+                            return attributeEffect.IsTemporaryMaxIncrease
                                 ? buff
                                 : debuff;
                         }
 
-                        if (x is not IResourceEffect resourceEffect)
+                        if (x is IResourceEffect resourceEffect)
                         {
-                            return other;
+                            switch (resourceEffect.EffectActionType)
+                            {
+                                case EffectActionType.PeriodicIncrease:
+                                case EffectActionType.SingleIncrease:
+                                case EffectActionType.TemporaryMaxIncrease:
+                                    return buff;
+
+                                case EffectActionType.PeriodicDecrease:
+                                case EffectActionType.SingleDecrease:
+                                case EffectActionType.TemporaryMaxDecrease:
+                                    return debuff;
+
+                                default:
+                                    return other;
+                            }
                         }
 
-                        switch (resourceEffect.EffectActionType)
-                        {
-                            case EffectActionType.PeriodicIncrease:
-                            case EffectActionType.SingleIncrease:
-                            case EffectActionType.TemporaryMaxIncrease:
-                                return buff;
-
-                            case EffectActionType.PeriodicDecrease:
-                            case EffectActionType.SingleDecrease:
-                            case EffectActionType.TemporaryMaxDecrease:
-                                return debuff;
-
-                            default:
-                                return other;
-                        }
+                        return other;
                     });
-
-            var elementalEffects = effects.Where(x => x is IElement);
-            var elementalEffect = elementalEffects.FirstOrDefault();
-            if (elementalEffect != null)
-            {
-                effects = effects
-                    .Except(elementalEffects.Where(x => x != elementalEffect));
-            }
 
             if (craftableType is CraftableType.Armor or CraftableType.Accessory)
             {
                 return effects
-                    .Where(x =>
-                        effectTypeLookup[x] == buff
-                        || x is IElement)
+                    .Where(x => effectTypeLookup[x] == buff)
                     .ToList();
             }
 
             if (craftableType == CraftableType.Weapon)
             {
                 return effects
-                    .Where(x =>
-                        effectTypeLookup[x] == debuff
-                        || x is IElement)
+                    .Where(x => effectTypeLookup[x] == debuff)
                     .ToList();
             }
 
@@ -183,12 +170,16 @@ namespace FullPotential.Core.Gameplay.Crafting
                 throw new Exception($"Unexpected craftingType '{craftableType}'");
             }
 
-            if (effects.Any(x => effectTypeLookup[x] == buff || effectTypeLookup[x] == other))
+            if (effects.Any(x => effectTypeLookup[x] == buff))
             {
                 effects = effects
-                    .Where(x =>
-                        effectTypeLookup[x] != debuff
-                        && x is not IElement);
+                    .Where(x => effectTypeLookup[x] != debuff);
+            }
+
+            if (effects.Any(x => effectTypeLookup[x] == debuff))
+            {
+                effects = effects
+                    .Where(x => effectTypeLookup[x] != buff);
             }
 
             if (targeting != null && !targeting.IsContinuous)
@@ -209,6 +200,8 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private int GetAttributeValue(int percentageChance)
         {
+            //todo: zzz v0.6 - Replace all hard-coded 100 values
+
             return IsSuccess(percentageChance) ? _random.Next(1, 100) : 0;
         }
 
@@ -475,8 +468,6 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private SpecialGear GetSpecialGear(ISpecialGear craftableType, string resourceTypeId, IList<CombatItemBase> components)
         {
-            //todo: zzz v0.4 - all attributes for specials
-
             var resourceType = resourceTypeId.IsNullOrWhiteSpace()
                 ? null
                 : _typeRegistry.GetRegisteredByTypeId<IResource>(resourceTypeId);
@@ -491,8 +482,12 @@ namespace FullPotential.Core.Gameplay.Crafting
                 {
                     Strength = ComputeAttribute(components, x => x.Attributes.Strength),
                     Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
+                    Range = ComputeAttribute(components, x => x.Attributes.Range),
+                    Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
                     Speed = ComputeAttribute(components, x => x.Attributes.Speed),
-                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
+                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery),
+                    Duration = ComputeAttribute(components, x => x.Attributes.Duration),
+                    Luck = ComputeAttribute(components, x => x.Attributes.Luck),
                 },
             };
 

@@ -109,7 +109,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ServerRpc]
         public void TryToAttackHoldServerRpc(bool isLeftHand)
         {
-            TryToAttackHold(isLeftHand);
+            var item = GetItemInHand(isLeftHand);
+            TryToAttackHold(isLeftHand, item);
         }
 
         [ServerRpc]
@@ -275,9 +276,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return _inventory.GetItemStackTotal(ammoTypeId);
         }
 
-        public void TryToAttackHold(bool isLeftHand)
+        public void TryToAttackHold(bool isLeftHand, ItemBase item)
         {
-            var item = GetItemInHand(isLeftHand);
             var handStatus = GetHandStatus(isLeftHand);
 
             if (item is Weapon weapon
@@ -301,7 +301,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            if (item is not IHasChargeUpOrCooldown hasChargeUpOrCooldown || !hasChargeUpOrCooldown.IsChargePercentageUsed)
+            if (item is not IHasCharge itemWithCharge || !itemWithCharge.IsChargePercentageUsed)
             {
                 //Debug.LogWarning("Trying to attack hold an item that is not compatible");
                 return;
@@ -313,7 +313,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             //Still cooling down
-            if (hasChargeUpOrCooldown.ChargePercentage > 0)
+            if (itemWithCharge.ChargePercentage > 0)
             {
                 return;
             }
@@ -323,13 +323,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 StopCoroutine(handStatus.PostActionEnumerator);
             }
 
-            handStatus.PreActionEnumerator = ChargeUpCoroutine(hasChargeUpOrCooldown);
-            handStatus.PostActionEnumerator = CooldownCoroutine(hasChargeUpOrCooldown);
+            handStatus.PreActionEnumerator = ChargeUpCoroutine(itemWithCharge);
+            handStatus.PostActionEnumerator = CooldownCoroutine(itemWithCharge);
 
             StartCoroutine(handStatus.PreActionEnumerator);
         }
 
-        private IEnumerator ChargeUpCoroutine(IHasChargeUpOrCooldown item)
+        private IEnumerator ChargeUpCoroutine(IHasCharge item)
         {
             var secondsToTake = item.GetChargeUpTime();
             var secondsUntilDone = secondsToTake * (100 - item.ChargePercentage) / 100f;
@@ -348,7 +348,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             //Debug.Log($"Charged in: {sw.ElapsedMilliseconds}ms and should have taken {secondsUntilDone}s");
         }
 
-        private IEnumerator CooldownCoroutine(IHasChargeUpOrCooldown item)
+        private IEnumerator CooldownCoroutine(IHasCharge item)
         {
             var secondsToTake = item.GetCooldownTime();
             var secondsUntilDone = secondsToTake * item.ChargePercentage / 100f;
@@ -380,7 +380,23 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void TriggerAttackFromClient(bool isLeftHand)
         {
+            var item = GetItemInHand(isLeftHand);
+
+            if (item is IHasCharge itemWithCharge
+                && itemWithCharge.IsChargePercentageUsed
+                && itemWithCharge.ChargePercentage == 0)
+            {
+                TryToAttackHold(isLeftHand, item);
+                return;
+            }
+
             AttackWithItemInHandServerRpc(isLeftHand);
+        }
+
+        public void TriggerAttackHoldFromClient(bool isLeftHand)
+        {
+            var item = GetItemInHand(isLeftHand);
+            TryToAttackHold(isLeftHand, item);
         }
 
         public void AttackWithItemInHand(bool isLeftHand, bool isAutoFire = false)
@@ -423,7 +439,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (Physics.Raycast(LookTransform.position, LookTransform.forward, out var hit, MeleeRangeLimit))
             {
-                _combatService.ApplyEffects(this, null, hit.transform.gameObject, hit.point, 1);
+                _combatService.ApplyEffects(this, null, hit.transform.gameObject, hit.point);
             }
         }
 
@@ -544,7 +560,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 {
                     foreach (var target in targets)
                     {
-                        _combatService.ApplyEffects(this, consumer, target.GameObject, target.Position, target.EffectPercentage);
+                        _combatService.ApplyEffects(this, consumer, target.GameObject, target.Position);
                     }
                 }
             }
@@ -613,7 +629,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 for (var i = 0; i < ammoUsed; i++)
                 {
-                    _combatService.ApplyEffects(this, weaponInHand, rangedHit.transform.gameObject, rangedHit.point, 1);
+                    _combatService.ApplyEffects(this, weaponInHand, rangedHit.transform.gameObject, rangedHit.point);
                 }
             }
         }
@@ -663,11 +679,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            var effectPercentage = weaponInHand.IsDefensive ? Weapon.DefensiveWeaponDpsMultiplier : 1;
-
             if (Physics.Raycast(LookTransform.position, LookTransform.forward, out var meleeHit, MeleeRangeLimit))
             {
-                _combatService.ApplyEffects(this, weaponInHand, meleeHit.transform.gameObject, meleeHit.point, effectPercentage);
+                _combatService.ApplyEffects(this, weaponInHand, meleeHit.transform.gameObject, meleeHit.point);
             }
         }
 

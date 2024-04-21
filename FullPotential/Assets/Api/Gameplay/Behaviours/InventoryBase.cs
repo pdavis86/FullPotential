@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.EventArgs;
@@ -439,14 +440,17 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (combatItem.EffectIds != null && combatItem.EffectIds.Length > 0 && combatItem.Effects == null)
                 {
-                    combatItem.Effects = combatItem.EffectIds.Select(x => _typeRegistry.GetEffect(x)).ToList();
+                    combatItem.Effects = combatItem.EffectIds
+                        .Select(x => _typeRegistry.GetRegisteredByTypeId<IEffect>(x))
+                        .Where(x => x != null)
+                        .ToList();
                 }
 
                 //For backwards compatibility
                 combatItem.Effects ??= new List<IEffect>();
                 if (!combatItem.Effects.Any())
                 {
-                    combatItem.Effects.Add(_typeRegistry.GetEffect(EffectTypeIds.HurtId));
+                    combatItem.Effects.Add(_typeRegistry.GetRegisteredByTypeId<IEffect>(EffectTypeIds.HurtId));
                 }
             }
         }

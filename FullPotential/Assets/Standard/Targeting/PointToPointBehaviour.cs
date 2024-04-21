@@ -63,7 +63,7 @@ namespace FullPotential.Standard.Targeting
                 Consumer.GetChargeUpTime(),
                 ApplyEffectsOnHit);
 
-            _maxBeamLength = Consumer.GetAdjustedRange();
+            _maxBeamLength = Consumer.GetRange();
 
             _isLocalOwner.Value = SourceFighter.OwnerClientId == NetworkManager.Singleton.LocalClientId;
 
@@ -78,7 +78,7 @@ namespace FullPotential.Standard.Targeting
 
         private void ApplyEffectsOnHit()
         {
-            _combatService.ApplyEffects(SourceFighter, Consumer, _hit.transform.gameObject, _hit.point, 1);
+            _combatService.ApplyEffects(SourceFighter, Consumer, _hit.transform.gameObject, _hit.point);
         }
 
         // ReSharper disable once UnusedMember.Local

@@ -7,7 +7,7 @@ namespace FullPotential.Api.Registry.Effects
         /// <summary>
         /// Whether the maximum will be temporarily increased (otherwise decreased)
         /// </summary>
-        bool TemporaryMaxIncrease { get; }
+        bool IsTemporaryMaxIncrease { get; }
 
         /// <summary>
         /// The attribute which will be affected

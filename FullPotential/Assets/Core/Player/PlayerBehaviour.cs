@@ -526,7 +526,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            _playerFighter.TryToAttackHold(isLeftHand);
+            _playerFighter.TriggerAttackHoldFromClient(isLeftHand);
         }
 
         private void HandleAttack(bool isLeftHand)

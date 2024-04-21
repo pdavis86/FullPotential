@@ -96,7 +96,7 @@ namespace FullPotential.Standard.Shapes
             var position = other.ClosestPointOnBounds(transform.position);
             var adjustedPosition = position + new Vector3(0, DistanceFromGround);
 
-            _combatService.ApplyEffects(SourceFighter, Consumer, other.gameObject, adjustedPosition, 1);
+            _combatService.ApplyEffects(SourceFighter, Consumer, other.gameObject, adjustedPosition);
         }
 
         private void HandleVisualsPrefabAddressValueChanged(FixedString4096Bytes previousValue, FixedString4096Bytes newValue)

@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Unity.Extensions;
+using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 
@@ -15,7 +17,6 @@ namespace FullPotential.Api.Items.Base
     [Serializable]
     public abstract class CombatItemBase : ItemBase
     {
-        public const float StrengthDivisor = 4;
         public const string AliasSegmentItem = "item";
         public const string AliasSegmentDefensive = "defensiveitem";
 
@@ -35,18 +36,10 @@ namespace FullPotential.Api.Items.Base
             set
             {
                 _effects = value;
-                EffectIds = _effects.Select(x => x.TypeId.ToString()).ToArray();
+                EffectIds = _effects
+                    .Select(x => x.TypeId.ToString())
+                    .ToArray();
             }
-        }
-
-        public static float GetHighInHighOutInRange(int attributeValue, float min, float max)
-        {
-            return attributeValue / 100f * (max - min) + min;
-        }
-
-        public static float GetHighInLowOutInRange(int attributeValue, float min, float max)
-        {
-            return (101 - attributeValue) / 100f * (max - min) + min;
         }
 
         public int GetNameHash()
@@ -120,32 +113,9 @@ namespace FullPotential.Api.Items.Base
             return sb.ToString().Trim();
         }
 
-        public float GetAdjustedRange()
-        {
-            var returnValue = Attributes.Range / 100f * 15 + 5;
-            return returnValue;
-        }
-
-        public float GetRangeForDisplay()
-        {
-            //Rough translation from Unity units to metres
-            return GetAdjustedRange() * 0.6f;
-        }
-
-        public float GetAccuracy()
-        {
-            return Attributes.Accuracy;
-        }
-
         public float GetEffectDuration()
         {
             var returnValue = Attributes.Duration / 10f;
-            return returnValue;
-        }
-
-        private float GetChargeUpOrCooldownTime(int attributeValue)
-        {
-            var returnValue = GetHighInLowOutInRange(attributeValue, 0.05f, 2f);
             return returnValue;
         }
 
@@ -159,25 +129,6 @@ namespace FullPotential.Api.Items.Base
             return GetChargeUpOrCooldownTime(Attributes.Recovery);
         }
 
-        private int GetAdjustedStrength()
-        {
-            return (int)Math.Ceiling(Attributes.Strength / StrengthDivisor);
-        }
-
-        public int GetResourceChange(IResourceEffect resourceEffect)
-        {
-            var change = GetAdjustedStrength();
-            return change;
-        }
-
-        public (int Change, DateTime Expiry) GetResourceChangeAndExpiry(IResourceEffect resourceEffect)
-        {
-            var change = GetResourceChange(resourceEffect);
-            var timeToLive = GetEffectDuration();
-
-            return (change, DateTime.Now.AddSeconds(timeToLive));
-        }
-
         public float GetDamagePerSecond(float damagePerItem, int numberOfItems, float itemsPerSecond, float reloadTime)
         {
             //https://www.reddit.com/r/Overwatch/comments/6x5q59/what_dps_is_and_how_to_calculate_it/
@@ -185,12 +136,27 @@ namespace FullPotential.Api.Items.Base
             return (damagePerItem * numberOfItems) / (numberOfItems / itemsPerSecond + reloadTime);
         }
 
-        public float GetPeriodicStatDamagePerSecond(IResourceEffect resourceEffect)
+        public Vector3 GetShotDirection(Vector3 aimDirection)
         {
-            return GetPeriodicStatDamagePerSecond(GetResourceChange(resourceEffect));
+            var maxAccuracyAngleDeviation = (101 - Attributes.Accuracy) / 100f * MaximumAccuracyAngleDeviation;
+            return aimDirection.AddNoiseOnAngle(-maxAccuracyAngleDeviation, maxAccuracyAngleDeviation);
         }
 
-        private float GetPeriodicStatDamagePerSecond(int change)
+        public int GetResourceCost()
+        {
+            var returnValue = MathsHelper.GetHighInLowOutInRange(Attributes.Efficiency, 5, 50);
+
+            //todo: zzz v0.8 - trait-based mana cost
+
+            return (int)returnValue * Math.Max(Effects?.Count ?? 1, 1);
+        }
+
+        public int GetSingleEffectValueChange()
+        {
+            return LivingEntityBase.GetAdjustedStrength(Attributes.Strength);
+        }
+
+        public int GetPeriodicEffectValueChange()
         {
             var effectDuration = GetEffectDuration();
             var timeBetweenEffects = GetChargeUpTime();
@@ -203,47 +169,16 @@ namespace FullPotential.Api.Items.Base
                 minNumberOfTimes = 1;
             }
 
-            return GetDamagePerSecond((float)change / maxNumberOfTimes, minNumberOfTimes, effectsPerSecond, 0);
+            var changeOverTimeFloat = GetDamagePerSecond((float)GetSingleEffectValueChange() / maxNumberOfTimes, minNumberOfTimes, effectsPerSecond, 0);
+
+            var changeOverTimeSignedInt = Math.Sign(changeOverTimeFloat) * (int)Mathf.Ceil(Mathf.Abs(changeOverTimeFloat));
+            return changeOverTimeSignedInt;
         }
 
-        public (int Change, DateTime Expiry, float delay) GetPeriodicResourceChangeExpiryAndDelay(IResourceEffect resourceEffect)
+        private float GetChargeUpOrCooldownTime(int attributeValue)
         {
-            return GetPeriodicResourceChangeExpiryAndDelay(GetResourceChange(resourceEffect));
-        }
-
-        public (int Change, DateTime Expiry, float delay) GetPeriodicResourceChangeExpiryAndDelay(int change)
-        {
-            var timeToLive = GetEffectDuration();
-            var delay = GetChargeUpTime();
-
-            var changeOverTimeRaw = GetPeriodicStatDamagePerSecond(change);
-            var changeOverTime = Math.Sign(changeOverTimeRaw) * (int)Mathf.Ceil(Mathf.Abs(changeOverTimeRaw));
-
-            return (changeOverTime, DateTime.Now.AddSeconds(timeToLive), delay);
-        }
-
-        public (int Change, DateTime Expiry) GetAttributeChangeAndExpiry()
-        {
-            var change = GetAdjustedStrength();
-
-            var timeToLive = GetEffectDuration();
-
-            return (change, DateTime.Now.AddSeconds(timeToLive));
-        }
-
-        public Vector3 GetShotDirection(Vector3 aimDirection)
-        {
-            var maxAccuracyAngleDeviation = (101 - GetAccuracy()) / 100f * MaximumAccuracyAngleDeviation;
-            return aimDirection.AddNoiseOnAngle(-maxAccuracyAngleDeviation, maxAccuracyAngleDeviation);
-        }
-
-        public int GetResourceCost()
-        {
-            var returnValue = GetHighInLowOutInRange(Attributes.Efficiency, 5, 50);
-
-            //todo: zzz v0.8 - trait-based mana cost
-
-            return (int)returnValue * Math.Max(Effects?.Count ?? 1, 1);
+            var returnValue = MathsHelper.GetHighInLowOutInRange(attributeValue, 0.05f, 2f);
+            return returnValue;
         }
     }
 }

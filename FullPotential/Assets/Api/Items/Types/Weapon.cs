@@ -1,25 +1,30 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry;
+using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Weapons;
+using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 
 namespace FullPotential.Api.Items.Types
 {
     [Serializable]
-    public class Weapon : CombatItemBase, IHasItemVisuals, IHasChargeUpOrCooldown
+    public class Weapon : CombatItemBase, IHasItemVisuals, IHasCharge
     {
         public const float DefensiveWeaponDpsMultiplier = 0.1f;
 
         private const string AliasSegmentMelee = "MeleeWeapon";
         private const string AliasSegmentRanged = "RangedWeapon";
 
-        private static ITypeRegistry _typeRegistry;
+        private static ICombatService _combatService;
+        private IEffect _hurtEffect;
 
         private IItemVisuals _visuals;
 
@@ -69,14 +74,14 @@ namespace FullPotential.Api.Items.Types
 
         public float GetReloadTime()
         {
-            var returnValue = GetHighInLowOutInRange(Attributes.Recovery, 0.5f, 5);
+            var returnValue = MathsHelper.GetHighInLowOutInRange(Attributes.Recovery, 0.5f, 5);
             return returnValue;
         }
 
         public float GetDelayBetweenShots()
         {
             //Roughly 2-6 bullets per second
-            var returnValue = GetHighInLowOutInRange(Attributes.Speed, 0.07f, 0.4f);
+            var returnValue = MathsHelper.GetHighInLowOutInRange(Attributes.Speed, 0.07f, 0.4f);
             return returnValue;
         }
 
@@ -278,7 +283,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Accuracy,
                 nameof(Attributes.Accuracy),
                 AliasSegmentItem,
-                localizer.TranslateFloat(GetAccuracy()),
+                localizer.TranslateFloat(Attributes.Accuracy),
                 UnitsType.Percent);
 
             AppendToDescription(
@@ -318,23 +323,24 @@ namespace FullPotential.Api.Items.Types
                 return _baseDamage;
             }
 
-            _typeRegistry ??= DependenciesContext.Dependencies.GetService<ITypeRegistry>();
+            _combatService ??= DependenciesContext.Dependencies.GetService<ICombatService>();
 
             var baseDamage = 0;
 
-            foreach (var effect in Effects)
+            if (!Effects.Any())
             {
-                var effectComputation = _typeRegistry.GetEffectComputation(effect.TypeId.ToString());
-
-                if (effectComputation != null)
+                _hurtEffect ??= DependenciesContext.Dependencies.GetService<ITypeRegistry>().GetRegisteredByTypeId<IEffect>(EffectTypeIds.HurtId);
+                baseDamage = (int)_combatService.GetEffectBaseChange(null, this, _hurtEffect, false);
+            }
+            else
+            {
+                foreach (var effect in Effects)
                 {
-                    baseDamage += effectComputation.GetCombatResult(null, this, null).Change;
+                    baseDamage += (int)_combatService.GetEffectBaseChange(null, this, effect, false);
                 }
             }
 
-            _baseDamage = baseDamage;
-
-            return baseDamage;
+            return _baseDamage = baseDamage;
         }
     }
 }

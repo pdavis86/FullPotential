@@ -14,8 +14,7 @@ namespace FullPotential.Api.Gameplay.Combat
             FighterBase sourceFighter,
             CombatItemBase itemUsed,
             GameObject target,
-            Vector3? position,
-            float effectPercentage
+            Vector3? position
         );
 
         void SpawnTargetingGameObject(
@@ -31,13 +30,16 @@ namespace FullPotential.Api.Gameplay.Combat
             Vector3 fallbackPosition,
             Vector3 lookDirection);
 
+        float GetEffectBaseChange(
+            FighterBase sourceFighter,
+            CombatItemBase itemUsed,
+            IEffect effect,
+            bool isCriticalHit);
+
         CombatResult GetCombatResult(
             FighterBase sourceFighter,
             CombatItemBase itemUsed,
             IEffect effect,
-            LivingEntityBase targetLivingEntity,
-            Vector3? position,
-            int change,
-            float effectPercentage);
+            LivingEntityBase targetLivingEntity);
     }
 }

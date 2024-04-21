@@ -30,7 +30,7 @@ namespace FullPotential.Standard.Targeting
             {
                 return new[]
                 {
-                    new ViableTarget { GameObject = hit.transform.gameObject, Position = hit.transform.position, EffectPercentage = 1 }
+                    new ViableTarget { GameObject = hit.transform.gameObject, Position = hit.transform.position }
                 };
             }
 

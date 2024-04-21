@@ -42,14 +42,14 @@ namespace FullPotential.Api.Items.Types
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {localizer.Translate(TranslationType.ItemType, GetType().Name)}" + "\n");
             }
 
-            //todo: zzz v0.4 - implement accessory triggers and traits
+            //todo: zzz v0.8 - implement accessory triggers and traits
             //if (Effects != null && Effects.Count > 0)
             //{
             //    var localisedEffects = Effects.Select(localizer.GetTranslatedTypeName);
             //    sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Effects))}: {string.Join(", ", localisedEffects)}\n");
             //}
 
-            //todo: zzz v0.4 - implement accessory triggers and traits
+            //todo: zzz v0.8 - implement accessory triggers and traits
             //sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Strength))}: {Attributes.Strength})\n");
             //sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Efficiency))}: {Attributes.Efficiency})\n");
             //sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Speed))}: {Attributes.Speed})\n");

@@ -1,5 +1,5 @@
 ﻿using System;
-using FullPotential.Api.Registry.Armor;
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.ArmorVisuals

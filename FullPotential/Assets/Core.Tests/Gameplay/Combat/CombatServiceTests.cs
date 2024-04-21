@@ -13,7 +13,6 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Core.Gameplay.Combat;
-using FullPotential.Core.Registry.Combat;
 using FullPotential.Core.Registry.Effects;
 using Moq;
 using NUnit.Framework;
@@ -24,7 +23,6 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
     {
         private ICombatService _combatService;
         private IEffect _singleDamageEffect;
-        private HurtEffectComputation _hurtEffectComputation;
 
         [SetUp]
         public void Setup()
@@ -49,8 +47,6 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
             _combatService = new CombatService(
                 Mock.Of<ITypeRegistry>(),
                 Mock.Of<IRpcService>());
-
-            _hurtEffectComputation = new HurtEffectComputation(Mock.Of<ITypeRegistry>());
         }
 
         [Test]
@@ -92,8 +88,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
 
         private int GetDamage(CombatItemBase item)
         {
-            var damage = _hurtEffectComputation.GetCombatResult(null, item, null).Change;
-            return damage;
+            return (int)_combatService.GetEffectBaseChange(null, item, _singleDamageEffect, false);
         }
 
         private Consumer GetConsumer(Attributes attributes, List<IEffect> effects)

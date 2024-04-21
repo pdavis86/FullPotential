@@ -42,7 +42,7 @@ namespace FullPotential.Api.Items.Types
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {localizer.Translate(TranslationType.ItemType, GetType().Name)}" + "\n");
             }
 
-            //todo: zzz v0.4 - implement armor triggers and traits
+            //todo: zzz v0.8 - implement armor triggers and traits
             //if (Effects != null && Effects.Count > 0)
             //{
             //    var localisedEffects = Effects.Select(localizer.GetTranslatedTypeName);

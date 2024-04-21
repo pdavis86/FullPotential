@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Registry.Resources;
+﻿using FullPotential.Api.CoreTypeIds;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.GameManagement.Events;
 using Unity.Netcode;

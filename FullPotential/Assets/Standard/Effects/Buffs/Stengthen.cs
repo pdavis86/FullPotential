@@ -10,7 +10,7 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public Guid TypeId => Id;
 
-        public bool TemporaryMaxIncrease => true;
+        public bool IsTemporaryMaxIncrease => true;
 
         public AttributeAffected AttributeAffectedToAffect => AttributeAffected.Strength;
     }

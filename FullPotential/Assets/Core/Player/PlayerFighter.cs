@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
@@ -12,7 +13,6 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Obsolete.Networking;
 using FullPotential.Api.Obsolete.Networking.Data;
 using FullPotential.Api.Persistence;
-using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Services;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Items.Base;
@@ -9,13 +10,12 @@ using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
-using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Utilities.Extensions;
 
 namespace FullPotential.Api.Items.Types
 {
     [Serializable]
-    public class Consumer : ItemWithTargetingAndShapeBase, IResourceConsumer, IHasChargeUpOrCooldown
+    public class Consumer : ItemWithTargetingAndShapeBase, IResourceConsumer, IHasCharge
     {
         public const string AliasSegmentConsumer = "consumer";
 
@@ -56,11 +56,15 @@ namespace FullPotential.Api.Items.Types
                 .Select(e => (IResourceEffect)e)
                 .ToList();
 
+            var resourceChange = GetSingleEffectValueChange();
+
             var singleEffects = healthEffects.Where(se => se.EffectActionType == EffectActionType.SingleDecrease || se.EffectActionType == EffectActionType.SingleIncrease);
-            var singleChangeSum = singleEffects.Sum(GetResourceChange);
+            var singleChangeSum = singleEffects.Sum(_ => resourceChange);
+
+            var periodicChange = GetPeriodicEffectValueChange();
 
             var periodicEffects = healthEffects.Where(se => se.EffectActionType == EffectActionType.PeriodicDecrease || se.EffectActionType == EffectActionType.PeriodicIncrease);
-            var periodicChangeSum = periodicEffects.Sum(GetPeriodicStatDamagePerSecond) * -1;
+            var periodicChangeSum = periodicEffects.Sum(_ => periodicChange) * -1;
 
             return singleChangeSum + periodicChangeSum;
         }
@@ -116,7 +120,7 @@ namespace FullPotential.Api.Items.Types
                 Attributes.Accuracy,
                 nameof(Attributes.Accuracy),
                 AliasSegmentItem,
-                localizer.TranslateFloat(GetAccuracy()),
+                localizer.TranslateFloat(Attributes.Accuracy),
                 UnitsType.Percent);
 
             AppendToDescription(
@@ -172,5 +176,16 @@ namespace FullPotential.Api.Items.Types
             Stoppables.Clear();
         }
 
+        public float GetRange()
+        {
+            var returnValue = Attributes.Range / 100f * 15 + 5;
+            return returnValue;
+        }
+
+        public float GetRangeForDisplay()
+        {
+            //Rough translation from Unity units to metres
+            return GetRange() * 0.6f;
+        }
     }
 }

@@ -5,14 +5,14 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Core.Registry.Effects
 {
-    public class Hurt : IResourceEffect
+    public class Exhaust : IResourceEffect
     {
-        private static readonly Guid Id = new Guid(EffectTypeIds.HurtId);
+        private static readonly Guid Id = new Guid(EffectTypeIds.ExhaustId);
 
         public Guid TypeId => Id;
 
         public EffectActionType EffectActionType => EffectActionType.SingleDecrease;
 
-        public string ResourceTypeIdString => ResourceTypeIds.HealthId;
+        public string ResourceTypeIdString => ResourceTypeIds.StaminaId;
     }
 }

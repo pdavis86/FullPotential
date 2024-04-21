@@ -25,7 +25,7 @@ namespace FullPotential.Standard.Targeting
         {
             return new[]
             {
-                new ViableTarget { GameObject = sourceFighter.GameObject, Position = sourceFighter.Transform.position, EffectPercentage = 1 }
+                new ViableTarget { GameObject = sourceFighter.GameObject, Position = sourceFighter.Transform.position }
             };
         }
     }

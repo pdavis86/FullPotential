@@ -1,6 +1,6 @@
 ﻿using System;
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Registry.Resources;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Standard.Effects.Buffs;
 
