@@ -239,7 +239,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void SetupResourceReplenishing()
         {
-            //todo: zzz v0.4 - every resource replenish fires every .2 seconds. Fix this
+            //todo: zzz v0.8 - trait-based resource replenish (not just every .2 seconds)
             _replenishResources = new DelayedAction(.2f, () =>
             {
                 foreach (var resource in GetResources())

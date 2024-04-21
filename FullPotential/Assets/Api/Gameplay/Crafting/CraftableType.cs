@@ -6,6 +6,6 @@
         Armor,
         Consumer,
         Weapon,
-        Special
+        SpecialGear
     }
 }

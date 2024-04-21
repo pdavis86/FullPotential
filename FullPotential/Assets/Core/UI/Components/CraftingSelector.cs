@@ -79,7 +79,7 @@ namespace FullPotential.Core.UI.Components
                 case CraftableType.Armor: return _armorTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
                 case CraftableType.Weapon: return _weaponTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
                 case CraftableType.Consumer: return null;
-                case CraftableType.Special: return _specialTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
+                case CraftableType.SpecialGear: return _specialTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
                 default: throw new InvalidOperationException($"Unknown craftable type: '{craftableType}'");
             }
         }
@@ -120,7 +120,7 @@ namespace FullPotential.Core.UI.Components
                     SetupResourcesDropDown();
                     break;
 
-                case CraftableType.Special:
+                case CraftableType.SpecialGear:
                     SubTypeDropdown.AddOptions(_specialTypes.Select(x => x.Value).ToList());
                     SetupResourcesDropDown();
                     break;
@@ -155,7 +155,7 @@ namespace FullPotential.Core.UI.Components
             var localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             var typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
 
-            _craftableTypes = GetDictionaryFromEnum<CraftableType>(localizer);
+            _craftableTypes = localizer.GetDictionaryFromEnum<CraftableType>(TranslationType.ItemType);
 
             _accessoryTypes = typeRegistry.GetRegisteredTypes<IAccessory>()
                 .ToDictionary(x => x, x => localizer.Translate(x))
@@ -188,18 +188,6 @@ namespace FullPotential.Core.UI.Components
                 .Where(x => x != null)
                 .OrderBy(x => x)
                 .ToList();
-        }
-
-        private Dictionary<T, string> GetDictionaryFromEnum<T>(ILocalizer localizer, bool sort = true)
-            where T : Enum
-        {
-            var dictionary = Enum.GetValues(typeof(T))
-                .Cast<T>()
-                .ToDictionary(x => x, x => localizer.Translate(x));
-
-            return sort
-                ? dictionary.OrderByValue()
-                : dictionary;
         }
     }
 }

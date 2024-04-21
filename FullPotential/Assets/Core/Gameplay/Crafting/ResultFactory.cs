@@ -341,7 +341,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 
             var suffix = _localizer.Translate(consumer.Targeting)
                 + (consumer.Shape != null ? " " + _localizer.Translate(consumer.Shape) : null)
-                + " " + _localizer.Translate(craftableType);
+                + " " + _localizer.Translate(TranslationType.ItemType, nameof(Consumer));
 
             if (consumer.Effects.Count > 0)
             {
@@ -523,7 +523,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     var craftableAccessory = _typeRegistry.GetRegisteredByTypeId<IAccessory>(typeId);
                     return GetAccessory(craftableAccessory, components);
 
-                case CraftableType.Special:
+                case CraftableType.SpecialGear:
                     var craftableSpecial = _typeRegistry.GetRegisteredByTypeId<ISpecialGear>(typeId);
                     return GetSpecialGear(craftableSpecial, resourceTypeId, components);
 

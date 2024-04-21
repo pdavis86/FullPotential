@@ -1,12 +1,11 @@
 ﻿using System;
-using FullPotential.Api.Registry;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;
@@ -106,8 +105,6 @@ namespace FullPotential.Core.Localization
 
             foreach (var item in data.Translations)
             {
-                //todo: zzz v0.4 - translations should be prefixed with the mod name to prevent overwriting?
-
                 if (_translations.ContainsKey(item.Key))
                 {
                     Debug.LogWarning($"Translations already contains a value for key '{item.Key}'");
@@ -200,11 +197,6 @@ namespace FullPotential.Core.Localization
             return "Unexpected IRegisterable type";
         }
 
-        public string Translate(Enum enumValue)
-        {
-            return Translate(enumValue.GetType().Name + "." + enumValue);
-        }
-
         public string TranslateWithArgs(string id, params object[] arguments)
         {
             return string.Format(Translate(id), arguments);
@@ -223,16 +215,21 @@ namespace FullPotential.Core.Localization
 
         public string Translate(TranslationType type, string suffix)
         {
-            var split = SplitOnCapitals(type.ToString());
+            var split = type.ToString().SplitOnCapitals();
             var translationKey = string.Join('.', split) + '.' + suffix;
             return Translate(translationKey);
         }
 
-        private static string[] SplitOnCapitals(string value)
+        public Dictionary<T, string> GetDictionaryFromEnum<T>(TranslationType translationType, bool sort = true)
+            where T : Enum
         {
-            const string regexSplitOnCapitals = @"(?<!^)(?=[A-Z])";
-            return Regex.Split(value, regexSplitOnCapitals);
-        }
+            var dictionary = Enum.GetValues(typeof(T))
+                .Cast<T>()
+                .ToDictionary(x => x, x => Translate(translationType, x.ToString()));
 
+            return sort
+                ? dictionary.OrderByValue()
+                : dictionary;
+        }
     }
 }

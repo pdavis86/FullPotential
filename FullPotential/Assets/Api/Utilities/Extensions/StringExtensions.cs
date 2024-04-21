@@ -1,6 +1,7 @@
 ﻿// ReSharper disable UnusedMember.Global
 
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace FullPotential.Api.Utilities.Extensions
 {
@@ -36,6 +37,12 @@ namespace FullPotential.Api.Utilities.Extensions
                 builder.Append(c);
             }
             return builder.ToString();
+        }
+
+        public static string[] SplitOnCapitals(this string value)
+        {
+            const string regexSplitOnCapitals = "(?<!^)(?=[A-Z])";
+            return Regex.Split(value, regexSplitOnCapitals);
         }
     }
 }

@@ -11,25 +11,24 @@
       "Value": "Right Hand"
     },
 	
-	
 	{
-      "Key": "craftabletype.weapon",
+      "Key": "item.type.weapon",
       "Value": "Weapon"
     },
     {
-      "Key": "craftabletype.armor",
+      "Key": "item.type.armor",
       "Value": "Armor"
     },
     {
-      "Key": "craftabletype.accessory",
+      "Key": "item.type.accessory",
       "Value": "Accessory"
     },
     {
-      "Key": "craftabletype.consumer",
+      "Key": "item.type.consumer",
       "Value": "Consumer"
     },
     {
-      "Key": "craftabletype.special",
+      "Key": "item.type.specialgear",
       "Value": "Custom"
     },
 	
@@ -538,24 +537,6 @@
     {
       "Key": "combat.attack.critical",
       "Value": "CRIT:"
-    },
-	
-	
-	{
-      "Key": "item.type.weapon",
-      "Value": "Weapon"
-    },
-    {
-      "Key": "item.type.armor",
-      "Value": "Armor"
-    },
-    {
-      "Key": "item.type.accessory",
-      "Value": "Accessory"
-    },
-    {
-      "Key": "item.type.consumer",
-      "Value": "Consumer"
     }
   ]
 }
