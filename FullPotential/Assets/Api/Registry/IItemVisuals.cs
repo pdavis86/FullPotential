@@ -1,6 +1,6 @@
 ﻿namespace FullPotential.Api.Registry
 {
-    public interface IItemVisuals : IRegisterable, IHasPrefab
+    public interface IItemVisuals : IRegisterableType, IHasPrefab
     {
         string ApplicableToTypeIdString { get; }
     }

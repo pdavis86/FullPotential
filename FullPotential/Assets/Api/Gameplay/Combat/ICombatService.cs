@@ -33,13 +33,13 @@ namespace FullPotential.Api.Gameplay.Combat
         float GetEffectBaseChange(
             FighterBase sourceFighter,
             CombatItemBase itemUsed,
-            IEffect effect,
+            IEffectType effect,
             bool isCriticalHit);
 
         CombatResult GetCombatResult(
             FighterBase sourceFighter,
             CombatItemBase itemUsed,
-            IEffect effect,
+            IEffectType effect,
             LivingEntityBase targetLivingEntity);
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace FullPotential.Api.Registry.Gear
 {
-    public interface IRegisterableWithSlot : IRegisterable
+    public interface IRegisterableWithSlotType : IRegisterableType
     {
         public string SlotSpritePrefabAddress { get; }
     }

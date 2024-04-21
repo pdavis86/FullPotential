@@ -5,7 +5,7 @@ using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 {
-    public class TeleportReloader : ISpecialGear
+    public class TeleportReloader : ISpecialGearType
     {
         public const string TypeIdString = "80c23584-9c2b-45d0-9922-5a4cbc1616a1";
 

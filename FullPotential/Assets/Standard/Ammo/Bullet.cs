@@ -5,7 +5,7 @@ using FullPotential.Api.Registry.Weapons;
 
 namespace FullPotential.Standard.Ammo
 {
-    public class Bullet : IAmmunition
+    public class Bullet : IAmmunitionType
     {
         public const string TypeIdString = "130cc39d-e7db-4b8b-bb09-53a5d68fa05d";
 

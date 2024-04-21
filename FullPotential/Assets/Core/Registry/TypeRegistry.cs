@@ -42,18 +42,18 @@ namespace FullPotential.Core.Registry
 
             _registerTypeFunctions = new Func<object, bool>[]
             {
-                AddToRegister<IResource>,
-                AddToRegister<IAccessory>,
-                AddToRegister<IAmmunition>,
-                AddToRegister<IArmor>,
-                AddToRegister<IEffect>,
-                AddToRegister<ILoot>,
-                AddToRegister<IShape>,
-                AddToRegister<ISpecialGear>,
-                AddToRegister<ITargeting>,
-                AddToRegister<IWeapon>,
-                AddToRegister<IRegisterableWithSlot>,
-                AddToRegister<IElement>,
+                AddToRegister<IResourceType>,
+                AddToRegister<IAccessoryType>,
+                AddToRegister<IAmmunitionType>,
+                AddToRegister<IArmorType>,
+                AddToRegister<IEffectType>,
+                AddToRegister<ILootType>,
+                AddToRegister<IShapeType>,
+                AddToRegister<ISpecialGearType>,
+                AddToRegister<ITargetingType>,
+                AddToRegister<IWeaponType>,
+                AddToRegister<IRegisterableWithSlotType>,
+                AddToRegister<IElementType>,
             };
 
             _registerVisualsFunctions = new Func<object, bool>[]
@@ -160,9 +160,9 @@ namespace FullPotential.Core.Registry
         {
             try
             {
-                if (!typeof(IRegisterable).IsAssignableFrom(type))
+                if (!typeof(IRegisterableType).IsAssignableFrom(type))
                 {
-                    Debug.LogError($"{type.Name} does not implement {nameof(IRegisterable)}");
+                    Debug.LogError($"{type.Name} does not implement {nameof(IRegisterableType)}");
                     return;
                 }
 
@@ -219,7 +219,7 @@ namespace FullPotential.Core.Registry
             }
         }
 
-        private bool AddToRegister<T>(object objectToRegister) where T : IRegisterable
+        private bool AddToRegister<T>(object objectToRegister) where T : IRegisterableType
         {
             if (objectToRegister is not T objectAsT)
             {
@@ -246,7 +246,7 @@ namespace FullPotential.Core.Registry
             return true;
         }
 
-        public IEnumerable<T> GetRegisteredTypes<T>() where T : IRegisterable
+        public IEnumerable<T> GetRegisteredTypes<T>() where T : IRegisterableType
         {
             if (!_registeredTypeLists.ContainsKey(typeof(T)))
             {
@@ -256,19 +256,19 @@ namespace FullPotential.Core.Registry
             return _registeredTypeLists[typeof(T)].Cast<T>();
         }
 
-        public T GetRegisteredByTypeId<T>(string typeIdString) where T : IRegisterable
+        public T GetRegisteredByTypeId<T>(string typeIdString) where T : IRegisterableType
         {
             return GetRegisteredTypes<T>().FirstOrDefault(x => x.TypeId.ToString() == typeIdString);
         }
 
-        public IRegisterable GetAnyRegisteredBySlotId(string typeIdString)
+        public IRegisterableType GetAnyRegisteredBySlotId(string typeIdString)
         {
             var typeId = typeIdString.Split(";")[0];
 
             foreach (var kvp in _registeredTypeLists)
             {
                 var match = kvp.Value
-                    .Cast<IRegisterable>()
+                    .Cast<IRegisterableType>()
                     .FirstOrDefault(x => x.TypeId.ToString() == typeId);
 
                 if (match != null)
@@ -280,7 +280,7 @@ namespace FullPotential.Core.Registry
             return null;
         }
 
-        private T GetRegistryTypeById<T>(string typeId) where T : IRegisterable
+        private T GetRegistryTypeById<T>(string typeId) where T : IRegisterableType
         {
             var craftablesOfType = GetRegisteredTypes<T>();
 
@@ -304,27 +304,27 @@ namespace FullPotential.Core.Registry
             return matches.First();
         }
 
-        private IRegisterable GetItemStackRegistryType(ItemBase item)
+        private IRegisterableType GetItemStackRegistryType(ItemBase item)
         {
-            return _registeredTypeLists[typeof(IAmmunition)].Cast<IAmmunition>().FirstOrDefault(x => x.TypeId.ToString() == item.RegistryTypeId);
+            return _registeredTypeLists[typeof(IAmmunitionType)].Cast<IAmmunitionType>().FirstOrDefault(x => x.TypeId.ToString() == item.RegistryTypeId);
         }
 
-        public IRegisterable GetRegistryTypeForItem(ItemBase item)
+        public IRegisterableType GetRegistryTypeForItem(ItemBase item)
         {
             switch (item)
             {
                 case Api.Items.Types.Accessory:
-                    return GetRegistryTypeById<IAccessory>(item.RegistryTypeId);
+                    return GetRegistryTypeById<IAccessoryType>(item.RegistryTypeId);
                 case Api.Items.Types.Armor:
-                    return GetRegistryTypeById<IArmor>(item.RegistryTypeId);
+                    return GetRegistryTypeById<IArmorType>(item.RegistryTypeId);
                 case Api.Items.Types.Weapon:
-                    return GetRegistryTypeById<IWeapon>(item.RegistryTypeId);
+                    return GetRegistryTypeById<IWeaponType>(item.RegistryTypeId);
                 case Api.Items.Types.Loot:
-                    return GetRegistryTypeById<ILoot>(item.RegistryTypeId);
+                    return GetRegistryTypeById<ILootType>(item.RegistryTypeId);
                 case Api.Items.Types.ItemStack:
                     return GetItemStackRegistryType(item);
                 case Api.Items.Types.SpecialGear:
-                    return GetRegistryTypeById<ISpecialGear>(item.RegistryTypeId);
+                    return GetRegistryTypeById<ISpecialGearType>(item.RegistryTypeId);
                 default:
                     return null;
             }

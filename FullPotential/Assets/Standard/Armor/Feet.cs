@@ -4,7 +4,7 @@ using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.Armor
 {
-    public class Feet : IArmor
+    public class Feet : IArmorType
     {
         private static readonly Guid Id = new Guid(ArmorTypeIds.FeetId);
 

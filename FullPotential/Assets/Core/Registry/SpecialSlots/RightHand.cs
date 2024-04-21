@@ -4,7 +4,7 @@ using FullPotential.Api.Ui;
 
 namespace FullPotential.Core.Registry.SpecialSlots
 {
-    public class RightHand : IRegisterableWithSlot
+    public class RightHand : IRegisterableWithSlotType
     {
         private static readonly Guid Id = new Guid(HandSlotIds.RightHand);
 

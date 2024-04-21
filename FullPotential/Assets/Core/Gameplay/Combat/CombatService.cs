@@ -36,8 +36,8 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private readonly ITypeRegistry _typeRegistry;
         private readonly IRpcService _rpcService;
-        private readonly IMovementEffect _pushEffect;
-        private readonly IEffect _hurtEffect;
+        private readonly IMovementEffectType _pushEffect;
+        private readonly IEffectType _hurtEffect;
 
         public CombatService(
             ITypeRegistry typeRegistry,
@@ -46,8 +46,8 @@ namespace FullPotential.Core.Gameplay.Combat
             _typeRegistry = typeRegistry;
             _rpcService = rpcService;
 
-            _pushEffect = typeRegistry.GetRegisteredByTypeId<IEffect>(EffectTypeIds.PushId) as IMovementEffect;
-            _hurtEffect = typeRegistry.GetRegisteredByTypeId<IEffect>(EffectTypeIds.HurtId);
+            _pushEffect = typeRegistry.GetRegisteredByTypeId<IEffectType>(EffectTypeIds.PushId) as IMovementEffectType;
+            _hurtEffect = typeRegistry.GetRegisteredByTypeId<IEffectType>(EffectTypeIds.HurtId);
         }
 
         public void ApplyEffects(
@@ -67,7 +67,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 ApplyMovementEffect(sourceFighter, null, _pushEffect, target);
             }
 
-            var itemUsedEffects = itemUsed?.Effects ?? new List<IEffect>();
+            var itemUsedEffects = itemUsed?.Effects ?? new List<IEffectType>();
 
             if (!itemUsedEffects.Any())
             {
@@ -88,15 +88,15 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 if (sourceFighter != null && effect is IHasSideEffect withSideEffect)
                 {
-                    var sideEffect = _typeRegistry.GetRegisteredByTypeId<IEffect>(withSideEffect.SideEffectTypeIdString);
+                    var sideEffect = _typeRegistry.GetRegisteredByTypeId<IEffectType>(withSideEffect.SideEffectTypeIdString);
                     ApplyEffect(null, itemUsed, sideEffect, sourceFighter.GameObject, position);
                 }
             }
         }
 
-        private static bool IsEffectAllowed(GameObject target, IEffect effect)
+        private static bool IsEffectAllowed(GameObject target, IEffectType effect)
         {
-            if (effect is IMovementEffect movementEffect
+            if (effect is IMovementEffectType movementEffect
                 && movementEffect.Direction == MovementDirection.MaintainDistance)
             {
                 if (target.GetComponent<MaintainDistance>() != null)
@@ -115,9 +115,9 @@ namespace FullPotential.Core.Gameplay.Combat
             return true;
         }
 
-        private void ApplyEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IEffect effect, GameObject targetGameObject, Vector3? position)
+        private void ApplyEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IEffectType effect, GameObject targetGameObject, Vector3? position)
         {
-            if (effect is IMovementEffect movementEffect)
+            if (effect is IMovementEffectType movementEffect)
             {
                 ApplyMovementEffect(sourceFighter, itemUsed, movementEffect, targetGameObject);
                 return;
@@ -135,7 +135,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             switch (effect)
             {
-                case IResourceEffect resourceEffect:
+                case IResourceEffectType resourceEffect:
                     ApplyResourceEffect(sourceFighter, itemUsed, resourceEffect, targetFighter, position);
                     return;
 
@@ -161,9 +161,9 @@ namespace FullPotential.Core.Gameplay.Combat
             return luckValue / 5f;
         }
 
-        public float GetEffectBaseChange(FighterBase sourceFighter, CombatItemBase itemUsed, IEffect effect, bool isCriticalHit)
+        public float GetEffectBaseChange(FighterBase sourceFighter, CombatItemBase itemUsed, IEffectType effect, bool isCriticalHit)
         {
-            var resourceEffect = effect as IResourceEffect;
+            var resourceEffect = effect as IResourceEffectType;
 
             var isPeriodic = resourceEffect?.EffectActionType is EffectActionType.PeriodicDecrease or EffectActionType.PeriodicIncrease;
 
@@ -212,7 +212,7 @@ namespace FullPotential.Core.Gameplay.Combat
             return change;
         }
 
-        public CombatResult GetCombatResult(FighterBase sourceFighter, CombatItemBase itemUsed, IEffect effect, LivingEntityBase targetLivingEntity)
+        public CombatResult GetCombatResult(FighterBase sourceFighter, CombatItemBase itemUsed, IEffectType effect, LivingEntityBase targetLivingEntity)
         {
             var isCriticalHit = false;
             if (sourceFighter != null)
@@ -230,7 +230,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             switch (effect)
             {
-                case IResourceEffect resourceEffect:
+                case IResourceEffectType resourceEffect:
                 {
                     if (resourceEffect.EffectActionType is EffectActionType.PeriodicDecrease or EffectActionType.SingleDecrease or EffectActionType.TemporaryMaxDecrease)
                     {
@@ -262,7 +262,7 @@ namespace FullPotential.Core.Gameplay.Combat
             //todo: zzz v0.8 - replace with sum of Strength of items with resistance to Hurt
 
             var armorItems = _typeRegistry
-                .GetRegisteredTypes<IArmor>()
+                .GetRegisteredTypes<IArmorType>()
                 .Select(x => targetLivingEntity.Inventory.GetItemInSlot<Armor>(x.TypeId.ToString(), false));
 
             var sum = armorItems
@@ -276,7 +276,7 @@ namespace FullPotential.Core.Gameplay.Combat
             return defenceRatio;
         }
 
-        private void ApplyResourceEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffect resourceEffect, FighterBase targetFighter, Vector3? position)
+        private void ApplyResourceEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, FighterBase targetFighter, Vector3? position)
         {
             switch (resourceEffect.EffectActionType)
             {
@@ -322,7 +322,7 @@ namespace FullPotential.Core.Gameplay.Combat
             comp.Consumer = consumer;
         }
 
-        private void ApplyMovementEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IMovementEffect movementEffect, GameObject targetGameObject)
+        private void ApplyMovementEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IMovementEffectType movementEffect, GameObject targetGameObject)
         {
             var targetRigidBody = targetGameObject.GetComponent<Rigidbody>();
 

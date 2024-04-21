@@ -5,7 +5,7 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Core.Registry.Effects
 {
-    public class Push : IMovementEffect
+    public class Push : IMovementEffectType
     {
         private static readonly Guid Id = new Guid(EffectTypeIds.PushId);
 

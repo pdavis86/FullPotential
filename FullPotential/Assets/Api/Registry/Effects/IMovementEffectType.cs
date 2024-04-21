@@ -2,7 +2,7 @@
 
 namespace FullPotential.Api.Registry.Effects
 {
-    public interface IMovementEffect : IEffect
+    public interface IMovementEffectType : IEffectType
     {
         /// <summary>
         /// The direction in which the source/target will be moved

@@ -5,7 +5,7 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Standard.Effects.Debuffs
 {
-    public class Lethargy : IResourceEffect
+    public class Lethargy : IResourceEffectType
     {
         private static readonly Guid Id = new Guid("260ff724-0708-42fa-81ab-45af911e6daf");
 

@@ -5,7 +5,7 @@ using FullPotential.Api.Registry.Gameplay;
 
 namespace FullPotential.Standard.Resources
 {
-    public class Energy : IResource
+    public class Energy : IResourceType
     {
         public const string TypeIdString = "89ec3ecf-badb-4e55-91b0-b288ca358010";
 

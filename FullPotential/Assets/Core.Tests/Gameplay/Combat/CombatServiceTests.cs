@@ -22,7 +22,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
     public class CombatServiceTests
     {
         private ICombatService _combatService;
-        private IEffect _singleDamageEffect;
+        private IEffectType _singleDamageEffect;
 
         [SetUp]
         public void Setup()
@@ -67,10 +67,10 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
                 Luck = 50
             };
 
-            var consumerSingleDamage = GetConsumer(allFifty, new List<IEffect> { _singleDamageEffect });
+            var consumerSingleDamage = GetConsumer(allFifty, new List<IEffectType> { _singleDamageEffect });
             Assert.AreEqual((int)expectedBaseDamage, GetDamage(consumerSingleDamage));
 
-            var consumerMultipleEffects = GetConsumer(allFifty, new List<IEffect> { _singleDamageEffect, _singleDamageEffect });
+            var consumerMultipleEffects = GetConsumer(allFifty, new List<IEffectType> { _singleDamageEffect, _singleDamageEffect });
             Assert.AreEqual((int)expectedBaseDamage, GetDamage(consumerMultipleEffects));
 
             var meleeOneHandedWeapon = GetMeleeWeapon(false, allFifty);
@@ -91,7 +91,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
             return (int)_combatService.GetEffectBaseChange(null, item, _singleDamageEffect, false);
         }
 
-        private Consumer GetConsumer(Attributes attributes, List<IEffect> effects)
+        private Consumer GetConsumer(Attributes attributes, List<IEffectType> effects)
         {
             return new Consumer
             {
@@ -122,7 +122,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
     }
 
     [ExcludeFromCodeCoverage]
-    public class TestWeaponType : IWeapon
+    public class TestWeaponType : IWeaponType
     {
         // ReSharper disable UnassignedGetOnlyAutoProperty
         public Guid TypeId { get; }

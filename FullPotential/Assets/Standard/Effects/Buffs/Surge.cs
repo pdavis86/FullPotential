@@ -5,7 +5,7 @@ using FullPotential.Standard.Resources;
 
 namespace FullPotential.Standard.Effects.Buffs
 {
-    public class Surge : IResourceEffect
+    public class Surge : IResourceEffectType
     {
         private static readonly Guid Id = new Guid("b1edb96d-da2b-49b3-bac3-80c9b1dfe9d6");
 

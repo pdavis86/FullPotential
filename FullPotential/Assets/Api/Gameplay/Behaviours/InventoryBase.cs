@@ -373,9 +373,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return true;
             }
 
-            return _typeRegistry.GetRegisteredTypes<IArmor>().FirstOrDefault(t => t.TypeId.ToString() == slotId) != null
-                   || _typeRegistry.GetRegisteredTypes<IAccessory>().FirstOrDefault(t => slotId.StartsWith(t.TypeId.ToString())) != null
-                   || _typeRegistry.GetRegisteredTypes<IRegisterableWithSlot>().FirstOrDefault(t => t.TypeId.ToString() == slotId) != null;
+            return _typeRegistry.GetRegisteredTypes<IArmorType>().FirstOrDefault(t => t.TypeId.ToString() == slotId) != null
+                   || _typeRegistry.GetRegisteredTypes<IAccessoryType>().FirstOrDefault(t => slotId.StartsWith(t.TypeId.ToString())) != null
+                   || _typeRegistry.GetRegisteredTypes<IRegisterableWithSlotType>().FirstOrDefault(t => t.TypeId.ToString() == slotId) != null;
         }
 
         protected void FillTypesFromIds(ItemBase item)
@@ -387,7 +387,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (item is ItemWithTargetingAndShapeBase withTargetingAndShape && !string.IsNullOrWhiteSpace(withTargetingAndShape.TargetingTypeId))
             {
-                withTargetingAndShape.Targeting = _typeRegistry.GetRegisteredTypes<ITargeting>()
+                withTargetingAndShape.Targeting = _typeRegistry.GetRegisteredTypes<ITargetingType>()
                     .First(x => x.TypeId.ToString() == withTargetingAndShape.TargetingTypeId);
 
                 withTargetingAndShape.TargetingVisuals = _typeRegistry.GetRegisteredTypes<ITargetingVisuals>()
@@ -395,7 +395,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
                 if (!string.IsNullOrWhiteSpace(withTargetingAndShape.ShapeTypeId))
                 {
-                    withTargetingAndShape.Shape = _typeRegistry.GetRegisteredTypes<IShape>()
+                    withTargetingAndShape.Shape = _typeRegistry.GetRegisteredTypes<IShapeType>()
                         .First(x => x.TypeId.ToString() == withTargetingAndShape.ShapeTypeId);
 
                     withTargetingAndShape.ShapeVisuals = _typeRegistry.GetRegisteredTypes<IShapeVisuals>()
@@ -405,12 +405,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (item is Consumer consumer)
             {
-                consumer.ResourceType = _typeRegistry.GetRegisteredTypes<IResource>()
+                consumer.ResourceType = _typeRegistry.GetRegisteredTypes<IResourceType>()
                     .First(x => x.TypeId.ToString() == consumer.ResourceTypeId);
             }
             else if (item is SpecialGear specialGear)
             {
-                specialGear.ResourceType = _typeRegistry.GetRegisteredTypes<IResource>()
+                specialGear.ResourceType = _typeRegistry.GetRegisteredTypes<IResourceType>()
                     .First(x => x.TypeId.ToString() == specialGear.ResourceTypeId);
             }
 
@@ -441,16 +441,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 if (combatItem.EffectIds != null && combatItem.EffectIds.Length > 0 && combatItem.Effects == null)
                 {
                     combatItem.Effects = combatItem.EffectIds
-                        .Select(x => _typeRegistry.GetRegisteredByTypeId<IEffect>(x))
+                        .Select(x => _typeRegistry.GetRegisteredByTypeId<IEffectType>(x))
                         .Where(x => x != null)
                         .ToList();
                 }
 
                 //For backwards compatibility
-                combatItem.Effects ??= new List<IEffect>();
+                combatItem.Effects ??= new List<IEffectType>();
                 if (!combatItem.Effects.Any())
                 {
-                    combatItem.Effects.Add(_typeRegistry.GetRegisteredByTypeId<IEffect>(EffectTypeIds.HurtId));
+                    combatItem.Effects.Add(_typeRegistry.GetRegisteredByTypeId<IEffectType>(EffectTypeIds.HurtId));
                 }
             }
         }

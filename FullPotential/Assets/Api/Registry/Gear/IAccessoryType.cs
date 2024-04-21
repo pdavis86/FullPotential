@@ -1,6 +1,6 @@
 ﻿namespace FullPotential.Api.Registry.Gear
 {
-    public interface IAccessory : IRegisterableWithSlot
+    public interface IAccessoryType : IRegisterableWithSlotType
     {
         public int SlotCount { get; }
     }

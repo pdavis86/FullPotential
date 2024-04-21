@@ -3,7 +3,7 @@ using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.Accessories
 {
-    public class Amulet : IAccessory
+    public class Amulet : IAccessoryType
     {
         public const string TypeIdString = "ddeafb61-0163-4888-b355-16a37d3a33b5";
 

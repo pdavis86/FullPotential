@@ -15,7 +15,7 @@ namespace FullPotential.Api.Items.Types
     [Serializable]
     public class SpecialGear : CombatItemBase, IResourceConsumer, IHasItemVisuals
     {
-        private IResource _resourceType;
+        private IResourceType _resourceType;
         private IItemVisuals _visuals;
 
         //Variables so they are serialized
@@ -26,7 +26,7 @@ namespace FullPotential.Api.Items.Types
         // ReSharper restore NotAccessedField.Global
         public string ResourceTypeId;
 
-        public IResource ResourceType
+        public IResourceType ResourceType
         {
             get => _resourceType;
             set
@@ -52,7 +52,7 @@ namespace FullPotential.Api.Items.Types
 
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
         {
-            var specialType = (ISpecialGear)RegistryType;
+            var specialType = (ISpecialGearType)RegistryType;
             var descriptionOverride = specialType.OverrideItemDescription(this, localizer, levelOfDetail);
 
             if (!descriptionOverride.IsNullOrWhiteSpace())

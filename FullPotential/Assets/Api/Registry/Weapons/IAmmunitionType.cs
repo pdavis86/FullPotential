@@ -2,7 +2,7 @@
 
 namespace FullPotential.Api.Registry.Weapons
 {
-    public interface IAmmunition : IRegisterable, IItemStack
+    public interface IAmmunitionType : IRegisterableType, IItemStack
     {
     }
 }

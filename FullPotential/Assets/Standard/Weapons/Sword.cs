@@ -3,7 +3,7 @@ using FullPotential.Api.Registry.Weapons;
 
 namespace FullPotential.Standard.Weapons
 {
-    public class Sword : IWeapon
+    public class Sword : IWeaponType
     {
         public const string TypeIdString = "b1ff5c3c-a306-4a2a-9fef-24320e05e74f";
 

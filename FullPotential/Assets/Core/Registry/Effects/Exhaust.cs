@@ -5,7 +5,7 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Core.Registry.Effects
 {
-    public class Exhaust : IResourceEffect
+    public class Exhaust : IResourceEffectType
     {
         private static readonly Guid Id = new Guid(EffectTypeIds.ExhaustId);
 

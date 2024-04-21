@@ -7,7 +7,7 @@ namespace FullPotential.Api.Gameplay.Effects
     {
         public Guid Id { get; set; }
 
-        public IEffect Effect { get; set; }
+        public IEffectType Effect { get; set; }
 
         public DateTime Expiry { get; set; }
 

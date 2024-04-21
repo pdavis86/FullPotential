@@ -3,7 +3,7 @@ using FullPotential.Api.Registry.Elements;
 
 namespace FullPotential.Standard.Effects.Elements
 {
-    public class Lightning : IElement
+    public class Lightning : IElementType
     {
         private static readonly Guid Id = new Guid("80f913d3-0969-42e1-8f32-8ac54c1b3203");
 

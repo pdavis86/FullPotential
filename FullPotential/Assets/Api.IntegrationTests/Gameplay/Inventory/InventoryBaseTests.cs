@@ -28,8 +28,8 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
         private Mock<IRpcService> _rpcServiceMock;
         private Mock<IFragmentedMessageReconstructorFactory> _fragmentedMessageReconstructorFactoryMock;
 
-        private Mock<IAmmunition> _stackRegistryType1;
-        private Mock<IAmmunition> _stackRegistryType2;
+        private Mock<IAmmunitionType> _stackRegistryType1;
+        private Mock<IAmmunitionType> _stackRegistryType2;
         private MyInventory _inventory;
 
         [SetUp]
@@ -57,7 +57,7 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
                 .Returns(fragmentedMessageReconstructorMock.Object);
 
             var guid1 = Guid.NewGuid();
-            _stackRegistryType1 = new Mock<IAmmunition>();
+            _stackRegistryType1 = new Mock<IAmmunitionType>();
             _stackRegistryType1
                 .Setup(m => m.TypeId)
                 .Returns(guid1);
@@ -66,7 +66,7 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
                 .Returns(2);
 
             var guid2 = Guid.NewGuid();
-            _stackRegistryType2 = new Mock<IAmmunition>();
+            _stackRegistryType2 = new Mock<IAmmunitionType>();
             _stackRegistryType2
                 .Setup(m => m.TypeId)
                 .Returns(guid2);

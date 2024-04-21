@@ -2,7 +2,7 @@
 
 namespace FullPotential.Api.Registry
 {
-    public interface IRegisterable
+    public interface IRegisterableType
     {
         /// <summary>
         /// The GUID for this type of registerable

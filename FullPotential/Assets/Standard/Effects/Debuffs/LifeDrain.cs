@@ -6,7 +6,7 @@ using FullPotential.Standard.Effects.Buffs;
 
 namespace FullPotential.Standard.Effects.Debuffs
 {
-    public class LifeDrain : IResourceEffect, IHasSideEffect
+    public class LifeDrain : IResourceEffectType, IHasSideEffect
     {
         private static readonly Guid Id = new Guid("fe828022-b20d-4204-a6ff-8fada0e75bb5");
 

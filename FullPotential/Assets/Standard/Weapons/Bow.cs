@@ -4,7 +4,7 @@ using FullPotential.Standard.Ammo;
 
 namespace FullPotential.Standard.Weapons
 {
-    public class Bow : IWeapon
+    public class Bow : IWeaponType
     {
         public const string TypeIdString = "47d23976-45ad-4360-b603-7ea4ed29846b";
 

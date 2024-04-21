@@ -5,7 +5,7 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Core.Registry.Effects
 {
-    public class Invigorate : IResourceEffect
+    public class Invigorate : IResourceEffectType
     {
         private static readonly Guid Id = new Guid(EffectTypeIds.InvigorateId);
 

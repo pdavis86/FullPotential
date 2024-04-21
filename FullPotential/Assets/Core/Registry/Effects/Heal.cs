@@ -5,7 +5,7 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Core.Registry.Effects
 {
-    public class Heal : IResourceEffect
+    public class Heal : IResourceEffectType
     {
         private static readonly Guid Id = new Guid(EffectTypeIds.HealId);
 

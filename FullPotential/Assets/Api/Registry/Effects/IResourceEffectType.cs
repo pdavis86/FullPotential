@@ -2,7 +2,7 @@
 
 namespace FullPotential.Api.Registry.Effects
 {
-    public interface IResourceEffect : IEffect
+    public interface IResourceEffectType : IEffectType
     {
         /// <summary>
         /// The underlying result of applying this effect

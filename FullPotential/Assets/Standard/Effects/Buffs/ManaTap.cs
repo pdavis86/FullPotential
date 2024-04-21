@@ -5,7 +5,7 @@ using FullPotential.Standard.Resources;
 
 namespace FullPotential.Standard.Effects.Buffs
 {
-    public class ManaTap : IResourceEffect, IIsSideEffect
+    public class ManaTap : IResourceEffectType, IIsSideEffect
     {
         public const string TypeIdString = "06629efd-6a9b-4627-8b02-37e8dab135a1";
 
