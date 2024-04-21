@@ -4,7 +4,7 @@ using FullPotential.Api.Gameplay.Behaviours;
 
 namespace FullPotential.Api.Registry.Gameplay
 {
-    public interface IResource : IRegisterable
+    public interface IResourceType : IRegisterableType
     {
         Color Color { get; }
 

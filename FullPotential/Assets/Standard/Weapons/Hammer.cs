@@ -3,7 +3,7 @@ using FullPotential.Api.Registry.Weapons;
 
 namespace FullPotential.Standard.Weapons
 {
-    public class Hammer : IWeapon
+    public class Hammer : IWeaponType
     {
         public const string TypeIdString = "70d38942-f1a9-4bd9-a3a4-c75e8615e31a";
 

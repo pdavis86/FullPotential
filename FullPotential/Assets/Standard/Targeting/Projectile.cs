@@ -7,7 +7,7 @@ using FullPotential.Api.Registry.Targeting;
 
 namespace FullPotential.Standard.Targeting
 {
-    public class Projectile : ITargeting
+    public class Projectile : ITargetingType
     {
         public const string TypeIdString = "6e41729e-bb21-44f8-8fb9-b9ad48c0e680";
         public const string AddressablePath = "Standard/Prefabs/Targeting/Projectile.prefab";

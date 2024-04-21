@@ -60,7 +60,7 @@ namespace FullPotential.Core.Ui.Behaviours
         private EquippedSummary _equippedRightHandSummary;
         private Text _equippedRightHandAmmo;
         private FighterBase _playerFighter;
-        private IEnumerable<IResource> _resources;
+        private IEnumerable<IResourceType> _resources;
 
         #region Unity Events Handlers
 
@@ -295,9 +295,9 @@ namespace FullPotential.Core.Ui.Behaviours
             }
         }
 
-        private Color GetEffectColor(IEffect effect)
+        private Color GetEffectColor(IEffectType effect)
         {
-            if (effect is IResourceEffect resourceEffect)
+            if (effect is IResourceEffectType resourceEffect)
             {
                 if (resourceEffect.EffectActionType == EffectActionType.SingleIncrease
                     || resourceEffect.EffectActionType == EffectActionType.PeriodicIncrease
@@ -329,7 +329,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void SetupResourceBars()
         {
-            _resources = _typeRegistry.GetRegisteredTypes<IResource>();
+            _resources = _typeRegistry.GetRegisteredTypes<IResourceType>();
 
             foreach (var resource in _resources)
             {

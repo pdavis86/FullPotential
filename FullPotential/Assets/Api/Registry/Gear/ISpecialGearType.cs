@@ -3,7 +3,7 @@ using FullPotential.Api.Localization;
 
 namespace FullPotential.Api.Registry.Gear
 {
-    public interface ISpecialGear : IRegisterable
+    public interface ISpecialGearType : IRegisterableType
     {
         string SlotIdString { get; }
 

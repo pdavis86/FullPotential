@@ -41,9 +41,9 @@ namespace FullPotential.Core.UI.Behaviours
         private IResultFactory _resultFactory;
         private ILocalizer _localizer;
 
-        private List<IEffect> _registeredEffects;
-        private List<ITargeting> _registeredTargetingOptions;
-        private List<IShape> _registeredShapes;
+        private List<IEffectType> _registeredEffects;
+        private List<ITargetingType> _registeredTargetingOptions;
+        private List<IShapeType> _registeredShapes;
 
         private List<NameAndValueSlider> _attributeSliderBehaviours;
         private List<NameAndToggle> _attributeToggleBehaviours;
@@ -58,9 +58,9 @@ namespace FullPotential.Core.UI.Behaviours
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
 
             var typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
-            _registeredEffects = typeRegistry.GetRegisteredTypes<IEffect>().ToList();
-            _registeredTargetingOptions = typeRegistry.GetRegisteredTypes<ITargeting>().ToList();
-            _registeredShapes = typeRegistry.GetRegisteredTypes<IShape>().ToList();
+            _registeredEffects = typeRegistry.GetRegisteredTypes<IEffectType>().ToList();
+            _registeredTargetingOptions = typeRegistry.GetRegisteredTypes<ITargetingType>().ToList();
+            _registeredShapes = typeRegistry.GetRegisteredTypes<IShapeType>().ToList();
 
             InstantiateAttributeControls();
             InstantiateEffectControls();
@@ -226,9 +226,9 @@ namespace FullPotential.Core.UI.Behaviours
             return (Attributes)attributes;
         }
 
-        private List<IEffect> GetEffects()
+        private List<IEffectType> GetEffects()
         {
-            var effects = new List<IEffect>();
+            var effects = new List<IEffectType>();
 
             foreach (var effect in _registeredEffects)
             {
@@ -242,14 +242,14 @@ namespace FullPotential.Core.UI.Behaviours
             return effects;
         }
 
-        private ITargeting GetTargeting()
+        private ITargetingType GetTargeting()
         {
             var firstToggle = _targetingToggleBehaviours.FirstOrDefault(x => x.Toggle.isOn);
             var typeName = firstToggle != null ? firstToggle.Name.text : null;
             return _registeredTargetingOptions.FirstOrDefault(x => x.GetType().Name == typeName);
         }
 
-        private IShape GetShape()
+        private IShapeType GetShape()
         {
             var firstToggle = _shapeToggleBehaviours.FirstOrDefault(x => x.Toggle.isOn);
             var typeName = firstToggle != null ? firstToggle.Name.text : null;

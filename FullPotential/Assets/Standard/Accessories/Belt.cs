@@ -3,7 +3,7 @@ using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.Accessories
 {
-    public class Belt : IAccessory
+    public class Belt : IAccessoryType
     {
         public const string TypeIdString = "6d4bce60-dda6-4a88-82fd-c2b086065c8b";
 

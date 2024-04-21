@@ -7,8 +7,8 @@ namespace FullPotential.Api.Items
 {
     public interface IHasTargetingAndShape
     {
-        ITargeting Targeting { get; set; }
+        ITargetingType Targeting { get; set; }
 
-        IShape Shape { get; set; }
+        IShapeType Shape { get; set; }
     }
 }

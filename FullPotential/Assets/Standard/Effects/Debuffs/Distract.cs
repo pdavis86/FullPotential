@@ -5,7 +5,7 @@ using FullPotential.Standard.Resources;
 
 namespace FullPotential.Standard.Effects.Debuffs
 {
-    public class Distract : IResourceEffect
+    public class Distract : IResourceEffectType
     {
         private static readonly Guid Id = new Guid("fb2fcd58-8a90-46de-8368-731773230835");
 

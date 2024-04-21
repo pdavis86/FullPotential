@@ -4,7 +4,7 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Standard.Effects.Movement
 {
-    public class StepBack : IMovementEffect
+    public class StepBack : IMovementEffectType
     {
         private static readonly Guid Id = new Guid("90781986-e490-4115-a7f6-7864c3ed1e41");
 

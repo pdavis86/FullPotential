@@ -27,11 +27,11 @@ namespace FullPotential.Core.UI.Components
         // ReSharper restore UnassignedField.Global
 
         private Dictionary<CraftableType, string> _craftableTypes;
-        private Dictionary<IAccessory, string> _accessoryTypes;
-        private Dictionary<IArmor, string> _armorTypes;
-        private Dictionary<IResource, string> _resourceTypes;
-        private Dictionary<IWeapon, string> _weaponTypes;
-        private Dictionary<ISpecialGear, string> _specialTypes;
+        private Dictionary<IAccessoryType, string> _accessoryTypes;
+        private Dictionary<IArmorType, string> _armorTypes;
+        private Dictionary<IResourceType, string> _resourceTypes;
+        private Dictionary<IWeaponType, string> _weaponTypes;
+        private Dictionary<ISpecialGearType, string> _specialTypes;
         private List<string> _handednessOptions;
         private List<int?> _optionalTwoHandedWeaponIndexes;
 
@@ -157,24 +157,24 @@ namespace FullPotential.Core.UI.Components
 
             _craftableTypes = localizer.GetDictionaryFromEnum<CraftableType>(TranslationType.ItemType);
 
-            _accessoryTypes = typeRegistry.GetRegisteredTypes<IAccessory>()
+            _accessoryTypes = typeRegistry.GetRegisteredTypes<IAccessoryType>()
                 .ToDictionary(x => x, x => localizer.Translate(x))
                 .OrderByValue();
 
-            _armorTypes = typeRegistry.GetRegisteredTypes<IArmor>()
+            _armorTypes = typeRegistry.GetRegisteredTypes<IArmorType>()
                 .ToDictionary(x => x, x => localizer.Translate(x))
                 .OrderByValue();
 
-            _resourceTypes = typeRegistry.GetRegisteredTypes<IResource>()
+            _resourceTypes = typeRegistry.GetRegisteredTypes<IResourceType>()
                 .Where(r => r.IsCraftable)
                 .ToDictionary(x => x, x => localizer.Translate(x))
                 .OrderByValue();
 
-            _weaponTypes = typeRegistry.GetRegisteredTypes<IWeapon>()
+            _weaponTypes = typeRegistry.GetRegisteredTypes<IWeaponType>()
                 .ToDictionary(x => x, x => localizer.Translate(x))
                 .OrderByValue();
 
-            _specialTypes = typeRegistry.GetRegisteredTypes<ISpecialGear>()
+            _specialTypes = typeRegistry.GetRegisteredTypes<ISpecialGearType>()
                 .ToDictionary(x => x, x => localizer.Translate(x))
                 .OrderByValue();
 

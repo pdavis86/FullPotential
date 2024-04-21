@@ -5,7 +5,7 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Standard.Effects.Buffs
 {
-    public class Endurance : IResourceEffect
+    public class Endurance : IResourceEffectType
     {
         private static readonly Guid Id = new Guid("29fa3077-627c-4cc2-9efc-8293ad7ce52d");
 

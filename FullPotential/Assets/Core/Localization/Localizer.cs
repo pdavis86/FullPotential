@@ -40,19 +40,19 @@ namespace FullPotential.Core.Localization
         {
             _typeDictionary.Clear();
 
-            CacheRegisterableTypeName<IResource>();
-            CacheRegisterableTypeName<IArmor>();
-            CacheRegisterableTypeName<IAccessory>();
-            CacheRegisterableTypeName<IWeapon>();
-            CacheRegisterableTypeName<ILoot>();
-            CacheRegisterableTypeName<IAmmunition>();
-            CacheRegisterableTypeName<IEffect>();
-            CacheRegisterableTypeName<IShape>();
-            CacheRegisterableTypeName<ITargeting>();
-            CacheRegisterableTypeName<ISpecialGear>();
+            CacheRegisterableTypeName<IResourceType>();
+            CacheRegisterableTypeName<IArmorType>();
+            CacheRegisterableTypeName<IAccessoryType>();
+            CacheRegisterableTypeName<IWeaponType>();
+            CacheRegisterableTypeName<ILootType>();
+            CacheRegisterableTypeName<IAmmunitionType>();
+            CacheRegisterableTypeName<IEffectType>();
+            CacheRegisterableTypeName<IShapeType>();
+            CacheRegisterableTypeName<ITargetingType>();
+            CacheRegisterableTypeName<ISpecialGearType>();
 
             //NOTE: Add this last to catch anything missed
-            _typeDictionary.Add(typeof(IRegisterableWithSlot), "slot");
+            _typeDictionary.Add(typeof(IRegisterableWithSlotType), "slot");
         }
 
         private void CacheRegisterableTypeName<T>()
@@ -184,7 +184,7 @@ namespace FullPotential.Core.Localization
             return $"'{id}' translation is missing";
         }
 
-        public string Translate(IRegisterable registeredItem)
+        public string Translate(IRegisterableType registeredItem)
         {
             foreach (var kvp in _typeDictionary)
             {

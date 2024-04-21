@@ -2,7 +2,7 @@
 
 namespace FullPotential.Api.Registry.Effects
 {
-    public interface ICustomEffect : IEffect
+    public interface ICustomEffectType : IEffectType
     {
         void ApplyEffect();
     }

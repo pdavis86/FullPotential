@@ -31,11 +31,11 @@ namespace FullPotential.Core.Gameplay.Crafting
         private readonly TypeRegistry _typeRegistry;
         private readonly ILocalizer _localizer;
 
-        private readonly List<ILoot> _lootTypes;
-        private readonly List<IAmmunition> _ammoTypes;
-        private readonly List<ITargeting> _targetingTypes;
-        private readonly List<IShape> _shapeTypes;
-        private readonly List<IEffect> _effectsForLoot;
+        private readonly List<ILootType> _lootTypes;
+        private readonly List<IAmmunitionType> _ammoTypes;
+        private readonly List<ITargetingType> _targetingTypes;
+        private readonly List<IShapeType> _shapeTypes;
+        private readonly List<IEffectType> _effectsForLoot;
 
         public ResultFactory(
             ITypeRegistry typeRegistry,
@@ -44,12 +44,12 @@ namespace FullPotential.Core.Gameplay.Crafting
             _typeRegistry = (TypeRegistry)typeRegistry;
             _localizer = localizer;
 
-            _lootTypes = _typeRegistry.GetRegisteredTypes<ILoot>().ToList();
-            _ammoTypes = _typeRegistry.GetRegisteredTypes<IAmmunition>().ToList();
-            _targetingTypes = _typeRegistry.GetRegisteredTypes<ITargeting>().ToList();
-            _shapeTypes = _typeRegistry.GetRegisteredTypes<IShape>().ToList();
+            _lootTypes = _typeRegistry.GetRegisteredTypes<ILootType>().ToList();
+            _ammoTypes = _typeRegistry.GetRegisteredTypes<IAmmunitionType>().ToList();
+            _targetingTypes = _typeRegistry.GetRegisteredTypes<ITargetingType>().ToList();
+            _shapeTypes = _typeRegistry.GetRegisteredTypes<IShapeType>().ToList();
 
-            _effectsForLoot = _typeRegistry.GetRegisteredTypes<IEffect>()
+            _effectsForLoot = _typeRegistry.GetRegisteredTypes<IEffectType>()
                 .Where(x => x is not IIsSideEffect)
                 .ToList();
         }
@@ -74,20 +74,20 @@ namespace FullPotential.Core.Gameplay.Crafting
             return result == 0 ? 1 : result;
         }
 
-        private ITargeting GetTargeting(IList<IHasTargetingAndShape> components)
+        private ITargetingType GetTargeting(IList<IHasTargetingAndShape> components)
         {
             //Exactly one targeting option
             var targetingComponent = components.FirstOrDefault(x => x.Targeting != null);
 
             if (targetingComponent == null)
             {
-                return _typeRegistry.GetRegisteredTypes<ITargeting>().FirstOrDefault();
+                return _typeRegistry.GetRegisteredTypes<ITargetingType>().FirstOrDefault();
             }
 
             return targetingComponent.Targeting;
         }
 
-        private IShape GetShapeOrNone(ITargeting targeting, IList<IHasTargetingAndShape> components)
+        private IShapeType GetShapeOrNone(ITargetingType targeting, IList<IHasTargetingAndShape> components)
         {
             //Only one shape, if any
             if (!targeting.CanHaveShape)
@@ -105,7 +105,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return _shapeTypes.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
         }
 
-        private List<IEffect> GetEffects(CraftableType craftableType, IList<CombatItemBase> components, ITargeting targeting = null)
+        private List<IEffectType> GetEffects(CraftableType craftableType, IList<CombatItemBase> components, ITargetingType targeting = null)
         {
             const string buff = "Buff";
             const string debuff = "Debuff";
@@ -129,7 +129,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                                 : debuff;
                         }
 
-                        if (x is IResourceEffect resourceEffect)
+                        if (x is IResourceEffectType resourceEffect)
                         {
                             switch (resourceEffect.EffectActionType)
                             {
@@ -186,7 +186,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             {
                 effects = effects
                     .Where(x =>
-                        x is not IMovementEffect movementEffect
+                        x is not IMovementEffectType movementEffect
                         || movementEffect.Direction != MovementDirection.MaintainDistance);
             }
 
@@ -205,12 +205,12 @@ namespace FullPotential.Core.Gameplay.Crafting
             return IsSuccess(percentageChance) ? _random.Next(1, 100) : 0;
         }
 
-        private IEffect GetRandomEffect()
+        private IEffectType GetRandomEffect()
         {
             return _effectsForLoot.ElementAt(_random.Next(0, _effectsForLoot.Count));
         }
 
-        private ITargeting GetRandomTargetingOrNone()
+        private ITargetingType GetRandomTargetingOrNone()
         {
             if (IsSuccess(50))
             {
@@ -219,7 +219,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return null;
         }
 
-        private IShape GetRandomShapeOrNone()
+        private IShapeType GetRandomShapeOrNone()
         {
             if (IsSuccess(10))
             {
@@ -253,11 +253,11 @@ namespace FullPotential.Core.Gameplay.Crafting
 
             if (IsSuccess(50))
             {
-                var effects = new List<IEffect>();
+                var effects = new List<IEffectType>();
                 var numberOfEffects = GetMinBiasedNumber(1, Math.Min(4, _effectsForLoot.Count));
                 for (var i = 1; i <= numberOfEffects; i++)
                 {
-                    IEffect effect;
+                    IEffectType effect;
                     var debugCounter = 0;
 
                     do
@@ -318,7 +318,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 
             var targeting = GetTargeting(relevantComponents);
 
-            var resourceType = _typeRegistry.GetRegisteredByTypeId<IResource>(resourceTypeId);
+            var resourceType = _typeRegistry.GetRegisteredByTypeId<IResourceType>(resourceTypeId);
 
             var consumer = new Consumer
             {
@@ -368,7 +368,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return $"{GetItemNamePrefix(isAttack)} {item.Attributes.Strength} {suffix}";
         }
 
-        private Weapon GetMeleeWeapon(IWeapon craftableType, IList<CombatItemBase> components, bool isTwoHanded)
+        private Weapon GetMeleeWeapon(IWeaponType craftableType, IList<CombatItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon
             {
@@ -387,7 +387,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Weapon GetRangedWeapon(IWeapon craftableType, IList<CombatItemBase> components, bool isTwoHanded)
+        private Weapon GetRangedWeapon(IWeaponType craftableType, IList<CombatItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon
             {
@@ -412,7 +412,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Weapon GetDefensiveWeapon(IWeapon craftableType, IList<CombatItemBase> components, bool isTwoHanded)
+        private Weapon GetDefensiveWeapon(IWeaponType craftableType, IList<CombatItemBase> components, bool isTwoHanded)
         {
             var weapon = new Weapon
             {
@@ -431,7 +431,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return weapon;
         }
 
-        private Armor GetArmor(IArmor craftableType, IList<CombatItemBase> components)
+        private Armor GetArmor(IArmorType craftableType, IList<CombatItemBase> components)
         {
             var armor = new Armor
             {
@@ -447,7 +447,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             return armor;
         }
 
-        private Accessory GetAccessory(IAccessory craftableType, IList<CombatItemBase> components)
+        private Accessory GetAccessory(IAccessoryType craftableType, IList<CombatItemBase> components)
         {
             var accessory = new Accessory
             {
@@ -466,11 +466,11 @@ namespace FullPotential.Core.Gameplay.Crafting
             return accessory;
         }
 
-        private SpecialGear GetSpecialGear(ISpecialGear craftableType, string resourceTypeId, IList<CombatItemBase> components)
+        private SpecialGear GetSpecialGear(ISpecialGearType craftableType, string resourceTypeId, IList<CombatItemBase> components)
         {
             var resourceType = resourceTypeId.IsNullOrWhiteSpace()
                 ? null
-                : _typeRegistry.GetRegisteredByTypeId<IResource>(resourceTypeId);
+                : _typeRegistry.GetRegisteredByTypeId<IResourceType>(resourceTypeId);
 
             var specialGear = new SpecialGear
             {
@@ -502,7 +502,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     return GetConsumer(craftableType, resourceTypeId, components);
 
                 case CraftableType.Weapon:
-                    var weaponType = _typeRegistry.GetRegisteredByTypeId<IWeapon>(typeId);
+                    var weaponType = _typeRegistry.GetRegisteredByTypeId<IWeaponType>(typeId);
                     if (weaponType.IsDefensive)
                     {
                         return GetDefensiveWeapon(weaponType, components, isTwoHanded);
@@ -516,15 +516,15 @@ namespace FullPotential.Core.Gameplay.Crafting
                     return GetRangedWeapon(weaponType, components, isTwoHanded);
 
                 case CraftableType.Armor:
-                    var craftableArmor = _typeRegistry.GetRegisteredByTypeId<IArmor>(typeId);
+                    var craftableArmor = _typeRegistry.GetRegisteredByTypeId<IArmorType>(typeId);
                     return GetArmor(craftableArmor, components);
 
                 case CraftableType.Accessory:
-                    var craftableAccessory = _typeRegistry.GetRegisteredByTypeId<IAccessory>(typeId);
+                    var craftableAccessory = _typeRegistry.GetRegisteredByTypeId<IAccessoryType>(typeId);
                     return GetAccessory(craftableAccessory, components);
 
                 case CraftableType.SpecialGear:
-                    var craftableSpecial = _typeRegistry.GetRegisteredByTypeId<ISpecialGear>(typeId);
+                    var craftableSpecial = _typeRegistry.GetRegisteredByTypeId<ISpecialGearType>(typeId);
                     return GetSpecialGear(craftableSpecial, resourceTypeId, components);
 
                 default:

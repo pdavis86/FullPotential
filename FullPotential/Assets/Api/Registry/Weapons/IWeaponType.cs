@@ -1,6 +1,6 @@
 ﻿namespace FullPotential.Api.Registry.Weapons
 {
-    public interface IWeapon : IRegisterable
+    public interface IWeaponType : IRegisterableType
     {
         /// <summary>
         /// This weapon is used primarily for defense

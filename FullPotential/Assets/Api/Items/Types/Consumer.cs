@@ -19,11 +19,11 @@ namespace FullPotential.Api.Items.Types
     {
         public const string AliasSegmentConsumer = "consumer";
 
-        private IResource _resourceType;
+        private IResourceType _resourceType;
 
         public string ResourceTypeId;
 
-        public IResource ResourceType
+        public IResourceType ResourceType
         {
             get => _resourceType;
             set
@@ -52,8 +52,8 @@ namespace FullPotential.Api.Items.Types
         public float GetResourceChangePerSecond()
         {
             var healthEffects = Effects
-                .Where(e => e is IResourceEffect se && se.ResourceTypeIdString == ResourceTypeIds.HealthId)
-                .Select(e => (IResourceEffect)e)
+                .Where(e => e is IResourceEffectType se && se.ResourceTypeIdString == ResourceTypeIds.HealthId)
+                .Select(e => (IResourceEffectType)e)
                 .ToList();
 
             var resourceChange = GetSingleEffectValueChange();

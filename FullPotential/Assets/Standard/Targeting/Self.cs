@@ -7,7 +7,7 @@ using FullPotential.Api.Registry.Targeting;
 
 namespace FullPotential.Standard.Targeting
 {
-    public class Self : ITargeting
+    public class Self : ITargetingType
     {
         public const string TypeIdString = "b7cd2ff2-e054-4955-bde9-38b3b6b9a1bf";
 

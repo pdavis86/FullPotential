@@ -6,9 +6,9 @@ namespace FullPotential.Api.Items.Base
     //todo: Remove all the Serializable nonsense and make this an interface instead of an abstract class
     public abstract class ItemWithTargetingAndShapeBase : CombatItemBase, IHasTargetingAndShape
     {
-        private ITargeting _targeting;
+        private ITargetingType _targeting;
         private ITargetingVisuals _targetingVisuals;
-        private IShape _shape;
+        private IShapeType _shape;
         private IShapeVisuals _shapeVisuals;
 
         //Variables so they are serialized
@@ -21,7 +21,7 @@ namespace FullPotential.Api.Items.Base
         // ReSharper restore MemberCanBePrivate.Global
         // ReSharper restore NotAccessedField.Global
 
-        public ITargeting Targeting
+        public ITargetingType Targeting
         {
             get => _targeting;
             set
@@ -42,7 +42,7 @@ namespace FullPotential.Api.Items.Base
             }
         }
 
-        public IShape Shape
+        public IShapeType Shape
         {
             get => _shape;
             set

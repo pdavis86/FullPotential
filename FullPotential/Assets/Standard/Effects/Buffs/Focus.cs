@@ -5,7 +5,7 @@ using FullPotential.Standard.Resources;
 
 namespace FullPotential.Standard.Effects.Buffs
 {
-    public class Focus : IResourceEffect
+    public class Focus : IResourceEffectType
     {
         private static readonly Guid Id = new Guid("d19cde18-e5dd-4fc2-b14f-da7daa5014d4");
 

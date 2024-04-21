@@ -24,7 +24,7 @@ namespace FullPotential.Api.Items.Types
         private const string AliasSegmentRanged = "RangedWeapon";
 
         private static ICombatService _combatService;
-        private IEffect _hurtEffect;
+        private IEffectType _hurtEffect;
 
         private IItemVisuals _visuals;
 
@@ -41,7 +41,7 @@ namespace FullPotential.Api.Items.Types
         private float _defensiveDps = -1;
         private float _rangedDps = -1;
 
-        public IWeapon WeaponType => (IWeapon)RegistryType;
+        public IWeaponType WeaponType => (IWeaponType)RegistryType;
 
         public bool IsRanged => WeaponType.AmmunitionTypeIdString != null;
 
@@ -329,7 +329,7 @@ namespace FullPotential.Api.Items.Types
 
             if (!Effects.Any())
             {
-                _hurtEffect ??= DependenciesContext.Dependencies.GetService<ITypeRegistry>().GetRegisteredByTypeId<IEffect>(EffectTypeIds.HurtId);
+                _hurtEffect ??= DependenciesContext.Dependencies.GetService<ITypeRegistry>().GetRegisteredByTypeId<IEffectType>(EffectTypeIds.HurtId);
                 baseDamage = (int)_combatService.GetEffectBaseChange(null, this, _hurtEffect, false);
             }
             else

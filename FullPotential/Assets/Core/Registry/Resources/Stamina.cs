@@ -6,7 +6,7 @@ using FullPotential.Api.Registry.Gameplay;
 
 namespace FullPotential.Core.Registry.Resources
 {
-    public class Stamina : IResource
+    public class Stamina : IResourceType
     {
         private static readonly Guid Id = new Guid(ResourceTypeIds.StaminaId);
         private static readonly Color ResourceColor = Color.FromArgb(39, 80, 147);

@@ -9,7 +9,7 @@ using FullPotential.Api.Utilities;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class Barrier : ISpecialGear
+    public class Barrier : ISpecialGearType
     {
         public const string TypeIdString = "17a6e875-cccd-46f0-b525-fe15cfdd8096";
 

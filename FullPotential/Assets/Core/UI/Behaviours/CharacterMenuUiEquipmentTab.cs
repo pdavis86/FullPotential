@@ -52,14 +52,14 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void InstantiateSlots()
         {
-            var armorTypes = _typeRegistry.GetRegisteredTypes<IArmor>();
+            var armorTypes = _typeRegistry.GetRegisteredTypes<IArmorType>();
 
             foreach (var slotType in armorTypes)
             {
                 InstantiateSlot(slotType.TypeId.ToString(), slotType.SlotSpritePrefabAddress, _lhs.transform);
             }
 
-            var accessoryTypes = _typeRegistry.GetRegisteredTypes<IAccessory>();
+            var accessoryTypes = _typeRegistry.GetRegisteredTypes<IAccessoryType>();
             foreach (var type in accessoryTypes)
             {
                 for (var i = 1; i <= type.SlotCount; i++)
@@ -68,7 +68,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 }
             }
 
-            foreach (var type in _typeRegistry.GetRegisteredTypes<IRegisterableWithSlot>())
+            foreach (var type in _typeRegistry.GetRegisteredTypes<IRegisterableWithSlotType>())
             {
                 if (type is Registry.SpecialSlots.LeftHand or Registry.SpecialSlots.RightHand)
                 {

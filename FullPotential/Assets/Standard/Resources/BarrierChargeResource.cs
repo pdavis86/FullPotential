@@ -8,7 +8,7 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.Resources
 {
-    public class BarrierChargeResource : IResource
+    public class BarrierChargeResource : IResourceType
     {
         public const string TypeIdString = "9f026e17-d313-4402-9da6-c5b002e26c64";
 

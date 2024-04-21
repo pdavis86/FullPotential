@@ -4,7 +4,7 @@
 
 namespace FullPotential.Api.Registry.Elements
 {
-    public interface IElement : IRegisterable
+    public interface IElementType : IRegisterableType
     {
         Type Opposite { get; }
     }

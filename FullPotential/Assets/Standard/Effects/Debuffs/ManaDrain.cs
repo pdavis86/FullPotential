@@ -6,7 +6,7 @@ using FullPotential.Standard.Resources;
 
 namespace FullPotential.Standard.Effects.Debuffs
 {
-    public class ManaDrain : IResourceEffect, IHasSideEffect
+    public class ManaDrain : IResourceEffectType, IHasSideEffect
     {
         private static readonly Guid Id = new Guid("e1ab10b2-fcae-4f25-a11f-ac5aeeadbdce");
 

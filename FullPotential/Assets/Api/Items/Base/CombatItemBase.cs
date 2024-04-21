@@ -26,8 +26,8 @@ namespace FullPotential.Api.Items.Base
         public string[] EffectIds;
         public bool IsTwoHanded;
 
-        private List<IEffect> _effects;
-        public List<IEffect> Effects
+        private List<IEffectType> _effects;
+        public List<IEffectType> Effects
         {
             get
             {

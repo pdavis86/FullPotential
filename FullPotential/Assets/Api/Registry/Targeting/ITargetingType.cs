@@ -7,7 +7,7 @@ using FullPotential.Api.Items.Types;
 
 namespace FullPotential.Api.Registry.Targeting
 {
-    public interface ITargeting : IRegisterable, IHasNetworkPrefab
+    public interface ITargetingType : IRegisterableType, IHasNetworkPrefab
     {
         bool CanHaveShape { get; }
 

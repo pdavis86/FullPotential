@@ -85,7 +85,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private readonly List<ActiveEffect> _activeEffects = new List<ActiveEffect>();
         private readonly Dictionary<string, int> _resourceValueCache = new Dictionary<string, int>();
 
-        private IEnumerable<IResource> _sortedResources;
+        private IEnumerable<IResourceType> _sortedResources;
 
         private FighterBase _fighterWhoMovedMeLast;
         private Rigidbody _rb;
@@ -188,7 +188,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             //Debug.Log("AddOrUpdateEffectClientRpc called with typeId: " + effectTypeId);
 
-            var effect = _typeRegistry.GetRegisteredByTypeId<IEffect>(effectTypeId);
+            var effect = _typeRegistry.GetRegisteredByTypeId<IEffectType>(effectTypeId);
             AddOrUpdateEffect(effect, change, expiry);
         }
 
@@ -224,7 +224,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Resource Management
 
-        protected IEnumerable<IResource> GetResources()
+        protected IEnumerable<IResourceType> GetResources()
         {
             return _sortedResources;
         }
@@ -273,7 +273,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void PopulateResourceValueCache()
         {
-            _sortedResources = _typeRegistry.GetRegisteredTypes<IResource>()
+            _sortedResources = _typeRegistry.GetRegisteredTypes<IResourceType>()
                 .OrderBy(x => x.TypeId);
 
             foreach (var resource in _sortedResources)
@@ -656,14 +656,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
             AddOrUpdateEffect(attributeEffect, change, expiry);
         }
 
-        public void ApplyPeriodicActionToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffect resourceEffect, Vector3? position)
+        public void ApplyPeriodicActionToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position)
         {
             var delay = itemUsed.GetChargeUpTime();
             var expiry = DateTime.Now.AddSeconds(itemUsed.GetEffectDuration());
             StartCoroutine(PeriodicActionToResourceCoroutine(sourceFighter, itemUsed, resourceEffect, position, delay, expiry));
         }
 
-        private IEnumerator PeriodicActionToResourceCoroutine(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffect resourceEffect, Vector3? position, float delay, DateTime expiry)
+        private IEnumerator PeriodicActionToResourceCoroutine(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position, float delay, DateTime expiry)
         {
             do
             {
@@ -673,12 +673,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
             } while (DateTime.Now < expiry);
         }
 
-        public void ApplySingleValueChangeToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffect resourceEffect, Vector3? position)
+        public void ApplySingleValueChangeToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position)
         {
             ApplySingleValueChangeToResourceInternal(sourceFighter, itemUsed, resourceEffect, position);
         }
 
-        private void ApplySingleValueChangeToResourceInternal(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffect resourceEffect, Vector3? position)
+        private void ApplySingleValueChangeToResourceInternal(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position)
         {
             var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, resourceEffect, this);
 
@@ -700,7 +700,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             AddOrUpdateEffect(resourceEffect, combatResult.Change, DateTime.Now.AddSeconds(SingleResourceChangeEffectDisplaySeconds));
         }
 
-        public void ApplyTemporaryMaxActionToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffect resourceEffect, Vector3? position)
+        public void ApplyTemporaryMaxActionToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position)
         {
             var expiry = DateTime.Now.AddSeconds(itemUsed.GetEffectDuration());
 
@@ -732,7 +732,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             return _activeEffects
                 .Where(x =>
-                    x.Effect is IResourceEffect resourceEffect
+                    x.Effect is IResourceEffectType resourceEffect
                     && resourceEffect.ResourceTypeIdString == resourceTypeId
                     && resourceEffect.EffectActionType is EffectActionType.TemporaryMaxIncrease or EffectActionType.TemporaryMaxDecrease)
                 .Sum(x => x.Change);
@@ -744,9 +744,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 || effectActionType == EffectActionType.TemporaryMaxDecrease;
         }
 
-        private void AddOrUpdateEffect(IEffect effect, int change, DateTime expiry)
+        private void AddOrUpdateEffect(IEffectType effect, int change, DateTime expiry)
         {
-            var resourceEffect = effect as IResourceEffect;
+            var resourceEffect = effect as IResourceEffectType;
 
             //todo: zzz v0.7 - Add health single decrease effect to a UI options list that can be changed
             var hideEffectFromFighter = resourceEffect != null
