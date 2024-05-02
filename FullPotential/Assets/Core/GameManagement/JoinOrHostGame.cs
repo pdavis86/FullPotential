@@ -19,6 +19,8 @@ using UnityEngine.UI;
 
 namespace FullPotential.Core.GameManagement
 {
+    using UnityEngine.Networking;
+
     public class JoinOrHostGame : MonoBehaviour
     {
 #pragma warning disable 0649
@@ -68,6 +70,27 @@ namespace FullPotential.Core.GameManagement
             _onlineSceneName = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(2));
 
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
+
+            //todo: move
+            StartCoroutine(GetRequest());
+        }
+
+        private IEnumerator GetRequest()
+        {
+            using (var www = UnityWebRequest.Get("https://localhost:7180/Instance/GetConnectionDetails"))
+            {
+                www.SetRequestHeader("X-Auth", "a;JwbZmIYhIgelVet0gr8u6Ecq6Rni9MgV");
+
+                yield return www.SendWebRequest();
+
+                if (www.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError(www.error);
+                    yield break;
+                }
+
+                Debug.Log(www.downloadHandler.text);
+            }
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -219,7 +242,7 @@ namespace FullPotential.Core.GameManagement
 
             _gameDetailsContainer.SetActive(false);
             _signInContainer.SetActive(true);
-            
+
             if (_signinFirstInput != null)
             {
                 _username = _signinFirstInput.text;
