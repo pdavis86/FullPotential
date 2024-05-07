@@ -72,7 +72,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected IEventManager _eventManager;
         protected ISceneService _sceneService;
 
-        protected readonly NetworkVariable<FixedString32Bytes> _entityName = new NetworkVariable<FixedString32Bytes>();
+        protected readonly NetworkVariable<FixedString128Bytes> _entityName = new NetworkVariable<FixedString128Bytes>();
 
         protected InventoryBase _inventory;
 
@@ -208,7 +208,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region NetworkVariable Handlers
 
-        private void HandleNameChange(FixedString32Bytes previousValue, FixedString32Bytes newValue)
+        private void HandleNameChange(FixedString128Bytes previousValue, FixedString128Bytes newValue)
         {
             UpdateNameOnUi();
         }

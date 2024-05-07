@@ -127,6 +127,7 @@
     <Compile Include="Assets\Api\Registry\IRegisterableType.cs" />
     <Compile Include="Assets\Api\Items\Base\CombatItemBase.cs" />
     <Compile Include="Assets\Api\Data\GameSettings.cs" />
+    <Compile Include="Assets\Api\GameManagement\IManagementService.cs" />
     <Compile Include="Assets\Api\Items\IHasCharge.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\PlayerSettings.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\CombatResult.cs" />
@@ -171,6 +172,7 @@
     <Compile Include="Assets\Api\Items\Base\ItemWithTargetingAndShapeBase.cs" />
     <Compile Include="Assets\Api\CoreTypeIds\ArmorTypeIds.cs" />
     <Compile Include="Assets\Api\Items\LevelOfDetail.cs" />
+    <Compile Include="Assets\Api\GameManagement\JsonModels\ConnectionDetails.cs" />
     <Compile Include="Assets\Api\Unity\Services\IUnityHelperUtilities.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector2Extensions.cs" />
     <Compile Include="Assets\Api\Ui\Services\IUiAssistant.cs" />

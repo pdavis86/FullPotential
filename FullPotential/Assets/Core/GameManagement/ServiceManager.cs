@@ -10,6 +10,7 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<Api.Scenes.ISceneService, Environment.SceneService>(true);
 
             //Singleton
+            DependenciesContext.Dependencies.Register<Api.GameManagement.IManagementService, ManagementService>();
             DependenciesContext.Dependencies.Register<Api.Persistence.IPersistenceService, Persistence.PersistenceService>();
             DependenciesContext.Dependencies.Register<Api.Persistence.IUserRepository, Persistence.UserRepository>();
             DependenciesContext.Dependencies.Register<Api.Gameplay.Crafting.IResultFactory, Gameplay.Crafting.ResultFactory>();
