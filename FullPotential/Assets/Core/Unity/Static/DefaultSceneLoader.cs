@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 // ReSharper disable UnusedType.Global
 
-namespace FullPotential.Core.Utilities.Static
+namespace FullPotential.Core.Unity.Static
 {
     [InitializeOnLoad]
     public static class DefaultSceneLoader

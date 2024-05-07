@@ -3,7 +3,6 @@ using System.Collections;
 using System.Linq;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Persistence;
 using FullPotential.Api.Ui.Services;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Networking.Data;
@@ -19,18 +18,23 @@ using UnityEngine.UI;
 
 namespace FullPotential.Core.GameManagement
 {
-    using UnityEngine.Networking;
+    using FullPotential.Api.GameManagement;
+    using FullPotential.Api.GameManagement.JsonModels;
+    using TMPro;
 
     public class JoinOrHostGame : MonoBehaviour
     {
 #pragma warning disable 0649
         [SerializeField] private GameObject _signInContainer;
-        [SerializeField] private InputField _signinFirstInput;
+        [SerializeField] private InputField _signinUsername;
+        [SerializeField] private TMP_InputField _signinPassword;
         [SerializeField] private Text _signinError;
         [SerializeField] private GameObject _gameDetailsContainer;
-        [SerializeField] private InputField _gameDetailsFirstInput;
+        [SerializeField] private InputField _gameDetailsAddress;
+        [SerializeField] private InputField _gameDetailsPort;
         [SerializeField] private Text _gameDetailsError;
         [SerializeField] private GameObject _joiningMessage;
+        [SerializeField] private GameObject _signingInMessage;
 #pragma warning restore 0649
 
         // ReSharper disable MemberCanBePrivate.Global
@@ -39,7 +43,7 @@ namespace FullPotential.Core.GameManagement
         // ReSharper restore UnassignedField.Global
         // ReSharper restore MemberCanBePrivate.Global
 
-        private IUserRepository _userRepository;
+        private IManagementService _managementService;
         private ILocalizer _localizer;
         private IUiAssistant _uiAssistant;
 
@@ -57,7 +61,7 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _userRepository = DependenciesContext.Dependencies.GetService<IUserRepository>();
+            _managementService = DependenciesContext.Dependencies.GetService<IManagementService>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _uiAssistant = DependenciesContext.Dependencies.GetService<IUiAssistant>();
         }
@@ -71,51 +75,29 @@ namespace FullPotential.Core.GameManagement
 
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
 
-            //todo: move
-            StartCoroutine(GetRequest());
-        }
-
-        private IEnumerator GetRequest()
-        {
-            using (var www = UnityWebRequest.Get("https://localhost:7180/Instance/GetConnectionDetails"))
-            {
-                www.SetRequestHeader("X-Auth", "a;JwbZmIYhIgelVet0gr8u6Ecq6Rni9MgV");
-
-                yield return www.SendWebRequest();
-
-                if (www.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogError(www.error);
-                    yield break;
-                }
-
-                Debug.Log(www.downloadHandler.text);
-            }
+            _signinPassword.onSubmit.AddListener(_ => SignIn());
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
             _username = GameManager.Instance.GameSettings.LastSigninUsername;
-            _signinFirstInput.text = _username;
+            _signinUsername.text = _username;
 
             if (string.IsNullOrWhiteSpace(GameManager.Instance.LocalGameDataStore.PlayerToken))
             {
                 _gameDetailsContainer.SetActive(false);
                 _signInContainer.SetActive(true);
-                if (_signinFirstInput != null)
+                if (_signinUsername != null)
                 {
-                    _signinFirstInput.Select();
+                    _signinUsername.Select();
                 }
             }
             else
             {
                 _signInContainer.SetActive(false);
                 _gameDetailsContainer.SetActive(true);
-                if (_gameDetailsFirstInput != null)
-                {
-                    _gameDetailsFirstInput.Select();
-                }
+                _gameDetailsAddress.Select();
             }
 
             ShowAnyError();
@@ -211,14 +193,32 @@ namespace FullPotential.Core.GameManagement
                 return;
             }
 
-            var token = _userRepository.SignIn(_username, _password);
+            _signInContainer.SetActive(false);
+            _signingInMessage.SetActive(true);
 
+            StartCoroutine(_managementService.SignInWithPasswordEnumerator(
+                _username,
+                _password,
+                AfterSignIn,
+                () => AfterSignIn(null)));
+        }
+
+        private void AfterSignIn(string token)
+        {
             if (string.IsNullOrWhiteSpace(token))
             {
+                _signingInMessage.SetActive(false);
+
                 _signinError.text = _localizer.Translate("ui.signin.error");
                 _signinError.gameObject.SetActive(true);
+                _signInContainer.SetActive(true);
                 return;
             }
+
+            _signinError.gameObject.SetActive(false);
+            _signInContainer.SetActive(false);
+
+            //_joiningMessage.SetActive(true);
 
             GameManager.Instance.GameSettings.LastSigninUsername = _username;
             GameManager.Instance.SaveGameSettings();
@@ -226,13 +226,25 @@ namespace FullPotential.Core.GameManagement
             GameManager.Instance.LocalGameDataStore.PlayerToken = token;
             _username = _password = null;
 
-            _signinError.gameObject.SetActive(false);
-            _signInContainer.SetActive(false);
+            StartCoroutine(_managementService.ConnectionDetailsCoroutine(
+                AfterConnectionDetails,
+                () => AfterConnectionDetails(null)));
+        }
+
+        private void AfterConnectionDetails(ConnectionDetails connectionDetails)
+        {
+            _signingInMessage.SetActive(false);
+
+            //todo: check connectionDetails.Status
+            // StartingUp = 0,
+            // Available = 1,
+            // Full = 2
+
+            _gameDetailsAddress.text = connectionDetails.Address;
+            _gameDetailsPort.text = connectionDetails.Port.ToString();
+
             _gameDetailsContainer.SetActive(true);
-            if (_gameDetailsFirstInput != null)
-            {
-                _gameDetailsFirstInput.Select();
-            }
+            _gameDetailsAddress.Select();
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -243,10 +255,10 @@ namespace FullPotential.Core.GameManagement
             _gameDetailsContainer.SetActive(false);
             _signInContainer.SetActive(true);
 
-            if (_signinFirstInput != null)
+            if (_signinUsername != null)
             {
-                _username = _signinFirstInput.text;
-                _signinFirstInput.Select();
+                _username = _signinUsername.text;
+                _signinUsername.Select();
             }
         }
 

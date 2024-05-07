@@ -81,6 +81,7 @@
     <Compile Include="Assets\Core\GameManagement\UserInterface.cs" />
     <Compile Include="Assets\Core\Persistence\UserRepository.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltips.cs" />
+    <Compile Include="Assets\Core\Unity\Static\DefaultSceneLoader.cs" />
     <Compile Include="Assets\Core\Registry\SpecialSlots\RightHand.cs" />
     <Compile Include="Assets\Core\Environment\LootInteractable.cs" />
     <Compile Include="Assets\Core\UI\Components\CraftingSelector.cs" />
@@ -102,7 +103,6 @@
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\AdminShopUi.cs" />
     <Compile Include="Assets\Core\GameManagement\GameManager.cs" />
-    <Compile Include="Assets\Core\Utilities\Static\DefaultSceneLoader.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\DrawingPadUi.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\TextLocalizer.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiEquipmentTab.cs" />
@@ -137,6 +137,7 @@
     <Compile Include="Assets\Core\UI\Components\SlideOutAlert.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiCraftingTab.cs" />
     <Compile Include="Assets\Core\Gameplay\Events\EventHandlerGroup.cs" />
+    <Compile Include="Assets\Core\GameManagement\ManagementService.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Heal.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Hurt.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiSlot.cs" />
