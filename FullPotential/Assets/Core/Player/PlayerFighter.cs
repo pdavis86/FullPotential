@@ -90,8 +90,7 @@ namespace FullPotential.Core.Player
                 StartCoroutine(SetTexture());
             }
         }
-        [HideInInspector] public string PlayerToken { get; set; }
-        [HideInInspector] public string Username { get; private set; }
+        [HideInInspector] public string Username { get; set; }
 
         public IPlayerInventory PlayerInventory { get; private set; }
 
@@ -164,7 +163,6 @@ namespace FullPotential.Core.Player
             if (IsServer)
             {
                 GetAndLoadPlayerData(false, null);
-                GameManager.Instance.ServerGameDataStore.ClientIdToUsername[OwnerClientId] = Username;
             }
             else if (IsOwner)
             {
@@ -458,7 +456,7 @@ namespace FullPotential.Core.Player
 
         private void GetAndLoadPlayerData(bool reduced, ulong? sendToClientId)
         {
-            var playerData = _userRepository.Load(PlayerToken, null, reduced);
+            var playerData = _userRepository.Load(Username, reduced);
 
             if (sendToClientId.HasValue)
             {
@@ -499,7 +497,7 @@ namespace FullPotential.Core.Player
 
         private void LoadFromPlayerData(PlayerData playerData)
         {
-            Username = playerData.Username;
+            //Username = playerData.Username;
             TextureUrl = playerData.Settings.TextureUrl;
 
             if (IsServer)

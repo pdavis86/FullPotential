@@ -84,6 +84,8 @@ namespace FullPotential.Core.GameManagement
             _username = GameManager.Instance.GameSettings.LastSigninUsername;
             _signinUsername.text = _username;
 
+            GameManager.Instance.LocalGameDataStore.PlayerToken = _managementService.SignInWithExistingToken();
+
             if (string.IsNullOrWhiteSpace(GameManager.Instance.LocalGameDataStore.PlayerToken))
             {
                 _gameDetailsContainer.SetActive(false);
@@ -95,9 +97,7 @@ namespace FullPotential.Core.GameManagement
             }
             else
             {
-                _signInContainer.SetActive(false);
-                _gameDetailsContainer.SetActive(true);
-                _gameDetailsAddress.Select();
+                AfterSignIn(GameManager.Instance.LocalGameDataStore.PlayerToken);
             }
 
             ShowAnyError();
@@ -183,7 +183,7 @@ namespace FullPotential.Core.GameManagement
 
         #endregion
 
-        // ReSharper disable once UnusedMember.Global
+        // ReSharper disable once MemberCanBePrivate.Global
         public void SignIn()
         {
             if (_username.IsNullOrWhiteSpace())
@@ -196,35 +196,42 @@ namespace FullPotential.Core.GameManagement
             _signInContainer.SetActive(false);
             _signingInMessage.SetActive(true);
 
-            StartCoroutine(_managementService.SignInWithPasswordEnumerator(
+            StartCoroutine(_managementService.SignInWithPasswordCoroutine(
                 _username,
                 _password,
                 AfterSignIn,
-                () => AfterSignIn(null)));
+                AfterSignInFailed));
+        }
+
+        private void AfterSignInFailed(bool isInvalid)
+        {
+            _signingInMessage.SetActive(false);
+
+            _signinError.text = isInvalid
+                ? _localizer.Translate("ui.signin.invalid")
+                : _localizer.Translate("ui.signin.error");
+
+            _signinError.gameObject.SetActive(true);
+            _signInContainer.SetActive(true);
         }
 
         private void AfterSignIn(string token)
         {
             if (string.IsNullOrWhiteSpace(token))
             {
-                _signingInMessage.SetActive(false);
-
-                _signinError.text = _localizer.Translate("ui.signin.error");
-                _signinError.gameObject.SetActive(true);
-                _signInContainer.SetActive(true);
-                return;
+                AfterSignInFailed(true);
             }
 
             _signinError.gameObject.SetActive(false);
             _signInContainer.SetActive(false);
 
-            //_joiningMessage.SetActive(true);
-
             GameManager.Instance.GameSettings.LastSigninUsername = _username;
             GameManager.Instance.SaveGameSettings();
 
             GameManager.Instance.LocalGameDataStore.PlayerToken = token;
+
             _username = _password = null;
+            _signinUsername.text = _signinPassword.text = null;
 
             StartCoroutine(_managementService.ConnectionDetailsCoroutine(
                 AfterConnectionDetails,
@@ -233,6 +240,12 @@ namespace FullPotential.Core.GameManagement
 
         private void AfterConnectionDetails(ConnectionDetails connectionDetails)
         {
+            if (connectionDetails == null)
+            {
+                //todo: handle failure
+                return;
+            }
+
             _signingInMessage.SetActive(false);
 
             //todo: check connectionDetails.Status
@@ -260,6 +273,10 @@ namespace FullPotential.Core.GameManagement
                 _username = _signinUsername.text;
                 _signinUsername.Select();
             }
+
+            StartCoroutine(_managementService.SignOutCoroutine(
+                () => { },
+                () => { }));
         }
 
         private void ShowAnyError()
@@ -332,7 +349,8 @@ namespace FullPotential.Core.GameManagement
         {
             var payload = JsonUtility.ToJson(new ConnectionPayload
             {
-                PlayerToken = GameManager.Instance.LocalGameDataStore.PlayerToken,
+                Username = GameManager.Instance.GameSettings.LastSigninUsername,
+                Token = GameManager.Instance.LocalGameDataStore.PlayerToken,
                 GameVersion = GameManager.GetGameVersion().ToString()
             });
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.UTF8.GetBytes(payload);

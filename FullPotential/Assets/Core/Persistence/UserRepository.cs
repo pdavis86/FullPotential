@@ -14,29 +14,8 @@ namespace FullPotential.Core.Persistence
         private readonly bool _isDebugBuild = Debug.isDebugBuild;
         private readonly string _persistentDataPath = Application.persistentDataPath;
 
-        public string SignIn(string username, string password)
+        public PlayerData Load(string username, bool reduced)
         {
-            var token = string.IsNullOrWhiteSpace(username)
-                ? SystemInfo.deviceUniqueIdentifier
-                : username;
-
-            return token;
-        }
-
-        public string GetUsernameFromToken(string token)
-        {
-            //todo: Username and token are never the same
-            return token;
-        }
-
-        public PlayerData Load(string token, string username, bool reduced)
-        {
-            //todo: Username and token are never the same
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                username = token;
-            }
-
             var filePath = GetPlayerSavePath(username);
 
             if (!System.IO.File.Exists(filePath))

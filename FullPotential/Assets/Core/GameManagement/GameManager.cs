@@ -53,7 +53,7 @@ namespace FullPotential.Core.GameManagement
         public event EventHandler<GameSettingsUpdatedEventArgs> GameSettingsUpdated;
 
         //Services
-        private IUserRepository _userRepository;
+        private IManagementService _managementService;
         private ISettingsRepository _settingsRepository;
         private IPersistenceService _persistenceService;
         private ILocalizer _localizer;
@@ -88,7 +88,7 @@ namespace FullPotential.Core.GameManagement
 
             ServiceManager.RegisterServices();
 
-            _userRepository = DependenciesContext.Dependencies.GetService<IUserRepository>();
+            _managementService = DependenciesContext.Dependencies.GetService<IManagementService>();
             _settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
@@ -141,6 +141,7 @@ namespace FullPotential.Core.GameManagement
         {
             if (approvalRequest.ClientNetworkId == NetworkManager.Singleton.LocalClientId)
             {
+                ServerGameDataStore.ClientIdToUsername[0] = GameSettings.LastSigninUsername;
                 approvalResponse.Approved = true;
                 return;
             }
@@ -148,7 +149,13 @@ namespace FullPotential.Core.GameManagement
             var payload = System.Text.Encoding.UTF8.GetString(approvalRequest.Payload);
             var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
 
-            var playerUsername = _userRepository.GetUsernameFromToken(connectionPayload.PlayerToken);
+            //todo: ValidateCredentials
+            _managementService
+                .ValidateCredentials(connectionPayload.Username, connectionPayload.Token)
+                .GetAwaiter()
+                .GetResult();
+
+            var playerUsername = connectionPayload.Username;
 
             if (playerUsername == null)
             {
@@ -184,6 +191,7 @@ namespace FullPotential.Core.GameManagement
             }
 
             approvalResponse.Approved = true;
+            ServerGameDataStore.ClientIdToUsername[approvalRequest.ClientNetworkId] = playerUsername;
         }
 
         private void HandleAfterDisconnectedFromServer(ulong clientId)
@@ -346,7 +354,7 @@ namespace FullPotential.Core.GameManagement
             return _playersParentTransform;
         }
 
-        public void SpawnPlayerNetworkObject(string playerToken, Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default)
+        public void SpawnPlayerNetworkObject(Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
@@ -361,7 +369,7 @@ namespace FullPotential.Core.GameManagement
             playerNetObj.transform.position = newPosition;
 
             var playerState = playerNetObj.GetComponent<PlayerFighter>();
-            playerState.PlayerToken = playerToken;
+            playerState.Username = ServerGameDataStore.ClientIdToUsername[playerState.OwnerClientId];
 
             playerNetObj.SpawnAsPlayerObject(serverRpcParams.Receive.SenderClientId);
         }

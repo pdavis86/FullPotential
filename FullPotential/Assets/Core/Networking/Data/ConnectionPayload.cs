@@ -3,7 +3,9 @@
     [System.Serializable]
     public struct ConnectionPayload
     {
-        public string PlayerToken;
+        public string Username;
+        
+        public string Token;
 
         public string GameVersion;
     }
