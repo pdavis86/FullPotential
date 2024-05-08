@@ -13,7 +13,7 @@ namespace FullPotential.Api.GameManagement
 
         IUserInterface GetUserInterface();
 
-        void SpawnPlayerNetworkObject(string playerToken, Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default);
+        void SpawnPlayerNetworkObject(Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default);
 
         string GetLocalPlayerToken();
 

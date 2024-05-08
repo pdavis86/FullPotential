@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections;
+    using System.Net.Http;
+    using System.Threading.Tasks;
     using FullPotential.Api.GameManagement;
     using FullPotential.Api.GameManagement.JsonModels;
     using Newtonsoft.Json;
@@ -13,6 +15,8 @@
     public class ManagementService : IManagementService
     {
         private const string JsonContentType = "application/json";
+        private const string StorageKeyUsername = "username";
+        private const string StorageKeyToken = "token";
 
         private readonly string _baseAddress;
         private string _authHeaderValue;
@@ -23,19 +27,21 @@
             _baseAddress = "https://localhost:7180/";
         }
 
-        private void SetCredentials(string username, string token)
+        public string SignInWithExistingToken()
         {
+            var username = PlayerPrefs.GetString(StorageKeyUsername);
+            var token = PlayerPrefs.GetString(StorageKeyToken);
+
             _authHeaderValue = $"{username};{token}";
 
-            //todo: remove
-            _authHeaderValue = "a;JwbZmIYhIgelVet0gr8u6Ecq6Rni9MgV";
+            return token;
         }
 
-        public IEnumerator SignInWithPasswordEnumerator(string userName, string password, Action<string> successCallback, Action failureCallback)
+        public IEnumerator SignInWithPasswordCoroutine(string username, string password, Action<string> successCallback, Action<bool> failureCallback)
         {
             var data = JsonConvert.SerializeObject(new
             {
-                UserName = userName,
+                UserName = username,
                 Password = password
             });
 
@@ -46,12 +52,18 @@
                 if (request.result != UnityWebRequest.Result.Success)
                 {
                     LogFailure(request);
-                    failureCallback();
+                    failureCallback(request.responseCode == 400);
                     yield break;
                 }
 
-                SetCredentials(userName, request.downloadHandler.text);
-                successCallback(request.downloadHandler.text);
+                var token = request.downloadHandler.text;
+
+                PlayerPrefs.SetString(StorageKeyUsername, username);
+                PlayerPrefs.SetString(StorageKeyToken, token);
+
+                _authHeaderValue = $"{username};{token}";
+
+                successCallback(token);
             }
         }
 
@@ -72,6 +84,41 @@
 
                 var result = JsonUtility.FromJson<ConnectionDetails>(request.downloadHandler.text);
                 successCallback(result);
+            }
+        }
+
+        public IEnumerator SignOutCoroutine(Action successCallback, Action failureCallback)
+        {
+            PlayerPrefs.SetString(StorageKeyUsername, null);
+            PlayerPrefs.SetString(StorageKeyToken, null);
+
+            using (var request = UnityWebRequest.Get(_baseAddress + "User/SignOut"))
+            {
+                SetAuthenticationHeader(request);
+
+                yield return request.SendWebRequest();
+
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    LogFailure(request);
+                    failureCallback();
+                    yield break;
+                }
+
+                _authHeaderValue = null;
+
+                successCallback();
+            }
+        }
+
+        public async Task<bool> ValidateCredentials(string username, string token)
+        {
+            //todo: implement
+            using (var httpClient = new HttpClient())
+            {
+                var response = await httpClient.GetAsync(_baseAddress + "User/GetUsernameFromToken?token=" + Uri.EscapeDataString(token));
+                var temp = await response.Content.ReadAsStringAsync();
+                return true;
             }
         }
 

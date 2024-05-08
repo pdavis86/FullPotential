@@ -78,15 +78,14 @@ namespace FullPotential.Standard.Scenes.Behaviours
                 }
             }
 
-            var playerToken = _gameManager.GetLocalPlayerToken();
             var chosenSpawnPoint = GetSpawnPoint();
-            HereAreMyJoiningDetailsServerRpc(playerToken, chosenSpawnPoint.Position, chosenSpawnPoint.Rotation);
+            HereAreMyJoiningDetailsServerRpc(chosenSpawnPoint.Position, chosenSpawnPoint.Rotation);
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void HereAreMyJoiningDetailsServerRpc(string playerToken, Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default)
+        private void HereAreMyJoiningDetailsServerRpc(Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default)
         {
-            _gameManager.SpawnPlayerNetworkObject(playerToken, position, rotation, serverRpcParams);
+            _gameManager.SpawnPlayerNetworkObject(position, rotation, serverRpcParams);
         }
 
         private void SpawnEnemy()

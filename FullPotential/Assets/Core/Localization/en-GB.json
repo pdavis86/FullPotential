@@ -297,6 +297,10 @@
     },
     {
       "Key": "ui.signin.error",
+      "Value": "Sorry, something went wrong"
+    },
+    {
+      "Key": "ui.signin.invalid",
       "Value": "Invalid username or password"
     },
 
