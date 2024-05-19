@@ -1,12 +1,11 @@
-﻿namespace FullPotential.Core.GameManagement
+﻿using FullPotential.Api.Persistence;
+
+namespace FullPotential.Core.GameManagement
 {
     using System;
     using System.Collections;
-    using System.Net.Http;
-    using System.Threading.Tasks;
     using FullPotential.Api.GameManagement;
     using FullPotential.Api.GameManagement.JsonModels;
-    using Newtonsoft.Json;
     using UnityEngine;
     using UnityEngine.Networking;
 
@@ -21,10 +20,10 @@
         private readonly string _baseAddress;
         private string _authHeaderValue;
 
-        public ManagementService()
+        public ManagementService(ISettingsRepository settingsRepository)
         {
-            //todo: read from settings
-            _baseAddress = "https://localhost:7180/";
+            var gameSettings = settingsRepository.GetOrLoad();
+            _baseAddress = gameSettings.ManagementApiAddress;
         }
 
         public string SignInWithExistingToken()
@@ -37,12 +36,12 @@
             return token;
         }
 
-        public IEnumerator SignInWithPasswordCoroutine(string username, string password, Action<string> successCallback, Action<bool> failureCallback)
+        public IEnumerator SignInWithPasswordEnumerator(string username, string password, Action<string> successCallback, Action<bool> failureCallback)
         {
-            var data = JsonConvert.SerializeObject(new
+            var data = JsonUtility.ToJson(new Credentials
             {
-                UserName = username,
-                Password = password
+                Username = username,
+                PasswordOrToken = password
             });
 
             using (var request = UnityWebRequest.Post(_baseAddress + "User/SignInWithPassword", data, JsonContentType))
@@ -52,11 +51,19 @@
                 if (request.result != UnityWebRequest.Result.Success)
                 {
                     LogFailure(request);
-                    failureCallback(request.responseCode == 400);
+                    failureCallback(false);
                     yield break;
                 }
 
-                var token = request.downloadHandler.text;
+                var response = JsonUtility.FromJson<GenericResponse>(request.downloadHandler.text);
+
+                if (!response.IsSuccess)
+                {
+                    failureCallback(true);
+                    yield break;
+                }
+
+                var token = response.Result;
 
                 PlayerPrefs.SetString(StorageKeyUsername, username);
                 PlayerPrefs.SetString(StorageKeyToken, token);
@@ -67,7 +74,7 @@
             }
         }
 
-        public IEnumerator ConnectionDetailsCoroutine(Action<ConnectionDetails> successCallback, Action failureCallback)
+        public IEnumerator ConnectionDetailsEnumerator(Action<ConnectionDetails> successCallback, Action failureCallback)
         {
             using (var request = UnityWebRequest.Get(_baseAddress + "Instance/GetConnectionDetails"))
             {
@@ -87,7 +94,7 @@
             }
         }
 
-        public IEnumerator SignOutCoroutine(Action successCallback, Action failureCallback)
+        public IEnumerator SignOutEnumerator(Action successCallback, Action failureCallback)
         {
             PlayerPrefs.SetString(StorageKeyUsername, null);
             PlayerPrefs.SetString(StorageKeyToken, null);
@@ -111,14 +118,35 @@
             }
         }
 
-        public async Task<bool> ValidateCredentials(string username, string token)
+        public IEnumerator ValidateCredentialsEnumerator(string username, string token, Action successCallback, Action failureCallback)
         {
-            //todo: implement
-            using (var httpClient = new HttpClient())
+            var data = JsonUtility.ToJson(new Credentials
             {
-                var response = await httpClient.GetAsync(_baseAddress + "User/GetUsernameFromToken?token=" + Uri.EscapeDataString(token));
-                var temp = await response.Content.ReadAsStringAsync();
-                return true;
+                Username = username,
+                PasswordOrToken = token
+            });
+
+            using (var request = UnityWebRequest.Post(_baseAddress + "User/IsTokenValid", data, JsonContentType))
+            {
+                yield return request.SendWebRequest();
+
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    LogFailure(request);
+                    failureCallback();
+                    yield break;
+                }
+
+                var response = JsonUtility.FromJson<GenericResponse>(request.downloadHandler.text);
+
+                if (response.IsSuccess)
+                {
+                    successCallback();
+                }
+                else
+                {
+                    failureCallback();
+                }
             }
         }
 

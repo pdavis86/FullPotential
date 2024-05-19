@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace FullPotential.Core.Persistence
 {
+    //todo: kill this class
     public class UserRepository : IUserRepository
     {
         private readonly bool _isDebugBuild = Debug.isDebugBuild;

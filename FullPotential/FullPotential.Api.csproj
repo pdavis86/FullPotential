@@ -99,6 +99,7 @@
     <Compile Include="Assets\Api\Registry\Shapes\IShapeType.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\ActiveEffect.cs" />
     <Compile Include="Assets\Api\Data\InventoryChanges.cs" />
+    <Compile Include="Assets\Api\GameManagement\JsonModels\GenericResponse.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Layers.cs" />
     <Compile Include="Assets\Api\Registry\Shapes\IShapeBehaviour.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\IEventHandlerArgs.cs" />
@@ -120,8 +121,10 @@
     <Compile Include="Assets\Api\Items\Types\Accessory.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\DictionaryExtensions.cs" />
     <Compile Include="Assets\Api\Registry\Effects\ICustomEffectType.cs" />
+    <Compile Include="Assets\Api\GameManagement\Enums\InstanceState.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\MovementDirection.cs" />
     <Compile Include="Assets\Api\Obsolete\Networking\Data\FragmentedMessage.cs" />
+    <Compile Include="Assets\Api\GameManagement\JsonModels\Credentials.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingBehaviour.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IArmorVisuals.cs" />
     <Compile Include="Assets\Api\Registry\IRegisterableType.cs" />
@@ -178,6 +181,7 @@
     <Compile Include="Assets\Api\Ui\Services\IUiAssistant.cs" />
     <Compile Include="Assets\Api\Ui\IHud.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IResourceEffectType.cs" />
+    <Compile Include="Assets\Api\GameManagement\Events\GameSettingsUpdatedEventArgs.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\EnumerableExtensions.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemBase.cs" />
     <Compile Include="Assets\Api\Registry\Gameplay\IResourceType.cs" />

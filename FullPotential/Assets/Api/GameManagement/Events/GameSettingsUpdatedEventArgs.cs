@@ -1,7 +1,7 @@
 ﻿using System;
 using FullPotential.Api.Data;
 
-namespace FullPotential.Core.GameManagement.Events
+namespace FullPotential.Api.GameManagement.Events
 {
     public class GameSettingsUpdatedEventArgs : EventArgs
     {
