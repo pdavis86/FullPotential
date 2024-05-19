@@ -97,15 +97,9 @@ namespace FullPotential.Core.Player
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void Update()
-        {
-            CheckForInteractable();
-        }
-
-        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            //todo: zzz v0.6 - stop using Update
+            CheckForInteractable();
             UpdateMenuStates();
         }
 

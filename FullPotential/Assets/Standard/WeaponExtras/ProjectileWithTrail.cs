@@ -34,7 +34,7 @@ namespace FullPotential.Standard.WeaponExtras
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void Update()
+        private void FixedUpdate()
         {
             var timeTaken = Time.time - _startTime;
 

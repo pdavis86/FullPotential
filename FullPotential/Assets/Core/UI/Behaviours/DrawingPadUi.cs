@@ -67,7 +67,7 @@ namespace FullPotential.Core.UI.Behaviours
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void Update()
+        private void FixedUpdate()
         {
             Draw();
         }
