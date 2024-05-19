@@ -34,19 +34,19 @@
 	
 	
     {
-      "Key": "resource.health",
+      "Key": "resourcetype.health",
       "Value": "Health"
     },
     {
-      "Key": "resource.stamina",
+      "Key": "resourcetype.stamina",
       "Value": "Stamina"
     },
     {
-      "Key": "resource.mana",
+      "Key": "resourcetype.mana",
       "Value": "Mana"
     },
     {
-      "Key": "resource.energy",
+      "Key": "resourcetype.energy",
       "Value": "Energy"
     },
     
@@ -553,11 +553,27 @@
 	
 	
 	{
-      "Key": "effect.push",
+      "Key": "effecttype.heal",
+      "Value": "Heal"
+    },
+    {
+      "Key": "effecttype.heal.description",
+      "Value": "Restores some HP"
+    },
+    {
+      "Key": "effecttype.hurt",
+      "Value": "Hurt"
+    },
+    {
+      "Key": "effecttype.hurt.description",
+      "Value": "Removes some HP"
+    },
+	{
+      "Key": "effecttype.push",
       "Value": "Push"
     },
     {
-      "Key": "effect.push.description",
+      "Key": "effecttype.push.description",
       "Value": "Pushes a target away from the source"
     }
   ]

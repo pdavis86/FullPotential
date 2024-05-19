@@ -3,107 +3,107 @@
   "Name": "English (United Kingdom)",
   "Translations": [
 	{
-      "Key": "accessory.amulet",
+      "Key": "accessorytype.amulet",
       "Value": "Amulet"
     },
     {
-      "Key": "accessory.belt",
+      "Key": "accessorytype.belt",
       "Value": "Belt"
     },
     {
-      "Key": "accessory.ring",
+      "Key": "accessorytype.ring",
       "Value": "Ring"
     },
     {
-      "Key": "accessory.reloader",
+      "Key": "accessorytype.reloader",
       "Value": "Ranged Weapon Reloader"
     },
     {
-      "Key": "accessory.barrier",
+      "Key": "accessorytype.barrier",
       "Value": "Barrier"
     },
     {
-      "Key": "accessory.autoammobuyer",
+      "Key": "accessorytype.autoammobuyer",
       "Value": "Auto Ammo Buyer"
     },
 
 
     {
-      "Key": "armor.helm",
+      "Key": "armortype.helm",
       "Value": "Helm"
     },
     {
-      "Key": "armor.chest",
+      "Key": "armortype.chest",
       "Value": "Chest"
     },
     {
-      "Key": "armor.legs",
+      "Key": "armortype.legs",
       "Value": "Legs"
     },
     {
-      "Key": "armor.feet",
+      "Key": "armortype.feet",
       "Value": "Feet"
     },
 	
 	
     {
-      "Key": "loot.scrap",
+      "Key": "loottype.scrap",
       "Value": "Scrap"
     },
     {
-      "Key": "loot.shard",
+      "Key": "loottype.shard",
       "Value": "Shard"
     },
     {
-      "Key": "loot.junk",
+      "Key": "loottype.junk",
       "Value": "Junk"
     },
 
 
     {
-      "Key": "ammunition.arrow",
+      "Key": "ammunitiontype.arrow",
       "Value": "Arrow"
     },
 	{
-      "Key": "ammunition.bullet",
+      "Key": "ammunitiontype.bullet",
       "Value": "Bullet"
     },
 
 
     {
-      "Key": "weapon.axe",
+      "Key": "weapontype.axe",
       "Value": "Axe"
     },
     {
-      "Key": "weapon.bow",
+      "Key": "weapontype.bow",
       "Value": "Bow"
     },
     {
-      "Key": "weapon.crossbow",
+      "Key": "weapontype.crossbow",
       "Value": "Crossbow"
     },
     {
-      "Key": "weapon.dagger",
+      "Key": "weapontype.dagger",
       "Value": "Dagger"
     },
     {
-      "Key": "weapon.gun",
+      "Key": "weapontype.gun",
       "Value": "Gun"
     },
     {
-      "Key": "weapon.hammer",
+      "Key": "weapontype.hammer",
       "Value": "Hammer"
     },
     {
-      "Key": "weapon.shield",
+      "Key": "weapontype.shield",
       "Value": "Shield"
     },
     {
-      "Key": "weapon.staff",
+      "Key": "weapontype.staff",
       "Value": "Staff"
     },
     {
-      "Key": "weapon.sword",
+      "Key": "weapontype.sword",
       "Value": "Sword"
     },
     
@@ -137,349 +137,321 @@
     
     
     {
-      "Key": "effect.courage",
+      "Key": "effecttype.courage",
       "Value": "Courage"
     },
     {
-      "Key": "effect.courage.description",
+      "Key": "effecttype.courage.description",
       "Value": "Boosts max HP"
     },
     {
-      "Key": "effect.focus",
+      "Key": "effecttype.focus",
       "Value": "Focus"
     },
     {
-      "Key": "effect.focus.description",
+      "Key": "effecttype.focus.description",
       "Value": "Boosts max mana"
     },
     {
-      "Key": "effect.haste",
+      "Key": "effecttype.haste",
       "Value": "Haste"
     },
     {
-      "Key": "effect.haste.description",
+      "Key": "effecttype.haste.description",
       "Value": "Boosts speed attribute"
     },
     {
-      "Key": "effect.lifetap",
+      "Key": "effecttype.lifetap",
       "Value": "Life Tap"
     },
     {
-      "Key": "effect.lifetap.description",
+      "Key": "effecttype.lifetap.description",
       "Value": "Periodically steals HP from a target with the Life Drain debuff"
     },
     {
-      "Key": "effect.manatap",
+      "Key": "effecttype.manatap",
       "Value": "Mana Tap"
     },
     {
-      "Key": "effect.manatap.description",
+      "Key": "effecttype.manatap.description",
       "Value": "Periodically steals mana from a target with the Mana Drain debuff"
     },
     {
-      "Key": "effect.regeneration",
+      "Key": "effecttype.regeneration",
       "Value": "Regeneration"
     },
     {
-      "Key": "effect.regeneration.description",
+      "Key": "effecttype.regeneration.description",
       "Value": "Periodically increases your HP"
     },
     {
-      "Key": "effect.strengthen",
+      "Key": "effecttype.strengthen",
       "Value": "Strengthen"
     },
     {
-      "Key": "effect.strengthen.description",
+      "Key": "effecttype.strengthen.description",
       "Value": "Boosts strength attribute"
     },
     {
-      "Key": "effect.surge",
+      "Key": "effecttype.surge",
       "Value": "Surge"
     },
     {
-      "Key": "effect.surge.description",
+      "Key": "effecttype.surge.description",
       "Value": "Boosts max energy"
     },
     {
-      "Key": "effect.endurance",
+      "Key": "effecttype.endurance",
       "Value": "Endurance"
     },
     {
-      "Key": "effect.endurance.description",
+      "Key": "effecttype.endurance.description",
       "Value": "Increases max stamina"
     },
 
 
     {
-      "Key": "effect.distract",
+      "Key": "effecttype.distract",
       "Value": "Distract"
     },
     {
-      "Key": "effect.distract.description",
+      "Key": "effecttype.distract.description",
       "Value": "Decreases max mana"
     },
     {
-      "Key": "effect.fear",
+      "Key": "effecttype.fear",
       "Value": "Fear"
     },
     {
-      "Key": "effect.fear.description",
+      "Key": "effecttype.fear.description",
       "Value": "Decreases max HP"
     },
     {
-      "Key": "effect.lifedrain",
+      "Key": "effecttype.lifedrain",
       "Value": "Life Drain"
     },
     {
-      "Key": "effect.lifedrain.description",
+      "Key": "effecttype.lifedrain.description",
       "Value": "Periodically steals HP to give to the originator"
     },
     {
-      "Key": "effect.manadrain",
+      "Key": "effecttype.manadrain",
       "Value": "Mana Drain"
     },
     {
-      "Key": "effect.manadrain.description",
+      "Key": "effecttype.manadrain.description",
       "Value": "Periodically steals mana to give to the originator"
     },
     {
-      "Key": "effect.poison",
+      "Key": "effecttype.poison",
       "Value": "Poison"
     },
     {
-      "Key": "effect.poison.description",
+      "Key": "effecttype.poison.description",
       "Value": "Periodically decreases your HP"
     },
     {
-      "Key": "effect.slow",
+      "Key": "effecttype.slow",
       "Value": "Slow"
     },
     {
-      "Key": "effect.slow.description",
+      "Key": "effecttype.slow.description",
       "Value": "Decreases speed attribute"
     },
     {
-      "Key": "effect.weaken",
+      "Key": "effecttype.weaken",
       "Value": "Weakness"
     },
     {
-      "Key": "effect.weakness.description",
+      "Key": "effecttype.weakness.description",
       "Value": "Decreases strength attribute"
     },
     {
-      "Key": "effect.shortcircuit",
+      "Key": "effecttype.shortcircuit",
       "Value": "Short Circuit"
     },
     {
-      "Key": "effect.shortcircuit.description",
+      "Key": "effecttype.shortcircuit.description",
       "Value": "Decreases max energy"
     },
     {
-      "Key": "effect.lethargy",
+      "Key": "effecttype.lethargy",
       "Value": "Lethargy"
     },
     {
-      "Key": "effect.lethargy.description",
+      "Key": "effecttype.lethargy.description",
       "Value": "Decreases max stamina"
     },
 
 
     {
-      "Key": "effect.air",
+      "Key": "effecttype.air",
       "Value": "Air"
     },
     {
-      "Key": "effect.air.description",
+      "Key": "effecttype.air.description",
       "Value": "Imbue with the Air element"
     },
     {
-      "Key": "effect.earth",
+      "Key": "effecttype.earth",
       "Value": "Earth"
     },
     {
-      "Key": "effect.earth.description",
+      "Key": "effecttype.earth.description",
       "Value": "Imbue with the Earth element"
     },
     {
-      "Key": "effect.fire",
+      "Key": "effecttype.fire",
       "Value": "Fire"
     },
     {
-      "Key": "effect.fire.description",
+      "Key": "effecttype.fire.description",
       "Value": "Imbue with the Fire element"
     },
     {
-      "Key": "effect.ice",
+      "Key": "effecttype.ice",
       "Value": "Ice"
     },
     {
-      "Key": "effect.ice.description",
+      "Key": "effecttype.ice.description",
       "Value": "Imbue with the Ice element"
     },
     {
-      "Key": "effect.lightning",
+      "Key": "effecttype.lightning",
       "Value": "Lightning"
     },
     {
-      "Key": "effect.lightning.description",
+      "Key": "effecttype.lightning.description",
       "Value": "Imbue with the Lightning element"
     },
     {
-      "Key": "effect.water",
+      "Key": "effecttype.water",
       "Value": "Water"
     },
     {
-      "Key": "effect.water.description",
+      "Key": "effecttype.water.description",
       "Value": "Imbue with the Water element"
     },
 
 
     {
-      "Key": "effect.conjure",
+      "Key": "effecttype.conjure",
       "Value": "WiP Conjure"
     },
     {
-      "Key": "effect.conjure.description",
+      "Key": "effecttype.conjure.description",
       "Value": "WiP"
     },
     {
-      "Key": "effect.float",
+      "Key": "effecttype.float",
       "Value": "WiP Float"
     },
     {
-      "Key": "effect.float.description",
+      "Key": "effecttype.float.description",
       "Value": "Reduces fall damage"
     },
     {
-      "Key": "effect.heal",
-      "Value": "Heal"
-    },
-    {
-      "Key": "effect.heal.description",
-      "Value": "Restores some HP"
-    },
-    {
-      "Key": "effect.hurt",
-      "Value": "Hurt"
-    },
-    {
-      "Key": "effect.hurt.description",
-      "Value": "Removes some HP"
-    },
-    {
-      "Key": "effect.reflect",
+      "Key": "effecttype.reflect",
       "Value": "WiP Reflect"
     },
     {
-      "Key": "effect.reflect.description",
+      "Key": "effecttype.reflect.description",
       "Value": "Reflect damage back at the attacker"
     },
     {
-      "Key": "effect.summon",
+      "Key": "effecttype.summon",
       "Value": "WiP Summon"
     },
     {
-      "Key": "effect.summon.description",
+      "Key": "effecttype.summon.description",
       "Value": "Summon entities to act as shields or weapons"
     },
     
     
     {
-      "Key": "effect.attract",
+      "Key": "effecttype.attract",
       "Value": "Attract"
     },
     {
-      "Key": "effect.attract.description",
+      "Key": "effecttype.attract.description",
       "Value": "Pulls a target towards the source"
     },
     {
-      "Key": "effect.hold",
+      "Key": "effecttype.hold",
       "Value": "Hold"
     },
     {
-      "Key": "effect.hold.description",
+      "Key": "effecttype.hold.description",
       "Value": "Holds the target a set distance away"
     },
     {
-      "Key": "effect.launch",
+      "Key": "effecttype.launch",
       "Value": "Launch"
     },
     {
-      "Key": "effect.launch.description",
+      "Key": "effecttype.launch.description",
       "Value": "Launch target into the air"
     },
     {
-      "Key": "effect.lunge",
+      "Key": "effecttype.lunge",
       "Value": "Lunge"
     },
     {
-      "Key": "effect.lunge.description",
+      "Key": "effecttype.lunge.description",
       "Value": "Moves the target forwards"
     },
     {
-      "Key": "effect.plummet",
+      "Key": "effecttype.plummet",
       "Value": "Plummet"
     },
     {
-      "Key": "effect.plummet.description",
+      "Key": "effecttype.plummet.description",
       "Value": "Causes the target to fall rapidly"
     },
     {
-      "Key": "effect.repel",
+      "Key": "effecttype.repel",
       "Value": "Repel"
     },
     {
-      "Key": "effect.repel.description",
+      "Key": "effecttype.repel.description",
       "Value": "Repels a target away from the source"
     },
     {
-      "Key": "effect.shoveleft",
+      "Key": "effecttype.shoveleft",
       "Value": "Shove Left"
     },
     {
-      "Key": "effect.shoveleft.description",
+      "Key": "effecttype.shoveleft.description",
       "Value": "Move a target to their left"
     },
     {
-      "Key": "effect.shoveright",
+      "Key": "effecttype.shoveright",
       "Value": "Shove Right"
     },
     {
-      "Key": "effect.shoveright.description",
+      "Key": "effecttype.shoveright.description",
       "Value": "Move a target to their right"
     },
     {
-      "Key": "effect.stepback",
+      "Key": "effecttype.stepback",
       "Value": "Step Back"
     },
     {
-      "Key": "effect.stepback.description",
+      "Key": "effecttype.stepback.description",
       "Value": "Causes your target to move backwards"
     },
 	
 	
-	{
-      "Key": "item.type.consolidatorreloader",
+    {
+      "Key": "specialgeartype.consolidatorreloader",
       "Value": "Consolidator Reloader"
     },
     {
-      "Key": "specialgear.consolidatorreloader",
-      "Value": "Consolidator Reloader"
-    },
-    {
-      "Key": "item.type.teleportreloader",
+      "Key": "specialgeartype.teleportreloader",
       "Value": "Teleport Reloader"
     },
     {
-      "Key": "specialgear.teleportreloader",
-      "Value": "Teleport Reloader"
-    },
-    {
-      "Key": "item.type.barrier",
-      "Value": "Barrier"
-    },
-    {
-      "Key": "specialgear.barrier",
+      "Key": "specialgeartype.barrier",
       "Value": "Barrier"
     },
 	
