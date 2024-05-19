@@ -8,6 +8,7 @@ using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Persistence;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
@@ -575,7 +576,9 @@ namespace FullPotential.Core.Player
                 _userInterface.DebuggingOverlay.SetActive(true);
             }
 
-            Camera.main.fieldOfView = GameManager.Instance.GameSettings.FieldOfView;
+            var settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
+            var gameSettings = settingsRepository.GetOrLoad();
+            Camera.main.fieldOfView = gameSettings.FieldOfView;
         }
     }
 }

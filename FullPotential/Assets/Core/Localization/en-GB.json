@@ -349,6 +349,10 @@
       "Key": "ui.connect.incompatible",
       "Value": "Your game version is incompatible with the server"
     },
+    {
+      "Key": "ui.connect.nodetails",
+      "Value": "Failed to get instance details"
+    },
 
 
     {

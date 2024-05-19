@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using FullPotential.Api.Data;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
@@ -15,9 +14,7 @@ using FullPotential.Api.Scenes;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Services;
 using FullPotential.Api.Utilities;
-using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement.Data;
-using FullPotential.Core.GameManagement.Events;
 using FullPotential.Core.Gameplay.Events;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Player;
@@ -45,12 +42,8 @@ namespace FullPotential.Core.GameManagement
         public DefaultInputActions InputActions { get; private set; }
 
         //Data Stores
-        public GameSettings GameSettings { get; private set; }
         public readonly ServerGameData ServerGameDataStore = new ServerGameData();
         public readonly LocalGameData LocalGameDataStore = new LocalGameData();
-
-        //Events
-        public event EventHandler<GameSettingsUpdatedEventArgs> GameSettingsUpdated;
 
         //Services
         private IManagementService _managementService;
@@ -103,10 +96,9 @@ namespace FullPotential.Core.GameManagement
             var typeRegistry = (TypeRegistry)DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             typeRegistry.FindAndRegisterAll(addressablesManager.ModPrefixes);
 
-            EnsureGameSettingsLoaded();
 
             await _localizer.LoadAvailableCulturesAsync(addressablesManager.LocalisationAddresses);
-            await _localizer.LoadLocalizationFilesAsync(GameSettings.Culture);
+            await _localizer.LoadLocalizationFilesAsync(_settingsRepository.GetOrLoad().Culture);
 
             InputActions = new DefaultInputActions();
 
@@ -141,19 +133,13 @@ namespace FullPotential.Core.GameManagement
         {
             if (approvalRequest.ClientNetworkId == NetworkManager.Singleton.LocalClientId)
             {
-                ServerGameDataStore.ClientIdToUsername[0] = GameSettings.LastSigninUsername;
+                ServerGameDataStore.ClientIdToUsername[0] = _settingsRepository.GetOrLoad().LastSigninUsername;
                 approvalResponse.Approved = true;
                 return;
             }
 
             var payload = System.Text.Encoding.UTF8.GetString(approvalRequest.Payload);
             var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
-
-            //todo: ValidateCredentials
-            _managementService
-                .ValidateCredentials(connectionPayload.Username, connectionPayload.Token)
-                .GetAwaiter()
-                .GetResult();
 
             var playerUsername = connectionPayload.Username;
 
@@ -192,6 +178,8 @@ namespace FullPotential.Core.GameManagement
 
             approvalResponse.Approved = true;
             ServerGameDataStore.ClientIdToUsername[approvalRequest.ClientNetworkId] = playerUsername;
+
+            DisconnectUserIfTokenInvalid(approvalRequest.ClientNetworkId, playerUsername, connectionPayload.Token);
         }
 
         private void HandleAfterDisconnectedFromServer(ulong clientId)
@@ -222,20 +210,9 @@ namespace FullPotential.Core.GameManagement
             UserInterface.DebuggingOverlay.SetActive(false);
             UserInterface.DebuggingOverlay.SetActive(true);
 
-            EnsureGameSettingsLoaded();
-            GameSettings.Culture = cultureCode;
-        }
-
-        private void EnsureGameSettingsLoaded()
-        {
-            if (!(GameSettings?.Culture).IsNullOrWhiteSpace())
-            {
-                return;
-            }
-
-            GameSettings = _settingsRepository.Load();
-
-            GameSettingsUpdated?.Invoke(this, new GameSettingsUpdatedEventArgs(GameSettings));
+            var gameSettings = _settingsRepository.GetOrLoad();
+            gameSettings.Culture = cultureCode;
+            _settingsRepository.Save(gameSettings);
         }
 
         public void Disconnect()
@@ -263,12 +240,6 @@ namespace FullPotential.Core.GameManagement
 #else
             Application.Quit ();
 #endif
-        }
-
-        public void SaveGameSettings()
-        {
-            _settingsRepository.Save(GameSettings);
-            GameSettingsUpdated?.Invoke(this, new GameSettingsUpdatedEventArgs(GameSettings));
         }
 
         public static Version GetGameVersion()
@@ -306,10 +277,20 @@ namespace FullPotential.Core.GameManagement
             eventManager.Register(InventoryBase.EventIdSlotChange, InventoryBase.DefaultHandlerForSlotChangeEvent);
         }
 
+        private void DisconnectUserIfTokenInvalid(ulong clientId, string username, string token)
+        {
+            StartCoroutine(_managementService.ValidateCredentialsEnumerator(
+                username,
+                token,
+                () => { /*Do nothing*/ },
+                () => { NetworkManager.Singleton.DisconnectClient(clientId, "Invalid token"); }));
+        }
+
         #region Methods for Mods
 
         private GameObject _sceneObjects;
         private ISceneBehaviour _sceneBehaviour;
+
         public ISceneBehaviour GetSceneBehaviour()
         {
             if (_sceneObjects == null || _sceneBehaviour == null)

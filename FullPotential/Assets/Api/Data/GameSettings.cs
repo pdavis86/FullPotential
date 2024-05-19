@@ -14,5 +14,7 @@ namespace FullPotential.Api.Data
         public float LookSensitivity;
 
         public float LookSmoothness;
+        
+        public string ManagementApiAddress;
     }
 }

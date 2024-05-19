@@ -114,7 +114,6 @@
     <Compile Include="Assets\Core\Unity\Services\ShaderUtilities.cs" />
     <Compile Include="Assets\Core\Networking\RpcService.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Invigorate.cs" />
-    <Compile Include="Assets\Core\GameManagement\Enums\ConnectStatus.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DebuggingActiveState.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\MainMenuUi.cs" />
     <Compile Include="Assets\Core\UI\Events\OnDrawingStopEventArgs.cs" />
@@ -124,7 +123,6 @@
     <Compile Include="Assets\Core\Localization\Localizer.cs" />
     <Compile Include="Assets\Core\Environment\SceneService.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\TooltipWithTranslation.cs" />
-    <Compile Include="Assets\Core\GameManagement\Events\GameSettingsUpdatedEventArgs.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\RespawnUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\SettingsMenuUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\Hud.cs" />

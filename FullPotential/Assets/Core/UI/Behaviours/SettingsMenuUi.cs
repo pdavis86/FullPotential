@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Persistence;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
 using UnityEngine;
@@ -30,6 +31,8 @@ namespace FullPotential.Core.Ui.Behaviours
         private int _newCultureIndex = -1;
         private Resolution[] _availableResolutions;
 
+        private ISettingsRepository _settingsRepository;
+
         //Revert variables
         private bool _isRevertRequired;
         private Resolution? _revertResolution;
@@ -50,6 +53,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _resolutionDropDown.AddOptions(_availableResolutions.Select(x => $"{x.width} x {x.height} ({GetAspectRatio(x.width, x.height)})").ToList());
 
             _cultures = DependenciesContext.Dependencies.GetService<ILocalizer>().GetAvailableCultures();
+            _settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
 
             _languageDropDown.options.Clear();
             _languageDropDown.AddOptions(_cultures.Select(x => x.Value).ToList());
@@ -118,19 +122,21 @@ namespace FullPotential.Core.Ui.Behaviours
                 await GameManager.Instance.SetCultureAsync(match.Key);
             }
 
-            GameManager.Instance.GameSettings.FieldOfView = Camera.main.fieldOfView;
+            var gameSettings = _settingsRepository.GetOrLoad();
+
+            gameSettings.FieldOfView = Camera.main.fieldOfView;
             
             if (float.TryParse(_lookSensitivityInput.text, out var newSensitivity))
             {
-                GameManager.Instance.GameSettings.LookSensitivity = newSensitivity;
+                gameSettings.LookSensitivity = newSensitivity;
             }
 
             if (float.TryParse(_lookSmoothnessInput.text, out var newSmoothness))
             {
-                GameManager.Instance.GameSettings.LookSmoothness = newSmoothness;
+                gameSettings.LookSmoothness = newSmoothness;
             }
 
-            GameManager.Instance.SaveGameSettings();
+            _settingsRepository.Save(gameSettings);
         }
 
         private void SavePlayerSettings()
@@ -184,20 +190,21 @@ namespace FullPotential.Core.Ui.Behaviours
             _revertFieldOfView = Camera.main.fieldOfView;
             _fovSlider.value = Camera.main.fieldOfView;
 
-            var culture = GameManager.Instance.GameSettings.Culture;
+            var gameSettings = _settingsRepository.GetOrLoad();
+
             int i;
             for (i = 0; i < _cultures.Count; i++)
             {
-                if (_cultures.ElementAt(i).Key == culture)
+                if (_cultures.ElementAt(i).Key == gameSettings.Culture)
                 {
                     break;
                 }
             }
             _languageDropDown.value = i;
 
-            _lookSensitivityInput.text = GameManager.Instance.GameSettings.LookSensitivity.ToString(CultureInfo.InvariantCulture);
+            _lookSensitivityInput.text = gameSettings.LookSensitivity.ToString(CultureInfo.InvariantCulture);
 
-            _lookSmoothnessInput.text = GameManager.Instance.GameSettings.LookSmoothness.ToString(CultureInfo.InvariantCulture);
+            _lookSmoothnessInput.text = gameSettings.LookSmoothness.ToString(CultureInfo.InvariantCulture);
         }
 
         private void LoadPlayerSettings()

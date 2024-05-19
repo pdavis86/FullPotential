@@ -2,19 +2,18 @@
 {
     using System;
     using System.Collections;
-    using System.Threading.Tasks;
     using FullPotential.Api.GameManagement.JsonModels;
 
     public interface IManagementService
     {
         string SignInWithExistingToken();
 
-        IEnumerator SignInWithPasswordCoroutine(string username, string password, Action<string> successCallback, Action<bool> failureCallback);
+        IEnumerator SignInWithPasswordEnumerator(string username, string password, Action<string> successCallback, Action<bool> failureCallback);
 
-        IEnumerator ConnectionDetailsCoroutine(Action<ConnectionDetails> successCallback, Action failureCallback);
+        IEnumerator ConnectionDetailsEnumerator(Action<ConnectionDetails> successCallback, Action failureCallback);
 
-        IEnumerator SignOutCoroutine(Action successCallback, Action failureCallback);
-        
-        Task<bool> ValidateCredentials(string username, string token);
+        IEnumerator SignOutEnumerator(Action successCallback, Action failureCallback);
+
+        IEnumerator ValidateCredentialsEnumerator(string username, string token, Action successCallback, Action failureCallback);
     }
 }

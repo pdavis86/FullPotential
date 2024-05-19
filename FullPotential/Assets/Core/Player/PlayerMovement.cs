@@ -1,6 +1,6 @@
 ﻿using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.GameManagement.Events;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.GameManagement.Events;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -9,6 +9,9 @@ using UnityEngine.InputSystem;
 
 namespace FullPotential.Core.Player
 {
+    using FullPotential.Api.Ioc;
+    using FullPotential.Api.Persistence;
+
     [RequireComponent(typeof(Rigidbody))]
     public class PlayerMovement : NetworkBehaviour
     {
@@ -55,7 +58,9 @@ namespace FullPotential.Core.Player
 
             _userInterface = GameManager.Instance.UserInterface;
 
-            GameManager.Instance.GameSettingsUpdated += OnGameSettingsUpdated;
+            var settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
+
+            settingsRepository.GameSettingsUpdated += OnGameSettingsUpdated;
         }
 
         // ReSharper disable once UnusedMember.Local

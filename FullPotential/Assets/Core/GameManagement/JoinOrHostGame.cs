@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using FullPotential.Api.GameManagement;
+using FullPotential.Api.GameManagement.JsonModels;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Persistence;
 using FullPotential.Api.Ui.Services;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Networking.Data;
+using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
@@ -14,14 +18,8 @@ using UnityEngine.UI;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-//https://docs-multiplayer.unity3d.com/docs
-
 namespace FullPotential.Core.GameManagement
 {
-    using FullPotential.Api.GameManagement;
-    using FullPotential.Api.GameManagement.JsonModels;
-    using TMPro;
-
     public class JoinOrHostGame : MonoBehaviour
     {
 #pragma warning disable 0649
@@ -46,6 +44,7 @@ namespace FullPotential.Core.GameManagement
         private IManagementService _managementService;
         private ILocalizer _localizer;
         private IUiAssistant _uiAssistant;
+        private ISettingsRepository _settingsRepository;
 
         private NetworkManager _networkManager;
         private UnityTransport _networkTransport;
@@ -64,6 +63,7 @@ namespace FullPotential.Core.GameManagement
             _managementService = DependenciesContext.Dependencies.GetService<IManagementService>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _uiAssistant = DependenciesContext.Dependencies.GetService<IUiAssistant>();
+            _settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -81,7 +81,7 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
-            _username = GameManager.Instance.GameSettings.LastSigninUsername;
+            _username = _settingsRepository.GetOrLoad().LastSigninUsername;
             _signinUsername.text = _username;
 
             GameManager.Instance.LocalGameDataStore.PlayerToken = _managementService.SignInWithExistingToken();
@@ -196,7 +196,7 @@ namespace FullPotential.Core.GameManagement
             _signInContainer.SetActive(false);
             _signingInMessage.SetActive(true);
 
-            StartCoroutine(_managementService.SignInWithPasswordCoroutine(
+            StartCoroutine(_managementService.SignInWithPasswordEnumerator(
                 _username,
                 _password,
                 AfterSignIn,
@@ -225,36 +225,34 @@ namespace FullPotential.Core.GameManagement
             _signinError.gameObject.SetActive(false);
             _signInContainer.SetActive(false);
 
-            GameManager.Instance.GameSettings.LastSigninUsername = _username;
-            GameManager.Instance.SaveGameSettings();
+            var gameSettings = _settingsRepository.GetOrLoad();
+            gameSettings.LastSigninUsername = _username;
+            _settingsRepository.Save(gameSettings);
 
             GameManager.Instance.LocalGameDataStore.PlayerToken = token;
 
             _username = _password = null;
             _signinUsername.text = _signinPassword.text = null;
 
-            StartCoroutine(_managementService.ConnectionDetailsCoroutine(
+            StartCoroutine(_managementService.ConnectionDetailsEnumerator(
                 AfterConnectionDetails,
                 () => AfterConnectionDetails(null)));
         }
 
         private void AfterConnectionDetails(ConnectionDetails connectionDetails)
         {
-            if (connectionDetails == null)
-            {
-                //todo: handle failure
-                return;
-            }
-
             _signingInMessage.SetActive(false);
 
-            //todo: check connectionDetails.Status
-            // StartingUp = 0,
-            // Available = 1,
-            // Full = 2
-
-            _gameDetailsAddress.text = connectionDetails.Address;
-            _gameDetailsPort.text = connectionDetails.Port.ToString();
+            if (connectionDetails != null)
+            {
+                _gameDetailsAddress.text = connectionDetails.Address;
+                _gameDetailsPort.text = connectionDetails.Port.ToString();
+            }
+            else
+            {
+                _gameDetailsError.text = _localizer.Translate("ui.connect.nodetails");
+                _gameDetailsError.gameObject.SetActive(true);
+            }
 
             _gameDetailsContainer.SetActive(true);
             _gameDetailsAddress.Select();
@@ -274,7 +272,7 @@ namespace FullPotential.Core.GameManagement
                 _signinUsername.Select();
             }
 
-            StartCoroutine(_managementService.SignOutCoroutine(
+            StartCoroutine(_managementService.SignOutEnumerator(
                 () => { },
                 () => { }));
         }
@@ -349,7 +347,7 @@ namespace FullPotential.Core.GameManagement
         {
             var payload = JsonUtility.ToJson(new ConnectionPayload
             {
-                Username = GameManager.Instance.GameSettings.LastSigninUsername,
+                Username = _settingsRepository.GetOrLoad().LastSigninUsername,
                 Token = GameManager.Instance.LocalGameDataStore.PlayerToken,
                 GameVersion = GameManager.GetGameVersion().ToString()
             });
