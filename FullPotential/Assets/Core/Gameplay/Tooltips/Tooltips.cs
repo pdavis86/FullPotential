@@ -31,7 +31,7 @@ namespace FullPotential.Core.Gameplay.Tooltips
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void Update()
+        private void FixedUpdate()
         {
             if (gameObject.activeSelf)
             {
