@@ -10,6 +10,7 @@ using UnityEngine;
 namespace FullPotential.Core.Persistence
 {
     //todo: kill this class
+    [Obsolete]
     public class UserRepository : IUserRepository
     {
         private readonly bool _isDebugBuild = Debug.isDebugBuild;
@@ -24,7 +25,7 @@ namespace FullPotential.Core.Persistence
                 return new PlayerData
                 {
                     Username = username,
-                    Settings = new PlayerSettings(),
+                    Settings = new CharacterSettings(),
                     Resources = Array.Empty<SerializableKeyValuePair<string, int>>(),
                     Inventory = new InventoryData()
                 };

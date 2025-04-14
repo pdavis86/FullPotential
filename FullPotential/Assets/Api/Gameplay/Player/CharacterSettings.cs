@@ -3,7 +3,7 @@
 namespace FullPotential.Api.Gameplay.Player
 {
     [System.Serializable]
-    public class PlayerSettings : INetworkSerializable
+    public class CharacterSettings : INetworkSerializable
     {
         public string TextureUrl;
 

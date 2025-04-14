@@ -7,7 +7,7 @@ namespace FullPotential.Api.Data
     public class PlayerData
     {
         public string Username;
-        public PlayerSettings Settings;
+        public CharacterSettings Settings;
         public SerializableKeyValuePair<string, int>[] Resources;
         public InventoryData Inventory;
 

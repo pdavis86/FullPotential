@@ -62,11 +62,13 @@
   <ItemGroup>
     <Compile Include="Assets\Api\Gameplay\Inventory\EventArgs\SlotChangeEventArgs.cs" />
     <Compile Include="Assets\Api\CoreTypeIds\ResourceTypeIds.cs" />
+    <Compile Include="Assets\Api\Gameplay\Player\CharacterSettings.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IMovementEffectType.cs" />
     <Compile Include="Assets\Api\Items\Types\Armor.cs" />
     <Compile Include="Assets\Api\Items\Types\Loot.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\IPlayerFighter.cs" />
     <Compile Include="Assets\Api\Input\DefaultInputActions.cs" />
+    <Compile Include="Assets\Api\Obsolete\InventoryData.cs" />
     <Compile Include="Assets\Api\Registry\Weapons\IWeaponVisuals.cs" />
     <Compile Include="Assets\Api\Items\Types\Weapon.cs" />
     <Compile Include="Assets\Api\Registry\Shapes\IShapeVisuals.cs" />
@@ -78,6 +80,7 @@
     <Compile Include="Assets\Api\Items\IHasTargetingAndShape.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IAccessoryType.cs" />
     <Compile Include="Assets\Api\Ui\Services\UiAssistant.cs" />
+    <Compile Include="Assets\Api\Obsolete\InventoryChanges.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\GameObjectExtensions.cs" />
     <Compile Include="Assets\Api\Ioc\Dependency.cs" />
     <Compile Include="Assets\Api\Obsolete\Networking\IFragmentedMessageReconstructor.cs" />
@@ -90,20 +93,18 @@
     <Compile Include="Assets\Api\Registry\Effects\IAttributeEffect.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\IEventManager.cs" />
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
-    <Compile Include="Assets\Api\Data\InventoryData.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IRegisterableWithSlotType.cs" />
     <Compile Include="Assets\Api\Scenes\SpawnPoint.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\ICombatService.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Tags.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\ViableTarget.cs" />
+    <Compile Include="Assets\Api\Obsolete\PlayerData.cs" />
     <Compile Include="Assets\Api\Registry\Shapes\IShapeType.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\ActiveEffect.cs" />
-    <Compile Include="Assets\Api\Data\InventoryChanges.cs" />
     <Compile Include="Assets\Api\GameManagement\JsonModels\GenericResponse.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Layers.cs" />
     <Compile Include="Assets\Api\Registry\Shapes\IShapeBehaviour.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\IEventHandlerArgs.cs" />
-    <Compile Include="Assets\Api\Data\PlayerData.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesCollection.cs" />
     <Compile Include="Assets\Api\Items\Types\Consumer.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\LivingEntityState.cs" />
@@ -132,7 +133,6 @@
     <Compile Include="Assets\Api\Data\GameSettings.cs" />
     <Compile Include="Assets\Api\GameManagement\IManagementService.cs" />
     <Compile Include="Assets\Api\Items\IHasCharge.cs" />
-    <Compile Include="Assets\Api\Gameplay\Player\PlayerSettings.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\CombatResult.cs" />
     <Compile Include="Assets\Api\Ui\IUserInterface.cs" />
     <Compile Include="Assets\Api\Obsolete\Networking\IFragmentedMessageReconstructorFactory.cs" />
