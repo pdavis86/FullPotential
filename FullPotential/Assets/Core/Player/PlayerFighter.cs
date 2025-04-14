@@ -55,7 +55,7 @@ namespace FullPotential.Core.Player
         private IPersistenceService _persistenceService;
 
         //Data
-        private PlayerSettings _playerSettings;
+        private CharacterSettings _characterSettings;
         private bool _inventoryLoadedSuccessfully;
 
         #endregion
@@ -250,13 +250,13 @@ namespace FullPotential.Core.Player
         }
 
         [ServerRpc]
-        private void UpdatePlayerSettingsServerRpc(PlayerSettings playerSettings)
+        private void UpdatePlayerSettingsServerRpc(CharacterSettings characterSettings)
         {
             _persistenceService.QueueAsapSave(Username);
 
-            _playerSettings = playerSettings;
+            _characterSettings = characterSettings;
 
-            UpdatePlayerSettings(_playerSettings);
+            UpdatePlayerSettings(_characterSettings);
         }
 
         #endregion
@@ -525,19 +525,19 @@ namespace FullPotential.Core.Player
                 playerData.InventoryLoadedSuccessfully = false;
             }
 
-            _playerSettings = playerData.Settings;
+            _characterSettings = playerData.Settings;
             _inventoryLoadedSuccessfully = playerData.InventoryLoadedSuccessfully;
 
             UpdateUiHealthAndDefenceValues();
         }
 
-        public void UpdatePlayerSettings(PlayerSettings playerSettings)
+        public void UpdatePlayerSettings(CharacterSettings characterSettings)
         {
-            TextureUrl = playerSettings.TextureUrl;
+            TextureUrl = characterSettings.TextureUrl;
 
             if (!IsServer)
             {
-                UpdatePlayerSettingsServerRpc(playerSettings);
+                UpdatePlayerSettingsServerRpc(characterSettings);
             }
         }
 
@@ -693,7 +693,7 @@ namespace FullPotential.Core.Player
             var saveData = new PlayerData
             {
                 Username = Username,
-                Settings = _playerSettings,
+                Settings = _characterSettings,
                 Resources = GetResources()
                     .Select(resource => new SerializableKeyValuePair<string, int>(
                         resource.TypeId.ToString(),

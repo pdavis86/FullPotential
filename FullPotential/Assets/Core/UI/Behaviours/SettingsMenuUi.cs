@@ -141,7 +141,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void SavePlayerSettings()
         {
-            var playerSettings = new PlayerSettings
+            var playerSettings = new CharacterSettings
             {
                 TextureUrl = _skinUrlInput.text
             };

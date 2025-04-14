@@ -350,8 +350,8 @@
       "Value": "Your game version is incompatible with the server"
     },
     {
-      "Key": "ui.connect.nodetails",
       "Value": "Failed to get instance details"
+      "Key": "ui.connect.nodetails",
     },
 
 
