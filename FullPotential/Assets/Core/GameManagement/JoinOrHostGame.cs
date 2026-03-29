@@ -222,6 +222,8 @@ namespace FullPotential.Core.GameManagement
                 AfterSignInFailed(true);
             }
 
+            // todo: check token validity
+
             _signinError.gameObject.SetActive(false);
             _signInContainer.SetActive(false);
 

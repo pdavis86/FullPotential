@@ -63,7 +63,10 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
         }
 
         // ReSharper disable once UnusedParameter.Local
+#pragma warning disable CS0618 // Type or member is obsolete
         [ServerRpc(RequireOwnership = false)]
+#pragma warning restore CS0618 // Type or member is obsolete
+        //[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         private void PingServerRpc(int pingId, ServerRpcParams serverRpcParams = default)
         {
             PongClientRpc(pingId, _pongClientParams);
