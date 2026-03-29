@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections;
-using FullPotential.Api.Data;
+
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
@@ -11,7 +11,9 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities;
+
 using Unity.Netcode;
+
 using UnityEngine;
 
 // ReSharper disable MemberCanBePrivate.Global

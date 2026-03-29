@@ -2,17 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data;
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Obsolete.Networking;
 using FullPotential.Api.Obsolete.Networking.Data;
-using FullPotential.Api.Persistence;
 using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Services;
@@ -22,7 +24,9 @@ using FullPotential.Core.Environment;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Registry.Resources;
 using FullPotential.Core.Ui.Components;
+
 using Unity.Netcode;
+
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -49,10 +53,9 @@ namespace FullPotential.Core.Player
         private ActionQueue<bool> _aliveStateChanges;
 
         //Registered Services
-        private IUserRepository _userRepository;
+        private IPlayerManagement _playerManagement;
         private IUnityHelperUtilities _unityHelperUtilities;
         private IShaderUtilities _shaderUtilities;
-        private IPersistenceService _persistenceService;
 
         //Data
         private CharacterSettings _characterSettings;
@@ -122,10 +125,9 @@ namespace FullPotential.Core.Player
             _inventory = (InventoryBase)PlayerInventory;
             _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
 
-            _userRepository = DependenciesContext.Dependencies.GetService<IUserRepository>();
+            _playerManagement = DependenciesContext.Dependencies.GetService<IPlayerManagement>();
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
             _shaderUtilities = DependenciesContext.Dependencies.GetService<IShaderUtilities>();
-            _persistenceService = DependenciesContext.Dependencies.GetService<IPersistenceService>();
 
             HealthBarSlider = _healthSlider;
         }
@@ -208,7 +210,7 @@ namespace FullPotential.Core.Player
         {
             if (IsServer)
             {
-                _persistenceService.SavePlayerData(GetPlayerSaveData());
+                _playerManagement.SavePlayerData(GetPlayerSaveData());
             }
         }
 
@@ -255,7 +257,7 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         private void UpdatePlayerSettingsServerRpc(CharacterSettings characterSettings)
         {
-            _persistenceService.QueueAsapSave(Username);
+            _playerManagement.QueueAsapSave(Username);
 
             _characterSettings = characterSettings;
 
@@ -459,7 +461,7 @@ namespace FullPotential.Core.Player
 
         private void GetAndLoadPlayerData(bool reduced, ulong? sendToClientId)
         {
-            var playerData = _userRepository.Load(Username, reduced);
+            var playerData = _playerManagement.Load(Username, reduced);
 
             if (sendToClientId.HasValue)
             {

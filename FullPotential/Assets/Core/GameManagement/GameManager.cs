@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+
+using FullPotential.Api.Data;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Persistence;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Ui;
@@ -19,7 +20,9 @@ using FullPotential.Core.Gameplay.Events;
 using FullPotential.Core.Networking.Data;
 using FullPotential.Core.Player;
 using FullPotential.Core.Registry;
+
 using Unity.Netcode;
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -46,9 +49,9 @@ namespace FullPotential.Core.GameManagement
         public readonly LocalGameData LocalGameDataStore = new LocalGameData();
 
         //Services
-        private IManagementService _managementService;
         private ISettingsRepository _settingsRepository;
-        private IPersistenceService _persistenceService;
+        private IUserManagement _userManagement;
+        private IPlayerManagement _playerManagement;
         private ILocalizer _localizer;
         private IUnityHelperUtilities _unityHelperUtilities;
 
@@ -64,7 +67,9 @@ namespace FullPotential.Core.GameManagement
         #region Unity Event Handlers
 
         // ReSharper disable once UnusedMember.Local
+#pragma warning disable UNT0006 // Incorrect message signature
         private async Task Awake()
+#pragma warning restore UNT0006 // Incorrect message signature
         {
             if (Instance != null && Instance != this)
             {
@@ -81,11 +86,11 @@ namespace FullPotential.Core.GameManagement
 
             ServiceManager.RegisterServices();
 
-            _managementService = DependenciesContext.Dependencies.GetService<IManagementService>();
             _settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
+            _userManagement = DependenciesContext.Dependencies.GetService<IUserManagement>();
+            _playerManagement = DependenciesContext.Dependencies.GetService<IPlayerManagement>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
-            _persistenceService = DependenciesContext.Dependencies.GetService<IPersistenceService>();
 
             RegisterEvents();
 
@@ -252,7 +257,7 @@ namespace FullPotential.Core.GameManagement
 
         private void SavePlayerData(bool allData = false)
         {
-            _persistenceService.SaveBatchPlayerData(ServerGameDataStore.ClientIdToUsername, allData);
+            _playerManagement.SaveBatchPlayerData(ServerGameDataStore.ClientIdToUsername, allData);
         }
 
         public void CheckIsAdmin()
@@ -280,7 +285,7 @@ namespace FullPotential.Core.GameManagement
 
         private void DisconnectUserIfTokenInvalid(ulong clientId, string username, string token)
         {
-            StartCoroutine(_managementService.ValidateCredentialsEnumerator(
+            StartCoroutine(_userManagement.ValidateCredentialsEnumerator(
                 username,
                 token,
                 () => { /*Do nothing*/ },

@@ -1,12 +1,14 @@
 ﻿using System;
-using FullPotential.Api.Data;
+
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Ui;
+
 using Unity.Netcode;
 
 // ReSharper disable ClassNeverInstantiated.Global

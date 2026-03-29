@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Utilities.Extensions;
 
-namespace FullPotential.Api.Data
+namespace FullPotential.Api.Obsolete
 {
     [System.Serializable]
     public class InventoryData

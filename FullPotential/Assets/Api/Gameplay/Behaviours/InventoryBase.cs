@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using FullPotential.Api.CoreTypeIds;
-using FullPotential.Api.Data;
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.EventArgs;
 using FullPotential.Api.Gameplay.Player;
@@ -11,6 +12,7 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Networking;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Obsolete.Networking;
 using FullPotential.Api.Obsolete.Networking.Data;
 using FullPotential.Api.Registry;
@@ -22,7 +24,9 @@ using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities.Extensions;
+
 using Unity.Netcode;
+
 using UnityEngine;
 
 // ReSharper disable UnusedMemberHierarchy.Global

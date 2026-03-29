@@ -22,6 +22,7 @@ Choose the appropriate item for the situation
 
 
 ## Dependencies
+You'll need to download these asset packs and include them in the project:
 - TextMeshPro
 - Conifers
 - ADG_Textures
@@ -41,7 +42,7 @@ See the [Project Trello Board](https://trello.com/b/biH6NdE0/oasis "Go to Trello
 - [x] v0.1 Core Gameplay (Basics)
 - [x] v0.2 Core Gameplay (Additional)
 - [x] v0.3 Playable PoC
-- [ ] v0.4 Battle Improvements
+- [x] v0.4 Battle Improvements
 - [ ] v0.5 Infrastructure Improvements
 - [ ] v0.6 Code Improvements
 - [ ] v0.7 UI, Inventory, & Crafting

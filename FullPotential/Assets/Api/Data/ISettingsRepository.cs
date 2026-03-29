@@ -1,8 +1,9 @@
-﻿using FullPotential.Api.Data;
-using System;
+﻿using System;
+
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.GameManagement.Events;
 
-namespace FullPotential.Api.Persistence
+namespace FullPotential.Api.Data
 {
     public interface ISettingsRepository
     {
