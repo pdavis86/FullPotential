@@ -222,7 +222,10 @@ namespace FullPotential.Core.Player
             GetAndLoadPlayerData(false, serverRpcParams.Receive.SenderClientId);
         }
 
+#pragma warning disable CS0618 // Type or member is obsolete
         [ServerRpc(RequireOwnership = false)]
+#pragma warning restore CS0618 // Type or member is obsolete
+        //[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         private void RequestReducedPlayerDataServerRpc(ServerRpcParams serverRpcParams = default)
         {
             GetAndLoadPlayerData(true, serverRpcParams.Receive.SenderClientId);

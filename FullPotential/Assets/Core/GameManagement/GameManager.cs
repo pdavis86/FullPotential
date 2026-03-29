@@ -107,7 +107,8 @@ namespace FullPotential.Core.GameManagement
 
             _playerPrefabNetObj = Prefabs.Player.GetComponent<NetworkObject>();
 
-            SceneManager.LoadSceneAsync(1);
+            // Fire-and-forget
+            SceneManager.LoadSceneAsync(1).GetAwaiter();
         }
 
         // ReSharper disable once UnusedMember.Local
