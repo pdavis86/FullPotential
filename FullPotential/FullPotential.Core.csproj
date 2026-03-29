@@ -61,28 +61,21 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.4.0f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Core\Utilities\UtilityBehaviours\StickUiToWorldPosition.cs" />
+    <Compile Include="Assets\Core\Persistence\Https\HttpsPersistenceBase.cs" />
+    <Compile Include="Assets\Core\Persistence\Https\UserManagement.cs" />
+    <Compile Include="Assets\Core\Persistence\Local\UserManagement.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\TextMeshProLocalizer.cs" />
-    <Compile Include="Assets\Core\Unity\Services\UnityHelperUtilities.cs" />
     <Compile Include="Assets\Core\Registry\Resources\Stamina.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DontDestroy.cs" />
-    <Compile Include="Assets\Core\Gameplay\Drawing\DrawingService.cs" />
-    <Compile Include="Assets\Core\Gameplay\Combat\MaintainDistance.cs" />
     <Compile Include="Assets\Core\GameManagement\Data\ServerGameData.cs" />
     <Compile Include="Assets\Core\UI\Components\EquippedSummary.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Push.cs" />
     <Compile Include="Assets\Core\GameManagement\UserInterface.cs" />
-    <Compile Include="Assets\Core\Persistence\UserRepository.cs" />
-    <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltips.cs" />
     <Compile Include="Assets\Core\Registry\SpecialSlots\RightHand.cs" />
-    <Compile Include="Assets\Core\Player\PlayerBehaviour.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltip.cs" />
     <Compile Include="Assets\Core\Player\PlayerFighter.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUi.cs" />
-    <Compile Include="Assets\Core\Persistence\PersistenceService.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\AdminShopUi.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\DrawingPadUi.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Exhaust.cs" />
     <Compile Include="Assets\Core\Networking\Data\ConnectionPayload.cs" />
     <Compile Include="Assets\Core\Unity\Services\ShaderUtilities.cs" />
@@ -90,21 +83,11 @@
     <Compile Include="Assets\Core\UI\Behaviours\MainMenuUi.cs" />
     <Compile Include="Assets\Core\Localization\Localizer.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\TooltipWithTranslation.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\Hud.cs" />
-    <Compile Include="Assets\Core\Modding\ModHelper.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ProgressWheel.cs" />
     <Compile Include="Assets\Core\Registry\SpecialSlots\LeftHand.cs" />
-    <Compile Include="Assets\Core\Gameplay\Combat\CombatService.cs" />
-    <Compile Include="Assets\Core\Registry\Effects\Hurt.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\InventoryUiSlot.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\LookAtMainCamera.cs" />
-    <Compile Include="Assets\Core\SceneObjects\SceneObjectsStartup.cs" />
     <Compile Include="Assets\Core\Player\PlayerInventory.cs" />
-    <Compile Include="Assets\Core\Gameplay\Events\EventManager.cs" />
-    <Compile Include="Assets\Core\Localization\Data\Localization.cs" />
     <Compile Include="Assets\Core\Registry\Events\LivingEntityHealthChangedEventHandler.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectsUi.cs" />
-    <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DestroyOnTriggerEnter.cs" />
     <Compile Include="Assets\Core\Unity\Static\DefaultSceneLoader.cs" />
     <Compile Include="Assets\Core\Environment\LootInteractable.cs" />
     <Compile Include="Assets\Core\UI\Components\CraftingSelector.cs" />
@@ -114,18 +97,46 @@
     <Compile Include="Assets\Core\GameManagement\AddressablesManager.cs" />
     <Compile Include="Assets\Core\Registry\Resources\Health.cs" />
     <Compile Include="Assets\Core\Networking\ClientNetworkTransform.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\DebuggingUi.cs" />
-    <Compile Include="Assets\Core\Utilities\UtilityBehaviours\NetworkStats.cs" />
+    <Compile Include="Assets\Core\Persistence\Https\InstanceManagement.cs" />
     <Compile Include="Assets\Core\GameManagement\Data\LocalGameData.cs" />
-    <Compile Include="Assets\Core\Persistence\SettingsRepository.cs" />
     <Compile Include="Assets\Core\GameManagement\GameManager.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\TextLocalizer.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiEquipmentTab.cs" />
     <Compile Include="Assets\Core\GameManagement\ServiceManager.cs" />
+    <Compile Include="Assets\Core\Registry\Effects\Invigorate.cs" />
+    <Compile Include="Assets\Core\Persistence\Local\SettingsRepository.cs" />
+    <Compile Include="Assets\Core\UI\Components\NameAndToggle.cs" />
+    <Compile Include="Assets\Core\UI\Components\SlideOutAlert.cs" />
+    <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiCraftingTab.cs" />
+    <Compile Include="Assets\Core\UI\Components\InventoryItemsList.cs" />
+    <Compile Include="Assets\Core\SceneObjects\SceneObjectsOffline.cs" />
+    <Compile Include="Assets\Core\Registry\Events\LivingEntityDiedEventHandler.cs" />
+    <Compile Include="Assets\Core\Utilities\UtilityBehaviours\StickUiToWorldPosition.cs" />
+    <Compile Include="Assets\Core\Unity\Services\UnityHelperUtilities.cs" />
+    <Compile Include="Assets\Core\Gameplay\Drawing\DrawingService.cs" />
+    <Compile Include="Assets\Core\Gameplay\Combat\MaintainDistance.cs" />
+    <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltips.cs" />
+    <Compile Include="Assets\Core\Player\PlayerBehaviour.cs" />
+    <Compile Include="Assets\Core\Persistence\Local\PlayerManagement.cs" />
+    <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUi.cs" />
+    <Compile Include="Assets\Core\UI\Behaviours\DrawingPadUi.cs" />
+    <Compile Include="Assets\Core\UI\Behaviours\Hud.cs" />
+    <Compile Include="Assets\Core\Modding\ModHelper.cs" />
+    <Compile Include="Assets\Core\Gameplay\Combat\CombatService.cs" />
+    <Compile Include="Assets\Core\Registry\Effects\Hurt.cs" />
+    <Compile Include="Assets\Core\UI\Behaviours\InventoryUiSlot.cs" />
+    <Compile Include="Assets\Core\SceneObjects\SceneObjectsStartup.cs" />
+    <Compile Include="Assets\Core\Persistence\Https\PlayerManagement.cs" />
+    <Compile Include="Assets\Core\Gameplay\Events\EventManager.cs" />
+    <Compile Include="Assets\Core\Localization\Data\Localization.cs" />
+    <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectsUi.cs" />
+    <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DestroyOnTriggerEnter.cs" />
+    <Compile Include="Assets\Core\Persistence\Local\InstanceManagement.cs" />
+    <Compile Include="Assets\Core\UI\Behaviours\DebuggingUi.cs" />
+    <Compile Include="Assets\Core\Utilities\UtilityBehaviours\NetworkStats.cs" />
     <Compile Include="Assets\Core\UI\Components\BarSlider.cs" />
     <Compile Include="Assets\Core\UI\Components\NameAndValueSlider.cs" />
     <Compile Include="Assets\Core\Networking\RpcService.cs" />
-    <Compile Include="Assets\Core\Registry\Effects\Invigorate.cs" />
     <Compile Include="Assets\Core\UI\Events\OnDrawingStopEventArgs.cs" />
     <Compile Include="Assets\Core\GameManagement\JoinOrHostGame.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiRow.cs" />
@@ -134,16 +145,9 @@
     <Compile Include="Assets\Core\UI\Behaviours\RespawnUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\SettingsMenuUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiInventoryTab.cs" />
-    <Compile Include="Assets\Core\UI\Components\NameAndToggle.cs" />
-    <Compile Include="Assets\Core\UI\Components\SlideOutAlert.cs" />
-    <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiCraftingTab.cs" />
     <Compile Include="Assets\Core\Gameplay\Events\EventHandlerGroup.cs" />
-    <Compile Include="Assets\Core\GameManagement\ManagementService.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Heal.cs" />
-    <Compile Include="Assets\Core\UI\Components\InventoryItemsList.cs" />
     <Compile Include="Assets\Core\Registry\TypeRegistry.cs" />
-    <Compile Include="Assets\Core\SceneObjects\SceneObjectsOffline.cs" />
-    <Compile Include="Assets\Core\Registry\Events\LivingEntityDiedEventHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Core\FullPotential.Core.asmdef" />
@@ -717,8 +721,16 @@
       <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@19a841221620\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+      <HintPath>Library\PackageCache\nuget.moq@9d3acbde62fa\Runtime\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.IO.Hashing">
       <HintPath>Library\PackageCache\com.unity.collections@538ace9075bc\Unity.Collections.Tests\System.IO.Hashing\System.IO.Hashing.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Diagnostics.EventLog">
+      <HintPath>Library\PackageCache\nuget.castle-core@0f12c6004338\Runtime\System.Diagnostics.EventLog.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
@@ -729,16 +741,8 @@
       <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff\Mono.Cecil.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>Library\PackageCache\com.unity.collections@538ace9075bc\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Moq">
       <HintPath>Library\PackageCache\nuget.moq@9d3acbde62fa\Runtime\Moq.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Diagnostics.EventLog">
-      <HintPath>Library\PackageCache\nuget.castle-core@0f12c6004338\Runtime\System.Diagnostics.EventLog.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Castle.Core">

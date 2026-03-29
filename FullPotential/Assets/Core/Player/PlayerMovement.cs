@@ -1,7 +1,11 @@
 ﻿using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.Data;
 using FullPotential.Api.GameManagement.Events;
+using FullPotential.Api.Ioc;
 using FullPotential.Core.GameManagement;
+
 using Unity.Netcode;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,8 +13,6 @@ using UnityEngine.InputSystem;
 
 namespace FullPotential.Core.Player
 {
-    using FullPotential.Api.Ioc;
-    using FullPotential.Api.Persistence;
 
     [RequireComponent(typeof(Rigidbody))]
     public class PlayerMovement : NetworkBehaviour

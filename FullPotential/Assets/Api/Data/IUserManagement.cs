@@ -1,19 +1,24 @@
-﻿namespace FullPotential.Api.GameManagement
-{
-    using System;
-    using System.Collections;
-    using FullPotential.Api.GameManagement.JsonModels;
+﻿using System;
+using System.Collections;
 
-    public interface IManagementService
+using FullPotential.Api.Obsolete;
+
+// ReSharper disable UnusedMember.Global
+
+namespace FullPotential.Api.Data
+{
+    public interface IUserManagement
     {
         string SignInWithExistingToken();
 
         IEnumerator SignInWithPasswordEnumerator(string username, string password, Action<string> successCallback, Action<bool> failureCallback);
 
-        IEnumerator ConnectionDetailsEnumerator(Action<ConnectionDetails> successCallback, Action failureCallback);
-
         IEnumerator SignOutEnumerator(Action successCallback, Action failureCallback);
 
         IEnumerator ValidateCredentialsEnumerator(string username, string token, Action successCallback, Action failureCallback);
+
+        PlayerData Load(string username, bool reduced);
+
+        void Save(PlayerData playerData);
     }
 }

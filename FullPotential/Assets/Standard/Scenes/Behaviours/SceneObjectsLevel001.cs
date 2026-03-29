@@ -82,7 +82,9 @@ namespace FullPotential.Standard.Scenes.Behaviours
             HereAreMyJoiningDetailsServerRpc(chosenSpawnPoint.Position, chosenSpawnPoint.Rotation);
         }
 
+#pragma warning disable CS0618 // Type or member is obsolete
         [ServerRpc(RequireOwnership = false)]
+#pragma warning restore CS0618 // Type or member is obsolete
         private void HereAreMyJoiningDetailsServerRpc(Vector3 position, Quaternion rotation, ServerRpcParams serverRpcParams = default)
         {
             _gameManager.SpawnPlayerNetworkObject(position, rotation, serverRpcParams);

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using FullPotential.Api.Data;
+
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Localization.Enums;

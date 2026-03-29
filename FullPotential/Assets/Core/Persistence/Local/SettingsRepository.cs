@@ -1,14 +1,14 @@
 ﻿using System;
 using FullPotential.Api.Data;
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.GameManagement.Events;
-using FullPotential.Api.Persistence;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Localization;
 using UnityEngine;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 
-namespace FullPotential.Core.Persistence
+namespace FullPotential.Core.Persistence.Local
 {
     public class SettingsRepository : ISettingsRepository
     {

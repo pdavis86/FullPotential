@@ -3,22 +3,26 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data;
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
-using FullPotential.Api.Persistence;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
+
 using Unity.Netcode;
+
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -28,7 +32,7 @@ namespace FullPotential.Core.Player
     public class PlayerInventory : InventoryBase, IPlayerInventory
     {
         //Services
-        private IPersistenceService _persistenceService;
+        private IPlayerManagement _playerManagement;
 
         private PlayerFighter _playerFighter;
 
@@ -43,7 +47,7 @@ namespace FullPotential.Core.Player
 
             _playerFighter = GetComponent<PlayerFighter>();
 
-            _persistenceService = DependenciesContext.Dependencies.GetService<IPersistenceService>();
+            _playerManagement = DependenciesContext.Dependencies.GetService<IPlayerManagement>();
         }
 
         #endregion
@@ -57,7 +61,7 @@ namespace FullPotential.Core.Player
 
             var slotChange = HandleSlotChange(item, slotId);
 
-            _persistenceService.QueueAsapSave(_playerFighter.Username);
+            _playerManagement.QueueAsapSave(_playerFighter.Username);
 
             var invChanges = new InventoryChanges
             {

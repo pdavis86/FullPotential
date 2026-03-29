@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Data
+﻿namespace FullPotential.Api.Obsolete
 {
     [System.Serializable]
     public class InventoryChanges : InventoryData

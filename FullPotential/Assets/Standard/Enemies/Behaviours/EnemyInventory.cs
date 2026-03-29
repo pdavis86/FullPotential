@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Items.Base;
 
@@ -13,7 +15,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
             //Nothing here
         }
 
-        protected override void ApplyEquippedItemChanges(Api.Data.SerializableKeyValuePair<string, string>[] equippedItems)
+        protected override void ApplyEquippedItemChanges(SerializableKeyValuePair<string, string>[] equippedItems)
         {
             //Nothing here
         }

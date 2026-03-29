@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
-using FullPotential.Api.GameManagement;
+
+using FullPotential.Api.Data;
 using FullPotential.Api.GameManagement.JsonModels;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Persistence;
 using FullPotential.Api.Ui.Services;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Networking.Data;
+
 using TMPro;
+
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -41,7 +44,8 @@ namespace FullPotential.Core.GameManagement
         // ReSharper restore UnassignedField.Global
         // ReSharper restore MemberCanBePrivate.Global
 
-        private IManagementService _managementService;
+        private IInstanceManagement _instanceManagement;
+        private IUserManagement _userManagement;
         private ILocalizer _localizer;
         private IUiAssistant _uiAssistant;
         private ISettingsRepository _settingsRepository;
@@ -60,7 +64,8 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _managementService = DependenciesContext.Dependencies.GetService<IManagementService>();
+            _instanceManagement = DependenciesContext.Dependencies.GetService<IInstanceManagement>();
+            _userManagement = DependenciesContext.Dependencies.GetService<IUserManagement>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _uiAssistant = DependenciesContext.Dependencies.GetService<IUiAssistant>();
             _settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
@@ -84,7 +89,7 @@ namespace FullPotential.Core.GameManagement
             _username = _settingsRepository.GetOrLoad().LastSigninUsername;
             _signinUsername.text = _username;
 
-            GameManager.Instance.LocalGameDataStore.PlayerToken = _managementService.SignInWithExistingToken();
+            GameManager.Instance.LocalGameDataStore.PlayerToken = _userManagement.SignInWithExistingToken();
 
             if (string.IsNullOrWhiteSpace(GameManager.Instance.LocalGameDataStore.PlayerToken))
             {
@@ -196,7 +201,7 @@ namespace FullPotential.Core.GameManagement
             _signInContainer.SetActive(false);
             _signingInMessage.SetActive(true);
 
-            StartCoroutine(_managementService.SignInWithPasswordEnumerator(
+            StartCoroutine(_userManagement.SignInWithPasswordEnumerator(
                 _username,
                 _password,
                 AfterSignIn,
@@ -236,7 +241,7 @@ namespace FullPotential.Core.GameManagement
             _username = _password = null;
             _signinUsername.text = _signinPassword.text = null;
 
-            StartCoroutine(_managementService.ConnectionDetailsEnumerator(
+            StartCoroutine(_instanceManagement.ConnectionDetailsEnumerator(
                 AfterConnectionDetails,
                 () => AfterConnectionDetails(null)));
         }
@@ -274,7 +279,7 @@ namespace FullPotential.Core.GameManagement
                 _signinUsername.Select();
             }
 
-            StartCoroutine(_managementService.SignOutEnumerator(
+            StartCoroutine(_userManagement.SignOutEnumerator(
                 () => { },
                 () => { }));
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+
 using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
@@ -8,7 +9,7 @@ using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Persistence;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
@@ -18,8 +19,11 @@ using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.UI.Behaviours;
 using FullPotential.Core.UI.Events;
 using FullPotential.Core.Utilities.UtilityBehaviours;
+
 using TMPro;
+
 using Unity.Netcode;
+
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global

@@ -2,19 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using FullPotential.Api.Data;
+
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.IntegrationTests.TestHelpers;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Networking;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Obsolete.Networking;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Weapons;
+
 using Moq;
+
 using NUnit.Framework;
+
 using Unity.Netcode;
+
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Local
