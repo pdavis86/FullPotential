@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using FullPotential.Api.Data.Models;
 
-using FullPotential.Api.Obsolete;
+using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
 
@@ -9,16 +8,12 @@ namespace FullPotential.Api.Data
 {
     public interface IUserManagement
     {
-        string SignInWithExistingToken();
+        Awaitable<string> SignInWithExistingTokenAsync();
 
-        IEnumerator SignInWithPasswordEnumerator(string username, string password, Action<string> successCallback, Action<bool> failureCallback);
+        Awaitable<SignInResult> SignInWithPasswordAsync(string username, string password);
 
-        IEnumerator SignOutEnumerator(Action successCallback, Action failureCallback);
+        Awaitable<bool> ValidateCredentialsAsync(string username, string token);
 
-        IEnumerator ValidateCredentialsEnumerator(string username, string token, Action successCallback, Action failureCallback);
-
-        PlayerData Load(string username, bool reduced);
-
-        void Save(PlayerData playerData);
+        Awaitable<bool> SignOutAsync();
     }
 }

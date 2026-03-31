@@ -1,41 +1,41 @@
 ﻿using System;
-using System.Collections;
+using System.Threading.Tasks;
 
 using FullPotential.Api.Data;
-using FullPotential.Api.Obsolete;
+using FullPotential.Api.Data.Models;
+
+using Newtonsoft.Json.Linq;
+
+using UnityEngine;
 
 namespace FullPotential.Core.Persistence.Local
 {
     public class UserManagement : IUserManagement
     {
-        public PlayerData Load(string username, bool reduced)
+        private const string dummyToken = "ThisIsNotARealToken";
+
+        public async Awaitable<string> SignInWithExistingTokenAsync()
         {
-            throw new NotImplementedException();
+            await Task.Yield();
+            return dummyToken;
         }
 
-        public void Save(PlayerData playerData)
+        public async Awaitable<SignInResult> SignInWithPasswordAsync(string username, string password)
         {
-            throw new NotImplementedException();
+            await Task.Yield();
+            return new SignInResult { Token = dummyToken };
         }
 
-        public string SignInWithExistingToken()
+        public async Awaitable<bool> ValidateCredentialsAsync(string username, string token)
         {
-            throw new NotImplementedException();
+            await Task.Yield();
+            return true;
         }
 
-        public IEnumerator SignInWithPasswordEnumerator(string username, string password, Action<string> successCallback, Action<bool> failureCallback)
+        public async Awaitable<bool> SignOutAsync()
         {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerator SignOutEnumerator(Action successCallback, Action failureCallback)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerator ValidateCredentialsEnumerator(string username, string token, Action successCallback, Action failureCallback)
-        {
-            throw new NotImplementedException();
+            await Task.Yield();
+            return true;
         }
     }
 }

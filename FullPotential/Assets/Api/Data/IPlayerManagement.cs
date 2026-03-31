@@ -2,13 +2,18 @@
 
 using FullPotential.Api.Obsolete;
 
+using UnityEngine;
+
 namespace FullPotential.Api.Data
 {
     public interface IPlayerManagement
     {
-        PlayerData Load(string username, bool reduced);
-        void QueueAsapSave(string username);
-        void SaveBatchPlayerData(Dictionary<ulong, string> clientIdToUsername, bool allData);
-        void SavePlayerData(PlayerData playerData);
+        Awaitable<PlayerData> LoadPlayerDataAsync(string username, bool reduced);
+
+        Awaitable SavePlayerDataAsapAsync(string username);
+
+        Awaitable SavePlayerDataImmediatelyAsync(PlayerData playerData);
+
+        Awaitable SavePlayerDataBatchAsync(Dictionary<ulong, string> clientIdToUsernameMapping, bool allData);
     }
 }

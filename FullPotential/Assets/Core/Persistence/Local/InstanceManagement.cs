@@ -1,16 +1,25 @@
-﻿using System;
-using System.Collections;
+﻿using System.Threading.Tasks;
 
-using FullPotential.Api.GameManagement.JsonModels;
 using FullPotential.Api.Data;
+using FullPotential.Api.GameManagement.Enums;
+using FullPotential.Api.GameManagement.JsonModels;
+
+using UnityEngine;
 
 namespace FullPotential.Core.Persistence.Local
 {
     public class InstanceManagement : IInstanceManagement
     {
-        public IEnumerator ConnectionDetailsEnumerator(Action<ConnectionDetails> successCallback, Action failureCallback)
+        public async Awaitable<ConnectionDetails> GetConnectionDetailsAsync()
         {
-            throw new NotImplementedException();
+            await Task.Yield();
+
+            return new ConnectionDetails
+            {
+                Address = "127.0.0.1",
+                Port = 7180,
+                Status = InstanceState.Available
+            };
         }
     }
 }

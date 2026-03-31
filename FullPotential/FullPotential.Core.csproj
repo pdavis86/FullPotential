@@ -61,23 +61,23 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.4.0f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Core\Persistence\Https\HttpsPersistenceBase.cs" />
-    <Compile Include="Assets\Core\Persistence\Https\UserManagement.cs" />
-    <Compile Include="Assets\Core\Persistence\Local\UserManagement.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\TextMeshProLocalizer.cs" />
     <Compile Include="Assets\Core\Registry\Resources\Stamina.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DontDestroy.cs" />
+    <Compile Include="Assets\Core\Persistence\Local\UserManagement.cs" />
     <Compile Include="Assets\Core\GameManagement\Data\ServerGameData.cs" />
     <Compile Include="Assets\Core\UI\Components\EquippedSummary.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Push.cs" />
     <Compile Include="Assets\Core\GameManagement\UserInterface.cs" />
     <Compile Include="Assets\Core\Registry\SpecialSlots\RightHand.cs" />
+    <Compile Include="Assets\Core\Persistence\Local\PlayerManagement.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltip.cs" />
     <Compile Include="Assets\Core\Player\PlayerFighter.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\AdminShopUi.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Exhaust.cs" />
     <Compile Include="Assets\Core\Networking\Data\ConnectionPayload.cs" />
+    <Compile Include="Assets\Core\Persistence\Https\UserManagement.cs" />
     <Compile Include="Assets\Core\Unity\Services\ShaderUtilities.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DebuggingActiveState.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\MainMenuUi.cs" />
@@ -108,6 +108,7 @@
     <Compile Include="Assets\Core\UI\Components\NameAndToggle.cs" />
     <Compile Include="Assets\Core\UI\Components\SlideOutAlert.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiCraftingTab.cs" />
+    <Compile Include="Assets\Core\Persistence\Https\PlayerManagement.cs" />
     <Compile Include="Assets\Core\UI\Components\InventoryItemsList.cs" />
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsOffline.cs" />
     <Compile Include="Assets\Core\Registry\Events\LivingEntityDiedEventHandler.cs" />
@@ -117,7 +118,6 @@
     <Compile Include="Assets\Core\Gameplay\Combat\MaintainDistance.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltips.cs" />
     <Compile Include="Assets\Core\Player\PlayerBehaviour.cs" />
-    <Compile Include="Assets\Core\Persistence\Local\PlayerManagement.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\DrawingPadUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\Hud.cs" />
@@ -126,12 +126,12 @@
     <Compile Include="Assets\Core\Registry\Effects\Hurt.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiSlot.cs" />
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsStartup.cs" />
-    <Compile Include="Assets\Core\Persistence\Https\PlayerManagement.cs" />
     <Compile Include="Assets\Core\Gameplay\Events\EventManager.cs" />
     <Compile Include="Assets\Core\Localization\Data\Localization.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectsUi.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DestroyOnTriggerEnter.cs" />
     <Compile Include="Assets\Core\Persistence\Local\InstanceManagement.cs" />
+    <Compile Include="Assets\Core\Persistence\Https\HttpsPersistenceBase.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\DebuggingUi.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\NetworkStats.cs" />
     <Compile Include="Assets\Core\UI\Components\BarSlider.cs" />
