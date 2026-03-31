@@ -139,7 +139,7 @@ namespace FullPotential.Core.GameManagement
         {
             if (approvalRequest.ClientNetworkId == NetworkManager.Singleton.LocalClientId)
             {
-                ServerGameDataStore.ClientIdToUsername[0] = _settingsRepository.GetOrLoad().LastSigninUsername;
+                ServerGameDataStore.ClientIdToUsername[approvalRequest.ClientNetworkId] = _settingsRepository.GetOrLoad().LastSigninUsername;
                 approvalResponse.Approved = true;
                 return;
             }
@@ -162,7 +162,7 @@ namespace FullPotential.Core.GameManagement
                 if (NetworkManager.Singleton.ConnectedClients.ContainsKey(originalClientId))
                 {
                     Debug.LogWarning($"User {playerUsername} is already connected");
-                    
+
                     approvalResponse.Reason = _localizer.Translate("ui.connect.alreadyconnected");
 
                     return;
@@ -185,7 +185,9 @@ namespace FullPotential.Core.GameManagement
             approvalResponse.Approved = true;
             ServerGameDataStore.ClientIdToUsername[approvalRequest.ClientNetworkId] = playerUsername;
 
-            DisconnectUserIfTokenInvalid(approvalRequest.ClientNetworkId, playerUsername, connectionPayload.Token);
+            // todo: is Fire-and-forget OK?
+            DisconnectUserIfTokenInvalidAsync(approvalRequest.ClientNetworkId, playerUsername, connectionPayload.Token)
+                .GetAwaiter();
         }
 
         private void HandleAfterDisconnectedFromServer(ulong clientId)
@@ -257,7 +259,8 @@ namespace FullPotential.Core.GameManagement
 
         private void SavePlayerData(bool allData = false)
         {
-            _playerManagement.SaveBatchPlayerData(ServerGameDataStore.ClientIdToUsername, allData);
+            // todo: is Fire-and-forget OK?
+            _playerManagement.SavePlayerDataBatchAsync(ServerGameDataStore.ClientIdToUsername, allData);
         }
 
         public void CheckIsAdmin()
@@ -283,13 +286,12 @@ namespace FullPotential.Core.GameManagement
             eventManager.Register(InventoryBase.EventIdSlotChange, InventoryBase.DefaultHandlerForSlotChangeEvent);
         }
 
-        private void DisconnectUserIfTokenInvalid(ulong clientId, string username, string token)
+        private async Awaitable DisconnectUserIfTokenInvalidAsync(ulong clientId, string username, string token)
         {
-            StartCoroutine(_userManagement.ValidateCredentialsEnumerator(
-                username,
-                token,
-                () => { /*Do nothing*/ },
-                () => { NetworkManager.Singleton.DisconnectClient(clientId, "Invalid token"); }));
+            if (!(await _userManagement.ValidateCredentialsAsync(username, token)))
+            {
+                NetworkManager.Singleton.DisconnectClient(clientId, "Invalid token");
+            }
         }
 
         #region Methods for Mods
@@ -362,6 +364,5 @@ namespace FullPotential.Core.GameManagement
         }
 
         #endregion
-
     }
 }

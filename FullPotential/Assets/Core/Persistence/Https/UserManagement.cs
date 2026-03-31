@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Threading.Tasks;
 
 using FullPotential.Api.Data;
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.GameManagement.JsonModels;
-using FullPotential.Api.Obsolete;
 
 using UnityEngine;
 
@@ -18,23 +17,15 @@ namespace FullPotential.Core.Persistence.Https
         {
         }
 
-        public PlayerData Load(string username, bool reduced)
+        public async Awaitable<string> SignInWithExistingTokenAsync()
         {
-            throw new NotImplementedException();
-        }
+            await Task.Yield();
 
-        public void Save(PlayerData playerData)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string SignInWithExistingToken()
-        {
             // todo: check there is a token
             return Token;
         }
 
-        public IEnumerator SignInWithPasswordEnumerator(string username, string password, Action<string> successCallback, Action<bool> failureCallback)
+        public async Awaitable<SignInResult> SignInWithPasswordAsync(string username, string password)
         {
             var data = JsonUtility.ToJson(new Credentials
             {
@@ -44,21 +35,19 @@ namespace FullPotential.Core.Persistence.Https
 
             using (var request = UnityWebRequest.Post(BaseAddress + "User/SignInWithPassword", data, JsonContentType))
             {
-                yield return request.SendWebRequest();
+                await request.SendWebRequest();
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
                     LogFailure(request);
-                    failureCallback(false);
-                    yield break;
+                    return new SignInResult();
                 }
 
                 var response = JsonUtility.FromJson<GenericResponse>(request.downloadHandler.text);
 
                 if (!response.IsSuccess)
                 {
-                    failureCallback(true);
-                    yield break;
+                    return new SignInResult { IsInvalid = true };
                 }
 
                 var token = response.Result;
@@ -66,31 +55,11 @@ namespace FullPotential.Core.Persistence.Https
                 Username = username;
                 Token = token;
 
-                successCallback(token);
+                return new SignInResult { Token = token };
             }
         }
 
-        public IEnumerator SignOutEnumerator(Action successCallback, Action failureCallback)
-        {
-            Username = null;
-            Token = null;
-
-            using (var request = UnityWebRequest.Get(BaseAddress + "User/SignOut"))
-            {
-                yield return request.SendWebRequest();
-
-                if (request.result != UnityWebRequest.Result.Success)
-                {
-                    LogFailure(request);
-                    failureCallback();
-                    yield break;
-                }
-
-                successCallback();
-            }
-        }
-
-        public IEnumerator ValidateCredentialsEnumerator(string username, string token, Action successCallback, Action failureCallback)
+        public async Awaitable<bool> ValidateCredentialsAsync(string username, string token)
         {
             var data = JsonUtility.ToJson(new Credentials
             {
@@ -100,26 +69,37 @@ namespace FullPotential.Core.Persistence.Https
 
             using (var request = UnityWebRequest.Post(BaseAddress + "User/IsTokenValid", data, JsonContentType))
             {
-                yield return request.SendWebRequest();
+                await request.SendWebRequest();
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
                     LogFailure(request);
-                    failureCallback();
-                    yield break;
+                    return false;
                 }
 
                 var response = JsonUtility.FromJson<GenericResponse>(request.downloadHandler.text);
 
-                if (response.IsSuccess)
+                return response.IsSuccess;
+            }
+        }
+
+        public async Awaitable<bool> SignOutAsync()
+        {
+            Username = null;
+            Token = null;
+
+            using (var request = UnityWebRequest.Get(BaseAddress + "User/SignOut"))
+            {
+                await request.SendWebRequest();
+
+                if (request.result != UnityWebRequest.Result.Success)
                 {
-                    successCallback();
-                }
-                else
-                {
-                    failureCallback();
+                    LogFailure(request);
+                    return false;
                 }
             }
+
+            return true;
         }
     }
 }

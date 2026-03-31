@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using FullPotential.Api.GameManagement.JsonModels;
 
-using FullPotential.Api.GameManagement.JsonModels;
+using UnityEngine;
 
 namespace FullPotential.Api.Data
 {
     public interface IInstanceManagement
     {
-        IEnumerator ConnectionDetailsEnumerator(Action<ConnectionDetails> successCallback, Action failureCallback);
+        Awaitable<ConnectionDetails> GetConnectionDetailsAsync();
     }
 }

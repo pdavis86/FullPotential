@@ -17,12 +17,74 @@ namespace FullPotential.Core.Persistence.Local
 {
     public class PlayerManagement : IPlayerManagement
     {
+        private readonly bool _isDebugBuild = Debug.isDebugBuild;
+        private readonly string _persistentDataPath = Application.persistentDataPath;
         private readonly List<string> _asapSaveUsernames = new List<string>();
 
         private bool _isSaving;
 
-        public void SaveBatchPlayerData(Dictionary<ulong, string> clientIdToUsernameMapping, bool allData = false)
+        public async Awaitable<PlayerData> LoadPlayerDataAsync(string username, bool reduced)
         {
+            await Task.Yield();
+
+            var filePath = GetPlayerSavePath(username);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return new PlayerData
+                {
+                    Username = username,
+                    Settings = new CharacterSettings(),
+                    Resources = Array.Empty<SerializableKeyValuePair<string, int>>(),
+                    Inventory = new InventoryData()
+                };
+            }
+
+            var loadJson = System.IO.File.ReadAllText(filePath);
+            var playerData = JsonUtility.FromJson<PlayerData>(loadJson);
+
+            if (reduced)
+            {
+                StripExtraData(playerData);
+            }
+
+            return playerData;
+        }
+
+        public async Awaitable SavePlayerDataAsapAsync(string username)
+        {
+            await Task.Yield();
+
+            if (!_asapSaveUsernames.Contains(username))
+            {
+                _asapSaveUsernames.Add(username);
+            }
+        }
+
+        public async Awaitable SavePlayerDataImmediatelyAsync(PlayerData playerData)
+        {
+            await Task.Yield();
+
+            if (!NetworkManager.Singleton.IsServer)
+            {
+                Debug.LogError($"Tried to save player data for '{playerData.Username}' when not on the server");
+                return;
+            }
+
+            if (!playerData.InventoryLoadedSuccessfully)
+            {
+                Debug.LogWarning($"Not saving player data for '{playerData.Username}' because the load failed");
+                return;
+            }
+
+            Debug.Log($"Saving player data for {playerData.Username}");
+            Save(playerData);
+        }
+
+        public async Awaitable SavePlayerDataBatchAsync(Dictionary<ulong, string> clientIdToUsernameMapping, bool allData)
+        {
+            await Task.Yield();
+
             if (!NetworkManager.Singleton.IsServer)
             {
                 Debug.LogWarning("Tried saving when not on the server");
@@ -61,10 +123,8 @@ namespace FullPotential.Core.Persistence.Local
 
             try
             {
-                var tasks = playerDataCollection.Select(x => Task.Run(() => SavePlayerData(x)));
-                Task.Run(async () => await Task.WhenAll(tasks))
-                    .GetAwaiter()
-                    .GetResult();
+                var tasks = playerDataCollection.Select(x => Task.Run(() => SavePlayerDataImmediately(x)));
+                await Task.WhenAll(tasks);
             }
             finally
             {
@@ -72,15 +132,7 @@ namespace FullPotential.Core.Persistence.Local
             }
         }
 
-        public void QueueAsapSave(string username)
-        {
-            if (!_asapSaveUsernames.Contains(username))
-            {
-                _asapSaveUsernames.Add(username);
-            }
-        }
-
-        public void SavePlayerData(PlayerData playerData)
+        private void SavePlayerDataImmediately(PlayerData playerData)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
@@ -95,45 +147,18 @@ namespace FullPotential.Core.Persistence.Local
 
             Debug.Log($"Saving player data for {playerData.Username}");
 
-            //_userRepository.Save(playerData);
+            Save(playerData);
 
             _asapSaveUsernames.Remove(playerData.Username);
         }
 
-        private readonly bool _isDebugBuild = Debug.isDebugBuild;
-        private readonly string _persistentDataPath = Application.persistentDataPath;
-
-        public PlayerData Load(string username, bool reduced)
-        {
-            var filePath = GetPlayerSavePath(username);
-
-            if (!System.IO.File.Exists(filePath))
-            {
-                return new PlayerData
-                {
-                    Username = username,
-                    Settings = new CharacterSettings(),
-                    Resources = Array.Empty<SerializableKeyValuePair<string, int>>(),
-                    Inventory = new InventoryData()
-                };
-            }
-
-            var loadJson = System.IO.File.ReadAllText(filePath);
-            var playerData = JsonUtility.FromJson<PlayerData>(loadJson);
-
-            if (reduced)
-            {
-                StripExtraData(playerData);
-            }
-
-            return playerData;
-        }
-
-        public void Save(PlayerData playerData)
+        private void Save(PlayerData playerData)
         {
             var prettyPrint = _isDebugBuild;
             var saveJson = JsonUtility.ToJson(playerData, prettyPrint);
             System.IO.File.WriteAllText(GetPlayerSavePath(playerData.Username), saveJson);
+
+            _asapSaveUsernames.Remove(playerData.Username);
         }
 
         private string GetPlayerSavePath(string username)

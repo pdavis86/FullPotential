@@ -61,7 +61,8 @@ namespace FullPotential.Core.Player
 
             var slotChange = HandleSlotChange(item, slotId);
 
-            _playerManagement.QueueAsapSave(_playerFighter.Username);
+            // todo: Is Fire-and-forget OK?
+            _playerManagement.SavePlayerDataAsapAsync(_playerFighter.Username);
 
             var invChanges = new InventoryChanges
             {

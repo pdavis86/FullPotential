@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data;
@@ -210,7 +211,8 @@ namespace FullPotential.Core.Player
         {
             if (IsServer)
             {
-                _playerManagement.SavePlayerData(GetPlayerSaveData());
+                // todo: Is Fire-and-forget OK?
+                _playerManagement.SavePlayerDataImmediatelyAsync(GetPlayerSaveData());
             }
         }
 
@@ -257,7 +259,8 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         private void UpdatePlayerSettingsServerRpc(CharacterSettings characterSettings)
         {
-            _playerManagement.QueueAsapSave(Username);
+            // todo: Is Fire-and-forget OK?
+            _playerManagement.SavePlayerDataAsapAsync(Username);
 
             _characterSettings = characterSettings;
 
@@ -461,7 +464,8 @@ namespace FullPotential.Core.Player
 
         private void GetAndLoadPlayerData(bool reduced, ulong? sendToClientId)
         {
-            var playerData = _playerManagement.Load(Username, reduced);
+            // todo: This is NOT async!
+            var playerData = Test(() => _playerManagement.LoadPlayerDataAsync(Username, reduced));
 
             if (sendToClientId.HasValue)
             {
@@ -471,6 +475,7 @@ namespace FullPotential.Core.Player
                     return;
                 }
 
+                // todo: replace all Coroutines
                 StartCoroutine(LoadFromPlayerDataCoroutine(playerData, sendToClientId.Value));
             }
             else
@@ -483,6 +488,11 @@ namespace FullPotential.Core.Player
                 var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, OwnerClientId);
                 ShowHudAlertClientRpc(string.Format(msg, Username), nearbyClients);
             }
+        }
+
+        private T Test<T>(Func<Awaitable<T>> f)
+        {
+            return Task.Run(async () => await f()).GetAwaiter().GetResult();
         }
 
         //todo: Remove? Need this to get over the key not found exception caused by too many RPC calls with large payloads

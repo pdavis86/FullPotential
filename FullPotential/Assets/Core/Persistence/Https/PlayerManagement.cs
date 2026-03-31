@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using FullPotential.Api.Data;
 using FullPotential.Api.Obsolete;
 
+using UnityEngine;
+
 namespace FullPotential.Core.Persistence.Https
 {
     public class PlayerManagement : HttpsPersistenceBase, IPlayerManagement
@@ -13,22 +15,22 @@ namespace FullPotential.Core.Persistence.Https
         {
         }
 
-        public PlayerData Load(string username, bool reduced)
+        public Awaitable<PlayerData> LoadPlayerDataAsync(string username, bool reduced)
         {
             throw new NotImplementedException();
         }
 
-        public void QueueAsapSave(string username)
+        public Awaitable SavePlayerDataAsapAsync(string username)
         {
             throw new NotImplementedException();
         }
 
-        public void SaveBatchPlayerData(Dictionary<ulong, string> clientIdToUsername, bool allData)
+        public Awaitable SavePlayerDataBatchAsync(Dictionary<ulong, string> clientIdToUsernameMapping, bool allData)
         {
             throw new NotImplementedException();
         }
 
-        public void SavePlayerData(PlayerData playerData)
+        public Awaitable SavePlayerDataImmediatelyAsync(PlayerData playerData)
         {
             throw new NotImplementedException();
         }

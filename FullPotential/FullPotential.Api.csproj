@@ -70,6 +70,7 @@
     <Compile Include="Assets\Api\Registry\Gear\ISpecialGearVisuals.cs" />
     <Compile Include="Assets\Api\Obsolete\PlayerData.cs" />
     <Compile Include="Assets\Api\Items\Types\Consumer.cs" />
+    <Compile Include="Assets\Api\Data\IInstanceManagement.cs" />
     <Compile Include="Assets\Api\Unity\Constants\ShaderRenderMode.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\EventArgs\ResourceValueChangedEventArgs.cs" />
     <Compile Include="Assets\Api\GameManagement\GameObjectNames.cs" />
@@ -77,8 +78,8 @@
     <Compile Include="Assets\Api\Gameplay\Effects\MovementDirection.cs" />
     <Compile Include="Assets\Api\GameManagement\JsonModels\Credentials.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingBehaviour.cs" />
+    <Compile Include="Assets\Api\Data\IUserManagement.cs" />
     <Compile Include="Assets\Api\Items\Base\CombatItemBase.cs" />
-    <Compile Include="Assets\Api\Data\Models\GameSettings.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\CombatResult.cs" />
     <Compile Include="Assets\Api\Ui\IUserInterface.cs" />
     <Compile Include="Assets\Api\Gameplay\Drawing\IDrawingService.cs" />
@@ -88,8 +89,8 @@
     <Compile Include="Assets\Api\Items\Types\SpecialGear.cs" />
     <Compile Include="Assets\Api\Registry\ILootType.cs" />
     <Compile Include="Assets\Api\Items\IResourceConsumer.cs" />
-    <Compile Include="Assets\Api\Data\Models\SerializableKeyValuePair.cs" />
     <Compile Include="Assets\Api\Modding\IModHelper.cs" />
+    <Compile Include="Assets\Api\Utilities\DebuggingTools.cs" />
     <Compile Include="Assets\Api\Unity\Services\IUnityHelperUtilities.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemBase.cs" />
     <Compile Include="Assets\Api\Registry\Gear\ISpecialGearType.cs" />
@@ -98,16 +99,15 @@
     <Compile Include="Assets\Api\Items\Types\Armor.cs" />
     <Compile Include="Assets\Api\Registry\Weapons\IWeaponVisuals.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IAccessoryVisuals.cs" />
-    <Compile Include="Assets\Api\Data\IUserManagement.cs" />
+    <Compile Include="Assets\Api\Data\Models\SerializableKeyValuePair.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\InventoryBase.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\IEventManager.cs" />
-    <Compile Include="Assets\Api\Data\IInstanceManagement.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\ViableTarget.cs" />
+    <Compile Include="Assets\Api\Data\Models\SignInResult.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\FighterBase.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\EventArgs\ReloadEventArgs.cs" />
     <Compile Include="Assets\Api\Registry\IRegisterableType.cs" />
     <Compile Include="Assets\Api\Items\IHasCharge.cs" />
-    <Compile Include="Assets\Api\Data\IPlayerManagement.cs" />
     <Compile Include="Assets\Api\Obsolete\Networking\IFragmentedMessageReconstructorFactory.cs" />
     <Compile Include="Assets\Api\Registry\IItemVisuals.cs" />
     <Compile Include="Assets\Api\Registry\ITypeRegistry.cs" />
@@ -139,13 +139,14 @@
     <Compile Include="Assets\Api\Gameplay\Events\IEventHandlerArgs.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesCollection.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\LivingEntityState.cs" />
-    <Compile Include="Assets\Api\Data\ISettingsRepository.cs" />
+    <Compile Include="Assets\Api\Data\IPlayerManagement.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\EventArgs\ShotFiredEventArgs.cs" />
     <Compile Include="Assets\Api\Registry\Weapons\IWeaponType.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\DictionaryExtensions.cs" />
     <Compile Include="Assets\Api\Registry\Effects\ICustomEffectType.cs" />
     <Compile Include="Assets\Api\Obsolete\Networking\Data\FragmentedMessage.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IArmorVisuals.cs" />
+    <Compile Include="Assets\Api\Data\ISettingsRepository.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\ColliderExtensions.cs" />
     <Compile Include="Assets\Api\Obsolete\Networking\FragmentedMessageReconstructor.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\ArrayExtensions.cs" />
@@ -199,6 +200,7 @@
     <Compile Include="Assets\Api\Utilities\Extensions\EnumerableExtensions.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\HandStatus.cs" />
     <Compile Include="Assets\Api\Registry\IHasPrefab.cs" />
+    <Compile Include="Assets\Api\Data\Models\GameSettings.cs" />
     <Compile Include="Assets\Api\CoreTypeIds\EffectTypeIds.cs" />
     <Compile Include="Assets\Api\Obsolete\AttributeAffected.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\NetworkLocation.cs" />
@@ -1322,7 +1324,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Assets\Api\Persistence\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

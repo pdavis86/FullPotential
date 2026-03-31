@@ -3,7 +3,6 @@ using System.Collections;
 using System.Linq;
 
 using FullPotential.Api.Data;
-using FullPotential.Api.GameManagement.JsonModels;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Ui.Services;
@@ -80,16 +79,16 @@ namespace FullPotential.Core.GameManagement
 
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
 
-            _signinPassword.onSubmit.AddListener(_ => SignIn());
+            _signinPassword.onSubmit.AddListener(async _ => await SignInAsync());
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void OnEnable()
+        private async Awaitable OnEnable()
         {
             _username = _settingsRepository.GetOrLoad().LastSigninUsername;
             _signinUsername.text = _username;
 
-            GameManager.Instance.LocalGameDataStore.PlayerToken = _userManagement.SignInWithExistingToken();
+            GameManager.Instance.LocalGameDataStore.PlayerToken = await _userManagement.SignInWithExistingTokenAsync();
 
             if (string.IsNullOrWhiteSpace(GameManager.Instance.LocalGameDataStore.PlayerToken))
             {
@@ -102,7 +101,7 @@ namespace FullPotential.Core.GameManagement
             }
             else
             {
-                AfterSignIn(GameManager.Instance.LocalGameDataStore.PlayerToken);
+                await HandleSignInResult(GameManager.Instance.LocalGameDataStore.PlayerToken);
             }
 
             ShowAnyError();
@@ -189,7 +188,7 @@ namespace FullPotential.Core.GameManagement
         #endregion
 
         // ReSharper disable once MemberCanBePrivate.Global
-        public void SignIn()
+        public async Awaitable SignInAsync()
         {
             if (_username.IsNullOrWhiteSpace())
             {
@@ -201,30 +200,22 @@ namespace FullPotential.Core.GameManagement
             _signInContainer.SetActive(false);
             _signingInMessage.SetActive(true);
 
-            StartCoroutine(_userManagement.SignInWithPasswordEnumerator(
-                _username,
-                _password,
-                AfterSignIn,
-                AfterSignInFailed));
+            var signInResult = await _userManagement.SignInWithPasswordAsync(_username, _password);
+            await HandleSignInResult(signInResult.Token, signInResult.IsInvalid);
         }
 
-        private void AfterSignInFailed(bool isInvalid)
-        {
-            _signingInMessage.SetActive(false);
-
-            _signinError.text = isInvalid
-                ? _localizer.Translate("ui.signin.invalid")
-                : _localizer.Translate("ui.signin.error");
-
-            _signinError.gameObject.SetActive(true);
-            _signInContainer.SetActive(true);
-        }
-
-        private void AfterSignIn(string token)
+        private async Awaitable HandleSignInResult(string token, bool isInvalid = false)
         {
             if (string.IsNullOrWhiteSpace(token))
             {
-                AfterSignInFailed(true);
+                _signingInMessage.SetActive(false);
+
+                _signinError.text = isInvalid
+                    ? _localizer.Translate("ui.signin.invalid")
+                    : _localizer.Translate("ui.signin.error");
+
+                _signinError.gameObject.SetActive(true);
+                _signInContainer.SetActive(true);
             }
 
             // todo: check token validity
@@ -241,13 +232,8 @@ namespace FullPotential.Core.GameManagement
             _username = _password = null;
             _signinUsername.text = _signinPassword.text = null;
 
-            StartCoroutine(_instanceManagement.ConnectionDetailsEnumerator(
-                AfterConnectionDetails,
-                () => AfterConnectionDetails(null)));
-        }
+            var connectionDetails = await _instanceManagement.GetConnectionDetailsAsync();
 
-        private void AfterConnectionDetails(ConnectionDetails connectionDetails)
-        {
             _signingInMessage.SetActive(false);
 
             if (connectionDetails != null)
@@ -266,7 +252,7 @@ namespace FullPotential.Core.GameManagement
         }
 
         // ReSharper disable once UnusedMember.Global
-        public void SignOut()
+        public async Awaitable SignOut()
         {
             GameManager.Instance.LocalGameDataStore.PlayerToken = null;
 
@@ -279,9 +265,7 @@ namespace FullPotential.Core.GameManagement
                 _signinUsername.Select();
             }
 
-            StartCoroutine(_userManagement.SignOutEnumerator(
-                () => { },
-                () => { }));
+            await _userManagement.SignOutAsync();
         }
 
         private void ShowAnyError()

@@ -28,8 +28,8 @@ namespace FullPotential.Core.GameManagement
 
             var settings = settingsRepository.GetOrLoad();
 
-            // todo: register the right kind
-            if (string.IsNullOrWhiteSpace(settings.ManagementApiAddress))
+            // todo: invert this
+            if (!string.IsNullOrWhiteSpace(settings.ManagementApiAddress))
             {
                 DependenciesContext.Dependencies.Register<Api.Data.IInstanceManagement, Persistence.Local.InstanceManagement>();
                 DependenciesContext.Dependencies.Register<Api.Data.IPlayerManagement, Persistence.Local.PlayerManagement>();
@@ -38,7 +38,8 @@ namespace FullPotential.Core.GameManagement
             else
             {
                 DependenciesContext.Dependencies.Register<Api.Data.IInstanceManagement, Persistence.Https.InstanceManagement>();
-                DependenciesContext.Dependencies.Register<Api.Data.IPlayerManagement, Persistence.Https.PlayerManagement>();
+                // todo: DependenciesContext.Dependencies.Register<Api.Data.IPlayerManagement, Persistence.Https.PlayerManagement>();
+                DependenciesContext.Dependencies.Register<Api.Data.IPlayerManagement, Persistence.Local.PlayerManagement>(); // todo: remove
                 DependenciesContext.Dependencies.Register<Api.Data.IUserManagement, Persistence.Https.UserManagement>();
             }
         }

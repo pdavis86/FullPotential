@@ -1,8 +1,5 @@
 ﻿namespace FullPotential.Core.Persistence.Https
 {
-    using System;
-    using System.Collections;
-
     using FullPotential.Api.Data;
     using FullPotential.Api.GameManagement.JsonModels;
 
@@ -18,23 +15,22 @@
         {
         }
 
-        public IEnumerator ConnectionDetailsEnumerator(Action<ConnectionDetails> successCallback, Action failureCallback)
+        public async Awaitable<ConnectionDetails> GetConnectionDetailsAsync()
         {
             using (var request = UnityWebRequest.Get(BaseAddress + "Instance/GetConnectionDetails"))
             {
                 SetAuthenticationHeader(request);
 
-                yield return request.SendWebRequest();
+                await request.SendWebRequest();
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
                     LogFailure(request);
-                    failureCallback();
-                    yield break;
+                    return null;
                 }
 
                 var result = JsonUtility.FromJson<ConnectionDetails>(request.downloadHandler.text);
-                successCallback(result);
+                return result;
             }
         }
     }
