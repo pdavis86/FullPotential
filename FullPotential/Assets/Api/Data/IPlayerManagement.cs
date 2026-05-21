@@ -1,19 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Obsolete;
-
-using UnityEngine;
+using FullPotential.Api.Data.Models;
 
 namespace FullPotential.Api.Data
 {
     public interface IPlayerManagement
     {
-        Awaitable<PlayerData> LoadPlayerDataAsync(string username, bool reduced);
+        UniTask<PlayerData> GetPlayerDataAsync(string username);
 
-        Awaitable SavePlayerDataAsapAsync(string username);
+        UniTask SavePlayerDataAsync(PlayerData playerData);
 
-        Awaitable SavePlayerDataImmediatelyAsync(PlayerData playerData);
+        UniTask<InventoryData> GetInventoryDataAsync(string username, bool reduced);
 
-        Awaitable SavePlayerDataBatchAsync(Dictionary<ulong, string> clientIdToUsernameMapping, bool allData);
+        UniTask SaveInventoryChangesAsync(InventoryChanges inventoryChanges);
     }
 }

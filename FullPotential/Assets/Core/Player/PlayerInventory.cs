@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data;
@@ -13,7 +14,6 @@ using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
-using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
@@ -29,14 +29,13 @@ using UnityEngine;
 
 namespace FullPotential.Core.Player
 {
+    // todo: zzz v0.6 - aim to make this class redundant
     public class PlayerInventory : InventoryBase, IPlayerInventory
     {
-        //Services
+        private ISaveManager _saveManager;
         private IPlayerManagement _playerManagement;
 
         private PlayerFighter _playerFighter;
-
-        private readonly Dictionary<string, string> _itemIdToShapeMapping = new Dictionary<string, string>();
 
         #region Unity Events Handlers
 
@@ -47,6 +46,7 @@ namespace FullPotential.Core.Player
 
             _playerFighter = GetComponent<PlayerFighter>();
 
+            _saveManager = DependenciesContext.Dependencies.GetService<ISaveManager>();
             _playerManagement = DependenciesContext.Dependencies.GetService<IPlayerManagement>();
         }
 
@@ -61,31 +61,31 @@ namespace FullPotential.Core.Player
 
             var slotChange = HandleSlotChange(item, slotId);
 
-            // todo: Is Fire-and-forget OK?
-            _playerManagement.SavePlayerDataAsapAsync(_playerFighter.Username);
+            MarkAsDirty();
 
-            var invChanges = new InventoryChanges
-            {
-                EquippedItems = _equippedItems
-                    .Where(x => slotChange.SlotsToSend.Contains(x.Key))
-                    .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value.Item?.Id))
-                    .ToArray()
-            };
+            //var invChanges = new InventoryChanges
+            //{
+            //    EquippedItems = _equippedItems
+            //        .Where(x => slotChange.SlotsToSend.Contains(x.Key))
+            //        .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value.Item?.Id))
+            //        .ToArray()
+            //};
 
-            if (slotChange.WasEquipped)
-            {
-                PopulateInventoryChangesWithItem(invChanges, item);
-            }
+            //if (slotChange.WasEquipped)
+            //{
+            //    PopulateInventoryChangesWithItem(invChanges, item);
+            //}
 
-            var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-            SendInventoryChangesToClients(invChanges, nearbyClients);
+            //var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
+            // todo: HandleInventoryChangeClientRpc(invChanges, nearbyClients);
         }
 
         #endregion
 
-        private IEnumerator ResetEquipmentUi()
+        // todo: zzz v0.6 - This should be an event
+        private async UniTask ResetEquipmentUiAsync()
         {
-            yield return new WaitForSeconds(0.1f);
+            await UniTask.WaitForSeconds(0.1f);
 
             var equipmentUi = GameManager.Instance.UserInterface.GetCharacterMenuUiEquipmentTab();
 
@@ -127,9 +127,10 @@ namespace FullPotential.Core.Player
                 .OrderBy(x => x.Name);
         }
 
-
+        // todo: zzz v0.6 - move LoadInventory down into base
         public void LoadInventory(InventoryData inventoryData)
         {
+            _username = inventoryData.Username;
             _maxItemCount = inventoryData.MaxItems > 0
                 ? inventoryData.MaxItems
                 : 30;
@@ -179,6 +180,8 @@ namespace FullPotential.Core.Player
 
         protected override void SetEquippedItem(string itemId, string slotId)
         {
+            MarkAsDirty();
+
             var item = itemId.IsNullOrWhiteSpace() ? null : _items[itemId];
 
             if (_equippedItems.TryGetValue(slotId, out var equippedItem))
@@ -211,6 +214,8 @@ namespace FullPotential.Core.Player
                 return;
             }
 
+            MarkAsDirty();
+
             foreach (var sourceKvp in equippedItems)
             {
                 var item = sourceKvp.Value.IsNullOrWhiteSpace() ? null : _items[sourceKvp.Value];
@@ -222,7 +227,7 @@ namespace FullPotential.Core.Player
 
             if (NetworkManager.LocalClientId == OwnerClientId)
             {
-                StartCoroutine(ResetEquipmentUi());
+                ResetEquipmentUiAsync().Forget();
             }
             else if (!IsServer)
             {
@@ -557,6 +562,8 @@ namespace FullPotential.Core.Player
 
             FillTypesFromIds(item);
             _items.Add(item.Id, item);
+
+            MarkAsDirty();
         }
 
         public string GetAssignedShape(string itemId)
@@ -607,32 +614,10 @@ namespace FullPotential.Core.Player
             return Regex.Replace(shapeCode, "(:\\d+)", string.Empty);
         }
 
-        public InventoryData GetInventorySaveData()
+        private void MarkAsDirty()
         {
-            var groupedItems = _items
-                .Select(x => x.Value)
-                .GroupBy(x => x.GetType());
-
-            var equippedItems = _equippedItems
-                .Where(x => !(x.Value?.Item?.Id.IsNullOrWhiteSpace() ?? false))
-                .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value.Item?.Id));
-
-            var shapeMapping = _itemIdToShapeMapping
-                .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value));
-
-            return new InventoryData
-            {
-                MaxItems = _maxItemCount,
-                Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(Loot))?.Select(x => x as Loot).ToArray(),
-                Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray(),
-                Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
-                Consumers = groupedItems.FirstOrDefault(x => x.Key == typeof(Consumer))?.Select(x => x as Consumer).ToArray(),
-                Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
-                ItemStacks = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemStack))?.Select(x => x as ItemStack).ToArray(),
-                SpecialGear = groupedItems.FirstOrDefault(x => x.Key == typeof(SpecialGear))?.Select(x => x as SpecialGear).ToArray(),
-                EquippedItems = equippedItems.ToArray(),
-                ShapeMapping = shapeMapping.ToArray()
-            };
+            IsDirty = true;
+            _saveManager.AddToQueue(_playerFighter.Username, this);
         }
     }
 }

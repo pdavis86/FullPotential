@@ -1,7 +1,7 @@
 ﻿using System;
 
-using FullPotential.Api.Data.Models;
 using FullPotential.Api.GameManagement.Events;
+using FullPotential.Api.GameManagement.Models;
 
 namespace FullPotential.Api.Data
 {
@@ -9,7 +9,7 @@ namespace FullPotential.Api.Data
     {
         event EventHandler<GameSettingsUpdatedEventArgs> GameSettingsUpdated;
 
-        GameSettings GetOrLoad();
+        GameSettings Get();
 
         void Save(GameSettings gameSettings);
     }

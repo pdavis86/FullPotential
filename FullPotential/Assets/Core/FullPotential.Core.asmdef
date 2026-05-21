@@ -10,7 +10,8 @@
         "Unity.TextMeshPro",
         "Unity.ResourceManager",
         "FullPotential.Api",
-        "Unity.Networking.Transport"
+        "Unity.Networking.Transport",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

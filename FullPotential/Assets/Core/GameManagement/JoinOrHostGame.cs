@@ -2,12 +2,15 @@
 using System.Collections;
 using System.Linq;
 
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.Data;
+using FullPotential.Api.GameManagement.Models;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Ui.Services;
+using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Core.Networking.Data;
+using FullPotential.Core.Networking.Models;
 
 using TMPro;
 
@@ -48,6 +51,7 @@ namespace FullPotential.Core.GameManagement
         private ILocalizer _localizer;
         private IUiAssistant _uiAssistant;
         private ISettingsRepository _settingsRepository;
+        private GameSettings _gameSettings;
 
         private NetworkManager _networkManager;
         private UnityTransport _networkTransport;
@@ -68,6 +72,10 @@ namespace FullPotential.Core.GameManagement
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _uiAssistant = DependenciesContext.Dependencies.GetService<IUiAssistant>();
             _settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
+
+            _gameSettings = _settingsRepository.Get();
+            GameManager.Instance.LocalGameDataStore.PlayerToken = _gameSettings.LastSigninToken;
+            _username = _gameSettings.LastSigninUsername;
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -78,17 +86,13 @@ namespace FullPotential.Core.GameManagement
             _onlineSceneName = System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(2));
 
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
-
-            _signinPassword.onSubmit.AddListener(async _ => await SignInAsync());
         }
 
         // ReSharper disable once UnusedMember.Local
-        private async Awaitable OnEnable()
+#pragma warning disable UNT0006
+        private async UniTask OnEnable()
         {
-            _username = _settingsRepository.GetOrLoad().LastSigninUsername;
             _signinUsername.text = _username;
-
-            GameManager.Instance.LocalGameDataStore.PlayerToken = await _userManagement.SignInWithExistingTokenAsync();
 
             if (string.IsNullOrWhiteSpace(GameManager.Instance.LocalGameDataStore.PlayerToken))
             {
@@ -101,11 +105,12 @@ namespace FullPotential.Core.GameManagement
             }
             else
             {
-                await HandleSignInResult(GameManager.Instance.LocalGameDataStore.PlayerToken);
+                await SignInWithTokenAsync();
             }
 
             ShowAnyError();
         }
+#pragma warning restore UNT0006
 
         // ReSharper disable once UnusedMember.Local
         private void OnDisable()
@@ -144,51 +149,49 @@ namespace FullPotential.Core.GameManagement
         #region Button Event Handlers
 
         // ReSharper disable once UnusedMember.Global
-        public void SetPlayerUsername(string value)
+        public void HandleUsernameAfterEdit(string value)
         {
             _username = value;
         }
 
         // ReSharper disable once UnusedMember.Global
-        public void SetPlayerPassword(string value)
+        public void HandlePasswordAfterEdit(string value)
         {
             _password = value;
         }
 
         // ReSharper disable once UnusedMember.Global
-        public void SetNetworkAddress(string value)
+        public void HandleNetworkAddressAfterEdit(string value)
         {
             _networkAddress = value;
         }
 
         // ReSharper disable once UnusedMember.Global
-        public void SetNetworkPort(string value)
+        public void HandleNetworkPortAfterEdit(string value)
         {
             _networkPort = value;
         }
 
         // ReSharper disable once UnusedMember.Global
-        public void HostGame()
+        public void HandleHostAfterClick()
         {
             HostGameInternal();
         }
 
         // ReSharper disable once UnusedMember.Global
-        public void JoinGame()
+        public void HandleJoinAfterClick()
         {
             JoinGameInternal();
         }
 
         // ReSharper disable once UnusedMember.Global
-        public void QuitGame()
+        public void HandleQuitClick()
         {
             GameManager.Instance.Quit();
         }
 
-        #endregion
-
         // ReSharper disable once MemberCanBePrivate.Global
-        public async Awaitable SignInAsync()
+        public void HandleSignInClick()
         {
             if (_username.IsNullOrWhiteSpace())
             {
@@ -200,11 +203,29 @@ namespace FullPotential.Core.GameManagement
             _signInContainer.SetActive(false);
             _signingInMessage.SetActive(true);
 
-            var signInResult = await _userManagement.SignInWithPasswordAsync(_username, _password);
-            await HandleSignInResult(signInResult.Token, signInResult.IsInvalid);
+            SignInWithPasswordAsync().Forget();
         }
 
-        private async Awaitable HandleSignInResult(string token, bool isInvalid = false)
+        public void HandleSignOutClick()
+        {
+            SignOutAsync().Forget();
+        }
+
+        #endregion
+
+        private async UniTask SignInWithTokenAsync()
+        {
+            var isValid = await _userManagement.ValidateCredentialsAsync(_username, GameManager.Instance.LocalGameDataStore.PlayerToken);
+            await HandleSignInResultAsync(GameManager.Instance.LocalGameDataStore.PlayerToken, !isValid);
+        }
+
+        private async UniTask SignInWithPasswordAsync()
+        {
+            var signInResult = await _userManagement.SignInWithPasswordAsync(_username, _password);
+            await HandleSignInResultAsync(signInResult.Token, signInResult.IsInvalid);
+        }
+
+        private async UniTask HandleSignInResultAsync(string token, bool isInvalid = false)
         {
             if (string.IsNullOrWhiteSpace(token))
             {
@@ -216,25 +237,22 @@ namespace FullPotential.Core.GameManagement
 
                 _signinError.gameObject.SetActive(true);
                 _signInContainer.SetActive(true);
+                return;
             }
-
-            // todo: check token validity
-
-            _signinError.gameObject.SetActive(false);
-            _signInContainer.SetActive(false);
-
-            var gameSettings = _settingsRepository.GetOrLoad();
-            gameSettings.LastSigninUsername = _username;
-            _settingsRepository.Save(gameSettings);
 
             GameManager.Instance.LocalGameDataStore.PlayerToken = token;
 
+            _gameSettings.LastSigninUsername = _username;
+            _gameSettings.LastSigninToken = token;
+            _settingsRepository.Save(_gameSettings);
+
+            _signingInMessage.SetActive(false);
+            _signinError.gameObject.SetActive(false);
+            _signInContainer.SetActive(false);
             _username = _password = null;
             _signinUsername.text = _signinPassword.text = null;
 
             var connectionDetails = await _instanceManagement.GetConnectionDetailsAsync();
-
-            _signingInMessage.SetActive(false);
 
             if (connectionDetails != null)
             {
@@ -252,7 +270,7 @@ namespace FullPotential.Core.GameManagement
         }
 
         // ReSharper disable once UnusedMember.Global
-        public async Awaitable SignOut()
+        public async UniTask SignOutAsync()
         {
             GameManager.Instance.LocalGameDataStore.PlayerToken = null;
 
@@ -338,7 +356,7 @@ namespace FullPotential.Core.GameManagement
         {
             var payload = JsonUtility.ToJson(new ConnectionPayload
             {
-                Username = _settingsRepository.GetOrLoad().LastSigninUsername,
+                Username = _username,
                 Token = GameManager.Instance.LocalGameDataStore.PlayerToken,
                 GameVersion = GameManager.GetGameVersion().ToString()
             });
@@ -356,10 +374,10 @@ namespace FullPotential.Core.GameManagement
 
             //NOTE: Do not need to change scene. This is handled by the server
 
-            StartCoroutine(JoinGameTimeout());
+            JoinGameTimeoutAsync().Forget();
         }
 
-        private IEnumerator JoinGameTimeout()
+        private async UniTask JoinGameTimeoutAsync()
         {
             const int timeoutSeconds = 10;
 
@@ -383,7 +401,7 @@ namespace FullPotential.Core.GameManagement
                     break;
                 }
 
-                yield return new WaitForSeconds(1);
+                await UniTask.WaitForSeconds(1);
 
             } while (true);
         }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Text;
+
 using FullPotential.Api.Items;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Utilities;

@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
-using FullPotential.Api.Obsolete;
-
-using UnityEngine;
+using FullPotential.Api.Data.Models;
 
 namespace FullPotential.Core.Persistence.Https
 {
@@ -15,22 +14,22 @@ namespace FullPotential.Core.Persistence.Https
         {
         }
 
-        public Awaitable<PlayerData> LoadPlayerDataAsync(string username, bool reduced)
+        public UniTask<PlayerData> GetPlayerDataAsync(string username)
         {
             throw new NotImplementedException();
         }
 
-        public Awaitable SavePlayerDataAsapAsync(string username)
+        public UniTask SavePlayerDataAsync(PlayerData playerData)
         {
             throw new NotImplementedException();
         }
 
-        public Awaitable SavePlayerDataBatchAsync(Dictionary<ulong, string> clientIdToUsernameMapping, bool allData)
+        public UniTask<InventoryData> GetInventoryDataAsync(string username, bool reduced)
         {
             throw new NotImplementedException();
         }
 
-        public Awaitable SavePlayerDataImmediatelyAsync(PlayerData playerData)
+        public UniTask SaveInventoryChangesAsync(InventoryChanges inventoryChanges)
         {
             throw new NotImplementedException();
         }

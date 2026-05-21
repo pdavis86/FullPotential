@@ -17,20 +17,20 @@ namespace FullPotential.Core.Ui.Behaviours
         }
 
         // ReSharper disable once UnusedMember.Global
-        public void ForceRespawn()
+        public void HandleForceRespawnAfterClick()
         {
             GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerFighter>().ForceRespawnServerRpc();
         }
 
         // ReSharper disable once UnusedMember.Global
-        public void Disconnect()
+        public void HandleDisconnectAfterClick()
         {
             _userInterface.HideAllMenus();
             GameManager.Instance.Disconnect();
         }
 
         // ReSharper disable once UnusedMember.Global
-        public void QuitGame()
+        public void HandleQuitGameAfterClick()
         {
             GameManager.Instance.Quit();
         }

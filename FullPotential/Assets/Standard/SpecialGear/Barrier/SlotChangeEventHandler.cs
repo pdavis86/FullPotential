@@ -1,10 +1,12 @@
 ﻿using System;
+
+using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.EventArgs;
-using FullPotential.Api.Modding;
 using FullPotential.Api.Ui;
 using FullPotential.Standard.Resources;
 using FullPotential.Standard.SpecialSlots;
+
 using Unity.Netcode;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -21,9 +23,9 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public Action<IEventHandlerArgs> AfterHandler => HandleAfterSlotChange;
 
-        public SlotChangeEventHandler(IModHelper modHelper)
+        public SlotChangeEventHandler(IGameManager gameManager)
         {
-            _hud = modHelper.GetGameManager().GetUserInterface().HudOverlay;
+            _hud = gameManager.GetUserInterface().HudOverlay;
 
             _hud.ToggleSliderBar(BarrierChargeResource.TypeIdString, false);
         }

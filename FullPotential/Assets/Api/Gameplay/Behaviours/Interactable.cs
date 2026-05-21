@@ -1,4 +1,5 @@
-﻿using FullPotential.Api.Ioc;
+﻿using FullPotential.Api.GameManagement;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Modding;
 using Unity.Netcode;
 using UnityEngine;
@@ -21,9 +22,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private void Start()
         {
             //Does not work in Awake, maybe because the class is abstract?
-            var modHelper = DependenciesContext.Dependencies.GetService<IModHelper>();
-
-            _interactionBubble = modHelper.GetGameManager().GetUserInterface().InteractionBubbleOverlay.GetComponent<TMPro.TextMeshProUGUI>();
+            var gameManager = DependenciesContext.Dependencies.GetService<IGameManager>();
+            _interactionBubble = gameManager.GetUserInterface().InteractionBubbleOverlay.GetComponent<TMPro.TextMeshProUGUI>();
         }
 
         // ReSharper disable once UnusedMember.Local

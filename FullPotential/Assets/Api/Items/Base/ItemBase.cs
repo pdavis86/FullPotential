@@ -1,15 +1,19 @@
 ﻿using System;
+
+using FullPotential.Api.Data;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 
 namespace FullPotential.Api.Items.Base
 {
     [Serializable]
-    public abstract class ItemBase
+    public abstract class ItemBase : ISaveable
     {
         public string Id;
         public string RegistryTypeId;
         public string Name;
+
+        public bool IsDirty { get; set; }
 
         private IRegisterableType _registryType;
         public IRegisterableType RegistryType

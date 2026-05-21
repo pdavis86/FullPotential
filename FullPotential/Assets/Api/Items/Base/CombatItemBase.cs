@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
+
 using UnityEngine;
 
 namespace FullPotential.Api.Items.Base

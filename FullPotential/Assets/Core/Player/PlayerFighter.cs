@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data;
 using FullPotential.Api.Data.Models;
@@ -13,12 +15,9 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Obsolete;
-using FullPotential.Api.Obsolete.Networking;
-using FullPotential.Api.Obsolete.Networking.Data;
 using FullPotential.Api.Ui.Components;
+using FullPotential.Api.Unity;
 using FullPotential.Api.Unity.Constants;
-using FullPotential.Api.Unity.Services;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Environment;
@@ -41,7 +40,6 @@ namespace FullPotential.Core.Player
 
         private ClientRpcParams _clientRpcParams;
 
-        private readonly FragmentedMessageReconstructor _loadPlayerDataReconstructor = new FragmentedMessageReconstructor();
         private readonly Dictionary<string, DateTime> _unclaimedLoot = new Dictionary<string, DateTime>();
 
         private string _textureUrl;
@@ -54,13 +52,15 @@ namespace FullPotential.Core.Player
         private ActionQueue<bool> _aliveStateChanges;
 
         //Registered Services
+        private ISaveManager _saveManager;
         private IPlayerManagement _playerManagement;
         private IUnityHelperUtilities _unityHelperUtilities;
         private IShaderUtilities _shaderUtilities;
 
         //Data
         private CharacterSettings _characterSettings;
-        private bool _inventoryLoadedSuccessfully;
+
+        public bool IsDirty { get; set; }
 
         #endregion
 
@@ -91,9 +91,10 @@ namespace FullPotential.Core.Player
             private set
             {
                 _textureUrl = value;
-                StartCoroutine(SetTexture());
+                SetTextureAsync().Forget();
             }
         }
+
         [HideInInspector] public string Username { get; set; }
 
         public IPlayerInventory PlayerInventory { get; private set; }
@@ -126,6 +127,7 @@ namespace FullPotential.Core.Player
             _inventory = (InventoryBase)PlayerInventory;
             _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
 
+            _saveManager = DependenciesContext.Dependencies.GetService<ISaveManager>();
             _playerManagement = DependenciesContext.Dependencies.GetService<IPlayerManagement>();
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
             _shaderUtilities = DependenciesContext.Dependencies.GetService<IShaderUtilities>();
@@ -134,7 +136,7 @@ namespace FullPotential.Core.Player
         }
 
         // ReSharper disable once UnusedMember.Local
-        protected override void Start()
+        protected override async void Start()
         {
             base.Start();
 
@@ -163,18 +165,7 @@ namespace FullPotential.Core.Player
                 ? Username
                 : "Player ID " + NetworkObjectId;
 
-            if (IsServer)
-            {
-                GetAndLoadPlayerData(false, null);
-            }
-            else if (IsOwner)
-            {
-                RequestPlayerDataServerRpc();
-            }
-            else
-            {
-                RequestReducedPlayerDataServerRpc();
-            }
+            await GetAndLoadPlayerDataAsync(!IsOwner);
 
             var gameObjectCollider = gameObject.GetComponent<Collider>();
             _myHeight = gameObjectCollider.bounds.max.y - gameObjectCollider.bounds.min.y;
@@ -211,29 +202,15 @@ namespace FullPotential.Core.Player
         {
             if (IsServer)
             {
-                // todo: Is Fire-and-forget OK?
-                _playerManagement.SavePlayerDataImmediatelyAsync(GetPlayerSaveData());
+                Task.Run(async () => await _saveManager.ProcessQueueForUsernameAsync(Username))
+                    .GetAwaiter()
+                    .GetResult();
             }
         }
 
         #endregion
 
         #region ServerRpc calls
-
-        [ServerRpc]
-        private void RequestPlayerDataServerRpc(ServerRpcParams serverRpcParams = default)
-        {
-            GetAndLoadPlayerData(false, serverRpcParams.Receive.SenderClientId);
-        }
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        [ServerRpc(RequireOwnership = false)]
-#pragma warning restore CS0618 // Type or member is obsolete
-        //[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        private void RequestReducedPlayerDataServerRpc(ServerRpcParams serverRpcParams = default)
-        {
-            GetAndLoadPlayerData(true, serverRpcParams.Receive.SenderClientId);
-        }
 
         [ServerRpc]
         private void RespawnServerRpc()
@@ -259,8 +236,8 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         private void UpdatePlayerSettingsServerRpc(CharacterSettings characterSettings)
         {
-            // todo: Is Fire-and-forget OK?
-            _playerManagement.SavePlayerDataAsapAsync(Username);
+            IsDirty = true;
+            _saveManager.AddToQueue(Username, this);
 
             _characterSettings = characterSettings;
 
@@ -271,23 +248,20 @@ namespace FullPotential.Core.Player
 
         #region ClientRpc calls
 
-        // ReSharper disable once UnusedParameter.Local
-        [ClientRpc]
-        private void LoadPlayerDataClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams)
-        {
-            var fragmentedMessage = JsonUtility.FromJson<FragmentedMessage>(fragmentedMessageJson);
+        //// ReSharper disable once UnusedParameter.Local
+        //[ClientRpc]
+        //private void LoadPlayerDataClientRpc(ClientRpcParams clientRpcParams)
+        //{
+        //    DoThing().Forget();
+        //}
 
-            _loadPlayerDataReconstructor.AddMessage(fragmentedMessage);
-            if (!_loadPlayerDataReconstructor.HaveAllMessages(fragmentedMessage.GroupId))
-            {
-                return;
-            }
+        //private async UniTask DoThing()
+        //{
+        //    var playerData = await _playerManagement.GetPlayerDataAsync(Username);
+        //    LoadFromPlayerData(playerData);
 
-            var playerData = JsonUtility.FromJson<PlayerData>(_loadPlayerDataReconstructor.Reconstruct(fragmentedMessage.GroupId));
-            LoadFromPlayerData(playerData);
-
-            StartCoroutine(SetTexture());
-        }
+        //    SetTextureAsync().Forget();
+        //}
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
@@ -462,58 +436,40 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private void GetAndLoadPlayerData(bool reduced, ulong? sendToClientId)
+        private async UniTask GetAndLoadPlayerDataAsync(bool reduced)
         {
-            // todo: This is NOT async!
-            var playerData = Test(() => _playerManagement.LoadPlayerDataAsync(Username, reduced));
+            PlayerData playerData = null;
+            InventoryData inventoryData = null;
 
-            if (sendToClientId.HasValue)
+            async UniTask GetPlayerData()
             {
-                //Don't send data to the server. It already has it loaded
-                if (sendToClientId.Value == 0)
-                {
-                    return;
-                }
-
-                // todo: replace all Coroutines
-                StartCoroutine(LoadFromPlayerDataCoroutine(playerData, sendToClientId.Value));
+                playerData = await _playerManagement.GetPlayerDataAsync(Username);
             }
-            else
-            {
-                //Server loading player data from player state
-                LoadFromPlayerData(playerData);
-                TextureUrl = playerData.Settings?.TextureUrl ?? string.Empty;
 
-                var msg = _localizer.Translate("ui.alert.playerjoined");
+            async UniTask GetInventoryData()
+            {
+                inventoryData = await _playerManagement.GetInventoryDataAsync(Username, reduced);
+            }
+
+            await UniTask.WhenAll(GetPlayerData(), GetInventoryData());
+
+            LoadFromPlayerData(playerData);
+
+            // todo: zzz v0.6 - why is a PlayerInventory cast necessary?
+            ((PlayerInventory)Inventory).LoadInventory(inventoryData);
+
+            // todo: zzz v0.6 - playerjoined should be an event
+            if (IsServer)
+            {
+                var msg = _localizer.Translate("ui.alert.playerjoined", Username);
                 var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, OwnerClientId);
-                ShowHudAlertClientRpc(string.Format(msg, Username), nearbyClients);
-            }
-        }
-
-        private T Test<T>(Func<Awaitable<T>> f)
-        {
-            return Task.Run(async () => await f()).GetAwaiter().GetResult();
-        }
-
-        //todo: Remove? Need this to get over the key not found exception caused by too many RPC calls with large payloads
-        private IEnumerator LoadFromPlayerDataCoroutine(PlayerData playerData, ulong clientId)
-        {
-            var clientRpcParams = new ClientRpcParams
-            {
-                Send = new ClientRpcSendParams { TargetClientIds = new[] { clientId } }
-            };
-
-            foreach (var message in _loadPlayerDataReconstructor.GetFragmentedMessages(playerData))
-            {
-                LoadPlayerDataClientRpc(message, clientRpcParams);
-                yield return null;
+                ShowHudAlertClientRpc(msg, nearbyClients);
             }
         }
 
         private void LoadFromPlayerData(PlayerData playerData)
         {
-            //Username = playerData.Username;
-            TextureUrl = playerData.Settings.TextureUrl;
+            TextureUrl = playerData.Settings?.TextureUrl ?? string.Empty;
 
             if (IsServer)
             {
@@ -529,19 +485,7 @@ namespace FullPotential.Core.Player
                 TriggerResourceValueUpdate(ResourceTypeIds.HealthId, 0, newValue);
             }
 
-            try
-            {
-                ((PlayerInventory)Inventory).LoadInventory(playerData.Inventory);
-                playerData.InventoryLoadedSuccessfully = true;
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError(ex.ToString());
-                playerData.InventoryLoadedSuccessfully = false;
-            }
-
             _characterSettings = playerData.Settings;
-            _inventoryLoadedSuccessfully = playerData.InventoryLoadedSuccessfully;
 
             UpdateUiHealthAndDefenceValues();
         }
@@ -556,11 +500,11 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private IEnumerator SetTexture()
+        private async UniTask SetTextureAsync()
         {
             if (Username.IsNullOrWhiteSpace())
             {
-                yield break;
+                return;
             }
 
             string filePath = null;
@@ -585,12 +529,12 @@ namespace FullPotential.Core.Player
                 {
                     using (var webRequest = UnityWebRequest.Get(TextureUrl))
                     {
-                        yield return webRequest.SendWebRequest();
+                        await webRequest.SendWebRequest();
 
                         if (webRequest.downloadHandler.data == null)
                         {
                             Debug.LogError("Failed to download texture");
-                            yield break;
+                            return;
                         }
 
                         System.IO.File.WriteAllBytes(filePath, webRequest.downloadHandler.data);
@@ -703,19 +647,13 @@ namespace FullPotential.Core.Player
 
         #endregion
 
-        public PlayerData GetPlayerSaveData()
+        public PlayerData GetPlayerData()
         {
             var saveData = new PlayerData
             {
                 Username = Username,
                 Settings = _characterSettings,
-                Resources = GetResources()
-                    .Select(resource => new SerializableKeyValuePair<string, int>(
-                        resource.TypeId.ToString(),
-                        GetResourceValue(resource.TypeId.ToString())))
-                    .ToArray(),
-                Inventory = ((PlayerInventory)PlayerInventory).GetInventorySaveData(),
-                InventoryLoadedSuccessfully = _inventoryLoadedSuccessfully
+                Resources = GetResourceArrayForSave()
             };
 
             return saveData;

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Weapons;
@@ -341,6 +341,12 @@ namespace FullPotential.Api.Items.Types
             }
 
             return _baseDamage = baseDamage;
+        }
+
+        public void UpdateAmmo(int newValue)
+        {
+            Ammo = newValue;
+            IsDirty = true;
         }
     }
 }

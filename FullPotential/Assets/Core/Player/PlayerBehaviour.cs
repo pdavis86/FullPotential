@@ -2,6 +2,7 @@
 using System.Linq;
 
 using FullPotential.Api.Data;
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
@@ -9,7 +10,6 @@ using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Obsolete;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
@@ -581,7 +581,7 @@ namespace FullPotential.Core.Player
             }
 
             var settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
-            var gameSettings = settingsRepository.GetOrLoad();
+            var gameSettings = settingsRepository.Get();
             Camera.main.fieldOfView = gameSettings.FieldOfView;
         }
     }

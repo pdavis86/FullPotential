@@ -30,7 +30,7 @@ namespace FullPotential.Core.Persistence.Https
 
         protected HttpsPersistenceBase(ISettingsRepository settingsRepository)
         {
-            BaseAddress = settingsRepository.GetOrLoad().ManagementApiAddress;
+            BaseAddress = settingsRepository.Get().ManagementApiAddress;
         }
 
         protected void SetAuthenticationHeader(UnityWebRequest request)

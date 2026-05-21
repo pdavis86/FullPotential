@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
 
+using Cysharp.Threading.Tasks;
+
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
@@ -124,7 +127,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ServerRpc]
         public void ReloadServerRpc(bool isLeftHand)
         {
-            Reload(GetReloadEventArgs(isLeftHand));
+            ReloadAsync(GetReloadEventArgs(isLeftHand)).Forget();
         }
 
         #endregion
@@ -135,6 +138,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ClientRpc]
         private void ReloadFinishedClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
         {
+            //todo: zzz v0.6 - Use an event instead
             var handStatus = GetHandStatus(isLeftHand);
             handStatus.IsBusy = false;
         }
@@ -143,6 +147,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ClientRpc]
         private void StopActiveConsumerBehaviourClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
         {
+            //todo: zzz v0.6 - Use an event instead
             var handStatus = GetHandStatus(isLeftHand);
             StopActiveConsumerBehaviour(handStatus);
         }
@@ -190,27 +195,22 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             //Lose any remaining ammo
-            weapon.Ammo = 0;
+            weapon.UpdateAmmo(0);
 
-            ReloadAndUpdateClientInventory(reloadEventArgs, weapon.GetAmmoMax());
+            //ReloadAndUpdateClientInventory(reloadEventArgs, weapon.GetAmmoMax());
         }
 
-        private void Reload(ReloadEventArgs reloadEventArgs)
-        {
-            StartCoroutine(ReloadCoroutine(reloadEventArgs));
-        }
-
-        private IEnumerator ReloadCoroutine(ReloadEventArgs reloadEventArgs)
+        private async UniTask ReloadAsync(ReloadEventArgs reloadEventArgs)
         {
             var slotId = reloadEventArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
             var itemInSlot = reloadEventArgs.Fighter.Inventory.GetItemInSlot(slotId);
 
             if (itemInSlot is not Weapon weapon)
             {
-                yield break;
+                return;
             }
 
-            yield return new WaitForSeconds(weapon.GetReloadTime());
+            await UniTask.WaitForSeconds(weapon.GetReloadTime());
 
             _eventManager.Trigger(EventIdReload, reloadEventArgs);
 
@@ -290,6 +290,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     TryToAttackHoldServerRpc(isLeftHand);
                 }
 
+                // todo: make AutomaticWeaponFireEnumerator async?
                 handStatus.IntraActionEnumerator = AutomaticWeaponFireEnumerator(weapon, isLeftHand);
                 StartCoroutine(handStatus.IntraActionEnumerator);
                 return;
@@ -523,6 +524,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (handStatus.PreActionEnumerator != null)
                 {
+                    // todo: make pre and post action async?
                     StopCoroutine(handStatus.PreActionEnumerator);
                     StartCoroutine(handStatus.PostActionEnumerator);
                 }
@@ -585,6 +587,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (!isAutoFire && handStatus.IntraActionEnumerator != null)
             {
+                // todo: make intra action async?
                 StopCoroutine(handStatus.IntraActionEnumerator);
                 handStatus.IntraActionEnumerator = null;
             }
@@ -655,13 +658,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var slotId = shotFiredArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
             var equippedWeapon = (Weapon)fighter.Inventory.GetItemInSlot(slotId);
 
-            equippedWeapon.Ammo -= shotFiredArgs.AmmoUsed;
+            equippedWeapon.UpdateAmmo(equippedWeapon.Ammo - shotFiredArgs.AmmoUsed);
 
-            var invChanges = new InventoryChanges
-            {
-                Weapons = new[] { equippedWeapon }
-            };
-            fighter.Inventory.SendInventoryChangesToClient(invChanges);
+            //var invChanges = new InventoryChanges
+            //{
+            //    Weapons = new[] { equippedWeapon }
+            //};
+            //fighter.Inventory.SendInventoryChangesToClient(invChanges);
         }
 
         private void UseMeleeWeapon(bool isLeftHand, Weapon weaponInHand)
@@ -779,7 +782,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            equippedWeapon.Ammo += countTaken;
+            equippedWeapon.UpdateAmmo(equippedWeapon.Ammo + countTaken);
 
             invChanges.Weapons = new[] { equippedWeapon };
 

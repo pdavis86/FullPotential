@@ -9,7 +9,7 @@ namespace FullPotential.Core.Registry.Resources
     public class Health : IResourceType
     {
         private static readonly Guid Id = new Guid(ResourceTypeIds.HealthId);
-        private static readonly Color ResourceColor = Color.FromArgb(156, 42, 50);
+        private static readonly Color ResourceColor = Color.FromArgb(156, 42, 50); // Red
 
         public Guid TypeId => Id;
 

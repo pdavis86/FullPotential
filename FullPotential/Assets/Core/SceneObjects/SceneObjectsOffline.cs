@@ -1,6 +1,7 @@
 ﻿using FullPotential.Api.GameManagement;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Unity.Services;
+using FullPotential.Api.Unity;
+
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global

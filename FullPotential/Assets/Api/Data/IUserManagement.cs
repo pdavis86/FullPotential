@@ -1,19 +1,15 @@
-﻿using FullPotential.Api.Data.Models;
+﻿using Cysharp.Threading.Tasks;
 
-using UnityEngine;
-
-// ReSharper disable UnusedMember.Global
+using FullPotential.Api.Data.Models;
 
 namespace FullPotential.Api.Data
 {
     public interface IUserManagement
     {
-        Awaitable<string> SignInWithExistingTokenAsync();
+        UniTask<SignInResult> SignInWithPasswordAsync(string username, string password);
 
-        Awaitable<SignInResult> SignInWithPasswordAsync(string username, string password);
+        UniTask<bool> ValidateCredentialsAsync(string username, string token);
 
-        Awaitable<bool> ValidateCredentialsAsync(string username, string token);
-
-        Awaitable<bool> SignOutAsync();
+        UniTask<bool> SignOutAsync();
     }
 }
