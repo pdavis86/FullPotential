@@ -1,12 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
 using FullPotential.Api.Data.Models;
-
-using Newtonsoft.Json.Linq;
-
-using UnityEngine;
 
 namespace FullPotential.Core.Persistence.Local
 {
@@ -14,25 +11,21 @@ namespace FullPotential.Core.Persistence.Local
     {
         private const string dummyToken = "ThisIsNotARealToken";
 
-        public async Awaitable<string> SignInWithExistingTokenAsync()
+        public async UniTask<SignInResult> SignInWithPasswordAsync(string username, string password)
         {
             await Task.Yield();
-            return dummyToken;
+            return username == password
+                ? new SignInResult { Token = dummyToken }
+                : new SignInResult { IsInvalid = true };
         }
 
-        public async Awaitable<SignInResult> SignInWithPasswordAsync(string username, string password)
-        {
-            await Task.Yield();
-            return new SignInResult { Token = dummyToken };
-        }
-
-        public async Awaitable<bool> ValidateCredentialsAsync(string username, string token)
+        public async UniTask<bool> ValidateCredentialsAsync(string username, string token)
         {
             await Task.Yield();
             return true;
         }
 
-        public async Awaitable<bool> SignOutAsync()
+        public async UniTask<bool> SignOutAsync()
         {
             await Task.Yield();
             return true;

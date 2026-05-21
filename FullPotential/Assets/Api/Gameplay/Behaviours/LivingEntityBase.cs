@@ -1,8 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.EventArgs;
@@ -22,9 +26,12 @@ using FullPotential.Api.Ui.Components;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
+
 using TMPro;
+
 using Unity.Collections;
 using Unity.Netcode;
+
 using UnityEngine;
 
 // ReSharper disable VirtualMemberNeverOverridden.Global
@@ -42,8 +49,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private const int ForceThreshold = 1000;
         private const int SingleResourceChangeEffectDisplaySeconds = 3;
         private const string EncodedValueSeparator = ";";
-
-        private readonly NetworkVariable<FixedString4096Bytes> _encodedResourceValues = new NetworkVariable<FixedString4096Bytes>();
 
         #region Inspector Variables
 #pragma warning disable 0649
@@ -85,6 +90,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private readonly List<ActiveEffect> _activeEffects = new List<ActiveEffect>();
         private readonly Dictionary<string, int> _resourceValueCache = new Dictionary<string, int>();
 
+        private CancellationTokenSource _activeEffectsCancellationTokenSource = new CancellationTokenSource();
         private IEnumerable<IResourceType> _sortedResources;
 
         private FighterBase _fighterWhoMovedMeLast;
@@ -115,7 +121,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected virtual void Awake()
         {
-            _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
+            _gameManager = DependenciesContext.Dependencies.GetService<IGameManager>();
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
@@ -124,7 +130,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _sceneService = _gameManager.GetSceneBehaviour().GetSceneService();
 
             PopulateResourceValueCache();
-            _encodedResourceValues.OnValueChanged += HandleEncodedResourcesChange;
 
             _entityName.OnValueChanged += HandleNameChange;
         }
@@ -147,7 +152,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             UpdateNameOnUi();
-            UpdateResourceValuesFromEncodedValue();
         }
 
         protected virtual void FixedUpdate()
@@ -171,8 +175,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public override void OnDestroy()
         {
             _entityName.OnValueChanged -= HandleNameChange;
-
-            _encodedResourceValues.OnValueChanged -= HandleEncodedResourcesChange;
 
             base.OnDestroy();
         }
@@ -213,13 +215,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             UpdateNameOnUi();
         }
 
-        protected virtual void HandleEncodedResourcesChange(FixedString4096Bytes previousValue, FixedString4096Bytes newValue)
-        {
-            //todo: Poor network performance. This fires a LOT e.g. stamina recharging. Maybe don't send recharge updates?
-
-            UpdateResourceValuesFromEncodedValue();
-        }
-
         #endregion
 
         #region Resource Management
@@ -227,6 +222,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected IEnumerable<IResourceType> GetResources()
         {
             return _sortedResources;
+        }
+
+        protected SerializableKeyValuePair<string, int>[] GetResourceArrayForSave()
+        {
+            return GetResources()
+                .Select(resource => new SerializableKeyValuePair<string, int>(
+                    resource.TypeId.ToString(),
+                    GetResourceValue(resource.TypeId.ToString())))
+                .ToArray();
         }
 
         private void SetupResourceReplenishing()
@@ -343,14 +347,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
             newValue = ClampResourceValue(typeId, newValue);
             _resourceValueCache[typeId] = newValue;
 
-            SendServerResourceValuesToClients();
+            // todo: do resource calcs on both server and client
+            //SendServerResourceValuesToClients();
         }
 
-        protected void SendServerResourceValuesToClients()
-        {
-            var newEncodeValue = string.Join(EncodedValueSeparator, _resourceValueCache.Select(x => x.Value.ToString()));
-            _encodedResourceValues.Value = newEncodeValue;
-        }
+        //protected void SendServerResourceValuesToClients()
+        //{
+        //    var newEncodeValue = string.Join(EncodedValueSeparator, _resourceValueCache.Select(x => x.Value.ToString()));
+        //    _encodedResourceValues.Value = newEncodeValue;
+        //}
 
         protected void SetServerResourceValuesForRespawn()
         {
@@ -367,10 +372,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return 100 + GetResourceMaxAdjustment(resourceTypeId);
         }
 
-        public virtual bool IsConsumingResource(string typeId)
-        {
-            return false;
-        }
+        public abstract bool IsConsumingResource(string typeId);
 
         #endregion
 
@@ -388,7 +390,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return 2.5f;
         }
 
-        protected virtual bool IsConsumingStamina()
+        protected bool IsConsumingStamina()
         {
             if (IsSprinting && GetResourceValue(ResourceTypeIds.StaminaId) < GetStaminaCost())
             {
@@ -443,29 +445,31 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _nameTag.text = displayName;
         }
 
-        private void UpdateResourceValuesFromEncodedValue()
-        {
-            var newValues = _encodedResourceValues.Value.ToString().Split(EncodedValueSeparator);
+        //private void UpdateResourceValuesFromEncodedValue()
+        //{
+        //    var newValues = _encodedResourceValues.Value.ToString().Split(EncodedValueSeparator);
 
-            for (var i = 0; i < newValues.Length; i++)
-            {
-                if (newValues[i].IsNullOrWhiteSpace())
-                {
-                    continue;
-                }
+        //    for (var i = 0; i < newValues.Length; i++)
+        //    {
+        //        if (newValues[i].IsNullOrWhiteSpace())
+        //        {
+        //            continue;
+        //        }
 
-                var typeId = _resourceValueCache.ElementAt(i).Key;
+        //        var typeId = _resourceValueCache.ElementAt(i).Key;
 
-                var oldValue = _resourceValueCache[typeId];
-                _resourceValueCache[typeId] = int.Parse(newValues[i]);
+        //        var oldValue = _resourceValueCache[typeId];
+        //        _resourceValueCache[typeId] = int.Parse(newValues[i]);
 
-                var eventArgs = new ResourceValueChangedEventArgs(this, typeId, _resourceValueCache[typeId], oldValue - _resourceValueCache[typeId]);
-                _eventManager.Trigger(EventIdResourceValueChangeAfter, eventArgs);
-            }
-        }
+        //        var eventArgs = new ResourceValueChangedEventArgs(this, typeId, _resourceValueCache[typeId], oldValue - _resourceValueCache[typeId]);
+        //        _eventManager.Trigger(EventIdResourceValueChangeAfter, eventArgs);
+        //    }
+        //}
 
         public void UpdateUiHealthAndDefenceValues()
         {
+            //todo: zzz v0.6 - use events
+
             if (!IsClient)
             {
                 return;
@@ -593,7 +597,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             ShowHudAlertClientRpc(deathMessage, nearbyClients);
 
-            StopAllCoroutines();
+            _activeEffectsCancellationTokenSource.Cancel();
+            _activeEffectsCancellationTokenSource.Dispose();
+            _activeEffectsCancellationTokenSource = new CancellationTokenSource();
+
             _activeEffects.Clear();
 
             HandleDeathAfter();
@@ -658,17 +665,18 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void ApplyPeriodicActionToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position)
         {
+            // todo: zzz v0.6 - replace use of DateTime with TimeProvider to ensure UTC
             var delay = itemUsed.GetChargeUpTime();
             var expiry = DateTime.Now.AddSeconds(itemUsed.GetEffectDuration());
-            StartCoroutine(PeriodicActionToResourceCoroutine(sourceFighter, itemUsed, resourceEffect, position, delay, expiry));
+            PeriodicActionToResourceAsync(sourceFighter, itemUsed, resourceEffect, position, delay, expiry, _activeEffectsCancellationTokenSource.Token).Forget();
         }
 
-        private IEnumerator PeriodicActionToResourceCoroutine(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position, float delay, DateTime expiry)
+        private async UniTask PeriodicActionToResourceAsync(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position, float delay, DateTime expiry, CancellationToken cancellationToken)
         {
             do
             {
                 ApplySingleValueChangeToResourceInternal(sourceFighter, itemUsed, resourceEffect, position);
-                yield return new WaitForSeconds(delay);
+                await UniTask.WaitForSeconds(delay, cancellationToken: cancellationToken);
 
             } while (DateTime.Now < expiry);
         }

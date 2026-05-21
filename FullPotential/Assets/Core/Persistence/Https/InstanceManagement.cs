@@ -1,7 +1,9 @@
 ﻿namespace FullPotential.Core.Persistence.Https
 {
+    using Cysharp.Threading.Tasks;
+
     using FullPotential.Api.Data;
-    using FullPotential.Api.GameManagement.JsonModels;
+    using FullPotential.Api.GameManagement.Models;
 
     using UnityEngine;
     using UnityEngine.Networking;
@@ -15,7 +17,7 @@
         {
         }
 
-        public async Awaitable<ConnectionDetails> GetConnectionDetailsAsync()
+        public async UniTask<ConnectionDetails> GetConnectionDetailsAsync()
         {
             using (var request = UnityWebRequest.Get(BaseAddress + "Instance/GetConnectionDetails"))
             {
@@ -32,6 +34,11 @@
                 var result = JsonUtility.FromJson<ConnectionDetails>(request.downloadHandler.text);
                 return result;
             }
+        }
+
+        public UniTask SaveConnectionDetailsAsync(ConnectionDetails connectionDetails)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

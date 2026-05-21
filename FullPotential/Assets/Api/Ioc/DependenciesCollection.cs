@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
@@ -21,6 +22,17 @@ namespace FullPotential.Api.Ioc
         public bool IsReady()
         {
             return _registry.Any();
+        }
+
+
+        public void Register<TInterface>(object instance)
+        {
+            Register(new Dependency
+            {
+                Type = typeof(TInterface),
+                Factory = () => (TInterface)instance,
+                IsSingleton = true
+            });
         }
 
         public void Register<TInterface, TClass>(bool newInstanceOnRequest = false)

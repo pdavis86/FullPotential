@@ -71,14 +71,14 @@
     <Compile Include="Assets\Core\GameManagement\UserInterface.cs" />
     <Compile Include="Assets\Core\Registry\SpecialSlots\RightHand.cs" />
     <Compile Include="Assets\Core\Persistence\Local\PlayerManagement.cs" />
+    <Compile Include="Assets\Core\UI\UiAssistant.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltip.cs" />
     <Compile Include="Assets\Core\Player\PlayerFighter.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\AdminShopUi.cs" />
+    <Compile Include="Assets\Core\Networking\Models\ConnectionPayload.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Exhaust.cs" />
-    <Compile Include="Assets\Core\Networking\Data\ConnectionPayload.cs" />
     <Compile Include="Assets\Core\Persistence\Https\UserManagement.cs" />
-    <Compile Include="Assets\Core\Unity\Services\ShaderUtilities.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DebuggingActiveState.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\MainMenuUi.cs" />
     <Compile Include="Assets\Core\Localization\Localizer.cs" />
@@ -88,6 +88,7 @@
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\LookAtMainCamera.cs" />
     <Compile Include="Assets\Core\Player\PlayerInventory.cs" />
     <Compile Include="Assets\Core\Registry\Events\LivingEntityHealthChangedEventHandler.cs" />
+    <Compile Include="Assets\Core\Persistence\Https\SaveManager.cs" />
     <Compile Include="Assets\Core\Unity\Static\DefaultSceneLoader.cs" />
     <Compile Include="Assets\Core\Environment\LootInteractable.cs" />
     <Compile Include="Assets\Core\UI\Components\CraftingSelector.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\TextLocalizer.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiEquipmentTab.cs" />
     <Compile Include="Assets\Core\GameManagement\ServiceManager.cs" />
+    <Compile Include="Assets\Core\Unity\UnityHelperUtilities.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Invigorate.cs" />
     <Compile Include="Assets\Core\Persistence\Local\SettingsRepository.cs" />
     <Compile Include="Assets\Core\UI\Components\NameAndToggle.cs" />
@@ -113,15 +115,15 @@
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsOffline.cs" />
     <Compile Include="Assets\Core\Registry\Events\LivingEntityDiedEventHandler.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\StickUiToWorldPosition.cs" />
-    <Compile Include="Assets\Core\Unity\Services\UnityHelperUtilities.cs" />
     <Compile Include="Assets\Core\Gameplay\Drawing\DrawingService.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\MaintainDistance.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltips.cs" />
     <Compile Include="Assets\Core\Player\PlayerBehaviour.cs" />
+    <Compile Include="Assets\Core\Unity\ShaderUtilities.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\DrawingPadUi.cs" />
+    <Compile Include="Assets\Core\Persistence\Local\SaveManager.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\Hud.cs" />
-    <Compile Include="Assets\Core\Modding\ModHelper.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\CombatService.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Hurt.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiSlot.cs" />
@@ -1263,6 +1265,10 @@
     </Reference>
     <Reference Include="Unity.Networking.Transport">
       <HintPath>Library\ScriptAssemblies\Unity.Networking.Transport.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UniTask">
+      <HintPath>Library\ScriptAssemblies\UniTask.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">

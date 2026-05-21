@@ -1,9 +1,11 @@
 ﻿using System;
+
 using FullPotential.Api.Data;
-using FullPotential.Api.Data.Models;
 using FullPotential.Api.GameManagement.Events;
+using FullPotential.Api.GameManagement.Models;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Localization;
+
 using UnityEngine;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -16,14 +18,14 @@ namespace FullPotential.Core.Persistence.Local
 
         public event EventHandler<GameSettingsUpdatedEventArgs> GameSettingsUpdated;
 
-        public GameSettings GetOrLoad()
+        public GameSettings Get()
         {
             return _gameSettings ??= Load();
         }
 
         public void Save(GameSettings gameSettings)
         {
-            System.IO.File.WriteAllText(GetGameSettingsPath(), JsonUtility.ToJson(gameSettings));
+            System.IO.File.WriteAllText(GetGameSettingsPath(), JsonUtility.ToJson(gameSettings, true));
             _gameSettings = gameSettings;
             GameSettingsUpdated?.Invoke(this, new GameSettingsUpdatedEventArgs(gameSettings));
         }
@@ -53,11 +55,6 @@ namespace FullPotential.Core.Persistence.Local
             if (gameSettings.Culture.IsNullOrWhiteSpace())
             {
                 gameSettings.Culture = Localizer.DefaultCulture;
-            }
-
-            if (gameSettings.ManagementApiAddress.IsNullOrWhiteSpace())
-            {
-                gameSettings.ManagementApiAddress = "https://localhost:7180/";
             }
 
             if (gameSettings.LookSensitivity == 0)

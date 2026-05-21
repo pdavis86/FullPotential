@@ -105,7 +105,7 @@ namespace FullPotential.Core.Ui.Behaviours
         }
 
         // ReSharper disable once UnusedMember.Global
-        public async void SaveAndClose()
+        public async void HandleSaveAndCloseAfterClick()
         {
             await SaveGameSettings();
 
@@ -124,7 +124,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 await GameManager.Instance.SetCultureAsync(match.Key);
             }
 
-            var gameSettings = _settingsRepository.GetOrLoad();
+            var gameSettings = _settingsRepository.Get();
 
             gameSettings.FieldOfView = Camera.main.fieldOfView;
             
@@ -192,7 +192,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _revertFieldOfView = Camera.main.fieldOfView;
             _fovSlider.value = Camera.main.fieldOfView;
 
-            var gameSettings = _settingsRepository.GetOrLoad();
+            var gameSettings = _settingsRepository.Get();
 
             int i;
             for (i = 0; i < _cultures.Count; i++)

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
-using FullPotential.Api.Localization.Enums;
+using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 
 namespace FullPotential.Api.Localization

@@ -109,29 +109,29 @@
     
 
     {
-      "Key": "shape.wall",
+      "Key": "shapetype.wall",
       "Value": "Wall"
     },
     {
-      "Key": "shape.zone",
+      "Key": "shapetype.zone",
       "Value": "Zone"
     },
 
 
     {
-      "Key": "targeting.pointtopoint",
+      "Key": "targetingtype.pointtopoint",
       "Value": "Point-to-point"
     },
     {
-      "Key": "targeting.projectile",
+      "Key": "targetingtype.projectile",
       "Value": "Projectile"
     },
     {
-      "Key": "targeting.self",
+      "Key": "targetingtype.self",
       "Value": "Self"
     },
     {
-      "Key": "targeting.withinreach",
+      "Key": "targetingtype.withinreach",
       "Value": "Within Reach"
     },
     
@@ -443,15 +443,15 @@
 	
 	
     {
-      "Key": "specialgeartype.consolidatorreloader",
+      "Key": "item.type.consolidatorreloader",
       "Value": "Consolidator Reloader"
     },
     {
-      "Key": "specialgeartype.teleportreloader",
+      "Key": "item.type.teleportreloader",
       "Value": "Teleport Reloader"
     },
     {
-      "Key": "specialgeartype.barrier",
+      "Key": "item.type.barrier",
       "Value": "Barrier"
     },
 	

@@ -1,11 +1,13 @@
-﻿using FullPotential.Api.GameManagement.JsonModels;
+﻿using Cysharp.Threading.Tasks;
 
-using UnityEngine;
+using FullPotential.Api.GameManagement.Models;
 
 namespace FullPotential.Api.Data
 {
     public interface IInstanceManagement
     {
-        Awaitable<ConnectionDetails> GetConnectionDetailsAsync();
+        UniTask<ConnectionDetails> GetConnectionDetailsAsync();
+
+        UniTask SaveConnectionDetailsAsync(ConnectionDetails connectionDetails);
     }
 }

@@ -3157,8 +3157,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 344.77527, y: -26.415512}
-  m_SizeDelta: {x: 226.51685, y: 45.110123}
+  m_AnchoredPosition: {x: 333.27527, y: -26.415512}
+  m_SizeDelta: {x: 218.85017, y: 45.110123}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &581361329
 CanvasRenderer:
@@ -4237,7 +4237,7 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 803093337}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.16898346}
+  m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
@@ -4674,7 +4674,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 315.78003, y: -50}
+  m_AnchoredPosition: {x: 317.28003, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &730206267
@@ -4824,7 +4824,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -190.66989}
+  m_AnchoredPosition: {x: 50, y: -198.16989}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &751475592
@@ -4872,8 +4872,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4559024457428667747}
-        m_TargetAssemblyTypeName: FullPotential.Core.Behaviours.Ui.MainMenuUi, Assembly-CSharp
-        m_MethodName: ForceRespawn
+        m_TargetAssemblyTypeName: FullPotential.Core.Ui.Behaviours.MainMenuUi, FullPotential.Core
+        m_MethodName: HandleForceRespawnAfterClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5190,8 +5190,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 576.2921, y: -26.415512}
-  m_SizeDelta: {x: 226.51685, y: 45.110123}
+  m_AnchoredPosition: {x: 557.1254, y: -26.415512}
+  m_SizeDelta: {x: 218.85017, y: 45.110123}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &810997064
 CanvasRenderer:
@@ -5465,8 +5465,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 266235021}
-        m_TargetAssemblyTypeName: SettingsMenuUi, Assembly-CSharp
-        m_MethodName: SaveAndClose
+        m_TargetAssemblyTypeName: FullPotential.Core.Ui.Behaviours.SettingsMenuUi,
+          FullPotential.Core
+        m_MethodName: HandleSaveAndCloseAfterClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5936,7 +5937,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -265.33008}
+  m_AnchoredPosition: {x: 50, y: -272.83008}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &944943128
@@ -8569,7 +8570,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 315.78003, y: -392.09912}
+  m_AnchoredPosition: {x: 317.28003, y: -392.09912}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1297492491
@@ -9336,8 +9337,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 675902104}
   m_HandleRect: {fileID: 675902103}
   m_Direction: 2
-  m_Value: 1.0000004
-  m_Size: 0.83101654
+  m_Value: 1
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -11040,7 +11041,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -227.99998}
+  m_AnchoredPosition: {x: 50, y: -235.49998}
   m_SizeDelta: {x: 100, y: 24.6602}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1762949665
@@ -13705,7 +13706,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 315.78003, y: -221.04953}
+  m_AnchoredPosition: {x: 317.28003, y: -221.04953}
   m_SizeDelta: {x: 100, y: 182.0991}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2092111434
@@ -14850,7 +14851,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -345.33008}
+  m_AnchoredPosition: {x: 50, y: -352.83008}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &4492785076512437334
@@ -15092,7 +15093,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -305.33008}
+  m_AnchoredPosition: {x: 50, y: -312.83008}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7011060653347729642
@@ -15140,8 +15141,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4559024457428667747}
-        m_TargetAssemblyTypeName: MainMenuUi, Assembly-CSharp
-        m_MethodName: Disconnect
+        m_TargetAssemblyTypeName: FullPotential.Core.Ui.Behaviours.MainMenuUi, FullPotential.Core
+        m_MethodName: HandleDisconnectAfterClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -16010,8 +16011,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4559024457428667747}
-        m_TargetAssemblyTypeName: EscMenuUi, Assembly-CSharp
-        m_MethodName: QuitGame
+        m_TargetAssemblyTypeName: FullPotential.Core.Ui.Behaviours.MainMenuUi, FullPotential.Core
+        m_MethodName: HandleQuitGameAfterClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -16107,8 +16108,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 113.25842, y: -26.415512}
-  m_SizeDelta: {x: 226.51685, y: 45.110123}
+  m_AnchoredPosition: {x: 109.42509, y: -26.415512}
+  m_SizeDelta: {x: 218.85017, y: 45.110123}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

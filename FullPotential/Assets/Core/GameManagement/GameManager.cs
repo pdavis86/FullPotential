@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.Data;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
@@ -13,11 +15,11 @@ using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Ui;
-using FullPotential.Api.Unity.Services;
+using FullPotential.Api.Unity;
 using FullPotential.Api.Utilities;
 using FullPotential.Core.GameManagement.Data;
 using FullPotential.Core.Gameplay.Events;
-using FullPotential.Core.Networking.Data;
+using FullPotential.Core.Networking.Models;
 using FullPotential.Core.Player;
 using FullPotential.Core.Registry;
 
@@ -50,6 +52,7 @@ namespace FullPotential.Core.GameManagement
 
         //Services
         private ISettingsRepository _settingsRepository;
+        private ISaveManager _saveManager;
         private IUserManagement _userManagement;
         private IPlayerManagement _playerManagement;
         private ILocalizer _localizer;
@@ -87,6 +90,7 @@ namespace FullPotential.Core.GameManagement
             ServiceManager.RegisterServices();
 
             _settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
+            _saveManager = DependenciesContext.Dependencies.GetService<ISaveManager>();
             _userManagement = DependenciesContext.Dependencies.GetService<IUserManagement>();
             _playerManagement = DependenciesContext.Dependencies.GetService<IPlayerManagement>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
@@ -103,7 +107,7 @@ namespace FullPotential.Core.GameManagement
 
 
             await _localizer.LoadAvailableCulturesAsync(addressablesManager.LocalisationAddresses);
-            await _localizer.LoadLocalizationFilesAsync(_settingsRepository.GetOrLoad().Culture);
+            await _localizer.LoadLocalizationFilesAsync(_settingsRepository.Get().Culture);
 
             InputActions = new DefaultInputActions();
 
@@ -113,13 +117,13 @@ namespace FullPotential.Core.GameManagement
             _playerPrefabNetObj = Prefabs.Player.GetComponent<NetworkObject>();
 
             // Fire-and-forget
-            SceneManager.LoadSceneAsync(1).GetAwaiter();
+            _ = SceneManager.LoadSceneAsync(1);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            _periodicSave = new DelayedAction(15f, () => SavePlayerData(), false);
+            _periodicSave = new DelayedAction(15f, () => SaveData(), false);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -129,7 +133,7 @@ namespace FullPotential.Core.GameManagement
             {
                 _periodicSave?.TryPerformAction();
             }
-            else if (NetworkManager.Singleton.IsServer)
+            else if (NetworkManager.Singleton?.IsServer ?? false)
             {
                 _serverHasBeenStarted = true;
             }
@@ -139,7 +143,7 @@ namespace FullPotential.Core.GameManagement
         {
             if (approvalRequest.ClientNetworkId == NetworkManager.Singleton.LocalClientId)
             {
-                ServerGameDataStore.ClientIdToUsername[approvalRequest.ClientNetworkId] = _settingsRepository.GetOrLoad().LastSigninUsername;
+                ServerGameDataStore.ClientIdToUsername[approvalRequest.ClientNetworkId] = _settingsRepository.Get().LastSigninUsername;
                 approvalResponse.Approved = true;
                 return;
             }
@@ -185,9 +189,10 @@ namespace FullPotential.Core.GameManagement
             approvalResponse.Approved = true;
             ServerGameDataStore.ClientIdToUsername[approvalRequest.ClientNetworkId] = playerUsername;
 
-            // todo: is Fire-and-forget OK?
-            DisconnectUserIfTokenInvalidAsync(approvalRequest.ClientNetworkId, playerUsername, connectionPayload.Token)
-                .GetAwaiter();
+            DisconnectUserIfTokenInvalidAsync(
+                approvalRequest.ClientNetworkId,
+                playerUsername,
+                connectionPayload.Token).Forget();
         }
 
         private void HandleAfterDisconnectedFromServer(ulong clientId)
@@ -218,7 +223,7 @@ namespace FullPotential.Core.GameManagement
             UserInterface.DebuggingOverlay.SetActive(false);
             UserInterface.DebuggingOverlay.SetActive(true);
 
-            var gameSettings = _settingsRepository.GetOrLoad();
+            var gameSettings = _settingsRepository.Get();
             gameSettings.Culture = cultureCode;
             _settingsRepository.Save(gameSettings);
         }
@@ -229,7 +234,7 @@ namespace FullPotential.Core.GameManagement
 
             if (NetworkManager.Singleton.IsServer)
             {
-                SavePlayerData(true);
+                SaveData();
             }
 
             NetworkManager.Singleton.Shutdown();
@@ -240,7 +245,7 @@ namespace FullPotential.Core.GameManagement
         {
             if (NetworkManager.Singleton.IsServer)
             {
-                SavePlayerData(true);
+                SaveData();
             }
 
 #if UNITY_EDITOR
@@ -257,10 +262,10 @@ namespace FullPotential.Core.GameManagement
             return new Version(appVersion + "." + lastWrite.ToString("yyyyMMdd"));
         }
 
-        private void SavePlayerData(bool allData = false)
+        private void SaveData()
         {
-            // todo: is Fire-and-forget OK?
-            _playerManagement.SavePlayerDataBatchAsync(ServerGameDataStore.ClientIdToUsername, allData);
+            // todo: _saveManager.ProcessQueueAsync().FireAndForget();
+            _saveManager.ProcessQueueAsync().Forget();
         }
 
         public void CheckIsAdmin()
@@ -286,7 +291,7 @@ namespace FullPotential.Core.GameManagement
             eventManager.Register(InventoryBase.EventIdSlotChange, InventoryBase.DefaultHandlerForSlotChangeEvent);
         }
 
-        private async Awaitable DisconnectUserIfTokenInvalidAsync(ulong clientId, string username, string token)
+        private async UniTask DisconnectUserIfTokenInvalidAsync(ulong clientId, string username, string token)
         {
             if (!(await _userManagement.ValidateCredentialsAsync(username, token)))
             {

@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
 using FullPotential.Api.Data.Models;
-using FullPotential.Api.GameManagement.JsonModels;
+using FullPotential.Api.GameManagement.Models;
 
 using UnityEngine;
 
@@ -17,15 +17,7 @@ namespace FullPotential.Core.Persistence.Https
         {
         }
 
-        public async Awaitable<string> SignInWithExistingTokenAsync()
-        {
-            await Task.Yield();
-
-            // todo: check there is a token
-            return Token;
-        }
-
-        public async Awaitable<SignInResult> SignInWithPasswordAsync(string username, string password)
+        public async UniTask<SignInResult> SignInWithPasswordAsync(string username, string password)
         {
             var data = JsonUtility.ToJson(new Credentials
             {
@@ -59,7 +51,7 @@ namespace FullPotential.Core.Persistence.Https
             }
         }
 
-        public async Awaitable<bool> ValidateCredentialsAsync(string username, string token)
+        public async UniTask<bool> ValidateCredentialsAsync(string username, string token)
         {
             var data = JsonUtility.ToJson(new Credentials
             {
@@ -83,7 +75,7 @@ namespace FullPotential.Core.Persistence.Https
             }
         }
 
-        public async Awaitable<bool> SignOutAsync()
+        public async UniTask<bool> SignOutAsync()
         {
             Username = null;
             Token = null;

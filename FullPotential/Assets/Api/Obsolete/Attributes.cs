@@ -3,7 +3,7 @@
     [System.Serializable]
     public struct Attributes
     {
-        //todo: generalise Attributes after moving to use a database
+        //todo: zzz v0.6 - generalise Attributes after moving to use a database
         //i.e. dictionary of attributes
         //so it is easier to add attributes in the future or in mods
 

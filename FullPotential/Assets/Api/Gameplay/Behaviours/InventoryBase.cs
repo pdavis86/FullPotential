@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.Data;
 using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.EventArgs;
@@ -13,8 +14,6 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Obsolete.Networking;
-using FullPotential.Api.Obsolete.Networking.Data;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
@@ -34,17 +33,18 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
-    public abstract class InventoryBase : NetworkBehaviour
+    public abstract class InventoryBase : NetworkBehaviour, ISaveable
     {
         public const string EventIdSlotChange = "9c7972de-4136-4825-aaa3-11925ad049ee";
-
-        private IFragmentedMessageReconstructor _inventoryChangesReconstructor;
 
         #region Protected variables
         // ReSharper disable InconsistentNaming
 
-        protected Dictionary<string, ItemBase> _items;
+        protected readonly Dictionary<string, string> _itemIdToShapeMapping = new Dictionary<string, string>();
+
+        protected string _username;
         protected int _maxItemCount;
+        protected Dictionary<string, ItemBase> _items;
         protected Dictionary<string, EquippedItem> _equippedItems;
         protected LivingEntityBase _livingEntity;
 
@@ -52,7 +52,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected ITypeRegistry _typeRegistry;
         protected ILocalizer _localizer;
         protected IRpcService _rpcService;
-        private IEventManager _eventManager;
+        protected IEventManager _eventManager;
+
+        public bool IsDirty { get; set; }
 
         // ReSharper restore InconsistentNaming
         #endregion
@@ -69,14 +71,21 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
             _eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
 
-            _inventoryChangesReconstructor = DependenciesContext.Dependencies.GetService<IFragmentedMessageReconstructorFactory>().Create();
-
             _livingEntity = GetComponent<LivingEntityBase>();
         }
 
         #endregion
 
         #region RPC Calls
+
+        // ReSharper disable once UnusedParameter.Local
+        //[ClientRpc]
+        //protected void HandleInventoryChangeClientRpc(InventoryChanges inventoryChanges, ClientRpcParams clientRpcParams)
+        //{
+        //    ApplyInventoryChanges(inventoryChanges, true);
+        //}
+
+        #endregion
 
         public void SendInventoryChangesToClient(InventoryChanges changes)
         {
@@ -85,39 +94,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            SendInventoryChangesToClients(changes, _rpcService.ForPlayer(OwnerClientId));
+            //HandleInventoryChangeClientRpc(changes, _rpcService.ForPlayer(OwnerClientId));
         }
-
-        protected void SendInventoryChangesToClients(InventoryChanges changes, ClientRpcParams rpcParams)
-        {
-            if (!IsServer)
-            {
-                return;
-            }
-
-            foreach (var message in _inventoryChangesReconstructor.GetFragmentedMessages(changes))
-            {
-                HandleChangeMessageFragmentClientRpc(message, rpcParams);
-            }
-        }
-
-        // ReSharper disable once UnusedParameter.Local
-        [ClientRpc]
-        private void HandleChangeMessageFragmentClientRpc(string fragmentedMessageJson, ClientRpcParams clientRpcParams)
-        {
-            var fragmentedMessage = JsonUtility.FromJson<FragmentedMessage>(fragmentedMessageJson);
-
-            _inventoryChangesReconstructor.AddMessage(fragmentedMessage);
-            if (!_inventoryChangesReconstructor.HaveAllMessages(fragmentedMessage.GroupId))
-            {
-                return;
-            }
-
-            var changes = JsonUtility.FromJson<InventoryChanges>(_inventoryChangesReconstructor.Reconstruct(fragmentedMessage.GroupId));
-            ApplyInventoryChanges(changes, true);
-        }
-
-        #endregion
 
         public bool ApplyInventoryChanges(InventoryChanges changes, bool isFromClientRpc = false)
         {
@@ -304,6 +282,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 IdsToRemove = idsToRemove.ToArray(),
                 ItemStacks = stacksChanged.ToArray()
             };
+
+            IsDirty = true;
 
             return (countTaken, invChanges);
         }
@@ -631,6 +611,38 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             _equippedItems[slotId].GameObject.SetActive(show);
+        }
+
+        public InventoryChanges GetInventoryChanges()
+        {
+            // todo: zzz v0.6 - only return unsaved changes
+
+            var groupedItems = _items
+                .Select(x => x.Value)
+                .GroupBy(x => x.GetType());
+
+            var equippedItems = _equippedItems
+                .Where(x => !(x.Value?.Item?.Id.IsNullOrWhiteSpace() ?? false))
+                .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value.Item?.Id));
+
+            var shapeMapping = _itemIdToShapeMapping
+                .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value));
+
+            return new InventoryChanges
+            {
+                Username = _username,
+                MaxItems = _maxItemCount,
+                ShapeMapping = shapeMapping.ToArray(),
+                EquippedItems = equippedItems.ToArray(),
+                // todo: zzz v0.6 - these should be generalised
+                Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(Loot))?.Select(x => x as Loot).ToArray(),
+                Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray(),
+                Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
+                Consumers = groupedItems.FirstOrDefault(x => x.Key == typeof(Consumer))?.Select(x => x as Consumer).ToArray(),
+                Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
+                ItemStacks = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemStack))?.Select(x => x as ItemStack).ToArray(),
+                SpecialGear = groupedItems.FirstOrDefault(x => x.Key == typeof(SpecialGear))?.Select(x => x as SpecialGear).ToArray()
+            };
         }
     }
 }

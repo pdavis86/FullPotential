@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+
 using FullPotential.Api.Localization;
-using FullPotential.Api.Localization.Enums;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
@@ -13,6 +13,7 @@ using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
+
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 

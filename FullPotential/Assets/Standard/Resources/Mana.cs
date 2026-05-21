@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Registry.Gameplay;
 
@@ -10,7 +11,7 @@ namespace FullPotential.Standard.Resources
         public const string TypeIdString = "378443ee-7942-4cd5-977d-818ee03333e9";
 
         private static readonly Guid Id = new Guid(TypeIdString);
-        private static readonly Color ResourceColor = Color.FromArgb(185, 36, 158);
+        private static readonly Color ResourceColor = Color.FromArgb(39, 80, 147); // Blue
 
         public Guid TypeId => Id;
 

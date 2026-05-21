@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Registry.Gameplay;
@@ -9,7 +10,7 @@ namespace FullPotential.Core.Registry.Resources
     public class Stamina : IResourceType
     {
         private static readonly Guid Id = new Guid(ResourceTypeIds.StaminaId);
-        private static readonly Color ResourceColor = Color.FromArgb(39, 80, 147);
+        private static readonly Color ResourceColor = Color.FromArgb(25, 118, 64); // Green
 
         public Guid TypeId => Id;
 

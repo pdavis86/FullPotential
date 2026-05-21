@@ -3,8 +3,10 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Modding;
-using FullPotential.Api.Unity.Services;
+using FullPotential.Api.Unity;
+
 using Unity.Netcode;
+
 using UnityEngine.InputSystem;
 
 // ReSharper disable UnusedType.Global
@@ -20,7 +22,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
+            _gameManager = DependenciesContext.Dependencies.GetService<IGameManager>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
 

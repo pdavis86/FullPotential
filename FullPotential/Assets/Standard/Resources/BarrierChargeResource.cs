@@ -13,7 +13,7 @@ namespace FullPotential.Standard.Resources
         public const string TypeIdString = "9f026e17-d313-4402-9da6-c5b002e26c64";
 
         private static readonly Guid Id = new Guid(TypeIdString);
-        private static readonly Color ResourceColor = Color.FromArgb(255, 255, 0);
+        private static readonly Color ResourceColor = Color.FromArgb(185, 36, 158); // Purple
 
         public Guid TypeId => Id;
 

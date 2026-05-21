@@ -6,7 +6,8 @@
         "Unity.Collections",
         "Unity.InputSystem",
         "Unity.Mathematics",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

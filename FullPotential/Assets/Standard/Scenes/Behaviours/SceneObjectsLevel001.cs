@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
+
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Scenes;
-using FullPotential.Api.Unity.Services;
+using FullPotential.Api.Unity;
 using FullPotential.Standard.Enemies.Behaviours;
+
 using Unity.Netcode;
+
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -44,7 +47,7 @@ namespace FullPotential.Standard.Scenes.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _gameManager = DependenciesContext.Dependencies.GetService<IModHelper>().GetGameManager();
+            _gameManager = DependenciesContext.Dependencies.GetService<IGameManager>();
             _sceneService = DependenciesContext.Dependencies.GetService<ISceneService>();
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
         }

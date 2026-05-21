@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+
+using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnassignedField.Global
@@ -10,7 +12,7 @@ namespace FullPotential.Core.GameManagement
         public GameObject Player;
         public EnvironmentObjects Environment;
 
-        [System.Serializable]
+        [Serializable]
         public class EnvironmentObjects
         {
             public GameObject LootChest;
