@@ -42,13 +42,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
     [RequireComponent(typeof(Rigidbody))]
     public abstract class LivingEntityBase : NetworkBehaviour
     {
-        public const string EventIdResourceValueChangeBefore = "34372a74-abf3-44eb-8598-4427a82f29ab";
-        public const string EventIdResourceValueChangeAfter = "20b3ff1d-e8d0-438a-873d-98124f726e38";
+        public const string EventIdResourceValueChange = "34372a74-abf3-44eb-8598-4427a82f29ab";
 
         private const int VelocityThreshold = 3;
         private const int ForceThreshold = 1000;
         private const int SingleResourceChangeEffectDisplaySeconds = 3;
-        private const string EncodedValueSeparator = ";";
 
         #region Inspector Variables
 #pragma warning disable 0649
@@ -157,12 +155,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected virtual void FixedUpdate()
         {
             RemoveExpiredEffects();
-
-            if (!IsServer)
-            {
-                return;
-            }
-
             ReplenishAndConsume();
         }
 
@@ -183,6 +175,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
         #endregion
 
         #region ClientRpc calls
+
+        // ReSharper disable once UnusedParameter.Local
+        [ClientRpc]
+        private void UpdateHealthValueClientRpc(int newValue, ClientRpcParams clientRpcParams)
+        {
+            UpdateResourceValue(ResourceTypeIds.HealthId, newValue);
+        }
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
@@ -310,59 +309,73 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return value;
         }
 
-        public void AdjustResourceValue(string typeId, int change)
-        {
-            var currentValue = GetResourceValue(typeId);
-            currentValue = ClampResourceValue(typeId, currentValue);
-            TriggerResourceValueUpdate(typeId, currentValue, currentValue + change);
-        }
-
         protected void SetResourceInitialValues(Dictionary<string, int> values)
         {
             foreach (var kvp in values)
             {
                 _resourceValueCache[kvp.Key] = ClampResourceValue(kvp.Key, kvp.Value);
             }
+
+            UpdateUiHealthAndDefenceValues();
         }
 
         public void TriggerResourceValueUpdate(string typeId, int oldValue, int newValue)
         {
-            var eventArgs = new ResourceValueChangedEventArgs(this, typeId, newValue, newValue - oldValue);
-            _eventManager.Trigger(EventIdResourceValueChangeBefore, eventArgs);
+            TriggerResourceValueUpdate(typeId, newValue - oldValue);
         }
 
-        public static void DefaultHandlerForResourceValueBeforeChangeEvent(IEventHandlerArgs eventArgs)
+        public void TriggerResourceValueUpdate(string typeId, int change)
+        {
+            var currentValue = ClampResourceValue(typeId, GetResourceValue(typeId));
+            var eventArgs = new ResourceValueChangedEventArgs(this, typeId, currentValue + change, change);
+            _eventManager.Trigger(EventIdResourceValueChange, eventArgs);
+        }
+
+        public static void DefaultHandlerForResourceValueChangeEvent(IEventHandlerArgs eventArgs)
         {
             var changedArgs = (ResourceValueChangedEventArgs)eventArgs;
-            changedArgs.LivingEntity.SetServerResourceValueAndSend(changedArgs.ResourceTypeId, changedArgs.NewValue);
+            changedArgs.LivingEntity.UpdateResourceValue(changedArgs.ResourceTypeId, changedArgs.NewValue);
         }
 
-        internal void SetServerResourceValueAndSend(string typeId, int newValue)
-        {
-            if (!IsServer)
-            {
-                return;
-            }
-
-            newValue = ClampResourceValue(typeId, newValue);
-            _resourceValueCache[typeId] = newValue;
-
-            // todo: do resource calcs on both server and client
-            //SendServerResourceValuesToClients();
-        }
-
-        //protected void SendServerResourceValuesToClients()
+        // todo: remove debugging
+        //private string GetResourceTypeName(string resourceTypeId)
         //{
-        //    var newEncodeValue = string.Join(EncodedValueSeparator, _resourceValueCache.Select(x => x.Value.ToString()));
-        //    _encodedResourceValues.Value = newEncodeValue;
+        //    switch (resourceTypeId)
+        //    {
+        //        case ResourceTypeIds.HealthId: return "Health";
+        //        case ResourceTypeIds.StaminaId: return "Stamina";
+        //        case "378443ee-7942-4cd5-977d-818ee03333e9": return "Mana";
+        //        case "89ec3ecf-badb-4e55-91b0-b288ca358010": return "Energy";
+        //        case "9f026e17-d313-4402-9da6-c5b002e26c64": return "Barrier charge";
+        //        default: return "Unknown";
+        //    }
         //}
 
-        protected void SetServerResourceValuesForRespawn()
+        internal void UpdateResourceValue(string typeId, int newValue)
+        {
+            newValue = ClampResourceValue(typeId, newValue);
+
+            // todo: remove debugging
+            //var locationName = IsServer ? "Server" : "Client";
+            //var typeName = GetResourceTypeName(typeId);
+            //Debug.Log($"{locationName}-{OwnerClientId}: '{typeName}' changed from {_resourceValueCache[typeId]} to {newValue}");
+
+            _resourceValueCache[typeId] = newValue;
+
+            // todo: zzz v0.7 - remove health bar over each player?
+            if (IsServer && typeId == ResourceTypeIds.HealthId)
+            {
+                var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, 0);
+                UpdateHealthValueClientRpc(newValue, nearbyClients);
+            }
+        }
+
+        protected void SetResourceValuesForRespawn()
         {
             var resourceKeys = _resourceValueCache.Keys.ToList();
-            foreach (var resourceId in resourceKeys)
+            foreach (var resourceTypeId in resourceKeys)
             {
-                TriggerResourceValueUpdate(resourceId, 0, GetResourceMax(resourceId));
+                TriggerResourceValueUpdate(resourceTypeId, GetResourceValue(resourceTypeId), GetResourceMax(resourceTypeId));
             }
         }
 
@@ -413,7 +426,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 var staminaCost = GetStaminaCost();
                 if (staminaValue >= staminaCost)
                 {
-                    AdjustResourceValue(ResourceTypeIds.StaminaId, -staminaCost / 2);
+                    TriggerResourceValueUpdate(ResourceTypeIds.StaminaId, -staminaCost / 2);
                 }
             });
         }
@@ -445,31 +458,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _nameTag.text = displayName;
         }
 
-        //private void UpdateResourceValuesFromEncodedValue()
-        //{
-        //    var newValues = _encodedResourceValues.Value.ToString().Split(EncodedValueSeparator);
-
-        //    for (var i = 0; i < newValues.Length; i++)
-        //    {
-        //        if (newValues[i].IsNullOrWhiteSpace())
-        //        {
-        //            continue;
-        //        }
-
-        //        var typeId = _resourceValueCache.ElementAt(i).Key;
-
-        //        var oldValue = _resourceValueCache[typeId];
-        //        _resourceValueCache[typeId] = int.Parse(newValues[i]);
-
-        //        var eventArgs = new ResourceValueChangedEventArgs(this, typeId, _resourceValueCache[typeId], oldValue - _resourceValueCache[typeId]);
-        //        _eventManager.Trigger(EventIdResourceValueChangeAfter, eventArgs);
-        //    }
-        //}
-
         public void UpdateUiHealthAndDefenceValues()
         {
-            //todo: zzz v0.6 - use events
-
             if (!IsClient)
             {
                 return;
@@ -547,7 +537,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ShowHealthChangeToSourceFighter(_fighterWhoMovedMeLast, contactPoint.point, healthChange, false);
             }
 
-            TriggerResourceValueUpdate(ResourceTypeIds.HealthId, health, health + healthChange);
+            TriggerResourceValueUpdate(ResourceTypeIds.HealthId, healthChange);
         }
 
         #endregion
@@ -704,7 +694,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            AdjustResourceValue(resourceEffect.ResourceTypeIdString, combatResult.Change);
+            TriggerResourceValueUpdate(resourceEffect.ResourceTypeIdString, combatResult.Change);
             AddOrUpdateEffect(resourceEffect, combatResult.Change, DateTime.Now.AddSeconds(SingleResourceChangeEffectDisplaySeconds));
         }
 
@@ -713,7 +703,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var expiry = DateTime.Now.AddSeconds(itemUsed.GetEffectDuration());
 
             var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, resourceEffect, this);
-            AdjustResourceValue(resourceEffect.ResourceTypeIdString, combatResult.Change);
+            TriggerResourceValueUpdate(resourceEffect.ResourceTypeIdString, combatResult.Change);
             AddOrUpdateEffect(resourceEffect, combatResult.Change, expiry);
         }
 

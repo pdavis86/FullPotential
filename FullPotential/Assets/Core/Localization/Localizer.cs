@@ -30,6 +30,8 @@ namespace FullPotential.Core.Localization
         private readonly List<CultureAddressables> _availableCultures = new List<CultureAddressables>();
         private readonly Dictionary<Type, string> _typeDictionary = new Dictionary<Type, string>();
 
+        private bool _isLoadingTranslations;
+
         public CultureInfo CurrentCulture { get; private set; }
 
         public Localizer()
@@ -141,6 +143,7 @@ namespace FullPotential.Core.Localization
 
         public async Task LoadLocalizationFilesAsync(string cultureCode)
         {
+            _isLoadingTranslations = true;
             _addressesLoaded.Clear();
             _translations.Clear();
 
@@ -165,6 +168,8 @@ namespace FullPotential.Core.Localization
 
                 ExtractTranslations(data, address);
             }
+
+            _isLoadingTranslations = false;
         }
 
         public Dictionary<string, string> GetAvailableCultures()
@@ -174,6 +179,11 @@ namespace FullPotential.Core.Localization
 
         public string Translate(string id)
         {
+            if (_isLoadingTranslations)
+            {
+                return "...";
+            }
+
             id = id.ToLower();
 
             if (_translations.TryGetValue(id, out var translation))

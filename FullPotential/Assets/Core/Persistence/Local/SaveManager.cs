@@ -54,7 +54,8 @@ namespace FullPotential.Core.Persistence.Local
                 return;
             }
 
-            Debug.Log($"Processing save queue for {username}");
+            // todo: remove debugging
+            //Debug.Log($"Processing save queue for {username}");
 
             var tasks = GetUniTasksForusername(username);
 
@@ -82,7 +83,8 @@ namespace FullPotential.Core.Persistence.Local
                 return;
             }
 
-            Debug.Log("Processing save queue");
+            // todo: remove debugging
+            //Debug.Log("Processing save queue");
 
             _isProcessingQueue = true;
 
@@ -112,16 +114,25 @@ namespace FullPotential.Core.Persistence.Local
 
         private async UniTask SaveImmediatelyAsync(ISaveable saveable, string username)
         {
+            if (!saveable.IsDirty)
+            {
+                Debug.LogWarning($"Did not save {saveable.GetType().Name} for username '{username}' because it was not dirty");
+                return;
+            }
+
+            // todo: remove debugging
             Debug.Log($"Saving type {saveable.GetType().Name} for user {username}");
 
             if (saveable is IPlayerFighter playerFighter)
             {
                 await _playerManagement.SavePlayerDataAsync(playerFighter.GetPlayerData());
+                playerFighter.IsDirty = false;
             }
 
             if (saveable is InventoryBase inventory)
             {
                 await _playerManagement.SaveInventoryChangesAsync(inventory.GetInventoryChanges());
+                inventory.IsDirty = false;
             }
         }
     }

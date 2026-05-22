@@ -1,4 +1,5 @@
 ﻿using System;
+
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
@@ -46,7 +47,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             barrier.SetCustomData(CustomDataKeyLastHit, DateTime.UtcNow.ToString("u"));
 
-            resourceChangeArgs.LivingEntity.AdjustResourceValue(BarrierChargeResource.TypeIdString, resourceChangeArgs.Change);
+            resourceChangeArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, resourceChangeArgs.Change);
 
             if (barrierCharge < Math.Abs(resourceChangeArgs.Change))
             {

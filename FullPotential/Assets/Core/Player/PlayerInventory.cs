@@ -58,26 +58,23 @@ namespace FullPotential.Core.Player
         public void EquipItemServerRpc(string itemId, string slotId)
         {
             var item = _items[itemId];
-
-            var slotChange = HandleSlotChange(item, slotId);
+            HandleSlotChange(item, slotId);
 
             MarkAsDirty();
+            
+            var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
+            HandleEquippedItemsChangeClientRpc(GetEquippedItemsArray(), nearbyClients);
+        }
 
-            //var invChanges = new InventoryChanges
-            //{
-            //    EquippedItems = _equippedItems
-            //        .Where(x => slotChange.SlotsToSend.Contains(x.Key))
-            //        .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value.Item?.Id))
-            //        .ToArray()
-            //};
+        #endregion
 
-            //if (slotChange.WasEquipped)
-            //{
-            //    PopulateInventoryChangesWithItem(invChanges, item);
-            //}
+        #region RPC Calls
 
-            //var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-            // todo: HandleInventoryChangeClientRpc(invChanges, nearbyClients);
+        // ReSharper disable once UnusedParameter.Local
+        [ClientRpc]
+        protected void HandleEquippedItemsChangeClientRpc(SerializableKeyValuePair<string, string>[] equippedItems, ClientRpcParams clientRpcParams)
+        {
+            ApplyEquippedItemChanges(equippedItems);
         }
 
         #endregion
@@ -616,6 +613,11 @@ namespace FullPotential.Core.Player
 
         private void MarkAsDirty()
         {
+            if (!IsServer)
+            {
+                return;
+            }
+
             IsDirty = true;
             _saveManager.AddToQueue(_playerFighter.Username, this);
         }

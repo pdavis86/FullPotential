@@ -1,4 +1,5 @@
 ﻿using System;
+
 using FullPotential.Api.Gameplay.Combat.EventArgs;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Standard.Resources;
@@ -8,7 +9,7 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class ResourceValueChangedEventHandler : IEventHandler
+    public class ChargeChangeEventHandler : IEventHandler
     {
         public NetworkLocation Location => NetworkLocation.Client;
 

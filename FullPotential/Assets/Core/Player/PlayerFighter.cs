@@ -95,7 +95,14 @@ namespace FullPotential.Core.Player
             }
         }
 
-        [HideInInspector] public string Username { get; set; }
+        private string _username;
+
+        [HideInInspector]
+        public string Username
+        {
+            get => _username;
+            set => _username = value;
+        }
 
         public IPlayerInventory PlayerInventory { get; private set; }
 
@@ -191,6 +198,12 @@ namespace FullPotential.Core.Player
             BecomeVulnerable();
         }
 
+        protected override void OnSynchronize<T>(ref BufferSerializer<T> serializer)
+        {
+            serializer.SerializeValue(ref _username);
+            base.OnSynchronize(ref serializer);
+        }
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -215,7 +228,7 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         private void RespawnServerRpc()
         {
-            SetServerResourceValuesForRespawn();
+            SetResourceValuesForRespawn();
 
             AliveState = LivingEntityState.Respawning;
 
@@ -247,21 +260,6 @@ namespace FullPotential.Core.Player
         #endregion
 
         #region ClientRpc calls
-
-        //// ReSharper disable once UnusedParameter.Local
-        //[ClientRpc]
-        //private void LoadPlayerDataClientRpc(ClientRpcParams clientRpcParams)
-        //{
-        //    DoThing().Forget();
-        //}
-
-        //private async UniTask DoThing()
-        //{
-        //    var playerData = await _playerManagement.GetPlayerDataAsync(Username);
-        //    LoadFromPlayerData(playerData);
-
-        //    SetTextureAsync().Forget();
-        //}
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
@@ -470,24 +468,22 @@ namespace FullPotential.Core.Player
         private void LoadFromPlayerData(PlayerData playerData)
         {
             TextureUrl = playerData.Settings?.TextureUrl ?? string.Empty;
+            _characterSettings = playerData.Settings;
 
             if (IsServer)
             {
                 _entityName.Value = Username;
-
-                var nonHealthResources = GetResources().Where(x => x.TypeId.ToString() != ResourceTypeIds.HealthId);
-                SetResourceInitialValues(nonHealthResources.ToDictionary(
-                    resource => resource.TypeId.ToString(),
-                    resource => playerData.Resources.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value));
-
-                var health = playerData.Resources.FirstOrDefault(kvp => kvp.Key == nameof(Health)).Value;
-                var newValue = health > 0 ? health : GetResourceMax(ResourceTypeIds.HealthId);
-                TriggerResourceValueUpdate(ResourceTypeIds.HealthId, 0, newValue);
             }
 
-            _characterSettings = playerData.Settings;
+            var health = playerData.Resources.FirstOrDefault(kvp => kvp.Key == nameof(Health));
+            if (health.Value == 0)
+            {
+                health.Value = GetResourceMax(ResourceTypeIds.HealthId);
+            }
 
-            UpdateUiHealthAndDefenceValues();
+            SetResourceInitialValues(GetResources().ToDictionary(
+                resource => resource.TypeId.ToString(),
+                resource => playerData.Resources.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value));
         }
 
         public void UpdatePlayerSettings(CharacterSettings characterSettings)

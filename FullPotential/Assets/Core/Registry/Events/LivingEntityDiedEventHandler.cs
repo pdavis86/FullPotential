@@ -19,7 +19,7 @@ namespace FullPotential.Core.Registry.Events
         {
             var changedArgs = (ResourceValueChangedEventArgs)eventArgs;
 
-            if (changedArgs.NewValue != 0 || changedArgs.ResourceTypeId != ResourceTypeIds.HealthId)
+            if (changedArgs.NewValue > 0 || changedArgs.ResourceTypeId != ResourceTypeIds.HealthId)
             {
                 return;
             }
