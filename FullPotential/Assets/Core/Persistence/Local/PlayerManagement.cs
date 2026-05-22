@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Cysharp.Threading.Tasks;
@@ -49,28 +50,45 @@ namespace FullPotential.Core.Persistence.Local
         public async UniTask<InventoryData> GetInventoryDataAsync(string username, bool reduced)
         {
             var filePath = GetInventorySavePath(username);
+            InventoryData inventoryData;
 
             if (System.IO.File.Exists(filePath))
             {
                 var loadJson = System.IO.File.ReadAllText(filePath);
-                var inventoryData = JsonUtility.FromJson<InventoryData>(loadJson);
-                return inventoryData;
+                inventoryData = JsonUtility.FromJson<InventoryData>(loadJson);
             }
-
-            // todo: zzz v0.6 - remove this fall-back
-            filePath = GetPlayerSavePath(username);
-            if (!System.IO.File.Exists(filePath))
+            else
             {
-                return new InventoryData();
+                // todo: zzz v0.6 - remove this fall-back
+                filePath = GetPlayerSavePath(username);
+                if (!System.IO.File.Exists(filePath))
+                {
+                    return new InventoryData();
+                }
+
+                var loadJsonOld = System.IO.File.ReadAllText(filePath);
+                var playerDataOld = JsonUtility.FromJson<PlayerDataOld>(loadJsonOld);
+                playerDataOld.Inventory.Username = username;
+                inventoryData = playerDataOld.Inventory;
             }
 
-            var loadJsonOld = System.IO.File.ReadAllText(filePath);
-            var playerDataOld = JsonUtility.FromJson<PlayerDataOld>(loadJsonOld);
-            playerDataOld.Inventory.Username = username;
+            if (reduced)
+            {
+                inventoryData.Loot = null;
+                inventoryData.ShapeMapping = null;
+                inventoryData.ItemStacks = null;
+
+                var equippedItemIds = inventoryData.EquippedItems.Select(x => x.Value);
+                inventoryData.Accessories = inventoryData.Accessories.Where(x => equippedItemIds.Contains(x.Id)).ToArray();
+                inventoryData.Armor = inventoryData.Armor.Where(x => equippedItemIds.Contains(x.Id)).ToArray();
+                inventoryData.Weapons = inventoryData.Weapons.Where(x => equippedItemIds.Contains(x.Id)).ToArray();
+                inventoryData.Consumers = inventoryData.Consumers.Where(x => equippedItemIds.Contains(x.Id)).ToArray();
+                inventoryData.SpecialGear = inventoryData.SpecialGear.Where(x => equippedItemIds.Contains(x.Id)).ToArray();
+            }
 
             await Task.Yield();
 
-            return playerDataOld.Inventory;
+            return inventoryData;
         }
 
         public async UniTask SaveInventoryChangesAsync(InventoryChanges inventoryChanges)

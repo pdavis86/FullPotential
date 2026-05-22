@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Modding;
+
 using UnityEngine;
 
 // ReSharper disable UnusedType.Global
@@ -152,8 +154,8 @@ namespace FullPotential.Standard
         public void RegisterEventHandlers(IEventManager eventManager)
         {
             eventManager.Subscribe<Accessories.AutoAmmoBuyer.ReloadEventHandler>(FighterBase.EventIdReload);
-            eventManager.Subscribe<SpecialGear.Barrier.HealthChangeEventHandler>(LivingEntityBase.EventIdResourceValueChangeBefore);
-            eventManager.Subscribe<SpecialGear.Barrier.ResourceValueChangedEventHandler>(LivingEntityBase.EventIdResourceValueChangeAfter);
+            eventManager.Subscribe<SpecialGear.Barrier.HealthChangeEventHandler>(LivingEntityBase.EventIdResourceValueChange);
+            eventManager.Subscribe<SpecialGear.Barrier.ChargeChangeEventHandler>(LivingEntityBase.EventIdResourceValueChange);
             eventManager.Subscribe<SpecialGear.Reloader.ConsolidatorReloader.ReloadEventHandler>(FighterBase.EventIdReload);
             eventManager.Subscribe<SpecialGear.Reloader.TeleportReloader.ReloadEventHandler>(FighterBase.EventIdReload);
             eventManager.Subscribe<SpecialGear.Reloader.TeleportReloader.ShotFiredEventHandler>(FighterBase.EventIdShotFired);

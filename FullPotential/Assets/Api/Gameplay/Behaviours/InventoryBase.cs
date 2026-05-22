@@ -13,7 +13,6 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Networking;
-using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
@@ -75,27 +74,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         }
 
         #endregion
-
-        #region RPC Calls
-
-        // ReSharper disable once UnusedParameter.Local
-        //[ClientRpc]
-        //protected void HandleInventoryChangeClientRpc(InventoryChanges inventoryChanges, ClientRpcParams clientRpcParams)
-        //{
-        //    ApplyInventoryChanges(inventoryChanges, true);
-        //}
-
-        #endregion
-
-        public void SendInventoryChangesToClient(InventoryChanges changes)
-        {
-            if (IsHost && OwnerClientId == NetworkManager.Singleton.LocalClientId)
-            {
-                return;
-            }
-
-            //HandleInventoryChangeClientRpc(changes, _rpcService.ForPlayer(OwnerClientId));
-        }
 
         public bool ApplyInventoryChanges(InventoryChanges changes, bool isFromClientRpc = false)
         {
@@ -172,11 +150,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             NotifyOfItemsAdded(itemsToAdd);
 
             ApplyEquippedItemChanges(changes.EquippedItems);
-
-            if (!isFromClientRpc)
-            {
-                SendInventoryChangesToClient(changes);
-            }
 
             return true;
         }
@@ -621,10 +594,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 .Select(x => x.Value)
                 .GroupBy(x => x.GetType());
 
-            var equippedItems = _equippedItems
-                .Where(x => !(x.Value?.Item?.Id.IsNullOrWhiteSpace() ?? false))
-                .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value.Item?.Id));
-
             var shapeMapping = _itemIdToShapeMapping
                 .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value));
 
@@ -633,7 +602,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 Username = _username,
                 MaxItems = _maxItemCount,
                 ShapeMapping = shapeMapping.ToArray(),
-                EquippedItems = equippedItems.ToArray(),
+                EquippedItems = GetEquippedItemsArray(),
                 // todo: zzz v0.6 - these should be generalised
                 Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(Loot))?.Select(x => x as Loot).ToArray(),
                 Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray(),
@@ -643,6 +612,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ItemStacks = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemStack))?.Select(x => x as ItemStack).ToArray(),
                 SpecialGear = groupedItems.FirstOrDefault(x => x.Key == typeof(SpecialGear))?.Select(x => x as SpecialGear).ToArray()
             };
+        }
+
+        public SerializableKeyValuePair<string, string>[] GetEquippedItemsArray()
+        {
+            var equippedItems = _equippedItems
+                .Where(x => !(x.Value?.Item?.Id.IsNullOrWhiteSpace() ?? false))
+                .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value.Item?.Id));
+
+            return equippedItems.ToArray();
         }
     }
 }

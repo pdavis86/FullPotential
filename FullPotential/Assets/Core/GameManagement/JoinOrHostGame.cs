@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Linq;
+using System.Threading;
 
 using Cysharp.Threading.Tasks;
 
@@ -74,8 +74,9 @@ namespace FullPotential.Core.GameManagement
             _settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
 
             _gameSettings = _settingsRepository.Get();
-            GameManager.Instance.LocalGameDataStore.PlayerToken = _gameSettings.LastSigninToken;
             _username = _gameSettings.LastSigninUsername;
+
+            _signinPassword.onSubmit.AddListener((string input) => HandleSignInClick());
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -94,7 +95,10 @@ namespace FullPotential.Core.GameManagement
         {
             _signinUsername.text = _username;
 
-            if (string.IsNullOrWhiteSpace(GameManager.Instance.LocalGameDataStore.PlayerToken))
+            // todo: Comment out 'LastSigninToken = null' when not debugging
+            _gameSettings.LastSigninToken = null;
+
+            if (string.IsNullOrWhiteSpace(_gameSettings.LastSigninToken))
             {
                 _gameDetailsContainer.SetActive(false);
                 _signInContainer.SetActive(true);
@@ -215,8 +219,8 @@ namespace FullPotential.Core.GameManagement
 
         private async UniTask SignInWithTokenAsync()
         {
-            var isValid = await _userManagement.ValidateCredentialsAsync(_username, GameManager.Instance.LocalGameDataStore.PlayerToken);
-            await HandleSignInResultAsync(GameManager.Instance.LocalGameDataStore.PlayerToken, !isValid);
+            var isValid = await _userManagement.ValidateCredentialsAsync(_username, _gameSettings.LastSigninToken);
+            await HandleSignInResultAsync(_gameSettings.LastSigninToken, !isValid);
         }
 
         private async UniTask SignInWithPasswordAsync()
@@ -290,6 +294,7 @@ namespace FullPotential.Core.GameManagement
         {
             if (GameManager.Instance.LocalGameDataStore.HasDisconnected && !_gameDetailsError.gameObject.activeInHierarchy)
             {
+                _signInContainer.SetActive(false);
                 _gameDetailsContainer.SetActive(true);
                 _joiningMessage.SetActive(false);
 
@@ -356,7 +361,7 @@ namespace FullPotential.Core.GameManagement
         {
             var payload = JsonUtility.ToJson(new ConnectionPayload
             {
-                Username = _username,
+                Username = _gameSettings.LastSigninUsername,
                 Token = GameManager.Instance.LocalGameDataStore.PlayerToken,
                 GameVersion = GameManager.GetGameVersion().ToString()
             });
@@ -374,10 +379,10 @@ namespace FullPotential.Core.GameManagement
 
             //NOTE: Do not need to change scene. This is handled by the server
 
-            JoinGameTimeoutAsync().Forget();
+            JoinGameTimeoutAsync(this.GetCancellationTokenOnDestroy()).Forget();
         }
 
-        private async UniTask JoinGameTimeoutAsync()
+        private async UniTask JoinGameTimeoutAsync(CancellationToken cancellationToken)
         {
             const int timeoutSeconds = 10;
 
@@ -403,7 +408,7 @@ namespace FullPotential.Core.GameManagement
 
                 await UniTask.WaitForSeconds(1);
 
-            } while (true);
+            } while (!cancellationToken.IsCancellationRequested);
         }
     }
 }

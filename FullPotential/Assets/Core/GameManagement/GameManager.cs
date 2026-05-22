@@ -153,7 +153,7 @@ namespace FullPotential.Core.GameManagement
 
             var playerUsername = connectionPayload.Username;
 
-            if (playerUsername == null)
+            if (string.IsNullOrEmpty(playerUsername))
             {
                 Debug.LogWarning("Someone tried to connect with an invalid Player token");
                 return;
@@ -264,7 +264,6 @@ namespace FullPotential.Core.GameManagement
 
         private void SaveData()
         {
-            // todo: _saveManager.ProcessQueueAsync().FireAndForget();
             _saveManager.ProcessQueueAsync().Forget();
         }
 
@@ -281,13 +280,9 @@ namespace FullPotential.Core.GameManagement
         {
             var eventManager = (EventManager)DependenciesContext.Dependencies.GetService<IEventManager>();
 
-            //NOTE: Before and after events because the code is updating a NetworkVariable
-            eventManager.Register(LivingEntityBase.EventIdResourceValueChangeBefore, LivingEntityBase.DefaultHandlerForResourceValueBeforeChangeEvent);
-            eventManager.Register(LivingEntityBase.EventIdResourceValueChangeAfter, null);
-
+            eventManager.Register(LivingEntityBase.EventIdResourceValueChange, LivingEntityBase.DefaultHandlerForResourceValueChangeEvent);
             eventManager.Register(FighterBase.EventIdReload, FighterBase.DefaultHandlerForReloadEvent);
             eventManager.Register(FighterBase.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEvent);
-
             eventManager.Register(InventoryBase.EventIdSlotChange, InventoryBase.DefaultHandlerForSlotChangeEvent);
         }
 
@@ -363,7 +358,7 @@ namespace FullPotential.Core.GameManagement
             playerNetObj.transform.position = newPosition;
 
             var playerState = playerNetObj.GetComponent<PlayerFighter>();
-            playerState.Username = ServerGameDataStore.ClientIdToUsername[playerState.OwnerClientId];
+            playerState.Username = ServerGameDataStore.ClientIdToUsername[serverRpcParams.Receive.SenderClientId];
 
             playerNetObj.SpawnAsPlayerObject(serverRpcParams.Receive.SenderClientId);
         }

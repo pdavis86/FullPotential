@@ -714,7 +714,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (!isTest)
             {
-                AdjustResourceValue(resourceTypeId, -resourceCost);
+                TriggerResourceValueUpdate(resourceTypeId, -resourceCost);
             }
 
             return true;
@@ -785,8 +785,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             equippedWeapon.UpdateAmmo(equippedWeapon.Ammo + countTaken);
 
             invChanges.Weapons = new[] { equippedWeapon };
-
-            fighter.Inventory.SendInventoryChangesToClient(invChanges);
         }
     }
 }

@@ -137,6 +137,7 @@
     <Compile Include="Assets\Api\Gameplay\Events\IEventHandlerArgs.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesCollection.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\LivingEntityState.cs" />
+    <Compile Include="Assets\Api\Unity\Extensions\SerializationExtensions.cs" />
     <Compile Include="Assets\Api\Data\IPlayerManagement.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\EventArgs\ShotFiredEventArgs.cs" />
     <Compile Include="Assets\Api\Registry\Weapons\IWeaponType.cs" />

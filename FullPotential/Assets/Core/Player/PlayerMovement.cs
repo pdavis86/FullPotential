@@ -13,7 +13,6 @@ using UnityEngine.InputSystem;
 
 namespace FullPotential.Core.Player
 {
-
     [RequireComponent(typeof(Rigidbody))]
     public class PlayerMovement : NetworkBehaviour
     {
@@ -133,9 +132,9 @@ namespace FullPotential.Core.Player
         #region RPC Methods
 
         [ServerRpc]
-        private void UpdateSprintStateServerRpc(bool isTryingToSprint)
+        private void UpdateSprintStateServerRpc(bool isTryingToSprint, Vector2 moveVal)
         {
-            UpdateSprintingState(isTryingToSprint);
+            UpdateSprintingState(isTryingToSprint, moveVal);
         }
 
         #endregion
@@ -145,7 +144,7 @@ namespace FullPotential.Core.Player
             return Physics.Raycast(transform.position, -Vector3.up, _maxDistanceToBeStanding);
         }
 
-        private void UpdateSprintingState(bool isTryingToSprint)
+        private void UpdateSprintingState(bool isTryingToSprint, Vector2 moveVal)
         {
             if (!isTryingToSprint)
             {
@@ -153,8 +152,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            _playerFighter.IsSprinting = _playerFighter.GetResourceValue(ResourceTypeIds.StaminaId) >= _playerFighter.GetStaminaCost();
-            _isTryingToSprint = _playerFighter.IsSprinting;
+            _playerFighter.IsSprinting = moveVal != Vector2.zero && _playerFighter.GetResourceValue(ResourceTypeIds.StaminaId) >= _playerFighter.GetStaminaCost();
         }
 
         private void MoveAndLook(Vector2 moveVal, Vector2 lookVal, bool isTryingToSprint)
@@ -163,8 +161,6 @@ namespace FullPotential.Core.Player
             {
                 var moveForwards = transform.forward * moveVal.y;
                 var moveSideways = transform.right * moveVal.x;
-
-                UpdateSprintingState(isTryingToSprint);
 
                 if (_playerFighter.IsSprinting)
                 {
@@ -234,8 +230,10 @@ namespace FullPotential.Core.Player
 
             if (_isTryingToSprint != _playerFighter.IsSprinting)
             {
-                UpdateSprintStateServerRpc(_isTryingToSprint);
+                UpdateSprintStateServerRpc(_isTryingToSprint, _moveVal);
             }
+
+            UpdateSprintingState(_isTryingToSprint, _moveVal);
 
             MoveAndLook(_moveVal, _lookVal, _isTryingToSprint);
 

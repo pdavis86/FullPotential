@@ -148,12 +148,12 @@
     <Compile Include="Assets\Standard\Shapes\ZoneBehaviour.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicBow.cs" />
     <Compile Include="Assets\Standard\Armor\Legs.cs" />
-    <Compile Include="Assets\Standard\SpecialGear\Barrier\ResourceValueChangedEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Haste.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Plummet.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Courage.cs" />
     <Compile Include="Assets\Standard\Scenes\Behaviours\SceneObjectsLevel001.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveLeft.cs" />
+    <Compile Include="Assets\Standard\SpecialGear\Barrier\ChargeChangeEventHandler.cs" />
     <Compile Include="Assets\Standard\Armor\Chest.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Air.cs" />
     <Compile Include="Assets\Standard\TargetingVisuals\BeamOfFlames.cs" />
