@@ -1,7 +1,8 @@
 ﻿using System;
 
 using FullPotential.Api.Data.Models;
-using FullPotential.Api.Gameplay.Player;
+
+// ReSharper disable UnusedMember.Global
 
 namespace FullPotential.Api.Obsolete
 {

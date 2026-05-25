@@ -1,11 +1,11 @@
-﻿
+﻿using System;
+
+using FullPotential.Api.GameManagement;
+
 // ReSharper disable UnassignedField.Global
 
-namespace FullPotential.Api.GameManagement.Models
+namespace FullPotential.Api.Data.Models
 {
-    using System;
-    using FullPotential.Api.GameManagement.Enums;
-
     [Serializable]
     public class ConnectionDetails
     {

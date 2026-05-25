@@ -3,7 +3,9 @@ using FullPotential.Api.Data.Models;
 
 using UnityEngine;
 
-namespace FullPotential.Api.Gameplay.Combat
+// ReSharper disable UnusedMember.Global
+
+namespace FullPotential.Api.Gameplay
 {
     public interface IPlayerFighter : ISaveable
     {

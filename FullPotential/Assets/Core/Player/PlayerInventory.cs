@@ -33,7 +33,6 @@ namespace FullPotential.Core.Player
     public class PlayerInventory : InventoryBase, IPlayerInventory
     {
         private ISaveManager _saveManager;
-        private IPlayerManagement _playerManagement;
 
         private PlayerFighter _playerFighter;
 
@@ -47,7 +46,6 @@ namespace FullPotential.Core.Player
             _playerFighter = GetComponent<PlayerFighter>();
 
             _saveManager = DependenciesContext.Dependencies.GetService<ISaveManager>();
-            _playerManagement = DependenciesContext.Dependencies.GetService<IPlayerManagement>();
         }
 
         #endregion
@@ -70,7 +68,7 @@ namespace FullPotential.Core.Player
 
         #region RPC Calls
 
-        // ReSharper disable once UnusedParameter.Local
+        // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
         protected void HandleEquippedItemsChangeClientRpc(SerializableKeyValuePair<string, string>[] equippedItems, ClientRpcParams clientRpcParams)
         {

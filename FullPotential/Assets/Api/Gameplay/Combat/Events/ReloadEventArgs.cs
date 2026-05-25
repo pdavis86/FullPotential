@@ -1,7 +1,7 @@
 ﻿using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 
-namespace FullPotential.Api.Gameplay.Combat.EventArgs
+namespace FullPotential.Api.Gameplay.Combat.Events
 {
     public class ReloadEventArgs : IEventHandlerArgs
     {

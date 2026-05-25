@@ -16,6 +16,7 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity;
+using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities;
 using FullPotential.Core.GameManagement.Data;
 using FullPotential.Core.Gameplay.Events;
@@ -54,7 +55,6 @@ namespace FullPotential.Core.GameManagement
         private ISettingsRepository _settingsRepository;
         private ISaveManager _saveManager;
         private IUserManagement _userManagement;
-        private IPlayerManagement _playerManagement;
         private ILocalizer _localizer;
         private IUnityHelperUtilities _unityHelperUtilities;
 
@@ -92,7 +92,6 @@ namespace FullPotential.Core.GameManagement
             _settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
             _saveManager = DependenciesContext.Dependencies.GetService<ISaveManager>();
             _userManagement = DependenciesContext.Dependencies.GetService<IUserManagement>();
-            _playerManagement = DependenciesContext.Dependencies.GetService<IPlayerManagement>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
 

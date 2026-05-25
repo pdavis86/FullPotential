@@ -1,6 +1,9 @@
 ﻿using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.GameManagement.Models;
+using FullPotential.Api.Data.Models;
+
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedParameter.Global
 
 namespace FullPotential.Api.Data
 {

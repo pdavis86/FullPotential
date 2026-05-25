@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,13 +8,12 @@ using Cysharp.Threading.Tasks;
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data;
 using FullPotential.Api.Data.Models;
-using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Inventory;
-using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Ui.Components;
+using FullPotential.Api.Ui;
 using FullPotential.Api.Unity;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities;
@@ -439,17 +437,17 @@ namespace FullPotential.Core.Player
             PlayerData playerData = null;
             InventoryData inventoryData = null;
 
-            async UniTask GetPlayerData()
+            async UniTask FetchPlayerData()
             {
                 playerData = await _playerManagement.GetPlayerDataAsync(Username);
             }
 
-            async UniTask GetInventoryData()
+            async UniTask FetchInventoryData()
             {
                 inventoryData = await _playerManagement.GetInventoryDataAsync(Username, reduced);
             }
 
-            await UniTask.WhenAll(GetPlayerData(), GetInventoryData());
+            await UniTask.WhenAll(FetchPlayerData(), FetchInventoryData());
 
             LoadFromPlayerData(playerData);
 

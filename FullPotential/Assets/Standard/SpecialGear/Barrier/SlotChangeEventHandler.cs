@@ -2,7 +2,7 @@
 
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Gameplay.Inventory.EventArgs;
+using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Ui;
 using FullPotential.Standard.Resources;
 using FullPotential.Standard.SpecialSlots;

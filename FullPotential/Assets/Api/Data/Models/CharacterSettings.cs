@@ -2,7 +2,7 @@
 
 using Unity.Netcode;
 
-namespace FullPotential.Api.Gameplay.Player
+namespace FullPotential.Api.Data.Models
 {
     [Serializable]
     public class CharacterSettings : INetworkSerializable

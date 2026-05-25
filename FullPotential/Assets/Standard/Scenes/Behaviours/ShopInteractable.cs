@@ -2,8 +2,8 @@
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Modding;
 using FullPotential.Api.Unity;
+using FullPotential.Api.Unity.Constants;
 
 using Unity.Netcode;
 

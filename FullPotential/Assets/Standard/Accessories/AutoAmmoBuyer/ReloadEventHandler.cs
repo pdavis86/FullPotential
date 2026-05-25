@@ -1,7 +1,7 @@
 ﻿using System;
 
 using FullPotential.Api.Data.Models;
-using FullPotential.Api.Gameplay.Combat.EventArgs;
+using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;

@@ -5,7 +5,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
-using FullPotential.Api.GameManagement.Models;
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Ui;
@@ -76,7 +76,7 @@ namespace FullPotential.Core.GameManagement
             _gameSettings = _settingsRepository.Get();
             _username = _gameSettings.LastSigninUsername;
 
-            _signinPassword.onSubmit.AddListener((string input) => HandleSignInClick());
+            _signinPassword.onSubmit.AddListener(_ => HandleSignInClick());
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -210,6 +210,7 @@ namespace FullPotential.Core.GameManagement
             SignInWithPasswordAsync().Forget();
         }
 
+        // ReSharper disable once UnusedMember.Global
         public void HandleSignOutClick()
         {
             SignOutAsync().Forget();

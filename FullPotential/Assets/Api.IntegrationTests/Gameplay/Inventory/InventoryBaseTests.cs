@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.IntegrationTests.TestHelpers;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Registry;

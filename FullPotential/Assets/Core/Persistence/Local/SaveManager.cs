@@ -5,8 +5,8 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Gameplay.Combat;
 
 using Unity.Netcode;
 

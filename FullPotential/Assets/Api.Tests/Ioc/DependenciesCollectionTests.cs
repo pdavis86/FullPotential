@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using FullPotential.Api.Gameplay.Combat;
+
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Scenes;
+
 using Moq;
+
 using NUnit.Framework;
+
 using UnityEngine;
 
 namespace FullPotential.Api.Tests.Ioc

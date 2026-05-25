@@ -1,7 +1,7 @@
 ﻿using System;
 
 using FullPotential.Api.CoreTypeIds;
-using FullPotential.Api.Gameplay.Combat.EventArgs;
+using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Standard.Resources;
 using FullPotential.Standard.SpecialSlots;

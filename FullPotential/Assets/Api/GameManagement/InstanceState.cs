@@ -1,4 +1,7 @@
-﻿namespace FullPotential.Api.GameManagement.Enums
+﻿
+// ReSharper disable UnusedMember.Global
+
+namespace FullPotential.Api.GameManagement
 {
     public enum InstanceState
     {

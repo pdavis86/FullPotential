@@ -3,7 +3,7 @@
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Gameplay.Inventory.EventArgs;
+using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Registry;

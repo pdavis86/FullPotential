@@ -155,7 +155,7 @@ namespace FullPotential.Core.Player
             _playerFighter.IsSprinting = moveVal != Vector2.zero && _playerFighter.GetResourceValue(ResourceTypeIds.StaminaId) >= _playerFighter.GetStaminaCost();
         }
 
-        private void MoveAndLook(Vector2 moveVal, Vector2 lookVal, bool isTryingToSprint)
+        private void MoveAndLook(Vector2 moveVal, Vector2 lookVal)
         {
             if (!_isMidJump && moveVal != Vector2.zero)
             {
@@ -235,7 +235,7 @@ namespace FullPotential.Core.Player
 
             UpdateSprintingState(_isTryingToSprint, _moveVal);
 
-            MoveAndLook(_moveVal, _lookVal, _isTryingToSprint);
+            MoveAndLook(_moveVal, _lookVal);
 
             Jump();
         }

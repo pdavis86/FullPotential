@@ -1,7 +1,5 @@
 ﻿using System;
 
-using FullPotential.Api.Gameplay.Player;
-
 namespace FullPotential.Api.Data.Models
 {
     [Serializable]

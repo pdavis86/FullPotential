@@ -1,5 +1,7 @@
-using FullPotential.Api.Ui.Components;
+using FullPotential.Api.Ui;
+
 using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
 

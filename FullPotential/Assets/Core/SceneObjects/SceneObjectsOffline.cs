@@ -1,6 +1,6 @@
-﻿using FullPotential.Api.GameManagement;
-using FullPotential.Api.Ioc;
+﻿using FullPotential.Api.Ioc;
 using FullPotential.Api.Unity;
+using FullPotential.Api.Unity.Constants;
 
 using UnityEngine;
 

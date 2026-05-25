@@ -1,6 +1,7 @@
-﻿// ReSharper disable UnusedMemberInSuper.Global
+﻿
+// ReSharper disable UnusedMember.Global
 
-namespace FullPotential.Api.Ui.Components
+namespace FullPotential.Api.Ui
 {
     public interface IBarSlider
     {
