@@ -4,6 +4,8 @@ using System.Linq;
 using FullPotential.Api.Data.Models;
 using FullPotential.Api.Items.Base;
 
+// ReSharper disable UnusedMember.Global
+
 namespace FullPotential.Api.Utilities.Extensions
 {
     public static class InventoryDataExtensions

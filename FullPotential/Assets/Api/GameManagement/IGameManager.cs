@@ -3,6 +3,8 @@ using FullPotential.Api.Ui;
 using Unity.Netcode;
 using UnityEngine;
 
+// ReSharper disable UnusedMember.Global
+
 namespace FullPotential.Api.GameManagement
 {
     public interface IGameManager

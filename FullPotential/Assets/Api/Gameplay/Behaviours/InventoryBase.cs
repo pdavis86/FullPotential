@@ -6,7 +6,7 @@ using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data;
 using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Gameplay.Inventory.EventArgs;
+using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
@@ -75,7 +75,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #endregion
 
-        public bool ApplyInventoryChanges(InventoryChanges changes, bool isFromClientRpc = false)
+        public bool ApplyInventoryChanges(InventoryChanges changes)
         {
             if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
             {

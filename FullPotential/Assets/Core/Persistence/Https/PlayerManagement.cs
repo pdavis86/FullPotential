@@ -16,21 +16,25 @@ namespace FullPotential.Core.Persistence.Https
 
         public UniTask<PlayerData> GetPlayerDataAsync(string username)
         {
+            // todo: GetPlayerDataAsync
             throw new NotImplementedException();
         }
 
         public UniTask SavePlayerDataAsync(PlayerData playerData)
         {
+            // todo: SavePlayerDataAsync
             throw new NotImplementedException();
         }
 
         public UniTask<InventoryData> GetInventoryDataAsync(string username, bool reduced)
         {
+            // todo: GetInventoryDataAsync
             throw new NotImplementedException();
         }
 
         public UniTask SaveInventoryChangesAsync(InventoryChanges inventoryChanges)
         {
+            // todo: SaveInventoryChangesAsync
             throw new NotImplementedException();
         }
     }

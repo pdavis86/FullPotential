@@ -1,6 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Data.Models;
+using FullPotential.Api.GameManagement.Models;
 
 namespace FullPotential.Api.Data
 {

@@ -1,7 +1,8 @@
 ﻿using FullPotential.Api.GameManagement;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Modding;
+
 using Unity.Netcode;
+
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global

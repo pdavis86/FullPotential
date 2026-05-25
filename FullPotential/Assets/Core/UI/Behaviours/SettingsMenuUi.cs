@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using FullPotential.Api.Data;
-using FullPotential.Api.Gameplay.Player;
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Core.GameManagement;

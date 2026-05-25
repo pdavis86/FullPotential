@@ -1,6 +1,7 @@
 ﻿using System;
+
 using FullPotential.Api.CoreTypeIds;
-using FullPotential.Api.Gameplay.Combat.EventArgs;
+using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 
 // ReSharper disable once ClassNeverInstantiated.Global

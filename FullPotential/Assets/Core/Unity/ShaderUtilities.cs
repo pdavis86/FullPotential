@@ -6,7 +6,7 @@ using UnityEngine;
 // ReSharper disable once ClassNeverInstantiated.Global
 // ReSharper disable StringLiteralTypo
 
-namespace FullPotential.Core.Unity.Services
+namespace FullPotential.Core.Unity
 {
     public class ShaderUtilities : IShaderUtilities
     {

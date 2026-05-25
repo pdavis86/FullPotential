@@ -6,7 +6,6 @@ using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
 using FullPotential.Api.Data.Models;
-using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Obsolete;
 
 using UnityEngine;

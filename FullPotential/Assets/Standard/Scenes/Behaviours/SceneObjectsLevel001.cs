@@ -2,9 +2,9 @@
 
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Modding;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Unity;
+using FullPotential.Api.Unity.Constants;
 using FullPotential.Standard.Enemies.Behaviours;
 
 using Unity.Netcode;

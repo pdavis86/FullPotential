@@ -2,9 +2,9 @@
 
 using FullPotential.Api.Data.Models;
 
-using NUnit.Framework;
-
 using Unity.Netcode;
+
+// ReSharper disable UnusedMember.Global
 
 namespace FullPotential.Api.Unity.Extensions
 {
@@ -18,7 +18,7 @@ namespace FullPotential.Api.Unity.Extensions
         public static void ReadValueSafe(this FastBufferReader reader, out SerializableKeyValuePair<string, string> kvp)
         {
             reader.ReadValueSafe(out string val);
-            var split = val.Split(new char[] { '=' });
+            var split = val.Split(new[] { '=' });
             kvp = new SerializableKeyValuePair<string, string>(split[0], split[1]);
         }
 
@@ -36,7 +36,7 @@ namespace FullPotential.Api.Unity.Extensions
             do
             {
                 reader.ReadValueSafe(out string val);
-                var split = val.Split(new char[] { '=' });
+                var split = val.Split(new[] { '=' });
                 results.Add(new SerializableKeyValuePair<string, string>(split[0], split[1]));
             } while (reader.Position < reader.Length);
 

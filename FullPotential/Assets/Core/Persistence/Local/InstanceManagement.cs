@@ -3,8 +3,8 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
-using FullPotential.Api.GameManagement.Enums;
-using FullPotential.Api.GameManagement.Models;
+using FullPotential.Api.Data.Models;
+using FullPotential.Api.GameManagement;
 
 namespace FullPotential.Core.Persistence.Local
 {

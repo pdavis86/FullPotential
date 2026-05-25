@@ -3,9 +3,8 @@ using System.Collections;
 
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Combat.EventArgs;
+using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items;

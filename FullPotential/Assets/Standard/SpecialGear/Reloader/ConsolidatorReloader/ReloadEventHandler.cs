@@ -1,9 +1,11 @@
 ﻿using System;
+
 using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Gameplay.Combat.EventArgs;
+using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Ui;
+
 using Unity.Netcode;
 
 // ReSharper disable ClassNeverInstantiated.Global

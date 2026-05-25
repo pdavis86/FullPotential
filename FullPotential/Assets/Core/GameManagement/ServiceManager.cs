@@ -10,7 +10,7 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<Api.Scenes.ISceneService, Environment.SceneService>(true);
 
             //Singleton
-            DependenciesContext.Dependencies.Register<Api.GameManagement.IGameManager>(Core.GameManagement.GameManager.Instance);
+            DependenciesContext.Dependencies.Register<Api.GameManagement.IGameManager>(GameManager.Instance);
             DependenciesContext.Dependencies.Register<Api.Gameplay.Combat.ICombatService, Gameplay.Combat.CombatService>();
             DependenciesContext.Dependencies.Register<Api.Gameplay.Crafting.IResultFactory, Gameplay.Crafting.ResultFactory>();
             DependenciesContext.Dependencies.Register<Api.Gameplay.Drawing.IDrawingService, Gameplay.Drawing.DrawingService>();
@@ -20,8 +20,8 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<Api.Data.ISettingsRepository, Persistence.Local.SettingsRepository>();
             DependenciesContext.Dependencies.Register<Api.Registry.ITypeRegistry, Registry.TypeRegistry>();
             DependenciesContext.Dependencies.Register<Api.Ui.IUiAssistant, Ui.UiAssistant>();
-            DependenciesContext.Dependencies.Register<Api.Unity.IShaderUtilities, Unity.Services.ShaderUtilities>();
-            DependenciesContext.Dependencies.Register<Api.Unity.IUnityHelperUtilities, Unity.Services.UnityHelperUtilities>();
+            DependenciesContext.Dependencies.Register<Api.Unity.IShaderUtilities, Unity.ShaderUtilities>();
+            DependenciesContext.Dependencies.Register<Api.Unity.IUnityHelperUtilities, Unity.UnityHelperUtilities>();
 
             var settingsRepository = DependenciesContext.Dependencies.GetService<Api.Data.ISettingsRepository>();
 

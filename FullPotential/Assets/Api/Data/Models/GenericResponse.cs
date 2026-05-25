@@ -1,4 +1,7 @@
-﻿namespace FullPotential.Api.Data.Models
+﻿
+// ReSharper disable UnusedMember.Global
+
+namespace FullPotential.Api.Data.Models
 {
     public class GenericResponse
     {

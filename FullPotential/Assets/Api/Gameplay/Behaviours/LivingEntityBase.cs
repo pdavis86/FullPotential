@@ -9,20 +9,19 @@ using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data.Models;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Combat.EventArgs;
+using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Modding;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Scenes;
-using FullPotential.Api.Ui.Components;
+using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
@@ -518,8 +517,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : "ui.alert.environmentaldamage");
 
             //Debug.Log($"{name} collided with {collision.gameObject.name} at velocity {collision.relativeVelocity} with force {force} with cause {cause}");
-
-            var health = GetResourceValue(ResourceTypeIds.HealthId);
 
             var healthChangeRaw = isVelocityDamage
                 ? Vector3.Dot(contactPoint.normal, collision.relativeVelocity)

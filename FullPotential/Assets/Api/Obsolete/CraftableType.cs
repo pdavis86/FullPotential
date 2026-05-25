@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Gameplay.Crafting
+﻿namespace FullPotential.Api.Obsolete
 {
     public enum CraftableType
     {

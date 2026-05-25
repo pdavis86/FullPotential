@@ -1,4 +1,7 @@
-﻿namespace FullPotential.Api.Data.Models
+﻿
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
+namespace FullPotential.Api.GameManagement.Models
 {
     public struct SignInResult
     {

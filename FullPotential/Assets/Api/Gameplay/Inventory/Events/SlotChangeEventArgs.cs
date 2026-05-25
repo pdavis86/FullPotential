@@ -1,7 +1,7 @@
 ﻿using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 
-namespace FullPotential.Api.Gameplay.Inventory.EventArgs
+namespace FullPotential.Api.Gameplay.Inventory.Events
 {
     public class SlotChangeEventArgs : IEventHandlerArgs
     {

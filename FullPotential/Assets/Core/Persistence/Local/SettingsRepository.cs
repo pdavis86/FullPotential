@@ -1,8 +1,8 @@
 ﻿using System;
 
 using FullPotential.Api.Data;
+using FullPotential.Api.Data.Models;
 using FullPotential.Api.GameManagement.Events;
-using FullPotential.Api.GameManagement.Models;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Localization;
 

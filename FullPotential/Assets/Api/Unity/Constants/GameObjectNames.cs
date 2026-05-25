@@ -1,7 +1,7 @@
 ﻿
 // ReSharper disable UnusedMember.Global
 
-namespace FullPotential.Api.GameManagement
+namespace FullPotential.Api.Unity.Constants
 {
     public static class GameObjectNames
     {

@@ -6,7 +6,7 @@ using UnityEngine;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 
-namespace FullPotential.Core.Unity.Services
+namespace FullPotential.Core.Unity
 {
     public class UnityHelperUtilities : IUnityHelperUtilities
     {

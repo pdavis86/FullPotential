@@ -1,6 +1,7 @@
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Ui.Components;
+using FullPotential.Api.Ui;
+
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global

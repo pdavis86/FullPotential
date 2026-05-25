@@ -1,7 +1,7 @@
 ﻿using FullPotential.Api.Gameplay;
 using UnityEngine;
 
-namespace FullPotential.Api.Items
+namespace FullPotential.Api.Utilities
 {
     public class DestroyStoppable : IStoppable
     {

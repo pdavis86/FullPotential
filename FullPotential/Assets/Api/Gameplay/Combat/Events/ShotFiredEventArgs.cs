@@ -2,7 +2,7 @@
 using FullPotential.Api.Gameplay.Events;
 using UnityEngine;
 
-namespace FullPotential.Api.Gameplay.Combat.EventArgs
+namespace FullPotential.Api.Gameplay.Combat.Events
 {
     public class ShotFiredEventArgs : IEventHandlerArgs
     {
