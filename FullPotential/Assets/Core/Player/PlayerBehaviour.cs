@@ -182,7 +182,7 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnAttackHoldLeft()
         {
-            HandleAttackHold(true);
+            HandleAttackHold(HandSlotIds.LeftHand);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -194,7 +194,7 @@ namespace FullPotential.Core.Player
             }
             else
             {
-                HandleAttack(true);
+                HandleAttack(HandSlotIds.LeftHand);
             }
         }
 
@@ -211,7 +211,7 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnAttackHoldRight()
         {
-            HandleAttackHold(false);
+            HandleAttackHold(HandSlotIds.RightHand);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -223,7 +223,7 @@ namespace FullPotential.Core.Player
             }
             else
             {
-                HandleAttack(false);
+                HandleAttack(HandSlotIds.RightHand);
             }
         }
 
@@ -249,13 +249,13 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnReloadLeft()
         {
-            _playerFighter.TriggerReloadFromClient(true);
+            _playerFighter.TriggerReloadFromClient(HandSlotIds.LeftHand);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnReloadRight()
         {
-            _playerFighter.TriggerReloadFromClient(false);
+            _playerFighter.TriggerReloadFromClient(HandSlotIds.RightHand);
         }
 
         #endregion
@@ -519,24 +519,24 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private void HandleAttackHold(bool isLeftHand)
+        private void HandleAttackHold(string slotId)
         {
             if (IsNoUiInteractionPermitted())
             {
                 return;
             }
 
-            _playerFighter.TriggerAttackHoldFromClient(isLeftHand);
+            _playerFighter.TriggerAttackHoldFromClient(slotId);
         }
 
-        private void HandleAttack(bool isLeftHand)
+        private void HandleAttack(string slotId)
         {
             if (IsNoUiInteractionPermitted())
             {
                 return;
             }
 
-            _playerFighter.TriggerAttackFromClient(isLeftHand);
+            _playerFighter.TriggerAttackFromClient(slotId);
         }
 
         private bool IsNoUiInteractionPermitted()

@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.Events;
@@ -19,9 +21,9 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Action<IEventHandlerArgs> BeforeHandler => null;
+        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => null;
 
-        public Action<IEventHandlerArgs> AfterHandler => HandleAfterSlotChange;
+        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => HandleAfterSlotChangeAsync;
 
         public SlotChangeEventHandler(IGameManager gameManager)
         {
@@ -30,13 +32,13 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             _hud.ToggleSliderBar(BarrierChargeResource.TypeIdString, false);
         }
 
-        private void HandleAfterSlotChange(IEventHandlerArgs eventArgs)
+        private UniTask HandleAfterSlotChangeAsync(IEventHandlerArgs eventArgs)
         {
             var slotChangeArgs = (SlotChangeEventArgs)eventArgs;
 
             if (slotChangeArgs.SlotId != BarrierSlot.TypeIdString)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             var isBarrierEquipped = slotChangeArgs.Inventory.GetItemInSlot(BarrierSlot.TypeIdString) != null;
@@ -50,6 +52,8 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             {
                 slotChangeArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, 0, 0);
             }
+
+            return UniTask.CompletedTask;
         }
     }
 }

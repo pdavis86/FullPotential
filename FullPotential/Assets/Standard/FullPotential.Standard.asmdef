@@ -6,7 +6,8 @@
         "Unity.InputSystem",
         "Unity.TextMeshPro",
         "FullPotential.Api",
-        "Unity.Collections"
+        "Unity.Collections",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

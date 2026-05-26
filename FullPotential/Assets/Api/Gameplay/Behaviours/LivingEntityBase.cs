@@ -327,13 +327,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             var currentValue = ClampResourceValue(typeId, GetResourceValue(typeId));
             var eventArgs = new ResourceValueChangedEventArgs(this, typeId, currentValue + change, change);
-            _eventManager.Trigger(EventIdResourceValueChange, eventArgs);
+            _eventManager.TriggerAsync(EventIdResourceValueChange, eventArgs).Forget();
         }
 
-        public static void DefaultHandlerForResourceValueChangeEvent(IEventHandlerArgs eventArgs)
+        public static UniTask DefaultHandlerForResourceValueChangeEventAsync(IEventHandlerArgs eventArgs)
         {
             var changedArgs = (ResourceValueChangedEventArgs)eventArgs;
             changedArgs.LivingEntity.UpdateResourceValue(changedArgs.ResourceTypeId, changedArgs.NewValue);
+            return UniTask.CompletedTask;
         }
 
         // todo: remove debugging

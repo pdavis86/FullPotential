@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
@@ -12,20 +14,22 @@ namespace FullPotential.Core.Registry.Events
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Action<IEventHandlerArgs> BeforeHandler => null;
+        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => null;
 
-        public Action<IEventHandlerArgs> AfterHandler => HandleAfterResourceValueChanged;
+        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => HandleAfterResourceValueChangedAsync;
 
-        private void HandleAfterResourceValueChanged(IEventHandlerArgs eventArgs)
+        private UniTask HandleAfterResourceValueChangedAsync(IEventHandlerArgs eventArgs)
         {
             var changedArgs = (ResourceValueChangedEventArgs)eventArgs;
 
             if (changedArgs.NewValue > 0 || changedArgs.ResourceTypeId != ResourceTypeIds.HealthId)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             changedArgs.LivingEntity.HandleDeath();
+
+            return UniTask.CompletedTask;
         }
     }
 }

@@ -18,17 +18,17 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private GameObject _targetPositionGameObject;
         private FixedJoint _joint;
-        private ClientNetworkTransform _cnt;
+        private ClientNetworkTransform _clientTransform;
 
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             CreateNewJoint();
 
-            _cnt = gameObject.GetComponent<ClientNetworkTransform>();
-            if (_cnt != null)
+            _clientTransform = gameObject.GetComponent<ClientNetworkTransform>();
+            if (_clientTransform != null)
             {
-                _cnt.SetServerAuthoritative(true);
+                _clientTransform.SetServerAuthoritative(true);
             }
         }
 
@@ -61,9 +61,9 @@ namespace FullPotential.Core.Gameplay.Combat
         {
             SourceFighter.StopActiveConsumerBehaviour(Consumer);
 
-            if (_cnt != null)
+            if (_clientTransform != null)
             {
-                _cnt.SetServerAuthoritative(false);
+                _clientTransform.SetServerAuthoritative(false);
             }
 
             Destroy(_targetPositionGameObject);

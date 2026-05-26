@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 using Cysharp.Threading.Tasks;
 
@@ -14,7 +16,11 @@ using FullPotential.Api.Obsolete;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities;
 
+using NUnit.Framework;
+
 using Unity.Netcode;
+
+using UnityEditorInternal.Profiling.Memory.Experimental;
 
 using UnityEngine;
 
@@ -24,8 +30,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 {
     public abstract class FighterBase : LivingEntityBase, IMoveable
     {
-        private const float ChargeGaugeUpdateSeconds = 0.05f;
-
         public const string EventIdReload = "2337f94e-5a7d-4e02-b1c8-1b5e9934a3ce";
         public const string EventIdShotFired = "f01cd95a-67cc-4f38-a394-5a69eaa721c6";
 
@@ -46,8 +50,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Other Variables
 
-        public readonly HandStatus HandStatusLeft = new HandStatus();
-        public readonly HandStatus HandStatusRight = new HandStatus();
+        private readonly Dictionary<string, SlotStatus> _slotStatuses = new Dictionary<string, SlotStatus>();
 
         private DelayedAction _consumeResource;
         private ReloadEventArgs _reloadArgsLeft;
@@ -75,11 +78,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             base.Awake();
 
-            _reloadArgsLeft = new ReloadEventArgs(this, true);
-            _reloadArgsRight = new ReloadEventArgs(this, false);
+            var leftSlotStatus = new SlotStatus(this, HandSlotIds.LeftHand);
+            _slotStatuses.Add(HandSlotIds.LeftHand, leftSlotStatus);
+            _reloadArgsLeft = new ReloadEventArgs(this, HandSlotIds.LeftHand);
+            _shotFiredArgsLeft = new ShotFiredEventArgs(this, HandSlotIds.LeftHand);
 
-            _shotFiredArgsLeft = new ShotFiredEventArgs(this, true);
-            _shotFiredArgsRight = new ShotFiredEventArgs(this, false);
+            var rightSlotStatus = new SlotStatus(this, HandSlotIds.RightHand);
+            _slotStatuses.Add(HandSlotIds.RightHand, rightSlotStatus);
+            _reloadArgsRight = new ReloadEventArgs(this, HandSlotIds.RightHand);
+            _shotFiredArgsRight = new ShotFiredEventArgs(this, HandSlotIds.RightHand);
         }
 
         protected override void Start()
@@ -88,8 +95,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             _consumeResource = new DelayedAction(.5f, () =>
             {
-                CheckIfActiveConsumerNeedsToStop(true);
-                CheckIfActiveConsumerNeedsToStop(false);
+                foreach (var kvp in _slotStatuses)
+                {
+                    CheckIfActiveConsumerNeedsToStop(kvp.Value);
+                }
             });
         }
 
@@ -111,22 +120,22 @@ namespace FullPotential.Api.Gameplay.Behaviours
         #region ServerRpc calls
 
         [ServerRpc]
-        public void TryToAttackHoldServerRpc(bool isLeftHand)
+        public void TryToAttackHoldServerRpc(string slotId)
         {
-            var item = GetItemInHand(isLeftHand);
-            TryToAttackHold(isLeftHand, item);
+            var item = Inventory.GetItemInSlot(slotId);
+            TryToAttackHold(slotId, item);
         }
 
         [ServerRpc]
-        public void AttackWithItemInHandServerRpc(bool isLeftHand)
+        public void AttackWithItemInHandServerRpc(string slotId)
         {
-            AttackWithItemInHand(isLeftHand);
+            AttackWithItemInHand(slotId);
         }
 
         [ServerRpc]
-        public void ReloadServerRpc(bool isLeftHand)
+        public void ReloadServerRpc(string slotId)
         {
-            ReloadAsync(GetReloadEventArgs(isLeftHand)).Forget();
+            TryToReload(slotId);
         }
 
         #endregion
@@ -134,22 +143,22 @@ namespace FullPotential.Api.Gameplay.Behaviours
         #region ClientRpc calls
 
         // ReSharper disable once UnusedParameter.Local
-        [ClientRpc]
-        private void ReloadFinishedClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
-        {
-            //todo: zzz v0.6 - Use an event instead
-            var handStatus = GetHandStatus(isLeftHand);
-            handStatus.IsBusy = false;
-        }
+        //[ClientRpc]
+        // todo: replace - private void ReloadFinishedClientRpc(string slotId, ClientRpcParams clientRpcParams)
+        //{
+        //    //todo: zzz v0.6 - Use an event instead
+        //    var slotStatus = GetSlotStatus(isLeftHand);
+        //    slotStatus.IsBusy = false;
+        //}
 
-        // ReSharper disable once UnusedParameter.Local
-        [ClientRpc]
-        private void StopActiveConsumerBehaviourClientRpc(bool isLeftHand, ClientRpcParams clientRpcParams)
-        {
-            //todo: zzz v0.6 - Use an event instead
-            var handStatus = GetHandStatus(isLeftHand);
-            StopActiveConsumerBehaviour(handStatus);
-        }
+        //// ReSharper disable once UnusedParameter.Local
+        //[ClientRpc]
+        // todo: replace - private void StopActiveConsumerBehaviourClientRpc(string slotId, ClientRpcParams clientRpcParams)
+        //{
+        //    //todo: zzz v0.6 - Use an event instead
+        //    var slotStatus = GetSlotStatus(isLeftHand);
+        //    StopActiveConsumerBehaviour(slotStatus);
+        //}
 
         [ClientRpc]
         public void ApplyMovementForceClientRpc(Vector3 force, ForceMode forceMode, ClientRpcParams clientRpcParams)
@@ -162,85 +171,44 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Reloading
 
-        private ReloadEventArgs GetReloadEventArgs(bool isLeftHand)
+        public void TriggerReloadFromClient(string slotId)
         {
-            return isLeftHand ? _reloadArgsLeft : _reloadArgsRight;
-        }
-
-        public void TriggerReloadFromClient(bool isLeftHand)
-        {
-            var handStatus = GetHandStatus(isLeftHand);
-
-            handStatus.IsBusy = true;
-
-            ReloadServerRpc(isLeftHand);
-        }
-
-        public static void DefaultHandlerForReloadEvent(IEventHandlerArgs eventArgs)
-        {
-            if (!NetworkManager.Singleton.IsServer)
+            if (TryToReload(slotId) && !IsServer)
             {
-                return;
+                ReloadServerRpc(slotId);
             }
+        }
 
-            var reloadEventArgs = (ReloadEventArgs)eventArgs;
-
-            var slotId = reloadEventArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
-            var itemInSlot = reloadEventArgs.Fighter.Inventory.GetItemInSlot(slotId);
+        private bool TryToReload(string slotId)
+        {
+            var itemInSlot = Inventory.GetItemInSlot(slotId);
 
             if (itemInSlot is not Weapon weapon)
             {
-                return;
+                return false;
             }
 
-            //Lose any remaining ammo
-            weapon.UpdateAmmo(0);
+            var reloadEventArgs = slotId == HandSlotIds.LeftHand ? _reloadArgsLeft : _reloadArgsRight;
+            _eventManager.TriggerAsync(EventIdReload, reloadEventArgs).Forget();
 
-            //ReloadAndUpdateClientInventory(reloadEventArgs, weapon.GetAmmoMax());
-        }
-
-        private async UniTask ReloadAsync(ReloadEventArgs reloadEventArgs)
-        {
-            var slotId = reloadEventArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
-            var itemInSlot = reloadEventArgs.Fighter.Inventory.GetItemInSlot(slotId);
-
-            if (itemInSlot is not Weapon weapon)
-            {
-                return;
-            }
-
-            await UniTask.WaitForSeconds(weapon.GetReloadTime());
-
-            _eventManager.Trigger(EventIdReload, reloadEventArgs);
-
-            ReloadFinishedClientRpc(reloadEventArgs.IsLeftHand, _rpcService.ForPlayer(OwnerClientId));
+            return true;
         }
 
         #endregion
 
         public override bool IsConsumingResource(string typeId)
         {
-            return IsHandItemConsumingResource(true, typeId)
-                || IsHandItemConsumingResource(false, typeId);
+            return _slotStatuses.Any(
+                kvp => kvp.Value.IsConsumingResource
+                && Inventory.GetItemInSlot(kvp.Key) is Consumer consumer
+                && consumer.ResourceType.TypeId.ToString() == typeId);
         }
 
-        private bool IsHandItemConsumingResource(bool isLeftHand, string typeId)
+        public SlotStatus GetSlotStatus(string slotId)
         {
-            var handStatus = GetHandStatus(isLeftHand);
-
-            return handStatus.IsConsumingResource
-                   && GetItemInHand(isLeftHand) is Consumer consumer
-                   && consumer.ResourceType.TypeId.ToString() == typeId;
-        }
-
-        private ItemBase GetItemInHand(bool isLeftHand)
-        {
-            return Inventory.GetItemInSlot(isLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand);
-        }
-
-        public HandStatus GetHandStatus(bool isLeftHand)
-        {
-            return isLeftHand ? HandStatusLeft : HandStatusRight;
+            return _slotStatuses.ContainsKey(slotId)
+                ? _slotStatuses[slotId]
+                : null;
         }
 
         public int GetAttributeValue(AttributeAffected attributeAffected)
@@ -261,37 +229,35 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public override void HandleDeath()
         {
-            HandStatusLeft.IsBusy = false;
-            HandStatusRight.IsBusy = false;
-
-            StopActiveConsumerBehaviour(HandStatusLeft);
-            StopActiveConsumerBehaviour(HandStatusRight);
+            foreach (var kvp in _slotStatuses)
+            {
+                kvp.Value.IsBusy = false;
+                kvp.Value.StopActiveConsumerBehaviour();
+            }
 
             base.HandleDeath();
         }
 
-        public int GetAvailableAmmo(bool isLeftHand)
+        public int GetAvailableAmmo(string slotId)
         {
-            var weapon = (Weapon)GetItemInHand(isLeftHand);
+            var weapon = Inventory.GetItemInSlot<Weapon>(slotId);
             var ammoTypeId = weapon.WeaponType.AmmunitionTypeIdString;
             return _inventory.GetItemStackTotal(ammoTypeId);
         }
 
-        public void TryToAttackHold(bool isLeftHand, ItemBase item)
+        public void TryToAttackHold(string slotId, ItemBase item)
         {
-            var handStatus = GetHandStatus(isLeftHand);
+            var slotStatus = GetSlotStatus(slotId);
 
             if (item is Weapon weapon
                 && weapon.Attributes.IsAutomatic)
             {
                 if (!IsServer)
                 {
-                    TryToAttackHoldServerRpc(isLeftHand);
+                    TryToAttackHoldServerRpc(slotId);
                 }
 
-                // todo: make AutomaticWeaponFireEnumerator async?
-                handStatus.IntraActionEnumerator = AutomaticWeaponFireEnumerator(weapon, isLeftHand);
-                StartCoroutine(handStatus.IntraActionEnumerator);
+                slotStatus.StartAutomaticWeaponFireAsync(weapon).Forget();
                 return;
             }
 
@@ -311,7 +277,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (!IsServer)
             {
-                TryToAttackHoldServerRpc(isLeftHand);
+                TryToAttackHoldServerRpc(slotId);
             }
 
             //Still cooling down
@@ -320,97 +286,39 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            if (handStatus.PostActionEnumerator != null)
-            {
-                StopCoroutine(handStatus.PostActionEnumerator);
-            }
-
-            handStatus.PreActionEnumerator = ChargeUpEnumerator(itemWithCharge);
-            handStatus.PostActionEnumerator = CooldownEnumerator(itemWithCharge);
-
-            StartCoroutine(handStatus.PreActionEnumerator);
+            slotStatus.StopCooldownLoop();
+            slotStatus.StartChargeUpLoopAsync(itemWithCharge).Forget();
         }
 
-        private IEnumerator ChargeUpEnumerator(IHasCharge item)
+        public void TriggerAttackFromClient(string slotId)
         {
-            var secondsToTake = item.GetChargeUpTime();
-            var secondsUntilDone = secondsToTake * (100 - item.ChargePercentage) / 100f;
-            var elapsedSeconds = secondsToTake - secondsUntilDone;
-
-            //var sw = System.Diagnostics.Stopwatch.StartNew();
-
-            while (item.ChargePercentage < 100)
-            {
-                yield return new WaitForSeconds(ChargeGaugeUpdateSeconds);
-
-                elapsedSeconds += ChargeGaugeUpdateSeconds;
-                item.ChargePercentage = (int)(elapsedSeconds / secondsToTake * 100);
-            }
-
-            //Debug.Log($"Charged in: {sw.ElapsedMilliseconds}ms and should have taken {secondsUntilDone}s");
-        }
-
-        private IEnumerator CooldownEnumerator(IHasCharge item)
-        {
-            var secondsToTake = item.GetCooldownTime();
-            var secondsUntilDone = secondsToTake * item.ChargePercentage / 100f;
-            var elapsedSeconds = secondsToTake - secondsUntilDone;
-
-            //var sw = System.Diagnostics.Stopwatch.StartNew();
-
-            while (item.ChargePercentage > 0)
-            {
-                yield return new WaitForSeconds(ChargeGaugeUpdateSeconds);
-
-                elapsedSeconds += ChargeGaugeUpdateSeconds;
-                item.ChargePercentage = 100 - (int)(elapsedSeconds / secondsToTake * 100);
-            }
-
-            //Debug.Log($"Cooled in: {sw.ElapsedMilliseconds}ms and should have taken {secondsUntilDone}s");
-        }
-
-        private IEnumerator AutomaticWeaponFireEnumerator(Weapon weapon, bool isLeftHand)
-        {
-            var delay = weapon.GetDelayBetweenShots();
-
-            while (weapon.Ammo > 0)
-            {
-                AttackWithItemInHand(isLeftHand, true);
-                yield return new WaitForSeconds(delay);
-            }
-        }
-
-        public void TriggerAttackFromClient(bool isLeftHand)
-        {
-            var item = GetItemInHand(isLeftHand);
+            var item = Inventory.GetItemInSlot(slotId);
 
             if (item is IHasCharge itemWithCharge
                 && itemWithCharge.IsChargePercentageUsed
                 && itemWithCharge.ChargePercentage <= 0)
             {
-                TryToAttackHold(isLeftHand, item);
+                TryToAttackHold(slotId, item);
                 return;
             }
 
-            AttackWithItemInHand(isLeftHand);
+            AttackWithItemInHand(slotId);
         }
 
-        public void TriggerAttackHoldFromClient(bool isLeftHand)
+        public void TriggerAttackHoldFromClient(string slotId)
         {
-            var item = GetItemInHand(isLeftHand);
-            TryToAttackHold(isLeftHand, item);
+            var item = Inventory.GetItemInSlot(slotId);
+            TryToAttackHold(slotId, item);
         }
 
-        public void AttackWithItemInHand(bool isLeftHand, bool isAutoFire = false)
+        public void AttackWithItemInHand(string slotId, bool isAutoFire = false)
         {
             if (AliveState != LivingEntityState.Alive)
             {
                 return;
             }
 
-            var itemInHand = isLeftHand
-                ? _inventory.GetItemInSlot(HandSlotIds.LeftHand)
-                : _inventory.GetItemInSlot(HandSlotIds.RightHand);
+            var itemInHand = _inventory.GetItemInSlot(slotId);
 
             switch (itemInHand)
             {
@@ -419,11 +327,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     break;
 
                 case Consumer consumer:
-                    UseConsumer(isLeftHand, consumer);
+                    UseConsumer(slotId, consumer);
                     break;
 
                 case Weapon weaponInHand:
-                    UseWeapon(isLeftHand, weaponInHand, isAutoFire);
+                    UseWeapon(slotId, weaponInHand, isAutoFire);
                     break;
 
                 default:
@@ -433,7 +341,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (!IsServer)
             {
-                AttackWithItemInHandServerRpc(isLeftHand);
+                AttackWithItemInHandServerRpc(slotId);
             }
         }
 
@@ -450,84 +358,41 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        public bool StopActiveConsumerBehaviour(HandStatus handStatus)
-        {
-            if (!handStatus.IsConsumingResource)
-            {
-                return false;
-            }
-
-            var slotId = handStatus == HandStatusLeft
-                ? HandSlotIds.LeftHand
-                : HandSlotIds.RightHand;
-
-            var activeConsumer = Inventory.GetItemInSlot<Consumer>(slotId);
-
-            return StopActiveConsumerBehaviour(handStatus, activeConsumer);
-        }
-
         public bool StopActiveConsumerBehaviour(Consumer consumer)
         {
-            HandStatus handStatus;
-
-            var activeConsumer = Inventory.GetItemInSlot<Consumer>(HandSlotIds.LeftHand);
-
-            if (activeConsumer != consumer)
+            var leftConsumer = Inventory.GetItemInSlot<Consumer>(HandSlotIds.LeftHand);
+            if (leftConsumer == consumer)
             {
-                activeConsumer = Inventory.GetItemInSlot<Consumer>(HandSlotIds.RightHand);
-
-                if (activeConsumer != consumer)
-                {
-                    return false;
-                }
-
-                handStatus = HandStatusRight;
-            }
-            else
-            {
-                handStatus = HandStatusLeft;
+                return _slotStatuses[HandSlotIds.LeftHand].StopActiveConsumerBehaviour();
             }
 
-            return StopActiveConsumerBehaviour(handStatus, activeConsumer);
+            var rightConsumer = Inventory.GetItemInSlot<Consumer>(HandSlotIds.RightHand);
+            if (leftConsumer == consumer)
+            {
+                return _slotStatuses[HandSlotIds.RightHand].StopActiveConsumerBehaviour();
+            }
+
+            return false;
         }
 
-        private bool StopActiveConsumerBehaviour(HandStatus handStatus, Consumer activeConsumer)
-        {
-            if (!handStatus.IsConsumingResource)
-            {
-                return false;
-            }
-
-            activeConsumer.StopStoppables();
-
-            handStatus.IsConsumingResource = false;
-
-            return true;
-        }
-
-        private void UseConsumer(bool isLeftHand, Consumer consumer)
+        private void UseConsumer(string slotId, Consumer consumer)
         {
             if (consumer == null)
             {
                 return;
             }
 
-            var handStatus = GetHandStatus(isLeftHand);
+            var slotStatus = GetSlotStatus(slotId);
 
-            if (StopActiveConsumerBehaviour(handStatus))
+            if (slotStatus.StopActiveConsumerBehaviour())
             {
                 return;
             }
 
             if (consumer.ChargePercentage < 100)
             {
-                if (handStatus.PreActionEnumerator != null)
-                {
-                    // todo: make pre and post action async?
-                    StopCoroutine(handStatus.PreActionEnumerator);
-                    StartCoroutine(handStatus.PostActionEnumerator);
-                }
-
+                slotStatus.StopChargeUpLoop();
+                slotStatus.StartCooldownLoopAsync(consumer).Forget();
                 return;
             }
 
@@ -538,7 +403,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (consumer.Targeting.IsContinuous)
             {
-                handStatus.IsConsumingResource = true;
+                slotStatus.IsConsumingResource = true;
             }
 
             consumer.ChargePercentage = 0;
@@ -548,7 +413,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            var handPosition = isLeftHand
+            var handPosition = slotId == HandSlotIds.LeftHand
                 ? Positions.LeftHand.position
                 : Positions.RightHand.position;
 
@@ -578,36 +443,32 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        private void UseWeapon(bool isLeftHand, Weapon weaponInHand, bool isAutoFire)
+        private void UseWeapon(string slotId, Weapon weaponInHand, bool isAutoFire)
         {
-            var handStatus = isLeftHand
-                ? HandStatusLeft
-                : HandStatusRight;
+            var slotStatus = GetSlotStatus(slotId);
 
-            if (!isAutoFire && handStatus.IntraActionEnumerator != null)
+            if (!isAutoFire && slotStatus.IsAutoFiring)
             {
-                // todo: make intra action async?
-                StopCoroutine(handStatus.IntraActionEnumerator);
-                handStatus.IntraActionEnumerator = null;
+                slotStatus.StopAutomaticWeaponFire();
             }
 
             if (weaponInHand.IsRanged)
             {
-                UseRangedWeapon(isLeftHand, handStatus, weaponInHand);
+                UseRangedWeapon(slotId, slotStatus, weaponInHand);
                 return;
             }
 
-            UseMeleeWeapon(isLeftHand, weaponInHand);
+            UseMeleeWeapon(slotId, weaponInHand);
         }
 
-        private void UseRangedWeapon(bool isLeftHand, HandStatus handStatus, Weapon weaponInHand)
+        private void UseRangedWeapon(string slotId, SlotStatus slotStatus, Weapon weaponInHand)
         {
-            if (weaponInHand.Ammo == 0 || handStatus.IsBusy)
+            if (weaponInHand.Ammo == 0 || slotStatus.IsBusy)
             {
                 return;
             }
 
-            var handPosition = isLeftHand
+            var handPosition = slotId == HandSlotIds.LeftHand
                 ? Positions.LeftHand.position
                 : Positions.RightHand.position;
 
@@ -621,13 +482,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 1 + weaponInHand.Attributes.ExtraAmmoPerShot,
                 weaponInHand.Ammo);
 
-            var eventArgs = isLeftHand ? _shotFiredArgsLeft : _shotFiredArgsRight;
+            var eventArgs = slotId == HandSlotIds.LeftHand ? _shotFiredArgsLeft : _shotFiredArgsRight;
             eventArgs.StartPosition = handPosition;
             eventArgs.EndPosition = endPos;
             eventArgs.AmmoUsed = ammoUsed;
             eventArgs.ObjectHit = rangedHit.transform?.gameObject;
 
-            _eventManager.Trigger(EventIdShotFired, eventArgs);
+            _eventManager.TriggerAsync(EventIdShotFired, eventArgs).Forget();
 
             if (rangedHit.transform == null)
             {
@@ -643,45 +504,38 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        public static void DefaultHandlerForShotFiredEvent(IEventHandlerArgs eventArgs)
+        public static UniTask DefaultHandlerForShotFiredEventAsync(IEventHandlerArgs eventArgs)
         {
             var shotFiredArgs = (ShotFiredEventArgs)eventArgs;
 
             if (!shotFiredArgs.Fighter.IsServer)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             var fighter = shotFiredArgs.Fighter;
 
-            var slotId = shotFiredArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
-            var equippedWeapon = (Weapon)fighter.Inventory.GetItemInSlot(slotId);
+            var equippedWeapon = fighter.Inventory.GetItemInSlot<Weapon>(shotFiredArgs.SlotId);
 
             equippedWeapon.UpdateAmmo(equippedWeapon.Ammo - shotFiredArgs.AmmoUsed);
 
-            //var invChanges = new InventoryChanges
-            //{
-            //    Weapons = new[] { equippedWeapon }
-            //};
-            //fighter.Inventory.SendInventoryChangesToClient(invChanges);
+            // todo: is there a bug where logging out then back in restores my ammo?
+
+            return UniTask.CompletedTask;
         }
 
-        private void UseMeleeWeapon(bool isLeftHand, Weapon weaponInHand)
+        private void UseMeleeWeapon(string slotId, Weapon weaponInHand)
         {
-            var handStatus = GetHandStatus(isLeftHand);
+            var slotStatus = GetSlotStatus(slotId);
 
             if (weaponInHand.ChargePercentage < 100)
             {
-                if (handStatus.PreActionEnumerator != null)
-                {
-                    StopCoroutine(handStatus.PreActionEnumerator);
-                    StartCoroutine(handStatus.PostActionEnumerator);
-                }
-
+                slotStatus.StopChargeUpLoop();
+                slotStatus.StartCooldownLoopAsync(weaponInHand).Forget();
                 return;
             }
 
-            StartCoroutine(handStatus.PostActionEnumerator);
+            slotStatus.StartChargeUpLoopAsync(weaponInHand).Forget();
 
             if (!IsServer)
             {
@@ -701,6 +555,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (slowDrain)
             {
+                // todo: trait-based resource cost?
                 resourceCost = (int)Math.Ceiling(resourceCost / 10f) + 1;
             }
 
@@ -722,6 +577,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         #region Nested Classes
         // ReSharper disable UnassignedField.Global
 
+        // todo: can these be merged into handstatus?
         [Serializable]
         public struct PositionTransforms
         {
@@ -729,6 +585,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             public Transform RightHand;
         }
 
+        // todo: what are these used for?
         [Serializable]
         public struct BodyPartTransforms
         {
@@ -741,49 +598,35 @@ namespace FullPotential.Api.Gameplay.Behaviours
         // ReSharper restore UnassignedField.Global
         #endregion
 
-        private void CheckIfActiveConsumerNeedsToStop(bool isLeftHand)
+        private void CheckIfActiveConsumerNeedsToStop(SlotStatus slotStatus)
         {
-            var handStatus = GetHandStatus(isLeftHand);
-
-            if (!handStatus.IsConsumingResource)
+            if (!slotStatus.IsConsumingResource)
             {
                 return;
             }
 
-            var slotId = handStatus == HandStatusLeft
-                ? HandSlotIds.LeftHand
-                : HandSlotIds.RightHand;
-
-            var consumer = Inventory.GetItemInSlot<Consumer>(slotId);
+            var consumer = Inventory.GetItemInSlot<Consumer>(slotStatus.SlotId);
 
             if (ConsumeResource(consumer, consumer.Targeting.IsContinuous))
             {
                 return;
             }
 
-            StopActiveConsumerBehaviour(handStatus);
-            StopActiveConsumerBehaviourClientRpc(isLeftHand, _rpcService.ForNearbyPlayers(transform.position));
+            slotStatus.StopActiveConsumerBehaviour();
         }
 
-        public static void ReloadAndUpdateClientInventory(ReloadEventArgs eventArgs, int ammoNeeded)
+        public static void UpdateAmmoCounts(ReloadEventArgs eventArgs)
         {
             var fighter = eventArgs.Fighter;
 
-            var slotId = eventArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
-            var equippedWeapon = (Weapon)fighter.Inventory.GetItemInSlot(slotId);
+            var equippedWeapon = fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
 
             var ammoTypeId = equippedWeapon.WeaponType.AmmunitionTypeIdString;
+            var ammoNeeded = equippedWeapon.GetAmmoMax() - equippedWeapon.Ammo;
 
-            var (countTaken, invChanges) = fighter.Inventory.TakeCountFromItemStacks(ammoTypeId, ammoNeeded);
-
-            if (invChanges == null)
-            {
-                return;
-            }
+            var (countTaken, _) = fighter.Inventory.TakeCountFromItemStacks(ammoTypeId, ammoNeeded);
 
             equippedWeapon.UpdateAmmo(equippedWeapon.Ammo + countTaken);
-
-            invChanges.Weapons = new[] { equippedWeapon };
         }
     }
 }

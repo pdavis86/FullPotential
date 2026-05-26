@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
@@ -7,7 +9,6 @@ using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Weapons;
-using FullPotential.Api.Ui;
 
 using Unity.Netcode;
 
@@ -22,9 +23,9 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Action<IEventHandlerArgs> BeforeHandler => HandleReloadBefore;
+        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => HandleReloadBeforeAsync;
 
-        public Action<IEventHandlerArgs> AfterHandler => null;
+        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => null;
 
         public ReloadEventHandler(ITypeRegistry typeRegistry, ILocalizer localizer)
         {
@@ -32,11 +33,11 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
             _localizer = localizer;
         }
 
-        private void HandleReloadBefore(IEventHandlerArgs eventArgs)
+        private UniTask HandleReloadBeforeAsync(IEventHandlerArgs eventArgs)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             var reloadEventArgs = (ReloadEventArgs)eventArgs;
@@ -46,13 +47,12 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 
             if (buyerItem == null)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             var fighter = reloadEventArgs.Fighter;
 
-            var slotId = reloadEventArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
-            var equippedWeapon = (Weapon)fighter.Inventory.GetItemInSlot(slotId);
+            var equippedWeapon = fighter.Inventory.GetItemInSlot<Weapon>(reloadEventArgs.SlotId);
 
             var ammoTypeId = equippedWeapon.WeaponType.AmmunitionTypeIdString;
             var ammoType = _typeRegistry.GetRegisteredByTypeId<IAmmunitionType>(ammoTypeId);
@@ -64,7 +64,7 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 
             if (ammoRemaining >= equippedWeapon.GetAmmoMax() || !hasEnoughMoney)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             var newItemStack = new ItemStack
@@ -84,6 +84,8 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
             {
                 //todo: zzz v0.9 - take money for ammo ItemStack
             }
+
+            return UniTask.CompletedTask;
         }
     }
 }

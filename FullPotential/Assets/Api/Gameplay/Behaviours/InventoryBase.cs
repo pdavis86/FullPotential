@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data;
 using FullPotential.Api.Data.Models;
@@ -161,11 +163,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
             JsonUtility.FromJsonOverwrite(newJson, oldItem);
         }
 
-        private T CastItemAsType<T>(ItemBase item, bool logIfNotFound, string identifierName, string id) where T : ItemBase
+        private T CastItemAsType<T>(ItemBase item, bool errorIfNotFound, string identifierName, string id) where T : ItemBase
         {
             if (item == null)
             {
-                if (logIfNotFound)
+                if (errorIfNotFound)
                 {
                     Debug.LogError($"Could not find the item with {identifierName} '{id}'");
                 }
@@ -180,16 +182,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return castAsType;
         }
 
-        public T GetItemWithId<T>(string id, bool logIfNotFound = true) where T : ItemBase
+        public T GetItemWithId<T>(string id, bool errorIfNotFound = true) where T : ItemBase
         {
             var item = _items.FirstOrDefault(x => x.Value.Id == id).Value;
-            return CastItemAsType<T>(item, logIfNotFound, "ID", id);
+            return CastItemAsType<T>(item, errorIfNotFound, "ID", id);
         }
 
-        public T GetItemInSlot<T>(string slotId, bool logIfNotFound = true) where T : ItemBase
+        public T GetItemInSlot<T>(string slotId, bool errorIfNotFound = false) where T : ItemBase
         {
             var item = GetItemInSlot(slotId);
-            return CastItemAsType<T>(item, logIfNotFound, "slot ID", slotId);
+            return CastItemAsType<T>(item, errorIfNotFound, "slot ID", slotId);
         }
 
         public ItemBase GetItemInSlot(string slotId)
@@ -556,13 +558,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected void TriggerSlotChangeEvent(ItemBase item, string slotId)
         {
             var eventArgs = new SlotChangeEventArgs(this, _livingEntity, slotId, item?.Id);
-            _eventManager.Trigger(EventIdSlotChange, eventArgs);
+            _eventManager.TriggerAsync(EventIdSlotChange, eventArgs).Forget();
         }
 
-        public static void DefaultHandlerForSlotChangeEvent(IEventHandlerArgs eventArgs)
+        public static UniTask DefaultHandlerForSlotChangeEventAsync(IEventHandlerArgs eventArgs)
         {
             var slotChangeEventArgs = (SlotChangeEventArgs)eventArgs;
             slotChangeEventArgs.Inventory.SetEquippedItem(slotChangeEventArgs.ItemId, slotChangeEventArgs.SlotId);
+            return UniTask.CompletedTask;
         }
 
         protected abstract void SetEquippedItem(string itemId, string slotId);

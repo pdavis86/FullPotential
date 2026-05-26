@@ -173,17 +173,17 @@ namespace FullPotential.Core.Ui.Behaviours
             }
         }
 
-        public void AddHandIcon(string id, bool isLeftHand, GameObject prefab)
+        public void AddHandIcon(string iconId, string slotId, GameObject prefab)
         {
-            if (_handIcons.ContainsKey(id))
+            if (_handIcons.ContainsKey(iconId))
             {
                 return;
             }
 
-            var container = isLeftHand ? _handIconContainerLeft : _handIconContainerRight;
+            var container = slotId == HandSlotIds.LeftHand ? _handIconContainerLeft : _handIconContainerRight;
             var newIcon = Instantiate(prefab, container.transform);
 
-            _handIcons.Add(id, newIcon);
+            _handIcons.Add(iconId, newIcon);
         }
 
         public void RemoveHandIcon(string id)
@@ -203,13 +203,15 @@ namespace FullPotential.Core.Ui.Behaviours
         private void UpdateHandOverlays()
         {
             var leftItem = _playerFighter.Inventory.GetItemInSlot(HandSlotIds.LeftHand);
+            var leftStatus = _playerFighter.GetSlotStatus(HandSlotIds.LeftHand);
             UpdateHandDescription(_equippedLeftHandSummary, leftItem);
-            UpdateHandAmmo(_playerFighter.HandStatusLeft, leftItem, true);
+            UpdateHandAmmo(_ammoLeft, leftStatus, leftItem);
             UpdateHandCharge(_chargeLeft, leftItem);
 
             var rightItem = _playerFighter.Inventory.GetItemInSlot(HandSlotIds.RightHand);
+            var rightStatus = _playerFighter.GetSlotStatus(HandSlotIds.RightHand);
             UpdateHandDescription(_equippedRightHandSummary, rightItem);
-            UpdateHandAmmo(_playerFighter.HandStatusRight, rightItem, false);
+            UpdateHandAmmo(_ammoRight, rightStatus, rightItem);
             UpdateHandCharge(_chargeRight, rightItem);
         }
 
@@ -218,10 +220,8 @@ namespace FullPotential.Core.Ui.Behaviours
             equippedSummary.SetContents(item?.GetDescription(_localizer));
         }
 
-        private void UpdateHandAmmo(HandStatus handStatus, ItemBase item, bool isLeftHand)
+        private void UpdateHandAmmo(Text ammoText, SlotStatus slotStatus, ItemBase item)
         {
-            var ammoText = isLeftHand ? _ammoLeft : _ammoRight;
-
             if (item is not Weapon weapon
                 || !weapon.IsRanged)
             {
@@ -234,9 +234,9 @@ namespace FullPotential.Core.Ui.Behaviours
                 ammoText.transform.parent.gameObject.SetActive(true);
             }
 
-            ammoText.text = handStatus.IsBusy
+            ammoText.text = slotStatus.IsBusy
                 ? _reloadingTranslation
-                : $"{weapon.Ammo}/{weapon.GetAmmoMax()} ({_playerFighter.GetAvailableAmmo(isLeftHand)})";
+                : $"{weapon.Ammo}/{weapon.GetAmmoMax()} ({_playerFighter.GetAvailableAmmo(slotStatus.SlotId)})";
         }
 
         private void UpdateHandCharge(ProgressWheel chargeWheel, ItemBase item)

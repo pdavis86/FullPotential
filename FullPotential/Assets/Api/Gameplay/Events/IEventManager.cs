@@ -1,4 +1,5 @@
-﻿
+﻿using Cysharp.Threading.Tasks;
+
 // ReSharper disable UnusedMember.Global
 
 namespace FullPotential.Api.Gameplay.Events
@@ -7,6 +8,6 @@ namespace FullPotential.Api.Gameplay.Events
     {
         void Subscribe<T>(string eventId) where T : IEventHandler;
 
-        void Trigger(string eventId, IEventHandlerArgs args);
+        UniTask TriggerAsync(string eventId, IEventHandlerArgs args);
     }
 }

@@ -1,13 +1,15 @@
 ﻿using System;
 
+using Cysharp.Threading.Tasks;
+
 namespace FullPotential.Api.Gameplay.Events
 {
     public interface IEventHandler
     {
         NetworkLocation Location { get; }
 
-        Action<IEventHandlerArgs> BeforeHandler { get; }
+        Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync { get; }
 
-        Action<IEventHandlerArgs> AfterHandler { get; }
+        Func<IEventHandlerArgs, UniTask> AfterHandlerAsync { get; }
     }
 }

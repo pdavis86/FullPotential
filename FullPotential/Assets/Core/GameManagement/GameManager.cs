@@ -10,6 +10,7 @@ using FullPotential.Api.Data;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
@@ -279,10 +280,11 @@ namespace FullPotential.Core.GameManagement
         {
             var eventManager = (EventManager)DependenciesContext.Dependencies.GetService<IEventManager>();
 
-            eventManager.Register(LivingEntityBase.EventIdResourceValueChange, LivingEntityBase.DefaultHandlerForResourceValueChangeEvent);
-            eventManager.Register(FighterBase.EventIdReload, FighterBase.DefaultHandlerForReloadEvent);
-            eventManager.Register(FighterBase.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEvent);
-            eventManager.Register(InventoryBase.EventIdSlotChange, InventoryBase.DefaultHandlerForSlotChangeEvent);
+            // todo: can I use the real EventArgs type instead of IEventHandlderArgs?
+            eventManager.Register(LivingEntityBase.EventIdResourceValueChange, LivingEntityBase.DefaultHandlerForResourceValueChangeEventAsync);
+            eventManager.Register(FighterBase.EventIdReload, SlotStatus.DefaultHandlerForReloadEventAsync);
+            eventManager.Register(FighterBase.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEventAsync);
+            eventManager.Register(InventoryBase.EventIdSlotChange, InventoryBase.DefaultHandlerForSlotChangeEventAsync);
         }
 
         private async UniTask DisconnectUserIfTokenInvalidAsync(ulong clientId, string username, string token)

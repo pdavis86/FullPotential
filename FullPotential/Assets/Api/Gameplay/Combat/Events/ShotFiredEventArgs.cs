@@ -1,5 +1,6 @@
 ﻿using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
+
 using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Combat.Events
@@ -10,7 +11,7 @@ namespace FullPotential.Api.Gameplay.Combat.Events
 
         public FighterBase Fighter { get; }
 
-        public bool IsLeftHand { get; }
+        public string SlotId { get; }
 
         public Vector3 StartPosition { get; set; }
 
@@ -20,10 +21,10 @@ namespace FullPotential.Api.Gameplay.Combat.Events
 
         public GameObject ObjectHit { get; set; }
 
-        public ShotFiredEventArgs(FighterBase fighter, bool isLeftHand)
+        public ShotFiredEventArgs(FighterBase fighter, string slotId)
         {
             Fighter = fighter;
-            IsLeftHand = isLeftHand;
+            SlotId = slotId;
         }
     }
 }

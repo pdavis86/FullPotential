@@ -1,10 +1,11 @@
 ﻿using System;
 
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Items.Types;
-using FullPotential.Api.Ui;
 
 using Unity.Netcode;
 
@@ -16,37 +17,33 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Action<IEventHandlerArgs> BeforeHandler => null;
+        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => null;
 
-        public Action<IEventHandlerArgs> AfterHandler => HandleShotFired;
+        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => HandleShotFiredAsync;
 
-        private void HandleShotFired(IEventHandlerArgs eventArgs)
+        private UniTask HandleShotFiredAsync(IEventHandlerArgs eventArgs)
         {
-            var shotFiredEventArgs = (ShotFiredEventArgs) eventArgs;
+            var shotFiredEventArgs = (ShotFiredEventArgs)eventArgs;
 
-            var reloader = (Api.Items.Types.SpecialGear)shotFiredEventArgs.Fighter.Inventory.GetItemInSlot(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+            var reloader = shotFiredEventArgs.Fighter.Inventory.GetItemInSlot<Api.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
             if (reloader == null || reloader.RegistryTypeId != TeleportReloader.TypeIdString)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             if (!shotFiredEventArgs.Fighter.ConsumeResource(reloader, true, !NetworkManager.Singleton.IsServer))
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             var fighter = shotFiredEventArgs.Fighter;
 
-            var slotId = shotFiredEventArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
-            var equippedWeapon = (Weapon)fighter.Inventory.GetItemInSlot(slotId);
+            var reloadEventArgs = new ReloadEventArgs(fighter, shotFiredEventArgs.SlotId);
 
-            var ammoMax = equippedWeapon.GetAmmoMax();
-            var ammoNeeded = ammoMax - equippedWeapon.Ammo;
-            
-            var reloadEventArgs = new ReloadEventArgs(fighter, shotFiredEventArgs.IsLeftHand);
+            FighterBase.UpdateAmmoCounts(reloadEventArgs);
 
-            FighterBase.ReloadAndUpdateClientInventory(reloadEventArgs, ammoNeeded);
+            return UniTask.CompletedTask;
         }
     }
 }

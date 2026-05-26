@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Items.Types;
@@ -20,24 +22,24 @@ namespace FullPotential.Standard.WeaponExtras
 
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Action<IEventHandlerArgs> BeforeHandler => null;
+        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => null;
 
-        public Action<IEventHandlerArgs> AfterHandler => HandleAfterBulletFired;
+        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => HandleAfterBulletFiredAsync;
 
         public ShotFiredEventHandler(ITypeRegistry typeRegistry)
         {
             _typeRegistry = typeRegistry;
         }
 
-        private void HandleAfterBulletFired(IEventHandlerArgs eventArgs)
+        private UniTask HandleAfterBulletFiredAsync(IEventHandlerArgs eventArgs)
         {
             var shotFiredArgs = (ShotFiredEventArgs)eventArgs;
 
-            var item = shotFiredArgs.Fighter.Inventory.GetItemInSlot(shotFiredArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand);
+            var item = shotFiredArgs.Fighter.Inventory.GetItemInSlot(shotFiredArgs.SlotId);
 
             if (item is not Weapon weapon || !weapon.IsRanged)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             _typeRegistry.LoadAddessable<GameObject>(BulletTrailPrefabAddress, prefab =>
@@ -52,6 +54,8 @@ namespace FullPotential.Standard.WeaponExtras
                 projectileScript.Speed = 500;
                 projectileScript.ObjectHit = shotFiredArgs.ObjectHit;
             });
+        
+                return UniTask.CompletedTask;
         }
     }
 }
