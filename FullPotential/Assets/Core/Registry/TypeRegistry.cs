@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Ioc;
@@ -19,7 +20,9 @@ using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Core.Registry.Events;
+
 using Unity.Netcode;
+
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 

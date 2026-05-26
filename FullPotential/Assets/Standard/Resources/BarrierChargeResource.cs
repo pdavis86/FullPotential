@@ -38,7 +38,7 @@ namespace FullPotential.Standard.Resources
                 return;
             }
 
-            var equippedBarrier = (Api.Items.Types.SpecialGear)targetFighter.Inventory.GetItemInSlot(BarrierSlot.TypeIdString);
+            var equippedBarrier = targetFighter.Inventory.GetItemInSlot<Api.Items.Types.SpecialGear>(BarrierSlot.TypeIdString);
 
             if (equippedBarrier == null)
             {

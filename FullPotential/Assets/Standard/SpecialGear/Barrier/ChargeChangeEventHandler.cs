@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Standard.Resources;
@@ -13,23 +15,25 @@ namespace FullPotential.Standard.SpecialGear.Barrier
     {
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Action<IEventHandlerArgs> BeforeHandler => null;
+        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => null;
 
-        public Action<IEventHandlerArgs> AfterHandler => HandleAfterResourceValueChanged;
+        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => HandleAfterResourceValueChangedAsync;
 
-        private void HandleAfterResourceValueChanged(IEventHandlerArgs eventArgs)
+        private UniTask HandleAfterResourceValueChangedAsync(IEventHandlerArgs eventArgs)
         {
             var resourceChangeArgs = (ResourceValueChangedEventArgs)eventArgs;
 
             if (resourceChangeArgs.ResourceTypeId != BarrierChargeResource.TypeIdString)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             var remainingCharge = resourceChangeArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString);
             var showVisuals = remainingCharge > 0;
 
             resourceChangeArgs.LivingEntity.Inventory.ToggleEquippedItemVisuals(BarrierSlot.TypeIdString, showVisuals);
+
+            return UniTask.CompletedTask;
         }
     }
 }

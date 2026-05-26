@@ -19,7 +19,7 @@ namespace FullPotential.Api.Ui
 
         void ToggleSliderBar(string id, bool show);
 
-        void AddHandIcon(string id, bool isLeftHand, GameObject prefab);
+        void AddHandIcon(string id, string slotId, GameObject prefab);
 
         void RemoveHandIcon(string id);
     }

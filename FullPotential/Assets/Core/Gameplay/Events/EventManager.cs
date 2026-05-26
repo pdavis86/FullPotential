@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Ioc;
+
 using Unity.Netcode;
+
 using UnityEngine;
 
 // ReSharper disable once ClassNeverInstantiated.Global
@@ -13,9 +18,9 @@ namespace FullPotential.Core.Gameplay.Events
     {
         private readonly Dictionary<string, EventHandlerGroup> _subscriptions = new Dictionary<string, EventHandlerGroup>();
 
-        internal void Register(string eventId, Action<IEventHandlerArgs> defaultHandler)
+        internal void Register(string eventId, Func<IEventHandlerArgs, UniTask> defaultHandlerAsync)
         {
-            _subscriptions.Add(eventId, new EventHandlerGroup(eventId, defaultHandler));
+            _subscriptions.Add(eventId, new EventHandlerGroup(eventId, defaultHandlerAsync));
         }
 
         public void Subscribe<T>(string eventId)
@@ -25,7 +30,7 @@ namespace FullPotential.Core.Gameplay.Events
             _subscriptions[eventId].OtherHandlers.Add(handler);
         }
 
-        public void Trigger(string eventId, IEventHandlerArgs args)
+        public async UniTask TriggerAsync(string eventId, IEventHandlerArgs args)
         {
             if (!IsEventIdRegistered(eventId))
             {
@@ -38,26 +43,26 @@ namespace FullPotential.Core.Gameplay.Events
 
             foreach (var handler in handlerGroup.OtherHandlers)
             {
-                if (ShouldHandlerRun(handler))
+                if (ShouldHandlerRun(handler) && handler.BeforeHandlerAsync != null)
                 {
-                    handler.BeforeHandler?.Invoke(args);
+                    await handler.BeforeHandlerAsync(args);
                 }
             }
 
-            if (!args.IsDefaultHandlerCancelled)
+            if (handlerGroup.DefaultHandlerAsync != null && !args.IsDefaultHandlerCancelled)
             {
-                handlerGroup.DefaultHandler?.Invoke(args);
+                await handlerGroup.DefaultHandlerAsync(args);
             }
-            else if (handlerGroup.DefaultHandler == null)
+            else if (handlerGroup.DefaultHandlerAsync == null && args.IsDefaultHandlerCancelled)
             {
                 Debug.LogWarning($"Tried to cancel the default handler for event {eventId} but no handler is present");
             }
 
             foreach (var handler in handlerGroup.OtherHandlers)
             {
-                if (ShouldHandlerRun(handler))
+                if (ShouldHandlerRun(handler) && handler.AfterHandlerAsync != null)
                 {
-                    handler.AfterHandler?.Invoke(args);
+                    await handler.AfterHandlerAsync(args);
                 }
             }
         }

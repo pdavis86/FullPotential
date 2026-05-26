@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
@@ -25,9 +27,9 @@ namespace FullPotential.Standard.SpecialGear.Reloader
 
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Action<IEventHandlerArgs> BeforeHandler => null;
+        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => null;
 
-        public Action<IEventHandlerArgs> AfterHandler => HandleAfterSlotChange;
+        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => HandleAfterSlotChangeAsync;
 
         public SlotChangeEventHandler(IGameManager gameManager, ITypeRegistry typeRegistry)
         {
@@ -38,20 +40,20 @@ namespace FullPotential.Standard.SpecialGear.Reloader
                 prefab => _handWarningPrefab = prefab);
         }
 
-        private void HandleAfterSlotChange(IEventHandlerArgs eventArgs)
+        private UniTask HandleAfterSlotChangeAsync(IEventHandlerArgs eventArgs)
         {
             var slotChangeArgs = (SlotChangeEventArgs)eventArgs;
 
             if (slotChangeArgs.Inventory.OwnerClientId != NetworkManager.Singleton.LocalClientId)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             if (slotChangeArgs.SlotId != HandSlotIds.LeftHand
                 && slotChangeArgs.SlotId != HandSlotIds.RightHand
                 && slotChangeArgs.SlotId != RangedWeaponReloaderSlot.TypeIdString)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             var reloaderEquipped = slotChangeArgs.Inventory.GetItemInSlot(RangedWeaponReloaderSlot.TypeIdString);
@@ -60,25 +62,26 @@ namespace FullPotential.Standard.SpecialGear.Reloader
             {
                 case HandSlotIds.LeftHand:
                 case HandSlotIds.RightHand:
-                    var isLeftHand = slotChangeArgs.SlotId == HandSlotIds.LeftHand;
-                    AddOrRemoveHandIcon(slotChangeArgs.Inventory, slotChangeArgs.SlotId, reloaderEquipped, isLeftHand);
-                    return;
+                    AddOrRemoveHandIcon(slotChangeArgs.Inventory, slotChangeArgs.SlotId, reloaderEquipped);
+                    return UniTask.CompletedTask;
 
                 case RangedWeaponReloaderSlot.TypeIdString:
-                    AddOrRemoveHandIcon(slotChangeArgs.Inventory, HandSlotIds.LeftHand, reloaderEquipped, true);
-                    AddOrRemoveHandIcon(slotChangeArgs.Inventory, HandSlotIds.RightHand, reloaderEquipped, false);
-                    return;
+                    AddOrRemoveHandIcon(slotChangeArgs.Inventory, HandSlotIds.LeftHand, reloaderEquipped);
+                    AddOrRemoveHandIcon(slotChangeArgs.Inventory, HandSlotIds.RightHand, reloaderEquipped);
+                    return UniTask.CompletedTask;
             }
+
+            return UniTask.CompletedTask;
         }
 
-        private void AddOrRemoveHandIcon(InventoryBase inventory, string slotId, ItemBase reloaderEquipped, bool isLeftHand)
+        private void AddOrRemoveHandIcon(InventoryBase inventory, string slotId, ItemBase reloaderEquipped)
         {
             var iconId = $"{slotId};ReloaderWarning";
             var isRangedWeapon = inventory.GetItemInSlot(slotId) is Weapon weapon && weapon.IsRanged;
 
             if (isRangedWeapon && reloaderEquipped == null)
             {
-                _hud.AddHandIcon(iconId, isLeftHand, _handWarningPrefab);
+                _hud.AddHandIcon(iconId, slotId, _handWarningPrefab);
             }
             else
             {

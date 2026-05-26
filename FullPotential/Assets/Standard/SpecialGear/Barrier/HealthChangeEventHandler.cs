@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
@@ -16,25 +18,25 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Action<IEventHandlerArgs> BeforeHandler => HandleBeforeHealthChange;
+        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => HandleBeforeHealthChangeAsync;
 
-        public Action<IEventHandlerArgs> AfterHandler => null;
+        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => null;
 
-        private void HandleBeforeHealthChange(IEventHandlerArgs eventArgs)
+        private UniTask HandleBeforeHealthChangeAsync(IEventHandlerArgs eventArgs)
         {
             var resourceChangeArgs = (ResourceValueChangedEventArgs)eventArgs;
 
             if (resourceChangeArgs.ResourceTypeId != ResourceTypeIds.HealthId
                 || resourceChangeArgs.Change >= 0)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
-            var barrier = (Api.Items.Types.SpecialGear)resourceChangeArgs.LivingEntity.Inventory.GetItemInSlot(BarrierSlot.TypeIdString);
+            var barrier = resourceChangeArgs.LivingEntity.Inventory.GetItemInSlot<Api.Items.Types.SpecialGear>(BarrierSlot.TypeIdString);
 
             if (barrier == null)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             var barrierCharge = resourceChangeArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString);
@@ -42,7 +44,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             if (barrierCharge <= 0)
             {
                 //Debug.Log("Barrier depleted. Taking full damage");
-                return;
+                return UniTask.CompletedTask;
             }
 
             barrier.SetCustomData(CustomDataKeyLastHit, DateTime.UtcNow.ToString("u"));
@@ -53,11 +55,13 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             {
                 //Debug.Log("Barrier nearly depleted. Taking partial damage");
                 resourceChangeArgs.Change += barrierCharge;
-                return;
+                return UniTask.CompletedTask;
             }
 
             //Debug.Log("Barrier OK. Taking no damage");
             eventArgs.IsDefaultHandlerCancelled = true;
+
+            return UniTask.CompletedTask;
         }
     }
 }

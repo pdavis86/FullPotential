@@ -9,12 +9,12 @@ namespace FullPotential.Api.Gameplay.Combat.Events
 
         public FighterBase Fighter { get; }
 
-        public bool IsLeftHand { get; }
+        public string SlotId { get; }
 
-        public ReloadEventArgs(FighterBase fighter, bool isLeftHand)
+        public ReloadEventArgs(FighterBase fighter, string slotId)
         {
             Fighter = fighter;
-            IsLeftHand = isLeftHand;
+            SlotId = slotId;
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
@@ -16,41 +18,43 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Action<IEventHandlerArgs> BeforeHandler => HandleReloadBefore;
+        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => HandleReloadBeforeAsync;
 
-        public Action<IEventHandlerArgs> AfterHandler => null;
+        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => null;
 
-        private void HandleReloadBefore(IEventHandlerArgs eventArgs)
+        private async UniTask HandleReloadBeforeAsync(IEventHandlerArgs eventArgs)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
                 return;
             }
 
-            var reloadEventArgs = (ReloadEventArgs)eventArgs;
+            var reloadArgs = (ReloadEventArgs)eventArgs;
 
-            var reloader = (Api.Items.Types.SpecialGear)reloadEventArgs.Fighter.Inventory.GetItemInSlot(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+            var reloader = reloadArgs.Fighter.Inventory.GetItemInSlot<Api.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
             if (reloader == null || reloader.RegistryTypeId != ConsolidatorReloader.TypeIdString)
             {
                 return;
             }
 
-            if (!reloadEventArgs.Fighter.ConsumeResource(reloader))
+            if (!reloadArgs.Fighter.ConsumeResource(reloader))
             {
                 return;
             }
 
             eventArgs.IsDefaultHandlerCancelled = true;
 
-            var fighter = reloadEventArgs.Fighter;
-            
-            var slotId = reloadEventArgs.IsLeftHand ? HandSlotIds.LeftHand : HandSlotIds.RightHand;
-            var equippedWeapon = (Weapon)fighter.Inventory.GetItemInSlot(slotId);
+            var slotStatus = reloadArgs.Fighter.GetSlotStatus(reloadArgs.SlotId);
 
-            var ammoNeeded = equippedWeapon.GetAmmoMax() - equippedWeapon.Ammo;
+            slotStatus.IsBusy = true;
 
-            FighterBase.ReloadAndUpdateClientInventory(reloadEventArgs, ammoNeeded);
+            var weapon = reloadArgs.Fighter.Inventory.GetItemInSlot<Weapon>(reloadArgs.SlotId);
+            await UniTask.WaitForSeconds(weapon.GetReloadTime());
+
+            FighterBase.UpdateAmmoCounts(reloadArgs);
+
+            slotStatus.IsBusy = false;
         }
     }
 }

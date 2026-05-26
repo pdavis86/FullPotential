@@ -59,7 +59,7 @@ namespace FullPotential.Core.Player
             HandleSlotChange(item, slotId);
 
             MarkAsDirty();
-            
+
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             HandleEquippedItemsChangeClientRpc(GetEquippedItemsArray(), nearbyClients);
         }
@@ -197,9 +197,7 @@ namespace FullPotential.Core.Player
                 });
             }
 
-            _playerFighter.StopActiveConsumerBehaviour(slotId == HandSlotIds.LeftHand
-                ? _playerFighter.HandStatusLeft
-                : _playerFighter.HandStatusRight);
+            _playerFighter.GetSlotStatus(slotId)?.StopActiveConsumerBehaviour();
         }
 
         protected override void ApplyEquippedItemChanges(SerializableKeyValuePair<string, string>[] equippedItems)
@@ -340,8 +338,7 @@ namespace FullPotential.Core.Player
             {
                 case HandSlotIds.LeftHand:
                 case HandSlotIds.RightHand:
-                    var isLeftHand = slotId == HandSlotIds.LeftHand;
-                    SpawnItemInHand(slotId, item, isLeftHand);
+                    SpawnItemInHand(slotId, item);
                     break;
 
                 default:
@@ -350,7 +347,7 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private void SpawnItemInHand(string slotId, ItemBase item, bool isLeftHand = true)
+        private void SpawnItemInHand(string slotId, ItemBase item)
         {
             if (!NetworkManager.Singleton.IsClient)
             {
@@ -365,7 +362,7 @@ namespace FullPotential.Core.Player
                        weapon.Visuals.PrefabAddress,
                        prefab =>
                        {
-                           InstantiateInPlayerHand(prefab, isLeftHand, new Vector3(0, 90), slotId);
+                           InstantiateInPlayerHand(slotId, prefab, new Vector3(0, 90));
                        });
 
                     break;
@@ -377,7 +374,7 @@ namespace FullPotential.Core.Player
                         {
                             if (prefab != null)
                             {
-                                InstantiateInPlayerHand(prefab, isLeftHand, null, slotId);
+                                InstantiateInPlayerHand(slotId, prefab, null);
                             }
                         });
 
@@ -389,11 +386,11 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private void InstantiateInPlayerHand(GameObject prefab, bool isLeftHand, Vector3? rotation, string slotId)
+        private void InstantiateInPlayerHand(string slotId, GameObject prefab, Vector3? rotation)
         {
             var newObj = Instantiate(prefab, _playerFighter.InFrontOfPlayer.transform);
 
-            newObj.transform.localPosition = isLeftHand
+            newObj.transform.localPosition = slotId == HandSlotIds.LeftHand
                 ? _playerFighter.Positions.LeftHand.localPosition
                 : _playerFighter.Positions.RightHand.localPosition;
 
