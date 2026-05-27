@@ -14,7 +14,7 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<Api.Gameplay.Combat.ICombatService, Gameplay.Combat.CombatService>();
             DependenciesContext.Dependencies.Register<Api.Gameplay.Crafting.IResultFactory, Gameplay.Crafting.ResultFactory>();
             DependenciesContext.Dependencies.Register<Api.Gameplay.Drawing.IDrawingService, Gameplay.Drawing.DrawingService>();
-            DependenciesContext.Dependencies.Register<Api.Gameplay.Events.IEventManager, Gameplay.Events.EventManager>();
+            DependenciesContext.Dependencies.Register<Api.Gameplay.Events.IEventBus, Gameplay.Events.EventBus>();
             DependenciesContext.Dependencies.Register<Api.Localization.ILocalizer, Localization.Localizer>();
             DependenciesContext.Dependencies.Register<Api.Networking.IRpcService, Networking.RpcService>();
             DependenciesContext.Dependencies.Register<Api.Data.ISettingsRepository, Persistence.Local.SettingsRepository>();

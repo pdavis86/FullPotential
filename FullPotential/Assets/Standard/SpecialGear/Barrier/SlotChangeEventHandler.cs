@@ -3,6 +3,7 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Ui;
@@ -15,15 +16,16 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class SlotChangeEventHandler : IEventHandler
+    [RegisterEvent(InventoryBase.SlotChangeEventId)]
+    public class SlotChangeEventHandler : IEventHandler<SlotChangeEventArgs>
     {
         private readonly IHud _hud;
 
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => null;
+        public Func<SlotChangeEventArgs, UniTask> BeforeHandlerAsync => null;
 
-        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => HandleAfterSlotChangeAsync;
+        public Func<SlotChangeEventArgs, UniTask> AfterHandlerAsync => HandleAfterSlotChangeAsync;
 
         public SlotChangeEventHandler(IGameManager gameManager)
         {
@@ -32,25 +34,23 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             _hud.ToggleSliderBar(BarrierChargeResource.TypeIdString, false);
         }
 
-        private UniTask HandleAfterSlotChangeAsync(IEventHandlerArgs eventArgs)
+        private UniTask HandleAfterSlotChangeAsync(SlotChangeEventArgs eventArgs)
         {
-            var slotChangeArgs = (SlotChangeEventArgs)eventArgs;
-
-            if (slotChangeArgs.SlotId != BarrierSlot.TypeIdString)
+            if (eventArgs.SlotId != BarrierSlot.TypeIdString)
             {
                 return UniTask.CompletedTask;
             }
 
-            var isBarrierEquipped = slotChangeArgs.Inventory.GetItemInSlot(BarrierSlot.TypeIdString) != null;
+            var isBarrierEquipped = eventArgs.Inventory.GetItemInSlot(BarrierSlot.TypeIdString) != null;
 
-            if (slotChangeArgs.Inventory.OwnerClientId == NetworkManager.Singleton.LocalClientId)
+            if (eventArgs.Inventory.OwnerClientId == NetworkManager.Singleton.LocalClientId)
             {
                 _hud.ToggleSliderBar(BarrierChargeResource.TypeIdString, isBarrierEquipped);
             }
 
             if (NetworkManager.Singleton.IsServer && !isBarrierEquipped)
             {
-                slotChangeArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, 0, 0);
+                eventArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, 0, 0);
             }
 
             return UniTask.CompletedTask;

@@ -101,7 +101,6 @@
     <Compile Include="Assets\Api\Data\Models\SerializableKeyValuePair.cs" />
     <Compile Include="Assets\Api\Data\Models\ConnectionDetails.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\InventoryBase.cs" />
-    <Compile Include="Assets\Api\Gameplay\Events\IEventManager.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\ViableTarget.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\FighterBase.cs" />
     <Compile Include="Assets\Api\Registry\IRegisterableType.cs" />
@@ -159,6 +158,7 @@
     <Compile Include="Assets\Api\Items\LevelOfDetail.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector2Extensions.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IResourceEffectType.cs" />
+    <Compile Include="Assets\Api\Gameplay\Events\RegisterEventAttribute.cs" />
     <Compile Include="Assets\Api\Data\Models\CharacterSettings.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\Events\ShotFiredEventArgs.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector3Extensions.cs" />
@@ -190,6 +190,7 @@
     <Compile Include="Assets\Api\Registry\IHasNetworkPrefab.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingType.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IItemStack.cs" />
+    <Compile Include="Assets\Api\Gameplay\Events\IEventBus.cs" />
     <Compile Include="Assets\Api\Data\Models\InventoryChanges.cs" />
     <Compile Include="Assets\Api\Networking\IRpcService.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\TransformExtensions.cs" />

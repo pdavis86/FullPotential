@@ -36,7 +36,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 {
     public abstract class InventoryBase : NetworkBehaviour, ISaveable
     {
-        public const string EventIdSlotChange = "9c7972de-4136-4825-aaa3-11925ad049ee";
+        public const string SlotChangeEventId = "9c7972de-4136-4825-aaa3-11925ad049ee";
 
         #region Protected variables
         // ReSharper disable InconsistentNaming
@@ -53,7 +53,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected ITypeRegistry _typeRegistry;
         protected ILocalizer _localizer;
         protected IRpcService _rpcService;
-        protected IEventManager _eventManager;
+        protected IEventBus _eventBus;
 
         public bool IsDirty { get; set; }
 
@@ -70,7 +70,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
-            _eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
+            _eventBus = DependenciesContext.Dependencies.GetService<IEventBus>();
 
             _livingEntity = GetComponent<LivingEntityBase>();
         }
@@ -558,13 +558,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected void TriggerSlotChangeEvent(ItemBase item, string slotId)
         {
             var eventArgs = new SlotChangeEventArgs(this, _livingEntity, slotId, item?.Id);
-            _eventManager.TriggerAsync(EventIdSlotChange, eventArgs).Forget();
+            _eventBus.PublishAsync(SlotChangeEventId, eventArgs).Forget();
         }
 
-        public static UniTask DefaultHandlerForSlotChangeEventAsync(IEventHandlerArgs eventArgs)
+        public static UniTask DefaultHandlerForSlotChangeEventAsync(SlotChangeEventArgs eventArgs)
         {
-            var slotChangeEventArgs = (SlotChangeEventArgs)eventArgs;
-            slotChangeEventArgs.Inventory.SetEquippedItem(slotChangeEventArgs.ItemId, slotChangeEventArgs.SlotId);
+            eventArgs.Inventory.SetEquippedItem(eventArgs.ItemId, eventArgs.SlotId);
             return UniTask.CompletedTask;
         }
 

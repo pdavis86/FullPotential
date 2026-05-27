@@ -159,24 +159,22 @@ namespace FullPotential.Api.Gameplay.Player
             return true;
         }
 
-        public static async UniTask DefaultHandlerForReloadEventAsync(IEventHandlerArgs eventArgs)
+        public static async UniTask DefaultHandlerForReloadEventAsync(ReloadEventArgs eventArgs)
         {
             // todo: remove debugging
             Debug.Log("Reload");
 
-            var reloadArgs = (ReloadEventArgs)eventArgs;
-
-            var slotStatus = reloadArgs.Fighter.GetSlotStatus(reloadArgs.SlotId);
+            var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);
             slotStatus.IsBusy = true;
 
-            var weapon = reloadArgs.Fighter.Inventory.GetItemInSlot<Weapon>(reloadArgs.SlotId);
+            var weapon = eventArgs.Fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
 
             //Lose any remaining ammo
             weapon.UpdateAmmo(0);
 
             await UniTask.WaitForSeconds(weapon.GetReloadTime());
 
-            FighterBase.UpdateAmmoCounts(reloadArgs);
+            FighterBase.UpdateAmmoCounts(eventArgs);
 
             slotStatus.IsBusy = false;
         }

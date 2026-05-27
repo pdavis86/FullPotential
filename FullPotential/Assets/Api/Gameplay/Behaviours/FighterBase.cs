@@ -30,8 +30,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 {
     public abstract class FighterBase : LivingEntityBase, IMoveable
     {
-        public const string EventIdReload = "2337f94e-5a7d-4e02-b1c8-1b5e9934a3ce";
-        public const string EventIdShotFired = "f01cd95a-67cc-4f38-a394-5a69eaa721c6";
+        public const string ReloadEventId = "2337f94e-5a7d-4e02-b1c8-1b5e9934a3ce";
+        public const string ShotFiredEventId = "f01cd95a-67cc-4f38-a394-5a69eaa721c6";
 
         private const int MeleeRangeLimit = 8;
         private const int ConsumerRangeLimit = 50;
@@ -189,7 +189,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             var reloadEventArgs = slotId == HandSlotIds.LeftHand ? _reloadArgsLeft : _reloadArgsRight;
-            _eventManager.TriggerAsync(EventIdReload, reloadEventArgs).Forget();
+            _eventBus.PublishAsync(ReloadEventId, reloadEventArgs).Forget();
 
             return true;
         }
@@ -488,7 +488,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             eventArgs.AmmoUsed = ammoUsed;
             eventArgs.ObjectHit = rangedHit.transform?.gameObject;
 
-            _eventManager.TriggerAsync(EventIdShotFired, eventArgs).Forget();
+            _eventBus.PublishAsync(ShotFiredEventId, eventArgs).Forget();
 
             if (rangedHit.transform == null)
             {
@@ -504,20 +504,18 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        public static UniTask DefaultHandlerForShotFiredEventAsync(IEventHandlerArgs eventArgs)
+        public static UniTask DefaultHandlerForShotFiredEventAsync(ShotFiredEventArgs eventArgs)
         {
-            var shotFiredArgs = (ShotFiredEventArgs)eventArgs;
-
-            if (!shotFiredArgs.Fighter.IsServer)
+            if (!eventArgs.Fighter.IsServer)
             {
                 return UniTask.CompletedTask;
             }
 
-            var fighter = shotFiredArgs.Fighter;
+            var fighter = eventArgs.Fighter;
 
-            var equippedWeapon = fighter.Inventory.GetItemInSlot<Weapon>(shotFiredArgs.SlotId);
+            var equippedWeapon = fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
 
-            equippedWeapon.UpdateAmmo(equippedWeapon.Ammo - shotFiredArgs.AmmoUsed);
+            equippedWeapon.UpdateAmmo(equippedWeapon.Ammo - eventArgs.AmmoUsed);
 
             // todo: is there a bug where logging out then back in restores my ammo?
 

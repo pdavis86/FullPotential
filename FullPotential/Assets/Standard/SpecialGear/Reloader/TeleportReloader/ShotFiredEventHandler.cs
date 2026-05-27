@@ -13,33 +13,32 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 {
-    public class ShotFiredEventHandler : IEventHandler
+    [RegisterEvent(FighterBase.ShotFiredEventId)]
+    public class ShotFiredEventHandler : IEventHandler<ShotFiredEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => null;
+        public Func<ShotFiredEventArgs, UniTask> BeforeHandlerAsync => null;
 
-        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => HandleShotFiredAsync;
+        public Func<ShotFiredEventArgs, UniTask> AfterHandlerAsync => HandleShotFiredAsync;
 
-        private UniTask HandleShotFiredAsync(IEventHandlerArgs eventArgs)
+        private UniTask HandleShotFiredAsync(ShotFiredEventArgs eventArgs)
         {
-            var shotFiredEventArgs = (ShotFiredEventArgs)eventArgs;
-
-            var reloader = shotFiredEventArgs.Fighter.Inventory.GetItemInSlot<Api.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
             if (reloader == null || reloader.RegistryTypeId != TeleportReloader.TypeIdString)
             {
                 return UniTask.CompletedTask;
             }
 
-            if (!shotFiredEventArgs.Fighter.ConsumeResource(reloader, true, !NetworkManager.Singleton.IsServer))
+            if (!eventArgs.Fighter.ConsumeResource(reloader, true, !NetworkManager.Singleton.IsServer))
             {
                 return UniTask.CompletedTask;
             }
 
-            var fighter = shotFiredEventArgs.Fighter;
+            var fighter = eventArgs.Fighter;
 
-            var reloadEventArgs = new ReloadEventArgs(fighter, shotFiredEventArgs.SlotId);
+            var reloadEventArgs = new ReloadEventArgs(fighter, eventArgs.SlotId);
 
             FighterBase.UpdateAmmoCounts(reloadEventArgs);
 

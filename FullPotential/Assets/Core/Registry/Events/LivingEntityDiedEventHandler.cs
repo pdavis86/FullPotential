@@ -3,6 +3,7 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 
@@ -10,24 +11,23 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Core.Registry.Events
 {
-    public class LivingEntityDiedEventHandler : IEventHandler
+    [RegisterEvent(LivingEntityBase.ResourceValueChangeEventId)]
+    public class LivingEntityDiedEventHandler : IEventHandler<ResourceValueChangedEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => null;
+        public Func<ResourceValueChangedEventArgs, UniTask> BeforeHandlerAsync => null;
 
-        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => HandleAfterResourceValueChangedAsync;
+        public Func<ResourceValueChangedEventArgs, UniTask> AfterHandlerAsync => HandleAfterResourceValueChangedAsync;
 
-        private UniTask HandleAfterResourceValueChangedAsync(IEventHandlerArgs eventArgs)
+        private UniTask HandleAfterResourceValueChangedAsync(ResourceValueChangedEventArgs eventArgs)
         {
-            var changedArgs = (ResourceValueChangedEventArgs)eventArgs;
-
-            if (changedArgs.NewValue > 0 || changedArgs.ResourceTypeId != ResourceTypeIds.HealthId)
+            if (eventArgs.NewValue > 0 || eventArgs.ResourceTypeId != ResourceTypeIds.HealthId)
             {
                 return UniTask.CompletedTask;
             }
 
-            changedArgs.LivingEntity.HandleDeath();
+            eventArgs.LivingEntity.HandleDeath();
 
             return UniTask.CompletedTask;
         }

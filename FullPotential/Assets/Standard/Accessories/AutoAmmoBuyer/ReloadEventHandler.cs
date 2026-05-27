@@ -3,6 +3,7 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data.Models;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Items.Types;
@@ -16,16 +17,17 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 {
-    public class ReloadEventHandler : IEventHandler
+    [RegisterEvent(FighterBase.ReloadEventId)]
+    public class ReloadEventHandler : IEventHandler<ReloadEventArgs>
     {
         private readonly ITypeRegistry _typeRegistry;
         private readonly ILocalizer _localizer;
 
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => HandleReloadBeforeAsync;
+        public Func<ReloadEventArgs, UniTask> BeforeHandlerAsync => HandleReloadBeforeAsync;
 
-        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => null;
+        public Func<ReloadEventArgs, UniTask> AfterHandlerAsync => null;
 
         public ReloadEventHandler(ITypeRegistry typeRegistry, ILocalizer localizer)
         {
@@ -33,26 +35,24 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
             _localizer = localizer;
         }
 
-        private UniTask HandleReloadBeforeAsync(IEventHandlerArgs eventArgs)
+        private UniTask HandleReloadBeforeAsync(ReloadEventArgs eventArgs)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
                 return UniTask.CompletedTask;
             }
 
-            var reloadEventArgs = (ReloadEventArgs)eventArgs;
-
             var buyerSlotId = Accessory.GetSlotId(AutoAmmoBuyer.TypeIdString, 1);
-            var buyerItem = reloadEventArgs.Fighter.Inventory.GetItemInSlot(buyerSlotId);
+            var buyerItem = eventArgs.Fighter.Inventory.GetItemInSlot(buyerSlotId);
 
             if (buyerItem == null)
             {
                 return UniTask.CompletedTask;
             }
 
-            var fighter = reloadEventArgs.Fighter;
+            var fighter = eventArgs.Fighter;
 
-            var equippedWeapon = fighter.Inventory.GetItemInSlot<Weapon>(reloadEventArgs.SlotId);
+            var equippedWeapon = fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
 
             var ammoTypeId = equippedWeapon.WeaponType.AmmunitionTypeIdString;
             var ammoType = _typeRegistry.GetRegisteredByTypeId<IAmmunitionType>(ammoTypeId);

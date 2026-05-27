@@ -41,7 +41,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
     [RequireComponent(typeof(Rigidbody))]
     public abstract class LivingEntityBase : NetworkBehaviour
     {
-        public const string EventIdResourceValueChange = "34372a74-abf3-44eb-8598-4427a82f29ab";
+        public const string ResourceValueChangeEventId = "34372a74-abf3-44eb-8598-4427a82f29ab";
 
         private const int VelocityThreshold = 3;
         private const int ForceThreshold = 1000;
@@ -71,7 +71,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected ILocalizer _localizer;
         protected ITypeRegistry _typeRegistry;
         protected ICombatService _combatService;
-        protected IEventManager _eventManager;
+        protected IEventBus _eventBus;
         protected ISceneService _sceneService;
 
         protected readonly NetworkVariable<FixedString128Bytes> _entityName = new NetworkVariable<FixedString128Bytes>();
@@ -123,7 +123,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
-            _eventManager = DependenciesContext.Dependencies.GetService<IEventManager>();
+            _eventBus = DependenciesContext.Dependencies.GetService<IEventBus>();
             _sceneService = _gameManager.GetSceneBehaviour().GetSceneService();
 
             PopulateResourceValueCache();
@@ -327,13 +327,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             var currentValue = ClampResourceValue(typeId, GetResourceValue(typeId));
             var eventArgs = new ResourceValueChangedEventArgs(this, typeId, currentValue + change, change);
-            _eventManager.TriggerAsync(EventIdResourceValueChange, eventArgs).Forget();
+            _eventBus.PublishAsync(ResourceValueChangeEventId, eventArgs).Forget();
         }
 
-        public static UniTask DefaultHandlerForResourceValueChangeEventAsync(IEventHandlerArgs eventArgs)
+        public static UniTask DefaultHandlerForResourceValueChangeEventAsync(ResourceValueChangedEventArgs eventArgs)
         {
-            var changedArgs = (ResourceValueChangedEventArgs)eventArgs;
-            changedArgs.LivingEntity.UpdateResourceValue(changedArgs.ResourceTypeId, changedArgs.NewValue);
+            eventArgs.LivingEntity.UpdateResourceValue(eventArgs.ResourceTypeId, eventArgs.NewValue);
             return UniTask.CompletedTask;
         }
 

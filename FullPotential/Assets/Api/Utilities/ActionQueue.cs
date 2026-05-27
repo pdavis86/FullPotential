@@ -25,7 +25,7 @@ namespace FullPotential.Api.Utilities
         {
             for (var i = _actions.Count - 1; i >= 0; i--)
             {
-                _actions.ElementAt(i)(value);
+                _actions[i](value);
             }
         }
 

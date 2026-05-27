@@ -3,6 +3,7 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Standard.Resources;
@@ -12,34 +13,33 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class HealthChangeEventHandler : IEventHandler
+    [RegisterEvent(LivingEntityBase.ResourceValueChangeEventId)]
+    public class HealthChangeEventHandler : IEventHandler<ResourceValueChangedEventArgs>
     {
         public const string CustomDataKeyLastHit = "LastHit";
 
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => HandleBeforeHealthChangeAsync;
+        public Func<ResourceValueChangedEventArgs, UniTask> BeforeHandlerAsync => HandleBeforeHealthChangeAsync;
 
-        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => null;
+        public Func<ResourceValueChangedEventArgs, UniTask> AfterHandlerAsync => null;
 
-        private UniTask HandleBeforeHealthChangeAsync(IEventHandlerArgs eventArgs)
+        private UniTask HandleBeforeHealthChangeAsync(ResourceValueChangedEventArgs eventArgs)
         {
-            var resourceChangeArgs = (ResourceValueChangedEventArgs)eventArgs;
-
-            if (resourceChangeArgs.ResourceTypeId != ResourceTypeIds.HealthId
-                || resourceChangeArgs.Change >= 0)
+            if (eventArgs.ResourceTypeId != ResourceTypeIds.HealthId
+                || eventArgs.Change >= 0)
             {
                 return UniTask.CompletedTask;
             }
 
-            var barrier = resourceChangeArgs.LivingEntity.Inventory.GetItemInSlot<Api.Items.Types.SpecialGear>(BarrierSlot.TypeIdString);
+            var barrier = eventArgs.LivingEntity.Inventory.GetItemInSlot<Api.Items.Types.SpecialGear>(BarrierSlot.TypeIdString);
 
             if (barrier == null)
             {
                 return UniTask.CompletedTask;
             }
 
-            var barrierCharge = resourceChangeArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString);
+            var barrierCharge = eventArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString);
 
             if (barrierCharge <= 0)
             {
@@ -49,12 +49,12 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             barrier.SetCustomData(CustomDataKeyLastHit, DateTime.UtcNow.ToString("u"));
 
-            resourceChangeArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, resourceChangeArgs.Change);
+            eventArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, eventArgs.Change);
 
-            if (barrierCharge < Math.Abs(resourceChangeArgs.Change))
+            if (barrierCharge < Math.Abs(eventArgs.Change))
             {
                 //Debug.Log("Barrier nearly depleted. Taking partial damage");
-                resourceChangeArgs.Change += barrierCharge;
+                eventArgs.Change += barrierCharge;
                 return UniTask.CompletedTask;
             }
 
