@@ -3,6 +3,7 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 
@@ -10,24 +11,23 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Core.Registry.Events
 {
-    internal class LivingEntityHealthChangedEventHandler : IEventHandler
+    [RegisterEvent(LivingEntityBase.ResourceValueChangeEventId)]
+    public class LivingEntityHealthChangedEventHandler : IEventHandler<ResourceValueChangedEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => null;
+        public Func<ResourceValueChangedEventArgs, UniTask> BeforeHandlerAsync => null;
 
-        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => HandleAfterValueChangedAsync;
+        public Func<ResourceValueChangedEventArgs, UniTask> AfterHandlerAsync => HandleAfterValueChangedAsync;
 
-        private UniTask HandleAfterValueChangedAsync(IEventHandlerArgs eventArgs)
+        private UniTask HandleAfterValueChangedAsync(ResourceValueChangedEventArgs eventArgs)
         {
-            var valueChangedArgs = (ResourceValueChangedEventArgs)eventArgs;
-
-            if (valueChangedArgs.ResourceTypeId != ResourceTypeIds.HealthId)
+            if (eventArgs.ResourceTypeId != ResourceTypeIds.HealthId)
             {
                 return UniTask.CompletedTask;
             }
 
-            valueChangedArgs.LivingEntity.UpdateUiHealthAndDefenceValues();
+            eventArgs.LivingEntity.UpdateUiHealthAndDefenceValues();
 
             return UniTask.CompletedTask;
         }

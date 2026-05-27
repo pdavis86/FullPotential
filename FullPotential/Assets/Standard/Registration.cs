@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Modding;
 
@@ -151,17 +154,27 @@ namespace FullPotential.Standard
             };
         }
 
-        public void RegisterEventHandlers(IEventManager eventManager)
+        public void RegisterEventHandlers(IEventBus eventBus)
         {
-            eventManager.Subscribe<Accessories.AutoAmmoBuyer.ReloadEventHandler>(FighterBase.EventIdReload);
-            eventManager.Subscribe<SpecialGear.Barrier.HealthChangeEventHandler>(LivingEntityBase.EventIdResourceValueChange);
-            eventManager.Subscribe<SpecialGear.Barrier.ChargeChangeEventHandler>(LivingEntityBase.EventIdResourceValueChange);
-            eventManager.Subscribe<SpecialGear.Reloader.ConsolidatorReloader.ReloadEventHandler>(FighterBase.EventIdReload);
-            eventManager.Subscribe<SpecialGear.Reloader.TeleportReloader.ReloadEventHandler>(FighterBase.EventIdReload);
-            eventManager.Subscribe<SpecialGear.Reloader.TeleportReloader.ShotFiredEventHandler>(FighterBase.EventIdShotFired);
-            eventManager.Subscribe<SpecialGear.Reloader.SlotChangeEventHandler>(InventoryBase.EventIdSlotChange);
-            eventManager.Subscribe<SpecialGear.Barrier.SlotChangeEventHandler>(InventoryBase.EventIdSlotChange);
-            eventManager.Subscribe<WeaponExtras.ShotFiredEventHandler>(FighterBase.EventIdShotFired);
+            // todo: zzz v.06 - Move this into type registry
+
+            var eventHandlerTypes = typeof(Registration).Assembly
+                .GetTypes()
+                .Where(t => t.GetCustomAttribute<RegisterEventAttribute>() != null)
+                .ToList();
+
+            foreach (var handlerType in eventHandlerTypes)
+            {
+                if (handlerType.GetInterface(typeof(IEventHandler<>).FullName) == null)
+                {
+                    Debug.LogError($"Type '{handlerType.FullName}' does not implement {typeof(IEventHandler<>).Name}");
+                    continue;
+                }
+
+                var eventId = handlerType.GetCustomAttribute<RegisterEventAttribute>().EventId;
+
+                eventBus.Subscribe(handlerType, eventId);
+            }
         }
     }
 }

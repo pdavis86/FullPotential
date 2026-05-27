@@ -2,6 +2,7 @@
 
 using Cysharp.Threading.Tasks;
 
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Standard.Resources;
@@ -11,27 +12,26 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class ChargeChangeEventHandler : IEventHandler
+    [RegisterEvent(LivingEntityBase.ResourceValueChangeEventId)]
+    public class ChargeChangeEventHandler : IEventHandler<ResourceValueChangedEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => null;
+        public Func<ResourceValueChangedEventArgs, UniTask> BeforeHandlerAsync => null;
 
-        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => HandleAfterResourceValueChangedAsync;
+        public Func<ResourceValueChangedEventArgs, UniTask> AfterHandlerAsync => HandleAfterResourceValueChangedAsync;
 
-        private UniTask HandleAfterResourceValueChangedAsync(IEventHandlerArgs eventArgs)
+        private UniTask HandleAfterResourceValueChangedAsync(ResourceValueChangedEventArgs eventArgs)
         {
-            var resourceChangeArgs = (ResourceValueChangedEventArgs)eventArgs;
-
-            if (resourceChangeArgs.ResourceTypeId != BarrierChargeResource.TypeIdString)
+            if (eventArgs.ResourceTypeId != BarrierChargeResource.TypeIdString)
             {
                 return UniTask.CompletedTask;
             }
 
-            var remainingCharge = resourceChangeArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString);
+            var remainingCharge = eventArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString);
             var showVisuals = remainingCharge > 0;
 
-            resourceChangeArgs.LivingEntity.Inventory.ToggleEquippedItemVisuals(BarrierSlot.TypeIdString, showVisuals);
+            eventArgs.LivingEntity.Inventory.ToggleEquippedItemVisuals(BarrierSlot.TypeIdString, showVisuals);
 
             return UniTask.CompletedTask;
         }

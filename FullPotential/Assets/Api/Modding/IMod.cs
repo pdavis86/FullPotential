@@ -14,6 +14,6 @@ namespace FullPotential.Api.Modding
 
         IEnumerable<string> GetNetworkPrefabAddresses();
 
-        void RegisterEventHandlers(IEventManager eventManager);
+        void RegisterEventHandlers(IEventBus eventBus);
     }
 }

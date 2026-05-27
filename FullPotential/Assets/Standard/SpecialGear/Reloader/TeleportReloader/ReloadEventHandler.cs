@@ -2,6 +2,7 @@
 
 using Cysharp.Threading.Tasks;
 
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 
@@ -9,26 +10,25 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 {
-    public class ReloadEventHandler : IEventHandler
+    [RegisterEvent(FighterBase.ReloadEventId)]
+    public class ReloadEventHandler : IEventHandler<ReloadEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => HandleReloadBeforeAsync;
+        public Func<ReloadEventArgs, UniTask> BeforeHandlerAsync => HandleReloadBeforeAsync;
 
-        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => null;
+        public Func<ReloadEventArgs, UniTask> AfterHandlerAsync => null;
 
-        private UniTask HandleReloadBeforeAsync(IEventHandlerArgs eventArgs)
+        private UniTask HandleReloadBeforeAsync(ReloadEventArgs eventArgs)
         {
-            var reloadEventArgs = (ReloadEventArgs)eventArgs;
-
-            var reloader = reloadEventArgs.Fighter.Inventory.GetItemInSlot<Api.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
             if (reloader == null || reloader.RegistryTypeId != TeleportReloader.TypeIdString)
             {
                 return UniTask.CompletedTask;
             }
 
-            if (!reloadEventArgs.Fighter.ConsumeResource(reloader, slowDrain: true, isTest: true))
+            if (!eventArgs.Fighter.ConsumeResource(reloader, slowDrain: true, isTest: true))
             {
                 return UniTask.CompletedTask;
             }

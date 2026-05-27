@@ -9,7 +9,9 @@ using Cysharp.Threading.Tasks;
 using FullPotential.Api.Data;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
@@ -278,13 +280,13 @@ namespace FullPotential.Core.GameManagement
 
         private void RegisterEvents()
         {
-            var eventManager = (EventManager)DependenciesContext.Dependencies.GetService<IEventManager>();
+            var eventBus = (EventBus)DependenciesContext.Dependencies.GetService<IEventBus>();
 
-            // todo: can I use the real EventArgs type instead of IEventHandlderArgs?
-            eventManager.Register(LivingEntityBase.EventIdResourceValueChange, LivingEntityBase.DefaultHandlerForResourceValueChangeEventAsync);
-            eventManager.Register(FighterBase.EventIdReload, SlotStatus.DefaultHandlerForReloadEventAsync);
-            eventManager.Register(FighterBase.EventIdShotFired, FighterBase.DefaultHandlerForShotFiredEventAsync);
-            eventManager.Register(InventoryBase.EventIdSlotChange, InventoryBase.DefaultHandlerForSlotChangeEventAsync);
+            // todo: make these register via attribute
+            eventBus.Register<ResourceValueChangedEventArgs>(LivingEntityBase.ResourceValueChangeEventId, LivingEntityBase.DefaultHandlerForResourceValueChangeEventAsync);
+            eventBus.Register<ReloadEventArgs>(FighterBase.ReloadEventId, SlotStatus.DefaultHandlerForReloadEventAsync);
+            eventBus.Register<ShotFiredEventArgs>(FighterBase.ShotFiredEventId, FighterBase.DefaultHandlerForShotFiredEventAsync);
+            eventBus.Register<SlotChangeEventArgs>(InventoryBase.SlotChangeEventId, InventoryBase.DefaultHandlerForSlotChangeEventAsync);
         }
 
         private async UniTask DisconnectUserIfTokenInvalidAsync(ulong clientId, string username, string token)

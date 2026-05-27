@@ -4,12 +4,12 @@ using Cysharp.Threading.Tasks;
 
 namespace FullPotential.Api.Gameplay.Events
 {
-    public interface IEventHandler
+    public interface IEventHandler<TArgs> where TArgs : IEventHandlerArgs
     {
         NetworkLocation Location { get; }
 
-        Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync { get; }
+        Func<TArgs, UniTask> BeforeHandlerAsync { get; }
 
-        Func<IEventHandlerArgs, UniTask> AfterHandlerAsync { get; }
+        Func<TArgs, UniTask> AfterHandlerAsync { get; }
     }
 }

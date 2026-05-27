@@ -2,6 +2,7 @@
 
 using Cysharp.Threading.Tasks;
 
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Items.Types;
@@ -14,7 +15,8 @@ using UnityEngine;
 
 namespace FullPotential.Standard.WeaponExtras
 {
-    public class ShotFiredEventHandler : IEventHandler
+    [RegisterEvent(FighterBase.ShotFiredEventId)]
+    public class ShotFiredEventHandler : IEventHandler<ShotFiredEventArgs>
     {
         private const string BulletTrailPrefabAddress = "Standard/Prefabs/Combat/BulletTrail.prefab";
 
@@ -22,20 +24,18 @@ namespace FullPotential.Standard.WeaponExtras
 
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Func<IEventHandlerArgs, UniTask> BeforeHandlerAsync => null;
+        public Func<ShotFiredEventArgs, UniTask> BeforeHandlerAsync => null;
 
-        public Func<IEventHandlerArgs, UniTask> AfterHandlerAsync => HandleAfterBulletFiredAsync;
+        public Func<ShotFiredEventArgs, UniTask> AfterHandlerAsync => HandleAfterBulletFiredAsync;
 
         public ShotFiredEventHandler(ITypeRegistry typeRegistry)
         {
             _typeRegistry = typeRegistry;
         }
 
-        private UniTask HandleAfterBulletFiredAsync(IEventHandlerArgs eventArgs)
+        private UniTask HandleAfterBulletFiredAsync(ShotFiredEventArgs eventArgs)
         {
-            var shotFiredArgs = (ShotFiredEventArgs)eventArgs;
-
-            var item = shotFiredArgs.Fighter.Inventory.GetItemInSlot(shotFiredArgs.SlotId);
+            var item = eventArgs.Fighter.Inventory.GetItemInSlot(eventArgs.SlotId);
 
             if (item is not Weapon weapon || !weapon.IsRanged)
             {
@@ -46,13 +46,13 @@ namespace FullPotential.Standard.WeaponExtras
             {
                 var projectile = UnityEngine.Object.Instantiate(
                     prefab,
-                    shotFiredArgs.StartPosition,
+                    eventArgs.StartPosition,
                     Quaternion.identity);
 
                 var projectileScript = projectile.GetComponent<ProjectileWithTrail>();
-                projectileScript.TargetPosition = shotFiredArgs.EndPosition;
+                projectileScript.TargetPosition = eventArgs.EndPosition;
                 projectileScript.Speed = 500;
-                projectileScript.ObjectHit = shotFiredArgs.ObjectHit;
+                projectileScript.ObjectHit = eventArgs.ObjectHit;
             });
         
                 return UniTask.CompletedTask;

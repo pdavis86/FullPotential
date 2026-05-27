@@ -35,13 +35,13 @@ namespace FullPotential.Core.Registry
         private readonly HashSet<string> _registeredTypeIds = new HashSet<string>();
         private readonly Dictionary<Type, IList> _registeredTypeLists = new Dictionary<Type, IList>();
         private readonly Dictionary<string, object> _loadedAddressables = new Dictionary<string, object>();
-        private readonly IEventManager _eventManager;
+        private readonly IEventBus _eventBus;
         private readonly Func<object, bool>[] _registerTypeFunctions;
         private readonly Func<object, bool>[] _registerVisualsFunctions;
 
-        public TypeRegistry(IEventManager eventManager)
+        public TypeRegistry(IEventBus eventBus)
         {
-            _eventManager = eventManager;
+            _eventBus = eventBus;
 
             _registerTypeFunctions = new Func<object, bool>[]
             {
@@ -110,9 +110,26 @@ namespace FullPotential.Core.Registry
             ValidateAndRegister(typeof(Effects.Hurt));
             ValidateAndRegister(typeof(Effects.Push));
 
-            _eventManager.Subscribe<LivingEntityDiedEventHandler>(LivingEntityBase.EventIdResourceValueChange);
-            _eventManager.Subscribe<LivingEntityHealthChangedEventHandler>(LivingEntityBase.EventIdResourceValueChange);
-        }
+			// todo: zzz v.06 - Make this generic
+
+			var eventHandlerTypes = typeof(TypeRegistry).Assembly
+				.GetTypes()
+				.Where(t => t.GetCustomAttribute<RegisterEventAttribute>() != null)
+				.ToList();
+
+			foreach (var handlerType in eventHandlerTypes)
+			{
+				if (handlerType.GetInterface(typeof(IEventHandler<>).FullName) == null)
+				{
+					Debug.LogError($"Type '{handlerType.FullName}' does not implement {typeof(IEventHandler<>).Name}");
+					continue;
+				}
+
+				var eventId = handlerType.GetCustomAttribute<RegisterEventAttribute>().EventId;
+
+				_eventBus.Subscribe(handlerType, eventId);
+			}
+		}
 
         private void HandleModRegistration(IMod mod)
         {
@@ -146,7 +163,7 @@ namespace FullPotential.Core.Registry
                 });
             }
 
-            mod.RegisterEventHandlers(_eventManager);
+            mod.RegisterEventHandlers(_eventBus);
         }
 
         private static uint GenerateHash(string input)

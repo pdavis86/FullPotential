@@ -14,30 +14,39 @@ using UnityEngine;
 
 namespace FullPotential.Core.Gameplay.Events
 {
-    public class EventManager : IEventManager
+    public class EventBus : IEventBus
     {
-        private readonly Dictionary<string, EventHandlerGroup> _subscriptions = new Dictionary<string, EventHandlerGroup>();
+        private readonly Dictionary<string, IEventHandlerGroup> _subscriptions = new Dictionary<string, IEventHandlerGroup>();
 
-        internal void Register(string eventId, Func<IEventHandlerArgs, UniTask> defaultHandlerAsync)
+        internal void Register<TArgs>(string eventId, Func<TArgs, UniTask> defaultHandlerAsync)
+            where TArgs : IEventHandlerArgs
         {
-            _subscriptions.Add(eventId, new EventHandlerGroup(eventId, defaultHandlerAsync));
+            _subscriptions.Add(eventId, new EventHandlerGroup<TArgs>(eventId, defaultHandlerAsync));
         }
 
-        public void Subscribe<T>(string eventId)
-            where T : IEventHandler
+        public void Subscribe<THandler, TArgs>(string eventId)
+            where THandler : IEventHandler<TArgs>
+            where TArgs : IEventHandlerArgs
         {
-            var handler = DependenciesContext.Dependencies.CreateInstance<T>();
-            _subscriptions[eventId].OtherHandlers.Add(handler);
+            var handler = DependenciesContext.Dependencies.CreateInstance<THandler>();
+            Subscribe(eventId, handler);
         }
 
-        public async UniTask TriggerAsync(string eventId, IEventHandlerArgs args)
+        public void Subscribe(Type handlerType, string eventId)
+        {
+            var handler = DependenciesContext.Dependencies.CreateInstance(handlerType);
+            Subscribe(eventId, handler);
+        }
+
+        public async UniTask PublishAsync<TArgs>(string eventId, TArgs args)
+            where TArgs : IEventHandlerArgs
         {
             if (!IsEventIdRegistered(eventId))
             {
                 return;
             }
 
-            var handlerGroup = _subscriptions[eventId];
+            var handlerGroup = (EventHandlerGroup<TArgs>)_subscriptions[eventId];
 
             args.IsDefaultHandlerCancelled = false;
 
@@ -67,7 +76,20 @@ namespace FullPotential.Core.Gameplay.Events
             }
         }
 
-        private bool ShouldHandlerRun(IEventHandler handler)
+        private void Subscribe(string eventId, object handler)
+        {
+            if (!_subscriptions.ContainsKey(eventId))
+            {
+                Debug.LogError($"Handler '{handler.GetType().FullName}' cannot subscribe to event '{eventId}' as it has not been registered");
+                return;
+            }
+
+            var group = (IEventHandlerGroup)_subscriptions[eventId];
+            group.Add(handler);
+        }
+
+        private bool ShouldHandlerRun<TArgs>(IEventHandler<TArgs> handler)
+            where TArgs : IEventHandlerArgs
         {
             switch (handler.Location)
             {
