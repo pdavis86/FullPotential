@@ -12,18 +12,18 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-namespace FullPotential.Core.Persistence.Local
+namespace FullPotential.Core.Persistence
 {
     public class SaveManager : ISaveManager
     {
         private readonly Dictionary<string, List<ISaveable>> _queue = new Dictionary<string, List<ISaveable>>();
 
-        private IPlayerManagement _playerManagement;
+        private IDataSaver _dataSaver;
         private bool _isProcessingQueue;
 
-        public SaveManager(IPlayerManagement playerManagement)
+        public SaveManager(IDataSaver dataSaver)
         {
-            _playerManagement = playerManagement;
+            _dataSaver = dataSaver;
         }
 
         public void AddToQueue(string username, ISaveable saveable)
@@ -123,16 +123,23 @@ namespace FullPotential.Core.Persistence.Local
             // todo: remove debugging
             Debug.Log($"Saving type {saveable.GetType().Name} for user {username}");
 
-            if (saveable is IPlayerFighter playerFighter)
+            try
             {
-                await _playerManagement.SavePlayerDataAsync(playerFighter.GetPlayerData());
-                playerFighter.IsDirty = false;
-            }
+                if (saveable is IPlayerFighter playerFighter)
+                {
+                    await _dataSaver.SavePlayerDataAsync(playerFighter.GetPlayerData());
+                    playerFighter.IsDirty = false;
+                }
 
-            if (saveable is InventoryBase inventory)
+                if (saveable is InventoryBase inventory)
+                {
+                    await _dataSaver.SaveInventoryChangesAsync(inventory.GetInventoryChanges());
+                    inventory.IsDirty = false;
+                }
+            }
+            catch (Exception ex)
             {
-                await _playerManagement.SaveInventoryChangesAsync(inventory.GetInventoryChanges());
-                inventory.IsDirty = false;
+                Debug.LogException(ex);
             }
         }
     }

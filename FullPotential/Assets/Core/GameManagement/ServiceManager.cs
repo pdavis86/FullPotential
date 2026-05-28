@@ -22,25 +22,25 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<Api.Ui.IUiAssistant, Ui.UiAssistant>();
             DependenciesContext.Dependencies.Register<Api.Unity.IShaderUtilities, Unity.ShaderUtilities>();
             DependenciesContext.Dependencies.Register<Api.Unity.IUnityHelperUtilities, Unity.UnityHelperUtilities>();
+            DependenciesContext.Dependencies.Register<Api.Data.ISaveManager, Persistence.SaveManager>();
 
             var settingsRepository = DependenciesContext.Dependencies.GetService<Api.Data.ISettingsRepository>();
 
             var settings = settingsRepository.Get();
 
-            if (string.IsNullOrWhiteSpace(settings.ManagementApiAddress))
-            {
-                DependenciesContext.Dependencies.Register<Api.Data.ISaveManager, Persistence.Local.SaveManager>();
-                DependenciesContext.Dependencies.Register<Api.Data.IInstanceManagement, Persistence.Local.InstanceManagement>();
-                DependenciesContext.Dependencies.Register<Api.Data.IPlayerManagement, Persistence.Local.PlayerManagement>();
-                DependenciesContext.Dependencies.Register<Api.Data.IUserManagement, Persistence.Local.UserManagement>();
-            }
-            else
-            {
-                DependenciesContext.Dependencies.Register<Api.Data.ISaveManager, Persistence.Https.SaveManager>();
-                DependenciesContext.Dependencies.Register<Api.Data.IInstanceManagement, Persistence.Https.InstanceManagement>();
-                DependenciesContext.Dependencies.Register<Api.Data.IPlayerManagement, Persistence.Https.PlayerManagement>();
-                DependenciesContext.Dependencies.Register<Api.Data.IUserManagement, Persistence.Https.UserManagement>();
-            }
+            // todo: uncomment dependencies
+            //if (string.IsNullOrWhiteSpace(settings.ManagementApiAddress))
+            //{
+            //    DependenciesContext.Dependencies.Register<Api.Data.IUserManagement, Persistence.Local.UserManagement>();
+            DependenciesContext.Dependencies.Register<Api.Data.IDataLoader, Persistence.Local.DataLoader>();
+            //    DependenciesContext.Dependencies.Register<Api.Data.IDataSaver, Persistence.Local.DataSaver>();
+            //}
+            //else
+            //{
+            DependenciesContext.Dependencies.Register<Api.Data.IUserManagement, Persistence.Https.UserManagement>();
+            //    DependenciesContext.Dependencies.Register<Api.Data.IDataLoader, Persistence.Https.DataLoader>();
+            DependenciesContext.Dependencies.Register<Api.Data.IDataSaver, Persistence.Https.DataSaver>();
+            //}
         }
     }
 }

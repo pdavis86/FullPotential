@@ -222,13 +222,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return _sortedResources;
         }
 
-        protected SerializableKeyValuePair<string, int>[] GetResourceArrayForSave()
+        protected Dictionary<string, int> GetResourceDictionaryForSave()
         {
-            return GetResources()
-                .Select(resource => new SerializableKeyValuePair<string, int>(
-                    resource.TypeId.ToString(),
-                    GetResourceValue(resource.TypeId.ToString())))
-                .ToArray();
+            return GetResources().ToDictionary(
+                x => x.TypeId.ToString(), 
+                x => GetResourceValue(x.TypeId.ToString()));
         }
 
         private void SetupResourceReplenishing()
