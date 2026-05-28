@@ -69,7 +69,6 @@
     <Compile Include="Assets\Api\Data\ISaveable.cs" />
     <Compile Include="Assets\Api\GameManagement\Models\Credentials.cs" />
     <Compile Include="Assets\Api\Items\Types\Consumer.cs" />
-    <Compile Include="Assets\Api\Data\IInstanceManagement.cs" />
     <Compile Include="Assets\Api\Unity\Constants\ShaderRenderMode.cs" />
     <Compile Include="Assets\Api\GameManagement\Models\SignInResult.cs" />
     <Compile Include="Assets\Api\Data\Models\PlayerData.cs" />
@@ -140,7 +139,6 @@
     <Compile Include="Assets\Api\Ioc\DependenciesCollection.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\LivingEntityState.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\SerializationExtensions.cs" />
-    <Compile Include="Assets\Api\Data\IPlayerManagement.cs" />
     <Compile Include="Assets\Api\Registry\Weapons\IWeaponType.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\DictionaryExtensions.cs" />
     <Compile Include="Assets\Api\Registry\Effects\ICustomEffectType.cs" />
@@ -150,6 +148,7 @@
     <Compile Include="Assets\Api\Utilities\Extensions\ArrayExtensions.cs" />
     <Compile Include="Assets\Api\Ui\HandSlotIds.cs" />
     <Compile Include="Assets\Api\Scenes\ISceneBehaviour.cs" />
+    <Compile Include="Assets\Api\Data\IDataLoader.cs" />
     <Compile Include="Assets\Api\Items\Types\ItemStack.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\LivingEntityBase.cs" />
     <Compile Include="Assets\Api\Obsolete\Attributes.cs" />
@@ -180,10 +179,12 @@
     <Compile Include="Assets\Api\Obsolete\CraftableType.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Layers.cs" />
     <Compile Include="Assets\Api\Registry\Shapes\IShapeBehaviour.cs" />
+    <Compile Include="Assets\Api\Data\IDataSaver.cs" />
     <Compile Include="Assets\Api\Gameplay\IMoveable.cs" />
     <Compile Include="Assets\Api\Scenes\SceneAttributes.cs" />
     <Compile Include="Assets\Api\Ui\IBarSlider.cs" />
     <Compile Include="Assets\Api\Items\Types\Accessory.cs" />
+    <Compile Include="Assets\Api\Utilities\Extensions\ObjectExtensions.cs" />
     <Compile Include="Assets\Api\Gameplay\Crafting\IResultFactory.cs" />
     <Compile Include="Assets\Api\Registry\IHasItemVisuals.cs" />
     <Compile Include="Assets\Api\Data\Models\InventoryData.cs" />

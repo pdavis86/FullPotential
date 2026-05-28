@@ -46,7 +46,7 @@ namespace FullPotential.Core.GameManagement
         // ReSharper restore UnassignedField.Global
         // ReSharper restore MemberCanBePrivate.Global
 
-        private IInstanceManagement _instanceManagement;
+        private IDataLoader _dataLoader;
         private IUserManagement _userManagement;
         private ILocalizer _localizer;
         private IUiAssistant _uiAssistant;
@@ -67,7 +67,7 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
-            _instanceManagement = DependenciesContext.Dependencies.GetService<IInstanceManagement>();
+            _dataLoader = DependenciesContext.Dependencies.GetService<IDataLoader>();
             _userManagement = DependenciesContext.Dependencies.GetService<IUserManagement>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _uiAssistant = DependenciesContext.Dependencies.GetService<IUiAssistant>();
@@ -103,6 +103,10 @@ namespace FullPotential.Core.GameManagement
                 _gameDetailsContainer.SetActive(false);
                 _signInContainer.SetActive(true);
                 if (_signinUsername != null)
+                {
+                    _signinPassword.Select();
+                }
+                else
                 {
                     _signinUsername.Select();
                 }
@@ -226,22 +230,43 @@ namespace FullPotential.Core.GameManagement
 
         private async UniTask SignInWithPasswordAsync()
         {
-            var signInResult = await _userManagement.SignInWithPasswordAsync(_username, _password);
-            await HandleSignInResultAsync(signInResult.Token, signInResult.IsInvalid);
+            try
+            {
+                var signInResult = await _userManagement.SignInWithPasswordAsync(_username, _password);
+                await HandleSignInResultAsync(signInResult.Token, signInResult.IsInvalid);
+            }
+            catch
+            {
+                HandleSignInError("ui.signin.fail");
+            }
+        }
+
+        private void HandleSignInError(string translationKey)
+        {
+            _signingInMessage.SetActive(false);
+
+            _signinError.text = _localizer.Translate(translationKey);
+            _signinError.gameObject.SetActive(true);
+
+            _signInContainer.SetActive(true);
+        }
+
+        private void HandleGameDetailsError(string translationKey)
+        {
+            _signingInMessage.SetActive(false);
+
+            _gameDetailsError.text = _localizer.Translate(translationKey);
+            _gameDetailsError.gameObject.SetActive(true);
+
+            _gameDetailsContainer.SetActive(true);
+            _gameDetailsAddress.Select();
         }
 
         private async UniTask HandleSignInResultAsync(string token, bool isInvalid = false)
         {
             if (string.IsNullOrWhiteSpace(token))
             {
-                _signingInMessage.SetActive(false);
-
-                _signinError.text = isInvalid
-                    ? _localizer.Translate("ui.signin.invalid")
-                    : _localizer.Translate("ui.signin.error");
-
-                _signinError.gameObject.SetActive(true);
-                _signInContainer.SetActive(true);
+                HandleSignInError(isInvalid ? "ui.signin.invalid" : "ui.signin.error");
                 return;
             }
 
@@ -257,21 +282,26 @@ namespace FullPotential.Core.GameManagement
             _username = _password = null;
             _signinUsername.text = _signinPassword.text = null;
 
-            var connectionDetails = await _instanceManagement.GetConnectionDetailsAsync();
-
-            if (connectionDetails != null)
+            try
             {
+                var connectionDetails = await _dataLoader.GetConnectionDetailsAsync();
+
+                if (connectionDetails == null)
+                {
+                    HandleGameDetailsError("ui.connect.nodetails");
+                    return;
+                }
+
                 _gameDetailsAddress.text = connectionDetails.Address;
                 _gameDetailsPort.text = connectionDetails.Port.ToString();
-            }
-            else
-            {
-                _gameDetailsError.text = _localizer.Translate("ui.connect.nodetails");
-                _gameDetailsError.gameObject.SetActive(true);
-            }
 
-            _gameDetailsContainer.SetActive(true);
-            _gameDetailsAddress.Select();
+                _gameDetailsContainer.SetActive(true);
+                _gameDetailsAddress.Select();
+            }
+            catch
+            {
+                HandleGameDetailsError("ui.connect.loadfailed");
+            }
         }
 
         // ReSharper disable once UnusedMember.Global

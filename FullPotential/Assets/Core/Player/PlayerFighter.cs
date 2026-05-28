@@ -51,7 +51,7 @@ namespace FullPotential.Core.Player
 
         //Registered Services
         private ISaveManager _saveManager;
-        private IPlayerManagement _playerManagement;
+        private IDataLoader _dataLoader;
         private IUnityHelperUtilities _unityHelperUtilities;
         private IShaderUtilities _shaderUtilities;
 
@@ -133,7 +133,7 @@ namespace FullPotential.Core.Player
             _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
 
             _saveManager = DependenciesContext.Dependencies.GetService<ISaveManager>();
-            _playerManagement = DependenciesContext.Dependencies.GetService<IPlayerManagement>();
+            _dataLoader = DependenciesContext.Dependencies.GetService<IDataLoader>();
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
             _shaderUtilities = DependenciesContext.Dependencies.GetService<IShaderUtilities>();
 
@@ -251,8 +251,7 @@ namespace FullPotential.Core.Player
             _saveManager.AddToQueue(Username, this);
 
             _characterSettings = characterSettings;
-
-            UpdatePlayerSettings(_characterSettings);
+            TextureUrl = characterSettings.TextureUrl;
         }
 
         #endregion
@@ -439,12 +438,12 @@ namespace FullPotential.Core.Player
 
             async UniTask FetchPlayerData()
             {
-                playerData = await _playerManagement.GetPlayerDataAsync(Username);
+                playerData = await _dataLoader.GetPlayerDataAsync(Username);
             }
 
             async UniTask FetchInventoryData()
             {
-                inventoryData = await _playerManagement.GetInventoryDataAsync(Username, reduced);
+                inventoryData = await _dataLoader.GetInventoryDataAsync(Username, reduced);
             }
 
             await UniTask.WhenAll(FetchPlayerData(), FetchInventoryData());
@@ -476,7 +475,7 @@ namespace FullPotential.Core.Player
             var health = playerData.Resources.FirstOrDefault(kvp => kvp.Key == nameof(Health));
             if (health.Value == 0)
             {
-                health.Value = GetResourceMax(ResourceTypeIds.HealthId);
+                playerData.Resources[nameof(Health)] = GetResourceMax(ResourceTypeIds.HealthId);
             }
 
             SetResourceInitialValues(GetResources().ToDictionary(
@@ -486,12 +485,9 @@ namespace FullPotential.Core.Player
 
         public void UpdatePlayerSettings(CharacterSettings characterSettings)
         {
+            _characterSettings = characterSettings;
             TextureUrl = characterSettings.TextureUrl;
-
-            if (!IsServer)
-            {
-                UpdatePlayerSettingsServerRpc(characterSettings);
-            }
+            UpdatePlayerSettingsServerRpc(characterSettings);
         }
 
         private async UniTask SetTextureAsync()
@@ -521,6 +517,7 @@ namespace FullPotential.Core.Player
 
                 if (doDownload)
                 {
+                    // todo: check URL was valid before getting here?
                     using (var webRequest = UnityWebRequest.Get(TextureUrl))
                     {
                         await webRequest.SendWebRequest();
@@ -647,7 +644,7 @@ namespace FullPotential.Core.Player
             {
                 Username = Username,
                 Settings = _characterSettings,
-                Resources = GetResourceArrayForSave()
+                Resources = GetResourceDictionaryForSave()
             };
 
             return saveData;

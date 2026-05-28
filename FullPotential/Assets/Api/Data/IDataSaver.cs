@@ -4,13 +4,11 @@ using FullPotential.Api.Data.Models;
 
 namespace FullPotential.Api.Data
 {
-    public interface IPlayerManagement
+    public interface IDataSaver
     {
-        UniTask<PlayerData> GetPlayerDataAsync(string username);
+        UniTask SaveConnectionDetailsAsync(ConnectionDetails connectionDetails);
 
         UniTask SavePlayerDataAsync(PlayerData playerData);
-
-        UniTask<InventoryData> GetInventoryDataAsync(string username, bool reduced);
 
         UniTask SaveInventoryChangesAsync(InventoryChanges inventoryChanges);
     }

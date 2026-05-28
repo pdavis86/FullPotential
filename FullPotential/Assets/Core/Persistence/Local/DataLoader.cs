@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -6,19 +7,30 @@ using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
 using FullPotential.Api.Data.Models;
+using FullPotential.Api.GameManagement;
 using FullPotential.Api.Obsolete;
 
 using UnityEngine;
 
 namespace FullPotential.Core.Persistence.Local
 {
-    public class PlayerManagement : IPlayerManagement
+    public class DataLoader : IDataLoader
     {
-        private readonly string _persistentDataPath = Application.persistentDataPath;
+        public async UniTask<ConnectionDetails> GetConnectionDetailsAsync()
+        {
+            await Task.Yield();
+
+            return new ConnectionDetails
+            {
+                Address = "127.0.0.1",
+                Port = 7180,
+                Status = InstanceState.Available
+            };
+        }
 
         public async UniTask<PlayerData> GetPlayerDataAsync(string username)
         {
-            var filePath = GetPlayerSavePath(username);
+            var filePath = Paths.GetPlayerSavePath(username);
 
             if (!System.IO.File.Exists(filePath))
             {
@@ -26,29 +38,32 @@ namespace FullPotential.Core.Persistence.Local
                 {
                     Username = username,
                     Settings = new CharacterSettings(),
-                    Resources = Array.Empty<SerializableKeyValuePair<string, int>>(),
+                    Resources = new Dictionary<string, int>()
                 };
             }
 
             var loadJson = System.IO.File.ReadAllText(filePath);
             var playerData = JsonUtility.FromJson<PlayerData>(loadJson);
 
+            // todo: zzz v0.6 - remove this fall-back
+            if (playerData.Resources == null)
+            {
+                var playerDataOld = JsonUtility.FromJson<PlayerDataOld>(loadJson);
+                playerData.Resources = new Dictionary<string, int>();
+                foreach (var item in playerDataOld.Resources)
+                {
+                    playerData.Resources[item.Key] = item.Value;
+                }
+            }
+
             await Task.Yield();
 
             return playerData;
         }
 
-        public async UniTask SavePlayerDataAsync(PlayerData playerData)
-        {
-            var saveJson = JsonUtility.ToJson(playerData, true);
-            System.IO.File.WriteAllText(GetPlayerSavePath(playerData.Username), saveJson);
-
-            await Task.Yield();
-        }
-
         public async UniTask<InventoryData> GetInventoryDataAsync(string username, bool reduced)
         {
-            var filePath = GetInventorySavePath(username);
+            var filePath = Paths.GetInventorySavePath(username);
             InventoryData inventoryData;
 
             if (System.IO.File.Exists(filePath))
@@ -59,7 +74,7 @@ namespace FullPotential.Core.Persistence.Local
             else
             {
                 // todo: zzz v0.6 - remove this fall-back
-                filePath = GetPlayerSavePath(username);
+                filePath = Paths.GetPlayerSavePath(username);
                 if (!System.IO.File.Exists(filePath))
                 {
                     return new InventoryData();
@@ -88,35 +103,6 @@ namespace FullPotential.Core.Persistence.Local
             await Task.Yield();
 
             return inventoryData;
-        }
-
-        public async UniTask SaveInventoryChangesAsync(InventoryChanges inventoryChanges)
-        {
-            var inventoryData = (InventoryData)inventoryChanges;
-            var saveJson = JsonUtility.ToJson(inventoryData, true);
-            System.IO.File.WriteAllText(GetInventorySavePath(inventoryData.Username), saveJson);
-
-            await Task.Yield();
-        }
-
-        private string GetPlayerSavePath(string username)
-        {
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                throw new ArgumentException("No username supplied");
-            }
-
-            return _persistentDataPath + "/" + username + ".json";
-        }
-
-        private string GetInventorySavePath(string username)
-        {
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                throw new ArgumentException("No username supplied");
-            }
-
-            return _persistentDataPath + "/" + username + "_inventory.json";
         }
     }
 }
