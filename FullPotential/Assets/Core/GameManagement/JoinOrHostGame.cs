@@ -5,7 +5,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
-using FullPotential.Api.Data.Models;
+using FullPotential.Api.GameManagement.Models;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Ui;
@@ -33,6 +33,7 @@ namespace FullPotential.Core.GameManagement
         [SerializeField] private TMP_InputField _signinPassword;
         [SerializeField] private Text _signinError;
         [SerializeField] private GameObject _gameDetailsContainer;
+        [SerializeField] private Text _gameDetailsIntro;
         [SerializeField] private InputField _gameDetailsAddress;
         [SerializeField] private InputField _gameDetailsPort;
         [SerializeField] private Text _gameDetailsError;
@@ -95,13 +96,14 @@ namespace FullPotential.Core.GameManagement
         {
             _signinUsername.text = _username;
 
-            // todo: Comment out 'LastSigninToken = null' when not debugging
-            _gameSettings.LastSigninToken = null;
+            // Comment out 'LastSigninToken = null' when not debugging
+            //_gameSettings.LastSigninToken = null;
 
             if (string.IsNullOrWhiteSpace(_gameSettings.LastSigninToken))
             {
                 _gameDetailsContainer.SetActive(false);
                 _signInContainer.SetActive(true);
+
                 if (_signinUsername != null)
                 {
                     _signinPassword.Select();
@@ -292,6 +294,7 @@ namespace FullPotential.Core.GameManagement
                     return;
                 }
 
+                _gameDetailsIntro.text = _localizer.Translate("ui.connect.intro", _gameSettings.LastSigninUsername);
                 _gameDetailsAddress.text = connectionDetails.Address;
                 _gameDetailsPort.text = connectionDetails.Port.ToString();
 

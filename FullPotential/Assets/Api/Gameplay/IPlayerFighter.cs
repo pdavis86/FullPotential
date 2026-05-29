@@ -1,5 +1,5 @@
 ﻿using FullPotential.Api.Data;
-using FullPotential.Api.Data.Models;
+using FullPotential.Models;
 
 using UnityEngine;
 

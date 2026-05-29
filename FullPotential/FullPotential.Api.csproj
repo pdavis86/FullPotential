@@ -71,7 +71,6 @@
     <Compile Include="Assets\Api\Items\Types\Consumer.cs" />
     <Compile Include="Assets\Api\Unity\Constants\ShaderRenderMode.cs" />
     <Compile Include="Assets\Api\GameManagement\Models\SignInResult.cs" />
-    <Compile Include="Assets\Api\Data\Models\PlayerData.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\MovementDirection.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingBehaviour.cs" />
     <Compile Include="Assets\Api\Data\IUserManagement.cs" />
@@ -80,6 +79,7 @@
     <Compile Include="Assets\Api\Gameplay\Combat\CombatResult.cs" />
     <Compile Include="Assets\Api\Ui\IUserInterface.cs" />
     <Compile Include="Assets\Api\Gameplay\Drawing\IDrawingService.cs" />
+    <Compile Include="Assets\Api\Gameplay\Events\BasicEventHandler.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IIsSideEffect.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\Interactable.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\EquippedItem.cs" />
@@ -91,14 +91,15 @@
     <Compile Include="Assets\Api\Items\Base\ItemBase.cs" />
     <Compile Include="Assets\Api\Registry\Gear\ISpecialGearType.cs" />
     <Compile Include="Assets\Api\Obsolete\PlayerDataOld.cs" />
+    <Compile Include="Assets\Api\Obsolete\InventoryDataOld.cs" />
+    <Compile Include="Assets\Api\Utilities\Extensions\JsonExtensions.cs" />
     <Compile Include="Assets\Api\Modding\IMod.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\StringExtensions.cs" />
+    <Compile Include="Assets\Api\Obsolete\SerializationExtensions.cs" />
     <Compile Include="Assets\Api\Items\Types\Armor.cs" />
     <Compile Include="Assets\Api\Registry\Weapons\IWeaponVisuals.cs" />
     <Compile Include="Assets\Api\Gameplay\IPlayerFighter.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IAccessoryVisuals.cs" />
-    <Compile Include="Assets\Api\Data\Models\SerializableKeyValuePair.cs" />
-    <Compile Include="Assets\Api\Data\Models\ConnectionDetails.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\InventoryBase.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\ViableTarget.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\FighterBase.cs" />
@@ -121,9 +122,9 @@
     <Compile Include="Assets\Api\Gameplay\IPlayerBehaviour.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\Events\SlotChangeEventArgs.cs" />
     <Compile Include="Assets\Api\Unity\IUnityHelperUtilities.cs" />
+    <Compile Include="Assets\Api\GameManagement\Models\GameSettings.cs" />
     <Compile Include="Assets\Api\Localization\UnitsType.cs" />
     <Compile Include="Assets\Api\Input\DefaultInputActions.cs" />
-    <Compile Include="Assets\Api\Data\Models\GenericResponse.cs" />
     <Compile Include="Assets\Api\Utilities\DestroyStoppable.cs" />
     <Compile Include="Assets\Api\Items\IHasTargetingAndShape.cs" />
     <Compile Include="Assets\Api\Unity\Constants\GameObjectNames.cs" />
@@ -138,7 +139,6 @@
     <Compile Include="Assets\Api\Gameplay\Events\IEventHandlerArgs.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesCollection.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\LivingEntityState.cs" />
-    <Compile Include="Assets\Api\Unity\Extensions\SerializationExtensions.cs" />
     <Compile Include="Assets\Api\Registry\Weapons\IWeaponType.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\DictionaryExtensions.cs" />
     <Compile Include="Assets\Api\Registry\Effects\ICustomEffectType.cs" />
@@ -158,7 +158,6 @@
     <Compile Include="Assets\Api\Unity\Extensions\Vector2Extensions.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IResourceEffectType.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\RegisterEventAttribute.cs" />
-    <Compile Include="Assets\Api\Data\Models\CharacterSettings.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\Events\ShotFiredEventArgs.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector3Extensions.cs" />
     <Compile Include="Assets\Api\Utilities\MathsHelper.cs" />
@@ -184,7 +183,6 @@
     <Compile Include="Assets\Api\Scenes\SceneAttributes.cs" />
     <Compile Include="Assets\Api\Ui\IBarSlider.cs" />
     <Compile Include="Assets\Api\Items\Types\Accessory.cs" />
-    <Compile Include="Assets\Api\Utilities\Extensions\ObjectExtensions.cs" />
     <Compile Include="Assets\Api\Gameplay\Crafting\IResultFactory.cs" />
     <Compile Include="Assets\Api\Registry\IHasItemVisuals.cs" />
     <Compile Include="Assets\Api\Data\Models\InventoryData.cs" />
@@ -198,8 +196,7 @@
     <Compile Include="Assets\Api\Ui\IHud.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\EnumerableExtensions.cs" />
     <Compile Include="Assets\Api\Registry\IHasPrefab.cs" />
-    <Compile Include="Assets\Api\Data\Models\GameSettings.cs" />
-    <Compile Include="Assets\Api\GameManagement\InstanceState.cs" />
+    <Compile Include="Assets\Api\Obsolete\SerializableKeyValuePair.cs" />
     <Compile Include="Assets\Api\CoreTypeIds\EffectTypeIds.cs" />
     <Compile Include="Assets\Api\Obsolete\AttributeAffected.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\NetworkLocation.cs" />
@@ -803,6 +800,10 @@
     </Reference>
     <Reference Include="Castle.Core">
       <HintPath>Library\PackageCache\nuget.castle-core@0f12c6004338\Runtime\Castle.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="FullPotential.Models">
+      <HintPath>Assets\Plugins\FullPotential\FullPotential.Models.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">

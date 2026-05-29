@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FullPotential.Api.Data.Models
+namespace FullPotential.Api.GameManagement.Models
 {
     [Serializable]
     public class GameSettings

@@ -3,6 +3,7 @@
 using FullPotential.Api.Data;
 using FullPotential.Api.Data.Models;
 using FullPotential.Api.GameManagement.Models;
+using FullPotential.Models;
 
 using UnityEngine;
 

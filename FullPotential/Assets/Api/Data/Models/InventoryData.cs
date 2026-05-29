@@ -1,24 +1,9 @@
-﻿using System;
-
-using FullPotential.Api.Items.Types;
+﻿using FullPotential.Api.Obsolete;
 
 namespace FullPotential.Api.Data.Models
 {
-    [Serializable]
-    public class InventoryData
+    // todo: kill InventoryData
+    public class InventoryData : InventoryDataOld
     {
-        public string Username;
-        public int MaxItems;
-
-        public Loot[] Loot;
-        public Accessory[] Accessories;
-        public Armor[] Armor;
-        public Weapon[] Weapons;
-        public Consumer[] Consumers;
-        public ItemStack[] ItemStacks;
-        public SpecialGear[] SpecialGear;
-
-        public SerializableKeyValuePair<string, string>[] EquippedItems;
-        public SerializableKeyValuePair<string, string>[] ShapeMapping;
     }
 }

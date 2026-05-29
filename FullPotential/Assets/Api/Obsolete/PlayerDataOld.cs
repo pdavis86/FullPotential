@@ -1,6 +1,7 @@
 ﻿using System;
 
 using FullPotential.Api.Data.Models;
+using FullPotential.Models;
 
 // ReSharper disable UnusedMember.Global
 

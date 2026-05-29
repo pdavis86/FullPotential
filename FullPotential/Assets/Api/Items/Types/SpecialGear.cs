@@ -5,6 +5,7 @@ using System.Text;
 using FullPotential.Api.Data.Models;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;

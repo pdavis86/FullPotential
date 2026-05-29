@@ -3,6 +3,7 @@
 using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Items.Base;
+using FullPotential.Api.Obsolete;
 
 // ReSharper disable ClassNeverInstantiated.Global
 

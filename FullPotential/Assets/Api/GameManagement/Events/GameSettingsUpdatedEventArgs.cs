@@ -1,6 +1,6 @@
 ﻿using System;
 
-using FullPotential.Api.Data.Models;
+using FullPotential.Api.GameManagement.Models;
 
 namespace FullPotential.Api.GameManagement.Events
 {

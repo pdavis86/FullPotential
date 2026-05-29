@@ -230,26 +230,15 @@ namespace FullPotential.Core.GameManagement
             _settingsRepository.Save(gameSettings);
         }
 
-        public void Disconnect()
+        public async UniTask DisconnectAsync()
         {
             _periodicSave = null;
-
-            if (NetworkManager.Singleton.IsServer)
-            {
-                SaveData();
-            }
-
             NetworkManager.Singleton.Shutdown();
-            SceneManager.LoadSceneAsync(1);
+            await SceneManager.LoadSceneAsync(1);
         }
 
         public void Quit()
         {
-            if (NetworkManager.Singleton.IsServer)
-            {
-                SaveData();
-            }
-
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #else

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using Cysharp.Threading.Tasks;
@@ -11,6 +12,7 @@ using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Ui;
@@ -22,6 +24,7 @@ using FullPotential.Core.Environment;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Registry.Resources;
 using FullPotential.Core.Ui.Components;
+using FullPotential.Models;
 
 using Unity.Netcode;
 
@@ -123,11 +126,6 @@ namespace FullPotential.Core.Player
         {
             base.Awake();
 
-            //_stamina.OnValueChanged += OnStaminaChanged;
-            //_health.OnValueChanged += OnHealthChanged;
-            //_mana.OnValueChanged += OnManaChanged;
-            //_energy.OnValueChanged += OnEnergyChanged;
-
             PlayerInventory = GetComponent<PlayerInventory>();
             _inventory = (InventoryBase)PlayerInventory;
             _bodyMeshRenderer = BodyParts.Body.GetComponent<MeshRenderer>();
@@ -138,6 +136,8 @@ namespace FullPotential.Core.Player
             _shaderUtilities = DependenciesContext.Dependencies.GetService<IShaderUtilities>();
 
             HealthBarSlider = _healthSlider;
+
+            _eventBus.Subscribe<ResourceValueChangedEventArgs>(ResourceValueChangeEventId, _ => IsDirty = true);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -209,16 +209,6 @@ namespace FullPotential.Core.Player
             _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
         }
 
-        public override void OnNetworkDespawn()
-        {
-            if (IsServer)
-            {
-                Task.Run(async () => await _saveManager.ProcessQueueForUsernameAsync(Username))
-                    .GetAwaiter()
-                    .GetResult();
-            }
-        }
-
         #endregion
 
         #region ServerRpc calls
@@ -245,14 +235,20 @@ namespace FullPotential.Core.Player
         }
 
         [ServerRpc]
-        private void UpdatePlayerSettingsServerRpc(CharacterSettings characterSettings)
+        public void SaveBeforeQuitServerRpc(bool isDisconnecting)
         {
-            IsDirty = true;
-            _saveManager.AddToQueue(Username, this);
-
-            _characterSettings = characterSettings;
-            TextureUrl = characterSettings.TextureUrl;
+            SaveBeforeQuitAsync(isDisconnecting).Forget();
         }
+
+        // todo:
+        //[ServerRpc]
+        //private void UpdatePlayerSettingsServerRpc(CharacterSettings characterSettings)
+        //{
+        //    MarkAsDirty();
+
+        //    _characterSettings = characterSettings;
+        //    TextureUrl = characterSettings.TextureUrl;
+        //}
 
         #endregion
 
@@ -317,6 +313,13 @@ namespace FullPotential.Core.Player
 
                     break;
             }
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        [ClientRpc]
+        public void NowOkToQuitClientRpc(bool isDisconnecting, ClientRpcParams clientRpcParams)
+        {
+            NowOkToQuitAsync(isDisconnecting).Forget();
         }
 
         #endregion
@@ -472,22 +475,22 @@ namespace FullPotential.Core.Player
                 _entityName.Value = Username;
             }
 
-            var health = playerData.Resources.FirstOrDefault(kvp => kvp.Key == nameof(Health));
+            var health = playerData.ValuePools.FirstOrDefault(kvp => kvp.Key == nameof(Health));
             if (health.Value == 0)
             {
-                playerData.Resources[nameof(Health)] = GetResourceMax(ResourceTypeIds.HealthId);
+                playerData.ValuePools[nameof(Health)] = GetResourceMax(ResourceTypeIds.HealthId);
             }
 
             SetResourceInitialValues(GetResources().ToDictionary(
                 resource => resource.TypeId.ToString(),
-                resource => playerData.Resources.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value));
+                resource => playerData.ValuePools.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value));
         }
 
         public void UpdatePlayerSettings(CharacterSettings characterSettings)
         {
             _characterSettings = characterSettings;
             TextureUrl = characterSettings.TextureUrl;
-            UpdatePlayerSettingsServerRpc(characterSettings);
+            //todo: UpdatePlayerSettingsServerRpc(characterSettings);
         }
 
         private async UniTask SetTextureAsync()
@@ -644,10 +647,49 @@ namespace FullPotential.Core.Player
             {
                 Username = Username,
                 Settings = _characterSettings,
-                Resources = GetResourceDictionaryForSave()
+                ValuePools = GetResourceDictionaryForSave()
             };
 
+            IsDirty = false;
+
             return saveData;
+        }
+
+        private void MarkAsDirtyAndAddToQueue()
+        {
+            if (!IsServer || IsDirty)
+            {
+                return;
+            }
+
+            // todo: remove debugging
+            Debug.Log($"Marking fighter as dirty for '{_username}'");
+
+            IsDirty = true;
+            _saveManager.AddToQueue(Username, this);
+        }
+
+        private async UniTask SaveBeforeQuitAsync(bool isDisconnecting)
+        {
+            _saveManager.AddToQueue(Username, this);
+            await _saveManager.ProcessQueueForUsernameAsync(Username);
+            var clientParams = _rpcService.ForPlayer(NetworkManager.Singleton.LocalClientId);
+            NowOkToQuitClientRpc(isDisconnecting, clientParams);
+        }
+
+        private async UniTask NowOkToQuitAsync(bool isDisconnecting)
+        {
+            //_userInterface = GameManager.Instance.UserInterface;
+            //_userInterface.HideAllMenus();
+
+            if (isDisconnecting)
+            {
+                await GameManager.Instance.DisconnectAsync();
+            }
+            else
+            {
+                GameManager.Instance.Quit();
+            }
         }
     }
 }

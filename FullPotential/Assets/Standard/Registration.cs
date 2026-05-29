@@ -173,7 +173,7 @@ namespace FullPotential.Standard
 
                 var eventId = handlerType.GetCustomAttribute<RegisterEventAttribute>().EventId;
 
-                eventBus.Subscribe(handlerType, eventId);
+                eventBus.Subscribe(eventId, handlerType);
             }
         }
     }
