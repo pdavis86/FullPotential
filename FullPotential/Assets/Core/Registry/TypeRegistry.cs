@@ -127,7 +127,7 @@ namespace FullPotential.Core.Registry
 
 				var eventId = handlerType.GetCustomAttribute<RegisterEventAttribute>().EventId;
 
-				_eventBus.Subscribe(handlerType, eventId);
+				_eventBus.Subscribe(eventId, handlerType);
 			}
 		}
 

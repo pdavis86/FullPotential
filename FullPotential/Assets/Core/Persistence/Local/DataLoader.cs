@@ -9,6 +9,8 @@ using FullPotential.Api.Data;
 using FullPotential.Api.Data.Models;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Models;
 
 using UnityEngine;
 
@@ -38,21 +40,21 @@ namespace FullPotential.Core.Persistence.Local
                 {
                     Username = username,
                     Settings = new CharacterSettings(),
-                    Resources = new Dictionary<string, int>()
+                    ValuePools = new Dictionary<string, int>()
                 };
             }
 
             var loadJson = System.IO.File.ReadAllText(filePath);
-            var playerData = JsonUtility.FromJson<PlayerData>(loadJson);
+            var playerData = loadJson.ToObject<PlayerData>();
 
             // todo: zzz v0.6 - remove this fall-back
-            if (playerData.Resources == null)
+            if (playerData.ValuePools == null)
             {
                 var playerDataOld = JsonUtility.FromJson<PlayerDataOld>(loadJson);
-                playerData.Resources = new Dictionary<string, int>();
+                playerData.ValuePools = new Dictionary<string, int>();
                 foreach (var item in playerDataOld.Resources)
                 {
-                    playerData.Resources[item.Key] = item.Value;
+                    playerData.ValuePools[item.Key] = item.Value;
                 }
             }
 

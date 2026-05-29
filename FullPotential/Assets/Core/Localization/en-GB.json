@@ -311,7 +311,7 @@
 
     {
       "Key": "ui.connect.intro",
-      "Value": "Welcome!"
+      "Value": "Welcome {0}!"
     },
     {
       "Key": "ui.connect.address",

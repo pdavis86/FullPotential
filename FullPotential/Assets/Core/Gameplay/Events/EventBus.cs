@@ -32,9 +32,16 @@ namespace FullPotential.Core.Gameplay.Events
             Subscribe(eventId, handler);
         }
 
-        public void Subscribe(Type handlerType, string eventId)
+        public void Subscribe(string eventId, Type handlerType)
         {
             var handler = DependenciesContext.Dependencies.CreateInstance(handlerType);
+            Subscribe(eventId, handler);
+        }
+
+        public void Subscribe<TArgs>(string eventId, Action<TArgs> handlerAction)
+            where TArgs : IEventHandlerArgs
+        {
+            var handler = new BasicEventHandler<TArgs>(handlerAction);
             Subscribe(eventId, handler);
         }
 

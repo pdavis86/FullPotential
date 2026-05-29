@@ -9,6 +9,7 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
+using FullPotential.Models;
 
 using UnityEngine;
 using UnityEngine.UI;

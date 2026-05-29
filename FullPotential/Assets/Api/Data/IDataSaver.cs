@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data.Models;
+using FullPotential.Models;
 
 namespace FullPotential.Api.Data
 {

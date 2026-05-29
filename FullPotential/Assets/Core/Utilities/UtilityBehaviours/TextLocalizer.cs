@@ -1,6 +1,9 @@
-﻿using FullPotential.Api.Ioc;
+﻿using System.Linq;
+
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Utilities.Extensions;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +20,8 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
         // ReSharper disable once UnassignedField.Global
         public string TranslationId;
 
+        public string[] Arguments;
+
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
@@ -32,7 +37,16 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
                 Debug.LogWarning($"Missing {nameof(TranslationId)} on {gameObject.name} under {transform.parent.gameObject.name}");
             }
 
-            _textComponent.text = _localizer.Translate(TranslationId);
+            var baseTranslation = _localizer.Translate(TranslationId);
+
+            if (Arguments != null && Arguments.Any())
+            {
+                _textComponent.text = string.Format(baseTranslation, Arguments);
+            }
+            else
+            {
+                _textComponent.text = baseTranslation;
+            }
         }
 
     }

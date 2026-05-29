@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using FullPotential.Api.Data;
 using FullPotential.Api.Data.Models;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Models;
 
 using UnityEngine;
 using UnityEngine.Networking;

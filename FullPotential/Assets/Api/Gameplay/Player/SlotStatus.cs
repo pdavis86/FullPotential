@@ -39,7 +39,7 @@ namespace FullPotential.Api.Gameplay.Player
         public async UniTask StartChargeUpLoopAsync(IHasCharge item)
         {
             // todo: remove debugging
-            Debug.Log("StartChargeUpLoopAsync");
+            //Debug.Log("StartChargeUpLoopAsync");
 
             _preActionCts?.Cancel();
             _preActionCts = new CancellationTokenSource();
@@ -69,7 +69,7 @@ namespace FullPotential.Api.Gameplay.Player
         public void StopChargeUpLoop()
         {
             // todo: remove debugging
-            Debug.Log("StopChargeUpLoop");
+            //Debug.Log("StopChargeUpLoop");
 
             _preActionCts?.Cancel();
         }
@@ -77,7 +77,7 @@ namespace FullPotential.Api.Gameplay.Player
         public async UniTask StartAutomaticWeaponFireAsync(Weapon weapon)
         {
             // todo: remove debugging
-            Debug.Log("StartAutomaticWeaponFireAsync");
+            //Debug.Log("StartAutomaticWeaponFireAsync");
 
             _intraActionCts?.Cancel();
             _intraActionCts = new CancellationTokenSource();
@@ -96,7 +96,7 @@ namespace FullPotential.Api.Gameplay.Player
         public void StopAutomaticWeaponFire()
         {
             // todo: remove debugging
-            Debug.Log("StopAutomaticWeaponFire");
+            //Debug.Log("StopAutomaticWeaponFire");
 
             _intraActionCts?.Cancel();
             IsAutoFiring = false;
@@ -105,7 +105,7 @@ namespace FullPotential.Api.Gameplay.Player
         public async UniTask StartCooldownLoopAsync(IHasCharge item)
         {
             // todo: remove debugging
-            Debug.Log("StartCooldownLoopAsync");
+            //Debug.Log("StartCooldownLoopAsync");
 
             _postActionCts?.Cancel();
             _postActionCts = new CancellationTokenSource();
@@ -135,7 +135,7 @@ namespace FullPotential.Api.Gameplay.Player
         public void StopCooldownLoop()
         {
             // todo: remove debugging
-            Debug.Log("StopCooldownLoop");
+            //Debug.Log("StopCooldownLoop");
 
             _postActionCts?.Cancel();
         }
@@ -143,7 +143,7 @@ namespace FullPotential.Api.Gameplay.Player
         public bool StopActiveConsumerBehaviour()
         {
             // todo: remove debugging
-            Debug.Log("StopActiveConsumerBehaviour");
+            //Debug.Log("StopActiveConsumerBehaviour");
 
             if (!IsConsumingResource)
             {
@@ -162,7 +162,7 @@ namespace FullPotential.Api.Gameplay.Player
         public static async UniTask DefaultHandlerForReloadEventAsync(ReloadEventArgs eventArgs)
         {
             // todo: remove debugging
-            Debug.Log("Reload");
+            //Debug.Log("Reload");
 
             var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);
             slotStatus.IsBusy = true;

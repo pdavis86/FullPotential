@@ -15,6 +15,7 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Networking;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
@@ -43,6 +44,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected readonly Dictionary<string, string> _itemIdToShapeMapping = new Dictionary<string, string>();
 
+        protected bool _hasInventoryLoaded;
         protected string _username;
         protected int _maxItemCount;
         protected Dictionary<string, ItemBase> _items;
@@ -54,6 +56,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected ILocalizer _localizer;
         protected IRpcService _rpcService;
         protected IEventBus _eventBus;
+        protected ISaveManager _saveManager;
 
         public bool IsDirty { get; set; }
 
@@ -71,6 +74,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
             _eventBus = DependenciesContext.Dependencies.GetService<IEventBus>();
+            _saveManager = DependenciesContext.Dependencies.GetService<ISaveManager>();
 
             _livingEntity = GetComponent<LivingEntityBase>();
         }
@@ -259,6 +263,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             };
 
             IsDirty = true;
+            // todo: add to queue
 
             return (countTaken, invChanges);
         }
@@ -599,7 +604,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var shapeMapping = _itemIdToShapeMapping
                 .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value));
 
-            return new InventoryChanges
+            var changes = new InventoryChanges
             {
                 Username = _username,
                 MaxItems = _maxItemCount,
@@ -614,6 +619,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ItemStacks = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemStack))?.Select(x => x as ItemStack).ToArray(),
                 SpecialGear = groupedItems.FirstOrDefault(x => x.Key == typeof(SpecialGear))?.Select(x => x as SpecialGear).ToArray()
             };
+
+            IsDirty = false;
+
+            return changes;
         }
 
         public SerializableKeyValuePair<string, string>[] GetEquippedItemsArray()
@@ -623,6 +632,20 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value.Item?.Id));
 
             return equippedItems.ToArray();
+        }
+
+        protected void MarkAsDirtyAndAddToQueue()
+        {
+            if (!IsServer || !_hasInventoryLoaded || IsDirty)
+            {
+                return;
+            }
+
+            // todo: remove debugging
+            Debug.Log($"Marking inventory as dirty for '{_username}'");
+
+            IsDirty = true;
+            _saveManager.AddToQueue(_username, this);
         }
     }
 }

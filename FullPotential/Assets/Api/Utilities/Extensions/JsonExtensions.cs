@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace FullPotential.Api.Utilities.Extensions
 {
-    public static class ObjectExtensions
+    public static class JsonExtensions
     {
         private static readonly JsonSerializer Serializer = JsonSerializer.Create();
 
@@ -21,6 +21,11 @@ namespace FullPotential.Api.Utilities.Extensions
             var json = Writer.ToString();
             Reset();
             return json;
+        }
+
+        public static T ToObject<T>(this string json)
+        {
+            return JsonConvert.DeserializeObject<T>(json);
         }
 
         private static void Reset()

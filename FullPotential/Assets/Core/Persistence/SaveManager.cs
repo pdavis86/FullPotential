@@ -34,6 +34,9 @@ namespace FullPotential.Core.Persistence
                 return;
             }
 
+            // todo: remove debugging
+            Debug.Log($"Adding {saveable.GetType().Name} to save queue for '{username}'");
+
             if (!_queue.ContainsKey(username))
             {
                 _queue.Add(username, new List<ISaveable> { saveable });
@@ -55,7 +58,7 @@ namespace FullPotential.Core.Persistence
             }
 
             // todo: remove debugging
-            //Debug.Log($"Processing save queue for {username}");
+            Debug.Log($"Processing save queue for '{username}'");
 
             var tasks = GetUniTasksForusername(username);
 
@@ -84,7 +87,7 @@ namespace FullPotential.Core.Persistence
             }
 
             // todo: remove debugging
-            //Debug.Log("Processing save queue");
+            Debug.Log("Processing save queue");
 
             _isProcessingQueue = true;
 
@@ -128,13 +131,11 @@ namespace FullPotential.Core.Persistence
                 if (saveable is IPlayerFighter playerFighter)
                 {
                     await _dataSaver.SavePlayerDataAsync(playerFighter.GetPlayerData());
-                    playerFighter.IsDirty = false;
                 }
 
                 if (saveable is InventoryBase inventory)
                 {
                     await _dataSaver.SaveInventoryChangesAsync(inventory.GetInventoryChanges());
-                    inventory.IsDirty = false;
                 }
             }
             catch (Exception ex)

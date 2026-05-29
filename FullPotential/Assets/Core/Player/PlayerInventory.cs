@@ -14,6 +14,7 @@ using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Items.Types;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
@@ -32,8 +33,6 @@ namespace FullPotential.Core.Player
     // todo: zzz v0.6 - aim to make this class redundant
     public class PlayerInventory : InventoryBase, IPlayerInventory
     {
-        private ISaveManager _saveManager;
-
         private PlayerFighter _playerFighter;
 
         #region Unity Events Handlers
@@ -44,8 +43,6 @@ namespace FullPotential.Core.Player
             base.Awake();
 
             _playerFighter = GetComponent<PlayerFighter>();
-
-            _saveManager = DependenciesContext.Dependencies.GetService<ISaveManager>();
         }
 
         #endregion
@@ -58,7 +55,7 @@ namespace FullPotential.Core.Player
             var item = _items[itemId];
             HandleSlotChange(item, slotId);
 
-            MarkAsDirty();
+            MarkAsDirtyAndAddToQueue();
 
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             HandleEquippedItemsChangeClientRpc(GetEquippedItemsArray(), nearbyClients);
@@ -171,11 +168,13 @@ namespace FullPotential.Core.Player
                     _itemIdToShapeMapping.Add(kvp.Key, kvp.Value);
                 }
             }
+
+            _hasInventoryLoaded = true;
         }
 
         protected override void SetEquippedItem(string itemId, string slotId)
         {
-            MarkAsDirty();
+            MarkAsDirtyAndAddToQueue();
 
             var item = itemId.IsNullOrWhiteSpace() ? null : _items[itemId];
 
@@ -207,7 +206,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            MarkAsDirty();
+            MarkAsDirtyAndAddToQueue();
 
             foreach (var sourceKvp in equippedItems)
             {
@@ -555,7 +554,7 @@ namespace FullPotential.Core.Player
             FillTypesFromIds(item);
             _items.Add(item.Id, item);
 
-            MarkAsDirty();
+            MarkAsDirtyAndAddToQueue();
         }
 
         public string GetAssignedShape(string itemId)
@@ -604,17 +603,6 @@ namespace FullPotential.Core.Player
         private string GetShapeCodeWithoutLengths(string shapeCode)
         {
             return Regex.Replace(shapeCode, "(:\\d+)", string.Empty);
-        }
-
-        private void MarkAsDirty()
-        {
-            if (!IsServer)
-            {
-                return;
-            }
-
-            IsDirty = true;
-            _saveManager.AddToQueue(_playerFighter.Username, this);
         }
     }
 }
