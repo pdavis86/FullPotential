@@ -10,7 +10,7 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 {
-    [RegisterEvent(FighterBase.ReloadEventId)]
+    [SubscribeToEvent(FighterBase.ReloadEventId)]
     public class ReloadEventHandler : IEventHandler<ReloadEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Server;

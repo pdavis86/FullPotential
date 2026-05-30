@@ -20,7 +20,7 @@ using UnityEngine;
 
 namespace FullPotential.Standard.SpecialGear.Reloader
 {
-    [RegisterEvent(InventoryBase.SlotChangeEventId)]
+    [SubscribeToEvent(InventoryBase.SlotChangeEventId)]
     public class SlotChangeEventHandler : IEventHandler<SlotChangeEventArgs>
     {
         private readonly IHud _hud;

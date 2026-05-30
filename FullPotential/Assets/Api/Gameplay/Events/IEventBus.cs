@@ -8,11 +8,9 @@ namespace FullPotential.Api.Gameplay.Events
 {
     public interface IEventBus
     {
-        // todo: Can Subscribe methods be simplified by storing the eventId just on the Type?
-
-        void Subscribe<THandler, TArgs>(string eventId)
-            where THandler : IEventHandler<TArgs>
-            where TArgs : IEventHandlerArgs;
+        //void Subscribe<THandler, TArgs>(string eventId)
+        //    where THandler : IEventHandler<TArgs>
+        //    where TArgs : IEventHandlerArgs;
 
         void Subscribe(string eventId, Type handlerType);
 

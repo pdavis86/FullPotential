@@ -12,7 +12,7 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    [RegisterEvent(LivingEntityBase.ResourceValueChangeEventId)]
+    [SubscribeToEvent(LivingEntityBase.ResourceValueChangeEventId)]
     public class ChargeChangeEventHandler : IEventHandler<ResourceValueChangedEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Client;

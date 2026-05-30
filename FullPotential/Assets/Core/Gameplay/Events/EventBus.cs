@@ -24,16 +24,26 @@ namespace FullPotential.Core.Gameplay.Events
             _subscriptions.Add(eventId, new EventHandlerGroup<TArgs>(eventId, defaultHandlerAsync));
         }
 
-        public void Subscribe<THandler, TArgs>(string eventId)
-            where THandler : IEventHandler<TArgs>
-            where TArgs : IEventHandlerArgs
-        {
-            var handler = DependenciesContext.Dependencies.CreateInstance<THandler>();
-            Subscribe(eventId, handler);
-        }
+        //public void Subscribe<THandler, TArgs>(string eventId)
+        //    where THandler : IEventHandler<TArgs>
+        //    where TArgs : IEventHandlerArgs
+        //{
+        //    var handler = DependenciesContext.Dependencies.CreateInstance<THandler>();
+        //    Subscribe(eventId, handler);
+        //}
 
         public void Subscribe(string eventId, Type handlerType)
         {
+            var interfaceImplementation = handlerType.GetInterface(typeof(IEventHandler<>).FullName);
+
+            if (interfaceImplementation == null)
+            {
+                Debug.LogError($"Type '{handlerType.FullName}' does not implement {typeof(IEventHandler<>).Name}");
+                return;
+            }
+
+            //var argumentsType = interfaceImplementation.GetGenericArguments()[0];
+
             var handler = DependenciesContext.Dependencies.CreateInstance(handlerType);
             Subscribe(eventId, handler);
         }

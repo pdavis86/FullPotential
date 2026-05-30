@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
-using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
@@ -19,7 +18,6 @@ using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
-using FullPotential.Core.Registry.Events;
 
 using Unity.Netcode;
 
@@ -110,25 +108,7 @@ namespace FullPotential.Core.Registry
             ValidateAndRegister(typeof(Effects.Hurt));
             ValidateAndRegister(typeof(Effects.Push));
 
-			// todo: zzz v.06 - Make this generic
-
-			var eventHandlerTypes = typeof(TypeRegistry).Assembly
-				.GetTypes()
-				.Where(t => t.GetCustomAttribute<RegisterEventAttribute>() != null)
-				.ToList();
-
-			foreach (var handlerType in eventHandlerTypes)
-			{
-				if (handlerType.GetInterface(typeof(IEventHandler<>).FullName) == null)
-				{
-					Debug.LogError($"Type '{handlerType.FullName}' does not implement {typeof(IEventHandler<>).Name}");
-					continue;
-				}
-
-				var eventId = handlerType.GetCustomAttribute<RegisterEventAttribute>().EventId;
-
-				_eventBus.Subscribe(eventId, handlerType);
-			}
+            RegisterEventHandlerTypes(typeof(TypeRegistry).Assembly);
 		}
 
         private void HandleModRegistration(IMod mod)
@@ -163,7 +143,7 @@ namespace FullPotential.Core.Registry
                 });
             }
 
-            mod.RegisterEventHandlers(_eventBus);
+            RegisterEventHandlerTypes(mod.GetType().Assembly);
         }
 
         private static uint GenerateHash(string input)
@@ -370,6 +350,19 @@ namespace FullPotential.Core.Registry
 
                     action(prefab);
                 };
+            }
+        }
+
+        private void RegisterEventHandlerTypes(Assembly assembly)
+        {
+            var eventHandlerTypes = assembly.GetTypes()
+                .Where(t => t.GetCustomAttribute<SubscribeToEventAttribute>() != null)
+                .ToList();
+
+            foreach (var handlerType in eventHandlerTypes)
+            {
+                var eventId = handlerType.GetCustomAttribute<SubscribeToEventAttribute>().EventId;
+                _eventBus.Subscribe(eventId, handlerType);
             }
         }
     }

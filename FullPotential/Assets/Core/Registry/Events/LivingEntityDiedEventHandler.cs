@@ -11,7 +11,7 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Core.Registry.Events
 {
-    [RegisterEvent(LivingEntityBase.ResourceValueChangeEventId)]
+    [SubscribeToEvent(LivingEntityBase.ResourceValueChangeEventId)]
     public class LivingEntityDiedEventHandler : IEventHandler<ResourceValueChangedEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Server;

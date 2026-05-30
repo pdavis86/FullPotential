@@ -5,11 +5,11 @@ using FullPotential.Api.Gameplay.Events;
 namespace FullPotential.Api.Gameplay.Events
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class RegisterEventAttribute : Attribute
+    public class SubscribeToEventAttribute : Attribute
     {
         public string EventId { get; }
 
-        public RegisterEventAttribute(string eventId)
+        public SubscribeToEventAttribute(string eventId)
         {
             EventId = eventId;
         }

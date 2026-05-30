@@ -748,12 +748,12 @@
       <HintPath>Library\PackageCache\nuget.moq@9d3acbde62fa\Runtime\Moq.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Castle.Core">
-      <HintPath>Library\PackageCache\nuget.castle-core@0f12c6004338\Runtime\Castle.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="FullPotential.Models">
       <HintPath>Assets\Plugins\FullPotential\FullPotential.Models.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Castle.Core">
+      <HintPath>Library\PackageCache\nuget.castle-core@0f12c6004338\Runtime\Castle.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">

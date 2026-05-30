@@ -13,7 +13,7 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 {
-    [RegisterEvent(FighterBase.ShotFiredEventId)]
+    [SubscribeToEvent(FighterBase.ShotFiredEventId)]
     public class ShotFiredEventHandler : IEventHandler<ShotFiredEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Server;
