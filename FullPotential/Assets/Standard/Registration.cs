@@ -160,19 +160,12 @@ namespace FullPotential.Standard
 
             var eventHandlerTypes = typeof(Registration).Assembly
                 .GetTypes()
-                .Where(t => t.GetCustomAttribute<RegisterEventAttribute>() != null)
+                .Where(t => t.GetCustomAttribute<SubscribeToEventAttribute>() != null)
                 .ToList();
 
             foreach (var handlerType in eventHandlerTypes)
             {
-                if (handlerType.GetInterface(typeof(IEventHandler<>).FullName) == null)
-                {
-                    Debug.LogError($"Type '{handlerType.FullName}' does not implement {typeof(IEventHandler<>).Name}");
-                    continue;
-                }
-
-                var eventId = handlerType.GetCustomAttribute<RegisterEventAttribute>().EventId;
-
+                var eventId = handlerType.GetCustomAttribute<SubscribeToEventAttribute>().EventId;
                 eventBus.Subscribe(eventId, handlerType);
             }
         }

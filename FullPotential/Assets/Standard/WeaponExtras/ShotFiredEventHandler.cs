@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace FullPotential.Standard.WeaponExtras
 {
-    [RegisterEvent(FighterBase.ShotFiredEventId)]
+    [SubscribeToEvent(FighterBase.ShotFiredEventId)]
     public class ShotFiredEventHandler : IEventHandler<ShotFiredEventArgs>
     {
         private const string BulletTrailPrefabAddress = "Standard/Prefabs/Combat/BulletTrail.prefab";

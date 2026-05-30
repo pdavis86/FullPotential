@@ -157,7 +157,6 @@
     <Compile Include="Assets\Api\Items\LevelOfDetail.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector2Extensions.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IResourceEffectType.cs" />
-    <Compile Include="Assets\Api\Gameplay\Events\RegisterEventAttribute.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\Events\ShotFiredEventArgs.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector3Extensions.cs" />
     <Compile Include="Assets\Api\Utilities\MathsHelper.cs" />
@@ -193,6 +192,7 @@
     <Compile Include="Assets\Api\Data\Models\InventoryChanges.cs" />
     <Compile Include="Assets\Api\Networking\IRpcService.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\TransformExtensions.cs" />
+    <Compile Include="Assets\Api\Gameplay\Events\SubscribeToEventAttribute.cs" />
     <Compile Include="Assets\Api\Ui\IHud.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\EnumerableExtensions.cs" />
     <Compile Include="Assets\Api\Registry\IHasPrefab.cs" />
@@ -798,12 +798,12 @@
       <HintPath>Library\PackageCache\nuget.moq@9d3acbde62fa\Runtime\Moq.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Castle.Core">
-      <HintPath>Library\PackageCache\nuget.castle-core@0f12c6004338\Runtime\Castle.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="FullPotential.Models">
       <HintPath>Assets\Plugins\FullPotential\FullPotential.Models.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Castle.Core">
+      <HintPath>Library\PackageCache\nuget.castle-core@0f12c6004338\Runtime\Castle.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">

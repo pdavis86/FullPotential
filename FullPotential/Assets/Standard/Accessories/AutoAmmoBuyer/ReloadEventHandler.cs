@@ -17,7 +17,7 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 {
-    [RegisterEvent(FighterBase.ReloadEventId)]
+    [SubscribeToEvent(FighterBase.ReloadEventId)]
     public class ReloadEventHandler : IEventHandler<ReloadEventArgs>
     {
         private readonly ITypeRegistry _typeRegistry;

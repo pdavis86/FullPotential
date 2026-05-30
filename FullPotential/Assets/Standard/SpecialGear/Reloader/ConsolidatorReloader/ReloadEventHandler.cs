@@ -13,7 +13,7 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 {
-    [RegisterEvent(FighterBase.ReloadEventId)]
+    [SubscribeToEvent(FighterBase.ReloadEventId)]
     public class ReloadEventHandler : IEventHandler<ReloadEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Server;

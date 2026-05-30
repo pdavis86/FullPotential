@@ -16,7 +16,7 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    [RegisterEvent(InventoryBase.SlotChangeEventId)]
+    [SubscribeToEvent(InventoryBase.SlotChangeEventId)]
     public class SlotChangeEventHandler : IEventHandler<SlotChangeEventArgs>
     {
         private readonly IHud _hud;

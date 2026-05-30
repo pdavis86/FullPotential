@@ -13,7 +13,7 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    [RegisterEvent(LivingEntityBase.ResourceValueChangeEventId)]
+    [SubscribeToEvent(LivingEntityBase.ResourceValueChangeEventId)]
     public class HealthChangeEventHandler : IEventHandler<ResourceValueChangedEventArgs>
     {
         public const string CustomDataKeyLastHit = "LastHit";
