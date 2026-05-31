@@ -210,9 +210,6 @@ namespace FullPotential.Core.GameManagement
                 return;
             }
 
-            _signInContainer.SetActive(false);
-            _signingInMessage.SetActive(true);
-
             SignInWithPasswordAsync().Forget();
         }
 
@@ -226,12 +223,26 @@ namespace FullPotential.Core.GameManagement
 
         private async UniTask SignInWithTokenAsync()
         {
-            var isValid = await _userManagement.ValidateCredentialsAsync(_username, _gameSettings.LastSigninToken);
-            await HandleSignInResultAsync(_gameSettings.LastSigninToken, !isValid);
+            _signInContainer.SetActive(false);
+            _signingInMessage.SetActive(true);
+
+            try
+            {
+                var isValid = await _userManagement.ValidateCredentialsAsync(_username, _gameSettings.LastSigninToken);
+                await HandleSignInResultAsync(_gameSettings.LastSigninToken, !isValid);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                await HandleSignInResultAsync(null);
+            }
         }
 
         private async UniTask SignInWithPasswordAsync()
         {
+            _signInContainer.SetActive(false);
+            _signingInMessage.SetActive(true);
+
             try
             {
                 var signInResult = await _userManagement.SignInWithPasswordAsync(_username, _password);
@@ -266,7 +277,7 @@ namespace FullPotential.Core.GameManagement
 
         private async UniTask HandleSignInResultAsync(string token, bool isInvalid = false)
         {
-            if (string.IsNullOrWhiteSpace(token))
+            if (isInvalid || string.IsNullOrWhiteSpace(token))
             {
                 HandleSignInError(isInvalid ? "ui.signin.invalid" : "ui.signin.error");
                 return;
