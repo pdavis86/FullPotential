@@ -281,6 +281,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.main.disconnect
+  Arguments: []
 --- !u!114 &9470402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1158,6 +1159,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.settings.fullscreen
+  Arguments: []
 --- !u!114 &217437891
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1293,6 +1295,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.character.tabs.crafting
+  Arguments: []
 --- !u!1 &239288195
 GameObject:
   m_ObjectHideFlags: 0
@@ -2001,6 +2004,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.save
+  Arguments: []
 --- !u!114 &336904402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2366,6 +2370,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.main.settings
+  Arguments: []
 --- !u!1 &503269632
 GameObject:
   m_ObjectHideFlags: 0
@@ -2398,7 +2403,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -254.06998}
+  m_AnchoredPosition: {x: 50, y: -245.06998}
   m_SizeDelta: {x: 100, y: 26.876}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &509438796
@@ -2452,6 +2457,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.settings.looksensitivity
+  Arguments: []
 --- !u!114 &509438799
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3305,6 +3311,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.respawn.respawn
+  Arguments: []
 --- !u!114 &583171252
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3515,6 +3522,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.character.tabs.crafting.craft
+  Arguments: []
 --- !u!1 &631381458
 GameObject:
   m_ObjectHideFlags: 0
@@ -3687,6 +3695,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.settings.gamesettings
+  Arguments: []
 --- !u!1 &636109073
 GameObject:
   m_ObjectHideFlags: 0
@@ -3890,7 +3899,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -332.50797}
+  m_AnchoredPosition: {x: 50, y: -323.50797}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &647290360
@@ -4824,7 +4833,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -198.16989}
+  m_AnchoredPosition: {x: 50, y: -197.66989}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &751475592
@@ -5339,6 +5348,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.settings.skinplaceholder
+  Arguments: []
 --- !u!114 &828488898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5937,7 +5947,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -272.83008}
+  m_AnchoredPosition: {x: 50, y: -272.33008}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &944943128
@@ -6705,6 +6715,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.settings.resolution
+  Arguments: []
 --- !u!114 &1021014487
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6862,7 +6873,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -372.50797}
+  m_AnchoredPosition: {x: 50, y: -363.50797}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1030297204
@@ -7325,6 +7336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.character.tabs.equipment
+  Arguments: []
 --- !u!1 &1088129714
 GameObject:
   m_ObjectHideFlags: 0
@@ -7973,6 +7985,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.character.tabs.inventory
+  Arguments: []
 --- !u!1 &1148570380
 GameObject:
   m_ObjectHideFlags: 0
@@ -8494,6 +8507,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.main.forcerespawn
+  Arguments: []
 --- !u!114 &1282840037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8666,6 +8680,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.settings.appsettings
+  Arguments: []
 --- !u!1 &1338658338
 GameObject:
   m_ObjectHideFlags: 0
@@ -8794,6 +8809,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.quit
+  Arguments: []
 --- !u!114 &1340700533
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9594,7 +9610,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -292.50797}
+  m_AnchoredPosition: {x: 50, y: -283.50797}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1475163167
@@ -10385,7 +10401,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -205.562}
+  m_AnchoredPosition: {x: 50, y: -196.562}
   m_SizeDelta: {x: 233.95703, y: 50.139954}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1658099165
@@ -10401,6 +10417,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.respawn.youdied
+  Arguments: []
 --- !u!114 &1658099166
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11041,7 +11058,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -235.49998}
+  m_AnchoredPosition: {x: 50, y: -234.99998}
   m_SizeDelta: {x: 100, y: 24.6602}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1762949665
@@ -11344,6 +11361,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.settings.playersettings
+  Arguments: []
 --- !u!1 &1801930410
 GameObject:
   m_ObjectHideFlags: 0
@@ -11794,6 +11812,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.settings.looksmoothness
+  Arguments: []
 --- !u!114 &1836346448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12326,6 +12345,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.settings.language
+  Arguments: []
 --- !u!114 &1918674805
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12916,6 +12936,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.settings.fov
+  Arguments: []
 --- !u!114 &1975741886
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13897,6 +13918,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.settings.skin
+  Arguments: []
 --- !u!114 &2100922203
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14834,6 +14856,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.quit
+  Arguments: []
 --- !u!224 &4354570714749078659
 RectTransform:
   m_ObjectHideFlags: 0
@@ -14851,7 +14874,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -352.83008}
+  m_AnchoredPosition: {x: 50, y: -352.33008}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &4492785076512437334
@@ -15093,7 +15116,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -312.83008}
+  m_AnchoredPosition: {x: 50, y: -312.33008}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7011060653347729642
@@ -15635,6 +15658,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TranslationId: ui.main.disconnect
+  Arguments: []
 --- !u!223 &7011060654693451856
 Canvas:
   m_ObjectHideFlags: 0
