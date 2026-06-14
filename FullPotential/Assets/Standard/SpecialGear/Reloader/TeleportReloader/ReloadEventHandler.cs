@@ -21,7 +21,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 
         private UniTask HandleReloadBeforeAsync(ReloadEventArgs eventArgs)
         {
-            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Obsolete.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
             if (reloader == null || reloader.RegistryTypeId != TeleportReloader.TypeIdString)
             {

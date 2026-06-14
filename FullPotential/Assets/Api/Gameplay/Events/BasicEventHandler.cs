@@ -13,6 +13,7 @@ namespace FullPotential.Api.Gameplay.Events
 
         public Func<TArgs, UniTask> AfterHandlerAsync { get; private set; }
 
+        // Resharper disable once UnusedMember.Global
         public BasicEventHandler(Func<TArgs, UniTask> basicFunction)
         {
             AfterHandlerAsync = basicFunction;

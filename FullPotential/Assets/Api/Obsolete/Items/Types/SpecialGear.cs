@@ -2,16 +2,15 @@
 using System.Linq;
 using System.Text;
 
-using FullPotential.Api.Data.Models;
-using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Obsolete;
+using FullPotential.Api.Obsolete.Items.Base;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Utilities.Extensions;
 
-namespace FullPotential.Api.Items.Types
+namespace FullPotential.Api.Obsolete.Items.Types
 {
     [Serializable]
     public class SpecialGear : CombatItemBase, IResourceConsumer, IHasItemVisuals

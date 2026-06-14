@@ -1,5 +1,5 @@
 ﻿using FullPotential.Api.Data;
-using FullPotential.Models;
+using FullPotential.Models.Player;
 
 using UnityEngine;
 
@@ -9,7 +9,7 @@ namespace FullPotential.Api.Gameplay
 {
     public interface IPlayerFighter : ISaveable
     {
-        PlayerData GetPlayerData();
+        CharacterData GetCharacterData();
 
         void SpawnLootChest(Vector3 position);
     }

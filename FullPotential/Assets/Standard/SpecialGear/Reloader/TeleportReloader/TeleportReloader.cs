@@ -15,7 +15,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 
         public string SlotIdString => SpecialSlots.RangedWeaponReloaderSlot.TypeIdString;
 
-        public string OverrideItemDescription(Api.Items.Types.SpecialGear specialGear, ILocalizer localizer, LevelOfDetail levelOfDetail)
+        public string OverrideItemDescription(Api.Obsolete.Items.Types.SpecialGear specialGear, ILocalizer localizer, LevelOfDetail levelOfDetail)
         {
             return null;
         }

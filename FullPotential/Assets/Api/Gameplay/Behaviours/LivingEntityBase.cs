@@ -6,17 +6,16 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.CoreTypeIds;
-using FullPotential.Api.Data.Models;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Obsolete.Items.Base;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
@@ -811,5 +810,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
         }
 
         #endregion
+
+        public virtual int GetMaxItems()
+        {
+            // todo: zzz v0.8 implement GetMaxItems()
+            return 30;
+        }
     }
 }

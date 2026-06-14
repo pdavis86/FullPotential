@@ -2,12 +2,12 @@
 
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Items.Types;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Weapons;
 
@@ -67,7 +67,7 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
                 return UniTask.CompletedTask;
             }
 
-            var newItemStack = new ItemStack
+            var newItemStack = new ItemStackBase
             {
                 RegistryType = ammoType,
                 Id = Guid.NewGuid().ToString(),
@@ -75,15 +75,16 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
                 Count = ammoType.MaxStackSize
             };
 
-            var addedToInventory = fighter.Inventory.ApplyInventoryChanges(new InventoryChanges
-            {
-                ItemStacks = new[] { newItemStack }
-            });
+            // todo: fix reload
+            //var addedToInventory = fighter.Inventory.ApplyInventoryChanges(new InventoryData
+            //{
+            //    Items = new[] { newItemStack }
+            //});
 
-            if (addedToInventory)
-            {
-                //todo: zzz v0.9 - take money for ammo ItemStack
-            }
+            //if (addedToInventory)
+            //{
+            //    //todo: zzz v0.9 - take money for ammo ItemStack
+            //}
 
             return UniTask.CompletedTask;
         }

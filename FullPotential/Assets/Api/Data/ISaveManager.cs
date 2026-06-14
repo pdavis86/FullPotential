@@ -4,9 +4,9 @@ namespace FullPotential.Api.Data
 {
     public interface ISaveManager
     {
-        void AddToQueue(string username, ISaveable saveable);
+        void AddToQueue(string characterId, ISaveable saveable);
 
-        UniTask ProcessQueueForUsernameAsync(string username);
+        UniTask ProcessQueueForCharacterIdAsync(string characterId);
 
         UniTask ProcessQueueAsync();
     }

@@ -1,7 +1,6 @@
 ﻿using System;
 
-using FullPotential.Api.Data.Models;
-using FullPotential.Models;
+using FullPotential.Models.Player;
 
 // ReSharper disable UnusedMember.Global
 
@@ -11,9 +10,9 @@ namespace FullPotential.Api.Obsolete
     public class PlayerDataOld
     {
         public string Username;
-        public CharacterSettings Settings;
+        public CharacterSettingsOld Settings;
         public SerializableKeyValuePair<string, int>[] Resources;
-        public InventoryData Inventory;
+        public InventoryDataOld Inventory;
 
         [NonSerialized] public bool InventoryLoadedSuccessfully;
     }

@@ -4,11 +4,8 @@ using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
-using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Items;
-using FullPotential.Api.Items.Types;
-
-using UnityEngine;
+using FullPotential.Api.Obsolete.Items.Types;
 
 namespace FullPotential.Api.Gameplay.Player
 {
@@ -38,7 +35,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public async UniTask StartChargeUpLoopAsync(IHasCharge item)
         {
-            // todo: remove debugging
+            // todo: zzz v0.6 - set debug log level
             //Debug.Log("StartChargeUpLoopAsync");
 
             _preActionCts?.Cancel();
@@ -68,7 +65,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public void StopChargeUpLoop()
         {
-            // todo: remove debugging
+            // todo: zzz v0.6 - set debug log level
             //Debug.Log("StopChargeUpLoop");
 
             _preActionCts?.Cancel();
@@ -76,7 +73,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public async UniTask StartAutomaticWeaponFireAsync(Weapon weapon)
         {
-            // todo: remove debugging
+            // todo: zzz v0.6 - set debug log level
             //Debug.Log("StartAutomaticWeaponFireAsync");
 
             _intraActionCts?.Cancel();
@@ -95,7 +92,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public void StopAutomaticWeaponFire()
         {
-            // todo: remove debugging
+            // todo: zzz v0.6 - set debug log level
             //Debug.Log("StopAutomaticWeaponFire");
 
             _intraActionCts?.Cancel();
@@ -104,7 +101,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public async UniTask StartCooldownLoopAsync(IHasCharge item)
         {
-            // todo: remove debugging
+            // todo: zzz v0.6 - set debug log level
             //Debug.Log("StartCooldownLoopAsync");
 
             _postActionCts?.Cancel();
@@ -134,7 +131,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public void StopCooldownLoop()
         {
-            // todo: remove debugging
+            // todo: zzz v0.6 - set debug log level
             //Debug.Log("StopCooldownLoop");
 
             _postActionCts?.Cancel();
@@ -142,7 +139,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public bool StopActiveConsumerBehaviour()
         {
-            // todo: remove debugging
+            // todo: zzz v0.6 - set debug log level
             //Debug.Log("StopActiveConsumerBehaviour");
 
             if (!IsConsumingResource)
@@ -161,7 +158,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public static async UniTask DefaultHandlerForReloadEventAsync(ReloadEventArgs eventArgs)
         {
-            // todo: remove debugging
+            // todo: zzz v0.6 - set debug log level
             //Debug.Log("Reload");
 
             var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);

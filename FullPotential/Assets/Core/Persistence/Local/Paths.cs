@@ -6,7 +6,7 @@ namespace FullPotential.Core.Persistence.Local
 {
     public static class Paths
     {
-        public static string GetPlayerSavePath(string username)
+        public static string GetCharacterSavePath(string username)
         {
             return GetBasePath(username) + ".json";
         }

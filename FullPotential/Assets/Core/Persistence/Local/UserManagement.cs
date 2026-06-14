@@ -15,14 +15,16 @@ namespace FullPotential.Core.Persistence.Local
         {
             await Task.Yield();
             return username == password
-                ? new SignInResult { Token = DummyToken }
-                : new SignInResult { IsInvalid = true };
+                ? new SignInResult { UserId = username, Username = username, CharacterId = username, Token = DummyToken }
+                : new SignInResult { UserId = username, Username = username, CharacterId = username, IsInvalid = true };
         }
 
-        public async UniTask<bool> ValidateCredentialsAsync(string username, string token)
+        public async UniTask<SignInResult> SignInWithTokenAsync(string username, string token)
         {
             await Task.Yield();
-            return true;
+            return token == DummyToken
+                ? new SignInResult { UserId = username, Username = username, CharacterId = username, Token = DummyToken }
+                : new SignInResult { UserId = username, Username = username, CharacterId = username, IsInvalid = true };
         }
 
         public async UniTask<bool> SignOutAsync()

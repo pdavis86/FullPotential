@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data;
-using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
@@ -22,9 +19,9 @@ using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Environment;
 using FullPotential.Core.GameManagement;
-using FullPotential.Core.Registry.Resources;
+using FullPotential.Core.GameManagement.Data;
 using FullPotential.Core.Ui.Components;
-using FullPotential.Models;
+using FullPotential.Models.Player;
 
 using Unity.Netcode;
 
@@ -59,7 +56,7 @@ namespace FullPotential.Core.Player
         private IShaderUtilities _shaderUtilities;
 
         //Data
-        private CharacterSettings _characterSettings;
+        private Dictionary<string, string> _characterSettings;
 
         public bool IsDirty { get; set; }
 
@@ -96,8 +93,15 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private string _username;
+        private string _characterId;
+        [HideInInspector]
+        public string CharacterId
+        {
+            get => _characterId;
+            set => _characterId = value;
+        }
 
+        private string _username;
         [HideInInspector]
         public string Username
         {
@@ -166,11 +170,9 @@ namespace FullPotential.Core.Player
                 }
             }
 
-            gameObject.name = IsServer
-                ? Username
-                : "Player ID " + NetworkObjectId;
+            gameObject.name = "Player ID " + NetworkObjectId;
 
-            await GetAndLoadPlayerDataAsync(!IsOwner);
+            await GetAndLoadCharacterDataAsync(!IsOwner);
 
             var gameObjectCollider = gameObject.GetComponent<Collider>();
             _myHeight = gameObjectCollider.bounds.max.y - gameObjectCollider.bounds.min.y;
@@ -198,7 +200,9 @@ namespace FullPotential.Core.Player
 
         protected override void OnSynchronize<T>(ref BufferSerializer<T> serializer)
         {
+            serializer.SerializeValue(ref _characterId);
             serializer.SerializeValue(ref _username);
+
             base.OnSynchronize(ref serializer);
         }
 
@@ -240,7 +244,7 @@ namespace FullPotential.Core.Player
             SaveBeforeQuitAsync(isDisconnecting).Forget();
         }
 
-        // todo:
+        // todo: use or delete
         //[ServerRpc]
         //private void UpdatePlayerSettingsServerRpc(CharacterSettings characterSettings)
         //{
@@ -434,24 +438,24 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private async UniTask GetAndLoadPlayerDataAsync(bool reduced)
+        private async UniTask GetAndLoadCharacterDataAsync(bool reduced)
         {
-            PlayerData playerData = null;
+            CharacterData playerData = null;
             InventoryData inventoryData = null;
 
-            async UniTask FetchPlayerData()
+            async UniTask FetchCharacterData()
             {
-                playerData = await _dataLoader.GetPlayerDataAsync(Username);
+                playerData = await _dataLoader.GetCharacterDataAsync(CharacterId);
             }
 
             async UniTask FetchInventoryData()
             {
-                inventoryData = await _dataLoader.GetInventoryDataAsync(Username, reduced);
+                inventoryData = await _dataLoader.GetInventoryDataAsync(CharacterId, reduced);
             }
 
-            await UniTask.WhenAll(FetchPlayerData(), FetchInventoryData());
+            await UniTask.WhenAll(FetchCharacterData(), FetchInventoryData());
 
-            LoadFromPlayerData(playerData);
+            LoadFromCharacterData(playerData);
 
             // todo: zzz v0.6 - why is a PlayerInventory cast necessary?
             ((PlayerInventory)Inventory).LoadInventory(inventoryData);
@@ -465,20 +469,20 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private void LoadFromPlayerData(PlayerData playerData)
+        private void LoadFromCharacterData(CharacterData playerData)
         {
-            TextureUrl = playerData.Settings?.TextureUrl ?? string.Empty;
             _characterSettings = playerData.Settings;
+            TextureUrl = GetSettingValue(CharacterSettingKey.TextureUrl) ?? string.Empty;
 
             if (IsServer)
             {
                 _entityName.Value = Username;
             }
 
-            var health = playerData.ValuePools.FirstOrDefault(kvp => kvp.Key == nameof(Health));
+            var health = playerData.ValuePools.FirstOrDefault(kvp => kvp.Key == ResourceTypeIds.HealthId);
             if (health.Value == 0)
             {
-                playerData.ValuePools[nameof(Health)] = GetResourceMax(ResourceTypeIds.HealthId);
+                playerData.ValuePools[ResourceTypeIds.HealthId] = GetResourceMax(ResourceTypeIds.HealthId);
             }
 
             SetResourceInitialValues(GetResources().ToDictionary(
@@ -486,13 +490,18 @@ namespace FullPotential.Core.Player
                 resource => playerData.ValuePools.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value));
         }
 
-        public void UpdatePlayerSettings(CharacterSettings characterSettings)
+        public void UpdatePlayerSettings(Dictionary<string, string> updatedSettings)
         {
-            _characterSettings = characterSettings;
-            TextureUrl = characterSettings.TextureUrl;
+            foreach (var kvp in updatedSettings)
+            {
+                _characterSettings[kvp.Key] = kvp.Value;
+            }
+            
+            TextureUrl = GetSettingValue(CharacterSettingKey.TextureUrl) ?? string.Empty;
             //todo: UpdatePlayerSettingsServerRpc(characterSettings);
         }
 
+        // todo: zzz v0.6 - move SetTextureAsync to a repository class
         private async UniTask SetTextureAsync()
         {
             if (Username.IsNullOrWhiteSpace())
@@ -520,7 +529,6 @@ namespace FullPotential.Core.Player
 
                 if (doDownload)
                 {
-                    // todo: check URL was valid before getting here?
                     using (var webRequest = UnityWebRequest.Get(TextureUrl))
                     {
                         await webRequest.SendWebRequest();
@@ -641,11 +649,11 @@ namespace FullPotential.Core.Player
 
         #endregion
 
-        public PlayerData GetPlayerData()
+        public CharacterData GetCharacterData()
         {
-            var saveData = new PlayerData
+            var saveData = new CharacterData
             {
-                Username = Username,
+                CharacterId = CharacterId,
                 Settings = _characterSettings,
                 ValuePools = GetResourceDictionaryForSave()
             };
@@ -662,17 +670,17 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            // todo: remove debugging
-            Debug.Log($"Marking fighter as dirty for '{_username}'");
+            // todo: zzz v0.6 - set debug log level
+            Debug.Log($"Marking fighter as dirty for '{CharacterId}'");
 
             IsDirty = true;
-            _saveManager.AddToQueue(Username, this);
+            _saveManager.AddToQueue(CharacterId, this);
         }
 
         private async UniTask SaveBeforeQuitAsync(bool isDisconnecting)
         {
-            _saveManager.AddToQueue(Username, this);
-            await _saveManager.ProcessQueueForUsernameAsync(Username);
+            _saveManager.AddToQueue(CharacterId, this);
+            await _saveManager.ProcessQueueForCharacterIdAsync(CharacterId);
             var clientParams = _rpcService.ForPlayer(NetworkManager.Singleton.LocalClientId);
             NowOkToQuitClientRpc(isDisconnecting, clientParams);
         }
@@ -690,6 +698,16 @@ namespace FullPotential.Core.Player
             {
                 GameManager.Instance.Quit();
             }
+        }
+
+        public string GetSettingValue(string key)
+        {
+            if (!_characterSettings.ContainsKey(key))
+            {
+                return null;
+            }
+
+            return _characterSettings[key];
         }
     }
 }

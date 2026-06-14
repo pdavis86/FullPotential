@@ -1,5 +1,6 @@
 ﻿using FullPotential.Api.Items;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Obsolete.Items.Types;
 
 namespace FullPotential.Api.Registry.Gear
 {
@@ -7,6 +8,6 @@ namespace FullPotential.Api.Registry.Gear
     {
         string SlotIdString { get; }
 
-        string OverrideItemDescription(Items.Types.SpecialGear specialGear, ILocalizer localizer, LevelOfDetail levelOfDetail);
+        string OverrideItemDescription(SpecialGear specialGear, ILocalizer localizer, LevelOfDetail levelOfDetail);
     }
 }

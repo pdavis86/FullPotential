@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 
-using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Obsolete;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -16,7 +14,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
             //Nothing here
         }
 
-        protected override void ApplyEquippedItemChanges(SerializableKeyValuePair<string, string>[] equippedItems)
+        protected override void ApplyEquippedItemChanges(Dictionary<string, string> equippedItems)
         {
             //Nothing here
         }

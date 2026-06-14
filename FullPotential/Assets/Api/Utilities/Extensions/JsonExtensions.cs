@@ -7,13 +7,11 @@ namespace FullPotential.Api.Utilities.Extensions
 {
     public static class JsonExtensions
     {
-        private static readonly JsonSerializer Serializer = JsonSerializer.Create();
+        private static readonly JsonSerializer Serializer = JsonSerializer.Create(new JsonSerializerSettings { Formatting = Formatting.Indented });
 
         private static readonly StringBuilder Builder = new();
 
         private static readonly StringWriter Writer = new(Builder);
-
-        //private static readonly JsonTextWriter JsonWriter = new(Writer);
 
         public static string ToJson(this object model)
         {
@@ -23,7 +21,7 @@ namespace FullPotential.Api.Utilities.Extensions
             return json;
         }
 
-        public static T ToObject<T>(this string json)
+        public static T FromJson<T>(this string json)
         {
             return JsonConvert.DeserializeObject<T>(json);
         }

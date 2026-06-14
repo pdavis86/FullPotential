@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 
-using FullPotential.Api.Data.Models;
-using FullPotential.Api.Obsolete;
-
 using Unity.Netcode;
 
 // ReSharper disable UnusedMember.Global

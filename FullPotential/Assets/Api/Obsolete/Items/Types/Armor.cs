@@ -1,26 +1,27 @@
 ﻿using System;
 using System.Text;
 
-using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Obsolete.Items.Base;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Utilities.Extensions;
 
-namespace FullPotential.Api.Items.Types
+namespace FullPotential.Api.Obsolete.Items.Types
 {
     [Serializable]
-    public class Accessory : CombatItemBase, IHasItemVisuals
+    public class Armor : CombatItemBase, IHasItemVisuals
     {
         private IItemVisuals _visuals;
 
         //Variables so they are serialized
         // ReSharper disable MemberCanBePrivate.Global
         // ReSharper disable NotAccessedField.Global
-        public string AccessoryVisualsTypeId;
+        public string ArmorVisualsTypeId;
         // ReSharper restore MemberCanBePrivate.Global
         // ReSharper restore NotAccessedField.Global
 
-        public string VisualsTypeId => AccessoryVisualsTypeId;
+        public string VisualsTypeId => ArmorVisualsTypeId;
 
         public IItemVisuals Visuals
         {
@@ -28,7 +29,7 @@ namespace FullPotential.Api.Items.Types
             set
             {
                 _visuals = value;
-                AccessoryVisualsTypeId = _visuals?.TypeId.ToString();
+                ArmorVisualsTypeId = _visuals?.TypeId.ToString();
             }
         }
 
@@ -42,25 +43,22 @@ namespace FullPotential.Api.Items.Types
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {localizer.Translate(TranslationType.ItemType, GetType().Name)}" + "\n");
             }
 
-            //todo: zzz v0.8 - implement accessory triggers and traits
+            //todo: zzz v0.8 - implement armor triggers and traits
             //if (Effects != null && Effects.Count > 0)
             //{
             //    var localisedEffects = Effects.Select(localizer.GetTranslatedTypeName);
             //    sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(Effects))}: {string.Join(", ", localisedEffects)}\n");
             //}
 
-            //todo: zzz v0.8 - implement accessory triggers and traits
-            //sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Strength))}: {Attributes.Strength})\n");
-            //sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Efficiency))}: {Attributes.Efficiency})\n");
-            //sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Speed))}: {Attributes.Speed})\n");
-            //sb.Append($"WiP ({localizer.Translate(TranslationType.Attribute, nameof(Attributes.Recovery))}: {Attributes.Recovery})\n");
+            AppendToDescription(
+                sb,
+                localizer,
+                Attributes.Strength,
+                nameof(Attributes.Strength),
+                AliasSegmentDefensive,
+                localizer.Translate(Attributes.Strength));
 
             return sb.ToString().Trim();
-        }
-
-        public static string GetSlotId(string typeId, int index)
-        {
-            return $"{typeId};{index}";
         }
     }
 }

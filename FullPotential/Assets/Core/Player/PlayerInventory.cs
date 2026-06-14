@@ -6,15 +6,11 @@ using System.Text.RegularExpressions;
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.CoreTypeIds;
-using FullPotential.Api.Data;
-using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
-using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.Types;
-using FullPotential.Api.Obsolete;
+using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
@@ -57,20 +53,28 @@ namespace FullPotential.Core.Player
 
             MarkAsDirtyAndAddToQueue();
 
-            var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-            HandleEquippedItemsChangeClientRpc(GetEquippedItemsArray(), nearbyClients);
+            // todo: fix equipping items
+            //var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
+            //HandleEquippedItemsChangeClientRpc(GetEquippedItemsArray(), nearbyClients);
         }
 
         #endregion
 
         #region RPC Calls
 
+        // todo: use ApplyInventoryChangesClientRpc instead
         // ReSharper disable once UnusedParameter.Global
-        [ClientRpc]
-        protected void HandleEquippedItemsChangeClientRpc(SerializableKeyValuePair<string, string>[] equippedItems, ClientRpcParams clientRpcParams)
-        {
-            ApplyEquippedItemChanges(equippedItems);
-        }
+        //[ClientRpc]
+        //protected void HandleEquippedItemsChangeClientRpc(SerializableKeyValuePair<string, string>[] equippedItems, ClientRpcParams clientRpcParams)
+        //{
+        //    var equippedItemsDict = new Dictionary<string, string>();
+        //    foreach (var kvp in equippedItems)
+        //    {
+        //        equippedItemsDict[kvp.Key] = kvp.Value;
+        //    }
+
+        //    ApplyEquippedItemChanges(equippedItemsDict);
+        //}
 
         #endregion
 
@@ -119,63 +123,8 @@ namespace FullPotential.Core.Player
                 .OrderBy(x => x.Name);
         }
 
-        // todo: zzz v0.6 - move LoadInventory down into base
-        public void LoadInventory(InventoryData inventoryData)
-        {
-            _username = inventoryData.Username;
-            _maxItemCount = inventoryData.MaxItems > 0
-                ? inventoryData.MaxItems
-                : 30;
-
-            var itemsToAdd = inventoryData.GetAllItems();
-
-            foreach (var item in itemsToAdd)
-            {
-                FillTypesFromIds(item);
-                _items.Add(item.Id, item);
-            }
-
-            if (inventoryData.EquippedItems != null)
-            {
-                foreach (var kvp in inventoryData.EquippedItems)
-                {
-                    if (kvp.Value.IsNullOrWhiteSpace())
-                    {
-                        continue;
-                    }
-
-                    var slotId = kvp.Key;
-                    var itemId = kvp.Value;
-
-                    var item = itemsToAdd.FirstOrDefault(x => x.Id == itemId);
-
-                    if (item == null)
-                    {
-                        Debug.LogWarning($"Item {itemId} is missing");
-                        continue;
-                    }
-
-                    TriggerSlotChangeEvent(item, slotId);
-
-                    SpawnEquippedObject(item, slotId);
-                }
-            }
-
-            if (inventoryData.ShapeMapping != null)
-            {
-                foreach (var kvp in inventoryData.ShapeMapping)
-                {
-                    _itemIdToShapeMapping.Add(kvp.Key, kvp.Value);
-                }
-            }
-
-            _hasInventoryLoaded = true;
-        }
-
         protected override void SetEquippedItem(string itemId, string slotId)
         {
-            MarkAsDirtyAndAddToQueue();
-
             var item = itemId.IsNullOrWhiteSpace() ? null : _items[itemId];
 
             if (_equippedItems.TryGetValue(slotId, out var equippedItem))
@@ -196,24 +145,24 @@ namespace FullPotential.Core.Player
                 });
             }
 
+            MarkAsDirtyAndAddToQueue();
+
             _playerFighter.GetSlotStatus(slotId)?.StopActiveConsumerBehaviour();
         }
 
-        protected override void ApplyEquippedItemChanges(SerializableKeyValuePair<string, string>[] equippedItems)
+        protected override void ApplyEquippedItemChanges(Dictionary<string, string> equippedItems)
         {
             if (equippedItems == null || !equippedItems.Any())
             {
                 return;
             }
 
-            MarkAsDirtyAndAddToQueue();
-
-            foreach (var sourceKvp in equippedItems)
+            foreach (var kvp in equippedItems)
             {
-                var item = sourceKvp.Value.IsNullOrWhiteSpace() ? null : _items[sourceKvp.Value];
-                var slotId = sourceKvp.Key;
+                var item = kvp.Value.IsNullOrWhiteSpace() ? null : _items[kvp.Value];
+                var slotId = kvp.Key;
 
-                TriggerSlotChangeEvent(item, slotId);
+                TriggerSlotChangeEvent(item.Id, slotId);
                 SpawnEquippedObject(item, slotId);
             }
 
@@ -221,21 +170,23 @@ namespace FullPotential.Core.Player
             {
                 ResetEquipmentUiAsync().Forget();
             }
-            else if (!IsServer)
-            {
-                var keysToRemove = new List<string>();
-                foreach (var kvp in _items)
-                {
-                    if (GetEquippedWithItemId(kvp.Key) == null)
-                    {
-                        keysToRemove.Add(kvp.Key);
-                    }
-                }
-                foreach (var key in keysToRemove)
-                {
-                    _items.Remove(key);
-                }
-            }
+            //else if (!IsServer)
+            //{
+            //    var keysToRemove = new List<string>();
+            //    foreach (var kvp in _items)
+            //    {
+            //        if (GetEquippedWithItemId(kvp.Key) == null)
+            //        {
+            //            keysToRemove.Add(kvp.Key);
+            //        }
+            //    }
+            //    foreach (var key in keysToRemove)
+            //    {
+            //        _items.Remove(key);
+            //    }
+            //}
+
+            MarkAsDirtyAndAddToQueue();
 
             _playerFighter.UpdateUiHealthAndDefenceValues();
         }
@@ -270,7 +221,7 @@ namespace FullPotential.Core.Player
 
         protected override void NotifyOfItemsRemoved(IEnumerable<ItemBase> itemsRemoved)
         {
-            var countRemoved = itemsRemoved.Count(x => x is not ItemStack);
+            var countRemoved = itemsRemoved.Count(x => x is not ItemStackBase);
 
             _playerFighter.AlertOfInventoryRemovals(countRemoved);
 
@@ -551,7 +502,7 @@ namespace FullPotential.Core.Player
         {
             GameManager.Instance.CheckIsAdmin();
 
-            FillTypesFromIds(item);
+            // todo: FillTypesFromIds(item);
             _items.Add(item.Id, item);
 
             MarkAsDirtyAndAddToQueue();

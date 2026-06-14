@@ -8,7 +8,7 @@ namespace FullPotential.Api.Data
     {
         UniTask<SignInResult> SignInWithPasswordAsync(string username, string password);
 
-        UniTask<bool> ValidateCredentialsAsync(string username, string token);
+        UniTask<SignInResult> SignInWithTokenAsync(string username, string token);
 
         UniTask<bool> SignOutAsync();
     }

@@ -110,6 +110,7 @@
     <Compile Include="Assets\Core\UI\Components\NameAndToggle.cs" />
     <Compile Include="Assets\Core\UI\Components\SlideOutAlert.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiCraftingTab.cs" />
+    <Compile Include="Assets\Core\GameManagement\Data\CharacterSettingKey.cs" />
     <Compile Include="Assets\Core\UI\Components\InventoryItemsList.cs" />
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsOffline.cs" />
     <Compile Include="Assets\Core\Registry\Events\LivingEntityDiedEventHandler.cs" />
@@ -124,12 +125,12 @@
     <Compile Include="Assets\Core\UI\Behaviours\DrawingPadUi.cs" />
     <Compile Include="Assets\Core\Persistence\Https\DataLoader.cs" />
     <Compile Include="Assets\Core\Gameplay\Events\EventBus.cs" />
+    <Compile Include="Assets\Core\Localization\Models\LocalizationOld.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\Hud.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\CombatService.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Hurt.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiSlot.cs" />
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsStartup.cs" />
-    <Compile Include="Assets\Core\Localization\Data\Localization.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectsUi.cs" />
     <Compile Include="Assets\Core\Persistence\Local\DataLoader.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DestroyOnTriggerEnter.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="Assets\Core\UI\Behaviours\DebuggingUi.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\NetworkStats.cs" />
     <Compile Include="Assets\Core\Persistence\SaveManager.cs" />
+    <Compile Include="Assets\Core\UI\Models\CharacterSettings.cs" />
     <Compile Include="Assets\Core\UI\Components\BarSlider.cs" />
     <Compile Include="Assets\Core\UI\Components\NameAndValueSlider.cs" />
     <Compile Include="Assets\Core\Networking\RpcService.cs" />

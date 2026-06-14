@@ -4,27 +4,24 @@ using System.Linq;
 
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data;
-using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Gameplay.Player;
+using FullPotential.Api.Gameplay.Player.Models;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Networking;
-using FullPotential.Api.Obsolete;
+using FullPotential.Api.Obsolete.Items.Base;
+using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
-using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;
-using FullPotential.Api.Registry.Shapes;
-using FullPotential.Api.Registry.Targeting;
-using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Models.Player;
 
 using Unity.Netcode;
 
@@ -39,37 +36,32 @@ namespace FullPotential.Api.Gameplay.Behaviours
     {
         public const string SlotChangeEventId = "9c7972de-4136-4825-aaa3-11925ad049ee";
 
-        #region Protected variables
-        // ReSharper disable InconsistentNaming
-
+        // todo: remove _itemIdToShapeMapping
         protected readonly Dictionary<string, string> _itemIdToShapeMapping = new Dictionary<string, string>();
 
-        protected bool _hasInventoryLoaded;
-        protected string _username;
-        protected int _maxItemCount;
-        protected Dictionary<string, ItemBase> _items;
-        protected Dictionary<string, EquippedItem> _equippedItems;
-        protected LivingEntityBase _livingEntity;
-
-        //Services
+        // ReSharper disable InconsistentNaming
+        protected IItemFactory _itemFactory;
         protected ITypeRegistry _typeRegistry;
         protected ILocalizer _localizer;
         protected IRpcService _rpcService;
         protected IEventBus _eventBus;
         protected ISaveManager _saveManager;
 
-        public bool IsDirty { get; set; }
-
+        protected bool _isDirty;
+        protected LivingEntityBase _livingEntity;
+        protected string _characterId;
+        protected bool _hasInventoryLoaded;
+        protected Dictionary<string, ItemBase> _items;
+        protected Dictionary<string, EquippedItem> _equippedItems;
         // ReSharper restore InconsistentNaming
-        #endregion
+
+        public bool IsDirty => _isDirty || _items.Any(x => x.Value.IsDirty);
 
         #region Unity Events Handlers
 
         protected virtual void Awake()
         {
-            _items = new Dictionary<string, ItemBase>();
-            _equippedItems = new Dictionary<string, EquippedItem>();
-
+            _itemFactory = DependenciesContext.Dependencies.GetService<IItemFactory>();
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
@@ -77,48 +69,104 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _saveManager = DependenciesContext.Dependencies.GetService<ISaveManager>();
 
             _livingEntity = GetComponent<LivingEntityBase>();
+
+            _items = new Dictionary<string, ItemBase>();
+            _equippedItems = new Dictionary<string, EquippedItem>();
         }
 
         #endregion
 
-        public bool ApplyInventoryChanges(InventoryChanges changes)
+        // ReSharper disable once UnusedParameter.Global
+        [ClientRpc]
+        public void ApplyChangesClientRpc(InventoryChangesForClient changes, ClientRpcParams clientRpcParams)
         {
-            if (changes.IdsToRemove != null && changes.IdsToRemove.Any())
+            // todo: ApplyChangesClientRpc
+        }
+
+        public void LoadInventory(InventoryData inventoryData)
+        {
+            _characterId = inventoryData.CharacterId;
+
+            foreach (var item in inventoryData.Items)
             {
-                var itemsRemoved = new List<ItemBase>();
-                foreach (var id in changes.IdsToRemove)
+                _items.Add(item.Id, _itemFactory.GetItemFromData(item));
+            }
+
+            if (inventoryData.EquippedItems != null)
+            {
+                foreach (var kvp in inventoryData.EquippedItems)
                 {
-                    if (!_items.ContainsKey(id))
+                    if (kvp.Value.IsNullOrWhiteSpace())
                     {
-                        Debug.LogWarning($"Could not remove item with ID {id}. Was this admin crafting?");
                         continue;
                     }
 
-                    itemsRemoved.Add(_items[id]);
-                    _items.Remove(id);
+                    var item = inventoryData.Items.FirstOrDefault(x => x.Id == kvp.Value);
+
+                    if (item == null)
+                    {
+                        Debug.LogWarning($"Cannot equip item '{kvp.Value}' as it is missing");
+                        continue;
+                    }
+
+                    // todo: TriggerSlotChangeEvent(item.Id, slotId);
                 }
 
-                NotifyOfItemsRemoved(itemsRemoved);
+                ApplyEquippedItemChanges(inventoryData.EquippedItems);
             }
 
-            //todo: zzz v0.6 - can still take item stacks when inventory is full if there is space
-            if (IsInventoryFull())
+            _hasInventoryLoaded = true;
+            // todo: fire an event so we can call SpawnEquippedObject for each equiped item
+        }
+
+        public bool ApplyInventoryChanges(InventoryData changes)
+        {
+            var itemsRemoved = new List<ItemBase>();
+            foreach (var item in changes.Items.Where(x => x.IsDeleted))
             {
-                NotifyOfInventoryFull();
-                return false;
+                if (!_items.ContainsKey(item.Id))
+                {
+                    Debug.LogWarning($"Could not remove item with ID {item.Id}. Was this admin crafting?");
+                    continue;
+                }
+
+                itemsRemoved.Add(_items[item.Id]);
+                _items.Remove(item.Id);
             }
 
-            var nonItemStacks = changes.GetNonItemStacks().ToList();
+            //todo: zzz v0.6 - should be able to take item stacks when inventory is full if there is space
+            //if (IsInventoryFull())
+            //{
+            //    NotifyOfInventoryFull();
+            //    return false;
+            //}
+
+            var allItems = changes.Items.Select(x => _itemFactory.GetItemFromData(x));
+            var itemStacks = allItems.Where(x => typeof(IItemStack).IsAssignableFrom(x.GetType()));
+            var nonItemStacks = allItems.Where(x => !typeof(IItemStack).IsAssignableFrom(x.GetType()));
 
             var itemsToAdd = new List<ItemBase>();
 
+            foreach (var itemStack in itemStacks.Select(x => (ItemStackBase)x))
+            {
+                var newStack = MergeItemStacks(itemStack);
+                if (newStack != null)
+                {
+                    itemsToAdd.Add(newStack);
+                }
+            }
+
             foreach (var item in nonItemStacks)
             {
-                FillTypesFromIds(item);
+                // todo: remove
+                //if (item == null)
+                //{
+                //    continue;
+                //}
 
                 if (_items.ContainsKey(item.Id))
                 {
-                    UpdateExistingItem(item);
+                    _items[item.Id] = item;
                 }
                 else
                 {
@@ -127,44 +175,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            if (changes.ItemStacks != null && changes.ItemStacks.Any())
-            {
-                foreach (var itemStack in changes.ItemStacks)
-                {
-                    FillTypesFromIds(itemStack);
-
-                    if (IsServer)
-                    {
-                        var newStack = MergeItemStacks(itemStack);
-                        if (newStack != null)
-                        {
-                            itemsToAdd.Add(newStack);
-                        }
-                    }
-                    else if (_items.ContainsKey(itemStack.Id))
-                    {
-                        UpdateExistingItem(itemStack);
-                    }
-                    else
-                    {
-                        _items.Add(itemStack.Id, itemStack);
-                        itemsToAdd.Add(itemStack);
-                    }
-                }
-            }
-
+            // todo: fire an event instead
+            NotifyOfItemsRemoved(itemsRemoved);
             NotifyOfItemsAdded(itemsToAdd);
-
             ApplyEquippedItemChanges(changes.EquippedItems);
 
             return true;
-        }
-
-        private void UpdateExistingItem(ItemBase newItem)
-        {
-            var newJson = JsonUtility.ToJson(newItem);
-            var oldItem = _items[newItem.Id];
-            JsonUtility.FromJsonOverwrite(newJson, oldItem);
         }
 
         private T CastItemAsType<T>(ItemBase item, bool errorIfNotFound, string identifierName, string id) where T : ItemBase
@@ -205,28 +221,18 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : null;
         }
 
-        public (int countTaken, InventoryChanges invChanges) TakeCountFromItemStacks(string typeId, int count)
+        public int TakeCountFromItemStacks(string typeId, int count)
         {
-            if (!IsServer)
-            {
-                Debug.LogError("TakeCountFromItemStacks called client-side");
-                return (0, null);
-            }
-
             var matches = _items
-                .Where(
-                    i => i.Value is ItemStack itemStack
-                    && itemStack.RegistryTypeId == typeId)
-                .Select(i => (ItemStack)i.Value)
-                .OrderBy(i => i.Count);
+                .Where(x => x.Value.RegistryTypeId == typeId)
+                .Select(x => (ItemStackBase)x.Value)
+                .OrderBy(x => x.Count);
 
             if (!matches.Any())
             {
-                return (0, null);
+                return 0;
             }
 
-            var stacksChanged = new List<ItemStack>();
-            var idsToRemove = new List<string>();
             var countRemaining = count;
 
             foreach (var itemStack in matches)
@@ -235,7 +241,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 {
                     countRemaining -= itemStack.Count;
                     _items.Remove(itemStack.Id);
-                    idsToRemove.Add(itemStack.Id);
                     continue;
                 }
 
@@ -246,41 +251,29 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 {
                     _items.Remove(itemStack.Id);
                 }
-                else
-                {
-                    stacksChanged.Add(itemStack);
-                }
 
                 break;
             }
 
-            var countTaken = count - countRemaining;
+            MarkAsDirtyAndAddToQueue();
 
-            var invChanges = new InventoryChanges
-            {
-                IdsToRemove = idsToRemove.ToArray(),
-                ItemStacks = stacksChanged.ToArray()
-            };
-
-            IsDirty = true;
-            // todo: add to queue
-
-            return (countTaken, invChanges);
+            return count - countRemaining;
         }
 
         public int GetItemStackTotal(string typeId)
         {
             return _items
                 .Where(
-                    i => i.Value is ItemStack itemStack
+                    i => i.Value is ItemStackBase itemStack
                     && itemStack.RegistryTypeId == typeId)
-                .Select(i => (ItemStack)i.Value)
+                .Select(i => (ItemStackBase)i.Value)
                 .Sum(i => i.Count);
         }
 
         public bool IsInventoryFull()
         {
-            return _items.Count >= _maxItemCount;
+            // todo: return _items.Count >= _maxItemCount;
+            return false;
         }
 
         public List<CombatItemBase> GetComponentsFromIds(string[] componentIds)
@@ -307,6 +300,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var components = GetComponentsFromIds(componentIds);
 
+            // todo: move these into type definitions
             var errors = new List<string>();
             if (itemToCraft is Consumer consumerItem)
             {
@@ -342,99 +336,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                    || _typeRegistry.GetRegisteredTypes<IRegisterableWithSlotType>().FirstOrDefault(t => t.TypeId.ToString() == slotId) != null;
         }
 
-        protected void FillTypesFromIds(ItemBase item)
-        {
-            if (!string.IsNullOrWhiteSpace(item.RegistryTypeId) && item.RegistryType == null)
-            {
-                item.RegistryType = _typeRegistry.GetRegistryTypeForItem(item);
-            }
-
-            if (item is ItemWithTargetingAndShapeBase withTargetingAndShape && !string.IsNullOrWhiteSpace(withTargetingAndShape.TargetingTypeId))
-            {
-                withTargetingAndShape.Targeting = _typeRegistry.GetRegisteredTypes<ITargetingType>()
-                    .First(x => x.TypeId.ToString() == withTargetingAndShape.TargetingTypeId);
-
-                withTargetingAndShape.TargetingVisuals = _typeRegistry.GetRegisteredTypes<ITargetingVisuals>()
-                    .FirstOrDefault(v => v.TypeId.ToString() == withTargetingAndShape.TargetingVisualsTypeId);
-
-                if (!string.IsNullOrWhiteSpace(withTargetingAndShape.ShapeTypeId))
-                {
-                    withTargetingAndShape.Shape = _typeRegistry.GetRegisteredTypes<IShapeType>()
-                        .First(x => x.TypeId.ToString() == withTargetingAndShape.ShapeTypeId);
-
-                    withTargetingAndShape.ShapeVisuals = _typeRegistry.GetRegisteredTypes<IShapeVisuals>()
-                        .FirstOrDefault(v => v.TypeId.ToString() == withTargetingAndShape.ShapeVisualsTypeId);
-                }
-            }
-
-            if (item is Consumer consumer)
-            {
-                consumer.ResourceType = _typeRegistry.GetRegisteredTypes<IResourceType>()
-                    .First(x => x.TypeId.ToString() == consumer.ResourceTypeId);
-            }
-            else if (item is SpecialGear specialGear)
-            {
-                specialGear.ResourceType = _typeRegistry.GetRegisteredTypes<IResourceType>()
-                    .First(x => x.TypeId.ToString() == specialGear.ResourceTypeId);
-            }
-
-            if (item is IHasItemVisuals itemWithVisuals)
-            {
-                switch (item)
-                {
-                    case Weapon:
-                        SetItemVisuals<IWeaponVisuals>(itemWithVisuals, item);
-                        break;
-
-                    case Armor:
-                        SetItemVisuals<IArmorVisuals>(itemWithVisuals, item);
-                        break;
-
-                    case Accessory:
-                        SetItemVisuals<IAccessoryVisuals>(itemWithVisuals, item);
-                        break;
-
-                    case SpecialGear:
-                        SetItemVisuals<ISpecialGearVisuals>(itemWithVisuals, item);
-                        break;
-                }
-            }
-
-            if (item is CombatItemBase combatItem)
-            {
-                if (combatItem.EffectIds != null && combatItem.EffectIds.Length > 0 && combatItem.Effects == null)
-                {
-                    combatItem.Effects = combatItem.EffectIds
-                        .Select(x => _typeRegistry.GetRegisteredByTypeId<IEffectType>(x))
-                        .Where(x => x != null)
-                        .ToList();
-                }
-
-                //For backwards compatibility
-                combatItem.Effects ??= new List<IEffectType>();
-                if (!combatItem.Effects.Any())
-                {
-                    combatItem.Effects.Add(_typeRegistry.GetRegisteredByTypeId<IEffectType>(EffectTypeIds.HurtId));
-                }
-            }
-        }
-
-        private void SetItemVisuals<T>(IHasItemVisuals itemWithVisuals, ItemBase item)
-            where T : IItemVisuals
-        {
-            if (itemWithVisuals.VisualsTypeId.IsNullOrWhiteSpace())
-            {
-                itemWithVisuals.Visuals = _typeRegistry.GetRegisteredTypes<T>()
-                    .FirstOrDefault(v => v.ApplicableToTypeIdString == item.RegistryType.TypeId.ToString());
-            }
-            else
-            {
-                itemWithVisuals.Visuals = _typeRegistry.GetRegisteredTypes<T>()
-                    .FirstOrDefault(v => v.TypeId.ToString() == itemWithVisuals.VisualsTypeId);
-            }
-        }
-
-        private ItemStack MergeItemStacks(ItemStack newStack)
+        private ItemBase MergeItemStacks(ItemStackBase newStack)
         {
             if (!IsServer)
             {
@@ -444,10 +346,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var partiallyFullStacks = _items
                 .Where(
-                    i => i.Value is ItemStack oldStack
+                    i => i.Value is ItemStackBase oldStack
                     && oldStack.RegistryTypeId == newStack.RegistryTypeId
                     && oldStack.Count < oldStack.MaxSize)
-                .Select(i => (ItemStack)i.Value);
+                .Select(i => (ItemStackBase)i.Value);
 
             if (!partiallyFullStacks.Any())
             {
@@ -496,17 +398,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return null;
         }
 
-        public void PopulateInventoryChangesWithItem(InventoryChanges invChanges, ItemBase item)
-        {
-            var itemType = item.GetType();
-            invChanges.Accessories = itemType == typeof(Accessory) ? new[] { item as Accessory } : null;
-            invChanges.Armor = itemType == typeof(Armor) ? new[] { item as Armor } : null;
-            invChanges.Consumers = itemType == typeof(Consumer) ? new[] { item as Consumer } : null;
-            invChanges.Weapons = itemType == typeof(Weapon) ? new[] { item as Weapon } : null;
-            invChanges.ItemStacks = itemType == typeof(ItemStack) ? new[] { item as ItemStack } : null;
-            invChanges.SpecialGear = itemType == typeof(SpecialGear) ? new[] { item as SpecialGear } : null;
-        }
-
         protected (bool WasEquipped, List<string> SlotsToSend) HandleSlotChange(ItemBase item, string slotId)
         {
             var slotsToSend = new List<string> { slotId };
@@ -531,7 +422,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var wasEquipped = false;
             if (previousSlotId.IsNullOrWhiteSpace() || previousSlotId != slotId)
             {
-                TriggerSlotChangeEvent(item, slotId);
+                TriggerSlotChangeEvent(item.Id, slotId);
                 wasEquipped = true;
             }
 
@@ -560,9 +451,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return (wasEquipped, slotsToSend);
         }
 
-        protected void TriggerSlotChangeEvent(ItemBase item, string slotId)
+        protected void TriggerSlotChangeEvent(string itemId, string slotId)
         {
-            var eventArgs = new SlotChangeEventArgs(this, _livingEntity, slotId, item?.Id);
+            var eventArgs = new SlotChangeEventArgs(this, _livingEntity, slotId, itemId);
             _eventBus.PublishAsync(SlotChangeEventId, eventArgs).Forget();
         }
 
@@ -574,7 +465,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected abstract void SetEquippedItem(string itemId, string slotId);
 
-        protected abstract void ApplyEquippedItemChanges(SerializableKeyValuePair<string, string>[] equippedItems);
+        protected abstract void ApplyEquippedItemChanges(Dictionary<string, string> equippedItems);
 
         protected abstract void NotifyOfItemsAdded(IEnumerable<ItemBase> itemsAdded);
 
@@ -593,45 +484,28 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _equippedItems[slotId].GameObject.SetActive(show);
         }
 
-        public InventoryChanges GetInventoryChanges()
+        public InventoryData GetInventoryData()
         {
-            // todo: zzz v0.6 - only return unsaved changes
+            // todo: stop filtering items
+            //var filteredItems = _items.Where(x => x.Value.Name == "Projectile Lightning Gadget");
+            var filteredItems = _items.Where(x => x.Value.PropertyDictionary.Any());
 
-            var groupedItems = _items
-                .Select(x => x.Value)
-                .GroupBy(x => x.GetType());
-
-            var shapeMapping = _itemIdToShapeMapping
-                .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value));
-
-            var changes = new InventoryChanges
+            var changes = new InventoryData
             {
-                Username = _username,
-                MaxItems = _maxItemCount,
-                ShapeMapping = shapeMapping.ToArray(),
-                EquippedItems = GetEquippedItemsArray(),
-                // todo: zzz v0.6 - these should be generalised
-                Loot = groupedItems.FirstOrDefault(x => x.Key == typeof(Loot))?.Select(x => x as Loot).ToArray(),
-                Accessories = groupedItems.FirstOrDefault(x => x.Key == typeof(Accessory))?.Select(x => x as Accessory).ToArray(),
-                Armor = groupedItems.FirstOrDefault(x => x.Key == typeof(Armor))?.Select(x => x as Armor).ToArray(),
-                Consumers = groupedItems.FirstOrDefault(x => x.Key == typeof(Consumer))?.Select(x => x as Consumer).ToArray(),
-                Weapons = groupedItems.FirstOrDefault(x => x.Key == typeof(Weapon))?.Select(x => x as Weapon).ToArray(),
-                ItemStacks = groupedItems.FirstOrDefault(x => x.Key == typeof(ItemStack))?.Select(x => x as ItemStack).ToArray(),
-                SpecialGear = groupedItems.FirstOrDefault(x => x.Key == typeof(SpecialGear))?.Select(x => x as SpecialGear).ToArray()
+                CharacterId = _characterId,
+                Items = filteredItems.Select(x => _itemFactory.GetDataFromItem(_characterId, x.Value)).ToList(),
+                EquippedItems = _equippedItems
+                    .Where(x => !(x.Value?.Item?.Id.IsNullOrWhiteSpace() ?? false))
+                    .ToDictionary(x => x.Key, x => x.Value.Item?.Id)
             };
 
-            IsDirty = false;
+            _isDirty = false;
+            foreach (var kvp in _items.Where(x => x.Value.IsDirty))
+            {
+                kvp.Value.IsDirty = false;
+            }
 
             return changes;
-        }
-
-        public SerializableKeyValuePair<string, string>[] GetEquippedItemsArray()
-        {
-            var equippedItems = _equippedItems
-                .Where(x => !(x.Value?.Item?.Id.IsNullOrWhiteSpace() ?? false))
-                .Select(x => new SerializableKeyValuePair<string, string>(x.Key, x.Value.Item?.Id));
-
-            return equippedItems.ToArray();
         }
 
         protected void MarkAsDirtyAndAddToQueue()
@@ -641,11 +515,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            // todo: remove debugging
-            Debug.Log($"Marking inventory as dirty for '{_username}'");
+            // todo: zzz v0.6 - set debug log level
+            Debug.Log($"Marking inventory as dirty for '{_characterId}'");
 
-            IsDirty = true;
-            _saveManager.AddToQueue(_username, this);
+            _isDirty = true;
+            _saveManager.AddToQueue(_characterId, this);
         }
     }
 }

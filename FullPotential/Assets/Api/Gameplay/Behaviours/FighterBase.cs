@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,20 +6,15 @@ using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.Events;
-using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.Types;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities;
 
-using NUnit.Framework;
-
 using Unity.Netcode;
-
-using UnityEditorInternal.Profiling.Memory.Experimental;
 
 using UnityEngine;
 
@@ -183,7 +177,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             var itemInSlot = Inventory.GetItemInSlot(slotId);
 
-            if (itemInSlot is not Weapon weapon)
+            if (itemInSlot is not Weapon)
             {
                 return false;
             }
@@ -367,7 +361,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             var rightConsumer = Inventory.GetItemInSlot<Consumer>(HandSlotIds.RightHand);
-            if (leftConsumer == consumer)
+            if (rightConsumer == consumer)
             {
                 return _slotStatuses[HandSlotIds.RightHand].StopActiveConsumerBehaviour();
             }
@@ -575,7 +569,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         #region Nested Classes
         // ReSharper disable UnassignedField.Global
 
-        // todo: can these be merged into handstatus?
         [Serializable]
         public struct PositionTransforms
         {
@@ -583,7 +576,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             public Transform RightHand;
         }
 
-        // todo: what are these used for?
         [Serializable]
         public struct BodyPartTransforms
         {
@@ -622,7 +614,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var ammoTypeId = equippedWeapon.WeaponType.AmmunitionTypeIdString;
             var ammoNeeded = equippedWeapon.GetAmmoMax() - equippedWeapon.Ammo;
 
-            var (countTaken, _) = fighter.Inventory.TakeCountFromItemStacks(ammoTypeId, ammoNeeded);
+            var countTaken = fighter.Inventory.TakeCountFromItemStacks(ammoTypeId, ammoNeeded);
 
             equippedWeapon.UpdateAmmo(equippedWeapon.Ammo + countTaken);
         }

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Modding;
 
@@ -154,20 +152,20 @@ namespace FullPotential.Standard
             };
         }
 
-        public void RegisterEventHandlers(IEventBus eventBus)
-        {
-            // todo: zzz v.06 - Move this into type registry
+        // todo: zzz v.06 - Move this into type registry
+        //public void RegisterEventHandlers(IEventBus eventBus)
+        //{
 
-            var eventHandlerTypes = typeof(Registration).Assembly
-                .GetTypes()
-                .Where(t => t.GetCustomAttribute<SubscribeToEventAttribute>() != null)
-                .ToList();
+        //    var eventHandlerTypes = typeof(Registration).Assembly
+        //        .GetTypes()
+        //        .Where(t => t.GetCustomAttribute<SubscribeToEventAttribute>() != null)
+        //        .ToList();
 
-            foreach (var handlerType in eventHandlerTypes)
-            {
-                var eventId = handlerType.GetCustomAttribute<SubscribeToEventAttribute>().EventId;
-                eventBus.Subscribe(eventId, handlerType);
-            }
-        }
+        //    foreach (var handlerType in eventHandlerTypes)
+        //    {
+        //        var eventId = handlerType.GetCustomAttribute<SubscribeToEventAttribute>().EventId;
+        //        eventBus.Subscribe(eventId, handlerType);
+        //    }
+        //}
     }
 }

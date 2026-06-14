@@ -4,7 +4,7 @@ using System.Linq;
 
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Obsolete;
+using FullPotential.Api.Obsolete.Items;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;

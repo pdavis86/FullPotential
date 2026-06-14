@@ -1,6 +1,5 @@
 ﻿using System;
 
-using FullPotential.Api.Data.Models;
 using FullPotential.Api.Obsolete;
 
 // ReSharper disable UnusedMember.Global
@@ -8,8 +7,9 @@ using FullPotential.Api.Obsolete;
 
 namespace FullPotential.Core.Localization.Data
 {
+    // todo: zzz v0.6 - kill LocalizationOld
     [Serializable]
-    public struct Localization
+    public struct LocalizationOld
     {
         public string Culture;
         public string Name;

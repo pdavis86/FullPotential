@@ -443,15 +443,15 @@
 	
 	
     {
-      "Key": "specialgeartype.consolidatorreloader",
+      "Key": "item.type.consolidatorreloader",
       "Value": "Consolidator Reloader"
     },
     {
-      "Key": "specialgeartype.teleportreloader",
+      "Key": "item.type.teleportreloader",
       "Value": "Teleport Reloader"
     },
     {
-      "Key": "specialgeartype.barrier",
+      "Key": "item.type.barrier",
       "Value": "Barrier"
     },
 	

@@ -101,7 +101,7 @@ namespace FullPotential.Core.Gameplay.Events
                 return;
             }
 
-            var group = (IEventHandlerGroup)_subscriptions[eventId];
+            var group = _subscriptions[eventId];
             group.Add(handler);
         }
 

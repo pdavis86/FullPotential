@@ -3,8 +3,12 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
-using FullPotential.Api.Data.Models;
-using FullPotential.Models;
+using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Models.GameManagement;
+using FullPotential.Models.Player;
+using FullPotential.Models.Utilities;
+
+using Newtonsoft.Json.Linq;
 
 using UnityEngine;
 using UnityEngine.Networking;
@@ -32,33 +36,71 @@ namespace FullPotential.Core.Persistence.Https
                     return null;
                 }
 
-                var result = JsonUtility.FromJson<ConnectionDetails>(request.downloadHandler.text);
-                return result;
+                var response = request.downloadHandler.text.FromJson<GenericResponse>();
+
+                if (!response.IsSuccess)
+                {
+                    return null;
+                }
+
+                var connectionDetails = ((JObject)response.Result).ToObject<ConnectionDetails>();
+
+                return connectionDetails;
             }
         }
 
-        public UniTask<PlayerData> GetPlayerDataAsync(string username)
+        public async UniTask<CharacterData> GetCharacterDataAsync(string characterId)
         {
-            // todo: GetPlayerDataAsync
-            throw new NotImplementedException();
+            using (var request = UnityWebRequest.Get(BaseAddress + $"Character/GetCharacterData?characterId={Uri.EscapeDataString(characterId)}"))
+            {
+                SetAuthenticationHeader(request);
+
+                await request.SendWebRequest();
+
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    LogFailure(request);
+                    return null;
+                }
+
+                var response = request.downloadHandler.text.FromJson<GenericResponse>();
+
+                if (!response.IsSuccess)
+                {
+                    return null;
+                }
+
+                var characterData = ((JObject)response.Result).ToObject<CharacterData>();
+
+                return characterData;
+            }
         }
 
-        public UniTask SavePlayerDataAsync(PlayerData playerData)
+        public async UniTask<InventoryData> GetInventoryDataAsync(string characterId, bool reduced)
         {
-            // todo: SavePlayerDataAsync
-            throw new NotImplementedException();
-        }
+            using (var request = UnityWebRequest.Get(BaseAddress + $"Character/GetInventoryData?characterId={Uri.EscapeDataString(characterId)}&minimal={reduced}"))
+            {
+                SetAuthenticationHeader(request);
 
-        public UniTask<InventoryData> GetInventoryDataAsync(string username, bool reduced)
-        {
-            // todo: GetInventoryDataAsync
-            throw new NotImplementedException();
-        }
+                await request.SendWebRequest();
 
-        public UniTask SaveInventoryChangesAsync(InventoryChanges inventoryChanges)
-        {
-            // todo: SaveInventoryChangesAsync
-            throw new NotImplementedException();
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    LogFailure(request);
+                    return null;
+                }
+
+                var response = request.downloadHandler.text.FromJson<GenericResponse>();
+
+                if (!response.IsSuccess)
+                {
+                    return null;
+                }
+
+                var inventoryData = ((JObject)response.Result).ToObject<InventoryData>();
+
+                return inventoryData;
+            }
         }
     }
 }

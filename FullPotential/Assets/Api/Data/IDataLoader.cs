@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Data.Models;
-using FullPotential.Models;
+using FullPotential.Models.GameManagement;
+using FullPotential.Models.Player;
 
 namespace FullPotential.Api.Data
 {
@@ -9,8 +9,8 @@ namespace FullPotential.Api.Data
     {
         UniTask<ConnectionDetails> GetConnectionDetailsAsync();
 
-        UniTask<PlayerData> GetPlayerDataAsync(string username);
+        UniTask<CharacterData> GetCharacterDataAsync(string characterId);
 
-        UniTask<InventoryData> GetInventoryDataAsync(string username, bool reduced);
+        UniTask<InventoryData> GetInventoryDataAsync(string characterId, bool reduced);
     }
 }

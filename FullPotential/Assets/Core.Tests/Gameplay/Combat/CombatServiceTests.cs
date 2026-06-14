@@ -2,19 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Obsolete.Items.Base;
+using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Core.Gameplay.Combat;
 using FullPotential.Core.Registry.Effects;
+
 using Moq;
+
 using NUnit.Framework;
 
 namespace FullPotential.Core.Tests.Gameplay.Combat
