@@ -77,7 +77,7 @@ namespace FullPotential.Api.Obsolete.Items.Types
             if (levelOfDetail == LevelOfDetail.Full)
             {
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(Name))}: {itemName.OrIfNullOrWhitespace(Name)}" + "\n");
-                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {localizer.Translate(TranslationType.ItemType, GetType().Name)}" + "\n");
+                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {localizer.Translate(RegistryType)}" + "\n");
             }
 
             if (Targeting != null)
