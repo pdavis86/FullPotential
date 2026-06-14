@@ -1,11 +1,12 @@
-﻿using System;
-
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
-using FullPotential.Api.Data.Models;
 using FullPotential.Api.GameManagement.Models;
-using FullPotential.Models;
+using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Models.User;
+using FullPotential.Models.Utilities;
+
+using Newtonsoft.Json.Linq;
 
 using UnityEngine;
 
@@ -38,23 +39,29 @@ namespace FullPotential.Core.Persistence.Https
                     return new SignInResult();
                 }
 
-                var response = JsonUtility.FromJson<GenericResponse>(request.downloadHandler.text);
+                var response = request.downloadHandler.text.FromJson<GenericResponse>();
 
                 if (!response.IsSuccess)
                 {
                     return new SignInResult { IsInvalid = true };
                 }
 
-                var token = response.Result;
+                var userData = ((JObject)response.Result).ToObject<UserData>();
 
                 Username = username;
-                Token = token;
+                Token = userData.Token;
 
-                return new SignInResult { Token = token };
+                return new SignInResult
+                {
+                    UserId = userData.UserId,
+                    Username = userData.Username,
+                    Token = userData.Token,
+                    CharacterId = userData.CharacterId
+                };
             }
         }
 
-        public async UniTask<bool> ValidateCredentialsAsync(string username, string token)
+        public async UniTask<SignInResult> SignInWithTokenAsync(string username, string token)
         {
             var data = JsonUtility.ToJson(new Credentials
             {
@@ -69,12 +76,28 @@ namespace FullPotential.Core.Persistence.Https
                 if (request.result != UnityWebRequest.Result.Success)
                 {
                     LogFailure(request);
-                    return false;
+                    return new SignInResult();
                 }
 
-                var response = JsonUtility.FromJson<GenericResponse>(request.downloadHandler.text);
+                var response = request.downloadHandler.text.FromJson<GenericResponse>();
 
-                return response.IsSuccess;
+                if (!response.IsSuccess)
+                {
+                    return new SignInResult { IsInvalid = true };
+                }
+
+                var userData = ((JObject)response.Result).ToObject<UserData>();
+
+                Username = username;
+                Token = userData.Token;
+
+                return new SignInResult
+                {
+                    UserId = userData.UserId,
+                    Username = userData.Username,
+                    Token = userData.Token,
+                    CharacterId = userData.CharacterId
+                };
             }
         }
 

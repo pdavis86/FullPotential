@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
-using FullPotential.Api.Data.Models;
-using FullPotential.Api.GameManagement;
+using FullPotential.Api.Items;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Models;
+using FullPotential.Core.GameManagement;
+using FullPotential.Models.GameManagement;
+using FullPotential.Models.Player;
+
+using Newtonsoft.Json;
 
 using UnityEngine;
 
@@ -18,6 +22,13 @@ namespace FullPotential.Core.Persistence.Local
 {
     public class DataLoader : IDataLoader
     {
+        private IItemFactory _itemFactory;
+
+        public DataLoader(IItemFactory itemFactory)
+        {
+            _itemFactory = itemFactory;
+        }
+
         public async UniTask<ConnectionDetails> GetConnectionDetailsAsync()
         {
             await Task.Yield();
@@ -30,53 +41,65 @@ namespace FullPotential.Core.Persistence.Local
             };
         }
 
-        public async UniTask<PlayerData> GetPlayerDataAsync(string username)
+        public async UniTask<CharacterData> GetCharacterDataAsync(string characterId)
         {
-            var filePath = Paths.GetPlayerSavePath(username);
+            var username = GameManager.Instance.LocalGameDataStore.SignInResult?.Username;
+            var filePath = Paths.GetCharacterSavePath(username);
 
             if (!System.IO.File.Exists(filePath))
             {
-                return new PlayerData
+                return new CharacterData
                 {
-                    Username = username,
-                    Settings = new CharacterSettings(),
+                    CharacterId = characterId,
+                    Settings = new Dictionary<string, string>(),
                     ValuePools = new Dictionary<string, int>()
                 };
             }
 
             var loadJson = System.IO.File.ReadAllText(filePath);
-            var playerData = loadJson.ToObject<PlayerData>();
+            var characterData = loadJson.FromJson<CharacterData>();
 
             // todo: zzz v0.6 - remove this fall-back
-            if (playerData.ValuePools == null)
+            if (characterData.ValuePools == null)
             {
                 var playerDataOld = JsonUtility.FromJson<PlayerDataOld>(loadJson);
-                playerData.ValuePools = new Dictionary<string, int>();
+                characterData.ValuePools = new Dictionary<string, int>();
                 foreach (var item in playerDataOld.Resources)
                 {
-                    playerData.ValuePools[item.Key] = item.Value;
+                    characterData.ValuePools[item.Key] = item.Value;
                 }
             }
 
             await Task.Yield();
 
-            return playerData;
+            return characterData;
         }
 
-        public async UniTask<InventoryData> GetInventoryDataAsync(string username, bool reduced)
+        public async UniTask<InventoryData> GetInventoryDataAsync(string characterId, bool reduced)
         {
+            var username = GameManager.Instance.LocalGameDataStore.SignInResult?.Username;
             var filePath = Paths.GetInventorySavePath(username);
+
             InventoryData inventoryData;
 
             if (System.IO.File.Exists(filePath))
             {
                 var loadJson = System.IO.File.ReadAllText(filePath);
-                inventoryData = JsonUtility.FromJson<InventoryData>(loadJson);
+                try
+                {
+                    inventoryData = loadJson.FromJson<InventoryData>();
+                }
+                catch (JsonSerializationException)
+                {
+                    // todo: zzz v0.6 - remove this fall-back
+                    var inventoryDataOld = JsonUtility.FromJson<InventoryDataOld>(loadJson);
+                    inventoryData = GetInventoryData(characterId, inventoryDataOld);
+                }
             }
             else
             {
                 // todo: zzz v0.6 - remove this fall-back
-                filePath = Paths.GetPlayerSavePath(username);
+                filePath = Paths.GetCharacterSavePath(username);
                 if (!System.IO.File.Exists(filePath))
                 {
                     return new InventoryData();
@@ -84,26 +107,35 @@ namespace FullPotential.Core.Persistence.Local
 
                 var loadJsonOld = System.IO.File.ReadAllText(filePath);
                 var playerDataOld = JsonUtility.FromJson<PlayerDataOld>(loadJsonOld);
-                playerDataOld.Inventory.Username = username;
-                inventoryData = playerDataOld.Inventory;
+                inventoryData = GetInventoryData(characterId, playerDataOld.Inventory);
             }
 
             if (reduced)
             {
-                inventoryData.Loot = null;
-                inventoryData.ShapeMapping = null;
-                inventoryData.ItemStacks = null;
-
-                var equippedItemIds = inventoryData.EquippedItems.Select(x => x.Value);
-                inventoryData.Accessories = inventoryData.Accessories.Where(x => equippedItemIds.Contains(x.Id)).ToArray();
-                inventoryData.Armor = inventoryData.Armor.Where(x => equippedItemIds.Contains(x.Id)).ToArray();
-                inventoryData.Weapons = inventoryData.Weapons.Where(x => equippedItemIds.Contains(x.Id)).ToArray();
-                inventoryData.Consumers = inventoryData.Consumers.Where(x => equippedItemIds.Contains(x.Id)).ToArray();
-                inventoryData.SpecialGear = inventoryData.SpecialGear.Where(x => equippedItemIds.Contains(x.Id)).ToArray();
+                var equippedItemIds = inventoryData.EquippedItems.Select(x => x.Key);
+                inventoryData.Items = inventoryData.Items.Where(x => equippedItemIds.Contains(x.Id)).ToList();
             }
 
             await Task.Yield();
 
+            return inventoryData;
+        }
+
+        private InventoryData GetInventoryData(string characterId, InventoryDataOld inventoryDataOld)
+        {
+            var allItems = Enumerable.Empty<ItemBase>()
+                 .UnionIfNotNull(inventoryDataOld.Accessories)
+                 .UnionIfNotNull(inventoryDataOld.Armor)
+                 .UnionIfNotNull(inventoryDataOld.Consumers)
+                 .UnionIfNotNull(inventoryDataOld.ItemStacks)
+                 .UnionIfNotNull(inventoryDataOld.Loot)
+                 .UnionIfNotNull(inventoryDataOld.SpecialGear)
+                 .UnionIfNotNull(inventoryDataOld.Weapons);
+
+            var inventoryData = new InventoryData();
+            inventoryData.CharacterId = characterId;
+            inventoryData.Items = allItems.Select(x => _itemFactory.GetDataFromItem(characterId, x)).ToList();
+            inventoryData.EquippedItems = inventoryDataOld.EquippedItems.ToDictionary(x => x.Key, x => x.Value);
             return inventoryData;
         }
     }

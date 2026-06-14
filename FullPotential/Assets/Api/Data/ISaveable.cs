@@ -2,6 +2,6 @@
 {
     public interface ISaveable
     {
-        bool IsDirty { get; set; }
+        bool IsDirty { get; }
     }
 }

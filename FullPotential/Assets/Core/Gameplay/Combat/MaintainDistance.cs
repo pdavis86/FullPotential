@@ -1,7 +1,8 @@
 ﻿using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Items.Types;
+using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Networking;
+
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global

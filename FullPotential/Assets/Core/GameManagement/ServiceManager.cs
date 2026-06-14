@@ -23,24 +23,24 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<Api.Unity.IShaderUtilities, Unity.ShaderUtilities>();
             DependenciesContext.Dependencies.Register<Api.Unity.IUnityHelperUtilities, Unity.UnityHelperUtilities>();
             DependenciesContext.Dependencies.Register<Api.Data.ISaveManager, Persistence.SaveManager>();
+            DependenciesContext.Dependencies.Register<Api.Items.IItemFactory, Api.Items.ItemFactory>();
 
             var settingsRepository = DependenciesContext.Dependencies.GetService<Api.Data.ISettingsRepository>();
 
             var settings = settingsRepository.Get();
 
-            // todo: uncomment dependencies
-            //if (string.IsNullOrWhiteSpace(settings.ManagementApiAddress))
-            //{
-            //    DependenciesContext.Dependencies.Register<Api.Data.IUserManagement, Persistence.Local.UserManagement>();
-            DependenciesContext.Dependencies.Register<Api.Data.IDataLoader, Persistence.Local.DataLoader>();
-            //    DependenciesContext.Dependencies.Register<Api.Data.IDataSaver, Persistence.Local.DataSaver>();
-            //}
-            //else
-            //{
-            DependenciesContext.Dependencies.Register<Api.Data.IUserManagement, Persistence.Https.UserManagement>();
-            //    DependenciesContext.Dependencies.Register<Api.Data.IDataLoader, Persistence.Https.DataLoader>();
-            DependenciesContext.Dependencies.Register<Api.Data.IDataSaver, Persistence.Https.DataSaver>();
-            //}
+            if (string.IsNullOrWhiteSpace(settings.ManagementApiAddress))
+            {
+                DependenciesContext.Dependencies.Register<Api.Data.IUserManagement, Persistence.Local.UserManagement>();
+                DependenciesContext.Dependencies.Register<Api.Data.IDataLoader, Persistence.Local.DataLoader>();
+                DependenciesContext.Dependencies.Register<Api.Data.IDataSaver, Persistence.Local.DataSaver>();
+            }
+            else
+            {
+                DependenciesContext.Dependencies.Register<Api.Data.IUserManagement, Persistence.Https.UserManagement>();
+                DependenciesContext.Dependencies.Register<Api.Data.IDataLoader, Persistence.Https.DataLoader>();
+                DependenciesContext.Dependencies.Register<Api.Data.IDataSaver, Persistence.Https.DataSaver>();
+            }
         }
     }
 }

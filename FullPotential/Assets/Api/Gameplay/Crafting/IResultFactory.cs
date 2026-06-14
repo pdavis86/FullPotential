@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Obsolete;
+using FullPotential.Api.Obsolete.Items;
+using FullPotential.Api.Obsolete.Items.Base;
 
 namespace FullPotential.Api.Gameplay.Crafting
 {

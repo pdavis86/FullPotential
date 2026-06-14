@@ -1,7 +1,7 @@
 ﻿using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Ui;
@@ -11,6 +11,7 @@ using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.Player;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.UI.Behaviours;
+
 using UnityEngine;
 using UnityEngine.UI;
 

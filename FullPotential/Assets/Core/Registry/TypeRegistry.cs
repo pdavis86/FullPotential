@@ -313,17 +313,17 @@ namespace FullPotential.Core.Registry
         {
             switch (item)
             {
-                case Api.Items.Types.Accessory:
+                case Api.Obsolete.Items.Types.Accessory:
                     return GetRegistryTypeById<IAccessoryType>(item.RegistryTypeId);
-                case Api.Items.Types.Armor:
+                case Api.Obsolete.Items.Types.Armor:
                     return GetRegistryTypeById<IArmorType>(item.RegistryTypeId);
-                case Api.Items.Types.Weapon:
+                case Api.Obsolete.Items.Types.Weapon:
                     return GetRegistryTypeById<IWeaponType>(item.RegistryTypeId);
-                case Api.Items.Types.Loot:
+                case Api.Obsolete.Items.Types.Loot:
                     return GetRegistryTypeById<ILootType>(item.RegistryTypeId);
-                case Api.Items.Types.ItemStack:
+                case ItemStackBase:
                     return GetItemStackRegistryType(item);
-                case Api.Items.Types.SpecialGear:
+                case Api.Obsolete.Items.Types.SpecialGear:
                     return GetRegistryTypeById<ISpecialGearType>(item.RegistryTypeId);
                 default:
                     return null;

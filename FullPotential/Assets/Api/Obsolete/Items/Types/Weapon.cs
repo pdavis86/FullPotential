@@ -5,15 +5,16 @@ using System.Text;
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Obsolete.Items.Base;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 
-namespace FullPotential.Api.Items.Types
+namespace FullPotential.Api.Obsolete.Items.Types
 {
     [Serializable]
     public class Weapon : CombatItemBase, IHasItemVisuals, IHasCharge

@@ -3,10 +3,9 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
-using FullPotential.Api.Data.Models;
-using FullPotential.Models;
-
-using UnityEngine;
+using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Models.GameManagement;
+using FullPotential.Models.Player;
 
 namespace FullPotential.Core.Persistence.Local
 {
@@ -18,19 +17,20 @@ namespace FullPotential.Core.Persistence.Local
             await Task.Yield();
         }
 
-        public async UniTask SavePlayerDataAsync(PlayerData playerData)
+        public async UniTask SaveCharacterDataAsync(CharacterData playerData)
         {
-            var saveJson = JsonUtility.ToJson(playerData, true);
-            System.IO.File.WriteAllText(Paths.GetPlayerSavePath(playerData.Username), saveJson);
+            var saveJson = playerData.ToJson();
+            var filePath = Paths.GetCharacterSavePath(playerData.CharacterId);
+            System.IO.File.WriteAllText(filePath, saveJson);
 
             await Task.Yield();
         }
 
-        public async UniTask SaveInventoryChangesAsync(InventoryChanges inventoryChanges)
+        public async UniTask SaveInventoryDataAsync(InventoryData inventoryData)
         {
-            var inventoryData = (InventoryData)inventoryChanges;
-            var saveJson = JsonUtility.ToJson(inventoryData, true);
-            System.IO.File.WriteAllText(Paths.GetInventorySavePath(inventoryData.Username), saveJson);
+            var saveJson = inventoryData.ToJson();
+            var filePath = Paths.GetInventorySavePath(inventoryData.CharacterId);
+            System.IO.File.WriteAllText(filePath, saveJson);
 
             await Task.Yield();
         }

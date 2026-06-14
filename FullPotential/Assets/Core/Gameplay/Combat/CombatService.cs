@@ -7,10 +7,10 @@ using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.Types;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Obsolete.Items.Base;
+using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gear;
@@ -266,7 +266,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             var armorItems = _typeRegistry
                 .GetRegisteredTypes<IArmorType>()
-                .Select(x => targetLivingEntity.Inventory.GetItemInSlot<Armor>(x.TypeId.ToString(), false));
+                .Select(x => targetLivingEntity.Inventory.GetItemInSlot<Armor>(x.TypeId.ToString()));
 
             var sum = armorItems
                 .Where(x => x != null)

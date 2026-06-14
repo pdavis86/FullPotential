@@ -1,13 +1,16 @@
 ﻿using System.Linq;
+
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Items.Types;
+using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Utilities.Extensions;
+
 using Unity.Collections;
 using Unity.Netcode;
+
 using UnityEngine;
 
 namespace FullPotential.Standard.Targeting

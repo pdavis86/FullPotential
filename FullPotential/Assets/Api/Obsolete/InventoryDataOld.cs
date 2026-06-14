@@ -1,6 +1,7 @@
 ﻿using System;
 
-using FullPotential.Api.Items.Types;
+using FullPotential.Api.Items.Base;
+using FullPotential.Api.Obsolete.Items.Types;
 
 namespace FullPotential.Api.Obsolete
 {
@@ -15,7 +16,7 @@ namespace FullPotential.Api.Obsolete
         public Armor[] Armor;
         public Weapon[] Weapons;
         public Consumer[] Consumers;
-        public ItemStack[] ItemStacks;
+        public ItemStackBase[] ItemStacks;
         public SpecialGear[] SpecialGear;
 
         public SerializableKeyValuePair<string, string>[] EquippedItems;

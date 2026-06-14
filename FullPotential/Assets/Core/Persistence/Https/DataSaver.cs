@@ -1,12 +1,11 @@
-﻿using System;
-using System.Net.Mime;
+﻿using System.Net.Mime;
 
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
-using FullPotential.Api.Data.Models;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Models;
+using FullPotential.Models.GameManagement;
+using FullPotential.Models.Player;
 
 using UnityEngine;
 using UnityEngine.Networking;
@@ -36,10 +35,10 @@ namespace FullPotential.Core.Persistence.Https
             }
         }
 
-        public async UniTask SavePlayerDataAsync(PlayerData playerData)
+        public async UniTask SaveCharacterDataAsync(CharacterData playerData)
         {
             var json = playerData.ToJson();
-            using (var request = UnityWebRequest.Post(BaseAddress + "Character/SavePlayerData", json, MediaTypeNames.Application.Json))
+            using (var request = UnityWebRequest.Post(BaseAddress + "Character/SaveCharacterData", json, MediaTypeNames.Application.Json))
             {
                 SetAuthenticationHeader(request);
 
@@ -52,10 +51,20 @@ namespace FullPotential.Core.Persistence.Https
             }
         }
 
-        public UniTask SaveInventoryChangesAsync(InventoryChanges inventoryChanges)
+        public async UniTask SaveInventoryDataAsync(InventoryData inventoryData)
         {
-            // todo: SaveInventoryChangesAsync
-            return UniTask.CompletedTask;
+            var json = inventoryData.ToJson();
+            using (var request = UnityWebRequest.Post(BaseAddress + "Character/SaveInventoryData", json, MediaTypeNames.Application.Json))
+            {
+                SetAuthenticationHeader(request);
+
+                await request.SendWebRequest();
+
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    LogFailure(request);
+                }
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items.Base;
+using FullPotential.Api.Obsolete.Items.Base;
 
 namespace FullPotential.Api.Gameplay.Inventory
 {

@@ -5,9 +5,8 @@ using Cysharp.Threading.Tasks;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Items.Types;
+using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
-using FullPotential.Api.Ui;
 
 using UnityEngine;
 

@@ -4,12 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using FullPotential.Api.Data;
-using FullPotential.Api.Data.Models;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.GameManagement.Data;
 using FullPotential.Core.Player;
-using FullPotential.Models;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -128,7 +127,7 @@ namespace FullPotential.Core.Ui.Behaviours
             var gameSettings = _settingsRepository.Get();
 
             gameSettings.FieldOfView = Camera.main.fieldOfView;
-            
+
             if (float.TryParse(_lookSensitivityInput.text, out var newSensitivity))
             {
                 gameSettings.LookSensitivity = newSensitivity;
@@ -144,9 +143,9 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void SavePlayerSettings()
         {
-            var playerSettings = new CharacterSettings
+            var playerSettings = new Dictionary<string, string>
             {
-                TextureUrl = _skinUrlInput.text
+                { CharacterSettingKey.TextureUrl, _skinUrlInput.text }
             };
 
             var playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerFighter>();
@@ -212,8 +211,8 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void LoadPlayerSettings()
         {
-            var playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerFighter>();
-            _skinUrlInput.text = playerState.TextureUrl;
+            var playerFighter = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerFighter>();
+            _skinUrlInput.text = playerFighter.TextureUrl;
         }
 
         private void RevertUnsavedSettings()

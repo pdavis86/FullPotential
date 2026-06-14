@@ -2,15 +2,14 @@
 using System.Linq;
 
 using FullPotential.Api.Data;
-using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Obsolete;
+using FullPotential.Api.Obsolete.Items;
+using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
@@ -334,14 +333,14 @@ namespace FullPotential.Core.Player
                 craftedItem.Name = itemName;
             }
 
-            var invChanges = new InventoryChanges
-            {
-                IdsToRemove = componentIdArray
-            };
+            // todo: fix crafting
+            //var invChanges = new InventoryData
+            //{
+            //    IdsToRemove = componentIdArray,
+            //    Items = new[] { craftedItem }
+            //};
 
-            _playerFighter.Inventory.PopulateInventoryChangesWithItem(invChanges, craftedItem);
-
-            _playerFighter.Inventory.ApplyInventoryChanges(invChanges);
+            //_playerFighter.Inventory.ApplyInventoryChanges(invChanges);
         }
 
         [ServerRpc]
@@ -367,23 +366,24 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            InventoryChanges invChanges;
-            if (_random.Next(1, 3) == 1)
-            {
-                invChanges = new InventoryChanges
-                {
-                    ItemStacks = new[] { _resultFactory.GetAmmoDrop() as ItemStack }
-                };
-            }
-            else
-            {
-                invChanges = new InventoryChanges
-                {
-                    Loot = new[] { _resultFactory.GetLootDrop() as Loot },
-                };
-            }
+            // todo: fix looting
+            //InventoryData invChanges;
+            //if (_random.Next(1, 3) == 1)
+            //{
+            //    invChanges = new InventoryData
+            //    {
+            //        Items = new[] { _resultFactory.GetAmmoDrop() }
+            //    };
+            //}
+            //else
+            //{
+            //    invChanges = new InventoryData
+            //    {
+            //        Items = new[] { _resultFactory.GetLootDrop() },
+            //    };
+            //}
 
-            _playerFighter.Inventory.ApplyInventoryChanges(invChanges);
+            //_playerFighter.Inventory.ApplyInventoryChanges(invChanges);
         }
 
         #endregion

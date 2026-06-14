@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Items.Types;
+using FullPotential.Api.Obsolete.Items.Types;
 
 using Unity.Netcode;
 
@@ -29,7 +29,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
                 return;
             }
 
-            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Obsolete.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
             if (reloader == null || reloader.RegistryTypeId != ConsolidatorReloader.TypeIdString)
             {

@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-using FullPotential.Api.Data.Models;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.IntegrationTests.TestHelpers;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Networking;
-using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Weapons;
 
@@ -199,14 +197,13 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
 
         private class MyInventory : InventoryBase
         {
+            // ReSharper disable UnusedMember.Local
+
             public Dictionary<string, ItemBase> Items => _items;
 
-            // ReSharper disable once UnusedMember.Local
             private new void Awake()
             {
                 base.Awake();
-
-                _maxItemCount = 100;
             }
 
             public void OverrideIsServer(bool newValue)
@@ -220,7 +217,7 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
                 //Nothing here
             }
 
-            protected override void ApplyEquippedItemChanges(SerializableKeyValuePair<string, string>[] equippedItems)
+            protected override void ApplyEquippedItemChanges(Dictionary<string, string> equippedItems)
             {
                 //Nothing here
             }

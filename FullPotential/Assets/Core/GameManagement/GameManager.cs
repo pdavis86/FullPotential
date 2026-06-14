@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -86,7 +85,6 @@ namespace FullPotential.Core.GameManagement
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            ServerGameDataStore.ClientIdToUsername = new Dictionary<ulong, string>();
             Prefabs = GetComponent<Prefabs>();
             UserInterface = _mainCanvas.GetComponent<UserInterface>();
 
@@ -125,6 +123,7 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
+            Debug.Log("Setting up periodic save");
             _periodicSave = new DelayedAction(15f, () => SaveData(), false);
         }
 
@@ -143,9 +142,10 @@ namespace FullPotential.Core.GameManagement
 
         private void HandleAfterApprovalCheck(NetworkManager.ConnectionApprovalRequest approvalRequest, NetworkManager.ConnectionApprovalResponse approvalResponse)
         {
+            // Payload is empty for Host
             if (approvalRequest.ClientNetworkId == NetworkManager.Singleton.LocalClientId)
             {
-                ServerGameDataStore.ClientIdToUsername[approvalRequest.ClientNetworkId] = _settingsRepository.Get().LastSigninUsername;
+                ServerGameDataStore.ClientIdToConnectionPayload[approvalRequest.ClientNetworkId] = GetConnectionPaylod();
                 approvalResponse.Approved = true;
                 return;
             }
@@ -153,28 +153,27 @@ namespace FullPotential.Core.GameManagement
             var payload = System.Text.Encoding.UTF8.GetString(approvalRequest.Payload);
             var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
 
-            var playerUsername = connectionPayload.Username;
-
-            if (string.IsNullOrEmpty(playerUsername))
+            if (string.IsNullOrEmpty(connectionPayload.Token))
             {
-                Debug.LogWarning("Someone tried to connect with an invalid Player token");
+                Debug.LogWarning($"User '{connectionPayload.UserId}' tried to connect with an invalid Player token");
                 return;
             }
 
-            if (ServerGameDataStore.ClientIdToUsername.ContainsValue(playerUsername))
+            var connectionMatch = ServerGameDataStore.ClientIdToConnectionPayload.FirstOrDefault(x => x.Value.UserId == connectionPayload.UserId);
+            if (!string.IsNullOrEmpty(connectionMatch.Value.UserId))
             {
-                var originalClientId = ServerGameDataStore.ClientIdToUsername.First(x => x.Value == playerUsername).Key;
+                var originalClientId = connectionMatch.Key;
 
                 if (NetworkManager.Singleton.ConnectedClients.ContainsKey(originalClientId))
                 {
-                    Debug.LogWarning($"User {playerUsername} is already connected");
+                    Debug.LogWarning($"User '{connectionPayload.UserId}' is already connected");
 
                     approvalResponse.Reason = _localizer.Translate("ui.connect.alreadyconnected");
 
                     return;
                 }
 
-                ServerGameDataStore.ClientIdToUsername.Remove(originalClientId);
+                ServerGameDataStore.ClientIdToConnectionPayload.Remove(originalClientId);
             }
 
             var serverVersion = GetGameVersion();
@@ -189,19 +188,20 @@ namespace FullPotential.Core.GameManagement
             }
 
             approvalResponse.Approved = true;
-            ServerGameDataStore.ClientIdToUsername[approvalRequest.ClientNetworkId] = playerUsername;
+            ServerGameDataStore.ClientIdToConnectionPayload[approvalRequest.ClientNetworkId] = connectionPayload;
 
             DisconnectUserIfTokenInvalidAsync(
                 approvalRequest.ClientNetworkId,
-                playerUsername,
-                connectionPayload.Token).Forget();
+                connectionPayload.Username,
+                connectionPayload.Token)
+                .Forget();
         }
 
         private void HandleAfterDisconnectedFromServer(ulong clientId)
         {
             if (NetworkManager.Singleton.IsServer)
             {
-                ServerGameDataStore.ClientIdToUsername.Remove(clientId);
+                ServerGameDataStore.ClientIdToConnectionPayload.Remove(clientId);
             }
             else
             {
@@ -255,6 +255,7 @@ namespace FullPotential.Core.GameManagement
 
         private void SaveData()
         {
+            Debug.Log("SaveData() was called");
             _saveManager.ProcessQueueAsync().Forget();
         }
 
@@ -271,7 +272,7 @@ namespace FullPotential.Core.GameManagement
         {
             var eventBus = (EventBus)DependenciesContext.Dependencies.GetService<IEventBus>();
 
-            // todo: make these register via attribute
+            // todo: zzz v0.6 - make these register via attribute
             eventBus.Register<ResourceValueChangedEventArgs>(LivingEntityBase.ResourceValueChangeEventId, LivingEntityBase.DefaultHandlerForResourceValueChangeEventAsync);
             eventBus.Register<ReloadEventArgs>(FighterBase.ReloadEventId, SlotStatus.DefaultHandlerForReloadEventAsync);
             eventBus.Register<ShotFiredEventArgs>(FighterBase.ShotFiredEventId, FighterBase.DefaultHandlerForShotFiredEventAsync);
@@ -280,7 +281,7 @@ namespace FullPotential.Core.GameManagement
 
         private async UniTask DisconnectUserIfTokenInvalidAsync(ulong clientId, string username, string token)
         {
-            if (!(await _userManagement.ValidateCredentialsAsync(username, token)))
+            if (string.IsNullOrWhiteSpace((await _userManagement.SignInWithTokenAsync(username, token)).Token))
             {
                 NetworkManager.Singleton.DisconnectClient(clientId, "Invalid token");
             }
@@ -304,11 +305,6 @@ namespace FullPotential.Core.GameManagement
         public IUserInterface GetUserInterface()
         {
             return UserInterface;
-        }
-
-        public string GetLocalPlayerToken()
-        {
-            return LocalGameDataStore.PlayerToken;
         }
 
         public GameObject GetLocalPlayerGameObject()
@@ -349,10 +345,24 @@ namespace FullPotential.Core.GameManagement
             var newPosition = sceneService.GetHeightAdjustedPosition(position, playerNetObj.GetComponent<Collider>());
             playerNetObj.transform.position = newPosition;
 
+            var connectionPlayload = ServerGameDataStore.ClientIdToConnectionPayload[serverRpcParams.Receive.SenderClientId];
             var playerState = playerNetObj.GetComponent<PlayerFighter>();
-            playerState.Username = ServerGameDataStore.ClientIdToUsername[serverRpcParams.Receive.SenderClientId];
+            playerState.CharacterId = connectionPlayload.CharacterId;
+            playerState.Username = connectionPlayload.Username;
 
             playerNetObj.SpawnAsPlayerObject(serverRpcParams.Receive.SenderClientId);
+        }
+
+        public ConnectionPayload GetConnectionPaylod()
+        {
+            return new ConnectionPayload
+            {
+                UserId = GameManager.Instance.LocalGameDataStore.SignInResult?.UserId,
+                Username = GameManager.Instance.LocalGameDataStore.SignInResult?.Username,
+                Token = GameManager.Instance.LocalGameDataStore.SignInResult?.Token,
+                CharacterId = GameManager.Instance.LocalGameDataStore.SignInResult?.CharacterId,
+                GameVersion = GameManager.GetGameVersion().ToString()
+            };
         }
 
         #endregion

@@ -1,7 +1,8 @@
-﻿using FullPotential.Api.Registry.Shapes;
+﻿using FullPotential.Api.Items;
+using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 
-namespace FullPotential.Api.Items.Base
+namespace FullPotential.Api.Obsolete.Items.Base
 {
     //todo: zzz v0.6 - Remove all the Serializable nonsense and make ItemWithTargetingAndShapeBase an interface instead of an abstract class
     public abstract class ItemWithTargetingAndShapeBase : CombatItemBase, IHasTargetingAndShape

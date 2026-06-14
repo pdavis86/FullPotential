@@ -32,7 +32,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 return UniTask.CompletedTask;
             }
 
-            var barrier = eventArgs.LivingEntity.Inventory.GetItemInSlot<Api.Items.Types.SpecialGear>(BarrierSlot.TypeIdString);
+            var barrier = eventArgs.LivingEntity.Inventory.GetItemInSlot<Api.Obsolete.Items.Types.SpecialGear>(BarrierSlot.TypeIdString);
 
             if (barrier == null)
             {

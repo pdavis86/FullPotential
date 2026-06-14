@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
+
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Items.Types;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Obsolete;
+using FullPotential.Api.Obsolete.Items.Base;
+using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Shapes;
@@ -15,6 +17,7 @@ using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Player;
 using FullPotential.Core.UI.Components;
+
 using UnityEngine;
 using UnityEngine.UI;
 

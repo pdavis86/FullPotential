@@ -19,7 +19,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public string SlotIdString => SpecialSlots.BarrierSlot.TypeIdString;
 
-        public string OverrideItemDescription(Api.Items.Types.SpecialGear specialGear, ILocalizer localizer, LevelOfDetail levelOfDetail)
+        public string OverrideItemDescription(Api.Obsolete.Items.Types.SpecialGear specialGear, ILocalizer localizer, LevelOfDetail levelOfDetail)
         {
             var sb = new StringBuilder();
 
@@ -54,13 +54,13 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             return sb.ToString().Trim();
         }
 
-        public static float GetRechargeDelay(Api.Items.Types.SpecialGear specialGear)
+        public static float GetRechargeDelay(Api.Obsolete.Items.Types.SpecialGear specialGear)
         {
             var returnValue = MathsHelper.GetHighInLowOutInRange(specialGear.Attributes.Recovery, 0.5f, 5f);
             return returnValue;
         }
 
-        public static int GetRechargeRate(Api.Items.Types.SpecialGear specialGear)
+        public static int GetRechargeRate(Api.Obsolete.Items.Types.SpecialGear specialGear)
         {
             var returnValue = (int)MathsHelper.GetHighInLowOutInRange(specialGear.Attributes.Speed, 1, 10);
             return returnValue;

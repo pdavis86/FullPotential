@@ -1,7 +1,5 @@
 ﻿using System;
 
-using FullPotential.Api.Gameplay.Events;
-
 namespace FullPotential.Api.Gameplay.Events
 {
     [AttributeUsage(AttributeTargets.Class)]

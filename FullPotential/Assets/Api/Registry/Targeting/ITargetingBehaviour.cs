@@ -1,5 +1,6 @@
 ﻿using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Items.Types;
+using FullPotential.Api.Obsolete.Items.Types;
+
 using UnityEngine;
 
 namespace FullPotential.Api.Registry.Targeting

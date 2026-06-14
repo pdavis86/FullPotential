@@ -26,7 +26,7 @@ namespace FullPotential.Core.Persistence
             _dataSaver = dataSaver;
         }
 
-        public void AddToQueue(string username, ISaveable saveable)
+        public void AddToQueue(string characterId, ISaveable saveable)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
@@ -34,22 +34,22 @@ namespace FullPotential.Core.Persistence
                 return;
             }
 
-            // todo: remove debugging
-            Debug.Log($"Adding {saveable.GetType().Name} to save queue for '{username}'");
+            // todo: zzz v0.6 - set debug log level
+            Debug.Log($"Adding '{saveable.GetType().Name}' to save queue for '{characterId}'");
 
-            if (!_queue.ContainsKey(username))
+            if (!_queue.ContainsKey(characterId))
             {
-                _queue.Add(username, new List<ISaveable> { saveable });
+                _queue.Add(characterId, new List<ISaveable> { saveable });
                 return;
             }
 
-            if (!_queue[username].Contains(saveable))
+            if (!_queue[characterId].Contains(saveable))
             {
-                _queue[username].Add(saveable);
+                _queue[characterId].Add(saveable);
             }
         }
 
-        public async UniTask ProcessQueueForUsernameAsync(string username)
+        public async UniTask ProcessQueueForCharacterIdAsync(string characterId)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
@@ -57,12 +57,12 @@ namespace FullPotential.Core.Persistence
                 return;
             }
 
-            // todo: remove debugging
-            Debug.Log($"Processing save queue for '{username}'");
+            // todo: zzz v0.6 - set debug log level
+            Debug.Log($"Processing save queue for '{characterId}'");
 
-            var tasks = GetUniTasksForusername(username);
+            var tasks = GetUniTasksForCharacterId(characterId);
 
-            _queue.Remove(username);
+            _queue.Remove(characterId);
 
             await UniTask.WhenAll(tasks);
         }
@@ -83,17 +83,18 @@ namespace FullPotential.Core.Persistence
 
             if (_queue.Count == 0)
             {
+                Debug.Log("Nothing in the save queue");
                 return;
             }
 
-            // todo: remove debugging
+            // todo: zzz v0.6 - set debug log level
             Debug.Log("Processing save queue");
 
             _isProcessingQueue = true;
 
             try
             {
-                var tasks = _queue.SelectMany(x => GetUniTasksForusername(x.Key)).ToList();
+                var tasks = _queue.SelectMany(x => GetUniTasksForCharacterId(x.Key)).ToList();
                 await UniTask.WhenAll(tasks);
                 _queue.Clear();
             }
@@ -103,39 +104,39 @@ namespace FullPotential.Core.Persistence
             }
         }
 
-        private IEnumerable<UniTask> GetUniTasksForusername(string username)
+        private IEnumerable<UniTask> GetUniTasksForCharacterId(string characterId)
         {
-            if (!_queue.ContainsKey(username))
+            if (!_queue.ContainsKey(characterId))
             {
                 return Array.Empty<UniTask>();
             }
 
-            var tasks = _queue[username].Select(x => SaveImmediatelyAsync(x, username)).ToList();
+            var tasks = _queue[characterId].Select(x => SaveImmediatelyAsync(x, characterId)).ToList();
 
             return tasks;
         }
 
-        private async UniTask SaveImmediatelyAsync(ISaveable saveable, string username)
+        private async UniTask SaveImmediatelyAsync(ISaveable saveable, string characterId)
         {
             if (!saveable.IsDirty)
             {
-                Debug.LogWarning($"Did not save {saveable.GetType().Name} for username '{username}' because it was not dirty");
+                Debug.LogWarning($"Did not save '{saveable.GetType().Name}' for user '{characterId}' because it was not dirty");
                 return;
             }
 
-            // todo: remove debugging
-            Debug.Log($"Saving type {saveable.GetType().Name} for user {username}");
+            // todo: zzz v0.6 - set debug log level
+            Debug.Log($"Saving type '{saveable.GetType().Name}' for user {characterId}");
 
             try
             {
                 if (saveable is IPlayerFighter playerFighter)
                 {
-                    await _dataSaver.SavePlayerDataAsync(playerFighter.GetPlayerData());
+                    await _dataSaver.SaveCharacterDataAsync(playerFighter.GetCharacterData());
                 }
 
                 if (saveable is InventoryBase inventory)
                 {
-                    await _dataSaver.SaveInventoryChangesAsync(inventory.GetInventoryChanges());
+                    await _dataSaver.SaveInventoryDataAsync(inventory.GetInventoryData());
                 }
             }
             catch (Exception ex)

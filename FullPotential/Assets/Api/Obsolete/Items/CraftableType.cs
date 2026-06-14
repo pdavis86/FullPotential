@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Obsolete
+﻿namespace FullPotential.Api.Obsolete.Items
 {
     public enum CraftableType
     {
