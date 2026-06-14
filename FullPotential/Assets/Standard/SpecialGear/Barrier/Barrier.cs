@@ -27,7 +27,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             {
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(specialGear.Name))}: {specialGear.Name}" + "\n");
 
-                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(specialGear.RegistryType))}: {localizer.Translate(TranslationType.ItemType, GetType().Name)}" + "\n");
+                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(specialGear.RegistryType))}: {localizer.Translate(this)}" + "\n");
             }
 
             var resourceConsumptionType = localizer.Translate(specialGear.ResourceType);
