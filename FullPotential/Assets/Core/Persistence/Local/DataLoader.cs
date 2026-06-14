@@ -43,6 +43,7 @@ namespace FullPotential.Core.Persistence.Local
 
         public async UniTask<CharacterData> GetCharacterDataAsync(string characterId)
         {
+            // Override the save file name
             var username = GameManager.Instance.LocalGameDataStore.SignInResult?.Username;
             var filePath = Paths.GetCharacterSavePath(username);
 
@@ -77,6 +78,7 @@ namespace FullPotential.Core.Persistence.Local
 
         public async UniTask<InventoryData> GetInventoryDataAsync(string characterId, bool reduced)
         {
+            // Override the save file name
             var username = GameManager.Instance.LocalGameDataStore.SignInResult?.Username;
             var filePath = Paths.GetInventorySavePath(username);
 

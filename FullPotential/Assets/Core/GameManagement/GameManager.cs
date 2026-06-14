@@ -232,7 +232,6 @@ namespace FullPotential.Core.GameManagement
 
         public async UniTask DisconnectAsync()
         {
-            _periodicSave = null;
             NetworkManager.Singleton.Shutdown();
             await SceneManager.LoadSceneAsync(1);
         }
