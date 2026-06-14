@@ -123,31 +123,10 @@ namespace FullPotential.Core.Player
                 .OrderBy(x => x.Name);
         }
 
-        protected override void SetEquippedItem(string itemId, string slotId)
+        protected override void ApplyEquippedItemChange(string itemId, string slotId)
         {
-            var item = itemId.IsNullOrWhiteSpace() ? null : _items[itemId];
-
-            if (_equippedItems.TryGetValue(slotId, out var equippedItem))
-            {
-                equippedItem.Item = item;
-            }
-            else
-            {
-                if (!IsValidSlotId(slotId))
-                {
-                    Debug.LogWarning($"Invalid slot ID {slotId}");
-                    return;
-                }
-
-                _equippedItems.Add(slotId, new EquippedItem
-                {
-                    Item = item
-                });
-            }
-
-            MarkAsDirtyAndAddToQueue();
-
-            _playerFighter.GetSlotStatus(slotId)?.StopActiveConsumerBehaviour();
+            var changes = new Dictionary<string, string> { { slotId, itemId } };
+            ApplyEquippedItemChanges(changes);
         }
 
         protected override void ApplyEquippedItemChanges(Dictionary<string, string> equippedItems)
@@ -162,7 +141,26 @@ namespace FullPotential.Core.Player
                 var item = kvp.Value.IsNullOrWhiteSpace() ? null : _items[kvp.Value];
                 var slotId = kvp.Key;
 
-                TriggerSlotChangeEvent(item.Id, slotId);
+                _playerFighter.GetSlotStatus(slotId)?.StopActiveConsumerBehaviour();
+
+                if (_equippedItems.TryGetValue(slotId, out var equippedItem))
+                {
+                    equippedItem.Item = item;
+                }
+                else
+                {
+                    if (!IsValidSlotId(slotId))
+                    {
+                        Debug.LogWarning($"Invalid slot ID {slotId}");
+                        return;
+                    }
+
+                    _equippedItems.Add(slotId, new EquippedItem
+                    {
+                        Item = item
+                    });
+                }
+
                 SpawnEquippedObject(item, slotId);
             }
 

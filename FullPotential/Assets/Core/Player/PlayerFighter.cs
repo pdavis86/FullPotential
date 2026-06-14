@@ -455,10 +455,9 @@ namespace FullPotential.Core.Player
 
             await UniTask.WhenAll(FetchCharacterData(), FetchInventoryData());
 
+            // todo: clean out anything stopping these from being async
             LoadFromCharacterData(playerData);
-
-            // todo: zzz v0.6 - why is a PlayerInventory cast necessary?
-            ((PlayerInventory)Inventory).LoadInventory(inventoryData);
+            Inventory.LoadInventory(inventoryData);
 
             // todo: zzz v0.6 - playerjoined should be an event
             if (IsServer)

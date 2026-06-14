@@ -94,29 +94,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (inventoryData.EquippedItems != null)
             {
-                foreach (var kvp in inventoryData.EquippedItems)
-                {
-                    if (kvp.Value.IsNullOrWhiteSpace())
-                    {
-                        continue;
-                    }
-
-                    var item = inventoryData.Items.FirstOrDefault(x => x.Id == kvp.Value);
-
-                    if (item == null)
-                    {
-                        Debug.LogWarning($"Cannot equip item '{kvp.Value}' as it is missing");
-                        continue;
-                    }
-
-                    // todo: TriggerSlotChangeEvent(item.Id, slotId);
-                }
-
                 ApplyEquippedItemChanges(inventoryData.EquippedItems);
             }
 
             _hasInventoryLoaded = true;
-            // todo: fire an event so we can call SpawnEquippedObject for each equiped item
         }
 
         public bool ApplyInventoryChanges(InventoryData changes)
@@ -158,12 +139,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             foreach (var item in nonItemStacks)
             {
-                // todo: remove
-                //if (item == null)
-                //{
-                //    continue;
-                //}
-
                 if (_items.ContainsKey(item.Id))
                 {
                     _items[item.Id] = item;
@@ -175,7 +150,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            // todo: fire an event instead
+            // todo: fire an event instead TriggerInventoryChangedEvent
             NotifyOfItemsRemoved(itemsRemoved);
             NotifyOfItemsAdded(itemsToAdd);
             ApplyEquippedItemChanges(changes.EquippedItems);
@@ -459,11 +434,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public static UniTask DefaultHandlerForSlotChangeEventAsync(SlotChangeEventArgs eventArgs)
         {
-            eventArgs.Inventory.SetEquippedItem(eventArgs.ItemId, eventArgs.SlotId);
+            eventArgs.Inventory.ApplyEquippedItemChange(eventArgs.ItemId, eventArgs.SlotId);
             return UniTask.CompletedTask;
         }
 
-        protected abstract void SetEquippedItem(string itemId, string slotId);
+        protected abstract void ApplyEquippedItemChange(string itemId, string slotId);
 
         protected abstract void ApplyEquippedItemChanges(Dictionary<string, string> equippedItems);
 
@@ -486,17 +461,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public InventoryData GetInventoryData()
         {
-            // todo: stop filtering items
-            //var filteredItems = _items.Where(x => x.Value.Name == "Projectile Lightning Gadget");
-            var filteredItems = _items.Where(x => x.Value.PropertyDictionary.Any());
-
             var changes = new InventoryData
             {
                 CharacterId = _characterId,
-                Items = filteredItems.Select(x => _itemFactory.GetDataFromItem(_characterId, x.Value)).ToList(),
-                EquippedItems = _equippedItems
-                    .Where(x => !(x.Value?.Item?.Id.IsNullOrWhiteSpace() ?? false))
-                    .ToDictionary(x => x.Key, x => x.Value.Item?.Id)
+                Items = _items.Select(x => _itemFactory.GetDataFromItem(_characterId, x.Value)).ToList(),
+                EquippedItems = _equippedItems.ToDictionary(x => x.Key, x => x.Value.Item?.Id)
             };
 
             _isDirty = false;
