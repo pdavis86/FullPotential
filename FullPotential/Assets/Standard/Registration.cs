@@ -46,12 +46,13 @@ namespace FullPotential.Standard
                 typeof(Effects.Debuffs.Slow),
                 typeof(Effects.Debuffs.Weaken),
 
-                typeof(Effects.Elements.Air),
-                typeof(Effects.Elements.Earth),
-                typeof(Effects.Elements.Fire),
-                typeof(Effects.Elements.Ice),
-                typeof(Effects.Elements.Lightning),
-                typeof(Effects.Elements.Water),
+                // todo: zzz v0.8 - Elements
+                //typeof(Effects.Elements.Air),
+                //typeof(Effects.Elements.Earth),
+                //typeof(Effects.Elements.Fire),
+                //typeof(Effects.Elements.Ice),
+                //typeof(Effects.Elements.Lightning),
+                //typeof(Effects.Elements.Water),
 
                 typeof(Effects.Movement.Attract),
                 typeof(Effects.Movement.Hold),
@@ -105,7 +106,7 @@ namespace FullPotential.Standard
 
                 typeof(Shapes.Wall),
                 typeof(Shapes.Zone),
-        };
+            };
         }
 
         public IEnumerable<Type> GetRegisterableVisuals()

@@ -35,20 +35,19 @@ namespace FullPotential.Api.Items
         public ItemFactory(ITypeRegistry typeRegistry)
         {
             _typeRegistry = typeRegistry;
-
-            // todo: why are the models obsolete but the interfaces are not???
-
-            _lootTypeIds = _typeRegistry.GetRegisteredTypes<ILootType>().Select(x => x.TypeId.ToString()).ToList();
-            _accessoryTypeIds = _typeRegistry.GetRegisteredTypes<IAccessoryType>().Select(x => x.TypeId.ToString()).ToList();
-            _armorTypeIds = _typeRegistry.GetRegisteredTypes<IArmorType>().Select(x => x.TypeId.ToString()).ToList();
-            _weaponTypeIds = _typeRegistry.GetRegisteredTypes<IWeaponType>().Select(x => x.TypeId.ToString()).ToList();
-            _ammunitionTypeIds = _typeRegistry.GetRegisteredTypes<IAmmunitionType>().Select(x => x.TypeId.ToString()).ToList();
-            _specialTypeIds = _typeRegistry.GetRegisteredTypes<ISpecialGearType>().Select(x => x.TypeId.ToString()).ToList();
         }
 
         public ItemBase GetItemFromData(ItemData model)
         {
             ItemBase item;
+
+            // todo: zzz v0.6 - why are the models obsolete but the interfaces are not???
+            _lootTypeIds ??= _typeRegistry.GetRegisteredTypes<ILootType>().Select(x => x.TypeId.ToString()).ToList();
+            _accessoryTypeIds ??= _typeRegistry.GetRegisteredTypes<IAccessoryType>().Select(x => x.TypeId.ToString()).ToList();
+            _armorTypeIds ??= _typeRegistry.GetRegisteredTypes<IArmorType>().Select(x => x.TypeId.ToString()).ToList();
+            _weaponTypeIds ??= _typeRegistry.GetRegisteredTypes<IWeaponType>().Select(x => x.TypeId.ToString()).ToList();
+            _ammunitionTypeIds ??= _typeRegistry.GetRegisteredTypes<IAmmunitionType>().Select(x => x.TypeId.ToString()).ToList();
+            _specialTypeIds ??= _typeRegistry.GetRegisteredTypes<ISpecialGearType>().Select(x => x.TypeId.ToString()).ToList();
 
             if (_lootTypeIds.Contains(model.RegistryTypeId))
             {
@@ -60,9 +59,7 @@ namespace FullPotential.Api.Items
                     Name = model.Name,
                     Attributes = GetAttributes(model.Attributes),
                     EffectIds = model.EffectIds.Select(x => x).ToArray(),
-                    Effects = model.EffectIds
-                        .Select(x => _typeRegistry.GetRegisteredByTypeId<IEffectType>(x))
-                        .ToList(),
+                    Effects = GetEffects(model),
                     TargetingTypeId = GetStringProperty(model, nameof(ItemWithTargetingAndShapeBase.TargetingTypeId)),
                     TargetingVisualsTypeId = GetStringProperty(model, nameof(ItemWithTargetingAndShapeBase.TargetingVisualsTypeId)),
                     ShapeTypeId = GetStringProperty(model, nameof(ItemWithTargetingAndShapeBase.ShapeTypeId)),
@@ -79,9 +76,7 @@ namespace FullPotential.Api.Items
                     Name = model.Name,
                     Attributes = GetAttributes(model.Attributes),
                     EffectIds = model.EffectIds.Select(x => x).ToArray(),
-                    Effects = model.EffectIds
-                        .Select(x => _typeRegistry.GetRegisteredByTypeId<IEffectType>(x))
-                        .ToList(),
+                    Effects = GetEffects(model),
                     AccessoryVisualsTypeId = GetStringProperty(model, nameof(Accessory.AccessoryVisualsTypeId))
                 };
             }
@@ -95,9 +90,7 @@ namespace FullPotential.Api.Items
                     Name = model.Name,
                     Attributes = GetAttributes(model.Attributes),
                     EffectIds = model.EffectIds.Select(x => x).ToArray(),
-                    Effects = model.EffectIds
-                        .Select(x => _typeRegistry.GetRegisteredByTypeId<IEffectType>(x))
-                        .ToList(),
+                    Effects = GetEffects(model),
                     ArmorVisualsTypeId = GetStringProperty(model, nameof(Armor.ArmorVisualsTypeId))
                 };
             }
@@ -111,9 +104,7 @@ namespace FullPotential.Api.Items
                     Name = model.Name,
                     Attributes = GetAttributes(model.Attributes),
                     EffectIds = model.EffectIds.Select(x => x).ToArray(),
-                    Effects = model.EffectIds
-                        .Select(x => _typeRegistry.GetRegisteredByTypeId<IEffectType>(x))
-                        .ToList(),
+                    Effects = GetEffects(model),
                     WeaponVisualsTypeId = GetStringProperty(model, nameof(Weapon.WeaponVisualsTypeId)),
                     Ammo = GetIntProperty(model, nameof(Weapon.Ammo))
                 };
@@ -140,9 +131,7 @@ namespace FullPotential.Api.Items
                     Name = model.Name,
                     Attributes = GetAttributes(model.Attributes),
                     EffectIds = model.EffectIds.Select(x => x).ToArray(),
-                    Effects = model.EffectIds
-                        .Select(x => _typeRegistry.GetRegisteredByTypeId<IEffectType>(x))
-                        .ToList(),
+                    Effects = GetEffects(model),
                     IsTwoHanded = GetBoolProperty(model, nameof(SpecialGear.IsTwoHanded)),
                     CustomVisualsTypeId = GetStringProperty(model, nameof(SpecialGear.CustomVisualsTypeId)),
                     ResourceTypeId = GetStringProperty(model, nameof(SpecialGear.ResourceTypeId)),
@@ -162,9 +151,7 @@ namespace FullPotential.Api.Items
                     Name = model.Name,
                     Attributes = GetAttributes(model.Attributes),
                     EffectIds = model.EffectIds.Select(x => x).ToArray(),
-                    Effects = model.EffectIds
-                        .Select(x => _typeRegistry.GetRegisteredByTypeId<IEffectType>(x))
-                        .ToList(),
+                    Effects = GetEffects(model),
                     IsTwoHanded = GetBoolProperty(model, nameof(Consumer.IsTwoHanded)),
                     TargetingTypeId = GetStringProperty(model, nameof(Consumer.TargetingTypeId)),
                     TargetingVisualsTypeId = GetStringProperty(model, nameof(Consumer.TargetingVisualsTypeId)),
@@ -268,7 +255,7 @@ namespace FullPotential.Api.Items
             if (item is CombatItemBase combatItem)
             {
                 itemData.Attributes = GetAttributeDictionary(combatItem.Attributes);
-                itemData.EffectIds = combatItem.EffectIds.Select(x => x).ToList();
+                itemData.EffectIds = combatItem.EffectIds?.Select(x => x).ToList() ?? new List<string>();
                 itemData.Properties = new Dictionary<string, string>
                 {
                     { nameof(CombatItemBase.IsTwoHanded), combatItem.IsTwoHanded.ToString() },
@@ -283,7 +270,7 @@ namespace FullPotential.Api.Items
                 itemData.Properties[nameof(ItemWithTargetingAndShapeBase.ShapeVisualsTypeId)] = complexItem.ShapeVisualsTypeId;
             }
 
-            // todo: where are there separate VisualsTypeId for each type?
+            // todo: zzz v0.6 - why are there separate xxxVisualsTypeId for each type?
             switch (item)
             {
                 case Accessory accessory:
@@ -304,7 +291,7 @@ namespace FullPotential.Api.Items
                     break;
 
                 case ItemStackBase itemStack:
-                    // todo: sort out this BaseName nonsense
+                    // todo: zzz v0.6 - sort out this BaseName nonsense
                     itemData.Properties = new Dictionary<string, string>
                     {
                         { nameof(ItemStackBase.Count) , itemStack.CountForSerialization.ToString() },
@@ -325,7 +312,7 @@ namespace FullPotential.Api.Items
             return itemData;
         }
 
-        protected void FillTypesFromIds(ItemBase item)
+        public void FillTypesFromIds(ItemBase item)
         {
             if (!string.IsNullOrWhiteSpace(item.RegistryTypeId) && item.RegistryType == null)
             {
@@ -423,6 +410,14 @@ namespace FullPotential.Api.Items
                 itemWithVisuals.Visuals = _typeRegistry.GetRegisteredTypes<T>()
                     .FirstOrDefault(v => v.TypeId.ToString() == itemWithVisuals.VisualsTypeId);
             }
+        }
+
+        private List<IEffectType> GetEffects(ItemData model)
+        {
+            return model.EffectIds
+                .Select(x => _typeRegistry.GetRegisteredByTypeId<IEffectType>(x))
+                .Where(x => x != null)
+                .ToList();
         }
     }
 }

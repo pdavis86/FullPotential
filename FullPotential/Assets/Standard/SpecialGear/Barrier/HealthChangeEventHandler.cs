@@ -27,7 +27,8 @@ namespace FullPotential.Standard.SpecialGear.Barrier
         private UniTask HandleBeforeHealthChangeAsync(ResourceValueChangedEventArgs eventArgs)
         {
             if (eventArgs.ResourceTypeId != ResourceTypeIds.HealthId
-                || eventArgs.Change >= 0)
+                || eventArgs.Change >= 0
+                || eventArgs.IsSelfInflicted)
             {
                 return UniTask.CompletedTask;
             }
@@ -49,7 +50,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             barrier.SetCustomData(CustomDataKeyLastHit, DateTime.UtcNow.ToString("u"));
 
-            eventArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, eventArgs.Change);
+            eventArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, eventArgs.Change, false);
 
             if (barrierCharge < Math.Abs(eventArgs.Change))
             {

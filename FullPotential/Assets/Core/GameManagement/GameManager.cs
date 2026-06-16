@@ -71,6 +71,7 @@ namespace FullPotential.Core.GameManagement
 
         #region Unity Event Handlers
 
+        // ReSharper disable once Unity.IncorrectMethodSignature
         // ReSharper disable once UnusedMember.Local
 #pragma warning disable UNT0006 // Incorrect message signature
         private async Task Awake()
@@ -105,7 +106,6 @@ namespace FullPotential.Core.GameManagement
             var typeRegistry = (TypeRegistry)DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             typeRegistry.FindAndRegisterAll(addressablesManager.ModPrefixes);
 
-
             await _localizer.LoadAvailableCulturesAsync(addressablesManager.LocalisationAddresses);
             await _localizer.LoadLocalizationFilesAsync(_settingsRepository.Get().Culture);
 
@@ -123,7 +123,9 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            Debug.Log("Setting up periodic save");
+            // todo: zzz v0.6 - set debug log level
+            //Debug.Log("Setting up periodic save");
+
             _periodicSave = new DelayedAction(15f, () => SaveData(), false);
         }
 
@@ -205,8 +207,11 @@ namespace FullPotential.Core.GameManagement
             }
             else
             {
-                LocalGameDataStore.HasDisconnected = true;
-                LocalGameDataStore.DisconnectReason = NetworkManager.Singleton.DisconnectReason;
+                if (NetworkManager.Singleton.DisconnectEvent != NetworkTransport.DisconnectEvents.TransportShutdown)
+                {
+                    LocalGameDataStore.HasDisconnected = true;
+                    LocalGameDataStore.DisconnectReason = NetworkManager.Singleton.DisconnectReason;
+                }
 
                 if (SceneManager.GetActiveScene().buildIndex != 1)
                 {
@@ -254,7 +259,9 @@ namespace FullPotential.Core.GameManagement
 
         private void SaveData()
         {
-            Debug.Log("SaveData() was called");
+            // todo: zzz v0.6 - set debug log level
+            //Debug.Log("SaveData() was called");
+
             _saveManager.ProcessQueueAsync().Forget();
         }
 

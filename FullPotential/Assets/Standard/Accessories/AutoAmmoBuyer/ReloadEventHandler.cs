@@ -1,15 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Weapons;
+using FullPotential.Models.Player;
 
 using Unity.Netcode;
 
@@ -22,6 +25,7 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
     {
         private readonly ITypeRegistry _typeRegistry;
         private readonly ILocalizer _localizer;
+        private readonly IItemFactory _itemFactory;
 
         public NetworkLocation Location => NetworkLocation.Server;
 
@@ -29,10 +33,11 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 
         public Func<ReloadEventArgs, UniTask> AfterHandlerAsync => null;
 
-        public ReloadEventHandler(ITypeRegistry typeRegistry, ILocalizer localizer)
+        public ReloadEventHandler(ITypeRegistry typeRegistry, ILocalizer localizer, IItemFactory itemFactory)
         {
             _typeRegistry = typeRegistry;
             _localizer = localizer;
+            _itemFactory = itemFactory;
         }
 
         private UniTask HandleReloadBeforeAsync(ReloadEventArgs eventArgs)
@@ -75,11 +80,10 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
                 Count = ammoType.MaxStackSize
             };
 
-            // todo: fix reload
-            //var addedToInventory = fighter.Inventory.ApplyInventoryChanges(new InventoryData
-            //{
-            //    Items = new[] { newItemStack }
-            //});
+            var addedToInventory = fighter.Inventory.ApplyInventoryChanges(new InventoryData
+            {
+                Items = new List<ItemData>() { _itemFactory.GetDataFromItem(equippedWeapon.CharacterId, newItemStack) }
+            });
 
             //if (addedToInventory)
             //{

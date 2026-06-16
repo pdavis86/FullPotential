@@ -15,12 +15,15 @@ namespace FullPotential.Api.Gameplay.Combat.Events
 
         public int Change { get; set; }
 
-        public ResourceValueChangedEventArgs(LivingEntityBase livingEntity, string resourceTypeId, int newValue, int change)
+        public bool IsSelfInflicted { get; set; }
+
+        public ResourceValueChangedEventArgs(LivingEntityBase livingEntity, string resourceTypeId, int newValue, int change, bool isSelfInflicted)
         {
             LivingEntity = livingEntity;
             ResourceTypeId = resourceTypeId;
             NewValue = newValue;
             Change = change;
+            IsSelfInflicted = isSelfInflicted;
         }
     }
 }

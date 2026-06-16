@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using FullPotential.Api.Gameplay.Drawing;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.UI.Events;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -175,11 +177,6 @@ namespace FullPotential.Core.UI.Behaviours
 
         public void StopDrawing(string slotId)
         {
-            if (slotId != _slotId)
-            {
-                return;
-            }
-
             _isDrawing = false;
 
             _canvasRenderer.SetMesh(new Mesh());

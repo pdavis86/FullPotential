@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
+using FullPotential.Api.Obsolete;
+
 namespace FullPotential.Api.Utilities.Extensions
 {
     public static class DictionaryExtensions
@@ -14,6 +16,13 @@ namespace FullPotential.Api.Utilities.Extensions
         public static string GetStringValueOrNull<T1>(this Dictionary<T1, string> dictionary, T1 key)
         {
             return dictionary.ContainsKey(key) ? dictionary[key] : null;
+        }
+
+        public static List<SerializableKeyValuePair<string, string>> GetSerializableKeyValuePairList(this Dictionary<string, string> dictionary)
+        {
+            return dictionary
+                .Select(kvp => new SerializableKeyValuePair<string, string>(kvp.Key, kvp.Value))
+                .ToList();
         }
     }
 }

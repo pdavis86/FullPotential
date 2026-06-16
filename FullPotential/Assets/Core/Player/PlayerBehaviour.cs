@@ -1,13 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Crafting;
+using FullPotential.Api.Gameplay.Player.Models;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Items;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete.Items;
 using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Ui;
@@ -19,6 +25,7 @@ using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.UI.Behaviours;
 using FullPotential.Core.UI.Events;
 using FullPotential.Core.Utilities.UtilityBehaviours;
+using FullPotential.Models.Player;
 
 using TMPro;
 
@@ -27,6 +34,8 @@ using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
+
+// todo: zzz v0.6 - events to handle player inputs
 
 namespace FullPotential.Core.Player
 {
@@ -45,6 +54,9 @@ namespace FullPotential.Core.Player
         //Services
         private IResultFactory _resultFactory;
         private ILocalizer _localizer;
+        private IItemFactory _itemFactory;
+        private IDataSaver _dataSaver;
+        private IRpcService _rpcService;
 
         private bool _hasMenuOpen;
         private UserInterface _userInterface;
@@ -67,6 +79,9 @@ namespace FullPotential.Core.Player
 
             _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+            _itemFactory = DependenciesContext.Dependencies.GetService<IItemFactory>();
+            _dataSaver = DependenciesContext.Dependencies.GetService<IDataSaver>();
+            _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
 
             _drawingPadUi = GameManager.Instance.UserInterface.DrawingPad.GetComponent<DrawingPadUi>();
 
@@ -171,6 +186,9 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnAttackDownLeft()
         {
+            // todo: zzz v0.6 - set debug log level
+            //Debug.Log("OnAttackDownLeft");
+
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
                 _drawingPadUi.InitialiseForEquip(EventSource, HandSlotIds.LeftHand);
@@ -181,12 +199,18 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnAttackHoldLeft()
         {
+            // todo: zzz v0.6 - set debug log level
+            //Debug.Log("OnAttackHoldLeft");
+
             HandleAttackHold(HandSlotIds.LeftHand);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnAttackReleaseLeft()
         {
+            // todo: zzz v0.6 - set debug log level
+            //Debug.Log("OnAttackReleaseLeft");
+
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
                 _drawingPadUi.StopDrawing(HandSlotIds.LeftHand);
@@ -200,6 +224,9 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnAttackDownRight()
         {
+            // todo: zzz v0.6 - set debug log level
+            //Debug.Log("OnAttackDownRight");
+
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
                 _drawingPadUi.InitialiseForEquip(EventSource, HandSlotIds.RightHand);
@@ -210,12 +237,18 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnAttackHoldRight()
         {
+            // todo: zzz v0.6 - set debug log level
+            //Debug.Log("OnAttackHoldRight");
+
             HandleAttackHold(HandSlotIds.RightHand);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnAttackReleaseRight()
         {
+            // todo: zzz v0.6 - set debug log level
+            //Debug.Log("OnAttackReleaseRight");
+
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
                 _drawingPadUi.StopDrawing(HandSlotIds.RightHand);
@@ -333,14 +366,18 @@ namespace FullPotential.Core.Player
                 craftedItem.Name = itemName;
             }
 
-            // todo: fix crafting
-            //var invChanges = new InventoryData
-            //{
-            //    IdsToRemove = componentIdArray,
-            //    Items = new[] { craftedItem }
-            //};
+            var items = componentIdArray
+                .Select(x => new ItemData { Id = x, IsDeleted = true })
+                .ToList();
 
-            //_playerFighter.Inventory.ApplyInventoryChanges(invChanges);
+            items.Add(_itemFactory.GetDataFromItem(_playerFighter.CharacterId, craftedItem));
+
+            var invChanges = new InventoryData
+            {
+                Items = items
+            };
+
+            _playerFighter.Inventory.ApplyInventoryChanges(invChanges);
         }
 
         [ServerRpc]
@@ -366,24 +403,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            // todo: fix looting
-            //InventoryData invChanges;
-            //if (_random.Next(1, 3) == 1)
-            //{
-            //    invChanges = new InventoryData
-            //    {
-            //        Items = new[] { _resultFactory.GetAmmoDrop() }
-            //    };
-            //}
-            //else
-            //{
-            //    invChanges = new InventoryData
-            //    {
-            //        Items = new[] { _resultFactory.GetLootDrop() },
-            //    };
-            //}
-
-            //_playerFighter.Inventory.ApplyInventoryChanges(invChanges);
+            SaveLootAndUpdatePlayerAsync().Forget();
         }
 
         #endregion
@@ -584,6 +604,21 @@ namespace FullPotential.Core.Player
             var settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
             var gameSettings = settingsRepository.Get();
             Camera.main.fieldOfView = gameSettings.FieldOfView;
+        }
+
+        private async UniTask SaveLootAndUpdatePlayerAsync()
+        {
+            var newItem = _random.Next(1, 3) == 1
+                ? _resultFactory.GetAmmoDrop()
+                : _resultFactory.GetLootDrop();
+
+            var itemData = _itemFactory.GetDataFromItem(_playerFighter.CharacterId, newItem);
+
+            var newItems = await _dataSaver.SaveInventoryAdditionsAndDeletionsAsync(_playerFighter.CharacterId, new List<ItemData> { itemData });
+            var changes = new InventoryChangesForClient { IdsToFetch = new[] { newItems[0].Id } };
+
+            var clientParams = _rpcService.ForPlayer(OwnerClientId);
+            _playerFighter.Inventory.ApplyChangesClientRpc(changes, clientParams);
         }
     }
 }

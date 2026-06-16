@@ -1,7 +1,7 @@
 ﻿using System;
 
-using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Registry;
 
 namespace FullPotential.Api.Items.Base
 {
@@ -23,11 +23,15 @@ namespace FullPotential.Api.Items.Base
             }
         }
 
-        public int MaxSize => ((IItemStack)RegistryType).MaxStackSize;
+        public int MaxSize => ((IItemStackType)RegistryType).MaxStackSize;
 
+        public override string GetName(ILocalizer localizer)
+        {
+            return $"{localizer.Translate(RegistryType)} ({Count})";
+        }
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
         {
-            return levelOfDetail == LevelOfDetail.Full ? $"{localizer.Translate(RegistryType)} ({Count})" : null;
+            return levelOfDetail == LevelOfDetail.Full ? GetName(localizer) : null;
         }
     }
 }

@@ -88,6 +88,7 @@
     <Compile Include="Assets\Api\Items\Base\ItemBase.cs" />
     <Compile Include="Assets\Api\Registry\Gear\ISpecialGearType.cs" />
     <Compile Include="Assets\Api\Obsolete\PlayerDataOld.cs" />
+    <Compile Include="Assets\Api\Utilities\Extensions\SerializableKeyValuePairExtensions.cs" />
     <Compile Include="Assets\Api\Obsolete\InventoryDataOld.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\JsonExtensions.cs" />
     <Compile Include="Assets\Api\Modding\IMod.cs" />
@@ -123,6 +124,7 @@
     <Compile Include="Assets\Api\Gameplay\Inventory\Events\SlotChangeEventArgs.cs" />
     <Compile Include="Assets\Api\Unity\IUnityHelperUtilities.cs" />
     <Compile Include="Assets\Api\GameManagement\Models\GameSettings.cs" />
+    <Compile Include="Assets\Api\Registry\IItemStackType.cs" />
     <Compile Include="Assets\Api\Localization\UnitsType.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\Models\InventoryChangesForClient.cs" />
     <Compile Include="Assets\Api\Input\DefaultInputActions.cs" />
@@ -189,7 +191,6 @@
     <Compile Include="Assets\Api\Registry\IHasItemVisuals.cs" />
     <Compile Include="Assets\Api\Registry\IHasNetworkPrefab.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingType.cs" />
-    <Compile Include="Assets\Api\Gameplay\Inventory\IItemStack.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\IEventBus.cs" />
     <Compile Include="Assets\Api\Networking\IRpcService.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\TransformExtensions.cs" />

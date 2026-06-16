@@ -74,13 +74,13 @@ namespace FullPotential.Core.UI.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
-            var playerState = GameManager.Instance.GetLocalPlayerGameObject().GetComponent<PlayerFighter>();
-
-            if (playerState.PlayerInventory.IsInventoryFull())
-            {
-                playerState.AlertInventoryIsFull();
-                GameManager.Instance.UserInterface.HideAllMenus();
-            }
+            // todo: zzz v0.7 - Handle when inventory is full
+            //var playerState = GameManager.Instance.GetLocalPlayerGameObject().GetComponent<PlayerFighter>();
+            //if (playerState.PlayerInventory.IsInventoryFull())
+            //{
+            //    playerState.AlertInventoryIsFull();
+            //    GameManager.Instance.UserInterface.HideAllMenus();
+            //}
 
             ResetUi();
         }

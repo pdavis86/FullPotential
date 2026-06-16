@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 
 using Cysharp.Threading.Tasks;
@@ -12,6 +13,7 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Obsolete;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity;
 using FullPotential.Api.Unity.Constants;
@@ -56,7 +58,7 @@ namespace FullPotential.Core.Player
         private IShaderUtilities _shaderUtilities;
 
         //Data
-        private Dictionary<string, string> _characterSettings;
+        private List<SerializableKeyValuePair<string, string>> _characterSettings;
 
         public bool IsDirty { get; set; }
 
@@ -140,8 +142,6 @@ namespace FullPotential.Core.Player
             _shaderUtilities = DependenciesContext.Dependencies.GetService<IShaderUtilities>();
 
             HealthBarSlider = _healthSlider;
-
-            _eventBus.Subscribe<ResourceValueChangedEventArgs>(ResourceValueChangeEventId, _ => IsDirty = true);
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -244,15 +244,12 @@ namespace FullPotential.Core.Player
             SaveBeforeQuitAsync(isDisconnecting).Forget();
         }
 
-        // todo: use or delete
-        //[ServerRpc]
-        //private void UpdatePlayerSettingsServerRpc(CharacterSettings characterSettings)
-        //{
-        //    MarkAsDirty();
-
-        //    _characterSettings = characterSettings;
-        //    TextureUrl = characterSettings.TextureUrl;
-        //}
+        [ServerRpc]
+        private void UpdatePlayerSettingsServerRpc(SerializableKeyValuePair<string, string>[] characterSettings)
+        {
+            UpdatePlayerSettings(characterSettings.ToList());
+            MarkAsDirtyAndAddToQueue();
+        }
 
         #endregion
 
@@ -305,7 +302,7 @@ namespace FullPotential.Core.Player
 
                     var bodyMaterialForRespawn = _bodyMeshRenderer.material;
                     _shaderUtilities.ChangeRenderMode(bodyMaterialForRespawn, ShaderRenderMode.Fade);
-                    bodyMaterialForRespawn.color = new Color(1, 1, 1, 0.2f);
+                    bodyMaterialForRespawn.SetColor("_BaseColor", new Color(1f, 1f, 1f, 0.2f));
                     ApplyMaterial(bodyMaterialForRespawn);
 
                     break;
@@ -455,7 +452,7 @@ namespace FullPotential.Core.Player
 
             await UniTask.WhenAll(FetchCharacterData(), FetchInventoryData());
 
-            // todo: clean out anything stopping these from being async
+            // todo: zzz v0.6 - clean out anything stopping data loading from being async
             LoadFromCharacterData(playerData);
             Inventory.LoadInventory(inventoryData);
 
@@ -470,8 +467,8 @@ namespace FullPotential.Core.Player
 
         private void LoadFromCharacterData(CharacterData playerData)
         {
-            _characterSettings = playerData.Settings;
-            TextureUrl = GetSettingValue(CharacterSettingKey.TextureUrl) ?? string.Empty;
+            _characterSettings = playerData.Settings.GetSerializableKeyValuePairList();
+            TextureUrl = _characterSettings.GetValue(CharacterSettingKey.TextureUrl);
 
             if (IsServer)
             {
@@ -487,17 +484,27 @@ namespace FullPotential.Core.Player
             SetResourceInitialValues(GetResources().ToDictionary(
                 resource => resource.TypeId.ToString(),
                 resource => playerData.ValuePools.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value));
+
+            _eventBus.Subscribe<ResourceValueChangedEventArgs>(ResourceValueChangeEventId, _ => MarkAsDirtyAndAddToQueue());
         }
 
-        public void UpdatePlayerSettings(Dictionary<string, string> updatedSettings)
+        public void UpdatePlayerSettings(List<SerializableKeyValuePair<string, string>> updatedSettings)
         {
             foreach (var kvp in updatedSettings)
             {
-                _characterSettings[kvp.Key] = kvp.Value;
+                _characterSettings.SetValue(kvp.Key, kvp.Value);
             }
-            
-            TextureUrl = GetSettingValue(CharacterSettingKey.TextureUrl) ?? string.Empty;
-            //todo: UpdatePlayerSettingsServerRpc(characterSettings);
+
+            TextureUrl = _characterSettings.GetValue(CharacterSettingKey.TextureUrl);
+
+            if (IsServer)
+            {
+                MarkAsDirtyAndAddToQueue();
+            }
+            else
+            {
+                UpdatePlayerSettingsServerRpc(_characterSettings.ToArray());
+            }
         }
 
         // todo: zzz v0.6 - move SetTextureAsync to a repository class
@@ -653,7 +660,7 @@ namespace FullPotential.Core.Player
             var saveData = new CharacterData
             {
                 CharacterId = CharacterId,
-                Settings = _characterSettings,
+                Settings = _characterSettings.ToDictionary(x => x.Key, x => x.Value),
                 ValuePools = GetResourceDictionaryForSave()
             };
 
@@ -670,7 +677,7 @@ namespace FullPotential.Core.Player
             }
 
             // todo: zzz v0.6 - set debug log level
-            Debug.Log($"Marking fighter as dirty for '{CharacterId}'");
+            //Debug.Log($"Marking fighter as dirty for '{CharacterId}'");
 
             IsDirty = true;
             _saveManager.AddToQueue(CharacterId, this);
@@ -679,16 +686,14 @@ namespace FullPotential.Core.Player
         private async UniTask SaveBeforeQuitAsync(bool isDisconnecting)
         {
             _saveManager.AddToQueue(CharacterId, this);
+            _saveManager.AddToQueue(CharacterId, Inventory);
             await _saveManager.ProcessQueueForCharacterIdAsync(CharacterId);
-            var clientParams = _rpcService.ForPlayer(NetworkManager.Singleton.LocalClientId);
+            var clientParams = _rpcService.ForPlayer(OwnerClientId);
             NowOkToQuitClientRpc(isDisconnecting, clientParams);
         }
 
         private async UniTask NowOkToQuitAsync(bool isDisconnecting)
         {
-            //_userInterface = GameManager.Instance.UserInterface;
-            //_userInterface.HideAllMenus();
-
             if (isDisconnecting)
             {
                 await GameManager.Instance.DisconnectAsync();
@@ -697,16 +702,6 @@ namespace FullPotential.Core.Player
             {
                 GameManager.Instance.Quit();
             }
-        }
-
-        public string GetSettingValue(string key)
-        {
-            if (!_characterSettings.ContainsKey(key))
-            {
-                return null;
-            }
-
-            return _characterSettings[key];
         }
     }
 }

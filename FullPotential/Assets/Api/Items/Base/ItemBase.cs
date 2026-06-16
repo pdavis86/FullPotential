@@ -8,7 +8,7 @@ using FullPotential.Api.Registry;
 namespace FullPotential.Api.Items.Base
 {
     // todo: zzz v0.6 - remove Serializable
-    // todo: abstract
+    // todo: zzz v0.6 - make abstract
     [Serializable]
     public class ItemBase : ISaveable
     {
@@ -36,6 +36,11 @@ namespace FullPotential.Api.Items.Base
                 _registryType = value;
                 RegistryTypeId = _registryType.TypeId.ToString();
             }
+        }
+
+        public virtual string GetName(ILocalizer localizer)
+        {
+            return Name;
         }
 
         public virtual string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)

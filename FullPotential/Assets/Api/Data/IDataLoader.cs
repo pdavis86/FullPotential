@@ -1,4 +1,6 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Collections.Generic;
+
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Models.GameManagement;
 using FullPotential.Models.Player;
@@ -12,5 +14,7 @@ namespace FullPotential.Api.Data
         UniTask<CharacterData> GetCharacterDataAsync(string characterId);
 
         UniTask<InventoryData> GetInventoryDataAsync(string characterId, bool reduced);
+
+        UniTask<List<ItemData>> GetInventoryItemDataAsync(string characterId, IEnumerable<string> itemIds);
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,7 +9,6 @@ using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Core.GameManagement;
 using FullPotential.Models.GameManagement;
 using FullPotential.Models.Player;
 
@@ -43,9 +41,7 @@ namespace FullPotential.Core.Persistence.Local
 
         public async UniTask<CharacterData> GetCharacterDataAsync(string characterId)
         {
-            // Override the save file name
-            var username = GameManager.Instance.LocalGameDataStore.SignInResult?.Username;
-            var filePath = Paths.GetCharacterSavePath(username);
+            var filePath = Paths.GetCharacterSavePath(characterId);
 
             if (!System.IO.File.Exists(filePath))
             {
@@ -78,9 +74,7 @@ namespace FullPotential.Core.Persistence.Local
 
         public async UniTask<InventoryData> GetInventoryDataAsync(string characterId, bool reduced)
         {
-            // Override the save file name
-            var username = GameManager.Instance.LocalGameDataStore.SignInResult?.Username;
-            var filePath = Paths.GetInventorySavePath(username);
+            var filePath = Paths.GetInventorySavePath(characterId);
 
             InventoryData inventoryData;
 
@@ -95,13 +89,13 @@ namespace FullPotential.Core.Persistence.Local
                 {
                     // todo: zzz v0.6 - remove this fall-back
                     var inventoryDataOld = JsonUtility.FromJson<InventoryDataOld>(loadJson);
-                    inventoryData = GetInventoryData(characterId, inventoryDataOld);
+                    inventoryData = GetInventoryDataV2FromV1(characterId, inventoryDataOld);
                 }
             }
             else
             {
                 // todo: zzz v0.6 - remove this fall-back
-                filePath = Paths.GetCharacterSavePath(username);
+                filePath = Paths.GetCharacterSavePath(characterId);
                 if (!System.IO.File.Exists(filePath))
                 {
                     return new InventoryData();
@@ -109,12 +103,12 @@ namespace FullPotential.Core.Persistence.Local
 
                 var loadJsonOld = System.IO.File.ReadAllText(filePath);
                 var playerDataOld = JsonUtility.FromJson<PlayerDataOld>(loadJsonOld);
-                inventoryData = GetInventoryData(characterId, playerDataOld.Inventory);
+                inventoryData = GetInventoryDataV2FromV1(characterId, playerDataOld.Inventory);
             }
 
             if (reduced)
             {
-                var equippedItemIds = inventoryData.EquippedItems.Select(x => x.Key);
+                var equippedItemIds = inventoryData.EquippedItems.Select(x => x.Value);
                 inventoryData.Items = inventoryData.Items.Where(x => equippedItemIds.Contains(x.Id)).ToList();
             }
 
@@ -123,7 +117,14 @@ namespace FullPotential.Core.Persistence.Local
             return inventoryData;
         }
 
-        private InventoryData GetInventoryData(string characterId, InventoryDataOld inventoryDataOld)
+        public async UniTask<List<ItemData>> GetInventoryItemDataAsync(string characterId, IEnumerable<string> itemIds)
+        {
+            var everything = await GetInventoryDataAsync(characterId, false);
+
+            return everything.Items.Where(x => itemIds.Contains(x.Id)).ToList();
+        }
+
+        private InventoryData GetInventoryDataV2FromV1(string characterId, InventoryDataOld inventoryDataOld)
         {
             var allItems = Enumerable.Empty<ItemBase>()
                  .UnionIfNotNull(inventoryDataOld.Accessories)
@@ -138,6 +139,7 @@ namespace FullPotential.Core.Persistence.Local
             inventoryData.CharacterId = characterId;
             inventoryData.Items = allItems.Select(x => _itemFactory.GetDataFromItem(characterId, x)).ToList();
             inventoryData.EquippedItems = inventoryDataOld.EquippedItems.ToDictionary(x => x.Key, x => x.Value);
+            inventoryData.IsDirty = true;
             return inventoryData;
         }
     }
