@@ -8,5 +8,7 @@ namespace FullPotential.Api.Items
         ItemBase GetItemFromData(ItemData model);
 
         ItemData GetDataFromItem(string characterId, ItemBase item);
+
+        void FillTypesFromIds(ItemBase item);
     }
 }

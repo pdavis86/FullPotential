@@ -45,7 +45,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
         {
             base.OnNetworkSpawn();
 
-            TriggerResourceValueUpdate(ResourceTypeIds.HealthId, 0, 100);
+            TriggerResourceValueUpdate(ResourceTypeIds.HealthId, 0, 100, false);
             UpdateUiHealthAndDefenceValues();
         }
 

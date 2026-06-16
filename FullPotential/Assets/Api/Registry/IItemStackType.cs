@@ -1,6 +1,6 @@
-﻿namespace FullPotential.Api.Gameplay.Inventory
+﻿namespace FullPotential.Api.Registry
 {
-    public interface IItemStack
+    public interface IItemStackType : IRegisterableType
     {
         public int MaxStackSize { get; }
 

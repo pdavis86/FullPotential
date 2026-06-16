@@ -36,7 +36,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
     {
         public const string SlotChangeEventId = "9c7972de-4136-4825-aaa3-11925ad049ee";
 
-        // todo: remove _itemIdToShapeMapping
+        // todo: fix itemIdToShapeMapping UI
         protected readonly Dictionary<string, string> _itemIdToShapeMapping = new Dictionary<string, string>();
 
         // ReSharper disable InconsistentNaming
@@ -46,6 +46,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected IRpcService _rpcService;
         protected IEventBus _eventBus;
         protected ISaveManager _saveManager;
+        protected IDataLoader _dataLoader;
 
         protected bool _isDirty;
         protected LivingEntityBase _livingEntity;
@@ -67,6 +68,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
             _eventBus = DependenciesContext.Dependencies.GetService<IEventBus>();
             _saveManager = DependenciesContext.Dependencies.GetService<ISaveManager>();
+            _dataLoader = DependenciesContext.Dependencies.GetService<IDataLoader>();
 
             _livingEntity = GetComponent<LivingEntityBase>();
 
@@ -80,7 +82,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ClientRpc]
         public void ApplyChangesClientRpc(InventoryChangesForClient changes, ClientRpcParams clientRpcParams)
         {
-            // todo: ApplyChangesClientRpc
+            ApplyChangesOnClientAsync(changes).Forget();
         }
 
         public void LoadInventory(InventoryData inventoryData)
@@ -94,7 +96,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (inventoryData.EquippedItems != null)
             {
-                ApplyEquippedItemChanges(inventoryData.EquippedItems);
+                foreach (var kvp in inventoryData.EquippedItems)
+                {
+                    TriggerSlotChangeEvent(kvp.Value, kvp.Key);
+                }
+            }
+
+            if (inventoryData.IsDirty)
+            {
+                MarkAsDirtyAndAddToQueue();
             }
 
             _hasInventoryLoaded = true;
@@ -122,18 +132,25 @@ namespace FullPotential.Api.Gameplay.Behaviours
             //    return false;
             //}
 
-            var allItems = changes.Items.Select(x => _itemFactory.GetItemFromData(x));
-            var itemStacks = allItems.Where(x => typeof(IItemStack).IsAssignableFrom(x.GetType()));
-            var nonItemStacks = allItems.Where(x => !typeof(IItemStack).IsAssignableFrom(x.GetType()));
+            var allItems = changes.Items
+                .Where(x => !x.IsDeleted)
+                .Select(x => _itemFactory.GetItemFromData(x));
 
-            var itemsToAdd = new List<ItemBase>();
+            var itemStacks = allItems.Where(x => typeof(ItemStackBase).IsAssignableFrom(x.GetType()));
+            var nonItemStacks = allItems.Where(x => !typeof(ItemStackBase).IsAssignableFrom(x.GetType()));
+
+            var itemsAdded = new List<ItemBase>();
 
             foreach (var itemStack in itemStacks.Select(x => (ItemStackBase)x))
             {
                 var newStack = MergeItemStacks(itemStack);
                 if (newStack != null)
                 {
-                    itemsToAdd.Add(newStack);
+                    itemsAdded.Add(newStack);
+                }
+                else
+                {
+                    itemsAdded.Add(itemStack);
                 }
             }
 
@@ -146,13 +163,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 else
                 {
                     _items.Add(item.Id, item);
-                    itemsToAdd.Add(item);
+                    itemsAdded.Add(item);
                 }
             }
 
-            // todo: fire an event instead TriggerInventoryChangedEvent
+            // todo: zzz v0.6 - fire an event instead - TriggerInventoryChangedEvent
             NotifyOfItemsRemoved(itemsRemoved);
-            NotifyOfItemsAdded(itemsToAdd);
+            NotifyOfItemsAdded(itemsAdded);
             ApplyEquippedItemChanges(changes.EquippedItems);
 
             return true;
@@ -245,12 +262,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 .Sum(i => i.Count);
         }
 
-        public bool IsInventoryFull()
-        {
-            // todo: return _items.Count >= _maxItemCount;
-            return false;
-        }
-
         public List<CombatItemBase> GetComponentsFromIds(string[] componentIds)
         {
             //Check that the components are actually in the player's inventory and load them in the order they are given
@@ -275,7 +286,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var components = GetComponentsFromIds(componentIds);
 
-            // todo: move these into type definitions
+            // todo: zzz v0.6 - move these into type definitions
             var errors = new List<string>();
             if (itemToCraft is Consumer consumerItem)
             {
@@ -479,16 +490,31 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected void MarkAsDirtyAndAddToQueue()
         {
-            if (!IsServer || !_hasInventoryLoaded || IsDirty)
+            if (!IsServer || !_hasInventoryLoaded || _isDirty)
             {
                 return;
             }
 
             // todo: zzz v0.6 - set debug log level
-            Debug.Log($"Marking inventory as dirty for '{_characterId}'");
+            //Debug.Log($"Marking inventory as dirty for '{_characterId}'");
 
             _isDirty = true;
             _saveManager.AddToQueue(_characterId, this);
+        }
+
+        private async UniTask ApplyChangesOnClientAsync(InventoryChangesForClient changesForClient)
+        {
+            var changes = new InventoryData
+            {
+                Items = await _dataLoader.GetInventoryItemDataAsync(_characterId, changesForClient.IdsToFetch)
+            };
+
+            foreach (var idToDelete in changesForClient.IdsToDelete)
+            {
+                changes.Items.Add(new ItemData { Id = idToDelete, IsDeleted = true });
+            }
+
+            ApplyInventoryChanges(changes);
         }
     }
 }

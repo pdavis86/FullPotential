@@ -50,7 +50,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             if (NetworkManager.Singleton.IsServer && !isBarrierEquipped)
             {
-                eventArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, 0, 0);
+                eventArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, 0, 0, false);
             }
 
             return UniTask.CompletedTask;

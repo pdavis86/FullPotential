@@ -59,7 +59,6 @@ namespace FullPotential.Api.Obsolete.Items.Types
             return sb.ToString().Trim();
         }
 
-        // todo: should define min and max slots at slot type creation
         public static string GetSlotId(string typeId, int index)
         {
             return $"{typeId};{index}";

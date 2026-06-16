@@ -1,4 +1,6 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Collections.Generic;
+
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Models.GameManagement;
 using FullPotential.Models.Player;
@@ -11,6 +13,8 @@ namespace FullPotential.Api.Data
 
         UniTask SaveCharacterDataAsync(CharacterData playerData);
 
-        UniTask SaveInventoryDataAsync(InventoryData inventoryChanges);
+        UniTask SaveInventoryDataAsync(InventoryData inventoryData);
+
+        UniTask<List<ItemData>> SaveInventoryAdditionsAndDeletionsAsync(string characterId, List<ItemData> newItems);
     }
 }

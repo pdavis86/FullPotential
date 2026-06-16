@@ -136,15 +136,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region ClientRpc calls
 
-        // ReSharper disable once UnusedParameter.Local
-        //[ClientRpc]
-        // todo: replace - private void ReloadFinishedClientRpc(string slotId, ClientRpcParams clientRpcParams)
-        //{
-        //    //todo: zzz v0.6 - Use an event instead
-        //    var slotStatus = GetSlotStatus(isLeftHand);
-        //    slotStatus.IsBusy = false;
-        //}
-
         //// ReSharper disable once UnusedParameter.Local
         //[ClientRpc]
         // todo: replace - private void StopActiveConsumerBehaviourClientRpc(string slotId, ClientRpcParams clientRpcParams)
@@ -378,17 +369,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var slotStatus = GetSlotStatus(slotId);
 
-            if (slotStatus.StopActiveConsumerBehaviour())
-            {
-                return;
-            }
-
-            if (consumer.ChargePercentage < 100)
+            if (consumer.ChargePercentage < 100 || slotStatus.StopActiveConsumerBehaviour())
             {
                 slotStatus.StopChargeUpLoop();
                 slotStatus.StartCooldownLoopAsync(consumer).Forget();
                 return;
             }
+
+            slotStatus.StartCooldownLoopAsync(consumer).Forget();
 
             if (!ConsumeResource(consumer, isTest: true))
             {
@@ -399,8 +387,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 slotStatus.IsConsumingResource = true;
             }
-
-            consumer.ChargePercentage = 0;
 
             if (!IsServer)
             {
@@ -510,8 +496,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var equippedWeapon = fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
 
             equippedWeapon.UpdateAmmo(equippedWeapon.Ammo - eventArgs.AmmoUsed);
-
-            // todo: is there a bug where logging out then back in restores my ammo?
+            equippedWeapon.IsDirty = true;
 
             return UniTask.CompletedTask;
         }
@@ -527,7 +512,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            slotStatus.StartChargeUpLoopAsync(weaponInHand).Forget();
+            slotStatus.StartCooldownLoopAsync(weaponInHand).Forget();
 
             if (!IsServer)
             {
@@ -547,7 +532,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (slowDrain)
             {
-                // todo: trait-based resource cost?
+                // todo: zzz v0.8 - trait-based resource cost?
                 resourceCost = (int)Math.Ceiling(resourceCost / 10f) + 1;
             }
 
@@ -560,7 +545,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (!isTest)
             {
-                TriggerResourceValueUpdate(resourceTypeId, -resourceCost);
+                TriggerResourceValueUpdate(resourceTypeId, -resourceCost, true);
             }
 
             return true;

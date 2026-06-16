@@ -89,21 +89,29 @@ namespace FullPotential.Core.GameManagement
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
         }
 
+        // ReSharper disable once Unity.IncorrectMethodSignature
         // ReSharper disable once UnusedMember.Local
 #pragma warning disable UNT0006
         private async UniTask OnEnable()
         {
-            _signinUsername.text = _username;
-
-            // Comment out 'LastSigninToken = null' when not debugging
-            //_gameSettings.LastSigninToken = null;
+            // todo: When debugging, set isTestingLocally to true
+            var isTestingLocally = false;
+            if (isTestingLocally)
+            {
+                _gameSettings.LastSigninUsername = null;
+                _gameSettings.LastSigninToken = null;
+            }
+            else
+            {
+                _signinUsername.text = _gameSettings.LastSigninUsername;
+            }
 
             if (string.IsNullOrWhiteSpace(_gameSettings.LastSigninToken))
             {
                 _gameDetailsContainer.SetActive(false);
                 _signInContainer.SetActive(true);
 
-                if (_signinUsername != null)
+                if (!_gameSettings.LastSigninUsername.IsNullOrWhiteSpace())
                 {
                     _signinPassword.Select();
                 }
@@ -323,6 +331,9 @@ namespace FullPotential.Core.GameManagement
         {
             GameManager.Instance.LocalGameDataStore.SignInResult = null;
 
+            _gameDetailsError.gameObject.SetActive(false);
+            _signinError.gameObject.SetActive(false);
+
             _gameDetailsContainer.SetActive(false);
             _signInContainer.SetActive(true);
 
@@ -386,6 +397,7 @@ namespace FullPotential.Core.GameManagement
             }
 
             GameManager.Instance.LocalGameDataStore.HasDisconnected = false;
+            GameManager.Instance.LocalGameDataStore.DisconnectReason = null;
             GameManager.Instance.ServerGameDataStore.ClientIdToConnectionPayload.Clear();
 
             _networkManager.StartHost();
@@ -410,6 +422,7 @@ namespace FullPotential.Core.GameManagement
             SetNetworkAddressAndPort();
 
             GameManager.Instance.LocalGameDataStore.HasDisconnected = false;
+            GameManager.Instance.LocalGameDataStore.DisconnectReason = null;
 
             _joinAttempt = DateTime.UtcNow;
             _networkManager.StartClient();

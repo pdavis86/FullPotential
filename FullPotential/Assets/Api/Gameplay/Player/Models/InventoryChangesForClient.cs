@@ -13,13 +13,13 @@ namespace FullPotential.Api.Gameplay.Player.Models
         
         public string[] IdsToDelete;
 
-        public string[] ChangedSlotsIds;
+        //public string[] ChangedSlotsIds;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeStringArray(ref IdsToFetch);
             serializer.SerializeStringArray(ref IdsToDelete);
-            serializer.SerializeStringArray(ref ChangedSlotsIds);
+            //serializer.SerializeStringArray(ref ChangedSlotsIds);
         }
     }
 }

@@ -48,35 +48,41 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         public void EquipItemServerRpc(string itemId, string slotId)
         {
-            var item = _items[itemId];
-            HandleSlotChange(item, slotId);
-
-            MarkAsDirtyAndAddToQueue();
-
-            // todo: fix equipping items
-            //var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-            //HandleEquippedItemsChangeClientRpc(GetEquippedItemsArray(), nearbyClients);
+            EquipItemAsync(itemId, slotId).Forget();
         }
 
         #endregion
 
-        #region RPC Calls
+        [ClientRpc]
+        public void EquipItemClientRpc(string itemId, string slotId, ClientRpcParams clientRpcParams)
+        {
+            EquipItemAsync(itemId, slotId).Forget();
+        }
 
-        // todo: use ApplyInventoryChangesClientRpc instead
-        // ReSharper disable once UnusedParameter.Global
-        //[ClientRpc]
-        //protected void HandleEquippedItemsChangeClientRpc(SerializableKeyValuePair<string, string>[] equippedItems, ClientRpcParams clientRpcParams)
-        //{
-        //    var equippedItemsDict = new Dictionary<string, string>();
-        //    foreach (var kvp in equippedItems)
-        //    {
-        //        equippedItemsDict[kvp.Key] = kvp.Value;
-        //    }
+        private async UniTask EquipItemAsync(string itemId, string slotId)
+        {
+            ItemBase item;
+            if (!_items.ContainsKey(itemId))
+            {
+                var itemData = (await _dataLoader.GetInventoryItemDataAsync(_characterId, new[] { itemId }))[0];
+                item = _itemFactory.GetItemFromData(itemData);
+                _items.Add(item.Id, item);
+            }
+            else
+            {
+                item = _items[itemId];
+            }
 
-        //    ApplyEquippedItemChanges(equippedItemsDict);
-        //}
+            HandleSlotChange(item, slotId);
 
-        #endregion
+            if (IsServer)
+            {
+                MarkAsDirtyAndAddToQueue();
+
+                var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, 0);
+                EquipItemClientRpc(itemId, slotId, nearbyClients);
+            }
+        }
 
         // todo: zzz v0.6 - This should be an event
         private async UniTask ResetEquipmentUiAsync()
@@ -155,10 +161,7 @@ namespace FullPotential.Core.Player
                         return;
                     }
 
-                    _equippedItems.Add(slotId, new EquippedItem
-                    {
-                        Item = item
-                    });
+                    _equippedItems.Add(slotId, new EquippedItem { Item = item });
                 }
 
                 SpawnEquippedObject(item, slotId);
@@ -200,7 +203,7 @@ namespace FullPotential.Core.Player
 
                 case 1:
                     var alert1Text = _localizer.Translate("ui.alert.itemadded");
-                    _playerFighter.ShowAlertForItemsAddedToInventory(string.Format(alert1Text, itemsAdded.First().Name));
+                    _playerFighter.ShowAlertForItemsAddedToInventory(string.Format(alert1Text, itemsAdded.First().GetName(_localizer)));
                     break;
 
                 default:
@@ -220,6 +223,11 @@ namespace FullPotential.Core.Player
         protected override void NotifyOfItemsRemoved(IEnumerable<ItemBase> itemsRemoved)
         {
             var countRemoved = itemsRemoved.Count(x => x is not ItemStackBase);
+
+            if (countRemoved == 0)
+            {
+                return;
+            }
 
             _playerFighter.AlertOfInventoryRemovals(countRemoved);
 
@@ -316,6 +324,12 @@ namespace FullPotential.Core.Player
                     break;
 
                 case Consumer consumer:
+                    if (consumer.ResourceType.ItemInHandDefaultPrefab == null)
+                    {
+                        Debug.LogWarning($"No default prefab exists for resource type '{_localizer.Translate(consumer.ResourceType)}'");
+                        return;
+                    }
+
                     _typeRegistry.LoadAddessable<GameObject>(
                         consumer.ResourceType.ItemInHandDefaultPrefab,
                         prefab =>
@@ -500,7 +514,7 @@ namespace FullPotential.Core.Player
         {
             GameManager.Instance.CheckIsAdmin();
 
-            // todo: FillTypesFromIds(item);
+            _itemFactory.FillTypesFromIds(item);
             _items.Add(item.Id, item);
 
             MarkAsDirtyAndAddToQueue();

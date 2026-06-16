@@ -315,15 +315,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
             UpdateUiHealthAndDefenceValues();
         }
 
-        public void TriggerResourceValueUpdate(string typeId, int oldValue, int newValue)
+        public void TriggerResourceValueUpdate(string typeId, int oldValue, int newValue, bool isSelfInflicted)
         {
-            TriggerResourceValueUpdate(typeId, newValue - oldValue);
+            TriggerResourceValueUpdate(typeId, newValue - oldValue, isSelfInflicted);
         }
 
-        public void TriggerResourceValueUpdate(string typeId, int change)
+        public void TriggerResourceValueUpdate(string typeId, int change, bool isSelfInflicted)
         {
             var currentValue = ClampResourceValue(typeId, GetResourceValue(typeId));
-            var eventArgs = new ResourceValueChangedEventArgs(this, typeId, currentValue + change, change);
+            var eventArgs = new ResourceValueChangedEventArgs(this, typeId, currentValue + change, change, isSelfInflicted);
             _eventBus.PublishAsync(ResourceValueChangeEventId, eventArgs).Forget();
         }
 
@@ -333,28 +333,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return UniTask.CompletedTask;
         }
 
-        // todo: remove debugging
-        //private string GetResourceTypeName(string resourceTypeId)
-        //{
-        //    switch (resourceTypeId)
-        //    {
-        //        case ResourceTypeIds.HealthId: return "Health";
-        //        case ResourceTypeIds.StaminaId: return "Stamina";
-        //        case "378443ee-7942-4cd5-977d-818ee03333e9": return "Mana";
-        //        case "89ec3ecf-badb-4e55-91b0-b288ca358010": return "Energy";
-        //        case "9f026e17-d313-4402-9da6-c5b002e26c64": return "Barrier charge";
-        //        default: return "Unknown";
-        //    }
-        //}
-
         internal void UpdateResourceValue(string typeId, int newValue)
         {
             newValue = ClampResourceValue(typeId, newValue);
 
-            // todo: remove debugging
+            // todo: zzz v0.6 - set debug log level
             //var locationName = IsServer ? "Server" : "Client";
-            //var typeName = GetResourceTypeName(typeId);
-            //Debug.Log($"{locationName}-{OwnerClientId}: '{typeName}' changed from {_resourceValueCache[typeId]} to {newValue}");
+            //var registeredType = _typeRegistry.GetRegisteredByTypeId<IResourceType>(typeId);
+            //Debug.Log($"{locationName}-{OwnerClientId}: '{_localizer.Translate(registeredType)}' changed from {_resourceValueCache[typeId]} to {newValue}");
 
             _resourceValueCache[typeId] = newValue;
 
@@ -371,7 +357,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var resourceKeys = _resourceValueCache.Keys.ToList();
             foreach (var resourceTypeId in resourceKeys)
             {
-                TriggerResourceValueUpdate(resourceTypeId, GetResourceValue(resourceTypeId), GetResourceMax(resourceTypeId));
+                TriggerResourceValueUpdate(resourceTypeId, GetResourceValue(resourceTypeId), GetResourceMax(resourceTypeId), false);
             }
         }
 
@@ -422,7 +408,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 var staminaCost = GetStaminaCost();
                 if (staminaValue >= staminaCost)
                 {
-                    TriggerResourceValueUpdate(ResourceTypeIds.StaminaId, -staminaCost / 2);
+                    TriggerResourceValueUpdate(ResourceTypeIds.StaminaId, -staminaCost / 2, true);
                 }
             });
         }
@@ -531,7 +517,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ShowHealthChangeToSourceFighter(_fighterWhoMovedMeLast, contactPoint.point, healthChange, false);
             }
 
-            TriggerResourceValueUpdate(ResourceTypeIds.HealthId, healthChange);
+            TriggerResourceValueUpdate(ResourceTypeIds.HealthId, healthChange, false);
         }
 
         #endregion
@@ -688,7 +674,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            TriggerResourceValueUpdate(resourceEffect.ResourceTypeIdString, combatResult.Change);
+            TriggerResourceValueUpdate(resourceEffect.ResourceTypeIdString, combatResult.Change, false);
             AddOrUpdateEffect(resourceEffect, combatResult.Change, DateTime.Now.AddSeconds(SingleResourceChangeEffectDisplaySeconds));
         }
 
@@ -697,7 +683,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var expiry = DateTime.Now.AddSeconds(itemUsed.GetEffectDuration());
 
             var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, resourceEffect, this);
-            TriggerResourceValueUpdate(resourceEffect.ResourceTypeIdString, combatResult.Change);
+            TriggerResourceValueUpdate(resourceEffect.ResourceTypeIdString, combatResult.Change, false);
             AddOrUpdateEffect(resourceEffect, combatResult.Change, expiry);
         }
 

@@ -31,11 +31,10 @@ namespace FullPotential.Core.Persistence
             if (!NetworkManager.Singleton.IsServer)
             {
                 Debug.LogWarning("Tried saving when not on the server");
-                return;
             }
 
             // todo: zzz v0.6 - set debug log level
-            Debug.Log($"Adding '{saveable.GetType().Name}' to save queue for '{characterId}'");
+            //Debug.Log($"Adding '{saveable.GetType().Name}' to save queue for '{characterId}'");
 
             if (!_queue.ContainsKey(characterId))
             {
@@ -54,11 +53,10 @@ namespace FullPotential.Core.Persistence
             if (!NetworkManager.Singleton.IsServer)
             {
                 Debug.LogWarning("Tried saving when not on the server");
-                return;
             }
 
             // todo: zzz v0.6 - set debug log level
-            Debug.Log($"Processing save queue for '{characterId}'");
+            //Debug.Log($"Processing save queue for '{characterId}'");
 
             var tasks = GetUniTasksForCharacterId(characterId);
 
@@ -72,7 +70,6 @@ namespace FullPotential.Core.Persistence
             if (!NetworkManager.Singleton.IsServer)
             {
                 Debug.LogWarning("Tried saving when not on the server");
-                return;
             }
 
             if (_isProcessingQueue)
@@ -83,12 +80,13 @@ namespace FullPotential.Core.Persistence
 
             if (_queue.Count == 0)
             {
-                Debug.Log("Nothing in the save queue");
+                // todo: zzz v0.6 - set debug log level
+                //Debug.Log("Nothing in the save queue");
                 return;
             }
 
             // todo: zzz v0.6 - set debug log level
-            Debug.Log("Processing save queue");
+            //Debug.Log("Processing save queue");
 
             _isProcessingQueue = true;
 
@@ -120,12 +118,13 @@ namespace FullPotential.Core.Persistence
         {
             if (!saveable.IsDirty)
             {
-                Debug.LogWarning($"Did not save '{saveable.GetType().Name}' for user '{characterId}' because it was not dirty");
+                // todo: zzz v0.6 - set debug log level
+                //Debug.Log($"Did not save '{saveable.GetType().Name}' for user '{characterId}' because it was not dirty");
                 return;
             }
 
             // todo: zzz v0.6 - set debug log level
-            Debug.Log($"Saving type '{saveable.GetType().Name}' for user {characterId}");
+            //Debug.Log($"Saving type '{saveable.GetType().Name}' for user {characterId}");
 
             try
             {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FullPotential.Api.Data;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Obsolete;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.GameManagement.Data;
 using FullPotential.Core.Player;
@@ -143,9 +144,9 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void SavePlayerSettings()
         {
-            var playerSettings = new Dictionary<string, string>
+            var playerSettings = new List<SerializableKeyValuePair<string, string>>
             {
-                { CharacterSettingKey.TextureUrl, _skinUrlInput.text }
+               new SerializableKeyValuePair<string, string>(CharacterSettingKey.TextureUrl, _skinUrlInput.text)
             };
 
             var playerState = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerFighter>();

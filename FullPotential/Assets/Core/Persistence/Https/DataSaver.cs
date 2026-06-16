@@ -1,4 +1,5 @@
-﻿using System.Net.Mime;
+﻿using System.Collections.Generic;
+using System.Net.Mime;
 
 using Cysharp.Threading.Tasks;
 
@@ -65,6 +66,12 @@ namespace FullPotential.Core.Persistence.Https
                     LogFailure(request);
                 }
             }
+        }
+
+        public UniTask<List<ItemData>> SaveInventoryAdditionsAndDeletionsAsync(string characterId, List<ItemData> newItems)
+        {
+            // todo: SaveInventoryAdditionsAndDeletionsAsync()
+            throw new System.NotImplementedException();
         }
     }
 }

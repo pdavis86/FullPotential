@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using Cysharp.Threading.Tasks;
 
@@ -10,7 +11,6 @@ using FullPotential.Models.Utilities;
 
 using Newtonsoft.Json.Linq;
 
-using UnityEngine;
 using UnityEngine.Networking;
 
 namespace FullPotential.Core.Persistence.Https
@@ -101,6 +101,12 @@ namespace FullPotential.Core.Persistence.Https
 
                 return inventoryData;
             }
+        }
+
+        public UniTask<List<ItemData>> GetInventoryItemDataAsync(string characterId, IEnumerable<string> itemIds)
+        {
+            // todo: GetInventoryItemDataAsync()
+            throw new NotImplementedException();
         }
     }
 }

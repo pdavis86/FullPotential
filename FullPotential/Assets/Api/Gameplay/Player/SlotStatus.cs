@@ -60,6 +60,7 @@ namespace FullPotential.Api.Gameplay.Player
                 item.ChargePercentage = (int)(elapsedSeconds / secondsToTake * 100);
             }
 
+            // todo: zzz v0.6 - set debug log level
             //Debug.Log($"Charged in: {sw.ElapsedMilliseconds}ms and should have taken {secondsUntilDone}s");
         }
 
@@ -139,13 +140,13 @@ namespace FullPotential.Api.Gameplay.Player
 
         public bool StopActiveConsumerBehaviour()
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("StopActiveConsumerBehaviour");
-
             if (!IsConsumingResource)
             {
                 return false;
             }
+
+            // todo: zzz v0.6 - set debug log level
+            //Debug.Log("StopActiveConsumerBehaviour");
 
             var activeConsumer = Fighter.Inventory.GetItemInSlot<Consumer>(SlotId);
 
@@ -156,6 +157,7 @@ namespace FullPotential.Api.Gameplay.Player
             return true;
         }
 
+        // todo: zzz v0.6 - Default handlers should not be in other classes and should be in Core
         public static async UniTask DefaultHandlerForReloadEventAsync(ReloadEventArgs eventArgs)
         {
             // todo: zzz v0.6 - set debug log level

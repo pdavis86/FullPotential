@@ -455,6 +455,11 @@
       "Value": "Barrier"
     },
 	
+    {
+      "Key": "resourcetype.barrierchargeresource",
+      "Value": "Barrier Charge"
+    },
+	
 	
 	{
       "Key": "noweaponreloader",
