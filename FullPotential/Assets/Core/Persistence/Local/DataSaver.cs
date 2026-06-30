@@ -61,6 +61,12 @@ namespace FullPotential.Core.Persistence.Local
                 inventoryData.EquippedItems = currentData.EquippedItems;
             }
 
+            var slotIdsToDelete = inventoryData.EquippedItems.Where(x => x.Value == null).Select(x => x.Key).ToList();
+            foreach (var slotId in slotIdsToDelete)
+            {
+                inventoryData.EquippedItems.Remove(slotId);
+            }
+
             var filePath = Paths.GetInventorySavePath(inventoryData.CharacterId);
             var saveJson = inventoryData.ToJson();
             System.IO.File.WriteAllText(filePath, saveJson);

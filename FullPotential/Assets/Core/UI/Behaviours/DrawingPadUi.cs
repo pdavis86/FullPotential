@@ -203,13 +203,18 @@ namespace FullPotential.Core.UI.Behaviours
             ClearMarkers();
 
             var finalShape = string.Join("-", _drawnShapes);
-
-            OnDrawingStop?.Invoke(this, new OnDrawingStopEventArgs(_eventSource, finalShape, _itemId, _slotId));
-
             _drawnShapes.Clear();
-            _eventSource = null;
-            _itemId = null;
-            _slotId = null;
+
+            try
+            {
+                OnDrawingStop?.Invoke(this, new OnDrawingStopEventArgs(_eventSource, finalShape, _itemId, _slotId));
+            }
+            finally
+            {
+                _eventSource = null;
+                _itemId = null;
+                _slotId = null;
+            }
         }
 
         private void UpdateMesh()

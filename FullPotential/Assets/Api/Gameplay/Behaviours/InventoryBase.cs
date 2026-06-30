@@ -36,9 +36,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
     {
         public const string SlotChangeEventId = "9c7972de-4136-4825-aaa3-11925ad049ee";
 
-        // todo: fix itemIdToShapeMapping UI
-        protected readonly Dictionary<string, string> _itemIdToShapeMapping = new Dictionary<string, string>();
-
         // ReSharper disable InconsistentNaming
         protected IItemFactory _itemFactory;
         protected ITypeRegistry _typeRegistry;
@@ -85,7 +82,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             ApplyChangesOnClientAsync(changes).Forget();
         }
 
-        public void LoadInventory(InventoryData inventoryData)
+        public virtual void LoadInventory(InventoryData inventoryData)
         {
             _characterId = inventoryData.CharacterId;
 
@@ -384,57 +381,19 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return null;
         }
 
-        protected (bool WasEquipped, List<string> SlotsToSend) HandleSlotChange(ItemBase item, string slotId)
+        protected void HandleSlotChange(ItemBase item, string slotId)
         {
-            var slotsToSend = new List<string> { slotId };
-
             var previousKvp = _equippedItems
                 .FirstOrDefault(x => x.Value.Item != null && x.Value?.Item.Id == item.Id);
 
             var previousSlotId = previousKvp.Value != null ? previousKvp.Key : null;
 
-            if (!previousSlotId.IsNullOrWhiteSpace())
+            if (!previousSlotId.IsNullOrWhiteSpace() && previousSlotId != slotId)
             {
-                if (previousSlotId != slotId)
-                {
-                    slotsToSend.Add(previousSlotId);
-                }
-
-                _equippedItems[previousSlotId!].Item = null;
-
-                TriggerSlotChangeEvent(null, slotId);
+                TriggerSlotChangeEvent(null, previousSlotId);
             }
 
-            var wasEquipped = false;
-            if (previousSlotId.IsNullOrWhiteSpace() || previousSlotId != slotId)
-            {
-                TriggerSlotChangeEvent(item.Id, slotId);
-                wasEquipped = true;
-            }
-
-            if (slotId == HandSlotIds.LeftHand || slotId == HandSlotIds.RightHand)
-            {
-                var otherHandSlotId = slotId == HandSlotIds.LeftHand
-                    ? HandSlotIds.RightHand
-                    : HandSlotIds.LeftHand;
-
-                if (item is Weapon weapon && weapon.IsTwoHanded)
-                {
-                    TriggerSlotChangeEvent(null, otherHandSlotId);
-                    slotsToSend.Add(otherHandSlotId);
-                }
-                else
-                {
-                    var itemInOtherHand = GetItemInSlot(otherHandSlotId);
-                    if (itemInOtherHand is Weapon otherWeapon && otherWeapon.IsTwoHanded)
-                    {
-                        TriggerSlotChangeEvent(null, otherHandSlotId);
-                        slotsToSend.Add(otherHandSlotId);
-                    }
-                }
-            }
-
-            return (wasEquipped, slotsToSend);
+            TriggerSlotChangeEvent(item.Id, slotId);
         }
 
         protected void TriggerSlotChangeEvent(string itemId, string slotId)
