@@ -27,6 +27,7 @@ namespace FullPotential.Api.Obsolete.Items.Base
         public Attributes Attributes;
         public string[] EffectIds;
         public bool IsTwoHanded;
+        public string ShapeCode;
 
         private List<IEffectType> _effects;
         public List<IEffectType> Effects

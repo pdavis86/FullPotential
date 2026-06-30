@@ -165,6 +165,11 @@ namespace FullPotential.Api.Items
                 throw new Exception("Unexpected type");
             }
 
+            if (item is CombatItemBase combatItem)
+            {
+                combatItem.ShapeCode = GetStringProperty(model, nameof(CombatItemBase.ShapeCode));
+            }
+
             FillAttributeDictionary(model, item);
             FillPropertyDictionary(model, item);
             FillTypesFromIds(item);
@@ -259,6 +264,7 @@ namespace FullPotential.Api.Items
                 itemData.Properties = new Dictionary<string, string>
                 {
                     { nameof(CombatItemBase.IsTwoHanded), combatItem.IsTwoHanded.ToString() },
+                    { nameof(CombatItemBase.ShapeCode), combatItem.ShapeCode },
                 };
             }
 

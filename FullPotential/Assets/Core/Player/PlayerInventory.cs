@@ -10,6 +10,7 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items.Base;
+using FullPotential.Api.Obsolete.Items.Base;
 using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Ui;
@@ -17,6 +18,7 @@ using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
+using FullPotential.Models.Player;
 
 using Unity.Netcode;
 
@@ -29,6 +31,8 @@ namespace FullPotential.Core.Player
     // todo: zzz v0.6 - aim to make this class redundant
     public class PlayerInventory : InventoryBase, IPlayerInventory
     {
+        protected Dictionary<string, CombatItemBase> _combatItemsWithShape;
+
         private PlayerFighter _playerFighter;
 
         #region Unity Events Handlers
@@ -127,6 +131,15 @@ namespace FullPotential.Core.Player
             return matches
                 .Select(x => x.Value)
                 .OrderBy(x => x.Name);
+        }
+
+        public override void LoadInventory(InventoryData inventoryData)
+        {
+            base.LoadInventory(inventoryData);
+
+            _combatItemsWithShape = _items
+                .Where(x => x.Value is CombatItemBase combatItem && combatItem.ShapeCode != null)
+                .ToDictionary(x => x.Key, x => (CombatItemBase)x.Value);
         }
 
         protected override void ApplyEquippedItemChange(string itemId, string slotId)
@@ -522,29 +535,37 @@ namespace FullPotential.Core.Player
 
         public string GetAssignedShape(string itemId)
         {
-            if (!_itemIdToShapeMapping.ContainsKey(itemId))
+            if (!_combatItemsWithShape.ContainsKey(itemId))
             {
                 return null;
             }
 
-            return _itemIdToShapeMapping[itemId];
+            return _combatItemsWithShape[itemId].ShapeCode;
         }
 
-        public bool SetAssignedShape(string itemId, string shape)
+        public bool SetAssignedShape(string itemId, string shapeCode)
         {
-            if (shape.IsNullOrWhiteSpace())
+            if (shapeCode.IsNullOrWhiteSpace())
             {
-                _itemIdToShapeMapping.Remove(itemId);
+                _combatItemsWithShape[itemId].ShapeCode = null;
+                _combatItemsWithShape[itemId].IsDirty = true;
+                _combatItemsWithShape.Remove(itemId);
                 return true;
             }
 
-            var conflict = _itemIdToShapeMapping.Any(x => x.Key != itemId && x.Value == shape);
+            var conflict = _combatItemsWithShape.Any(x => x.Key != itemId && x.Value.ShapeCode == shapeCode);
             if (conflict)
             {
                 return false;
             }
 
-            _itemIdToShapeMapping[itemId] = shape;
+            if (!_combatItemsWithShape.ContainsKey(itemId))
+            {
+                _combatItemsWithShape.Add(itemId, (CombatItemBase)_items[itemId]);
+            }
+
+            _combatItemsWithShape[itemId].ShapeCode = shapeCode;
+            _combatItemsWithShape[itemId].IsDirty = true;
             return true;
         }
 
@@ -552,8 +573,8 @@ namespace FullPotential.Core.Player
         {
             var comparisonShapeCode = GetShapeCodeWithoutLengths(shapeCode);
 
-            var match = _itemIdToShapeMapping
-                .FirstOrDefault(x => GetShapeCodeWithoutLengths(x.Value) == comparisonShapeCode);
+            var match = _combatItemsWithShape
+                .FirstOrDefault(x => GetShapeCodeWithoutLengths(x.Value.ShapeCode) == comparisonShapeCode);
 
             if (match.Key.IsNullOrWhiteSpace())
             {
