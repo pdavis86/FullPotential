@@ -213,7 +213,7 @@ namespace FullPotential.Core.Player
 
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.StopDrawing(HandSlotIds.LeftHand);
+                _drawingPadUi.StopDrawing();
             }
             else
             {
@@ -251,7 +251,7 @@ namespace FullPotential.Core.Player
 
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
-                _drawingPadUi.StopDrawing(HandSlotIds.RightHand);
+                _drawingPadUi.StopDrawing();
             }
             else
             {
@@ -302,6 +302,8 @@ namespace FullPotential.Core.Player
             var playerNetworkObject = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject;
 
             Interactable interactable = null;
+
+            // ReSharper disable once Unity.PreferNonAllocApi
             var collidersInRange = Physics.OverlapSphere(playerNetworkObject.transform.position, searchRadius);
             foreach (var colliderNearby in collidersInRange)
             {
@@ -419,8 +421,10 @@ namespace FullPotential.Core.Player
             var offsetZ = (float)_random.Next(-9, 10) / 100;
             var adjustedPosition = position + new Vector3(offsetX, offsetY, offsetZ);
 
-            var hit = Instantiate(_hitTextPrefab);
-            hit.transform.SetParent(GameManager.Instance.UserInterface.HitNumberContainer.transform, false);
+            var hit = Instantiate(
+                _hitTextPrefab,
+                GameManager.Instance.UserInterface.HitNumberContainer.transform,
+                false);
 
             var hitText = hit.GetComponent<TextMeshProUGUI>();
 

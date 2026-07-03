@@ -3,6 +3,8 @@
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Obsolete.Items.Types;
 
+// ReSharper disable UnusedMember.Global
+
 namespace FullPotential.Api.Obsolete
 {
     [Serializable]

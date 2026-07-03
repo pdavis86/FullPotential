@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 
 using Cysharp.Threading.Tasks;
@@ -81,7 +80,6 @@ namespace FullPotential.Core.Player
 
         #region Properties
 
-        [HideInInspector]
         public string TextureUrl
         {
             get
@@ -96,7 +94,6 @@ namespace FullPotential.Core.Player
         }
 
         private string _characterId;
-        [HideInInspector]
         public string CharacterId
         {
             get => _characterId;
@@ -104,7 +101,6 @@ namespace FullPotential.Core.Player
         }
 
         private string _username;
-        [HideInInspector]
         public string Username
         {
             get => _username;
@@ -302,6 +298,7 @@ namespace FullPotential.Core.Player
 
                     var bodyMaterialForRespawn = _bodyMeshRenderer.material;
                     _shaderUtilities.ChangeRenderMode(bodyMaterialForRespawn, ShaderRenderMode.Fade);
+                    // ReSharper disable once Unity.PreferAddressByIdToGraphicsParams
                     bodyMaterialForRespawn.SetColor("_BaseColor", new Color(1f, 1f, 1f, 0.2f));
                     ApplyMaterial(bodyMaterialForRespawn);
 
@@ -318,7 +315,7 @@ namespace FullPotential.Core.Player
 
         // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        public void NowOkToQuitClientRpc(bool isDisconnecting, ClientRpcParams clientRpcParams)
+        private void NowOkToQuitClientRpc(bool isDisconnecting, ClientRpcParams clientRpcParams)
         {
             NowOkToQuitAsync(isDisconnecting).Forget();
         }

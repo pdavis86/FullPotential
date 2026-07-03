@@ -85,10 +85,10 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
                 Items = new List<ItemData>() { _itemFactory.GetDataFromItem(equippedWeapon.CharacterId, newItemStack) }
             });
 
-            //if (addedToInventory)
-            //{
-            //    //todo: zzz v0.9 - take money for ammo ItemStack
-            //}
+            if (addedToInventory)
+            {
+                //todo: zzz v0.9 - take money for ammo ItemStack
+            }
 
             return UniTask.CompletedTask;
         }

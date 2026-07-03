@@ -6,7 +6,6 @@ using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Gameplay.Player.Models;

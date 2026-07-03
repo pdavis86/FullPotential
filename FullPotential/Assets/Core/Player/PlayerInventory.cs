@@ -31,8 +31,7 @@ namespace FullPotential.Core.Player
     // todo: zzz v0.6 - aim to make this class redundant
     public class PlayerInventory : InventoryBase, IPlayerInventory
     {
-        protected Dictionary<string, CombatItemBase> _combatItemsWithShape;
-
+        private Dictionary<string, CombatItemBase> _combatItemsWithShape;
         private PlayerFighter _playerFighter;
 
         #region Unity Events Handlers
@@ -57,8 +56,9 @@ namespace FullPotential.Core.Player
 
         #endregion
 
+        // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
-        public void EquipItemClientRpc(string itemId, string slotId, ClientRpcParams clientRpcParams)
+        private void EquipItemClientRpc(string itemId, string slotId, ClientRpcParams clientRpcParams)
         {
             EquipItemAsync(itemId, slotId).Forget();
         }

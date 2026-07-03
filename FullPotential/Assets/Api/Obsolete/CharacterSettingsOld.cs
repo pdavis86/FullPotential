@@ -1,4 +1,7 @@
-﻿namespace FullPotential.Api.Obsolete
+﻿
+// ReSharper disable UnusedMember.Global
+
+namespace FullPotential.Api.Obsolete
 {
     public class CharacterSettingsOld
     {

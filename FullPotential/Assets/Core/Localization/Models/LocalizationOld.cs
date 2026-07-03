@@ -5,7 +5,7 @@ using FullPotential.Api.Obsolete;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnassignedField.Global
 
-namespace FullPotential.Core.Localization.Data
+namespace FullPotential.Core.Localization.Models
 {
     // todo: zzz v0.6 - kill LocalizationOld
     [Serializable]

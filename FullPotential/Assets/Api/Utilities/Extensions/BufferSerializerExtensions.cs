@@ -7,7 +7,7 @@ namespace FullPotential.Api.Utilities.Extensions
         public static void SerializeStringArray<T>(this BufferSerializer<T> serializer, ref string[] array)
             where T : IReaderWriter
         {
-            int length = array?.Length ?? 0;
+            var length = array?.Length ?? 0;
             serializer.SerializeValue(ref length);
 
             if (serializer.IsReader)
@@ -15,7 +15,12 @@ namespace FullPotential.Api.Utilities.Extensions
                 array = new string[length];
             }
 
-            for (int i = 0; i < length; i++)
+            if (array == null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < length; i++)
             {
                 serializer.SerializeValue(ref array[i]);
             }

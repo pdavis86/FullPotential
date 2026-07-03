@@ -136,15 +136,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region ClientRpc calls
 
-        //// ReSharper disable once UnusedParameter.Local
-        //[ClientRpc]
-        // todo: replace - private void StopActiveConsumerBehaviourClientRpc(string slotId, ClientRpcParams clientRpcParams)
-        //{
-        //    //todo: zzz v0.6 - Use an event instead
-        //    var slotStatus = GetSlotStatus(isLeftHand);
-        //    StopActiveConsumerBehaviour(slotStatus);
-        //}
-
         [ClientRpc]
         public void ApplyMovementForceClientRpc(Vector3 force, ForceMode forceMode, ClientRpcParams clientRpcParams)
         {

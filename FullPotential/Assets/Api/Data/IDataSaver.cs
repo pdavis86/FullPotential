@@ -5,6 +5,8 @@ using Cysharp.Threading.Tasks;
 using FullPotential.Models.GameManagement;
 using FullPotential.Models.Player;
 
+// ReSharper disable UnusedMember.Global
+
 namespace FullPotential.Api.Data
 {
     public interface IDataSaver

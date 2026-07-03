@@ -62,12 +62,12 @@ namespace FullPotential.Standard.SpecialGear.Reloader
                 case HandSlotIds.LeftHand:
                 case HandSlotIds.RightHand:
                     AddOrRemoveHandIcon(eventArgs.Inventory, eventArgs.SlotId, reloaderEquipped);
-                    return UniTask.CompletedTask;
+                    break;
 
                 case RangedWeaponReloaderSlot.TypeIdString:
                     AddOrRemoveHandIcon(eventArgs.Inventory, HandSlotIds.LeftHand, reloaderEquipped);
                     AddOrRemoveHandIcon(eventArgs.Inventory, HandSlotIds.RightHand, reloaderEquipped);
-                    return UniTask.CompletedTask;
+                    break;
             }
 
             return UniTask.CompletedTask;
