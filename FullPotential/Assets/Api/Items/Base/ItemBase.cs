@@ -21,10 +21,6 @@ namespace FullPotential.Api.Items.Base
 
         public Dictionary<string, string> PropertyDictionary { get; } = new Dictionary<string, string>();
 
-        public List<string> EffectIdEnumerable { get; } = new List<string>();
-
-        public bool IsDeleted { get; set; }
-
         public bool IsDirty { get; set; }
 
         private IRegisterableType _registryType;

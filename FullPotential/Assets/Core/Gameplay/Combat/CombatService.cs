@@ -143,7 +143,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     return;
 
                 case IAttributeEffect attributeEffect:
-                    ApplyAttributeEffect(sourceFighter, itemUsed, attributeEffect, targetFighter, position);
+                    ApplyAttributeEffect(sourceFighter, itemUsed, attributeEffect, targetFighter);
                     return;
 
                 default:
@@ -295,7 +295,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 case EffectActionType.TemporaryMaxDecrease:
                 case EffectActionType.TemporaryMaxIncrease:
-                    targetFighter.ApplyTemporaryMaxActionToResource(sourceFighter, itemUsed, resourceEffect, position);
+                    targetFighter.ApplyTemporaryMaxActionToResource(sourceFighter, itemUsed, resourceEffect);
                     return;
 
                 default:
@@ -304,11 +304,11 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private void ApplyAttributeEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IAttributeEffect attributeEffect, FighterBase targetFighter, Vector3? position)
+        private void ApplyAttributeEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IAttributeEffect attributeEffect, FighterBase targetFighter)
         {
             var expiry = DateTime.Now.AddSeconds(itemUsed.GetEffectDuration());
             var attributeCombatResult = GetCombatResult(sourceFighter, itemUsed, attributeEffect, targetFighter);
-            targetFighter.AddAttributeModifier(attributeEffect, attributeCombatResult.Change, expiry, position);
+            targetFighter.AddAttributeModifier(attributeEffect, attributeCombatResult.Change, expiry);
         }
 
         private void ApplyMaintainDistance(FighterBase sourceFighter, CombatItemBase itemUsed, GameObject targetGameObject)

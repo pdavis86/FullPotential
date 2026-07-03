@@ -41,6 +41,7 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
 
             if (Arguments != null && Arguments.Any())
             {
+                // ReSharper disable once CoVariantArrayConversion
                 _textComponent.text = string.Format(baseTranslation, Arguments);
             }
             else

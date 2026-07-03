@@ -94,6 +94,9 @@ namespace FullPotential.Core.GameManagement
 #pragma warning disable UNT0006
         private async UniTask OnEnable()
         {
+            // ReSharper disable HeuristicUnreachableCode
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+
             // todo: When debugging, set isTestingLocally to true
             var isTestingLocally = false;
             if (isTestingLocally)
@@ -293,8 +296,8 @@ namespace FullPotential.Core.GameManagement
 
             GameManager.Instance.LocalGameDataStore.SignInResult = signInResult;
 
-            _gameSettings.LastSigninUsername = signInResult?.Username;
-            _gameSettings.LastSigninToken = signInResult?.Token;
+            _gameSettings.LastSigninUsername = signInResult.Value.Username;
+            _gameSettings.LastSigninToken = signInResult.Value.Token;
             _settingsRepository.Save(_gameSettings);
 
             _signingInMessage.SetActive(false);

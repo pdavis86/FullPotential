@@ -13,7 +13,7 @@ using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
-
+using FullPotential.Core.Localization.Models;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -70,7 +70,7 @@ namespace FullPotential.Core.Localization
             _typeDictionary.Add(interfaceType, interfaceType.Name.Substring(1).ToLower());
         }
 
-        private async Task<Data.LocalizationOld> LoadCultureFileAsync(string address)
+        private async Task<LocalizationOld> LoadCultureFileAsync(string address)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace FullPotential.Core.Localization
                 var loadTask = Addressables.LoadAssetAsync<TextAsset>(address).Task;
                 await loadTask;
 
-                var data = JsonUtility.FromJson<Data.LocalizationOld>(loadTask.Result.text);
+                var data = JsonUtility.FromJson<LocalizationOld>(loadTask.Result.text);
 
                 Addressables.Release(loadTask.Result);
 
@@ -98,7 +98,7 @@ namespace FullPotential.Core.Localization
             }
         }
 
-        private void ExtractTranslations(Data.LocalizationOld data, string address)
+        private void ExtractTranslations(LocalizationOld data, string address)
         {
             if (data.Translations == null)
             {

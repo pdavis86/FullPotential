@@ -628,7 +628,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Effect-related methods
 
-        public void AddAttributeModifier(IAttributeEffect attributeEffect, int change, DateTime expiry, Vector3? position)
+        public void AddAttributeModifier(IAttributeEffect attributeEffect, int change, DateTime expiry)
         {
             AddOrUpdateEffect(attributeEffect, change, expiry);
         }
@@ -678,7 +678,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             AddOrUpdateEffect(resourceEffect, combatResult.Change, DateTime.Now.AddSeconds(SingleResourceChangeEffectDisplaySeconds));
         }
 
-        public void ApplyTemporaryMaxActionToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position)
+        public void ApplyTemporaryMaxActionToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect)
         {
             var expiry = DateTime.Now.AddSeconds(itemUsed.GetEffectDuration());
 

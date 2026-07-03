@@ -144,9 +144,6 @@ namespace FullPotential.Core.Gameplay.Crafting
                                 case EffectActionType.SingleDecrease:
                                 case EffectActionType.TemporaryMaxDecrease:
                                     return debuff;
-
-                                default:
-                                    return other;
                             }
                         }
 

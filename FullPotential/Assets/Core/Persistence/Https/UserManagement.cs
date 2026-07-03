@@ -48,6 +48,11 @@ namespace FullPotential.Core.Persistence.Https
 
                 var userData = ((JObject)response.Result).ToObject<UserData>();
 
+                if (userData == null)
+                {
+                    return new SignInResult { IsInvalid = true };
+                }
+
                 Username = username;
                 Token = userData.Token;
 
@@ -87,6 +92,11 @@ namespace FullPotential.Core.Persistence.Https
                 }
 
                 var userData = ((JObject)response.Result).ToObject<UserData>();
+
+                if (userData == null)
+                {
+                    return new SignInResult { IsInvalid = true };
+                }
 
                 Username = username;
                 Token = userData.Token;

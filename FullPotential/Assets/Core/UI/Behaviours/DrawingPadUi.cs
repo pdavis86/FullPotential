@@ -175,7 +175,7 @@ namespace FullPotential.Core.UI.Behaviours
             CheckForShape(rawMousePosition);
         }
 
-        public void StopDrawing(string slotId)
+        public void StopDrawing()
         {
             _isDrawing = false;
 

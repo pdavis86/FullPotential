@@ -11,7 +11,8 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
 #pragma warning restore 0649
 
         // ReSharper disable once UnusedMember.Local
-        private void OnTriggerEnter()
+        // ReSharper disable once UnusedParameter.Local
+        private void OnTriggerEnter(Collider other)
         {
             Destroy(_gameObjectToDestroy);
         }
