@@ -20,6 +20,9 @@ using UnityEngine;
 
 // ReSharper disable MemberCanBePrivate.Global
 
+// todo: zzz v0.6 - Break this up e.g. combat, equipment, etc.
+// todo: zzz v0.6 - Only use ClientRpc methods for non-state situations (otherwise network varaibles)
+
 namespace FullPotential.Api.Gameplay.Behaviours
 {
     public abstract class FighterBase : LivingEntityBase, IMoveable
@@ -139,6 +142,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ClientRpc]
         public void ApplyMovementForceClientRpc(Vector3 force, ForceMode forceMode, ClientRpcParams clientRpcParams)
         {
+            // todo: zzz v0.6 - Apply position changes on client rather than forces
             var targetRigidBody = GetComponent<Rigidbody>();
             targetRigidBody.AddForce(force, forceMode);
         }
@@ -159,7 +163,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             var itemInSlot = Inventory.GetItemInSlot(slotId);
 
-            if (itemInSlot is not Weapon)
+            if (itemInSlot is not Weapon weapon)
+            {
+                return false;
+            }
+
+            var ammoInInventory = Inventory.GetItemStackTotal(weapon.WeaponType.AmmunitionTypeIdString);
+
+            if (ammoInInventory == 0)
             {
                 return false;
             }
