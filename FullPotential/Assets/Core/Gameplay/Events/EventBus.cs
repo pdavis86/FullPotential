@@ -18,6 +18,9 @@ namespace FullPotential.Core.Gameplay.Events
     {
         private readonly Dictionary<string, IEventHandlerGroup> _subscriptions = new Dictionary<string, IEventHandlerGroup>();
 
+        // todo: zzz v0.6 - Have another look at being able to do _eventBus.Publish(new WeaponReloadedEvent(...));
+        // todo: zzz v0.6 - Use `readonly record struct ThingyId(string Id);` instead of string everywhere
+
         internal void Register<TArgs>(string eventId, Func<TArgs, UniTask> defaultHandlerAsync)
             where TArgs : IEventHandlerArgs
         {

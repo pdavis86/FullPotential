@@ -178,6 +178,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ClientRpc]
         private void UpdateHealthValueClientRpc(int newValue, ClientRpcParams clientRpcParams)
         {
+            // todo: zzz v0.6 - Does not work for clients joining mid-battle
             UpdateResourceValue(ResourceTypeIds.HealthId, newValue);
         }
 
@@ -185,8 +186,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ClientRpc]
         private void AddOrUpdateEffectClientRpc(string effectTypeId, int change, DateTime expiry, ClientRpcParams clientRpcParams)
         {
-            //Debug.Log("AddOrUpdateEffectClientRpc called with typeId: " + effectTypeId);
-
+            // todo: zzz v0.6 - Does not work for clients joining mid-battle
             var effect = _typeRegistry.GetRegisteredByTypeId<IEffectType>(effectTypeId);
             AddOrUpdateEffect(effect, change, expiry);
         }
@@ -195,6 +195,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ClientRpc]
         protected void ShowHudAlertClientRpc(string announcement, ClientRpcParams clientRpcParams)
         {
+            // todo: zzz v0.6 - Use events instead of ShowHudAlertClientRpc
             if (announcement.IsNullOrWhiteSpace())
             {
                 return;
@@ -307,6 +308,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected void SetResourceInitialValues(Dictionary<string, int> values)
         {
+            // todo: zzz v0.6 - These should come from the server
+         
             foreach (var kvp in values)
             {
                 _resourceValueCache[kvp.Key] = ClampResourceValue(kvp.Key, kvp.Value);
