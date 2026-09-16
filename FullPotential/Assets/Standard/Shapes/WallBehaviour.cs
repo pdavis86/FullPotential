@@ -3,6 +3,7 @@ using System.Linq;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Shapes;
@@ -21,6 +22,7 @@ namespace FullPotential.Standard.Shapes
     {
         private readonly NetworkVariable<FixedString4096Bytes> _visualsPrefabAddress = new NetworkVariable<FixedString4096Bytes>();
 
+        private IAuditor _logger;
         private ICombatService _combatService;
         private ITypeRegistry _typeRegistry;
 
@@ -36,6 +38,7 @@ namespace FullPotential.Standard.Shapes
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
+            _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
             _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
 
@@ -52,7 +55,7 @@ namespace FullPotential.Standard.Shapes
 
             if (Consumer == null)
             {
-                Debug.LogError("No Consumer has been set");
+                _logger.Error("No Consumer has been set");
                 Destroy(gameObject);
                 return;
             }
@@ -102,7 +105,7 @@ namespace FullPotential.Standard.Shapes
         {
             if (_visualsPrefabAddress.Value.ToString().IsNullOrWhiteSpace())
             {
-                Debug.LogError("Cannot spawn visuals as no prefab address was provided");
+                _logger.Error("Cannot spawn visuals as no prefab address was provided");
                 return;
             }
 

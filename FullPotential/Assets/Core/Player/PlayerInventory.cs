@@ -172,7 +172,7 @@ namespace FullPotential.Core.Player
                 {
                     if (!IsValidSlotId(slotId))
                     {
-                        Debug.LogWarning($"Invalid slot ID {slotId}");
+                        _logger.Warn($"Invalid slot ID {slotId}");
                         return;
                     }
 
@@ -313,7 +313,7 @@ namespace FullPotential.Core.Player
                     break;
 
                 default:
-                    Debug.LogWarning("Not yet implemented equipping for slot " + slotId);
+                    _logger.Warn("Not yet implemented equipping for slot " + slotId);
                     break;
             }
         }
@@ -322,7 +322,7 @@ namespace FullPotential.Core.Player
         {
             if (!NetworkManager.Singleton.IsClient)
             {
-                Debug.LogError("Tried to spawn a GameObject on a server");
+                _logger.Error("Tried to spawn a GameObject on a server");
                 return;
             }
 
@@ -341,7 +341,7 @@ namespace FullPotential.Core.Player
                 case Consumer consumer:
                     if (consumer.ResourceType.ItemInHandDefaultPrefab == null)
                     {
-                        Debug.LogWarning($"No default prefab exists for resource type '{_localizer.Translate(consumer.ResourceType)}'");
+                        _logger.Warn($"No default prefab exists for resource type '{_localizer.Translate(consumer.ResourceType)}'");
                         return;
                     }
 
@@ -358,7 +358,7 @@ namespace FullPotential.Core.Player
                     break;
 
                 default:
-                    Debug.LogWarning($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name}");
+                    _logger.Warn($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name}");
                     break;
             }
         }
@@ -425,7 +425,7 @@ namespace FullPotential.Core.Player
 
             if (item is not Accessory accessoryItem)
             {
-                Debug.LogError("Item is not an accessory");
+                _logger.Error("Item is not an accessory");
                 return;
             }
 
@@ -473,7 +473,7 @@ namespace FullPotential.Core.Player
 
             if (item is not Armor armorItem)
             {
-                Debug.LogError("Item is not armor");
+                _logger.Error("Item is not armor");
                 return;
             }
 
@@ -502,7 +502,7 @@ namespace FullPotential.Core.Player
         {
             if (item is not SpecialGear specialGearItem)
             {
-                Debug.LogError("Item is not special gear");
+                _logger.Error("Item is not special gear");
                 return;
             }
 

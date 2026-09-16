@@ -1,6 +1,7 @@
 ﻿using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
@@ -23,6 +24,7 @@ namespace FullPotential.Core.UI.Behaviours
 #pragma warning restore 0649
 
         //Services
+        private IAuditor _logger;
         private ILocalizer _localizer;
 
         private PlayerFighter _playerFighter;
@@ -32,6 +34,7 @@ namespace FullPotential.Core.UI.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
+            _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
 
             _playerFighter = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerFighter>();
@@ -51,6 +54,7 @@ namespace FullPotential.Core.UI.Behaviours
         private void LoadInventory()
         {
             InventoryItemsList.LoadInventoryItems(
+                _logger,
                 null,
                 _componentsContainer,
                 _inventoryRowPrefab,

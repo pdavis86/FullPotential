@@ -7,8 +7,10 @@ using Cysharp.Threading.Tasks;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Player;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Ui;
@@ -75,12 +77,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             base.Awake();
 
-            var leftSlotStatus = new SlotStatus(this, HandSlotIds.LeftHand);
+            // todo: Should slots be up to the mod instead of Core?
+
+            var leftSlotStatus = new SlotStatus(_logger, this, HandSlotIds.LeftHand);
             _slotStatuses.Add(HandSlotIds.LeftHand, leftSlotStatus);
             _reloadArgsLeft = new ReloadEventArgs(this, HandSlotIds.LeftHand);
             _shotFiredArgsLeft = new ShotFiredEventArgs(this, HandSlotIds.LeftHand);
 
-            var rightSlotStatus = new SlotStatus(this, HandSlotIds.RightHand);
+            var rightSlotStatus = new SlotStatus(_logger, this, HandSlotIds.RightHand);
             _slotStatuses.Add(HandSlotIds.RightHand, rightSlotStatus);
             _reloadArgsRight = new ReloadEventArgs(this, HandSlotIds.RightHand);
             _shotFiredArgsRight = new ShotFiredEventArgs(this, HandSlotIds.RightHand);
@@ -258,7 +262,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (item is not IHasCharge itemWithCharge || !itemWithCharge.IsChargePercentageUsed)
             {
-                //Debug.LogWarning("Trying to attack hold an item that is not compatible");
+                //_logger.Warn("Trying to attack hold an item that is not compatible");
                 return;
             }
 
@@ -322,7 +326,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     break;
 
                 default:
-                    Debug.LogWarning("Not implemented attack for " + itemInHand.Name + " yet");
+                    _logger.Warn("Not implemented attack for " + itemInHand.Name + " yet");
                     return;
             }
 

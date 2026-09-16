@@ -3,6 +3,7 @@
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
@@ -24,6 +25,7 @@ namespace FullPotential.Standard.Targeting
 {
     public class PointToPointBehaviour : NetworkBehaviour, ITargetingBehaviour
     {
+        private IAuditor _logger;
         private ICombatService _combatService;
         private ITypeRegistry _typeRegistry;
         private IRpcService _rpcService;
@@ -47,6 +49,7 @@ namespace FullPotential.Standard.Targeting
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
+            _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
             _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
@@ -105,7 +108,7 @@ namespace FullPotential.Standard.Targeting
             {
                 if (hit.transform.gameObject == SourceFighter.GameObject)
                 {
-                    Debug.LogWarning("Beam is hitting the source player!");
+                    _logger.Warn("Beam is hitting the source player!");
                     return;
                 }
 
@@ -144,7 +147,7 @@ namespace FullPotential.Standard.Targeting
         {
             if (_visualsPrefabAddress.Value.ToString().IsNullOrWhiteSpace())
             {
-                Debug.LogError("Cannot spawn visuals as no prefab address was provided");
+                _logger.Error("Cannot spawn visuals as no prefab address was provided");
                 return;
             }
 

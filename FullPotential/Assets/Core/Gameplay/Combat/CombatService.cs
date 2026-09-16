@@ -7,6 +7,7 @@ using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Obsolete.Items.Base;
@@ -35,17 +36,19 @@ namespace FullPotential.Core.Gameplay.Combat
 {
     public class CombatService : ICombatService
     {
-        private readonly System.Random _random = new System.Random();
-
+        private readonly IAuditor _logger;
         private readonly ITypeRegistry _typeRegistry;
         private readonly IRpcService _rpcService;
         private readonly IMovementEffectType _pushEffect;
         private readonly IEffectType _hurtEffect;
+        private readonly System.Random _random = new System.Random();
 
         public CombatService(
+            IAuditorFactory auditorFactory,
             ITypeRegistry typeRegistry,
             IRpcService rpcService)
         {
+            _logger = auditorFactory.Create(this);
             _typeRegistry = typeRegistry;
             _rpcService = rpcService;
 
@@ -61,7 +64,7 @@ namespace FullPotential.Core.Gameplay.Combat
         {
             if (!NetworkManager.Singleton.IsServer)
             {
-                Debug.LogWarning("ApplyEffects was not called on the server");
+                _logger.Warn("ApplyEffects was not called on the server");
                 return;
             }
 
@@ -81,11 +84,11 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 if (!IsEffectAllowed(target, effect))
                 {
-                    //Debug.Log($"Effect {effect.TypeName} is not permitted against target {target}");
+                    //_logger.Debug($"Effect {effect.TypeName} is not permitted against target {target}");
                     continue;
                 }
 
-                //Debug.Log($"Applying effect {effect.TypeName} to {target.name}");
+                //_logger.Debug($"Applying effect {effect.TypeName} to {target.name}");
 
                 ApplyEffect(sourceFighter, itemUsed, effect, target, position);
 
@@ -104,13 +107,13 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 if (target.GetComponent<MaintainDistance>() != null)
                 {
-                    //Debug.Log("Continuing to hold target");
+                    //_logger.Debug("Continuing to hold target");
                     return false;
                 }
 
                 if (target.GetComponent<PlayerFighter>() != null)
                 {
-                    //Debug.Log("Cannot target players");
+                    //_logger.Debug("Cannot target players");
                     return false;
                 }
             }
@@ -130,11 +133,11 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (targetFighter == null)
             {
-                //Debug.LogWarning($"Not applying {effect.TypeName} to {targetGameObject.name} because they are not an FighterBase");
+                //_logger.Warn($"Not applying {effect.TypeName} to {targetGameObject.name} because they are not an FighterBase");
                 return;
             }
 
-            //Debug.Log($"Applying {effect.TypeName} to {targetFighter.FighterName}");
+            //_logger.Debug($"Applying {effect.TypeName} to {targetFighter.FighterName}");
 
             switch (effect)
             {
@@ -147,7 +150,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     return;
 
                 default:
-                    Debug.LogError($"Not implemented handling for effect {effect}");
+                    _logger.Error($"Not implemented handling for effect {effect}");
                     return;
             }
         }
@@ -299,7 +302,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     return;
 
                 default:
-                    Debug.LogError($"Not implemented handling for affect type {resourceEffect.EffectActionType}");
+                    _logger.Error($"Not implemented handling for affect type {resourceEffect.EffectActionType}");
                     return;
             }
         }
@@ -315,7 +318,7 @@ namespace FullPotential.Core.Gameplay.Combat
         {
             if (itemUsed is not Consumer consumer || !consumer.Targeting.IsContinuous)
             {
-                Debug.LogWarning("MaintainDistance has been incorrectly applied to an item");
+                _logger.Warn("MaintainDistance has been incorrectly applied to an item");
                 return;
             }
 
@@ -331,7 +334,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (targetRigidBody == null)
             {
-                //Debug.LogWarning($"Cannot move target '{targetGameObject.name}' as it does not have a RigidBody");
+                //_logger.Warn($"Cannot move target '{targetGameObject.name}' as it does not have a RigidBody");
                 return;
             }
 
@@ -350,7 +353,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (targetGameObject.GetComponent<NetworkObject>() == null)
             {
-                Debug.LogWarning($"Cannot apply a movement effect to target '{targetGameObject.name}' as it does not have a NetworkObject component");
+                _logger.Warn($"Cannot apply a movement effect to target '{targetGameObject.name}' as it does not have a NetworkObject component");
                 return;
             }
 
@@ -358,7 +361,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (targetMoveable == null)
             {
-                Debug.LogWarning($"Cannot apply a movement effect to target '{targetGameObject.name}' as it has no components that implement {nameof(IMoveable)}");
+                _logger.Warn($"Cannot apply a movement effect to target '{targetGameObject.name}' as it has no components that implement {nameof(IMoveable)}");
                 return;
             }
 
@@ -387,7 +390,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
                     if (sourceFighter == null)
                     {
-                        Debug.LogWarning("Attack source not found. Did they sign out?");
+                        _logger.Warn("Attack source not found. Did they sign out?");
                         return;
                     }
 
@@ -406,7 +409,7 @@ namespace FullPotential.Core.Gameplay.Combat
                             forwardsBackwardsDirection = -sourceFighter.RigidBody.transform.forward;
                         }
 
-                        //Debug.Log($"Applying {force} force to {targetGameObject.name}");
+                        //_logger.Debug($"Applying {force} force to {targetGameObject.name}");
 
                         forceToApply = forwardsBackwardsDirection.normalized * force;
                     }
@@ -438,7 +441,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     break;
 
                 default:
-                    Debug.LogError($"Not implemented handling for movement direction {movementEffect.Direction}");
+                    _logger.Error($"Not implemented handling for movement direction {movementEffect.Direction}");
                     return;
             }
 
@@ -480,7 +483,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     targetingBehaviour.Consumer = consumer;
                     targetingBehaviour.Direction = direction;
 
-                    targetingGameObject.NetworkSpawn();
+                    targetingGameObject.NetworkSpawn(_logger);
 
                     if (consumer.Targeting.IsContinuous)
                     {
@@ -533,7 +536,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     shapeBehaviour.Consumer = consumer;
                     shapeBehaviour.Direction = lookDirection;
 
-                    shapeGameObject.NetworkSpawn();
+                    shapeGameObject.NetworkSpawn(_logger);
                 });
         }
     }

@@ -8,6 +8,7 @@ using FullPotential.Api.Data;
 using FullPotential.Api.GameManagement.Models;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities.Extensions;
 
@@ -43,9 +44,11 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable MemberCanBePrivate.Global
         // ReSharper disable UnassignedField.Global
         public GameObject[] TabOrder;
+
         // ReSharper restore UnassignedField.Global
         // ReSharper restore MemberCanBePrivate.Global
 
+        private IAuditor _logger;
         private IDataLoader _dataLoader;
         private IUserManagement _userManagement;
         private ILocalizer _localizer;
@@ -67,6 +70,7 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
+            _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
             _dataLoader = DependenciesContext.Dependencies.GetService<IDataLoader>();
             _userManagement = DependenciesContext.Dependencies.GetService<IUserManagement>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
@@ -361,7 +365,7 @@ namespace FullPotential.Core.GameManagement
 
                 if (!string.IsNullOrWhiteSpace(disconnectReason))
                 {
-                    Debug.LogWarning($"Server refused connection: {disconnectReason}");
+                    _logger.Warn($"Server refused connection: {disconnectReason}");
                     _gameDetailsError.text = disconnectReason;
                 }
                 else
@@ -449,7 +453,7 @@ namespace FullPotential.Core.GameManagement
                 {
                     NetworkManager.Singleton.Shutdown();
 
-                    Debug.LogWarning($"Failed to join game after {timeoutSeconds} seconds");
+                    _logger.Warn($"Failed to join game after {timeoutSeconds} seconds");
 
                     if (!_gameDetailsError.gameObject.activeInHierarchy)
                     {

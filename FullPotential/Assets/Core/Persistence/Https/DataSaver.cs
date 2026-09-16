@@ -4,6 +4,7 @@ using System.Net.Mime;
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Models.GameManagement;
 using FullPotential.Models.Player;
@@ -15,9 +16,12 @@ namespace FullPotential.Core.Persistence.Https
 {
     public class DataSaver : HttpsPersistenceBase, IDataSaver
     {
-        public DataSaver(ISettingsRepository settingsRepository)
+        private readonly IAuditor _logger;
+
+        public DataSaver(IAuditorFactory auditorFactory, ISettingsRepository settingsRepository)
             : base(settingsRepository)
         {
+            _logger = auditorFactory.Create(this);
         }
 
         public async UniTask SaveConnectionDetailsAsync(ConnectionDetails connectionDetails)
@@ -72,6 +76,11 @@ namespace FullPotential.Core.Persistence.Https
         {
             // todo: SaveInventoryAdditionsAndDeletionsAsync()
             throw new System.NotImplementedException();
+        }
+
+        protected override IAuditor GetLogger()
+        {
+            return _logger;
         }
     }
 }

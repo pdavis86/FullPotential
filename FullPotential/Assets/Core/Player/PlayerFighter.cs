@@ -538,7 +538,7 @@ namespace FullPotential.Core.Player
 
                         if (webRequest.downloadHandler.data == null)
                         {
-                            Debug.LogError("Failed to download texture");
+                            _logger.Error("Failed to download texture");
                             return;
                         }
 
@@ -597,7 +597,7 @@ namespace FullPotential.Core.Player
         {
             if (!_unclaimedLoot.ContainsKey(id))
             {
-                Debug.LogError($"Could not find loot with ID {id}");
+                _logger.Error($"Could not find loot with ID {id}");
                 return false;
             }
 
@@ -673,8 +673,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log($"Marking fighter as dirty for '{CharacterId}'");
+            _logger.Debug($"Marking fighter as dirty for '{CharacterId}'");
 
             IsDirty = true;
             _saveManager.AddToQueue(CharacterId, this);

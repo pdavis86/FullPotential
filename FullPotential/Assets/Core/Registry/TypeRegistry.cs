@@ -9,6 +9,7 @@ using System.Text;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
@@ -30,15 +31,17 @@ namespace FullPotential.Core.Registry
 {
     public class TypeRegistry : ITypeRegistry
     {
+        private readonly IAuditor _logger;
+        private readonly IEventBus _eventBus;
         private readonly HashSet<string> _registeredTypeIds = new HashSet<string>();
         private readonly Dictionary<Type, IList> _registeredTypeLists = new Dictionary<Type, IList>();
         private readonly Dictionary<string, object> _loadedAddressables = new Dictionary<string, object>();
-        private readonly IEventBus _eventBus;
         private readonly Func<object, bool>[] _registerTypeFunctions;
         private readonly Func<object, bool>[] _registerVisualsFunctions;
 
-        public TypeRegistry(IEventBus eventBus)
+        public TypeRegistry(IAuditorFactory auditorFactory, IEventBus eventBus)
         {
+            _logger = auditorFactory.Create(this);
             _eventBus = eventBus;
 
             _registerTypeFunctions = new Func<object, bool>[]
@@ -79,7 +82,7 @@ namespace FullPotential.Core.Registry
                 {
                     if (opHandle.Result == null)
                     {
-                        Debug.LogWarning($"Failed to find registration GameObject for Mod '{modPrefix}'");
+                        _logger.Warn($"Failed to find registration GameObject for Mod '{modPrefix}'");
                         return;
                     }
 
@@ -87,7 +90,7 @@ namespace FullPotential.Core.Registry
 
                     if (mod == null)
                     {
-                        Debug.LogWarning($"Failed to find IMod implementation for Mod '{modPrefix}'");
+                        _logger.Warn($"Failed to find IMod implementation for Mod '{modPrefix}'");
                         return;
                     }
 
@@ -131,7 +134,7 @@ namespace FullPotential.Core.Registry
 
                     if (networkObject == null)
                     {
-                        Debug.LogError($"Cannot register {address} as a Network Prefab as it does not have a NetworkObject component");
+                        _logger.Error($"Cannot register {address} as a Network Prefab as it does not have a NetworkObject component");
                         return;
                     }
 
@@ -162,7 +165,7 @@ namespace FullPotential.Core.Registry
             {
                 if (!typeof(IRegisterableType).IsAssignableFrom(type))
                 {
-                    Debug.LogError($"{type.Name} does not implement {nameof(IRegisterableType)}");
+                    _logger.Error($"{type.Name} does not implement {nameof(IRegisterableType)}");
                     return;
                 }
 
@@ -176,11 +179,11 @@ namespace FullPotential.Core.Registry
                     }
                 }
 
-                Debug.LogError($"{type.FullName} does not implement any of the valid interfaces");
+                _logger.Error($"{type.FullName} does not implement any of the valid interfaces");
             }
             catch (Exception ex)
             {
-                Debug.LogError($"{type.FullName} failed to register: " + ex);
+                _logger.Error($"{type.FullName} failed to register: " + ex);
             }
         }
 
@@ -190,7 +193,7 @@ namespace FullPotential.Core.Registry
             {
                 if (!typeof(IItemVisuals).IsAssignableFrom(type))
                 {
-                    Debug.LogError($"{type.Name} does not implement {nameof(IItemVisuals)}");
+                    _logger.Error($"{type.Name} does not implement {nameof(IItemVisuals)}");
                     return;
                 }
 
@@ -199,7 +202,7 @@ namespace FullPotential.Core.Registry
 
                 if (!_registeredTypeIds.Contains(objectAsVisuals.ApplicableToTypeIdString))
                 {
-                    Debug.LogError($"{objectAsVisuals.GetType().FullName} refers to a type that is not registered with ID {objectAsVisuals.ApplicableToTypeIdString}");
+                    _logger.Error($"{objectAsVisuals.GetType().FullName} refers to a type that is not registered with ID {objectAsVisuals.ApplicableToTypeIdString}");
                     return;
                 }
 
@@ -211,11 +214,11 @@ namespace FullPotential.Core.Registry
                     }
                 }
 
-                Debug.LogError($"{type.FullName} does not implement any of the valid {nameof(IItemVisuals)} interfaces");
+                _logger.Error($"{type.FullName} does not implement any of the valid {nameof(IItemVisuals)} interfaces");
             }
             catch (Exception ex)
             {
-                Debug.LogError($"{type.FullName} failed to register: " + ex);
+                _logger.Error($"{type.FullName} failed to register: " + ex);
             }
         }
 
@@ -236,7 +239,7 @@ namespace FullPotential.Core.Registry
             var match = list.Cast<T>().FirstOrDefault(x => x.TypeId == objectAsT.TypeId);
             if (match != null)
             {
-                Debug.LogError($"A type with ID '{objectAsT.TypeId}' has already been registered");
+                _logger.Error($"A type with ID '{objectAsT.TypeId}' has already been registered");
                 return true;
             }
 

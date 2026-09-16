@@ -7,6 +7,7 @@ using Cysharp.Threading.Tasks;
 using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Logging;
 
 using Unity.Netcode;
 
@@ -18,13 +19,15 @@ namespace FullPotential.Core.Persistence
 {
     public class SaveManager : ISaveManager
     {
+        private readonly IAuditor _logger;
         private readonly Dictionary<string, List<ISaveable>> _queue = new Dictionary<string, List<ISaveable>>();
 
         private IDataSaver _dataSaver;
         private bool _isProcessingQueue;
 
-        public SaveManager(IDataSaver dataSaver)
+        public SaveManager(IAuditorFactory auditorFactory, IDataSaver dataSaver)
         {
+            _logger = auditorFactory.Create(this);
             _dataSaver = dataSaver;
         }
 
@@ -32,11 +35,10 @@ namespace FullPotential.Core.Persistence
         {
             if (!NetworkManager.Singleton.IsServer)
             {
-                Debug.LogWarning("Tried saving when not on the server");
+                _logger.Warn("Tried saving when not on the server");
             }
 
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log($"Adding '{saveable.GetType().Name}' to save queue for '{characterId}'");
+            _logger.Debug($"Adding '{saveable.GetType().Name}' to save queue for '{characterId}'");
 
             if (!_queue.ContainsKey(characterId))
             {
@@ -54,11 +56,10 @@ namespace FullPotential.Core.Persistence
         {
             if (!NetworkManager.Singleton.IsServer)
             {
-                Debug.LogWarning("Tried saving when not on the server");
+                _logger.Warn("Tried saving when not on the server");
             }
 
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log($"Processing save queue for '{characterId}'");
+            _logger.Debug($"Processing save queue for '{characterId}'");
 
             var tasks = GetUniTasksForCharacterId(characterId);
 
@@ -71,24 +72,22 @@ namespace FullPotential.Core.Persistence
         {
             if (!NetworkManager.Singleton.IsServer)
             {
-                Debug.LogWarning("Tried saving when not on the server");
+                _logger.Warn("Tried saving when not on the server");
             }
 
             if (_isProcessingQueue)
             {
-                Debug.LogWarning("Already processing the queue");
+                _logger.Warn("Already processing the queue");
                 return;
             }
 
             if (_queue.Count == 0)
             {
-                // todo: zzz v0.6 - set debug log level
-                //Debug.Log("Nothing in the save queue");
+                _logger.Debug("Nothing in the save queue");
                 return;
             }
 
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("Processing save queue");
+            _logger.Debug("Processing save queue");
 
             _isProcessingQueue = true;
 
@@ -120,13 +119,11 @@ namespace FullPotential.Core.Persistence
         {
             if (!saveable.IsDirty)
             {
-                // todo: zzz v0.6 - set debug log level
-                //Debug.Log($"Did not save '{saveable.GetType().Name}' for user '{characterId}' because it was not dirty");
+                _logger.Debug($"Did not save '{saveable.GetType().Name}' for user '{characterId}' because it was not dirty");
                 return;
             }
 
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log($"Saving type '{saveable.GetType().Name}' for user {characterId}");
+            _logger.Debug($"Saving type '{saveable.GetType().Name}' for user {characterId}");
 
             try
             {

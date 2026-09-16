@@ -14,6 +14,7 @@ using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Scenes;
 using FullPotential.Api.Ui;
@@ -54,6 +55,7 @@ namespace FullPotential.Core.GameManagement
         public readonly LocalGameData LocalGameDataStore = new LocalGameData();
 
         //Services
+        private IAuditor _logger;
         private ISettingsRepository _settingsRepository;
         private ISaveManager _saveManager;
         private IUserManagement _userManagement;
@@ -91,6 +93,7 @@ namespace FullPotential.Core.GameManagement
 
             ServiceManager.RegisterServices();
 
+            _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
             _settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
             _saveManager = DependenciesContext.Dependencies.GetService<ISaveManager>();
             _userManagement = DependenciesContext.Dependencies.GetService<IUserManagement>();
@@ -123,8 +126,7 @@ namespace FullPotential.Core.GameManagement
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("Setting up periodic save");
+            _logger.Debug("Setting up periodic save");
 
             _periodicSave = new DelayedAction(15f, () => SaveData(), false);
         }
@@ -157,7 +159,7 @@ namespace FullPotential.Core.GameManagement
 
             if (string.IsNullOrEmpty(connectionPayload.Token))
             {
-                Debug.LogWarning($"User '{connectionPayload.UserId}' tried to connect with an invalid Player token");
+                _logger.Warn($"User '{connectionPayload.UserId}' tried to connect with an invalid Player token");
                 return;
             }
 
@@ -168,7 +170,7 @@ namespace FullPotential.Core.GameManagement
 
                 if (NetworkManager.Singleton.ConnectedClients.ContainsKey(originalClientId))
                 {
-                    Debug.LogWarning($"User '{connectionPayload.UserId}' is already connected");
+                    _logger.Warn($"User '{connectionPayload.UserId}' is already connected");
 
                     approvalResponse.Reason = _localizer.Translate("ui.connect.alreadyconnected");
 
@@ -182,7 +184,7 @@ namespace FullPotential.Core.GameManagement
             var clientVersion = new Version(connectionPayload.GameVersion);
             if (serverVersion.Major != clientVersion.Major || serverVersion.Minor != clientVersion.Minor)
             {
-                Debug.LogWarning("Client tried to connect with an incompatible version");
+                _logger.Warn("Client tried to connect with an incompatible version");
 
                 approvalResponse.Reason = _localizer.Translate("ui.connect.incompatible");
 
@@ -259,8 +261,7 @@ namespace FullPotential.Core.GameManagement
 
         private void SaveData()
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("SaveData() was called");
+            _logger.Debug("SaveData() was called");
 
             _saveManager.ProcessQueueAsync().Forget();
         }
@@ -341,7 +342,7 @@ namespace FullPotential.Core.GameManagement
         {
             if (!NetworkManager.Singleton.IsServer)
             {
-                Debug.LogError("Tried to create a player when not on the server");
+                _logger.Error("Tried to create a player when not on the server");
                 return;
             }
 

@@ -5,6 +5,7 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
@@ -23,6 +24,7 @@ namespace FullPotential.Core.Ui.Components
         public const string AssignedShapeSet = "1";
 
         public static void LoadInventoryItems(
+            IAuditor logger,
             GameObject slot,
             GameObject componentsContainer,
             GameObject rowPrefab,
@@ -47,7 +49,7 @@ namespace FullPotential.Core.Ui.Components
 
             if (!itemsForSlot.Any())
             {
-                Debug.LogWarning("There are no items of the correct type");
+                logger.Warn("There are no items of the correct type");
                 return;
             }
 

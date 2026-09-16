@@ -13,6 +13,7 @@ using FullPotential.Api.Gameplay.Player.Models;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete.Items;
 using FullPotential.Api.Obsolete.Items.Types;
@@ -52,6 +53,7 @@ namespace FullPotential.Core.Player
 #pragma warning restore 0649
 
         //Services
+        private IAuditor _logger;
         private IResultFactory _resultFactory;
         private ILocalizer _localizer;
         private IItemFactory _itemFactory;
@@ -77,6 +79,7 @@ namespace FullPotential.Core.Player
             _playerFighter = GetComponent<PlayerFighter>();
             _playerMovement = GetComponent<PlayerMovement>();
 
+            _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
             _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _itemFactory = DependenciesContext.Dependencies.GetService<IItemFactory>();
@@ -186,8 +189,7 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnAttackDownLeft()
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("OnAttackDownLeft");
+            _logger.Debug("OnAttackDownLeft");
 
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
@@ -199,8 +201,7 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnAttackHoldLeft()
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("OnAttackHoldLeft");
+            _logger.Debug("OnAttackHoldLeft");
 
             HandleAttackHold(HandSlotIds.LeftHand);
         }
@@ -208,8 +209,7 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnAttackReleaseLeft()
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("OnAttackReleaseLeft");
+            _logger.Debug("OnAttackReleaseLeft");
 
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
@@ -224,8 +224,7 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnAttackDownRight()
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("OnAttackDownRight");
+            _logger.Debug("OnAttackDownRight");
 
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
@@ -237,8 +236,7 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnAttackHoldRight()
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("OnAttackHoldRight");
+            _logger.Debug("OnAttackHoldRight");
 
             HandleAttackHold(HandSlotIds.RightHand);
         }
@@ -246,8 +244,7 @@ namespace FullPotential.Core.Player
         // ReSharper disable once UnusedMember.Local
         private void OnAttackReleaseRight()
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("OnAttackReleaseRight");
+            _logger.Debug("OnAttackReleaseRight");
 
             if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
             {
@@ -323,7 +320,7 @@ namespace FullPotential.Core.Player
 
             if (interactable == null)
             {
-                Debug.LogError("Failed to find the interactable with gameObjectName " + gameObjectName);
+                _logger.Error("Failed to find the interactable with gameObjectName " + gameObjectName);
                 return;
             }
 
@@ -343,7 +340,7 @@ namespace FullPotential.Core.Player
 
             if (components.Count != componentIdArray.Length)
             {
-                Debug.LogWarning("Someone tried cheating: One or more IDs provided are not in the inventory");
+                _logger.Warn("Someone tried cheating: One or more IDs provided are not in the inventory");
                 return;
             }
 
@@ -359,7 +356,7 @@ namespace FullPotential.Core.Player
 
             if (_playerFighter.PlayerInventory.ValidateIsCraftable(componentIdArray, craftedItem).Any())
             {
-                Debug.LogWarning("Someone tried cheating: validation was skipped");
+                _logger.Warn("Someone tried cheating: validation was skipped");
                 return;
             }
 
@@ -577,7 +574,7 @@ namespace FullPotential.Core.Player
 
             if (e.SlotId.IsNullOrWhiteSpace())
             {
-                Debug.LogError("No slot was set so cannot equip any item");
+                _logger.Error("No slot was set so cannot equip any item");
                 return;
             }
 

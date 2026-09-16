@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.SpecialGear.Barrier;
@@ -15,6 +16,8 @@ namespace FullPotential.Standard.Resources
         private static readonly Guid Id = new Guid(TypeIdString);
         private static readonly Color ResourceColor = Color.FromArgb(185, 36, 158); // Purple
 
+        private readonly IAuditor _logger;
+
         public Guid TypeId => Id;
 
         public Color Color => ResourceColor;
@@ -25,6 +28,11 @@ namespace FullPotential.Standard.Resources
 
         public Action<LivingEntityBase> ReplenishBehaviour => PerformReplenish;
 
+        public BarrierChargeResource(IAuditorFactory auditorFactory)
+        {
+            _logger = auditorFactory.Create(this);
+        }
+
         private void PerformReplenish(LivingEntityBase livingEntity)
         {
             if (livingEntity.GetResourceValue(TypeIdString) >= livingEntity.GetResourceMax(TypeIdString))
@@ -34,7 +42,7 @@ namespace FullPotential.Standard.Resources
 
             if (livingEntity is not FighterBase targetFighter)
             {
-                UnityEngine.Debug.LogError("LivingEntity was not a fighter. Cannot replenish barrier resource");
+                _logger.Error("LivingEntity was not a fighter. Cannot replenish barrier resource");
                 return;
             }
 

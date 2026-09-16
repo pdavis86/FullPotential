@@ -4,6 +4,7 @@ using System.Linq;
 
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Items.Base;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Obsolete.Items.Base;
 using FullPotential.Api.Obsolete.Items.Types;
@@ -23,6 +24,8 @@ namespace FullPotential.Api.Items
 {
     public class ItemFactory : IItemFactory
     {
+        private readonly IAuditor _logger;
+
         private ITypeRegistry _typeRegistry;
 
         private List<string> _lootTypeIds;
@@ -32,8 +35,9 @@ namespace FullPotential.Api.Items
         private List<string> _ammunitionTypeIds;
         private List<string> _specialTypeIds;
 
-        public ItemFactory(ITypeRegistry typeRegistry)
+        public ItemFactory(IAuditorFactory auditorFactory, ITypeRegistry typeRegistry)
         {
+            _logger = auditorFactory.Create(this);
             _typeRegistry = typeRegistry;
         }
 
@@ -326,7 +330,7 @@ namespace FullPotential.Api.Items
 
                 if (itemType == null)
                 {
-                    Debug.LogError($"No registry type found for '{item.GetType().Name}'");
+                    _logger.Error($"No registry type found for '{item.GetType().Name}'");
                     return;
                 }
 

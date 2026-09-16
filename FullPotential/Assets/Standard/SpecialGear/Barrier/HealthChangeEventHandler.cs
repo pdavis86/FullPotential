@@ -44,7 +44,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             if (barrierCharge <= 0)
             {
-                //Debug.Log("Barrier depleted. Taking full damage");
+                //_logger.Debug("Barrier depleted. Taking full damage");
                 return UniTask.CompletedTask;
             }
 
@@ -54,12 +54,12 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             if (barrierCharge < Math.Abs(eventArgs.Change))
             {
-                //Debug.Log("Barrier nearly depleted. Taking partial damage");
+                //_logger.Debug("Barrier nearly depleted. Taking partial damage");
                 eventArgs.Change += barrierCharge;
                 return UniTask.CompletedTask;
             }
 
-            //Debug.Log("Barrier OK. Taking no damage");
+            //_logger.Debug("Barrier OK. Taking no damage");
             eventArgs.IsDefaultHandlerCancelled = true;
 
             return UniTask.CompletedTask;

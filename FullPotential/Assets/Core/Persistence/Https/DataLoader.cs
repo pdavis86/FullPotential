@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Models.GameManagement;
 using FullPotential.Models.Player;
@@ -17,9 +18,12 @@ namespace FullPotential.Core.Persistence.Https
 {
     public class DataLoader : HttpsPersistenceBase, IDataLoader
     {
-        public DataLoader(ISettingsRepository settingsRepository)
+        private readonly IAuditor _logger;
+
+        public DataLoader(IAuditorFactory auditorFactory, ISettingsRepository settingsRepository)
             : base(settingsRepository)
         {
+            _logger = auditorFactory.Create(this);
         }
 
         public async UniTask<ConnectionDetails> GetConnectionDetailsAsync()
@@ -107,6 +111,11 @@ namespace FullPotential.Core.Persistence.Https
         {
             // todo: GetInventoryItemDataAsync()
             throw new NotImplementedException();
+        }
+
+        protected override IAuditor GetLogger()
+        {
+            return _logger;
         }
     }
 }

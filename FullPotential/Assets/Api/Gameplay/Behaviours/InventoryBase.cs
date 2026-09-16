@@ -13,6 +13,7 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete.Items.Base;
 using FullPotential.Api.Obsolete.Items.Types;
@@ -36,6 +37,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public const string SlotChangeEventId = "9c7972de-4136-4825-aaa3-11925ad049ee";
 
         // ReSharper disable InconsistentNaming
+        protected IAuditor _logger;
         protected IItemFactory _itemFactory;
         protected ITypeRegistry _typeRegistry;
         protected ILocalizer _localizer;
@@ -58,6 +60,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected virtual void Awake()
         {
+            _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
             _itemFactory = DependenciesContext.Dependencies.GetService<IItemFactory>();
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
@@ -113,7 +116,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (!_items.ContainsKey(item.Id))
                 {
-                    Debug.LogWarning($"Could not remove item with ID {item.Id}. Was this admin crafting?");
+                    _logger.Warn($"Could not remove item with ID {item.Id}. Was this admin crafting?");
                     continue;
                 }
 
@@ -177,7 +180,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (errorIfNotFound)
                 {
-                    Debug.LogError($"Could not find the item with {identifierName} '{id}'");
+                    _logger.Error($"Could not find the item with {identifierName} '{id}'");
                 }
                 return null;
             }
@@ -322,7 +325,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             if (!IsServer)
             {
-                Debug.LogError("MergeItemStacks called client-side");
+                _logger.Error("MergeItemStacks called client-side");
                 return null;
             }
 
@@ -453,8 +456,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log($"Marking inventory as dirty for '{_characterId}'");
+            _logger.Debug($"Marking inventory as dirty for '{_characterId}'");
 
             _isDirty = true;
             _saveManager.AddToQueue(_characterId, this);

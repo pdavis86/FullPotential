@@ -6,6 +6,7 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Obsolete.Items.Base;
 using FullPotential.Api.Obsolete.Items.Types;
@@ -41,6 +42,7 @@ namespace FullPotential.Core.UI.Behaviours
         [SerializeField] private InputField _itemNameInputField;
 #pragma warning restore 0649
 
+        private IAuditor _logger;
         private IResultFactory _resultFactory;
         private ILocalizer _localizer;
 
@@ -57,6 +59,7 @@ namespace FullPotential.Core.UI.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
+            _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
             _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
 
@@ -131,7 +134,7 @@ namespace FullPotential.Core.UI.Behaviours
                 }
                 else
                 {
-                    Debug.LogWarning("Unhandled Attributes type: " + field.FieldType);
+                    _logger.Warn("Unhandled Attributes type: " + field.FieldType);
                 }
             }
 

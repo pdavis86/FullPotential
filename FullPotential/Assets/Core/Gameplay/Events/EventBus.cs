@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Logging;
 
 using Unity.Netcode;
 
@@ -16,10 +17,16 @@ namespace FullPotential.Core.Gameplay.Events
 {
     public class EventBus : IEventBus
     {
+        private readonly IAuditor _logger;
         private readonly Dictionary<string, IEventHandlerGroup> _subscriptions = new Dictionary<string, IEventHandlerGroup>();
 
         // todo: zzz v0.6 - Have another look at being able to do _eventBus.Publish(new WeaponReloadedEvent(...));
         // todo: zzz v0.6 - Use `readonly record struct ThingyId(string Id);` instead of string everywhere
+
+        public EventBus(IAuditorFactory auditorFactory)
+        {
+            _logger = auditorFactory.Create(this);
+        }
 
         internal void Register<TArgs>(string eventId, Func<TArgs, UniTask> defaultHandlerAsync)
             where TArgs : IEventHandlerArgs
@@ -41,7 +48,7 @@ namespace FullPotential.Core.Gameplay.Events
 
             if (interfaceImplementation == null)
             {
-                Debug.LogError($"Type '{handlerType.FullName}' does not implement {typeof(IEventHandler<>).Name}");
+                _logger.Error($"Type '{handlerType.FullName}' does not implement {typeof(IEventHandler<>).Name}");
                 return;
             }
 
@@ -84,7 +91,7 @@ namespace FullPotential.Core.Gameplay.Events
             }
             else if (handlerGroup.DefaultHandlerAsync == null && args.IsDefaultHandlerCancelled)
             {
-                Debug.LogWarning($"Tried to cancel the default handler for event {eventId} but no handler is present");
+                _logger.Warn($"Tried to cancel the default handler for event {eventId} but no handler is present");
             }
 
             foreach (var handler in handlerGroup.OtherHandlers)
@@ -100,7 +107,7 @@ namespace FullPotential.Core.Gameplay.Events
         {
             if (!_subscriptions.ContainsKey(eventId))
             {
-                Debug.LogError($"Handler '{handler.GetType().FullName}' cannot subscribe to event '{eventId}' as it has not been registered");
+                _logger.Error($"Handler '{handler.GetType().FullName}' cannot subscribe to event '{eventId}' as it has not been registered");
                 return;
             }
 
@@ -131,7 +138,7 @@ namespace FullPotential.Core.Gameplay.Events
                 return true;
             }
 
-            Debug.LogError("No event handler has been registered for event " + eventId);
+            _logger.Error("No event handler has been registered for event " + eventId);
             return false;
 
         }

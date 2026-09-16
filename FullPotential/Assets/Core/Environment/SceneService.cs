@@ -1,4 +1,5 @@
-﻿using FullPotential.Api.Scenes;
+﻿using FullPotential.Api.Logging;
+using FullPotential.Api.Scenes;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -7,6 +8,13 @@ namespace FullPotential.Core.Environment
 {
     public class SceneService : ISceneService
     {
+        private readonly IAuditor _logger;
+
+        public SceneService(IAuditorFactory auditorFactory)
+        {
+            _logger = auditorFactory.Create(this);
+        }
+
         public Vector3 GetPositionOnSolidObject(Vector3 startingPoint)
         {
             startingPoint.y += 10;
@@ -25,7 +33,7 @@ namespace FullPotential.Core.Environment
 
             if (collider == null)
             {
-                Debug.LogWarning("GameObject did not have any collider");
+                _logger.Warn("GameObject did not have any collider");
                 return startingPoint;
             }
 
@@ -43,7 +51,7 @@ namespace FullPotential.Core.Environment
         {
             if (gameObjectHeight == 0)
             {
-                Debug.LogWarning("Collider did not have any height");
+                _logger.Warn("Collider did not have any height");
                 return startingPoint;
             }
 

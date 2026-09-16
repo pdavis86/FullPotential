@@ -1,4 +1,7 @@
-﻿using Unity.Netcode;
+﻿using FullPotential.Api.Logging;
+
+using Unity.Netcode;
+
 using UnityEngine;
 
 // ReSharper disable UnusedMember.Global
@@ -59,13 +62,13 @@ namespace FullPotential.Api.Unity.Extensions
             }
         }
 
-        public static void NetworkSpawn(this GameObject gameObject, bool warnOnFailure = true)
+        public static void NetworkSpawn(this GameObject gameObject, IAuditor auditor, bool warnOnFailure = true)
         {
             var networkObject = gameObject.GetComponent<NetworkObject>();
 
             if (warnOnFailure && networkObject == null)
             {
-                Debug.LogWarning($"Cannot network spawn {gameObject.name} as it does not have a NetworkObject component");
+                auditor.Warn($"Cannot network spawn {gameObject.name} as it does not have a NetworkObject component");
                 return;
             }
 

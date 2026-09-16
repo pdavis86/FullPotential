@@ -1,4 +1,5 @@
 ﻿using FullPotential.Api.Data;
+using FullPotential.Api.Logging;
 
 using UnityEngine;
 using UnityEngine.Networking;
@@ -14,7 +15,7 @@ namespace FullPotential.Core.Persistence.Https
 
         private string _authHeaderValue;
 
-        protected string BaseAddress { get; private set;}
+        protected string BaseAddress { get; private set; }
 
         protected string Username
         {
@@ -40,7 +41,9 @@ namespace FullPotential.Core.Persistence.Https
 
         protected void LogFailure(UnityWebRequest request)
         {
-            Debug.LogError($"Got response code {request.responseCode} with error '{request.error}':\n{request.downloadHandler.text}");
+            GetLogger().Error($"Got response code {request.responseCode} with error '{request.error}':\n{request.downloadHandler.text}");
         }
+
+        protected abstract IAuditor GetLogger();
     }
 }

@@ -6,6 +6,7 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Obsolete.Items.Base;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
@@ -37,6 +38,7 @@ namespace FullPotential.Core.Ui.Behaviours
         private PlayerFighter _playerFighter;
         private PlayerBehaviour _playerBehaviour;
 
+        private IAuditor _logger;
         private IResultFactory _resultFactory;
         private ILocalizer _localizer;
 
@@ -46,6 +48,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _playerFighter = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerFighter>();
             _playerBehaviour = _playerFighter.gameObject.GetComponent<PlayerBehaviour>();
 
+            _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
             _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
 
@@ -105,7 +108,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
             if (item == null)
             {
-                Debug.LogWarning("No item found with id " + itemId);
+                _logger.Warn("No item found with id " + itemId);
                 return;
             }
 
@@ -143,6 +146,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _components.Clear();
 
             InventoryItemsList.LoadInventoryItems(
+                _logger,
                 null,
                 _componentsContainer,
                 _inventoryRowPrefab,

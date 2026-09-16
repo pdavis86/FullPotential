@@ -48,7 +48,7 @@
   <PropertyGroup>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <UnityProjectGenerator>Package</UnityProjectGenerator>
-    <UnityProjectGeneratorVersion>2.0.27</UnityProjectGeneratorVersion>
+    <UnityProjectGeneratorVersion>2.0.28</UnityProjectGeneratorVersion>
     <UnityProjectGeneratorStyle>Legacy</UnityProjectGeneratorStyle>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Assets\Api\CoreTypeIds\ResourceTypeIds.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IPlayerInventory.cs" />
+    <Compile Include="Assets\Api\Logging\IAuditorFactory.cs" />
     <Compile Include="Assets\Api\Data\ISaveManager.cs" />
     <Compile Include="Assets\Api\Registry\Gear\ISpecialGearVisuals.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\SlotStatus.cs" />
@@ -106,6 +107,7 @@
     <Compile Include="Assets\Api\Registry\IRegisterableType.cs" />
     <Compile Include="Assets\Api\Items\IHasCharge.cs" />
     <Compile Include="Assets\Api\Obsolete\Items\Types\Accessory.cs" />
+    <Compile Include="Assets\Api\Logging\AuditLevel.cs" />
     <Compile Include="Assets\Api\Registry\IItemVisuals.cs" />
     <Compile Include="Assets\Api\Registry\ITypeRegistry.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemStackBase.cs" />
@@ -141,6 +143,7 @@
     <Compile Include="Assets\Api\Registry\Shapes\IShapeType.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\ActiveEffect.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\IEventHandlerArgs.cs" />
+    <Compile Include="Assets\Api\Logging\IAuditor.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesCollection.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\LivingEntityState.cs" />
     <Compile Include="Assets\Api\Items\IItemFactory.cs" />

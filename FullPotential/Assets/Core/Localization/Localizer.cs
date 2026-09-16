@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using FullPotential.Api.Localization;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
@@ -14,6 +15,7 @@ using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Localization.Models;
+
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -25,6 +27,7 @@ namespace FullPotential.Core.Localization
     {
         public const string DefaultCulture = "en-GB";
 
+        private readonly IAuditor _logger;
         private readonly List<string> _addressesLoaded = new List<string>();
         private readonly Dictionary<string, string> _translations = new Dictionary<string, string>();
         private readonly List<CultureAddressables> _availableCultures = new List<CultureAddressables>();
@@ -34,8 +37,9 @@ namespace FullPotential.Core.Localization
 
         public CultureInfo CurrentCulture { get; private set; }
 
-        public Localizer()
+        public Localizer(IAuditorFactory auditorFactory)
         {
+            _logger = auditorFactory.Create(this);
             CacheRegisterableTypeNames();
         }
 
@@ -93,7 +97,7 @@ namespace FullPotential.Core.Localization
             }
             catch (Exception ex)
             {
-                Debug.LogError(ex);
+                _logger.Error(ex);
                 return default;
             }
         }
@@ -102,7 +106,7 @@ namespace FullPotential.Core.Localization
         {
             if (data.Translations == null)
             {
-                Debug.LogError($"No translations found in addressable at '{address}'");
+                _logger.Error($"No translations found in addressable at '{address}'");
                 return;
             }
 
@@ -110,7 +114,7 @@ namespace FullPotential.Core.Localization
             {
                 if (_translations.ContainsKey(item.Key))
                 {
-                    Debug.LogWarning($"Translations already contains a value for key '{item.Key}'");
+                    _logger.Warn($"Translations already contains a value for key '{item.Key}'");
                 }
                 else
                 {
@@ -154,7 +158,7 @@ namespace FullPotential.Core.Localization
             {
                 if (_addressesLoaded.Contains(address))
                 {
-                    //Debug.Log($"Skipping '{address}' because it is already loaded");
+                    //_logger.Debug($"Skipping '{address}' because it is already loaded");
                     continue;
                 }
 
@@ -162,7 +166,7 @@ namespace FullPotential.Core.Localization
 
                 if (data.Translations == null)
                 {
-                    Debug.LogError($"Failed to load any translations from addressable at '{address}'");
+                    _logger.Error($"Failed to load any translations from addressable at '{address}'");
                     continue;
                 }
 
@@ -191,7 +195,7 @@ namespace FullPotential.Core.Localization
                 return translation;
             }
 
-            Debug.LogWarning($"Missing translation for '{id}'");
+            _logger.Warn($"Missing translation for '{id}'");
             return $"'{id}' translation is missing";
         }
 

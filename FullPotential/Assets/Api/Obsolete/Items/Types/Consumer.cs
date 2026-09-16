@@ -46,7 +46,7 @@ namespace FullPotential.Api.Obsolete.Items.Types
             var returnValue = castSpeed < 0.5
                 ? 0.5f
                 : castSpeed;
-            //Debug.Log("GetProjectileSpeed: " + returnValue);
+            //_logger.Debug("GetProjectileSpeed: " + returnValue);
             return returnValue;
         }
 

@@ -7,6 +7,7 @@ using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Obsolete.Items;
 using FullPotential.Api.Obsolete.Items.Base;
@@ -30,6 +31,7 @@ namespace FullPotential.Core.Gameplay.Crafting
         public const int MaxExtraAmmo = 3;
 
         private readonly Random _random = new Random();
+        private readonly IAuditor _logger;
         private readonly TypeRegistry _typeRegistry;
         private readonly ILocalizer _localizer;
 
@@ -40,9 +42,11 @@ namespace FullPotential.Core.Gameplay.Crafting
         private readonly List<IEffectType> _effectsForLoot;
 
         public ResultFactory(
+            IAuditorFactory auditorFactory,
             ITypeRegistry typeRegistry,
             ILocalizer localizer)
         {
+            _logger = auditorFactory.Create(this);
             _typeRegistry = (TypeRegistry)typeRegistry;
             _localizer = localizer;
 
@@ -268,7 +272,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 
                     if (debugCounter >= 10)
                     {
-                        UnityEngine.Debug.LogError("Infinite loop situation here. Go fix it!");
+                        _logger.Error("Infinite loop situation here. Go fix it!");
                     }
 
                     effects.Add(effect);

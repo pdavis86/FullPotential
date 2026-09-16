@@ -6,6 +6,7 @@ using System.Globalization;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Obsolete.Items.Base;
@@ -48,6 +49,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
             });
 
             _combatService = new CombatService(
+                Mock.Of<IAuditorFactory>(),
                 Mock.Of<ITypeRegistry>(),
                 Mock.Of<IRpcService>());
         }

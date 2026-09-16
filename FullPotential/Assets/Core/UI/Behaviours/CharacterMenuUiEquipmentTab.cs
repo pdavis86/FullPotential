@@ -1,6 +1,7 @@
 ﻿using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
@@ -29,6 +30,7 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private GameObject _inventoryRowPrefab;
 #pragma warning restore 0649
 
+        private IAuditor _logger;
         private ILocalizer _localizer;
         private ITypeRegistry _typeRegistry;
 
@@ -38,6 +40,7 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
+            _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
 
@@ -182,6 +185,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _componentsContainer.SetActive(true);
 
             InventoryItemsList.LoadInventoryItems(
+                _logger,
                 slot,
                 _componentsContainer,
                 _inventoryRowPrefab,

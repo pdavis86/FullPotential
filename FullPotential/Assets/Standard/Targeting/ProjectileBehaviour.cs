@@ -3,6 +3,7 @@
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Targeting;
@@ -18,6 +19,7 @@ namespace FullPotential.Standard.Targeting
     // ReSharper disable once UnusedType.Global
     public class ProjectileBehaviour : NetworkBehaviour, ITargetingBehaviour
     {
+        private IAuditor _logger;
         private ICombatService _combatService;
         private ITypeRegistry _typeRegistry;
 
@@ -34,6 +36,7 @@ namespace FullPotential.Standard.Targeting
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
+            _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
             _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
 
@@ -103,7 +106,7 @@ namespace FullPotential.Standard.Targeting
         {
             if (_visualsPrefabAddress.Value.ToString().IsNullOrWhiteSpace())
             {
-                Debug.LogError("Cannot spawn visuals as no prefab address was provided");
+                _logger.Error("Cannot spawn visuals as no prefab address was provided");
                 return;
             }
 

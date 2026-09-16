@@ -24,7 +24,6 @@ namespace FullPotential.Api.Ioc
             return _registry.Any();
         }
 
-
         public void Register<TInterface>(object instance)
         {
             Register(new Dependency

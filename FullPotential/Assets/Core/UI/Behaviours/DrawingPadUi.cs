@@ -190,12 +190,12 @@ namespace FullPotential.Core.UI.Behaviours
                 }
                 //else
                 //{
-                //    Debug.Log("There was an uncompleted line");
+                //    _logger.Debug("There was an uncompleted line");
                 //}
             }
             //else
             //{
-            //    Debug.Log("There was an uncompleted circle");
+            //    _logger.Debug("There was an uncompleted circle");
             //}
 
             _isDrawingCircle = false;
@@ -287,17 +287,17 @@ namespace FullPotential.Core.UI.Behaviours
             //    var diff2 = Mathf.Abs(angle2 - angle3);
             //    var diff3 = Mathf.Abs(angle1 - angle3);
 
-            //    //Debug.Log($"diff1:{diff1}, diff2:{diff2}, diff3:{diff3}");
+            //    //_logger.Debug($"diff1:{diff1}, diff2:{diff2}, diff3:{diff3}");
 
             //    if (diff1 < _circleAngleTolerance
             //        && diff2 < _circleAngleTolerance
             //        && diff3 < _circleAngleTolerance)
             //    {
-            //        //Debug.Log("Line");
+            //        //_logger.Debug("Line");
             //    }
             //    else
             //    {
-            //        //Debug.Log("_isDrawingCircle = true");
+            //        //_logger.Debug("_isDrawingCircle = true");
             //        _isDrawingCircle = true;
             //        CreateMarker(rawMousePosition);
             //        return;
@@ -312,11 +312,11 @@ namespace FullPotential.Core.UI.Behaviours
             var lineAngle = currentDirection.y < 0 ? Vector2.Angle(Vector2.up, initialDirection) : Vector2.SignedAngle(Vector2.up, initialDirection);
             var markerAngle = currentDirection.y < 0 ? Vector2.Angle(Vector2.up, currentDirection) : Vector2.SignedAngle(Vector2.up, currentDirection);
 
-            //Debug.Log($"lineAngle:{lineAngle}, markerAngle:{markerAngle}, diff:{Mathf.Abs(lineAngle - markerAngle)}");
+            //_logger.Debug($"lineAngle:{lineAngle}, markerAngle:{markerAngle}, diff:{Mathf.Abs(lineAngle - markerAngle)}");
 
             if (Mathf.Abs(lineAngle - markerAngle) > _directionAngleTolerance)
             {
-                //Debug.Log("Over DirectionAngleTolerance");
+                //_logger.Debug("Over DirectionAngleTolerance");
                 RecordShapeDrawn(initialDirection, GetLength());
                 return;
             }
@@ -339,7 +339,7 @@ namespace FullPotential.Core.UI.Behaviours
         {
             _drawnShapes.Add(_drawingService.GetDrawingCode(direction, length));
 
-            //Debug.Log("That was a " + _drawnShapes.Last());
+            //_logger.Debug("That was a " + _drawnShapes.Last());
 
             ClearMarkers();
         }

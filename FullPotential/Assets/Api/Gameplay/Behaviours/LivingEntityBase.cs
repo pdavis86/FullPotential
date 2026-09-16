@@ -13,6 +13,7 @@ using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Obsolete.Items.Base;
@@ -65,6 +66,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected string _lastDamageSourceName;
         protected string _lastDamageItemName;
 
+        protected IAuditor _logger;
         protected IGameManager _gameManager;
         protected IRpcService _rpcService;
         protected ILocalizer _localizer;
@@ -117,6 +119,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected virtual void Awake()
         {
+            _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
+
             _gameManager = DependenciesContext.Dependencies.GetService<IGameManager>();
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
@@ -246,7 +250,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _lastDamageSourceName = sourceFighter != null ? sourceFighter.FighterName : null;
             _lastDamageItemName = itemUsed?.Name.OrIfNullOrWhitespace(_localizer.Translate("ui.alert.attack.noitem"));
 
-            //Debug.Log($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
+            //_logger.Debug($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
 
             if (sourceFighter == null)
             {
@@ -340,10 +344,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             newValue = ClampResourceValue(typeId, newValue);
 
-            // todo: zzz v0.6 - set debug log level
-            //var locationName = IsServer ? "Server" : "Client";
-            //var registeredType = _typeRegistry.GetRegisteredByTypeId<IResourceType>(typeId);
-            //Debug.Log($"{locationName}-{OwnerClientId}: '{_localizer.Translate(registeredType)}' changed from {_resourceValueCache[typeId]} to {newValue}");
+            var locationName = IsServer ? "Server" : "Client";
+            var registeredType = _typeRegistry.GetRegisteredByTypeId<IResourceType>(typeId);
+            _logger.Debug($"{locationName}-{OwnerClientId}: '{_localizer.Translate(registeredType)}' changed from {_resourceValueCache[typeId]} to {newValue}");
 
             _resourceValueCache[typeId] = newValue;
 
@@ -424,7 +427,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             if (!IsServer)
             {
-                Debug.LogWarning("Client tried to set fighter name");
+                _logger.Warn("Client tried to set fighter name");
                 return;
             }
 
@@ -502,7 +505,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ? "ui.alert.falldamage"
                 : "ui.alert.environmentaldamage");
 
-            //Debug.Log($"{name} collided with {collision.gameObject.name} at velocity {collision.relativeVelocity} with force {force} with cause {cause}");
+            //_logger.Debug($"{name} collided with {collision.gameObject.name} at velocity {collision.relativeVelocity} with force {force} with cause {cause}");
 
             var healthChangeRaw = isVelocityDamage
                 ? Vector3.Dot(contactPoint.normal, collision.relativeVelocity)

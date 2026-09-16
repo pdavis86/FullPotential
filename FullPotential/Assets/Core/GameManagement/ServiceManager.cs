@@ -9,8 +9,11 @@ namespace FullPotential.Core.GameManagement
             //Scoped
             DependenciesContext.Dependencies.Register<Api.Scenes.ISceneService, Environment.SceneService>(true);
 
-            //Singleton
+            //Special cases
             DependenciesContext.Dependencies.Register<Api.GameManagement.IGameManager>(GameManager.Instance);
+
+            //Singleton
+            DependenciesContext.Dependencies.Register<Api.Logging.IAuditorFactory, Logging.AuditorFactory>();
             DependenciesContext.Dependencies.Register<Api.Gameplay.Combat.ICombatService, Gameplay.Combat.CombatService>();
             DependenciesContext.Dependencies.Register<Api.Gameplay.Crafting.IResultFactory, Gameplay.Crafting.ResultFactory>();
             DependenciesContext.Dependencies.Register<Api.Gameplay.Drawing.IDrawingService, Gameplay.Drawing.DrawingService>();
@@ -26,7 +29,6 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<Api.Items.IItemFactory, Api.Items.ItemFactory>();
 
             var settingsRepository = DependenciesContext.Dependencies.GetService<Api.Data.ISettingsRepository>();
-
             var settings = settingsRepository.Get();
 
             if (string.IsNullOrWhiteSpace(settings.ManagementApiAddress))

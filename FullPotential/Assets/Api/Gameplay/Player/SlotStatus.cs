@@ -1,10 +1,12 @@
-﻿using System.Threading;
+﻿using System.Diagnostics;
+using System.Threading;
 
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Items;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Obsolete.Items.Types;
 
 namespace FullPotential.Api.Gameplay.Player
@@ -12,6 +14,8 @@ namespace FullPotential.Api.Gameplay.Player
     public class SlotStatus
     {
         private const float ChargeGaugeUpdateSeconds = 0.05f;
+
+        private readonly IAuditor _logger;
 
         private CancellationTokenSource _preActionCts;
         private CancellationTokenSource _intraActionCts;
@@ -27,16 +31,17 @@ namespace FullPotential.Api.Gameplay.Player
 
         public bool IsAutoFiring { get; set; }
 
-        public SlotStatus(FighterBase fighter, string slotId)
+        public SlotStatus(IAuditor logger, FighterBase fighter, string slotId)
         {
+            _logger = logger;
+
             Fighter = fighter;
             SlotId = slotId;
         }
 
         public async UniTask StartChargeUpLoopAsync(IHasCharge item)
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("StartChargeUpLoopAsync");
+            _logger.Debug("StartChargeUpLoopAsync");
 
             _preActionCts?.Cancel();
             _preActionCts = new CancellationTokenSource();
@@ -45,7 +50,11 @@ namespace FullPotential.Api.Gameplay.Player
             var secondsUntilDone = secondsToTake * (100 - item.ChargePercentage) / 100f;
             var elapsedSeconds = secondsToTake - secondsUntilDone;
 
-            //var sw = System.Diagnostics.Stopwatch.StartNew();
+            Stopwatch sw = null;
+            if (_logger.IsEnabled(AuditLevel.Debug))
+            {
+                sw = Stopwatch.StartNew();
+            }
 
             while (item.ChargePercentage < 100 && !_preActionCts.IsCancellationRequested)
             {
@@ -60,22 +69,22 @@ namespace FullPotential.Api.Gameplay.Player
                 item.ChargePercentage = (int)(elapsedSeconds / secondsToTake * 100);
             }
 
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log($"Charged in: {sw.ElapsedMilliseconds}ms and should have taken {secondsUntilDone}s");
+            if (_logger.IsEnabled(AuditLevel.Debug))
+            {
+                _logger.Debug($"Charged in: {sw.ElapsedMilliseconds}ms and should have taken {secondsUntilDone}s");
+            }
         }
 
         public void StopChargeUpLoop()
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("StopChargeUpLoop");
+            _logger.Debug("StopChargeUpLoop");
 
             _preActionCts?.Cancel();
         }
 
         public async UniTask StartAutomaticWeaponFireAsync(Weapon weapon)
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("StartAutomaticWeaponFireAsync");
+            _logger.Debug("StartAutomaticWeaponFireAsync");
 
             _intraActionCts?.Cancel();
             _intraActionCts = new CancellationTokenSource();
@@ -93,8 +102,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public void StopAutomaticWeaponFire()
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("StopAutomaticWeaponFire");
+            _logger.Debug("StopAutomaticWeaponFire");
 
             _intraActionCts?.Cancel();
             IsAutoFiring = false;
@@ -102,8 +110,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public async UniTask StartCooldownLoopAsync(IHasCharge item)
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("StartCooldownLoopAsync");
+            _logger.Debug("StartCooldownLoopAsync");
 
             _postActionCts?.Cancel();
             _postActionCts = new CancellationTokenSource();
@@ -112,7 +119,11 @@ namespace FullPotential.Api.Gameplay.Player
             var secondsUntilDone = secondsToTake * item.ChargePercentage / 100f;
             var elapsedSeconds = secondsToTake - secondsUntilDone;
 
-            //var sw = System.Diagnostics.Stopwatch.StartNew();
+            Stopwatch sw = null;
+            if (_logger.IsEnabled(AuditLevel.Debug))
+            {
+                sw = Stopwatch.StartNew();
+            }
 
             while (item.ChargePercentage > 0 && !_postActionCts.IsCancellationRequested)
             {
@@ -127,13 +138,15 @@ namespace FullPotential.Api.Gameplay.Player
                 item.ChargePercentage = 100 - (int)(elapsedSeconds / secondsToTake * 100);
             }
 
-            //Debug.Log($"Cooled in: {sw.ElapsedMilliseconds}ms and should have taken {secondsUntilDone}s");
+            if (_logger.IsEnabled(AuditLevel.Debug))
+            {
+                _logger.Debug($"Cooled in: {sw.ElapsedMilliseconds}ms and should have taken {secondsUntilDone}s");
+            }
         }
 
         public void StopCooldownLoop()
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("StopCooldownLoop");
+            _logger.Debug("StopCooldownLoop");
 
             _postActionCts?.Cancel();
         }
@@ -145,8 +158,7 @@ namespace FullPotential.Api.Gameplay.Player
                 return false;
             }
 
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("StopActiveConsumerBehaviour");
+            _logger.Debug("StopActiveConsumerBehaviour");
 
             var activeConsumer = Fighter.Inventory.GetItemInSlot<Consumer>(SlotId);
 
@@ -157,12 +169,9 @@ namespace FullPotential.Api.Gameplay.Player
             return true;
         }
 
-        // todo: zzz v0.6 - Default handlers should not be in other classes and should be in Core
+        // todo: Default handlers should not be in other classes and should be in Standard
         public static async UniTask DefaultHandlerForReloadEventAsync(ReloadEventArgs eventArgs)
         {
-            // todo: zzz v0.6 - set debug log level
-            //Debug.Log("Reload");
-
             var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);
             slotStatus.IsBusy = true;
 

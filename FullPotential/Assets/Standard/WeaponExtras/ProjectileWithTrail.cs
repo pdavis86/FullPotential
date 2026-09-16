@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Unity.Extensions;
 using UnityEngine;
@@ -17,6 +18,7 @@ namespace FullPotential.Standard.WeaponExtras
         public float Speed;
         public GameObject ObjectHit;
 
+        private IAuditor _logger;
         private ITypeRegistry _typeRegistry;
 
         private float _startTime;
@@ -26,6 +28,7 @@ namespace FullPotential.Standard.WeaponExtras
         // ReSharper disable once UnusedMember.Local
         private void Start()
         {
+            _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
 
             _startTime = Time.time;
@@ -104,7 +107,7 @@ namespace FullPotential.Standard.WeaponExtras
             _typeRegistry.LoadAddessable<GameObject>(BulletHolePrefabAddress, prefab =>
             {
                 var bulletHole = Instantiate(prefab, position.Value, rotation);
-                bulletHole.NetworkSpawn();
+                bulletHole.NetworkSpawn(_logger);
                 Destroy(bulletHole, 5);
             });
         }

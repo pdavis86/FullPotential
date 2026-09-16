@@ -48,7 +48,7 @@
   <PropertyGroup>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <UnityProjectGenerator>Package</UnityProjectGenerator>
-    <UnityProjectGeneratorVersion>2.0.27</UnityProjectGeneratorVersion>
+    <UnityProjectGeneratorVersion>2.0.28</UnityProjectGeneratorVersion>
     <UnityProjectGeneratorStyle>Legacy</UnityProjectGeneratorStyle>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
@@ -87,6 +87,7 @@
     <Compile Include="Assets\Core\Persistence\Local\DataSaver.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ProgressWheel.cs" />
     <Compile Include="Assets\Core\Registry\SpecialSlots\LeftHand.cs" />
+    <Compile Include="Assets\Core\Logging\Auditor.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\LookAtMainCamera.cs" />
     <Compile Include="Assets\Core\Player\PlayerInventory.cs" />
     <Compile Include="Assets\Core\Registry\Events\LivingEntityHealthChangedEventHandler.cs" />
@@ -124,6 +125,7 @@
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\DrawingPadUi.cs" />
     <Compile Include="Assets\Core\Persistence\Https\DataLoader.cs" />
+    <Compile Include="Assets\Core\Logging\AuditorFactory.cs" />
     <Compile Include="Assets\Core\Gameplay\Events\EventBus.cs" />
     <Compile Include="Assets\Core\Localization\Models\LocalizationOld.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\Hud.cs" />

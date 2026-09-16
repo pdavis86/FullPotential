@@ -2,6 +2,7 @@
 
 using FullPotential.Api.Data;
 using FullPotential.Api.GameManagement.Models;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Models.User;
 using FullPotential.Models.Utilities;
@@ -16,9 +17,12 @@ namespace FullPotential.Core.Persistence.Https
 {
     public class UserManagement : HttpsPersistenceBase, IUserManagement
     {
-        public UserManagement(ISettingsRepository settingsRepository)
+        private readonly IAuditor _logger;
+
+        public UserManagement(IAuditorFactory auditorFactory, ISettingsRepository settingsRepository)
             : base(settingsRepository)
         {
+            _logger = auditorFactory.Create(this);
         }
 
         public async UniTask<SignInResult> SignInWithPasswordAsync(string username, string password)
@@ -128,6 +132,11 @@ namespace FullPotential.Core.Persistence.Https
             }
 
             return true;
+        }
+
+        protected override IAuditor GetLogger()
+        {
+            return _logger;
         }
     }
 }
