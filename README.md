@@ -43,7 +43,7 @@ See the [Project Trello Board](https://trello.com/b/biH6NdE0/oasis "Go to Trello
 - [x] v0.2 Core Gameplay (Additional)
 - [x] v0.3 Playable PoC
 - [x] v0.4 Battle Improvements
-- [ ] v0.5 Infrastructure Improvements
+- [x] v0.5 Infrastructure Improvements
 - [ ] v0.6 Code Improvements
 - [ ] v0.7 UI, Inventory, & Crafting
 - [ ] v0.8 Playable Demo
