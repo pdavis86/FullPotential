@@ -9,7 +9,7 @@ namespace FullPotential.Api.Localization
 {
     public interface ILocalizer
     {
-        public CultureInfo CurrentCulture { get; }
+        CultureInfo CurrentCulture { get; }
 
         Task LoadAvailableCulturesAsync(Dictionary<string, List<string>> localisationAddresses);
 

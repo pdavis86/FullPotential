@@ -4,7 +4,7 @@ namespace FullPotential.Api.Items
 {
     public interface IResourceConsumer
     {
-        public IResourceType ResourceType { get; }
+        IResourceType ResourceType { get; }
 
         int GetResourceCost();
     }

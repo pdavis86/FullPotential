@@ -10,10 +10,10 @@ namespace FullPotential.Api.Registry.Shapes
 {
     public interface IShapeBehaviour
     {
-        public FighterBase SourceFighter { get; set; }
+        FighterBase SourceFighter { get; set; }
 
-        public Consumer Consumer { get; set; }
+        Consumer Consumer { get; set; }
 
-        public Vector3 Direction { get; set; }
+        Vector3 Direction { get; set; }
     }
 }

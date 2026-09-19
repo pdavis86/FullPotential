@@ -2,6 +2,6 @@
 {
     public interface IRegisterableWithSlotType : IRegisterableType
     {
-        public string SlotSpritePrefabAddress { get; }
+        string SlotSpritePrefabAddress { get; }
     }
 }

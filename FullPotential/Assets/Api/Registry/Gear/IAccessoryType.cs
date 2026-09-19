@@ -2,6 +2,6 @@
 {
     public interface IAccessoryType : IRegisterableWithSlotType
     {
-        public int SlotCount { get; }
+        int SlotCount { get; }
     }
 }

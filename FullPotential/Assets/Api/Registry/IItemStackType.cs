@@ -2,10 +2,10 @@
 {
     public interface IItemStackType : IRegisterableType
     {
-        public int MaxStackSize { get; }
+        int MaxStackSize { get; }
 
-        public int MinDropCount { get; }
+        int MinDropCount { get; }
 
-        public int MaxDropCount { get; }
+        int MaxDropCount { get; }
     }
 }
