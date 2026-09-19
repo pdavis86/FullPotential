@@ -169,20 +169,19 @@ namespace FullPotential.Api.Gameplay.Player
             return true;
         }
 
-        // todo: Default handlers should not be in other classes and should be in Standard
-        public static async UniTask DefaultHandlerForReloadEventAsync(ReloadEventArgs eventArgs)
+        public static async UniTask DefaultHandlerForReloadEventAsync(ReloadEvent reloadEvent)
         {
-            var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);
+            var slotStatus = reloadEvent.Fighter.GetSlotStatus(reloadEvent.SlotId);
             slotStatus.IsBusy = true;
 
-            var weapon = eventArgs.Fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
+            var weapon = reloadEvent.Fighter.Inventory.GetItemInSlot<Weapon>(reloadEvent.SlotId);
 
             //Lose any remaining ammo
             weapon.UpdateAmmo(0);
 
             await UniTask.WaitForSeconds(weapon.GetReloadTime());
 
-            FighterBase.UpdateAmmoCounts(eventArgs);
+            FighterBase.UpdateAmmoCounts(reloadEvent);
 
             slotStatus.IsBusy = false;
         }

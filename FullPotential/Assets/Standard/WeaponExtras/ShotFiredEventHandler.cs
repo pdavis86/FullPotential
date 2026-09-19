@@ -14,8 +14,7 @@ using UnityEngine;
 
 namespace FullPotential.Standard.WeaponExtras
 {
-    [SubscribeToEvent(FighterBase.ShotFiredEventId)]
-    public class ShotFiredEventHandler : IEventHandler<ShotFiredEventArgs>
+    public class ShotFiredEventHandler : IEventHandler<ShotFiredEvent>
     {
         private const string BulletTrailPrefabAddress = "Standard/Prefabs/Combat/BulletTrail.prefab";
 
@@ -23,16 +22,16 @@ namespace FullPotential.Standard.WeaponExtras
 
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Func<ShotFiredEventArgs, UniTask> BeforeHandlerAsync => null;
+        public Func<ShotFiredEvent, UniTask> BeforeHandlerAsync => null;
 
-        public Func<ShotFiredEventArgs, UniTask> AfterHandlerAsync => HandleAfterBulletFiredAsync;
+        public Func<ShotFiredEvent, UniTask> AfterHandlerAsync => HandleAfterBulletFiredAsync;
 
         public ShotFiredEventHandler(ITypeRegistry typeRegistry)
         {
             _typeRegistry = typeRegistry;
         }
 
-        private UniTask HandleAfterBulletFiredAsync(ShotFiredEventArgs eventArgs)
+        private UniTask HandleAfterBulletFiredAsync(ShotFiredEvent eventArgs)
         {
             var item = eventArgs.Fighter.Inventory.GetItemInSlot(eventArgs.SlotId);
 

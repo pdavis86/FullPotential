@@ -32,10 +32,10 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
+    // todo: zzz v0.6 - Use `readonly record struct ThingyId(string Id);` instead of string everywhere
+
     public abstract class InventoryBase : NetworkBehaviour, ISaveable
     {
-        public const string SlotChangeEventId = "9c7972de-4136-4825-aaa3-11925ad049ee";
-
         // ReSharper disable InconsistentNaming
         protected IAuditor _logger;
         protected IItemFactory _itemFactory;
@@ -166,7 +166,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            // todo: zzz v0.6 - fire an event instead - TriggerInventoryChangedEvent
+            // todo: fire an event instead - TriggerInventoryChangedEvent
             NotifyOfItemsRemoved(itemsRemoved);
             NotifyOfItemsAdded(itemsAdded);
             ApplyEquippedItemChanges(changes.EquippedItems);
@@ -400,13 +400,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected void TriggerSlotChangeEvent(string itemId, string slotId)
         {
-            var eventArgs = new SlotChangeEventArgs(this, _livingEntity, slotId, itemId);
-            _eventBus.PublishAsync(SlotChangeEventId, eventArgs).Forget();
+            var changeEvent = new SlotChangeEvent(this, _livingEntity, slotId, itemId);
+            _eventBus.PublishAsync(changeEvent).Forget();
         }
 
-        public static UniTask DefaultHandlerForSlotChangeEventAsync(SlotChangeEventArgs eventArgs)
+        public static UniTask DefaultHandlerForSlotChangeEventAsync(SlotChangeEvent changeEvent)
         {
-            eventArgs.Inventory.ApplyEquippedItemChange(eventArgs.ItemId, eventArgs.SlotId);
+            changeEvent.Inventory.ApplyEquippedItemChange(changeEvent.ItemId, changeEvent.SlotId);
             return UniTask.CompletedTask;
         }
 

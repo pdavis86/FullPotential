@@ -16,16 +16,15 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    [SubscribeToEvent(InventoryBase.SlotChangeEventId)]
-    public class SlotChangeEventHandler : IEventHandler<SlotChangeEventArgs>
+    public class SlotChangeEventHandler : IEventHandler<SlotChangeEvent>
     {
         private readonly IHud _hud;
 
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Func<SlotChangeEventArgs, UniTask> BeforeHandlerAsync => null;
+        public Func<SlotChangeEvent, UniTask> BeforeHandlerAsync => null;
 
-        public Func<SlotChangeEventArgs, UniTask> AfterHandlerAsync => HandleAfterSlotChangeAsync;
+        public Func<SlotChangeEvent, UniTask> AfterHandlerAsync => HandleAfterSlotChangeAsync;
 
         public SlotChangeEventHandler(IGameManager gameManager)
         {
@@ -34,7 +33,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             _hud.ToggleSliderBar(BarrierChargeResource.TypeIdString, false);
         }
 
-        private UniTask HandleAfterSlotChangeAsync(SlotChangeEventArgs eventArgs)
+        private UniTask HandleAfterSlotChangeAsync(SlotChangeEvent eventArgs)
         {
             if (eventArgs.SlotId != BarrierSlot.TypeIdString)
             {

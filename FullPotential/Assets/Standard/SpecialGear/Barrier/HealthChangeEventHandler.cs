@@ -13,18 +13,17 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    [SubscribeToEvent(LivingEntityBase.ResourceValueChangeEventId)]
-    public class HealthChangeEventHandler : IEventHandler<ResourceValueChangedEventArgs>
+    public class HealthChangeEventHandler : IEventHandler<ResourceValueChangedEvent>
     {
         public const string CustomDataKeyLastHit = "LastHit";
 
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Func<ResourceValueChangedEventArgs, UniTask> BeforeHandlerAsync => HandleBeforeHealthChangeAsync;
+        public Func<ResourceValueChangedEvent, UniTask> BeforeHandlerAsync => HandleBeforeHealthChangeAsync;
 
-        public Func<ResourceValueChangedEventArgs, UniTask> AfterHandlerAsync => null;
+        public Func<ResourceValueChangedEvent, UniTask> AfterHandlerAsync => null;
 
-        private UniTask HandleBeforeHealthChangeAsync(ResourceValueChangedEventArgs eventArgs)
+        private UniTask HandleBeforeHealthChangeAsync(ResourceValueChangedEvent eventArgs)
         {
             if (eventArgs.ResourceTypeId != ResourceTypeIds.HealthId
                 || eventArgs.Change >= 0

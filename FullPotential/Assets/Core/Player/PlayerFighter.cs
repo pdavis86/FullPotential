@@ -453,7 +453,7 @@ namespace FullPotential.Core.Player
             LoadFromCharacterData(playerData);
             Inventory.LoadInventory(inventoryData);
 
-            // todo: zzz v0.6 - playerjoined should be an event
+            // todo: playerjoined should be an event
             if (IsServer)
             {
                 var msg = _localizer.Translate("ui.alert.playerjoined", Username);
@@ -482,7 +482,7 @@ namespace FullPotential.Core.Player
                 resource => resource.TypeId.ToString(),
                 resource => playerData.ValuePools.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value));
 
-            _eventBus.Subscribe<ResourceValueChangedEventArgs>(ResourceValueChangeEventId, _ => MarkAsDirtyAndAddToQueue());
+            _eventBus.Subscribe<ResourceValueChangedEvent>(_ => MarkAsDirtyAndAddToQueue());
         }
 
         public void UpdatePlayerSettings(List<SerializableKeyValuePair<string, string>> updatedSettings)

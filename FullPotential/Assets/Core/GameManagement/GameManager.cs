@@ -279,11 +279,12 @@ namespace FullPotential.Core.GameManagement
         {
             var eventBus = (EventBus)DependenciesContext.Dependencies.GetService<IEventBus>();
 
-            // todo: zzz v0.6 - make these register via attribute
-            eventBus.Register<ResourceValueChangedEventArgs>(LivingEntityBase.ResourceValueChangeEventId, LivingEntityBase.DefaultHandlerForResourceValueChangeEventAsync);
-            eventBus.Register<ReloadEventArgs>(FighterBase.ReloadEventId, SlotStatus.DefaultHandlerForReloadEventAsync);
-            eventBus.Register<ShotFiredEventArgs>(FighterBase.ShotFiredEventId, FighterBase.DefaultHandlerForShotFiredEventAsync);
-            eventBus.Register<SlotChangeEventArgs>(InventoryBase.SlotChangeEventId, InventoryBase.DefaultHandlerForSlotChangeEventAsync);
+            // todo: Default handlers should have their own class and should be in Standard
+            // todo: make these register via attribute
+            eventBus.Register<ResourceValueChangedEvent>(LivingEntityBase.DefaultHandlerForResourceValueChangeEventAsync);
+            eventBus.Register<ReloadEvent>(SlotStatus.DefaultHandlerForReloadEventAsync);
+            eventBus.Register<ShotFiredEvent>(FighterBase.DefaultHandlerForShotFiredEventAsync);
+            eventBus.Register<SlotChangeEvent>(InventoryBase.DefaultHandlerForSlotChangeEventAsync);
         }
 
         private async UniTask DisconnectUserIfTokenInvalidAsync(ulong clientId, string username, string token)

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 using Cysharp.Threading.Tasks;
 
@@ -20,29 +22,26 @@ namespace FullPotential.Core.Gameplay.Events
         private readonly IAuditor _logger;
         private readonly Dictionary<string, IEventHandlerGroup> _subscriptions = new Dictionary<string, IEventHandlerGroup>();
 
-        // todo: zzz v0.6 - Have another look at being able to do _eventBus.Publish(new WeaponReloadedEvent(...));
-        // todo: zzz v0.6 - Use `readonly record struct ThingyId(string Id);` instead of string everywhere
-
         public EventBus(IAuditorFactory auditorFactory)
         {
             _logger = auditorFactory.Create(this);
         }
 
-        internal void Register<TArgs>(string eventId, Func<TArgs, UniTask> defaultHandlerAsync)
-            where TArgs : IEventHandlerArgs
+        internal void Register<TEvent>(Func<TEvent, UniTask> defaultHandlerAsync)
+            where TEvent : IEvent
         {
-            _subscriptions.Add(eventId, new EventHandlerGroup<TArgs>(eventId, defaultHandlerAsync));
+            var eventId = typeof(TEvent).GetCustomAttribute<RegisterEventAttribute>()?.EventId;
+
+            if (eventId == null)
+            {
+                _logger.Error($"The type '{typeof(TEvent)}' is missing the attribute '{nameof(RegisterEventAttribute)}'");
+                return;
+            }
+
+            _subscriptions.Add(eventId, new EventHandlerGroup<TEvent>(eventId, defaultHandlerAsync));
         }
 
-        //public void Subscribe<THandler, TArgs>(string eventId)
-        //    where THandler : IEventHandler<TArgs>
-        //    where TArgs : IEventHandlerArgs
-        //{
-        //    var handler = DependenciesContext.Dependencies.CreateInstance<THandler>();
-        //    Subscribe(eventId, handler);
-        //}
-
-        public void Subscribe(string eventId, Type handlerType)
+        public void Subscribe(Type handlerType)
         {
             var interfaceImplementation = handlerType.GetInterface(typeof(IEventHandler<>).FullName);
 
@@ -52,28 +51,60 @@ namespace FullPotential.Core.Gameplay.Events
                 return;
             }
 
-            //var argumentsType = interfaceImplementation.GetGenericArguments()[0];
+            var eventType = handlerType
+                .GetInterfaces()
+                .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEventHandler<>))
+                .GetGenericArguments()[0];
+
+            if (typeof(BasicEventHandler<>).MakeGenericType(eventType).IsAssignableFrom(handlerType))
+            {
+                return;
+            }
+
+            var eventId = eventType.GetCustomAttribute<RegisterEventAttribute>()?.EventId;
+
+            if (eventId == null)
+            {
+                _logger.Error($"The type '{eventType}' is missing the attribute '{nameof(RegisterEventAttribute)}'");
+                return;
+            }
 
             var handler = DependenciesContext.Dependencies.CreateInstance(handlerType);
             Subscribe(eventId, handler);
         }
 
-        public void Subscribe<TArgs>(string eventId, Action<TArgs> handlerAction)
-            where TArgs : IEventHandlerArgs
+        public void Subscribe<TEvent>(Action<TEvent> handlerAction)
+            where TEvent : IEvent
         {
-            var handler = new BasicEventHandler<TArgs>(handlerAction);
+            var eventId = typeof(TEvent).GetCustomAttribute<RegisterEventAttribute>()?.EventId;
+
+            if (eventId == null)
+            {
+                _logger.Error($"The type '{typeof(TEvent)}' is missing the attribute '{nameof(RegisterEventAttribute)}'");
+                return;
+            }
+
+            var handler = new BasicEventHandler<TEvent>(handlerAction);
             Subscribe(eventId, handler);
         }
 
-        public async UniTask PublishAsync<TArgs>(string eventId, TArgs args)
-            where TArgs : IEventHandlerArgs
+        public async UniTask PublishAsync<TEvent>(TEvent args)
+            where TEvent : IEvent
         {
+            var eventId = args.GetType().GetCustomAttribute<RegisterEventAttribute>()?.EventId;
+
+            if (eventId == null)
+            {
+                _logger.Error($"The type '{args.GetType()}' is missing the attribute '{nameof(RegisterEventAttribute)}'");
+                return;
+            }
+
             if (!IsEventIdRegistered(eventId))
             {
                 return;
             }
 
-            var handlerGroup = (EventHandlerGroup<TArgs>)_subscriptions[eventId];
+            var handlerGroup = (EventHandlerGroup<TEvent>)_subscriptions[eventId];
 
             args.IsDefaultHandlerCancelled = false;
 
@@ -115,8 +146,8 @@ namespace FullPotential.Core.Gameplay.Events
             group.Add(handler);
         }
 
-        private bool ShouldHandlerRun<TArgs>(IEventHandler<TArgs> handler)
-            where TArgs : IEventHandlerArgs
+        private bool ShouldHandlerRun<TEvent>(IEventHandler<TEvent> handler)
+            where TEvent : IEvent
         {
             switch (handler.Location)
             {
@@ -140,7 +171,6 @@ namespace FullPotential.Core.Gameplay.Events
 
             _logger.Error("No event handler has been registered for event " + eventId);
             return false;
-
         }
     }
 }

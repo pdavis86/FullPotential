@@ -20,8 +20,7 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 {
-    [SubscribeToEvent(FighterBase.ReloadEventId)]
-    public class ReloadEventHandler : IEventHandler<ReloadEventArgs>
+    public class ReloadEventHandler : IEventHandler<ReloadEvent>
     {
         private readonly ITypeRegistry _typeRegistry;
         private readonly ILocalizer _localizer;
@@ -29,9 +28,9 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Func<ReloadEventArgs, UniTask> BeforeHandlerAsync => HandleReloadBeforeAsync;
+        public Func<ReloadEvent, UniTask> BeforeHandlerAsync => HandleReloadBeforeAsync;
 
-        public Func<ReloadEventArgs, UniTask> AfterHandlerAsync => null;
+        public Func<ReloadEvent, UniTask> AfterHandlerAsync => null;
 
         public ReloadEventHandler(ITypeRegistry typeRegistry, ILocalizer localizer, IItemFactory itemFactory)
         {
@@ -40,7 +39,7 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
             _itemFactory = itemFactory;
         }
 
-        private UniTask HandleReloadBeforeAsync(ReloadEventArgs eventArgs)
+        private UniTask HandleReloadBeforeAsync(ReloadEvent eventArgs)
         {
             if (!NetworkManager.Singleton.IsServer)
             {

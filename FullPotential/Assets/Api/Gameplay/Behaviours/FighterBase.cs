@@ -29,9 +29,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 {
     public abstract class FighterBase : LivingEntityBase, IMoveable
     {
-        public const string ReloadEventId = "2337f94e-5a7d-4e02-b1c8-1b5e9934a3ce";
-        public const string ShotFiredEventId = "f01cd95a-67cc-4f38-a394-5a69eaa721c6";
-
         private const int MeleeRangeLimit = 8;
         private const int ConsumerRangeLimit = 50;
         private const int MaximumRange = 100;
@@ -52,10 +49,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private readonly Dictionary<string, SlotStatus> _slotStatuses = new Dictionary<string, SlotStatus>();
 
         private DelayedAction _consumeResource;
-        private ReloadEventArgs _reloadArgsLeft;
-        private ReloadEventArgs _reloadArgsRight;
-        private ShotFiredEventArgs _shotFiredArgsLeft;
-        private ShotFiredEventArgs _shotFiredArgsRight;
+        private ReloadEvent _reloadEventLeft;
+        private ReloadEvent _reloadEventRight;
+        private ShotFiredEvent _shotFiredArgsLeft;
+        private ShotFiredEvent _shotFiredArgsRight;
         #endregion
 
         #region Properties
@@ -81,13 +78,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var leftSlotStatus = new SlotStatus(_logger, this, HandSlotIds.LeftHand);
             _slotStatuses.Add(HandSlotIds.LeftHand, leftSlotStatus);
-            _reloadArgsLeft = new ReloadEventArgs(this, HandSlotIds.LeftHand);
-            _shotFiredArgsLeft = new ShotFiredEventArgs(this, HandSlotIds.LeftHand);
+            _reloadEventLeft = new ReloadEvent(this, HandSlotIds.LeftHand);
+            _shotFiredArgsLeft = new ShotFiredEvent(this, HandSlotIds.LeftHand);
 
             var rightSlotStatus = new SlotStatus(_logger, this, HandSlotIds.RightHand);
             _slotStatuses.Add(HandSlotIds.RightHand, rightSlotStatus);
-            _reloadArgsRight = new ReloadEventArgs(this, HandSlotIds.RightHand);
-            _shotFiredArgsRight = new ShotFiredEventArgs(this, HandSlotIds.RightHand);
+            _reloadEventRight = new ReloadEvent(this, HandSlotIds.RightHand);
+            _shotFiredArgsRight = new ShotFiredEvent(this, HandSlotIds.RightHand);
         }
 
         protected override void Start()
@@ -179,8 +176,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return false;
             }
 
-            var reloadEventArgs = slotId == HandSlotIds.LeftHand ? _reloadArgsLeft : _reloadArgsRight;
-            _eventBus.PublishAsync(ReloadEventId, reloadEventArgs).Forget();
+            var reloadEvent = slotId == HandSlotIds.LeftHand ? _reloadEventLeft : _reloadEventRight;
+            _eventBus.PublishAsync(reloadEvent).Forget();
 
             return true;
         }
@@ -468,13 +465,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 1 + weaponInHand.Attributes.ExtraAmmoPerShot,
                 weaponInHand.Ammo);
 
-            var eventArgs = slotId == HandSlotIds.LeftHand ? _shotFiredArgsLeft : _shotFiredArgsRight;
-            eventArgs.StartPosition = handPosition;
-            eventArgs.EndPosition = endPos;
-            eventArgs.AmmoUsed = ammoUsed;
-            eventArgs.ObjectHit = rangedHit.transform?.gameObject;
+            var shotEvent = slotId == HandSlotIds.LeftHand ? _shotFiredArgsLeft : _shotFiredArgsRight;
+            shotEvent.StartPosition = handPosition;
+            shotEvent.EndPosition = endPos;
+            shotEvent.AmmoUsed = ammoUsed;
+            shotEvent.ObjectHit = rangedHit.transform?.gameObject;
 
-            _eventBus.PublishAsync(ShotFiredEventId, eventArgs).Forget();
+            _eventBus.PublishAsync(shotEvent).Forget();
 
             if (rangedHit.transform == null)
             {
@@ -490,7 +487,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        public static UniTask DefaultHandlerForShotFiredEventAsync(ShotFiredEventArgs eventArgs)
+        public static UniTask DefaultHandlerForShotFiredEventAsync(ShotFiredEvent eventArgs)
         {
             if (!eventArgs.Fighter.IsServer)
             {
@@ -596,7 +593,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             slotStatus.StopActiveConsumerBehaviour();
         }
 
-        public static void UpdateAmmoCounts(ReloadEventArgs eventArgs)
+        public static void UpdateAmmoCounts(ReloadEvent eventArgs)
         {
             var fighter = eventArgs.Fighter;
 

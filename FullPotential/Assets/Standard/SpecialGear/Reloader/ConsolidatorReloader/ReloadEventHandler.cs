@@ -13,16 +13,15 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 {
-    [SubscribeToEvent(FighterBase.ReloadEventId)]
-    public class ReloadEventHandler : IEventHandler<ReloadEventArgs>
+    public class ReloadEventHandler : IEventHandler<ReloadEvent>
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Func<ReloadEventArgs, UniTask> BeforeHandlerAsync => HandleReloadBeforeAsync;
+        public Func<ReloadEvent, UniTask> BeforeHandlerAsync => HandleReloadBeforeAsync;
 
-        public Func<ReloadEventArgs, UniTask> AfterHandlerAsync => null;
+        public Func<ReloadEvent, UniTask> AfterHandlerAsync => null;
 
-        private async UniTask HandleReloadBeforeAsync(ReloadEventArgs eventArgs)
+        private async UniTask HandleReloadBeforeAsync(ReloadEvent eventArgs)
         {
             if (!NetworkManager.Singleton.IsServer)
             {

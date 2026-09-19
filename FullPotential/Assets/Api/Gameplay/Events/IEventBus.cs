@@ -8,16 +8,12 @@ namespace FullPotential.Api.Gameplay.Events
 {
     public interface IEventBus
     {
-        //void Subscribe<THandler, TArgs>(string eventId)
-        //    where THandler : IEventHandler<TArgs>
-        //    where TArgs : IEventHandlerArgs;
+        void Subscribe(Type handlerType);
 
-        void Subscribe(string eventId, Type handlerType);
+        void Subscribe<TEvent>(Action<TEvent> handlerAction)
+            where TEvent : IEvent;
 
-        void Subscribe<TArgs>(string eventId, Action<TArgs> handlerAction)
-            where TArgs : IEventHandlerArgs;
-
-        UniTask PublishAsync<TArgs>(string eventId, TArgs args)
-            where TArgs : IEventHandlerArgs;
+        UniTask PublishAsync<TEvent>(TEvent args)
+            where TEvent : IEvent;
     }
 }

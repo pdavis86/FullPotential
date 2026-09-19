@@ -12,16 +12,15 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    [SubscribeToEvent(LivingEntityBase.ResourceValueChangeEventId)]
-    public class ChargeChangeEventHandler : IEventHandler<ResourceValueChangedEventArgs>
+    public class ChargeChangeEventHandler : IEventHandler<ResourceValueChangedEvent>
     {
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Func<ResourceValueChangedEventArgs, UniTask> BeforeHandlerAsync => null;
+        public Func<ResourceValueChangedEvent, UniTask> BeforeHandlerAsync => null;
 
-        public Func<ResourceValueChangedEventArgs, UniTask> AfterHandlerAsync => HandleAfterResourceValueChangedAsync;
+        public Func<ResourceValueChangedEvent, UniTask> AfterHandlerAsync => HandleAfterResourceValueChangedAsync;
 
-        private UniTask HandleAfterResourceValueChangedAsync(ResourceValueChangedEventArgs eventArgs)
+        private UniTask HandleAfterResourceValueChangedAsync(ResourceValueChangedEvent eventArgs)
         {
             if (eventArgs.ResourceTypeId != BarrierChargeResource.TypeIdString)
             {

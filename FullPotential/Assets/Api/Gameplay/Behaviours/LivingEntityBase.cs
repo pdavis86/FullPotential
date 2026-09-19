@@ -41,8 +41,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
     [RequireComponent(typeof(Rigidbody))]
     public abstract class LivingEntityBase : NetworkBehaviour
     {
-        public const string ResourceValueChangeEventId = "34372a74-abf3-44eb-8598-4427a82f29ab";
-
         private const int VelocityThreshold = 3;
         private const int ForceThreshold = 1000;
         private const int SingleResourceChangeEffectDisplaySeconds = 3;
@@ -199,7 +197,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ClientRpc]
         protected void ShowHudAlertClientRpc(string announcement, ClientRpcParams clientRpcParams)
         {
-            // todo: zzz v0.6 - Use events instead of ShowHudAlertClientRpc
+            // todo: Use events instead of ShowHudAlertClientRpc
             if (announcement.IsNullOrWhiteSpace())
             {
                 return;
@@ -330,13 +328,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public void TriggerResourceValueUpdate(string typeId, int change, bool isSelfInflicted)
         {
             var currentValue = ClampResourceValue(typeId, GetResourceValue(typeId));
-            var eventArgs = new ResourceValueChangedEventArgs(this, typeId, currentValue + change, change, isSelfInflicted);
-            _eventBus.PublishAsync(ResourceValueChangeEventId, eventArgs).Forget();
+            var changeEvent = new ResourceValueChangedEvent(this, typeId, currentValue + change, change, isSelfInflicted);
+            _eventBus.PublishAsync(changeEvent).Forget();
         }
 
-        public static UniTask DefaultHandlerForResourceValueChangeEventAsync(ResourceValueChangedEventArgs eventArgs)
+        public static UniTask DefaultHandlerForResourceValueChangeEventAsync(ResourceValueChangedEvent changeEvent)
         {
-            eventArgs.LivingEntity.UpdateResourceValue(eventArgs.ResourceTypeId, eventArgs.NewValue);
+            changeEvent.LivingEntity.UpdateResourceValue(changeEvent.ResourceTypeId, changeEvent.NewValue);
             return UniTask.CompletedTask;
         }
 

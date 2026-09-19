@@ -88,7 +88,7 @@ namespace FullPotential.Core.Player
             }
         }
 
-        // todo: zzz v0.6 - This should be an event
+        // todo: This should be an event
         private async UniTask ResetEquipmentUiAsync()
         {
             await UniTask.WaitForSeconds(0.1f);

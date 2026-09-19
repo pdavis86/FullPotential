@@ -11,16 +11,15 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Core.Registry.Events
 {
-    [SubscribeToEvent(LivingEntityBase.ResourceValueChangeEventId)]
-    public class LivingEntityHealthChangedEventHandler : IEventHandler<ResourceValueChangedEventArgs>
+    public class LivingEntityHealthChangedEventHandler : IEventHandler<ResourceValueChangedEvent>
     {
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Func<ResourceValueChangedEventArgs, UniTask> BeforeHandlerAsync => null;
+        public Func<ResourceValueChangedEvent, UniTask> BeforeHandlerAsync => null;
 
-        public Func<ResourceValueChangedEventArgs, UniTask> AfterHandlerAsync => HandleAfterValueChangedAsync;
+        public Func<ResourceValueChangedEvent, UniTask> AfterHandlerAsync => HandleAfterValueChangedAsync;
 
-        private UniTask HandleAfterValueChangedAsync(ResourceValueChangedEventArgs eventArgs)
+        private UniTask HandleAfterValueChangedAsync(ResourceValueChangedEvent eventArgs)
         {
             if (eventArgs.ResourceTypeId != ResourceTypeIds.HealthId)
             {

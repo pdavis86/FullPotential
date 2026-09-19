@@ -3,7 +3,8 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Api.Gameplay.Combat.Events
 {
-    public class ResourceValueChangedEventArgs : IEventHandlerArgs
+    [RegisterEvent("34372a74-abf3-44eb-8598-4427a82f29ab")]
+    public class ResourceValueChangedEvent : IEvent
     {
         public bool IsDefaultHandlerCancelled { get; set; }
 
@@ -17,7 +18,7 @@ namespace FullPotential.Api.Gameplay.Combat.Events
 
         public bool IsSelfInflicted { get; set; }
 
-        public ResourceValueChangedEventArgs(LivingEntityBase livingEntity, string resourceTypeId, int newValue, int change, bool isSelfInflicted)
+        public ResourceValueChangedEvent(LivingEntityBase livingEntity, string resourceTypeId, int newValue, int change, bool isSelfInflicted)
         {
             LivingEntity = livingEntity;
             ResourceTypeId = resourceTypeId;

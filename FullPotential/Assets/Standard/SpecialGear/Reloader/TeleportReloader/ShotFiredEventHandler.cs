@@ -12,16 +12,15 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 {
-    [SubscribeToEvent(FighterBase.ShotFiredEventId)]
-    public class ShotFiredEventHandler : IEventHandler<ShotFiredEventArgs>
+    public class ShotFiredEventHandler : IEventHandler<ShotFiredEvent>
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Func<ShotFiredEventArgs, UniTask> BeforeHandlerAsync => null;
+        public Func<ShotFiredEvent, UniTask> BeforeHandlerAsync => null;
 
-        public Func<ShotFiredEventArgs, UniTask> AfterHandlerAsync => HandleShotFiredAsync;
+        public Func<ShotFiredEvent, UniTask> AfterHandlerAsync => HandleShotFiredAsync;
 
-        private UniTask HandleShotFiredAsync(ShotFiredEventArgs eventArgs)
+        private UniTask HandleShotFiredAsync(ShotFiredEvent eventArgs)
         {
             var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Obsolete.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
@@ -37,7 +36,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 
             var fighter = eventArgs.Fighter;
 
-            var reloadEventArgs = new ReloadEventArgs(fighter, eventArgs.SlotId);
+            var reloadEventArgs = new ReloadEvent(fighter, eventArgs.SlotId);
 
             FighterBase.UpdateAmmoCounts(reloadEventArgs);
 

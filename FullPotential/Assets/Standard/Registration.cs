@@ -149,21 +149,5 @@ namespace FullPotential.Standard
                 Targeting.Projectile.AddressablePath,
             };
         }
-
-        // todo: zzz v.06 - Move this into type registry
-        //public void RegisterEventHandlers(IEventBus eventBus)
-        //{
-
-        //    var eventHandlerTypes = typeof(Registration).Assembly
-        //        .GetTypes()
-        //        .Where(t => t.GetCustomAttribute<SubscribeToEventAttribute>() != null)
-        //        .ToList();
-
-        //    foreach (var handlerType in eventHandlerTypes)
-        //    {
-        //        var eventId = handlerType.GetCustomAttribute<SubscribeToEventAttribute>().EventId;
-        //        eventBus.Subscribe(eventId, handlerType);
-        //    }
-        //}
     }
 }

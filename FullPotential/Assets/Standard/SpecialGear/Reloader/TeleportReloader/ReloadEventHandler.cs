@@ -10,16 +10,15 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 {
-    [SubscribeToEvent(FighterBase.ReloadEventId)]
-    public class ReloadEventHandler : IEventHandler<ReloadEventArgs>
+    public class ReloadEventHandler : IEventHandler<ReloadEvent>
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Func<ReloadEventArgs, UniTask> BeforeHandlerAsync => HandleReloadBeforeAsync;
+        public Func<ReloadEvent, UniTask> BeforeHandlerAsync => HandleReloadBeforeAsync;
 
-        public Func<ReloadEventArgs, UniTask> AfterHandlerAsync => null;
+        public Func<ReloadEvent, UniTask> AfterHandlerAsync => null;
 
-        private UniTask HandleReloadBeforeAsync(ReloadEventArgs eventArgs)
+        private UniTask HandleReloadBeforeAsync(ReloadEvent eventArgs)
         {
             var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Obsolete.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 

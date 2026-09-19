@@ -112,7 +112,7 @@ namespace FullPotential.Core.Registry
             ValidateAndRegister(typeof(Effects.Push));
 
             RegisterEventHandlerTypes(typeof(TypeRegistry).Assembly);
-		}
+        }
 
         private void HandleModRegistration(IMod mod)
         {
@@ -358,14 +358,14 @@ namespace FullPotential.Core.Registry
 
         private void RegisterEventHandlerTypes(Assembly assembly)
         {
-            var eventHandlerTypes = assembly.GetTypes()
-                .Where(t => t.GetCustomAttribute<SubscribeToEventAttribute>() != null)
+            var eventHandlerTypes = assembly
+                .GetTypes()
+                .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEventHandler<>)))
                 .ToList();
 
             foreach (var handlerType in eventHandlerTypes)
             {
-                var eventId = handlerType.GetCustomAttribute<SubscribeToEventAttribute>().EventId;
-                _eventBus.Subscribe(eventId, handlerType);
+                 _eventBus.Subscribe(handlerType);
             }
         }
     }

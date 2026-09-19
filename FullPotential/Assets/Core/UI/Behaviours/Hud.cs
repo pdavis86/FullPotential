@@ -95,7 +95,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 return;
             }
 
-            //todo: zzz v0.6 - use events instead of firing on every update!
+            //todo: use events instead of firing on every update!
             UpdateResourceBars();
             UpdateHandOverlays();
             UpdateActiveEffects();

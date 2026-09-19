@@ -3,11 +3,11 @@
 namespace FullPotential.Api.Gameplay.Events
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class SubscribeToEventAttribute : Attribute
+    public class RegisterEventAttribute : Attribute
     {
         public string EventId { get; }
 
-        public SubscribeToEventAttribute(string eventId)
+        public RegisterEventAttribute(string eventId)
         {
             EventId = eventId;
         }

@@ -9,15 +9,15 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Core.Gameplay.Events
 {
-    public class EventHandlerGroup<TArgs> : IEventHandlerGroup where TArgs : IEventHandlerArgs
+    public class EventHandlerGroup<TEvent> : IEventHandlerGroup where TEvent : IEvent
     {
         public string EventId { get; }
 
-        public Func<TArgs, UniTask> DefaultHandlerAsync { get; }
+        public Func<TEvent, UniTask> DefaultHandlerAsync { get; }
 
-        public HashSet<IEventHandler<TArgs>> OtherHandlers { get; } = new HashSet<IEventHandler<TArgs>>();
+        public HashSet<IEventHandler<TEvent>> OtherHandlers { get; } = new HashSet<IEventHandler<TEvent>>();
 
-        public EventHandlerGroup(string eventId, Func<TArgs, UniTask> defaultHandlerAsync)
+        public EventHandlerGroup(string eventId, Func<TEvent, UniTask> defaultHandlerAsync)
         {
             EventId = eventId;
             DefaultHandlerAsync = defaultHandlerAsync;
@@ -25,7 +25,7 @@ namespace FullPotential.Core.Gameplay.Events
 
         public void Add(object handler)
         {
-            OtherHandlers.Add((IEventHandler<TArgs>)handler);
+            OtherHandlers.Add((IEventHandler<TEvent>)handler);
         }
     }
 }

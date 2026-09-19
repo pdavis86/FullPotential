@@ -36,7 +36,7 @@ using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-// todo: zzz v0.6 - events to handle player inputs
+// todo: events to handle player inputs
 
 namespace FullPotential.Core.Player
 {

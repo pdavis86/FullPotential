@@ -20,17 +20,16 @@ using UnityEngine;
 
 namespace FullPotential.Standard.SpecialGear.Reloader
 {
-    [SubscribeToEvent(InventoryBase.SlotChangeEventId)]
-    public class SlotChangeEventHandler : IEventHandler<SlotChangeEventArgs>
+    public class SlotChangeEventHandler : IEventHandler<SlotChangeEvent>
     {
         private readonly IHud _hud;
         private GameObject _handWarningPrefab;
 
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Func<SlotChangeEventArgs, UniTask> BeforeHandlerAsync => null;
+        public Func<SlotChangeEvent, UniTask> BeforeHandlerAsync => null;
 
-        public Func<SlotChangeEventArgs, UniTask> AfterHandlerAsync => HandleAfterSlotChangeAsync;
+        public Func<SlotChangeEvent, UniTask> AfterHandlerAsync => HandleAfterSlotChangeAsync;
 
         public SlotChangeEventHandler(IGameManager gameManager, ITypeRegistry typeRegistry)
         {
@@ -41,7 +40,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader
                 prefab => _handWarningPrefab = prefab);
         }
 
-        private UniTask HandleAfterSlotChangeAsync(SlotChangeEventArgs eventArgs)
+        private UniTask HandleAfterSlotChangeAsync(SlotChangeEvent eventArgs)
         {
             if (eventArgs.Inventory.OwnerClientId != NetworkManager.Singleton.LocalClientId)
             {
