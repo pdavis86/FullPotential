@@ -15,7 +15,7 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class SlotChangeEventHandler : IEventHandler<SlotChangeEvent>
+    public class SlotChangeEventHandler : IEventHandler<SlotChangeEventArgs>
     {
         private readonly IHud _hud;
 
@@ -23,7 +23,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public Timing Timing => Timing.After;
 
-        public Func<SlotChangeEvent, UniTask> HandlerAsync => HandleAfterSlotChangeAsync;
+        public Func<SlotChangeEventArgs, UniTask<HandlerResult>> HandlerAsync => HandleAfterSlotChangeAsync;
 
         public SlotChangeEventHandler(IGameManager gameManager)
         {
@@ -32,11 +32,11 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             _hud.ToggleSliderBar(BarrierChargeResource.TypeIdString, false);
         }
 
-        private UniTask HandleAfterSlotChangeAsync(SlotChangeEvent eventArgs)
+        private UniTask<HandlerResult> HandleAfterSlotChangeAsync(SlotChangeEventArgs eventArgs)
         {
             if (eventArgs.SlotId != BarrierSlot.TypeIdString)
             {
-                return UniTask.CompletedTask;
+                return UniTask.FromResult(new HandlerResult());
             }
 
             var isBarrierEquipped = eventArgs.Inventory.GetItemInSlot(BarrierSlot.TypeIdString) != null;
@@ -51,7 +51,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 eventArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, 0, 0, false);
             }
 
-            return UniTask.CompletedTask;
+            return UniTask.FromResult(new HandlerResult());
         }
     }
 }

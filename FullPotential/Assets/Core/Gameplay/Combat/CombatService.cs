@@ -133,11 +133,11 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (targetFighter == null)
             {
-                _logger.Warn($"Not applying {effect.TypeId} to {targetGameObject.name} because they are not an FighterBase");
+                _logger.Debug($"Not applying effect {effect.TypeId} to {targetGameObject.name} because they are not an FighterBase");
                 return;
             }
 
-            _logger.Debug($"Applying {effect.TypeId} to {targetFighter.FighterName}");
+            _logger.Debug($"Applying effect {effect.TypeId} to {targetFighter.FighterName}");
 
             switch (effect)
             {

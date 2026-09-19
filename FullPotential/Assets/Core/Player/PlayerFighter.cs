@@ -482,7 +482,7 @@ namespace FullPotential.Core.Player
                 resource => resource.TypeId.ToString(),
                 resource => playerData.ValuePools.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value));
 
-            _eventBus.Subscribe<ResourceValueChangedEvent>(_ => MarkAsDirtyAndAddToQueue());
+            _eventBus.Subscribe<ResourceValueChangedEventArgs>(_ => MarkAsDirtyAndAddToQueue());
         }
 
         public void UpdatePlayerSettings(List<SerializableKeyValuePair<string, string>> updatedSettings)

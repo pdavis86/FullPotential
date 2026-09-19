@@ -12,10 +12,13 @@ namespace FullPotential.Api.Gameplay.Events
 
         void Subscribe(Type handlerType);
 
-        void Subscribe<TEvent>(Action<TEvent> handlerAction)
-            where TEvent : IEvent;
+        void Subscribe<TEventArgs>(Action<TEventArgs> handlerAction)
+            where TEventArgs : IEventArgs;
 
-        UniTask PublishAsync<TEvent>(TEvent eventArgs)
-            where TEvent : IEvent;
+        void Subscribe<TEventArgs>(Func<TEventArgs, UniTask<HandlerResult>> handlerFunction)
+            where TEventArgs : IEventArgs;
+
+        UniTask PublishAsync<TEventArgs>(TEventArgs eventArgs)
+            where TEventArgs : IEventArgs;
     }
 }

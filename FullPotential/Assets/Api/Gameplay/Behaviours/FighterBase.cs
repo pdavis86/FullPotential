@@ -43,15 +43,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
         #endregion
 
         #region Other Variables
-
+        
         // todo: Should slots be up to the mod instead of Core?
         private readonly Dictionary<string, SlotStatus> _slotStatuses = new Dictionary<string, SlotStatus>();
 
         private DelayedAction _consumeResource;
-        private ReloadEvent _reloadEventLeft;
-        private ReloadEvent _reloadEventRight;
-        private ShotFiredEvent _shotFiredArgsLeft;
-        private ShotFiredEvent _shotFiredArgsRight;
+
         #endregion
 
         #region Properties
@@ -75,13 +72,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var leftSlotStatus = new SlotStatus(_logger, this, HandSlotIds.LeftHand);
             _slotStatuses.Add(HandSlotIds.LeftHand, leftSlotStatus);
-            _reloadEventLeft = new ReloadEvent(this, HandSlotIds.LeftHand);
-            _shotFiredArgsLeft = new ShotFiredEvent(this, HandSlotIds.LeftHand);
 
             var rightSlotStatus = new SlotStatus(_logger, this, HandSlotIds.RightHand);
             _slotStatuses.Add(HandSlotIds.RightHand, rightSlotStatus);
-            _reloadEventRight = new ReloadEvent(this, HandSlotIds.RightHand);
-            _shotFiredArgsRight = new ShotFiredEvent(this, HandSlotIds.RightHand);
         }
 
         protected override void Start()
@@ -173,8 +166,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return false;
             }
 
-            var reloadEvent = slotId == HandSlotIds.LeftHand ? _reloadEventLeft : _reloadEventRight;
-            _eventBus.PublishAsync(reloadEvent).Forget();
+            _eventBus.PublishAsync(new ReloadEventArgs(this, slotId)).Forget();
 
             return true;
         }
@@ -462,13 +454,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 1 + weaponInHand.Attributes.ExtraAmmoPerShot,
                 weaponInHand.Ammo);
 
-            var shotEvent = slotId == HandSlotIds.LeftHand ? _shotFiredArgsLeft : _shotFiredArgsRight;
-            shotEvent.StartPosition = handPosition;
-            shotEvent.EndPosition = endPos;
-            shotEvent.AmmoUsed = ammoUsed;
-            shotEvent.ObjectHit = rangedHit.transform?.gameObject;
-
-            _eventBus.PublishAsync(shotEvent).Forget();
+            var eventArgs = new ShotFiredEventArgs(this, slotId, handPosition, endPos, ammoUsed, rangedHit.transform?.gameObject);
+            _eventBus.PublishAsync(eventArgs).Forget();
 
             if (rangedHit.transform == null)
             {

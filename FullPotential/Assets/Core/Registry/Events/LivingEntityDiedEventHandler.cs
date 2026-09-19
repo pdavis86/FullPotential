@@ -10,24 +10,24 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Core.Registry.Events
 {
-    public class LivingEntityDiedEventHandler : IEventHandler<ResourceValueChangedEvent>
+    public class LivingEntityDiedEventHandler : IEventHandler<ResourceValueChangedEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
         public Timing Timing => Timing.After;
 
-        public Func<ResourceValueChangedEvent, UniTask> HandlerAsync => HandleAfterResourceValueChangedAsync;
+        public Func<ResourceValueChangedEventArgs, UniTask<HandlerResult>> HandlerAsync => HandleAfterResourceValueChangedAsync;
 
-        private UniTask HandleAfterResourceValueChangedAsync(ResourceValueChangedEvent eventArgs)
+        private UniTask<HandlerResult> HandleAfterResourceValueChangedAsync(ResourceValueChangedEventArgs eventArgs)
         {
             if (eventArgs.NewValue > 0 || eventArgs.ResourceTypeId != ResourceTypeIds.HealthId)
             {
-                return UniTask.CompletedTask;
+                return UniTask.FromResult(new HandlerResult());
             }
 
             eventArgs.LivingEntity.HandleDeath();
 
-            return UniTask.CompletedTask;
+            return UniTask.FromResult(new HandlerResult());
         }
     }
 }

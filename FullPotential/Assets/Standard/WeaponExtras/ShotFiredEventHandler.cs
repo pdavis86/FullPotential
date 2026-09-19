@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace FullPotential.Standard.WeaponExtras
 {
-    public class ShotFiredEventHandler : IEventHandler<ShotFiredEvent>
+    public class ShotFiredEventHandler : IEventHandler<ShotFiredEventArgs>
     {
         private const string BulletTrailPrefabAddress = "Standard/Prefabs/Combat/BulletTrail.prefab";
 
@@ -23,36 +23,36 @@ namespace FullPotential.Standard.WeaponExtras
 
         public Timing Timing => Timing.After;
 
-        public Func<ShotFiredEvent, UniTask> HandlerAsync => HandleAfterBulletFiredAsync;
+        public Func<ShotFiredEventArgs, UniTask<HandlerResult>> HandlerAsync => HandleAfterBulletFiredAsync;
 
         public ShotFiredEventHandler(ITypeRegistry typeRegistry)
         {
             _typeRegistry = typeRegistry;
         }
 
-        private UniTask HandleAfterBulletFiredAsync(ShotFiredEvent eventArgs)
+        private UniTask<HandlerResult> HandleAfterBulletFiredAsync(ShotFiredEventArgs eventArgs)
         {
             var item = eventArgs.Fighter.Inventory.GetItemInSlot(eventArgs.SlotId);
 
             if (item is not Weapon weapon || !weapon.IsRanged)
             {
-                return UniTask.CompletedTask;
+                return UniTask.FromResult(new HandlerResult());
             }
 
             _typeRegistry.LoadAddessable<GameObject>(BulletTrailPrefabAddress, prefab =>
             {
                 var projectile = UnityEngine.Object.Instantiate(
                     prefab,
-                    eventArgs.StartPosition,
+                    eventArgs.StartPosition.Value,
                     Quaternion.identity);
 
                 var projectileScript = projectile.GetComponent<ProjectileWithTrail>();
-                projectileScript.TargetPosition = eventArgs.EndPosition;
+                projectileScript.TargetPosition = eventArgs.EndPosition.Value;
                 projectileScript.Speed = 500;
                 projectileScript.ObjectHit = eventArgs.ObjectHit;
             });
-        
-                return UniTask.CompletedTask;
+
+            return UniTask.FromResult(new HandlerResult());
         }
     }
 }

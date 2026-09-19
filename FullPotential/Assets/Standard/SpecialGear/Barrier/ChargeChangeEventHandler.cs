@@ -11,19 +11,19 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class ChargeChangeEventHandler : IEventHandler<ResourceValueChangedEvent>
+    public class ChargeChangeEventHandler : IEventHandler<ResourceValueChangedEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Client;
 
         public Timing Timing => Timing.After;
 
-        public Func<ResourceValueChangedEvent, UniTask> HandlerAsync => HandleAfterResourceValueChangedAsync;
+        public Func<ResourceValueChangedEventArgs, UniTask<HandlerResult>> HandlerAsync => HandleAfterResourceValueChangedAsync;
 
-        private UniTask HandleAfterResourceValueChangedAsync(ResourceValueChangedEvent eventArgs)
+        private UniTask<HandlerResult> HandleAfterResourceValueChangedAsync(ResourceValueChangedEventArgs eventArgs)
         {
             if (eventArgs.ResourceTypeId != BarrierChargeResource.TypeIdString)
             {
-                return UniTask.CompletedTask;
+                return UniTask.FromResult(new HandlerResult());
             }
 
             var remainingCharge = eventArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString);
@@ -31,7 +31,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             eventArgs.LivingEntity.Inventory.ToggleEquippedItemVisuals(BarrierSlot.TypeIdString, showVisuals);
 
-            return UniTask.CompletedTask;
+            return UniTask.FromResult(new HandlerResult());
         }
     }
 }

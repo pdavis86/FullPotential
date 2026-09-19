@@ -9,7 +9,9 @@ using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Crafting;
+using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Player.Models;
+using FullPotential.Api.Input;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Localization;
@@ -54,6 +56,7 @@ namespace FullPotential.Core.Player
 
         //Services
         private IAuditor _logger;
+        private IEventBus _eventBus;
         private IResultFactory _resultFactory;
         private ILocalizer _localizer;
         private IItemFactory _itemFactory;
@@ -80,6 +83,7 @@ namespace FullPotential.Core.Player
             _playerMovement = GetComponent<PlayerMovement>();
 
             _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
+            _eventBus = DependenciesContext.Dependencies.GetService<IEventBus>();
             _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _itemFactory = DependenciesContext.Dependencies.GetService<IItemFactory>();
@@ -202,6 +206,8 @@ namespace FullPotential.Core.Player
         private void OnAttackHoldLeft()
         {
             _logger.Debug("OnAttackHoldLeft");
+
+            _eventBus.PublishAsync(new AttackHoldEventArgs(_playerFighter, HandSlotIds.LeftHand));
 
             HandleAttackHold(HandSlotIds.LeftHand);
         }

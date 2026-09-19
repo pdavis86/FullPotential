@@ -19,7 +19,7 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 {
-    public class ReloadEventHandler : IEventHandler<ReloadEvent>
+    public class ReloadEventHandler : IEventHandler<ReloadEventArgs>
     {
         private readonly ITypeRegistry _typeRegistry;
         private readonly ILocalizer _localizer;
@@ -29,7 +29,7 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 
         public Timing Timing => Timing.Before;
 
-        public Func<ReloadEvent, UniTask> HandlerAsync => HandleReloadBeforeAsync;
+        public Func<ReloadEventArgs, UniTask<HandlerResult>> HandlerAsync => HandleReloadBeforeAsync;
 
         public ReloadEventHandler(ITypeRegistry typeRegistry, ILocalizer localizer, IItemFactory itemFactory)
         {
@@ -38,11 +38,11 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
             _itemFactory = itemFactory;
         }
 
-        private UniTask HandleReloadBeforeAsync(ReloadEvent eventArgs)
+        private UniTask<HandlerResult> HandleReloadBeforeAsync(ReloadEventArgs eventArgs)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
-                return UniTask.CompletedTask;
+                return UniTask.FromResult(new HandlerResult());
             }
 
             var buyerSlotId = Accessory.GetSlotId(AutoAmmoBuyer.TypeIdString, 1);
@@ -50,7 +50,7 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 
             if (buyerItem == null)
             {
-                return UniTask.CompletedTask;
+                return UniTask.FromResult(new HandlerResult());
             }
 
             var fighter = eventArgs.Fighter;
@@ -67,7 +67,7 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 
             if (ammoRemaining >= equippedWeapon.GetAmmoMax() || !hasEnoughMoney)
             {
-                return UniTask.CompletedTask;
+                return UniTask.FromResult(new HandlerResult());
             }
 
             var newItemStack = new ItemStackBase
@@ -88,7 +88,7 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
                 //todo: zzz v0.9 - take money for ammo ItemStack
             }
 
-            return UniTask.CompletedTask;
+            return UniTask.FromResult(new HandlerResult());
         }
     }
 }

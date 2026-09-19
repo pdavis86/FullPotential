@@ -8,37 +8,23 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Core.Gameplay.Events
 {
-    public class BasicEventHandler<TEvent> : IEventHandler<TEvent>
-        where TEvent : IEvent
+    public class BasicEventHandler<TEventArgs> : IEventHandler<TEventArgs>
+        where TEventArgs : IEventArgs
     {
         public NetworkLocation Location { get; private set; }
 
         public Timing Timing { get; private set; }
 
-        public Func<TEvent, UniTask> HandlerAsync { get; private set; }
+        public Func<TEventArgs, UniTask<HandlerResult>> HandlerAsync { get; private set; }
 
         public BasicEventHandler(
-            Func<TEvent, UniTask> basicFunction,
+            Func<TEventArgs, UniTask<HandlerResult>> basicFunction,
             NetworkLocation location = NetworkLocation.Both,
             Timing timing = Timing.Main)
         {
             Location = location;
             Timing = timing;
             HandlerAsync = basicFunction;
-        }
-
-        public BasicEventHandler(
-            Action<TEvent> basicAction,
-            NetworkLocation location = NetworkLocation.Both,
-            Timing timing = Timing.Main)
-        {
-            Location = location;
-            Timing = timing;
-            HandlerAsync = args =>
-            {
-                basicAction(args);
-                return UniTask.CompletedTask;
-            };
         }
     }
 }

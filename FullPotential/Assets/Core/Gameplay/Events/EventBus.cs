@@ -18,27 +18,27 @@ namespace FullPotential.Core.Gameplay.Events
     public class EventBus : IEventBus
     {
         private readonly IAuditor _logger;
-        private readonly Dictionary<string, IEventHandlerGroup> _subscriptions = new Dictionary<string, IEventHandlerGroup>();
+        private readonly Dictionary<Type, IEventHandlerGroup> _subscriptions = new Dictionary<Type, IEventHandlerGroup>();
 
         public EventBus(IAuditorFactory auditorFactory)
         {
             _logger = auditorFactory.Create(this);
         }
 
-        public void Register(Type eventType)
+        public void Register(Type eventArgsType)
         {
-            var eventId = eventType.GetCustomAttribute<RegisterEventAttribute>()?.EventId;
+            var attribute = eventArgsType.GetCustomAttribute<RegisterEventAttribute>();
 
-            if (eventId == null)
+            if (attribute == null)
             {
-                _logger.Error($"The type '{eventType}' is missing the attribute '{nameof(RegisterEventAttribute)}'");
+                _logger.Error($"The type '{eventArgsType}' is missing the attribute '{nameof(RegisterEventAttribute)}'");
                 return;
             }
 
-            var groupType = typeof(EventHandlerGroup<>).MakeGenericType(eventType);
+            var groupType = typeof(EventHandlerGroup<>).MakeGenericType(eventArgsType);
             var group = (IEventHandlerGroup)DependenciesContext.Dependencies.CreateInstance(groupType);
 
-            _subscriptions.Add(eventId, group);
+            _subscriptions.Add(eventArgsType, group);
         }
 
         public void Subscribe(Type handlerType)
@@ -51,62 +51,53 @@ namespace FullPotential.Core.Gameplay.Events
                 return;
             }
 
-            var eventType = handlerType
+            var argsType = handlerType
                 .GetInterfaces()
                 .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEventHandler<>))
                 .GetGenericArguments()[0];
 
-            if (typeof(BasicEventHandler<>).MakeGenericType(eventType).IsAssignableFrom(handlerType))
+            if (typeof(BasicEventHandler<>).MakeGenericType(argsType).IsAssignableFrom(handlerType))
             {
-                return;
-            }
-
-            var eventId = eventType.GetCustomAttribute<RegisterEventAttribute>()?.EventId;
-
-            if (eventId == null)
-            {
-                _logger.Error($"The type '{eventType}' is missing the attribute '{nameof(RegisterEventAttribute)}'");
                 return;
             }
 
             var handler = DependenciesContext.Dependencies.CreateInstance(handlerType);
-            Subscribe(eventId, handler);
+            Subscribe(argsType, handler);
         }
 
-        public void Subscribe<TEvent>(Action<TEvent> handlerAction)
-            where TEvent : IEvent
+        public void Subscribe<TEventArgs>(Action<TEventArgs> handlerAction)
+            where TEventArgs : IEventArgs
         {
-            var eventId = typeof(TEvent).GetCustomAttribute<RegisterEventAttribute>()?.EventId;
-
-            if (eventId == null)
+            var handler = new BasicEventHandler<TEventArgs>(args =>
             {
-                _logger.Error($"The type '{typeof(TEvent)}' is missing the attribute '{nameof(RegisterEventAttribute)}'");
-                return;
-            }
+                handlerAction(args);
+                return UniTask.FromResult(new HandlerResult());
+            });
 
-            var handler = new BasicEventHandler<TEvent>(handlerAction);
-            Subscribe(eventId, handler);
+            Subscribe(typeof(TEventArgs), handler);
         }
 
-        public async UniTask PublishAsync<TEvent>(TEvent eventArgs)
-            where TEvent : IEvent
+        public void Subscribe<TEventArgs>(Func<TEventArgs, UniTask<HandlerResult>> handlerFunction)
+            where TEventArgs : IEventArgs
         {
-            eventArgs.IsCancelled = false;
+            var handler = new BasicEventHandler<TEventArgs>(handlerFunction);
+            Subscribe(typeof(TEventArgs), handler);
+        }
 
-            var eventId = eventArgs.GetType().GetCustomAttribute<RegisterEventAttribute>()?.EventId;
+        public async UniTask PublishAsync<TEventArgs>(TEventArgs eventArgs)
+            where TEventArgs : IEventArgs
+        {
+            var argsType = eventArgs.GetType();
 
-            if (eventId == null)
+            if (!IsEventRegistered(argsType))
             {
-                _logger.Error($"The type '{eventArgs.GetType()}' is missing the attribute '{nameof(RegisterEventAttribute)}'");
+                _logger.Error($"No event with args type '{argsType}' was registered");
                 return;
             }
 
-            if (!IsEventIdRegistered(eventId))
-            {
-                return;
-            }
+            _logger.Debug($"Event with args type '{argsType}' was published");
 
-            var handlerGroup = (EventHandlerGroup<TEvent>)_subscriptions[eventId];
+            var handlerGroup = (EventHandlerGroup<TEventArgs>)_subscriptions[argsType];
             var timings = new List<Timing> { Timing.Before, Timing.Main, Timing.After };
 
             foreach (var timing in timings)
@@ -115,31 +106,38 @@ namespace FullPotential.Core.Gameplay.Events
                 {
                     if (ShouldHandlerRun(handler, timing))
                     {
-                        await handler.HandlerAsync(eventArgs);
+                        var result = await handler.HandlerAsync(eventArgs);
 
-                        if (eventArgs.IsCancelled)
+                        if (result.NextAction == NextAction.Cancel)
                         {
+                            _logger.Debug($"Handler {handler.GetType().FullName} cancelled the remaining handlers");
                             return;
+                        }
+
+                        if (result.UpdatedEventArgs != null
+                            && result.UpdatedEventArgs is TEventArgs updatedEventArgs)
+                        {
+                            eventArgs = updatedEventArgs;
                         }
                     }
                 }
             }
         }
 
-        private void Subscribe(string eventId, object handler)
+        private void Subscribe(Type argsType, object handler)
         {
-            if (!_subscriptions.ContainsKey(eventId))
+            if (!_subscriptions.ContainsKey(argsType))
             {
-                _logger.Error($"Handler '{handler.GetType().FullName}' cannot subscribe to event '{eventId}' as it has not been registered");
+                _logger.Error($"Handler '{handler.GetType().FullName}' cannot subscribe to event with arguments type '{argsType}' as it has not been registered");
                 return;
             }
 
-            var group = _subscriptions[eventId];
+            var group = _subscriptions[argsType];
             group.Add(handler);
         }
 
-        private bool ShouldHandlerRun<TEvent>(IEventHandler<TEvent> handler, Timing timing)
-            where TEvent : IEvent
+        private bool ShouldHandlerRun<TEventArgs>(IEventHandler<TEventArgs> handler, Timing timing)
+            where TEventArgs : IEventArgs
         {
             if (handler.Timing != timing)
             {
@@ -159,14 +157,14 @@ namespace FullPotential.Core.Gameplay.Events
             }
         }
 
-        private bool IsEventIdRegistered(string eventId)
+        private bool IsEventRegistered(Type argsType)
         {
-            if (_subscriptions.ContainsKey(eventId))
+            if (_subscriptions.ContainsKey(argsType))
             {
                 return true;
             }
 
-            _logger.Error("No event handler has been registered for event " + eventId);
+            _logger.Error("No event handler has been registered for event with arguments type " + argsType);
             return false;
         }
     }

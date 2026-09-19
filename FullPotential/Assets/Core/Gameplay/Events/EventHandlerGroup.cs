@@ -4,17 +4,17 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Core.Gameplay.Events
 {
-    public class EventHandlerGroup<TEvent> : IEventHandlerGroup where TEvent : IEvent
+    public class EventHandlerGroup<TEventArgs> : IEventHandlerGroup where TEventArgs : IEventArgs
     {
-        public HashSet<IEventHandler<TEvent>> Handlers { get; } = new HashSet<IEventHandler<TEvent>>();
+        public HashSet<IEventHandler<TEventArgs>> Handlers { get; } = new HashSet<IEventHandler<TEventArgs>>();
 
         public void Add(object handler)
         {
-            Handlers.Add((IEventHandler<TEvent>)handler);
+            Handlers.Add((IEventHandler<TEventArgs>)handler);
         }
         public bool Remove(object handler)
         {
-            return Handlers.Remove((IEventHandler<TEvent>)handler);
+            return Handlers.Remove((IEventHandler<TEventArgs>)handler);
         }
     }
 }

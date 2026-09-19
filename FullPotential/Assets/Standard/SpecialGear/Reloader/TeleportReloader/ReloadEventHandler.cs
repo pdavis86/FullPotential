@@ -9,31 +9,29 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 {
-    public class ReloadEventHandler : IEventHandler<ReloadEvent>
+    public class ReloadEventHandler : IEventHandler<ReloadEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
         public Timing Timing => Timing.Before;
 
-        public Func<ReloadEvent, UniTask> HandlerAsync => HandleReloadBeforeAsync;
+        public Func<ReloadEventArgs, UniTask<HandlerResult>> HandlerAsync => HandleReloadBeforeAsync;
 
-        private UniTask HandleReloadBeforeAsync(ReloadEvent eventArgs)
+        private UniTask<HandlerResult> HandleReloadBeforeAsync(ReloadEventArgs eventArgs)
         {
             var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Obsolete.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
             if (reloader == null || reloader.RegistryTypeId != TeleportReloader.TypeIdString)
             {
-                return UniTask.CompletedTask;
+                return UniTask.FromResult(new HandlerResult());
             }
 
             if (!eventArgs.Fighter.ConsumeResource(reloader, slowDrain: true, isTest: true))
             {
-                return UniTask.CompletedTask;
+                return UniTask.FromResult(new HandlerResult());
             }
 
-            eventArgs.IsCancelled = true;
-
-            return UniTask.CompletedTask;
+            return UniTask.FromResult(new HandlerResult(NextAction.Cancel));
         }
     }
 }

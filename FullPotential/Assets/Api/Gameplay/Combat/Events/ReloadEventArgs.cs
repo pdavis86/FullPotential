@@ -5,22 +5,20 @@ using FullPotential.Api.Obsolete.Items.Types;
 namespace FullPotential.Api.Gameplay.Combat.Events
 {
     // todo: move to standard
-    [RegisterEvent("2337f94e-5a7d-4e02-b1c8-1b5e9934a3ce")]
-    public class ReloadEvent : IEvent
+    [RegisterEvent]
+    public struct ReloadEventArgs : IEventArgs
     {
-        public bool IsCancelled { get; set; }
-
         public FighterBase Fighter { get; }
 
         public string SlotId { get; }
 
-        public ReloadEvent(FighterBase fighter, string slotId)
+        public ReloadEventArgs(FighterBase fighter, string slotId)
         {
             Fighter = fighter;
             SlotId = slotId;
         }
 
-        public static void UpdateAmmoCounts(ReloadEvent eventArgs)
+        public static void UpdateAmmoCounts(ReloadEventArgs eventArgs)
         {
             var fighter = eventArgs.Fighter;
 

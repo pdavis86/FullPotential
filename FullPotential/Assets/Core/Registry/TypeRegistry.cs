@@ -102,8 +102,8 @@ namespace FullPotential.Core.Registry
 
         private void RegisterApiTypes()
         {
-            RegisterEventTypes(typeof(IEvent).Assembly);
-            RegisterEventHandlerTypes(typeof(IEvent).Assembly);
+            RegisterEventTypes(typeof(IEventArgs).Assembly);
+            RegisterEventHandlerTypes(typeof(IEventArgs).Assembly);
         }
 
         private void RegisterCoreTypes()
@@ -373,15 +373,19 @@ namespace FullPotential.Core.Registry
         {
             var eventTypes = assembly
                 .GetTypes()
-                .Where(
-                    t => typeof(IEvent).IsAssignableFrom(t)
-                    && !t.IsInterface
-                    && !t.IsAbstract)
+                .Where(t => t.GetCustomAttribute<RegisterEventAttribute>() != null)
                 .ToList();
 
             foreach (var eventType in eventTypes)
             {
-                _eventBus.Register(eventType);
+                try
+                {
+                    _eventBus.Register(eventType);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex);
+                }
             }
         }
 
@@ -394,7 +398,14 @@ namespace FullPotential.Core.Registry
 
             foreach (var handlerType in eventHandlerTypes)
             {
-                _eventBus.Subscribe(handlerType);
+                try
+                {
+                    _eventBus.Subscribe(handlerType);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex);
+                }
             }
         }
     }

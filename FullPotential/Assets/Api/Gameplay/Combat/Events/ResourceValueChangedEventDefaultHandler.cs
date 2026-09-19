@@ -6,18 +6,18 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Api.Gameplay.Combat.Events
 {
-    public class ResourceValueChangedEventDefaultHandler : IEventHandler<ResourceValueChangedEvent>
+    public class ResourceValueChangedEventDefaultHandler : IEventHandler<ResourceValueChangedEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Both;
 
         public Timing Timing => Timing.Main;
 
-        public Func<ResourceValueChangedEvent, UniTask> HandlerAsync => DefaultHandler;
+        public Func<ResourceValueChangedEventArgs, UniTask<HandlerResult>> HandlerAsync => DefaultHandlerAsync;
 
-        private UniTask DefaultHandler(ResourceValueChangedEvent eventArgs)
+        private UniTask<HandlerResult> DefaultHandlerAsync(ResourceValueChangedEventArgs eventArgs)
         {
             eventArgs.LivingEntity.UpdateResourceValue(eventArgs.ResourceTypeId, eventArgs.NewValue);
-            return UniTask.CompletedTask;
+            return UniTask.FromResult(new HandlerResult());
         }
     }
 }

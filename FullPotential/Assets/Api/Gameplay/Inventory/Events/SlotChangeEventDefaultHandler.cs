@@ -6,18 +6,18 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Api.Gameplay.Inventory.Events
 {
-    public class SlotChangeEventDefaultHandler : IEventHandler<SlotChangeEvent>
+    public class SlotChangeEventDefaultHandler : IEventHandler<SlotChangeEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Both;
 
         public Timing Timing => Timing.Main;
 
-        public Func<SlotChangeEvent, UniTask> HandlerAsync => DefaultHandler;
+        public Func<SlotChangeEventArgs, UniTask<HandlerResult>> HandlerAsync => DefaultHandlerAsync;
 
-        private UniTask DefaultHandler(SlotChangeEvent eventArgs)
+        private UniTask<HandlerResult> DefaultHandlerAsync(SlotChangeEventArgs eventArgs)
         {
             eventArgs.Inventory.ApplyEquippedItemChange(eventArgs.ItemId, eventArgs.SlotId);
-            return UniTask.CompletedTask;
+            return UniTask.FromResult(new HandlerResult());
         }
     }
 }

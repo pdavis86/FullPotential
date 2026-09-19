@@ -8,15 +8,15 @@ using FullPotential.Api.Obsolete.Items.Types;
 
 namespace FullPotential.Standard.Weapons.Events
 {
-    public class ReloadEventDefaultHandler : IEventHandler<ReloadEvent>
+    public class ReloadEventDefaultHandler : IEventHandler<ReloadEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Both;
 
         public Timing Timing => Timing.Main;
 
-        public Func<ReloadEvent, UniTask> HandlerAsync => DefaultHandler;
+        public Func<ReloadEventArgs, UniTask<HandlerResult>> HandlerAsync => DefaultHandlerAsync;
 
-        private async UniTask DefaultHandler(ReloadEvent eventArgs)
+        private async UniTask<HandlerResult> DefaultHandlerAsync(ReloadEventArgs eventArgs)
         {
             var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);
             slotStatus.IsBusy = true;
@@ -28,9 +28,11 @@ namespace FullPotential.Standard.Weapons.Events
 
             await UniTask.WaitForSeconds(weapon.GetReloadTime());
 
-            ReloadEvent.UpdateAmmoCounts(eventArgs);
+            ReloadEventArgs.UpdateAmmoCounts(eventArgs);
 
             slotStatus.IsBusy = false;
+
+            return new HandlerResult();
         }
     }
 }

@@ -248,12 +248,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _lastDamageSourceName = sourceFighter != null ? sourceFighter.FighterName : null;
             _lastDamageItemName = itemUsed?.Name.OrIfNullOrWhitespace(_localizer.Translate("ui.alert.attack.noitem"));
 
-            _logger.Debug($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
-
             if (sourceFighter == null)
             {
                 return;
             }
+
+            _logger.Debug($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
 
             var sourceNetworkObject = sourceFighter.GameObject.GetComponent<NetworkObject>();
             var sourceClientId = sourceNetworkObject != null ? (ulong?)sourceNetworkObject.OwnerClientId : null;
@@ -328,7 +328,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public void TriggerResourceValueUpdate(string typeId, int change, bool isSelfInflicted)
         {
             var currentValue = ClampResourceValue(typeId, GetResourceValue(typeId));
-            var changeEvent = new ResourceValueChangedEvent(this, typeId, currentValue + change, change, isSelfInflicted);
+            var changeEvent = new ResourceValueChangedEventArgs(this, typeId, currentValue + change, change, isSelfInflicted);
             _eventBus.PublishAsync(changeEvent).Forget();
         }
 

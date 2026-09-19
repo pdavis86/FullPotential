@@ -8,29 +8,29 @@ using FullPotential.Api.Obsolete.Items.Types;
 
 namespace FullPotential.Standard.Weapons.Events
 {
-    public class ShotFiredEventDefaultHandler : IEventHandler<ShotFiredEvent>
+    public class ShotFiredEventDefaultHandler : IEventHandler<ShotFiredEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Both;
 
         public Timing Timing => Timing.Main;
 
-        public Func<ShotFiredEvent, UniTask> HandlerAsync => DefaultHandler;
+        public Func<ShotFiredEventArgs, UniTask<HandlerResult>> HandlerAsync => DefaultHandlerAsync;
 
-        private UniTask DefaultHandler(ShotFiredEvent eventArgs)
+        private UniTask<HandlerResult> DefaultHandlerAsync(ShotFiredEventArgs eventArgs)
         {
             if (!eventArgs.Fighter.IsServer)
             {
-                return UniTask.CompletedTask;
+                return UniTask.FromResult(new HandlerResult());
             }
 
             var fighter = eventArgs.Fighter;
 
             var equippedWeapon = fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
 
-            equippedWeapon.UpdateAmmo(equippedWeapon.Ammo - eventArgs.AmmoUsed);
+            equippedWeapon.UpdateAmmo(equippedWeapon.Ammo - eventArgs.AmmoUsed.Value);
             equippedWeapon.IsDirty = true;
 
-            return UniTask.CompletedTask;
+            return UniTask.FromResult(new HandlerResult());
         }
     }
 }

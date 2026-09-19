@@ -20,7 +20,7 @@ using UnityEngine;
 
 namespace FullPotential.Standard.SpecialGear.Reloader
 {
-    public class SlotChangeEventHandler : IEventHandler<SlotChangeEvent>
+    public class SlotChangeEventHandler : IEventHandler<SlotChangeEventArgs>
     {
         private readonly IHud _hud;
         private GameObject _handWarningPrefab;
@@ -29,7 +29,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader
 
         public Timing Timing => Timing.After;
 
-        public Func<SlotChangeEvent, UniTask> HandlerAsync => HandleAfterSlotChangeAsync;
+        public Func<SlotChangeEventArgs, UniTask<HandlerResult>> HandlerAsync => HandleAfterSlotChangeAsync;
 
         public SlotChangeEventHandler(IGameManager gameManager, ITypeRegistry typeRegistry)
         {
@@ -40,18 +40,18 @@ namespace FullPotential.Standard.SpecialGear.Reloader
                 prefab => _handWarningPrefab = prefab);
         }
 
-        private UniTask HandleAfterSlotChangeAsync(SlotChangeEvent eventArgs)
+        private UniTask<HandlerResult> HandleAfterSlotChangeAsync(SlotChangeEventArgs eventArgs)
         {
             if (eventArgs.Inventory.OwnerClientId != NetworkManager.Singleton.LocalClientId)
             {
-                return UniTask.CompletedTask;
+                return UniTask.FromResult(new HandlerResult());
             }
 
             if (eventArgs.SlotId != HandSlotIds.LeftHand
                 && eventArgs.SlotId != HandSlotIds.RightHand
                 && eventArgs.SlotId != RangedWeaponReloaderSlot.TypeIdString)
             {
-                return UniTask.CompletedTask;
+                return UniTask.FromResult(new HandlerResult());
             }
 
             var reloaderEquipped = eventArgs.Inventory.GetItemInSlot(RangedWeaponReloaderSlot.TypeIdString);
@@ -69,7 +69,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader
                     break;
             }
 
-            return UniTask.CompletedTask;
+            return UniTask.FromResult(new HandlerResult());
         }
 
         private void AddOrRemoveHandIcon(InventoryBase inventory, string slotId, ItemBase reloaderEquipped)

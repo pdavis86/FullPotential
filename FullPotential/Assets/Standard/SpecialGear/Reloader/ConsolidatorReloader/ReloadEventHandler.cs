@@ -12,34 +12,32 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 {
-    public class ReloadEventHandler : IEventHandler<ReloadEvent>
+    public class ReloadEventHandler : IEventHandler<ReloadEventArgs>
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
         public Timing Timing => Timing.Before;
 
-        public Func<ReloadEvent, UniTask> HandlerAsync => HandleReloadBeforeAsync;
+        public Func<ReloadEventArgs, UniTask<HandlerResult>> HandlerAsync => HandleReloadBeforeAsync;
 
-        private async UniTask HandleReloadBeforeAsync(ReloadEvent eventArgs)
+        private async UniTask<HandlerResult> HandleReloadBeforeAsync(ReloadEventArgs eventArgs)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
-                return;
+                return new HandlerResult();
             }
 
             var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Obsolete.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
             if (reloader == null || reloader.RegistryTypeId != ConsolidatorReloader.TypeIdString)
             {
-                return;
+                return new HandlerResult();
             }
 
             if (!eventArgs.Fighter.ConsumeResource(reloader))
             {
-                return;
+                return new HandlerResult();
             }
-
-            eventArgs.IsCancelled = true;
 
             var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);
 
@@ -48,9 +46,11 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
             var weapon = eventArgs.Fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
             await UniTask.WaitForSeconds(weapon.GetReloadTime());
 
-            ReloadEvent.UpdateAmmoCounts(eventArgs);
+            ReloadEventArgs.UpdateAmmoCounts(eventArgs);
 
             slotStatus.IsBusy = false;
+
+            return new HandlerResult(NextAction.Cancel);
         }
     }
 }
