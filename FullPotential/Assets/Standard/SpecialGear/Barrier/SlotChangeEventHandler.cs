@@ -3,7 +3,6 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Ui;
@@ -22,9 +21,9 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Func<SlotChangeEvent, UniTask> BeforeHandlerAsync => null;
+        public Timing Timing => Timing.After;
 
-        public Func<SlotChangeEvent, UniTask> AfterHandlerAsync => HandleAfterSlotChangeAsync;
+        public Func<SlotChangeEvent, UniTask> HandlerAsync => HandleAfterSlotChangeAsync;
 
         public SlotChangeEventHandler(IGameManager gameManager)
         {

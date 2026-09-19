@@ -6,7 +6,7 @@ namespace FullPotential.Api.Gameplay.Inventory.Events
     [RegisterEvent("9c7972de-4136-4825-aaa3-11925ad049ee")]
     public class SlotChangeEvent : IEvent
     {
-        public bool IsDefaultHandlerCancelled { get; set; }
+        public bool IsCancelled { get; set; }
 
         public InventoryBase Inventory { get; }
 

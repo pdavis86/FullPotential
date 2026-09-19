@@ -8,8 +8,8 @@ namespace FullPotential.Api.Gameplay.Events
     {
         NetworkLocation Location { get; }
 
-        Func<TEvent, UniTask> BeforeHandlerAsync { get; }
+        Timing Timing { get; }
 
-        Func<TEvent, UniTask> AfterHandlerAsync { get; }
+        Func<TEvent, UniTask> HandlerAsync { get; }
     }
 }

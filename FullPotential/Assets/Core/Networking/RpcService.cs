@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
+using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
 
 using Unity.Netcode;
@@ -13,8 +14,15 @@ namespace FullPotential.Core.Networking
 {
     public class RpcService : IRpcService
     {
+        private readonly IAuditor _logger;
+
         //todo: zzz v0.6 - Implement the calculation of "nearby" players
         //todo: zzz v0.6 - We suggest developers cache their ulong[] variables or use an array pool to cycle ulong[] instances so that it would cause less heap allocations.
+
+        public RpcService(IAuditorFactory auditorFactory)
+        {
+            _logger = auditorFactory.Create(this);
+        }
 
         public ClientRpcParams ForPlayer(ulong clientId)
         {
@@ -29,7 +37,7 @@ namespace FullPotential.Core.Networking
 
         public ClientRpcParams ForNearbyPlayers(Vector3 position)
         {
-            //_logger.Debug("Sending RPC call to all clients near " + position);
+            _logger.Debug("Sending RPC call to all clients near " + position);
             return new ClientRpcParams();
         }
 
@@ -40,7 +48,7 @@ namespace FullPotential.Core.Networking
 
         public ClientRpcParams ForNearbyPlayersExcept(Vector3 position, IEnumerable<ulong> exceptClientIds)
         {
-            //_logger.Debug($"Sending RPC call to all clients except {string.Join(',', exceptClientIds)} near " + position);
+            _logger.Debug($"Sending RPC call to all clients except {string.Join(',', exceptClientIds)} near " + position);
 
             var clientIds = NetworkManager.Singleton.ConnectedClientsIds.Except(exceptClientIds);
 

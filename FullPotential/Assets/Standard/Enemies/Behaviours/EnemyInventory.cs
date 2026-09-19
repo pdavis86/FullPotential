@@ -9,7 +9,7 @@ namespace FullPotential.Standard.Enemies.Behaviours
 {
     public class EnemyInventory : InventoryBase
     {
-        protected override void ApplyEquippedItemChange(string itemId, string slotId)
+        public override void ApplyEquippedItemChange(string itemId, string slotId)
         {
             //Nothing here
         }

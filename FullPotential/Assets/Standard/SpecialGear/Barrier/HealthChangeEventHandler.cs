@@ -3,9 +3,9 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.CoreTypeIds;
-using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Logging;
 using FullPotential.Standard.Resources;
 using FullPotential.Standard.SpecialSlots;
 
@@ -17,11 +17,18 @@ namespace FullPotential.Standard.SpecialGear.Barrier
     {
         public const string CustomDataKeyLastHit = "LastHit";
 
+        private readonly IAuditor _logger;
+
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Func<ResourceValueChangedEvent, UniTask> BeforeHandlerAsync => HandleBeforeHealthChangeAsync;
+        public Timing Timing => Timing.Before;
 
-        public Func<ResourceValueChangedEvent, UniTask> AfterHandlerAsync => null;
+        public Func<ResourceValueChangedEvent, UniTask> HandlerAsync => HandleBeforeHealthChangeAsync;
+
+        public HealthChangeEventHandler(IAuditorFactory auditorFactory)
+        {
+            _logger = auditorFactory.Create(this);
+        }
 
         private UniTask HandleBeforeHealthChangeAsync(ResourceValueChangedEvent eventArgs)
         {
@@ -43,7 +50,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             if (barrierCharge <= 0)
             {
-                //_logger.Debug("Barrier depleted. Taking full damage");
+                _logger.Debug("Barrier depleted. Taking full damage");
                 return UniTask.CompletedTask;
             }
 
@@ -53,13 +60,13 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             if (barrierCharge < Math.Abs(eventArgs.Change))
             {
-                //_logger.Debug("Barrier nearly depleted. Taking partial damage");
+                _logger.Debug("Barrier nearly depleted. Taking partial damage");
                 eventArgs.Change += barrierCharge;
                 return UniTask.CompletedTask;
             }
 
-            //_logger.Debug("Barrier OK. Taking no damage");
-            eventArgs.IsDefaultHandlerCancelled = true;
+            _logger.Debug("Barrier OK. Taking no damage");
+            eventArgs.IsCancelled = true;
 
             return UniTask.CompletedTask;
         }

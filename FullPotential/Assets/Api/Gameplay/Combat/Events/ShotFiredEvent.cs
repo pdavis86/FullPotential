@@ -5,10 +5,11 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Combat.Events
 {
+    // todo: move to standard
     [RegisterEvent("f01cd95a-67cc-4f38-a394-5a69eaa721c6")]
     public class ShotFiredEvent : IEvent
     {
-        public bool IsDefaultHandlerCancelled { get; set; }
+        public bool IsCancelled { get; set; }
 
         public FighterBase Fighter { get; }
 

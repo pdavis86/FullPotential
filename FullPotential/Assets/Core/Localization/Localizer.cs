@@ -158,7 +158,7 @@ namespace FullPotential.Core.Localization
             {
                 if (_addressesLoaded.Contains(address))
                 {
-                    //_logger.Debug($"Skipping '{address}' because it is already loaded");
+                    _logger.Debug($"Skipping '{address}' because it is already loaded");
                     continue;
                 }
 

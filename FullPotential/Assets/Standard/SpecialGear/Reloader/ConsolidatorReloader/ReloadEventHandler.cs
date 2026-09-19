@@ -2,7 +2,6 @@
 
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Obsolete.Items.Types;
@@ -17,9 +16,9 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Func<ReloadEvent, UniTask> BeforeHandlerAsync => HandleReloadBeforeAsync;
+        public Timing Timing => Timing.Before;
 
-        public Func<ReloadEvent, UniTask> AfterHandlerAsync => null;
+        public Func<ReloadEvent, UniTask> HandlerAsync => HandleReloadBeforeAsync;
 
         private async UniTask HandleReloadBeforeAsync(ReloadEvent eventArgs)
         {
@@ -40,7 +39,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
                 return;
             }
 
-            eventArgs.IsDefaultHandlerCancelled = true;
+            eventArgs.IsCancelled = true;
 
             var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);
 
@@ -49,7 +48,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
             var weapon = eventArgs.Fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
             await UniTask.WaitForSeconds(weapon.GetReloadTime());
 
-            FighterBase.UpdateAmmoCounts(eventArgs);
+            ReloadEvent.UpdateAmmoCounts(eventArgs);
 
             slotStatus.IsBusy = false;
         }

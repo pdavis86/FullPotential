@@ -4,7 +4,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Items;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Obsolete.Items.Types;
@@ -167,23 +166,6 @@ namespace FullPotential.Api.Gameplay.Player
             IsConsumingResource = false;
 
             return true;
-        }
-
-        public static async UniTask DefaultHandlerForReloadEventAsync(ReloadEvent reloadEvent)
-        {
-            var slotStatus = reloadEvent.Fighter.GetSlotStatus(reloadEvent.SlotId);
-            slotStatus.IsBusy = true;
-
-            var weapon = reloadEvent.Fighter.Inventory.GetItemInSlot<Weapon>(reloadEvent.SlotId);
-
-            //Lose any remaining ammo
-            weapon.UpdateAmmo(0);
-
-            await UniTask.WaitForSeconds(weapon.GetReloadTime());
-
-            FighterBase.UpdateAmmoCounts(reloadEvent);
-
-            slotStatus.IsBusy = false;
         }
     }
 }

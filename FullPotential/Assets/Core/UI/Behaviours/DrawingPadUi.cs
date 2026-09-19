@@ -4,6 +4,7 @@ using System.Linq;
 
 using FullPotential.Api.Gameplay.Drawing;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.UI.Events;
@@ -37,6 +38,7 @@ namespace FullPotential.Core.UI.Behaviours
 #pragma warning restore 0649
 
         //Services
+        private IAuditor _logger;
         private IDrawingService _drawingService;
 
         //Other variables
@@ -65,6 +67,7 @@ namespace FullPotential.Core.UI.Behaviours
             _currentShapeMarkers = new List<Vector2>();
             _drawnShapes = new List<string>();
 
+            _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
             _drawingService = DependenciesContext.Dependencies.GetService<IDrawingService>();
         }
 
@@ -287,17 +290,17 @@ namespace FullPotential.Core.UI.Behaviours
             //    var diff2 = Mathf.Abs(angle2 - angle3);
             //    var diff3 = Mathf.Abs(angle1 - angle3);
 
-            //    //_logger.Debug($"diff1:{diff1}, diff2:{diff2}, diff3:{diff3}");
+            //    _logger.Debug($"diff1:{diff1}, diff2:{diff2}, diff3:{diff3}");
 
             //    if (diff1 < _circleAngleTolerance
             //        && diff2 < _circleAngleTolerance
             //        && diff3 < _circleAngleTolerance)
             //    {
-            //        //_logger.Debug("Line");
+            //        _logger.Debug("Line");
             //    }
             //    else
             //    {
-            //        //_logger.Debug("_isDrawingCircle = true");
+            //        _logger.Debug("_isDrawingCircle = true");
             //        _isDrawingCircle = true;
             //        CreateMarker(rawMousePosition);
             //        return;
@@ -312,11 +315,11 @@ namespace FullPotential.Core.UI.Behaviours
             var lineAngle = currentDirection.y < 0 ? Vector2.Angle(Vector2.up, initialDirection) : Vector2.SignedAngle(Vector2.up, initialDirection);
             var markerAngle = currentDirection.y < 0 ? Vector2.Angle(Vector2.up, currentDirection) : Vector2.SignedAngle(Vector2.up, currentDirection);
 
-            //_logger.Debug($"lineAngle:{lineAngle}, markerAngle:{markerAngle}, diff:{Mathf.Abs(lineAngle - markerAngle)}");
+            _logger.Debug($"lineAngle:{lineAngle}, markerAngle:{markerAngle}, diff:{Mathf.Abs(lineAngle - markerAngle)}");
 
             if (Mathf.Abs(lineAngle - markerAngle) > _directionAngleTolerance)
             {
-                //_logger.Debug("Over DirectionAngleTolerance");
+                _logger.Debug("Over DirectionAngleTolerance");
                 RecordShapeDrawn(initialDirection, GetLength());
                 return;
             }
@@ -339,7 +342,7 @@ namespace FullPotential.Core.UI.Behaviours
         {
             _drawnShapes.Add(_drawingService.GetDrawingCode(direction, length));
 
-            //_logger.Debug("That was a " + _drawnShapes.Last());
+            _logger.Debug("That was a " + _drawnShapes.Last());
 
             ClearMarkers();
         }

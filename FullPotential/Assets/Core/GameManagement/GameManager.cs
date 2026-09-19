@@ -7,11 +7,6 @@ using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
 using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Gameplay.Combat.Events;
-using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Gameplay.Inventory.Events;
-using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
@@ -22,7 +17,6 @@ using FullPotential.Api.Unity;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities;
 using FullPotential.Core.GameManagement.Data;
-using FullPotential.Core.Gameplay.Events;
 using FullPotential.Core.Networking.Models;
 using FullPotential.Core.Player;
 using FullPotential.Core.Registry;
@@ -99,8 +93,6 @@ namespace FullPotential.Core.GameManagement
             _userManagement = DependenciesContext.Dependencies.GetService<IUserManagement>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
-
-            RegisterEvents();
 
             await UnityEngine.AddressableAssets.Addressables.InitializeAsync().Task;
 
@@ -273,18 +265,6 @@ namespace FullPotential.Core.GameManagement
             //{
             //    throw new Exception("You are not an admin so cannot perform that action");
             //}
-        }
-
-        private void RegisterEvents()
-        {
-            var eventBus = (EventBus)DependenciesContext.Dependencies.GetService<IEventBus>();
-
-            // todo: Default handlers should have their own class and should be in Standard
-            // todo: make these register via attribute
-            eventBus.Register<ResourceValueChangedEvent>(LivingEntityBase.DefaultHandlerForResourceValueChangeEventAsync);
-            eventBus.Register<ReloadEvent>(SlotStatus.DefaultHandlerForReloadEventAsync);
-            eventBus.Register<ShotFiredEvent>(FighterBase.DefaultHandlerForShotFiredEventAsync);
-            eventBus.Register<SlotChangeEvent>(InventoryBase.DefaultHandlerForSlotChangeEventAsync);
         }
 
         private async UniTask DisconnectUserIfTokenInvalidAsync(ulong clientId, string username, string token)

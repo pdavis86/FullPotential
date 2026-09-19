@@ -2,7 +2,6 @@
 
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 
@@ -14,9 +13,9 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Func<ReloadEvent, UniTask> BeforeHandlerAsync => HandleReloadBeforeAsync;
+        public Timing Timing => Timing.Before;
 
-        public Func<ReloadEvent, UniTask> AfterHandlerAsync => null;
+        public Func<ReloadEvent, UniTask> HandlerAsync => HandleReloadBeforeAsync;
 
         private UniTask HandleReloadBeforeAsync(ReloadEvent eventArgs)
         {
@@ -32,7 +31,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
                 return UniTask.CompletedTask;
             }
 
-            eventArgs.IsDefaultHandlerCancelled = true;
+            eventArgs.IsCancelled = true;
 
             return UniTask.CompletedTask;
         }

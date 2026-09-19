@@ -2,6 +2,6 @@
 {
     public interface IEvent
     {
-        bool IsDefaultHandlerCancelled { get; set; }
+        bool IsCancelled { get; set; }
     }
 }

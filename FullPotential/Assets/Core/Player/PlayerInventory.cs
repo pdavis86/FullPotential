@@ -142,7 +142,7 @@ namespace FullPotential.Core.Player
                 .ToDictionary(x => x.Key, x => (CombatItemBase)x.Value);
         }
 
-        protected override void ApplyEquippedItemChange(string itemId, string slotId)
+        public override void ApplyEquippedItemChange(string itemId, string slotId)
         {
             var changes = new Dictionary<string, string> { { slotId, itemId } };
             ApplyEquippedItemChanges(changes);

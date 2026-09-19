@@ -27,9 +27,9 @@ namespace FullPotential.Standard.SpecialGear.Reloader
 
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Func<SlotChangeEvent, UniTask> BeforeHandlerAsync => null;
+        public Timing Timing => Timing.After;
 
-        public Func<SlotChangeEvent, UniTask> AfterHandlerAsync => HandleAfterSlotChangeAsync;
+        public Func<SlotChangeEvent, UniTask> HandlerAsync => HandleAfterSlotChangeAsync;
 
         public SlotChangeEventHandler(IGameManager gameManager, ITypeRegistry typeRegistry)
         {

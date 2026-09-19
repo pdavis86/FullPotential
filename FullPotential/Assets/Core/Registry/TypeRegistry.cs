@@ -73,6 +73,7 @@ namespace FullPotential.Core.Registry
 
         public void FindAndRegisterAll(List<string> modPrefixes)
         {
+            RegisterApiTypes();
             RegisterCoreTypes();
 
             foreach (var modPrefix in modPrefixes)
@@ -99,8 +100,16 @@ namespace FullPotential.Core.Registry
             }
         }
 
+        private void RegisterApiTypes()
+        {
+            RegisterEventTypes(typeof(IEvent).Assembly);
+            RegisterEventHandlerTypes(typeof(IEvent).Assembly);
+        }
+
         private void RegisterCoreTypes()
         {
+            // todo: register using Reflection instead of named types
+
             ValidateAndRegister(typeof(SpecialSlots.LeftHand));
             ValidateAndRegister(typeof(SpecialSlots.RightHand));
 
@@ -111,11 +120,14 @@ namespace FullPotential.Core.Registry
             ValidateAndRegister(typeof(Effects.Hurt));
             ValidateAndRegister(typeof(Effects.Push));
 
+            RegisterEventTypes(typeof(TypeRegistry).Assembly);
             RegisterEventHandlerTypes(typeof(TypeRegistry).Assembly);
         }
 
         private void HandleModRegistration(IMod mod)
         {
+            // todo: register using Reflection instead of named types
+
             foreach (var t in mod.GetRegisterableTypes())
             {
                 ValidateAndRegister(t);
@@ -146,6 +158,7 @@ namespace FullPotential.Core.Registry
                 });
             }
 
+            RegisterEventTypes(mod.GetType().Assembly);
             RegisterEventHandlerTypes(mod.GetType().Assembly);
         }
 
@@ -356,6 +369,22 @@ namespace FullPotential.Core.Registry
             }
         }
 
+        private void RegisterEventTypes(Assembly assembly)
+        {
+            var eventTypes = assembly
+                .GetTypes()
+                .Where(
+                    t => typeof(IEvent).IsAssignableFrom(t)
+                    && !t.IsInterface
+                    && !t.IsAbstract)
+                .ToList();
+
+            foreach (var eventType in eventTypes)
+            {
+                _eventBus.Register(eventType);
+            }
+        }
+
         private void RegisterEventHandlerTypes(Assembly assembly)
         {
             var eventHandlerTypes = assembly
@@ -365,7 +394,7 @@ namespace FullPotential.Core.Registry
 
             foreach (var handlerType in eventHandlerTypes)
             {
-                 _eventBus.Subscribe(handlerType);
+                _eventBus.Subscribe(handlerType);
             }
         }
     }

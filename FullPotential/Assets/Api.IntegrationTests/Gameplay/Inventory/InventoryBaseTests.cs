@@ -212,7 +212,7 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
                 propInfo!.SetValue(this, newValue);
             }
 
-            protected override void ApplyEquippedItemChange(string itemId, string slotId)
+            public override void ApplyEquippedItemChange(string itemId, string slotId)
             {
                 //Nothing here
             }

@@ -6,7 +6,7 @@ namespace FullPotential.Api.Gameplay.Combat.Events
     [RegisterEvent("34372a74-abf3-44eb-8598-4427a82f29ab")]
     public class ResourceValueChangedEvent : IEvent
     {
-        public bool IsDefaultHandlerCancelled { get; set; }
+        public bool IsCancelled { get; set; }
 
         public LivingEntityBase LivingEntity { get; }
 

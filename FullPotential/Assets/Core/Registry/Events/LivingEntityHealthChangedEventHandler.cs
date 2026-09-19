@@ -3,7 +3,6 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.CoreTypeIds;
-using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 
@@ -15,9 +14,9 @@ namespace FullPotential.Core.Registry.Events
     {
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Func<ResourceValueChangedEvent, UniTask> BeforeHandlerAsync => null;
+        public Timing Timing => Timing.After;
 
-        public Func<ResourceValueChangedEvent, UniTask> AfterHandlerAsync => HandleAfterValueChangedAsync;
+        public Func<ResourceValueChangedEvent, UniTask> HandlerAsync => HandleAfterValueChangedAsync;
 
         private UniTask HandleAfterValueChangedAsync(ResourceValueChangedEvent eventArgs)
         {

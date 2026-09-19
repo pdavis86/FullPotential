@@ -248,7 +248,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _lastDamageSourceName = sourceFighter != null ? sourceFighter.FighterName : null;
             _lastDamageItemName = itemUsed?.Name.OrIfNullOrWhitespace(_localizer.Translate("ui.alert.attack.noitem"));
 
-            //_logger.Debug($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
+            _logger.Debug($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
 
             if (sourceFighter == null)
             {
@@ -332,13 +332,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _eventBus.PublishAsync(changeEvent).Forget();
         }
 
-        public static UniTask DefaultHandlerForResourceValueChangeEventAsync(ResourceValueChangedEvent changeEvent)
-        {
-            changeEvent.LivingEntity.UpdateResourceValue(changeEvent.ResourceTypeId, changeEvent.NewValue);
-            return UniTask.CompletedTask;
-        }
-
-        internal void UpdateResourceValue(string typeId, int newValue)
+        public void UpdateResourceValue(string typeId, int newValue)
         {
             newValue = ClampResourceValue(typeId, newValue);
 
@@ -503,7 +497,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ? "ui.alert.falldamage"
                 : "ui.alert.environmentaldamage");
 
-            //_logger.Debug($"{name} collided with {collision.gameObject.name} at velocity {collision.relativeVelocity} with force {force} with cause {cause}");
+            _logger.Debug($"{name} collided with {collision.gameObject.name} at velocity {collision.relativeVelocity} with force {force} with cause {cause}");
 
             var healthChangeRaw = isVelocityDamage
                 ? Vector3.Dot(contactPoint.normal, collision.relativeVelocity)

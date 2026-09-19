@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Assets\Api\CoreTypeIds\ResourceTypeIds.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IPlayerInventory.cs" />
+    <Compile Include="Assets\Api\Gameplay\Events\Timing.cs" />
     <Compile Include="Assets\Api\Logging\IAuditorFactory.cs" />
     <Compile Include="Assets\Api\Data\ISaveManager.cs" />
     <Compile Include="Assets\Api\Registry\Gear\ISpecialGearVisuals.cs" />
@@ -154,6 +155,7 @@
     <Compile Include="Assets\Api\Registry\Effects\IResourceEffectType.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\IEvent.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\RegisterEventAttribute.cs" />
+    <Compile Include="Assets\Api\Gameplay\Combat\Events\ResourceValueChangedEventDefaultHandler.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector3Extensions.cs" />
     <Compile Include="Assets\Api\Utilities\MathsHelper.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IMovementEffectType.cs" />
@@ -161,6 +163,7 @@
     <Compile Include="Assets\Api\Registry\Shapes\IShapeVisuals.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesContext.cs" />
     <Compile Include="Assets\Api\Utilities\DelayedAction.cs" />
+    <Compile Include="Assets\Api\Gameplay\Inventory\Events\SlotChangeEventDefaultHandler.cs" />
     <Compile Include="Assets\Api\Ioc\Dependency.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IHasSideEffect.cs" />
     <Compile Include="Assets\Api\Utilities\ActionQueue.cs" />

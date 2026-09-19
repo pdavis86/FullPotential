@@ -7,10 +7,8 @@ using Cysharp.Threading.Tasks;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Player;
-using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Logging;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Ui;
@@ -46,6 +44,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Other Variables
 
+        // todo: Should slots be up to the mod instead of Core?
         private readonly Dictionary<string, SlotStatus> _slotStatuses = new Dictionary<string, SlotStatus>();
 
         private DelayedAction _consumeResource;
@@ -73,8 +72,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected override void Awake()
         {
             base.Awake();
-
-            // todo: Should slots be up to the mod instead of Core?
 
             var leftSlotStatus = new SlotStatus(_logger, this, HandSlotIds.LeftHand);
             _slotStatuses.Add(HandSlotIds.LeftHand, leftSlotStatus);
@@ -259,7 +256,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (item is not IHasCharge itemWithCharge || !itemWithCharge.IsChargePercentageUsed)
             {
-                //_logger.Warn("Trying to attack hold an item that is not compatible");
+                _logger.Warn("Trying to attack hold an item that is not compatible");
                 return;
             }
 
@@ -487,23 +484,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        public static UniTask DefaultHandlerForShotFiredEventAsync(ShotFiredEvent eventArgs)
-        {
-            if (!eventArgs.Fighter.IsServer)
-            {
-                return UniTask.CompletedTask;
-            }
-
-            var fighter = eventArgs.Fighter;
-
-            var equippedWeapon = fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
-
-            equippedWeapon.UpdateAmmo(equippedWeapon.Ammo - eventArgs.AmmoUsed);
-            equippedWeapon.IsDirty = true;
-
-            return UniTask.CompletedTask;
-        }
-
         private void UseMeleeWeapon(string slotId, Weapon weaponInHand)
         {
             var slotStatus = GetSlotStatus(slotId);
@@ -591,20 +571,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             slotStatus.StopActiveConsumerBehaviour();
-        }
-
-        public static void UpdateAmmoCounts(ReloadEvent eventArgs)
-        {
-            var fighter = eventArgs.Fighter;
-
-            var equippedWeapon = fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
-
-            var ammoTypeId = equippedWeapon.WeaponType.AmmunitionTypeIdString;
-            var ammoNeeded = equippedWeapon.GetAmmoMax() - equippedWeapon.Ammo;
-
-            var countTaken = fighter.Inventory.TakeCountFromItemStacks(ammoTypeId, ammoNeeded);
-
-            equippedWeapon.UpdateAmmo(equippedWeapon.Ammo + countTaken);
         }
     }
 }

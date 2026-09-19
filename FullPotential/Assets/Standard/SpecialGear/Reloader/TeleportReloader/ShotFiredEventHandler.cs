@@ -2,7 +2,6 @@
 
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 
@@ -16,11 +15,11 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Func<ShotFiredEvent, UniTask> BeforeHandlerAsync => null;
+        public Timing Timing => Timing.After;
 
-        public Func<ShotFiredEvent, UniTask> AfterHandlerAsync => HandleShotFiredAsync;
+        public Func<ShotFiredEvent, UniTask> HandlerAsync => HandleAfterShotFiredAsync;
 
-        private UniTask HandleShotFiredAsync(ShotFiredEvent eventArgs)
+        private UniTask HandleAfterShotFiredAsync(ShotFiredEvent eventArgs)
         {
             var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Obsolete.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
@@ -38,7 +37,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 
             var reloadEventArgs = new ReloadEvent(fighter, eventArgs.SlotId);
 
-            FighterBase.UpdateAmmoCounts(reloadEventArgs);
+            ReloadEvent.UpdateAmmoCounts(reloadEventArgs);
 
             return UniTask.CompletedTask;
         }

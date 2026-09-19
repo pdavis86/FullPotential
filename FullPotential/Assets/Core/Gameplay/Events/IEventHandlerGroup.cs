@@ -3,5 +3,7 @@
     public interface IEventHandlerGroup
     {
         void Add(object handler);
+
+        bool Remove(object handler);
     }
 }

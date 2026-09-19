@@ -90,6 +90,7 @@
     <Compile Include="Assets\Standard\Effects\Buffs\Regeneration.cs" />
     <Compile Include="Assets\Standard\Shapes\Zone.cs" />
     <Compile Include="Assets\Standard\Accessories\Belt.cs" />
+    <Compile Include="Assets\Standard\Weapons\Events\ReloadEventDefaultHandler.cs" />
     <Compile Include="Assets\Standard\Armor\Feet.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Ice.cs" />
     <Compile Include="Assets\Standard\TargetingVisuals\ProjectileFlames.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="Assets\Standard\Effects\Debuffs\Fear.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Fire.cs" />
     <Compile Include="Assets\Standard\SpecialSlots\RangedWeaponReloaderSlot.cs" />
+    <Compile Include="Assets\Standard\Weapons\Events\ShotFiredEventDefaultHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Hold.cs" />
     <Compile Include="Assets\Standard\Targeting\Projectile.cs" />
     <Compile Include="Assets\Standard\Ammo\Arrow.cs" />

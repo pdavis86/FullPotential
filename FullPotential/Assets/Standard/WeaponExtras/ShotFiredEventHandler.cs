@@ -2,7 +2,6 @@
 
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Obsolete.Items.Types;
@@ -22,9 +21,9 @@ namespace FullPotential.Standard.WeaponExtras
 
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Func<ShotFiredEvent, UniTask> BeforeHandlerAsync => null;
+        public Timing Timing => Timing.After;
 
-        public Func<ShotFiredEvent, UniTask> AfterHandlerAsync => HandleAfterBulletFiredAsync;
+        public Func<ShotFiredEvent, UniTask> HandlerAsync => HandleAfterBulletFiredAsync;
 
         public ShotFiredEventHandler(ITypeRegistry typeRegistry)
         {

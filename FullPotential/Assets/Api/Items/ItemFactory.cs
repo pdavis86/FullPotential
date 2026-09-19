@@ -18,8 +18,6 @@ using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Models.Player;
 
-using UnityEngine;
-
 namespace FullPotential.Api.Items
 {
     public class ItemFactory : IItemFactory

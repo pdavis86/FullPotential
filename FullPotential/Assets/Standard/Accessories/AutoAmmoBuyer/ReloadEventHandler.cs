@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Items;
@@ -28,9 +27,9 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Func<ReloadEvent, UniTask> BeforeHandlerAsync => HandleReloadBeforeAsync;
+        public Timing Timing => Timing.Before;
 
-        public Func<ReloadEvent, UniTask> AfterHandlerAsync => null;
+        public Func<ReloadEvent, UniTask> HandlerAsync => HandleReloadBeforeAsync;
 
         public ReloadEventHandler(ITypeRegistry typeRegistry, ILocalizer localizer, IItemFactory itemFactory)
         {

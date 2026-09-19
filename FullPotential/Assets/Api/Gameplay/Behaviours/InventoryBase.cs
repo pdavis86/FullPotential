@@ -404,13 +404,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _eventBus.PublishAsync(changeEvent).Forget();
         }
 
-        public static UniTask DefaultHandlerForSlotChangeEventAsync(SlotChangeEvent changeEvent)
-        {
-            changeEvent.Inventory.ApplyEquippedItemChange(changeEvent.ItemId, changeEvent.SlotId);
-            return UniTask.CompletedTask;
-        }
-
-        protected abstract void ApplyEquippedItemChange(string itemId, string slotId);
+        public abstract void ApplyEquippedItemChange(string itemId, string slotId);
 
         protected abstract void ApplyEquippedItemChanges(Dictionary<string, string> equippedItems);
 

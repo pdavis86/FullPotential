@@ -11,8 +11,6 @@ using FullPotential.Api.Logging;
 
 using Unity.Netcode;
 
-using UnityEngine;
-
 // ReSharper disable once ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Gameplay.Events
@@ -27,18 +25,20 @@ namespace FullPotential.Core.Gameplay.Events
             _logger = auditorFactory.Create(this);
         }
 
-        internal void Register<TEvent>(Func<TEvent, UniTask> defaultHandlerAsync)
-            where TEvent : IEvent
+        public void Register(Type eventType)
         {
-            var eventId = typeof(TEvent).GetCustomAttribute<RegisterEventAttribute>()?.EventId;
+            var eventId = eventType.GetCustomAttribute<RegisterEventAttribute>()?.EventId;
 
             if (eventId == null)
             {
-                _logger.Error($"The type '{typeof(TEvent)}' is missing the attribute '{nameof(RegisterEventAttribute)}'");
+                _logger.Error($"The type '{eventType}' is missing the attribute '{nameof(RegisterEventAttribute)}'");
                 return;
             }
 
-            _subscriptions.Add(eventId, new EventHandlerGroup<TEvent>(eventId, defaultHandlerAsync));
+            var groupType = typeof(EventHandlerGroup<>).MakeGenericType(eventType);
+            var group = (IEventHandlerGroup)DependenciesContext.Dependencies.CreateInstance(groupType);
+
+            _subscriptions.Add(eventId, group);
         }
 
         public void Subscribe(Type handlerType)
@@ -88,14 +88,16 @@ namespace FullPotential.Core.Gameplay.Events
             Subscribe(eventId, handler);
         }
 
-        public async UniTask PublishAsync<TEvent>(TEvent args)
+        public async UniTask PublishAsync<TEvent>(TEvent eventArgs)
             where TEvent : IEvent
         {
-            var eventId = args.GetType().GetCustomAttribute<RegisterEventAttribute>()?.EventId;
+            eventArgs.IsCancelled = false;
+
+            var eventId = eventArgs.GetType().GetCustomAttribute<RegisterEventAttribute>()?.EventId;
 
             if (eventId == null)
             {
-                _logger.Error($"The type '{args.GetType()}' is missing the attribute '{nameof(RegisterEventAttribute)}'");
+                _logger.Error($"The type '{eventArgs.GetType()}' is missing the attribute '{nameof(RegisterEventAttribute)}'");
                 return;
             }
 
@@ -105,31 +107,21 @@ namespace FullPotential.Core.Gameplay.Events
             }
 
             var handlerGroup = (EventHandlerGroup<TEvent>)_subscriptions[eventId];
+            var timings = new List<Timing> { Timing.Before, Timing.Main, Timing.After };
 
-            args.IsDefaultHandlerCancelled = false;
-
-            foreach (var handler in handlerGroup.OtherHandlers)
+            foreach (var timing in timings)
             {
-                if (ShouldHandlerRun(handler) && handler.BeforeHandlerAsync != null)
+                foreach (var handler in handlerGroup.Handlers)
                 {
-                    await handler.BeforeHandlerAsync(args);
-                }
-            }
+                    if (ShouldHandlerRun(handler, timing))
+                    {
+                        await handler.HandlerAsync(eventArgs);
 
-            if (handlerGroup.DefaultHandlerAsync != null && !args.IsDefaultHandlerCancelled)
-            {
-                await handlerGroup.DefaultHandlerAsync(args);
-            }
-            else if (handlerGroup.DefaultHandlerAsync == null && args.IsDefaultHandlerCancelled)
-            {
-                _logger.Warn($"Tried to cancel the default handler for event {eventId} but no handler is present");
-            }
-
-            foreach (var handler in handlerGroup.OtherHandlers)
-            {
-                if (ShouldHandlerRun(handler) && handler.AfterHandlerAsync != null)
-                {
-                    await handler.AfterHandlerAsync(args);
+                        if (eventArgs.IsCancelled)
+                        {
+                            return;
+                        }
+                    }
                 }
             }
         }
@@ -146,9 +138,14 @@ namespace FullPotential.Core.Gameplay.Events
             group.Add(handler);
         }
 
-        private bool ShouldHandlerRun<TEvent>(IEventHandler<TEvent> handler)
+        private bool ShouldHandlerRun<TEvent>(IEventHandler<TEvent> handler, Timing timing)
             where TEvent : IEvent
         {
+            if (handler.Timing != timing)
+            {
+                return false;
+            }
+
             switch (handler.Location)
             {
                 case NetworkLocation.Server:

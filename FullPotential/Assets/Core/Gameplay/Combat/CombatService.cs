@@ -84,11 +84,11 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 if (!IsEffectAllowed(target, effect))
                 {
-                    //_logger.Debug($"Effect {effect.TypeName} is not permitted against target {target}");
+                    _logger.Debug($"Effect {effect.TypeId} is not permitted against target {target}");
                     continue;
                 }
 
-                //_logger.Debug($"Applying effect {effect.TypeName} to {target.name}");
+                _logger.Debug($"Applying effect {effect.TypeId} to {target.name}");
 
                 ApplyEffect(sourceFighter, itemUsed, effect, target, position);
 
@@ -100,20 +100,20 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private static bool IsEffectAllowed(GameObject target, IEffectType effect)
+        private bool IsEffectAllowed(GameObject target, IEffectType effect)
         {
             if (effect is IMovementEffectType movementEffect
                 && movementEffect.Direction == MovementDirection.MaintainDistance)
             {
                 if (target.GetComponent<MaintainDistance>() != null)
                 {
-                    //_logger.Debug("Continuing to hold target");
+                    _logger.Debug("Continuing to hold target");
                     return false;
                 }
 
                 if (target.GetComponent<PlayerFighter>() != null)
                 {
-                    //_logger.Debug("Cannot target players");
+                    _logger.Debug("Cannot target players");
                     return false;
                 }
             }
@@ -133,11 +133,11 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (targetFighter == null)
             {
-                //_logger.Warn($"Not applying {effect.TypeName} to {targetGameObject.name} because they are not an FighterBase");
+                _logger.Warn($"Not applying {effect.TypeId} to {targetGameObject.name} because they are not an FighterBase");
                 return;
             }
 
-            //_logger.Debug($"Applying {effect.TypeName} to {targetFighter.FighterName}");
+            _logger.Debug($"Applying {effect.TypeId} to {targetFighter.FighterName}");
 
             switch (effect)
             {
@@ -334,7 +334,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (targetRigidBody == null)
             {
-                //_logger.Warn($"Cannot move target '{targetGameObject.name}' as it does not have a RigidBody");
+                _logger.Warn($"Cannot move target '{targetGameObject.name}' as it does not have a RigidBody");
                 return;
             }
 
@@ -409,7 +409,7 @@ namespace FullPotential.Core.Gameplay.Combat
                             forwardsBackwardsDirection = -sourceFighter.RigidBody.transform.forward;
                         }
 
-                        //_logger.Debug($"Applying {force} force to {targetGameObject.name}");
+                        _logger.Debug($"Applying {force} force to {targetGameObject.name}");
 
                         forceToApply = forwardsBackwardsDirection.normalized * force;
                     }

@@ -1,8 +1,5 @@
-﻿using System;
-
-using FullPotential.Api.Ioc;
+﻿using FullPotential.Api.Ioc;
 using FullPotential.Api.Logging;
-using FullPotential.Core.Logging;
 
 namespace FullPotential.Core.Logging
 {
