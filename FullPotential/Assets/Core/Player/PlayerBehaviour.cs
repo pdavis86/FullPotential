@@ -8,6 +8,7 @@ using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Player.Models;
@@ -37,8 +38,6 @@ using Unity.Netcode;
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
-
-// todo: events to handle player inputs
 
 namespace FullPotential.Core.Player
 {
@@ -90,7 +89,8 @@ namespace FullPotential.Core.Player
             _dataSaver = DependenciesContext.Dependencies.GetService<IDataSaver>();
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
 
-            _drawingPadUi = GameManager.Instance.UserInterface.DrawingPad.GetComponent<DrawingPadUi>();
+            _userInterface = GameManager.Instance.UserInterface;
+            _drawingPadUi = _userInterface.DrawingPad.GetComponent<DrawingPadUi>();
 
             _drawingPadUi.OnDrawingStop += HandleOnDrawingStop;
         }
@@ -102,8 +102,6 @@ namespace FullPotential.Core.Player
             {
                 return;
             }
-
-            _userInterface = GameManager.Instance.UserInterface;
 
             _userInterface.Hud.SetActive(true);
 
@@ -120,7 +118,14 @@ namespace FullPotential.Core.Player
             _inFrontOfPlayerCamera.gameObject.SetActive(true);
             _playerCamera.gameObject.SetActive(true);
 
-            SetupLocalClient();
+            if (Debug.isDebugBuild)
+            {
+                _userInterface.DebuggingOverlay.SetActive(true);
+            }
+
+            var settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
+            var gameSettings = settingsRepository.Get();
+            Camera.main.fieldOfView = gameSettings.FieldOfView;
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -156,9 +161,69 @@ namespace FullPotential.Core.Player
         #region Input Event Handlers
 
         // ReSharper disable once UnusedMember.Local
+        private void OnOpenCharacterMenu()
+        {
+            _toggleCharacterMenu = true;
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnCancel()
+        {
+            _toggleGameMenu = true;
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnAttackDownLeft()
+        {
+            HandleAttackDown(HandSlotIds.LeftHand);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnAttackHoldLeft()
+        {
+            HandleAttackHold(HandSlotIds.LeftHand);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnAttackReleaseLeft()
+        {
+            HandleAttackRelease(HandSlotIds.LeftHand);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnAttackDownRight()
+        {
+            HandleAttackDown(HandSlotIds.RightHand);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnAttackHoldRight()
+        {
+            HandleAttackHold(HandSlotIds.RightHand);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnAttackReleaseRight()
+        {
+            HandleAttackRelease(HandSlotIds.RightHand);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnReloadLeft()
+        {
+            HandleReload(HandSlotIds.LeftHand);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private void OnReloadRight()
+        {
+            HandleReload(HandSlotIds.RightHand);
+        }
+
+        // ReSharper disable once UnusedMember.Local
         private void OnInteract()
         {
-            if (IsNoUiInteractionPermitted())
+            if (IsCharacterInputDisabled())
             {
                 return;
             }
@@ -179,123 +244,27 @@ namespace FullPotential.Core.Player
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void OnOpenCharacterMenu()
-        {
-            _toggleCharacterMenu = true;
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void OnCancel()
-        {
-            _toggleGameMenu = true;
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void OnAttackDownLeft()
-        {
-            _logger.Debug("OnAttackDownLeft");
-
-            if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
-            {
-                _drawingPadUi.InitialiseForEquip(EventSource, HandSlotIds.LeftHand);
-                _drawingPadUi.StartDrawing();
-            }
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void OnAttackHoldLeft()
-        {
-            _logger.Debug("OnAttackHoldLeft");
-
-            _eventBus.PublishAsync(new AttackHoldEventArgs(_playerFighter, HandSlotIds.LeftHand));
-
-            HandleAttackHold(HandSlotIds.LeftHand);
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void OnAttackReleaseLeft()
-        {
-            _logger.Debug("OnAttackReleaseLeft");
-
-            if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
-            {
-                _drawingPadUi.StopDrawing();
-            }
-            else
-            {
-                HandleAttack(HandSlotIds.LeftHand);
-            }
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void OnAttackDownRight()
-        {
-            _logger.Debug("OnAttackDownRight");
-
-            if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
-            {
-                _drawingPadUi.InitialiseForEquip(EventSource, HandSlotIds.RightHand);
-                _drawingPadUi.StartDrawing();
-            }
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void OnAttackHoldRight()
-        {
-            _logger.Debug("OnAttackHoldRight");
-
-            HandleAttackHold(HandSlotIds.RightHand);
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void OnAttackReleaseRight()
-        {
-            _logger.Debug("OnAttackReleaseRight");
-
-            if (GameManager.Instance.UserInterface.DrawingPad.activeInHierarchy)
-            {
-                _drawingPadUi.StopDrawing();
-            }
-            else
-            {
-                HandleAttack(HandSlotIds.RightHand);
-            }
-        }
-
-        // ReSharper disable once UnusedMember.Local
         private void OnShowCursorStart()
         {
-            if (IsNoUiInteractionPermitted())
+            if (IsCharacterInputDisabled())
             {
                 return;
             }
 
-            GameManager.Instance.UserInterface.HudOverlay.ToggleDrawingMode(true);
-            GameManager.Instance.UserInterface.DrawingPad.SetActive(true);
+            _userInterface.HudOverlay.ToggleDrawingMode(true);
+            _userInterface.DrawingPad.SetActive(true);
         }
 
         // ReSharper disable once UnusedMember.Local
         private void OnShowCursorStop()
         {
-            GameManager.Instance.UserInterface.HudOverlay.ToggleDrawingMode(false);
-            GameManager.Instance.UserInterface.DrawingPad.SetActive(false);
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void OnReloadLeft()
-        {
-            _playerFighter.TriggerReloadFromClient(HandSlotIds.LeftHand);
-        }
-
-        // ReSharper disable once UnusedMember.Local
-        private void OnReloadRight()
-        {
-            _playerFighter.TriggerReloadFromClient(HandSlotIds.RightHand);
+            _userInterface.HudOverlay.ToggleDrawingMode(false);
+            _userInterface.DrawingPad.SetActive(false);
         }
 
         #endregion
 
-        #region ServerRpc calls
+        #region Other ServerRpc calls
 
         [ServerRpc]
         private void TryToInteractServerRpc(string gameObjectName, ServerRpcParams serverRpcParams = default)
@@ -426,7 +395,7 @@ namespace FullPotential.Core.Player
 
             var hit = Instantiate(
                 _hitTextPrefab,
-                GameManager.Instance.UserInterface.HitNumberContainer.transform,
+                _userInterface.HitNumberContainer.transform,
                 false);
 
             var hitText = hit.GetComponent<TextMeshProUGUI>();
@@ -509,17 +478,13 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private Ray GetLookDirectionRay()
-        {
-            return _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
-        }
-
         private void CheckForInteractable()
         {
-            if (Physics.Raycast(GetLookDirectionRay(), out var hit, maxDistance: 1000))
+            var lookDirectionRay = _playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
+
+            if (Physics.Raycast(lookDirectionRay, out var hit, maxDistance: 1000))
             {
-                var interactable = hit.collider.GetComponent<Interactable>();
-                if (interactable != null)
+                if (hit.collider.TryGetComponent<Interactable>(out var interactable))
                 {
                     var distance = Vector3.Distance(_playerCamera.transform.position, interactable.transform.position);
                     if (distance <= interactable.Radius)
@@ -546,29 +511,10 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private void HandleAttackHold(string slotId)
+        private bool IsCharacterInputDisabled()
         {
-            if (IsNoUiInteractionPermitted())
-            {
-                return;
-            }
-
-            _playerFighter.TriggerAttackHoldFromClient(slotId);
-        }
-
-        private void HandleAttack(string slotId)
-        {
-            if (IsNoUiInteractionPermitted())
-            {
-                return;
-            }
-
-            _playerFighter.TriggerAttackFromClient(slotId);
-        }
-
-        private bool IsNoUiInteractionPermitted()
-        {
-            return _hasMenuOpen || _playerFighter.AliveState != LivingEntityState.Alive;
+            return _hasMenuOpen
+                || _playerFighter.AliveState != LivingEntityState.Alive;
         }
 
         private void HandleOnDrawingStop(object sender, OnDrawingStopEventArgs e)
@@ -596,23 +542,6 @@ namespace FullPotential.Core.Player
             playerInventory.EquipItemServerRpc(item.Id, e.SlotId);
         }
 
-        private void SetupLocalClient()
-        {
-            if (!IsClient)
-            {
-                return;
-            }
-
-            if (Debug.isDebugBuild)
-            {
-                _userInterface.DebuggingOverlay.SetActive(true);
-            }
-
-            var settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
-            var gameSettings = settingsRepository.Get();
-            Camera.main.fieldOfView = gameSettings.FieldOfView;
-        }
-
         private async UniTask SaveLootAndUpdatePlayerAsync()
         {
             var newItem = _random.Next(1, 3) == 1
@@ -626,6 +555,83 @@ namespace FullPotential.Core.Player
 
             var clientParams = _rpcService.ForPlayer(OwnerClientId);
             _playerFighter.Inventory.ApplyChangesClientRpc(changes, clientParams);
+        }
+
+        private void HandleAttackDown(string slotId)
+        {
+            _logger.Debug("OnAttackDown: " + slotId);
+
+            if (_userInterface.DrawingPad.activeInHierarchy)
+            {
+                _drawingPadUi.InitialiseForEquip(EventSource, slotId);
+                _drawingPadUi.StartDrawing();
+            }
+        }
+
+        private void HandleAttackHold(string slotId)
+        {
+            if (IsCharacterInputDisabled())
+            {
+                return;
+            }
+
+            _eventBus.PublishAsync(new AttackHoldEventArgs(_playerFighter, slotId));
+
+            if (!IsHost)
+            {
+                AttackHoldServerRpc(slotId);
+            }
+        }
+
+        [ServerRpc]
+        public void AttackHoldServerRpc(string slotId)
+        {
+            _eventBus.PublishAsync(new AttackHoldEventArgs(_playerFighter, slotId));
+        }
+
+        private void HandleAttackRelease(string slotId)
+        {
+            _logger.Debug("OnAttackRelease:" + slotId);
+
+            if (_userInterface.DrawingPad.activeInHierarchy)
+            {
+                _drawingPadUi.StopDrawing();
+                return;
+            }
+
+            if (IsCharacterInputDisabled())
+            {
+                return;
+            }
+
+            _eventBus.PublishAsync(new AttackReleaseEventArgs(_playerFighter, slotId));
+
+            if (!IsHost)
+            {
+                AttackReleaseServerRpc(slotId);
+            }
+        }
+
+        [ServerRpc]
+        public void AttackReleaseServerRpc(string slotId)
+        {
+            _eventBus.PublishAsync(new AttackReleaseEventArgs(_playerFighter, slotId));
+        }
+
+        private void HandleReload(string slotId)
+        {
+            _eventBus.PublishAsync(new ReloadEventArgs(_playerFighter, slotId));
+
+            if (!IsHost)
+            {
+                ReloadServerRpc(slotId);
+            }
+        }
+
+        [ServerRpc]
+        public void ReloadServerRpc(string slotId)
+        {
+            _eventBus.PublishAsync(new ReloadEventArgs(_playerFighter, slotId));
         }
     }
 }

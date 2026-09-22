@@ -128,6 +128,8 @@ namespace FullPotential.Core.Registry
         {
             // todo: register using Reflection instead of named types
 
+            mod.RegisterServices();
+
             foreach (var t in mod.GetRegisterableTypes())
             {
                 ValidateAndRegister(t);

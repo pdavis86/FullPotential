@@ -238,7 +238,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
             ammoText.text = slotStatus.IsBusy
                 ? _reloadingTranslation
-                : $"{weapon.Ammo}/{weapon.GetAmmoMax()} ({_playerFighter.GetAvailableAmmo(slotStatus.SlotId)})";
+                : $"{weapon.Ammo}/{weapon.GetAmmoMax()} ({FighterBase.GetAvailableAmmo(_playerFighter, slotStatus.SlotId)})";
         }
 
         private void UpdateHandCharge(ProgressWheel chargeWheel, ItemBase item)

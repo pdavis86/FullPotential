@@ -2,8 +2,8 @@
 
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Input;
 
 using Unity.Netcode;
 

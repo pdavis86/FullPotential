@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
@@ -11,6 +10,7 @@ using FullPotential.Api.Localization;
 using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Weapons;
+using FullPotential.Api.Input;
 using FullPotential.Models.Player;
 
 using Unity.Netcode;

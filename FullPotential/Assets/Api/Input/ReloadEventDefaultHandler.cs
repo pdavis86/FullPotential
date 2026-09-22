@@ -2,11 +2,10 @@
 
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Obsolete.Items.Types;
 
-namespace FullPotential.Standard.Weapons.Events
+namespace FullPotential.Api.Input
 {
     public class ReloadEventDefaultHandler : IEventHandler<ReloadEventArgs>
     {
@@ -18,10 +17,22 @@ namespace FullPotential.Standard.Weapons.Events
 
         private async UniTask<HandlerResult> DefaultHandlerAsync(ReloadEventArgs eventArgs)
         {
+            var itemInSlot = eventArgs.Fighter.Inventory.GetItemInSlot(eventArgs.SlotId);
+
+            if (itemInSlot is not Weapon weapon)
+            {
+                return new HandlerResult();
+            }
+
+            var ammoInInventory = eventArgs.Fighter.Inventory.GetItemStackTotal(weapon.WeaponType.AmmunitionTypeIdString);
+
+            if (ammoInInventory == 0)
+            {
+                return new HandlerResult();
+            }
+
             var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);
             slotStatus.IsBusy = true;
-
-            var weapon = eventArgs.Fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
 
             //Lose any remaining ammo
             weapon.UpdateAmmo(0);

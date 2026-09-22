@@ -28,7 +28,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public bool IsConsumingResource { get; set; }
 
-        public bool IsAutoFiring { get; set; }
+        public bool IsIntraActionLooping { get; set; }
 
         public SlotStatus(IAuditor logger, FighterBase fighter, string slotId)
         {
@@ -40,7 +40,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public async UniTask StartChargeUpLoopAsync(IHasCharge item)
         {
-            _logger.Debug("StartChargeUpLoopAsync");
+            _logger.Debug($"StartChargeUpLoopAsync for item '{item}'");
 
             _preActionCts?.Cancel();
             _preActionCts = new CancellationTokenSource();
@@ -81,35 +81,48 @@ namespace FullPotential.Api.Gameplay.Player
             _preActionCts?.Cancel();
         }
 
-        public async UniTask StartAutomaticWeaponFireAsync(Weapon weapon)
+        public async UniTask StartIntraActionLoopAsync(SlotIntraAction intraAction)
         {
-            _logger.Debug("StartAutomaticWeaponFireAsync");
+            _logger.Debug("StartIntraActionLoopAsync");
 
             _intraActionCts?.Cancel();
             _intraActionCts = new CancellationTokenSource();
 
-            var delay = weapon.GetDelayBetweenShots();
+            IsIntraActionLooping = true;
 
-            IsAutoFiring = true;
-
-            while (weapon.Ammo > 0 && !_intraActionCts.IsCancellationRequested)
+            while (!_intraActionCts.IsCancellationRequested)
             {
-                Fighter.AttackWithItemInHand(SlotId);
-                await UniTask.WaitForSeconds(delay, cancellationToken: _intraActionCts.Token);
+                if (intraAction.DelayBefore.HasValue)
+                {
+                    await UniTask.WaitForSeconds(intraAction.DelayBefore.Value, cancellationToken: _intraActionCts.Token);
+                }
+
+                await intraAction.ActionAsync();
+
+                if (intraAction.AdditionalStopCondition != null && intraAction.AdditionalStopCondition())
+                {
+                    StopIntraActionLoop();
+                    return;
+                }
+
+                if (intraAction.DelayAfter.HasValue)
+                {
+                    await UniTask.WaitForSeconds(intraAction.DelayAfter.Value, cancellationToken: _intraActionCts.Token);
+                }
             }
         }
 
-        public void StopAutomaticWeaponFire()
+        public void StopIntraActionLoop()
         {
-            _logger.Debug("StopAutomaticWeaponFire");
+            _logger.Debug("StopIntraActionLoop");
 
             _intraActionCts?.Cancel();
-            IsAutoFiring = false;
+            IsIntraActionLooping = false;
         }
 
         public async UniTask StartCooldownLoopAsync(IHasCharge item)
         {
-            _logger.Debug("StartCooldownLoopAsync");
+            _logger.Debug($"StartCooldownLoopAsync for item '{item}'");
 
             _postActionCts?.Cancel();
             _postActionCts = new CancellationTokenSource();

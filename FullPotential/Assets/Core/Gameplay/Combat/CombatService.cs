@@ -498,6 +498,7 @@ namespace FullPotential.Core.Gameplay.Combat
         {
             if (consumer.Shape == null)
             {
+                _logger.Debug("Cancelling SpawnShapeGameObject because there was no Shape");
                 return;
             }
 

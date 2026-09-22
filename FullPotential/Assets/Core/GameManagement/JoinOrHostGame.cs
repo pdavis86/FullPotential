@@ -101,7 +101,6 @@ namespace FullPotential.Core.GameManagement
             // ReSharper disable HeuristicUnreachableCode
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
 
-            // todo: When debugging, set isTestingLocally to true
             var isTestingLocally = false;
             if (isTestingLocally)
             {

@@ -5,6 +5,8 @@ namespace FullPotential.Api.Modding
 {
     public interface IMod
     {
+        void RegisterServices();
+
         IEnumerable<Type> GetRegisterableTypes();
 
         IEnumerable<Type> GetRegisterableVisuals();

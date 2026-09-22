@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Modding;
 
 using UnityEngine;
@@ -11,6 +12,11 @@ namespace FullPotential.Standard
 {
     public class Registration : MonoBehaviour, IMod
     {
+        public void RegisterServices()
+        {
+            DependenciesContext.Dependencies.Register<Weapons.Helpers.IAttackHelper, Weapons.Helpers.AttackHelper>();
+        }
+
         public IEnumerable<Type> GetRegisterableTypes()
         {
             return new[]

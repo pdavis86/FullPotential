@@ -2,9 +2,8 @@
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Obsolete.Items.Types;
 
-namespace FullPotential.Api.Gameplay.Combat.Events
+namespace FullPotential.Api.Input
 {
-    // todo: move to standard
     [RegisterEvent]
     public struct ReloadEventArgs : IEventArgs
     {

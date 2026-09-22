@@ -25,6 +25,7 @@ using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Assets.Api.Gameplay.Combat.Events;
 
 using TMPro;
 
@@ -227,7 +228,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected Dictionary<string, int> GetResourceDictionaryForSave()
         {
             return GetResources().ToDictionary(
-                x => x.TypeId.ToString(), 
+                x => x.TypeId.ToString(),
                 x => GetResourceValue(x.TypeId.ToString()));
         }
 
@@ -311,7 +312,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected void SetResourceInitialValues(Dictionary<string, int> values)
         {
             // todo: zzz v0.6 - These should come from the server
-         
+
             foreach (var kvp in values)
             {
                 _resourceValueCache[kvp.Key] = ClampResourceValue(kvp.Key, kvp.Value);
@@ -552,6 +553,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (!NetworkManager.Singleton.ConnectedClients.ContainsKey(clientId))
                 {
+                    // todo: zzz v0.8 - Disconnected players miss out on loot
                     continue;
                 }
 

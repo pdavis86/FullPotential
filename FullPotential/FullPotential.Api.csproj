@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Api\CoreTypeIds\ResourceTypeIds.cs" />
+    <Compile Include="Assets\Api\Gameplay\Combat\Events\HealthChangeTextEventArgs.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IPlayerInventory.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\Timing.cs" />
     <Compile Include="Assets\Api\Logging\IAuditorFactory.cs" />
@@ -64,9 +65,9 @@
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingBehaviour.cs" />
     <Compile Include="Assets\Api\Items\ItemFactory.cs" />
     <Compile Include="Assets\Api\Data\IUserManagement.cs" />
-    <Compile Include="Assets\Api\Gameplay\Combat\Events\ReloadEventArgs.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\CombatResult.cs" />
     <Compile Include="Assets\Api\Ui\IUserInterface.cs" />
+    <Compile Include="Assets\Api\Input\ShotFiredEventArgs.cs" />
     <Compile Include="Assets\Api\Gameplay\Drawing\IDrawingService.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IIsSideEffect.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\Interactable.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="Assets\Api\Gameplay\Combat\ViableTarget.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\FighterBase.cs" />
     <Compile Include="Assets\Api\Obsolete\CharacterSettingsOld.cs" />
+    <Compile Include="Assets\Api\Input\ReloadEventArgs.cs" />
     <Compile Include="Assets\Api\Obsolete\Items\Base\ItemWithTargetingAndShapeBase.cs" />
     <Compile Include="Assets\Api\Registry\IRegisterableType.cs" />
     <Compile Include="Assets\Api\Items\IHasCharge.cs" />
@@ -142,6 +144,7 @@
     <Compile Include="Assets\Api\Registry\Gear\IArmorVisuals.cs" />
     <Compile Include="Assets\Api\Data\ISettingsRepository.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\ColliderExtensions.cs" />
+    <Compile Include="Assets\Api\Input\ReloadEventDefaultHandler.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\ArrayExtensions.cs" />
     <Compile Include="Assets\Api\Ui\HandSlotIds.cs" />
     <Compile Include="Assets\Api\Obsolete\Items\Types\SpecialGear.cs" />
@@ -149,6 +152,7 @@
     <Compile Include="Assets\Api\Data\IDataLoader.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\LivingEntityBase.cs" />
     <Compile Include="Assets\Api\Obsolete\Attributes.cs" />
+    <Compile Include="Assets\Api\Gameplay\Player\SlotIntraAction.cs" />
     <Compile Include="Assets\Api\Registry\Elements\IElementType.cs" />
     <Compile Include="Assets\Api\CoreTypeIds\ArmorTypeIds.cs" />
     <Compile Include="Assets\Api\Items\LevelOfDetail.cs" />
@@ -156,7 +160,6 @@
     <Compile Include="Assets\Api\Registry\Effects\IResourceEffectType.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\RegisterEventAttribute.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\Events\ResourceValueChangedEventDefaultHandler.cs" />
-    <Compile Include="Assets\Api\Gameplay\Combat\Events\ShotFiredEventArgs.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector3Extensions.cs" />
     <Compile Include="Assets\Api\Utilities\MathsHelper.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IMovementEffectType.cs" />
@@ -193,6 +196,7 @@
     <Compile Include="Assets\Api\Unity\Extensions\TransformExtensions.cs" />
     <Compile Include="Assets\Api\Ui\IHud.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Assets\Api\Input\AttackReleaseEventArgs.cs" />
     <Compile Include="Assets\Api\Registry\IHasPrefab.cs" />
     <Compile Include="Assets\Api\Obsolete\SerializableKeyValuePair.cs" />
     <Compile Include="Assets\Api\CoreTypeIds\EffectTypeIds.cs" />
