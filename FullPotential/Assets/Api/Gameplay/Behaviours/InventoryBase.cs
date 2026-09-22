@@ -32,7 +32,7 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
-    // todo: zzz v0.6 - Use `readonly record struct ThingyId(string Id);` instead of string everywhere
+    // todo: zzz v0.6 - Use `readonly struct ThingyId(string Id);` instead of string everywhere
 
     public abstract class InventoryBase : NetworkBehaviour, ISaveable
     {

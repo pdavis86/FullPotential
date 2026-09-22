@@ -5,7 +5,7 @@ using FullPotential.Api.Obsolete.Items.Types;
 namespace FullPotential.Api.Input
 {
     [RegisterEvent]
-    public struct ReloadEventArgs : IEventArgs
+    public readonly struct ReloadEventArgs : IEventArgs
     {
         public FighterBase Fighter { get; }
 

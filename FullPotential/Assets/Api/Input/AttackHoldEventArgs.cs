@@ -4,7 +4,7 @@ using FullPotential.Api.Gameplay.Events;
 namespace FullPotential.Api.Input
 {
     [RegisterEvent]
-    public struct AttackHoldEventArgs : IEventArgs
+    public readonly struct AttackHoldEventArgs : IEventArgs
     {
         public FighterBase Fighter { get; }
 

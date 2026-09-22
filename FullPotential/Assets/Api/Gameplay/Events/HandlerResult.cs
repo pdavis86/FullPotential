@@ -1,6 +1,6 @@
 ﻿namespace FullPotential.Api.Gameplay.Events
 {
-    public struct HandlerResult
+    public readonly struct HandlerResult
     {
         public NextAction NextAction { get; }
 

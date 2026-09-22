@@ -1,6 +1,4 @@
-﻿using System;
-
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Events;
@@ -23,8 +21,6 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public Timing Timing => Timing.After;
 
-        public Func<SlotChangeEventArgs, UniTask<HandlerResult>> HandlerAsync => HandleAfterSlotChangeAsync;
-
         public SlotChangeEventHandler(IGameManager gameManager)
         {
             _hud = gameManager.GetUserInterface().HudOverlay;
@@ -32,7 +28,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             _hud.ToggleSliderBar(BarrierChargeResource.TypeIdString, false);
         }
 
-        private UniTask<HandlerResult> HandleAfterSlotChangeAsync(SlotChangeEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(SlotChangeEventArgs eventArgs)
         {
             if (eventArgs.SlotId != BarrierSlot.TypeIdString)
             {

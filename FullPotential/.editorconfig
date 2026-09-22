@@ -51,6 +51,7 @@ dotnet_diagnostic.IDE0051.severity = none # Remove unused private member
 dotnet_diagnostic.IDE0058.severity = suggestion # Remove unnecessary expression value
 dotnet_diagnostic.IDE0059.severity = suggestion # Unnecessary assignment of a value
 dotnet_diagnostic.IDE0060.severity = suggestion # Remove unused parameter
+dotnet_diagnostic.IDE0072.severity = none # Add missing cases to switch expression
 
 # Code quality
 dotnet_code_quality_unused_parameters = all:suggestion

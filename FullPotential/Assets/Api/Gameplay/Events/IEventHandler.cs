@@ -1,6 +1,4 @@
-﻿using System;
-
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 
 namespace FullPotential.Api.Gameplay.Events
 {
@@ -10,6 +8,6 @@ namespace FullPotential.Api.Gameplay.Events
 
         Timing Timing { get; }
 
-        Func<TEventArgs, UniTask<HandlerResult>> HandlerAsync { get; }
+        UniTask<HandlerResult> HandleEventAsync(TEventArgs eventArgs);
     }
 }

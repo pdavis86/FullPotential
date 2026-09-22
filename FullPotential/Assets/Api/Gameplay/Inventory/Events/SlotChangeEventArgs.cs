@@ -4,7 +4,7 @@ using FullPotential.Api.Gameplay.Events;
 namespace FullPotential.Api.Gameplay.Inventory.Events
 {
     [RegisterEvent]
-    public struct SlotChangeEventArgs : IEventArgs
+    public readonly struct SlotChangeEventArgs : IEventArgs
     {
         public InventoryBase Inventory { get; }
 

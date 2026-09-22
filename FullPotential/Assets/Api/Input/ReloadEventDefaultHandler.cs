@@ -1,6 +1,4 @@
-﻿using System;
-
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Obsolete.Items.Types;
@@ -13,9 +11,7 @@ namespace FullPotential.Api.Input
 
         public Timing Timing => Timing.Main;
 
-        public Func<ReloadEventArgs, UniTask<HandlerResult>> HandlerAsync => DefaultHandlerAsync;
-
-        private async UniTask<HandlerResult> DefaultHandlerAsync(ReloadEventArgs eventArgs)
+        public async UniTask<HandlerResult> HandleEventAsync(ReloadEventArgs eventArgs)
         {
             var itemInSlot = eventArgs.Fighter.Inventory.GetItemInSlot(eventArgs.SlotId);
 

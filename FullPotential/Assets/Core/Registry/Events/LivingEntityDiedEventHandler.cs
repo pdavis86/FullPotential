@@ -1,6 +1,4 @@
-﻿using System;
-
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Combat.Events;
@@ -16,9 +14,7 @@ namespace FullPotential.Core.Registry.Events
 
         public Timing Timing => Timing.After;
 
-        public Func<ResourceValueChangedEventArgs, UniTask<HandlerResult>> HandlerAsync => HandleAfterResourceValueChangedAsync;
-
-        private UniTask<HandlerResult> HandleAfterResourceValueChangedAsync(ResourceValueChangedEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(ResourceValueChangedEventArgs eventArgs)
         {
             if (eventArgs.NewValue > 0 || eventArgs.ResourceTypeId != ResourceTypeIds.HealthId)
             {

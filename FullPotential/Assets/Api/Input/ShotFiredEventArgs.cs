@@ -7,7 +7,7 @@ namespace FullPotential.Api.Input
 {
     // todo: move to standard
     [RegisterEvent]
-    public struct ShotFiredEventArgs : IEventArgs
+    public readonly struct ShotFiredEventArgs : IEventArgs
     {
         public FighterBase Fighter { get; }
 

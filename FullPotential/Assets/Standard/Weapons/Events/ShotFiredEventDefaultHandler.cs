@@ -1,10 +1,8 @@
-﻿using System;
-
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Input;
+using FullPotential.Api.Obsolete.Items.Types;
 
 namespace FullPotential.Standard.Weapons.Events
 {
@@ -14,9 +12,7 @@ namespace FullPotential.Standard.Weapons.Events
 
         public Timing Timing => Timing.Main;
 
-        public Func<ShotFiredEventArgs, UniTask<HandlerResult>> HandlerAsync => DefaultHandlerAsync;
-
-        private UniTask<HandlerResult> DefaultHandlerAsync(ShotFiredEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(ShotFiredEventArgs eventArgs)
         {
             if (!eventArgs.Fighter.IsServer)
             {

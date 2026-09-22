@@ -11,11 +11,11 @@ namespace FullPotential.Core.Gameplay.Events
     public class BasicEventHandler<TEventArgs> : IEventHandler<TEventArgs>
         where TEventArgs : IEventArgs
     {
+        private readonly Func<TEventArgs, UniTask<HandlerResult>> _handlerAsync;
+
         public NetworkLocation Location { get; private set; }
 
         public Timing Timing { get; private set; }
-
-        public Func<TEventArgs, UniTask<HandlerResult>> HandlerAsync { get; private set; }
 
         public BasicEventHandler(
             Func<TEventArgs, UniTask<HandlerResult>> basicFunction,
@@ -24,7 +24,12 @@ namespace FullPotential.Core.Gameplay.Events
         {
             Location = location;
             Timing = timing;
-            HandlerAsync = basicFunction;
+            _handlerAsync = basicFunction;
+        }
+
+        public UniTask<HandlerResult> HandleEventAsync(TEventArgs eventArgs)
+        {
+            return _handlerAsync(eventArgs);
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
@@ -29,8 +27,6 @@ namespace FullPotential.Standard.SpecialGear.Reloader
 
         public Timing Timing => Timing.After;
 
-        public Func<SlotChangeEventArgs, UniTask<HandlerResult>> HandlerAsync => HandleAfterSlotChangeAsync;
-
         public SlotChangeEventHandler(IGameManager gameManager, ITypeRegistry typeRegistry)
         {
             _hud = gameManager.GetUserInterface().HudOverlay;
@@ -40,16 +36,16 @@ namespace FullPotential.Standard.SpecialGear.Reloader
                 prefab => _handWarningPrefab = prefab);
         }
 
-        private UniTask<HandlerResult> HandleAfterSlotChangeAsync(SlotChangeEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(SlotChangeEventArgs eventArgs)
         {
             if (eventArgs.Inventory.OwnerClientId != NetworkManager.Singleton.LocalClientId)
             {
                 return UniTask.FromResult(new HandlerResult());
             }
 
-            if (eventArgs.SlotId != HandSlotIds.LeftHand
-                && eventArgs.SlotId != HandSlotIds.RightHand
-                && eventArgs.SlotId != RangedWeaponReloaderSlot.TypeIdString)
+            if (eventArgs.SlotId is not HandSlotIds.LeftHand
+                and not HandSlotIds.RightHand
+                and not RangedWeaponReloaderSlot.TypeIdString)
             {
                 return UniTask.FromResult(new HandlerResult());
             }

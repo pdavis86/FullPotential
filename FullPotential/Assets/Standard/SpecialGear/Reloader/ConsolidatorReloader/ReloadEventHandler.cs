@@ -1,10 +1,8 @@
-﻿using System;
-
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Input;
+using FullPotential.Api.Obsolete.Items.Types;
 
 using Unity.Netcode;
 
@@ -18,9 +16,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 
         public Timing Timing => Timing.Before;
 
-        public Func<ReloadEventArgs, UniTask<HandlerResult>> HandlerAsync => HandleReloadBeforeAsync;
-
-        private async UniTask<HandlerResult> HandleReloadBeforeAsync(ReloadEventArgs eventArgs)
+        public async UniTask<HandlerResult> HandleEventAsync(ReloadEventArgs eventArgs)
         {
             if (!NetworkManager.Singleton.IsServer)
             {

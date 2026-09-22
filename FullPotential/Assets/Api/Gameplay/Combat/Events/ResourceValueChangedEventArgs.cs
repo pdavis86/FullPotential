@@ -4,7 +4,7 @@ using FullPotential.Api.Gameplay.Events;
 namespace FullPotential.Api.Gameplay.Combat.Events
 {
     [RegisterEvent]
-    public struct ResourceValueChangedEventArgs : IEventArgs
+    public readonly struct ResourceValueChangedEventArgs : IEventArgs
     {
         public LivingEntityBase LivingEntity { get; }
 
@@ -12,7 +12,7 @@ namespace FullPotential.Api.Gameplay.Combat.Events
 
         public int NewValue { get; }
 
-        public int Change { get; set; }
+        public int Change { get; }
 
         public bool IsSelfInflicted { get; }
 

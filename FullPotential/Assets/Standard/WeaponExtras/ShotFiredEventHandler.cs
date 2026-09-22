@@ -1,11 +1,9 @@
-﻿using System;
-
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Input;
 using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
-using FullPotential.Api.Input;
 
 using UnityEngine;
 
@@ -23,14 +21,12 @@ namespace FullPotential.Standard.WeaponExtras
 
         public Timing Timing => Timing.After;
 
-        public Func<ShotFiredEventArgs, UniTask<HandlerResult>> HandlerAsync => HandleAfterBulletFiredAsync;
-
         public ShotFiredEventHandler(ITypeRegistry typeRegistry)
         {
             _typeRegistry = typeRegistry;
         }
 
-        private UniTask<HandlerResult> HandleAfterBulletFiredAsync(ShotFiredEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(ShotFiredEventArgs eventArgs)
         {
             var item = eventArgs.Fighter.Inventory.GetItemInSlot(eventArgs.SlotId);
 
@@ -41,7 +37,7 @@ namespace FullPotential.Standard.WeaponExtras
 
             _typeRegistry.LoadAddessable<GameObject>(BulletTrailPrefabAddress, prefab =>
             {
-                var projectile = UnityEngine.Object.Instantiate(
+                var projectile = Object.Instantiate(
                     prefab,
                     eventArgs.StartPosition.Value,
                     Quaternion.identity);

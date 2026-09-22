@@ -1,6 +1,4 @@
-﻿using System;
-
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
 
@@ -12,9 +10,7 @@ namespace FullPotential.Api.Gameplay.Inventory.Events
 
         public Timing Timing => Timing.Main;
 
-        public Func<SlotChangeEventArgs, UniTask<HandlerResult>> HandlerAsync => DefaultHandlerAsync;
-
-        private UniTask<HandlerResult> DefaultHandlerAsync(SlotChangeEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(SlotChangeEventArgs eventArgs)
         {
             eventArgs.Inventory.ApplyEquippedItemChange(eventArgs.ItemId, eventArgs.SlotId);
             return UniTask.FromResult(new HandlerResult());

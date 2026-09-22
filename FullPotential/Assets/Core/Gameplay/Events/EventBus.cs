@@ -18,11 +18,14 @@ namespace FullPotential.Core.Gameplay.Events
     public class EventBus : IEventBus
     {
         private readonly IAuditor _logger;
+        private readonly Timing[] _eventTimings;
         private readonly Dictionary<Type, IEventHandlerGroup> _subscriptions = new Dictionary<Type, IEventHandlerGroup>();
 
         public EventBus(IAuditorFactory auditorFactory)
         {
             _logger = auditorFactory.Create(this);
+
+            _eventTimings = new[] { Timing.Before, Timing.Main, Timing.After };
         }
 
         public void Register(Type eventArgsType)
@@ -43,7 +46,9 @@ namespace FullPotential.Core.Gameplay.Events
 
         public void Subscribe(Type handlerType)
         {
-            var interfaceImplementation = handlerType.GetInterface(typeof(IEventHandler<>).FullName);
+            var interfaceImplementation = handlerType
+                .GetInterfaces()
+                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEventHandler<>));
 
             if (interfaceImplementation == null)
             {
@@ -51,10 +56,7 @@ namespace FullPotential.Core.Gameplay.Events
                 return;
             }
 
-            var argsType = handlerType
-                .GetInterfaces()
-                .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEventHandler<>))
-                .GetGenericArguments()[0];
+            var argsType = interfaceImplementation.GetGenericArguments()[0];
 
             if (typeof(BasicEventHandler<>).MakeGenericType(argsType).IsAssignableFrom(handlerType))
             {
@@ -98,15 +100,14 @@ namespace FullPotential.Core.Gameplay.Events
             _logger.Debug($"Event with args type '{argsType}' was published");
 
             var handlerGroup = (EventHandlerGroup<TEventArgs>)_subscriptions[argsType];
-            var timings = new List<Timing> { Timing.Before, Timing.Main, Timing.After };
 
-            foreach (var timing in timings)
+            foreach (var timing in _eventTimings)
             {
                 foreach (var handler in handlerGroup.Handlers)
                 {
                     if (ShouldHandlerRun(handler, timing))
                     {
-                        var result = await handler.HandlerAsync(eventArgs);
+                        var result = await handler.HandleEventAsync(eventArgs);
 
                         if (result.NextAction == NextAction.Cancel)
                         {
@@ -114,8 +115,7 @@ namespace FullPotential.Core.Gameplay.Events
                             return;
                         }
 
-                        if (result.UpdatedEventArgs != null
-                            && result.UpdatedEventArgs is TEventArgs updatedEventArgs)
+                        if (result.UpdatedEventArgs is not null and TEventArgs updatedEventArgs)
                         {
                             eventArgs = updatedEventArgs;
                         }
@@ -144,17 +144,12 @@ namespace FullPotential.Core.Gameplay.Events
                 return false;
             }
 
-            switch (handler.Location)
+            return handler.Location switch
             {
-                case NetworkLocation.Server:
-                    return NetworkManager.Singleton.IsServer;
-
-                case NetworkLocation.Client:
-                    return NetworkManager.Singleton.IsClient;
-
-                default:
-                    return true;
-            }
+                NetworkLocation.Server => NetworkManager.Singleton.IsServer,
+                NetworkLocation.Client => NetworkManager.Singleton.IsClient,
+                _ => true,
+            };
         }
 
         private bool IsEventRegistered(Type argsType)

@@ -1,6 +1,4 @@
-﻿using System;
-
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Player;
@@ -20,15 +18,13 @@ namespace FullPotential.Standard.Weapons.Helpers
 
         public Timing Timing => Timing.Main;
 
-        public Func<AttackHoldEventArgs, UniTask<HandlerResult>> HandlerAsync => StandardHandlerAsync;
-
         public AttackHoldEventHandler(IAuditorFactory auditorFactory, IAttackHelper attackHelper)
         {
             _logger = auditorFactory.Create(this);
             _attackHelper = attackHelper;
         }
 
-        private UniTask<HandlerResult> StandardHandlerAsync(AttackHoldEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(AttackHoldEventArgs eventArgs)
         {
             var item = eventArgs.Fighter.Inventory.GetItemInSlot(eventArgs.SlotId);
             var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);

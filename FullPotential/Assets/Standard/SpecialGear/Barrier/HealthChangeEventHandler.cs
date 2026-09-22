@@ -23,14 +23,12 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public Timing Timing => Timing.Before;
 
-        public Func<ResourceValueChangedEventArgs, UniTask<HandlerResult>> HandlerAsync => HandleBeforeHealthChangeAsync;
-
         public HealthChangeEventHandler(IAuditorFactory auditorFactory)
         {
             _logger = auditorFactory.Create(this);
         }
 
-        private UniTask<HandlerResult> HandleBeforeHealthChangeAsync(ResourceValueChangedEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(ResourceValueChangedEventArgs eventArgs)
         {
             if (eventArgs.ResourceTypeId != ResourceTypeIds.HealthId
                 || eventArgs.Change >= 0
@@ -54,15 +52,22 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 return UniTask.FromResult(new HandlerResult());
             }
 
-               barrier.SetCustomData(CustomDataKeyLastHit, DateTime.UtcNow.ToString("u"));
+            barrier.SetCustomData(CustomDataKeyLastHit, DateTime.UtcNow.ToString("u"));
 
             eventArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, eventArgs.Change, false);
 
             if (barrierCharge < Math.Abs(eventArgs.Change))
             {
                 _logger.Debug("Barrier nearly depleted. Taking partial damage");
-                eventArgs.Change += barrierCharge;
-                return UniTask.FromResult(new HandlerResult(updatedEventArgs: eventArgs));
+
+                var updatedEventArgs = new ResourceValueChangedEventArgs(
+                    eventArgs.LivingEntity,
+                    eventArgs.ResourceTypeId,
+                    eventArgs.NewValue,
+                    eventArgs.Change + barrierCharge,
+                    eventArgs.IsSelfInflicted);
+
+                return UniTask.FromResult(new HandlerResult(updatedEventArgs: updatedEventArgs));
             }
 
             _logger.Debug("Barrier OK. Taking no damage");
