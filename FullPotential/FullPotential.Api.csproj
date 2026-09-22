@@ -50,7 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Api\CoreTypeIds\ResourceTypeIds.cs" />
-    <Compile Include="Assets\Api\Gameplay\Combat\Events\HealthChangeTextEventArgs.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IPlayerInventory.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\Timing.cs" />
     <Compile Include="Assets\Api\Logging\IAuditorFactory.cs" />

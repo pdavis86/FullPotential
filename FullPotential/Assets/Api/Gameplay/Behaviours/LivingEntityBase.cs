@@ -718,8 +718,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private bool DoesActionTypeAllowMultiple(EffectActionType effectActionType)
         {
-            return effectActionType == EffectActionType.TemporaryMaxIncrease
-                || effectActionType == EffectActionType.TemporaryMaxDecrease;
+            return effectActionType is EffectActionType.TemporaryMaxIncrease or EffectActionType.TemporaryMaxDecrease;
         }
 
         private void AddOrUpdateEffect(IEffectType effect, int change, DateTime expiry)

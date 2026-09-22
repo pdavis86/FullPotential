@@ -23,9 +23,9 @@ namespace FullPotential.Standard.Weapons.Helpers
         private const int ConsumerRangeLimit = 50;
         private const int MaximumRange = 100;
 
-        private IAuditor _logger;
-        private ICombatService _combatService;
-        private IEventBus _eventBus;
+        private readonly IAuditor _logger;
+        private readonly ICombatService _combatService;
+        private readonly IEventBus _eventBus;
 
         public AttackHelper(
             IAuditorFactory auditorFactory,
@@ -113,13 +113,14 @@ namespace FullPotential.Standard.Weapons.Helpers
 
             var endPos = Physics.Raycast(fighter.LookTransform.position, shotDirection, out var rangedHit, MaximumRange)
                 ? rangedHit.point
-                : handPosition + shotDirection * MaximumRange;
+                : handPosition + (shotDirection * MaximumRange);
 
             var ammoUsed = Math.Min(
                 1 + weaponInHand.Attributes.ExtraAmmoPerShot,
                 weaponInHand.Ammo);
 
-            var eventArgs = new ShotFiredEventArgs(fighter, slotId, handPosition, endPos, ammoUsed, rangedHit.transform?.gameObject);
+            var hitGameObject = rangedHit.transform != null ? rangedHit.transform.gameObject : null;
+            var eventArgs = new ShotFiredEventArgs(fighter, slotId, handPosition, endPos, ammoUsed, hitGameObject);
             _eventBus.PublishAsync(eventArgs).Forget();
 
             if (rangedHit.transform == null)

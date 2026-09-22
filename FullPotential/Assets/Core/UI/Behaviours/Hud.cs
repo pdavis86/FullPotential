@@ -301,9 +301,9 @@ namespace FullPotential.Core.Ui.Behaviours
         {
             if (effect is IResourceEffectType resourceEffect)
             {
-                if (resourceEffect.EffectActionType == EffectActionType.SingleIncrease
-                    || resourceEffect.EffectActionType == EffectActionType.PeriodicIncrease
-                    || resourceEffect.EffectActionType == EffectActionType.TemporaryMaxIncrease)
+                if (resourceEffect.EffectActionType is EffectActionType.SingleIncrease
+                    or EffectActionType.PeriodicIncrease
+                    or EffectActionType.TemporaryMaxIncrease)
                 {
                     return Color.green;
                 }

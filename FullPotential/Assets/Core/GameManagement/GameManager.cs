@@ -130,7 +130,7 @@ namespace FullPotential.Core.GameManagement
             {
                 _periodicSave?.TryPerformAction();
             }
-            else if (NetworkManager.Singleton?.IsServer ?? false)
+            else if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
             {
                 _serverHasBeenStarted = true;
             }
@@ -345,11 +345,11 @@ namespace FullPotential.Core.GameManagement
         {
             return new ConnectionPayload
             {
-                UserId = GameManager.Instance.LocalGameDataStore.SignInResult?.UserId,
-                Username = GameManager.Instance.LocalGameDataStore.SignInResult?.Username,
-                Token = GameManager.Instance.LocalGameDataStore.SignInResult?.Token,
-                CharacterId = GameManager.Instance.LocalGameDataStore.SignInResult?.CharacterId,
-                GameVersion = GameManager.GetGameVersion().ToString()
+                UserId = Instance.LocalGameDataStore.SignInResult?.UserId,
+                Username = Instance.LocalGameDataStore.SignInResult?.Username,
+                Token = Instance.LocalGameDataStore.SignInResult?.Token,
+                CharacterId = Instance.LocalGameDataStore.SignInResult?.CharacterId,
+                GameVersion = GetGameVersion().ToString()
             };
         }
 

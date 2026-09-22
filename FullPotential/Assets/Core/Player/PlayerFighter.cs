@@ -82,10 +82,7 @@ namespace FullPotential.Core.Player
 
         public string TextureUrl
         {
-            get
-            {
-                return _textureUrl;
-            }
+            get => _textureUrl;
             private set
             {
                 _textureUrl = value;
@@ -532,8 +529,8 @@ namespace FullPotential.Core.Player
 
                 if (doDownload)
                 {
-                    using (var webRequest = UnityWebRequest.Get(TextureUrl))
-                    {
+                    using var webRequest = UnityWebRequest.Get(TextureUrl);
+
                         await webRequest.SendWebRequest();
 
                         if (webRequest.downloadHandler.data == null)
@@ -546,7 +543,6 @@ namespace FullPotential.Core.Player
                         System.IO.File.WriteAllText(validatePath, TextureUrl);
                     }
                 }
-            }
 
             Material newMat;
 
