@@ -8,7 +8,6 @@ using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Player.Models;
@@ -46,6 +45,8 @@ namespace FullPotential.Core.Player
         private const string EventSource = nameof(PlayerBehaviour);
 
         private readonly System.Random _random = new System.Random();
+
+        private readonly Collider[] _collidersInRange = new Collider[10];
 
 #pragma warning disable 0649
         [SerializeField] private Camera _playerCamera;
@@ -275,15 +276,12 @@ namespace FullPotential.Core.Player
 
             Interactable interactable = null;
 
-            // ReSharper disable once Unity.PreferNonAllocApi
-            var collidersInRange = Physics.OverlapSphere(playerNetworkObject.transform.position, searchRadius);
-            foreach (var colliderNearby in collidersInRange)
+            var colliderCount = Physics.OverlapSphereNonAlloc(playerNetworkObject.transform.position, searchRadius, _collidersInRange);
+            for (var i = 0; i < colliderCount; i++)
             {
-                if (colliderNearby.gameObject.name == gameObjectName)
+                if (_collidersInRange[i].gameObject.name == gameObjectName)
                 {
-                    var colliderInteractable = colliderNearby.gameObject.GetComponent<Interactable>();
-
-                    if (colliderInteractable == null)
+                    if (!_collidersInRange[i].gameObject.TryGetComponent<Interactable>(out var colliderInteractable))
                     {
                         continue;
                     }
