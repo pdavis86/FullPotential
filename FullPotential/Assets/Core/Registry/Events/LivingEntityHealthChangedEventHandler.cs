@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Combat.Events;
@@ -8,13 +8,13 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Core.Registry.Events
 {
-    public class LivingEntityHealthChangedEventHandler : IEventHandler<ResourceValueChangedEventArgs>
+    public class LivingEntityHealthChangedEventHandler : IEventHandler<ResourceValueChangeEvent>
     {
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Timing Timing => Timing.After;
+        public Timing Timing => Timing.Late;
 
-        public UniTask<HandlerResult> HandleEventAsync(ResourceValueChangedEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(ResourceValueChangeEvent eventArgs)
         {
             if (eventArgs.ResourceTypeId != ResourceTypeIds.HealthId)
             {

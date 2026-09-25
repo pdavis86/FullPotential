@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Cysharp.Threading.Tasks;
 
@@ -120,7 +120,7 @@ namespace FullPotential.Standard.Weapons.Helpers
                 weaponInHand.Ammo);
 
             var hitGameObject = rangedHit.transform != null ? rangedHit.transform.gameObject : null;
-            var eventArgs = new ShotFiredEventArgs(fighter, slotId, handPosition, endPos, ammoUsed, hitGameObject);
+            var eventArgs = new ShotFiredAfterEvent(fighter, slotId, handPosition, endPos, ammoUsed, hitGameObject);
             _eventBus.PublishAsync(eventArgs).Forget();
 
             if (rangedHit.transform == null)

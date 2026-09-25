@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -400,7 +400,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected void TriggerSlotChangeEvent(string itemId, string slotId)
         {
-            var changeEvent = new SlotChangeEventArgs(this, _livingEntity, slotId, itemId);
+            var changeEvent = new SlotChangeEvent(this, _livingEntity, slotId, itemId);
             _eventBus.PublishAsync(changeEvent).Forget();
         }
 

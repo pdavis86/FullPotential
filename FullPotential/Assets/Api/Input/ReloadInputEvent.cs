@@ -1,23 +1,23 @@
-﻿using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Obsolete.Items.Types;
 
 namespace FullPotential.Api.Input
 {
     [RegisterEvent]
-    public readonly struct ReloadEventArgs : IEventArgs
+    public readonly struct ReloadInputEvent : IEvent
     {
         public FighterBase Fighter { get; }
 
         public string SlotId { get; }
 
-        public ReloadEventArgs(FighterBase fighter, string slotId)
+        public ReloadInputEvent(FighterBase fighter, string slotId)
         {
             Fighter = fighter;
             SlotId = slotId;
         }
 
-        public static void UpdateAmmoCounts(ReloadEventArgs eventArgs)
+        public static void UpdateAmmoCounts(ReloadInputEvent eventArgs)
         {
             var fighter = eventArgs.Fighter;
 

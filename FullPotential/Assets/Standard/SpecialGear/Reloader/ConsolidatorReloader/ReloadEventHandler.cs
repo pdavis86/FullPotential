@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Input;
@@ -10,13 +10,13 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 {
-    public class ReloadEventHandler : IEventHandler<ReloadEventArgs>
+    public class ReloadEventHandler : IEventHandler<ReloadInputEvent>
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Timing Timing => Timing.Before;
+        public Timing Timing => Timing.Early;
 
-        public async UniTask<HandlerResult> HandleEventAsync(ReloadEventArgs eventArgs)
+        public async UniTask<HandlerResult> HandleEventAsync(ReloadInputEvent eventArgs)
         {
             if (!NetworkManager.Singleton.IsServer)
             {
@@ -42,7 +42,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
             var weapon = eventArgs.Fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
             await UniTask.WaitForSeconds(weapon.GetReloadTime());
 
-            ReloadEventArgs.UpdateAmmoCounts(eventArgs);
+            ReloadInputEvent.UpdateAmmoCounts(eventArgs);
 
             slotStatus.IsBusy = false;
 

@@ -1,9 +1,9 @@
-﻿namespace FullPotential.Api.Gameplay.Events
+namespace FullPotential.Api.Gameplay.Events
 {
     public enum Timing
     {
-        Before,
+        Early,
         Main,
-        After
+        Late
     }
 }

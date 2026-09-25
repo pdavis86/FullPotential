@@ -1,10 +1,10 @@
-﻿using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Api.Gameplay.Inventory.Events
 {
     [RegisterEvent]
-    public readonly struct SlotChangeEventArgs : IEventArgs
+    public readonly struct SlotChangeEvent : IEvent
     {
         public InventoryBase Inventory { get; }
 
@@ -14,7 +14,7 @@ namespace FullPotential.Api.Gameplay.Inventory.Events
 
         public string ItemId { get; }
 
-        public SlotChangeEventArgs(InventoryBase inventory, LivingEntityBase livingEntity, string slotId, string itemId)
+        public SlotChangeEvent(InventoryBase inventory, LivingEntityBase livingEntity, string slotId, string itemId)
         {
             Inventory = inventory;
             LivingEntity = livingEntity;

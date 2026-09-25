@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Cysharp.Threading.Tasks;
 
@@ -12,13 +12,13 @@ namespace FullPotential.Api.Gameplay.Events
 
         void Subscribe(Type handlerType);
 
-        void Subscribe<TEventArgs>(Action<TEventArgs> handlerAction)
-            where TEventArgs : IEventArgs;
+        void Subscribe<TEvent>(Action<TEvent> handlerAction)
+            where TEvent : IEvent;
 
-        void Subscribe<TEventArgs>(Func<TEventArgs, UniTask<HandlerResult>> handlerFunction)
-            where TEventArgs : IEventArgs;
+        void Subscribe<TEvent>(Func<TEvent, UniTask<HandlerResult>> handlerFunction)
+            where TEvent : IEvent;
 
-        UniTask PublishAsync<TEventArgs>(TEventArgs eventArgs)
-            where TEventArgs : IEventArgs;
+        UniTask PublishAsync<TEvent>(TEvent eventArgs)
+            where TEvent : IEvent;
     }
 }

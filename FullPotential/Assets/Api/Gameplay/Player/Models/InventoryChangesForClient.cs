@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using FullPotential.Api.Utilities.Extensions;
 
@@ -10,7 +10,7 @@ namespace FullPotential.Api.Gameplay.Player.Models
     public class InventoryChangesForClient : INetworkSerializable
     {
         public string[] IdsToFetch;
-        
+
         public string[] IdsToDelete;
 
         //public string[] ChangedSlotsIds;

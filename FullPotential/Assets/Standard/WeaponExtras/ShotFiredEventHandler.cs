@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Input;
@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace FullPotential.Standard.WeaponExtras
 {
-    public class ShotFiredEventHandler : IEventHandler<ShotFiredEventArgs>
+    public class ShotFiredEventHandler : IEventHandler<ShotFiredAfterEvent>
     {
         private const string BulletTrailPrefabAddress = "Standard/Prefabs/Combat/BulletTrail.prefab";
 
@@ -19,14 +19,14 @@ namespace FullPotential.Standard.WeaponExtras
 
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Timing Timing => Timing.After;
+        public Timing Timing => Timing.Late;
 
         public ShotFiredEventHandler(ITypeRegistry typeRegistry)
         {
             _typeRegistry = typeRegistry;
         }
 
-        public UniTask<HandlerResult> HandleEventAsync(ShotFiredEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(ShotFiredAfterEvent eventArgs)
         {
             var item = eventArgs.Fighter.Inventory.GetItemInSlot(eventArgs.SlotId);
 

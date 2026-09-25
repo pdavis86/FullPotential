@@ -1,17 +1,17 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Obsolete.Items.Types;
 
 namespace FullPotential.Api.Input
 {
-    public class ReloadEventDefaultHandler : IEventHandler<ReloadEventArgs>
+    public class ReloadEventDefaultHandler : IEventHandler<ReloadInputEvent>
     {
         public NetworkLocation Location => NetworkLocation.Both;
 
         public Timing Timing => Timing.Main;
 
-        public async UniTask<HandlerResult> HandleEventAsync(ReloadEventArgs eventArgs)
+        public async UniTask<HandlerResult> HandleEventAsync(ReloadInputEvent eventArgs)
         {
             var itemInSlot = eventArgs.Fighter.Inventory.GetItemInSlot(eventArgs.SlotId);
 
@@ -35,7 +35,7 @@ namespace FullPotential.Api.Input
 
             await UniTask.WaitForSeconds(weapon.GetReloadTime());
 
-            ReloadEventArgs.UpdateAmmoCounts(eventArgs);
+            ReloadInputEvent.UpdateAmmoCounts(eventArgs);
 
             slotStatus.IsBusy = false;
 

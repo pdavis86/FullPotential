@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Events;
@@ -13,13 +13,13 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class SlotChangeEventHandler : IEventHandler<SlotChangeEventArgs>
+    public class SlotChangeEventHandler : IEventHandler<SlotChangeEvent>
     {
         private readonly IHud _hud;
 
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Timing Timing => Timing.After;
+        public Timing Timing => Timing.Late;
 
         public SlotChangeEventHandler(IGameManager gameManager)
         {
@@ -28,7 +28,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             _hud.ToggleSliderBar(BarrierChargeResource.TypeIdString, false);
         }
 
-        public UniTask<HandlerResult> HandleEventAsync(SlotChangeEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(SlotChangeEvent eventArgs)
         {
             if (eventArgs.SlotId != BarrierSlot.TypeIdString)
             {

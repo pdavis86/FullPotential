@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
+using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
@@ -87,9 +88,7 @@ namespace FullPotential.Core.Registry
                         return;
                     }
 
-                    var mod = opHandle.Result.GetComponent<IMod>();
-
-                    if (mod == null)
+                    if (!opHandle.Result.TryGetComponent<IMod>(out var mod))
                     {
                         _logger.Warn($"Failed to find IMod implementation for Mod '{modPrefix}'");
                         return;
@@ -102,8 +101,8 @@ namespace FullPotential.Core.Registry
 
         private void RegisterApiTypes()
         {
-            RegisterEventTypes(typeof(IEventArgs).Assembly);
-            RegisterEventHandlerTypes(typeof(IEventArgs).Assembly);
+            RegisterEventTypes(typeof(IGameManager).Assembly);
+            RegisterEventHandlerTypes(typeof(IGameManager).Assembly);
         }
 
         private void RegisterCoreTypes()

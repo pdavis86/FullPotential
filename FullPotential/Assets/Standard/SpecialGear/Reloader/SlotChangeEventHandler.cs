@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Behaviours;
@@ -18,14 +18,14 @@ using UnityEngine;
 
 namespace FullPotential.Standard.SpecialGear.Reloader
 {
-    public class SlotChangeEventHandler : IEventHandler<SlotChangeEventArgs>
+    public class SlotChangeEventHandler : IEventHandler<SlotChangeEvent>
     {
         private readonly IHud _hud;
         private GameObject _handWarningPrefab;
 
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Timing Timing => Timing.After;
+        public Timing Timing => Timing.Late;
 
         public SlotChangeEventHandler(IGameManager gameManager, ITypeRegistry typeRegistry)
         {
@@ -36,7 +36,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader
                 prefab => _handWarningPrefab = prefab);
         }
 
-        public UniTask<HandlerResult> HandleEventAsync(SlotChangeEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(SlotChangeEvent eventArgs)
         {
             if (eventArgs.Inventory.OwnerClientId != NetworkManager.Singleton.LocalClientId)
             {

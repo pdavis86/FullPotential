@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Player;
@@ -9,7 +9,7 @@ using FullPotential.Api.Obsolete.Items.Types;
 
 namespace FullPotential.Standard.Weapons.Helpers
 {
-    public class AttackHoldEventHandler : IEventHandler<AttackHoldEventArgs>
+    public class AttackHoldEventHandler : IEventHandler<AttackHoldInputEvent>
     {
         private readonly IAuditor _logger;
         private readonly IAttackHelper _attackHelper;
@@ -24,7 +24,7 @@ namespace FullPotential.Standard.Weapons.Helpers
             _attackHelper = attackHelper;
         }
 
-        public UniTask<HandlerResult> HandleEventAsync(AttackHoldEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(AttackHoldInputEvent eventArgs)
         {
             var item = eventArgs.Fighter.Inventory.GetItemInSlot(eventArgs.SlotId);
             var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);

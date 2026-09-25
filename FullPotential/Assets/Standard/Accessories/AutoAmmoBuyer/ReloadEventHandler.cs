@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Cysharp.Threading.Tasks;
@@ -19,7 +19,7 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 {
-    public class ReloadEventHandler : IEventHandler<ReloadEventArgs>
+    public class ReloadEventHandler : IEventHandler<ReloadInputEvent>
     {
         private readonly ITypeRegistry _typeRegistry;
         private readonly ILocalizer _localizer;
@@ -27,7 +27,7 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Timing Timing => Timing.Before;
+        public Timing Timing => Timing.Early;
 
         public ReloadEventHandler(ITypeRegistry typeRegistry, ILocalizer localizer, IItemFactory itemFactory)
         {
@@ -36,7 +36,7 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
             _itemFactory = itemFactory;
         }
 
-        public UniTask<HandlerResult> HandleEventAsync(ReloadEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(ReloadInputEvent eventArgs)
         {
             if (!NetworkManager.Singleton.IsServer)
             {

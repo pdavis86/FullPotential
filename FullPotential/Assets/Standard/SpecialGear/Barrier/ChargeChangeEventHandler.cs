@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
@@ -9,13 +9,13 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class ChargeChangeEventHandler : IEventHandler<ResourceValueChangedEventArgs>
+    public class ChargeChangeEventHandler : IEventHandler<ResourceValueChangeEvent>
     {
         public NetworkLocation Location => NetworkLocation.Client;
 
-        public Timing Timing => Timing.After;
+        public Timing Timing => Timing.Late;
 
-        public UniTask<HandlerResult> HandleEventAsync(ResourceValueChangedEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(ResourceValueChangeEvent eventArgs)
         {
             if (eventArgs.ResourceTypeId != BarrierChargeResource.TypeIdString)
             {

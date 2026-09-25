@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Input;
@@ -6,7 +6,7 @@ using FullPotential.Api.Items;
 
 namespace FullPotential.Standard.Weapons.Helpers
 {
-    public class AttackReleaseEventHandler : IEventHandler<AttackReleaseEventArgs>
+    public class AttackReleaseEventHandler : IEventHandler<AttackReleaseInputEvent>
     {
         private readonly IEventBus _eventBus;
         private readonly IAttackHelper _attackHelper;
@@ -21,7 +21,7 @@ namespace FullPotential.Standard.Weapons.Helpers
             _attackHelper = attackHelper;
         }
 
-        public UniTask<HandlerResult> HandleEventAsync(AttackReleaseEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(AttackReleaseInputEvent eventArgs)
         {
             var item = eventArgs.Fighter.Inventory.GetItemInSlot(eventArgs.SlotId);
 
@@ -29,7 +29,7 @@ namespace FullPotential.Standard.Weapons.Helpers
                 && itemWithCharge.IsChargePercentageUsed
                 && itemWithCharge.ChargePercentage <= 0)
             {
-                _eventBus.PublishAsync(new AttackHoldEventArgs(eventArgs.Fighter, eventArgs.SlotId));
+                _eventBus.PublishAsync(new AttackHoldInputEvent(eventArgs.Fighter, eventArgs.SlotId));
                 return UniTask.FromResult(new HandlerResult(NextAction.Cancel));
             }
 

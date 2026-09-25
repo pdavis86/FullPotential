@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Cysharp.Threading.Tasks;
 
@@ -13,7 +13,7 @@ using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class HealthChangeEventHandler : IEventHandler<ResourceValueChangedEventArgs>
+    public class HealthChangeEventHandler : IEventHandler<ResourceValueChangeEvent>
     {
         public const string CustomDataKeyLastHit = "LastHit";
 
@@ -21,15 +21,16 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Timing Timing => Timing.Before;
+        public Timing Timing => Timing.Early;
 
         public HealthChangeEventHandler(IAuditorFactory auditorFactory)
         {
             _logger = auditorFactory.Create(this);
         }
 
-        public UniTask<HandlerResult> HandleEventAsync(ResourceValueChangedEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(ResourceValueChangeEvent eventArgs)
         {
+            // todo: remove IsSelfInflicted
             if (eventArgs.ResourceTypeId != ResourceTypeIds.HealthId
                 || eventArgs.Change >= 0
                 || eventArgs.IsSelfInflicted)
@@ -60,7 +61,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             {
                 _logger.Debug("Barrier nearly depleted. Taking partial damage");
 
-                var updatedEventArgs = new ResourceValueChangedEventArgs(
+                var updatedEventArgs = new ResourceValueChangeEvent(
                     eventArgs.LivingEntity,
                     eventArgs.ResourceTypeId,
                     eventArgs.NewValue,

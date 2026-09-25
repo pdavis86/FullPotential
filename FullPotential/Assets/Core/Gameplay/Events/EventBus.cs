@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -25,7 +25,7 @@ namespace FullPotential.Core.Gameplay.Events
         {
             _logger = auditorFactory.Create(this);
 
-            _eventTimings = new[] { Timing.Before, Timing.Main, Timing.After };
+            _eventTimings = new[] { Timing.Early, Timing.Main, Timing.Late };
         }
 
         public void Register(Type eventArgsType)
@@ -67,27 +67,27 @@ namespace FullPotential.Core.Gameplay.Events
             Subscribe(argsType, handler);
         }
 
-        public void Subscribe<TEventArgs>(Action<TEventArgs> handlerAction)
-            where TEventArgs : IEventArgs
+        public void Subscribe<TEvent>(Action<TEvent> handlerAction)
+            where TEvent : IEvent
         {
-            var handler = new BasicEventHandler<TEventArgs>(args =>
+            var handler = new BasicEventHandler<TEvent>(args =>
             {
                 handlerAction(args);
                 return UniTask.FromResult(new HandlerResult());
             });
 
-            Subscribe(typeof(TEventArgs), handler);
+            Subscribe(typeof(TEvent), handler);
         }
 
-        public void Subscribe<TEventArgs>(Func<TEventArgs, UniTask<HandlerResult>> handlerFunction)
-            where TEventArgs : IEventArgs
+        public void Subscribe<TEvent>(Func<TEvent, UniTask<HandlerResult>> handlerFunction)
+            where TEvent : IEvent
         {
-            var handler = new BasicEventHandler<TEventArgs>(handlerFunction);
-            Subscribe(typeof(TEventArgs), handler);
+            var handler = new BasicEventHandler<TEvent>(handlerFunction);
+            Subscribe(typeof(TEvent), handler);
         }
 
-        public async UniTask PublishAsync<TEventArgs>(TEventArgs eventArgs)
-            where TEventArgs : IEventArgs
+        public async UniTask PublishAsync<TEvent>(TEvent eventArgs)
+            where TEvent : IEvent
         {
             var argsType = eventArgs.GetType();
 
@@ -99,7 +99,7 @@ namespace FullPotential.Core.Gameplay.Events
 
             _logger.Debug($"Event with args type '{argsType}' was published");
 
-            var handlerGroup = (EventHandlerGroup<TEventArgs>)_subscriptions[argsType];
+            var handlerGroup = (EventHandlerGroup<TEvent>)_subscriptions[argsType];
 
             foreach (var timing in _eventTimings)
             {
@@ -107,6 +107,8 @@ namespace FullPotential.Core.Gameplay.Events
                 {
                     if (ShouldHandlerRun(handler, timing))
                     {
+                        _logger.Debug($"Running handler {handler.GetType().FullName}");
+
                         var result = await handler.HandleEventAsync(eventArgs);
 
                         if (result.NextAction == NextAction.Cancel)
@@ -115,7 +117,7 @@ namespace FullPotential.Core.Gameplay.Events
                             return;
                         }
 
-                        if (result.UpdatedEventArgs is not null and TEventArgs updatedEventArgs)
+                        if (result.UpdatedEventArgs is not null and TEvent updatedEventArgs)
                         {
                             eventArgs = updatedEventArgs;
                         }
@@ -136,8 +138,8 @@ namespace FullPotential.Core.Gameplay.Events
             group.Add(handler);
         }
 
-        private bool ShouldHandlerRun<TEventArgs>(IEventHandler<TEventArgs> handler, Timing timing)
-            where TEventArgs : IEventArgs
+        private bool ShouldHandlerRun<TEvent>(IEventHandler<TEvent> handler, Timing timing)
+            where TEvent : IEvent
         {
             if (handler.Timing != timing)
             {

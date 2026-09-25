@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Input;
@@ -7,13 +7,13 @@ using FullPotential.Api.Input;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 {
-    public class ReloadEventHandler : IEventHandler<ReloadEventArgs>
+    public class ReloadEventHandler : IEventHandler<ReloadInputEvent>
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Timing Timing => Timing.Before;
+        public Timing Timing => Timing.Early;
 
-        public UniTask<HandlerResult> HandleEventAsync(ReloadEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(ReloadInputEvent eventArgs)
         {
             var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Obsolete.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 

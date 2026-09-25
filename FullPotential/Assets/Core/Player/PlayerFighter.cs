@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -475,11 +475,17 @@ namespace FullPotential.Core.Player
                 playerData.ValuePools[ResourceTypeIds.HealthId] = GetResourceMax(ResourceTypeIds.HealthId);
             }
 
-            SetResourceInitialValues(GetResources().ToDictionary(
-                resource => resource.TypeId.ToString(),
-                resource => playerData.ValuePools.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value));
+            // todo: zzz v0.6 - These should come from the server
+            foreach (var resource in GetResources())
+            {
+                var key = resource.TypeId.ToString();
+                var value = playerData.ValuePools.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value;
+                _resourceValueCache[key] = ClampResourceValue(key, value);
+            }
 
-            _eventBus.Subscribe<ResourceValueChangedEventArgs>(_ => MarkAsDirtyAndAddToQueue());
+            UpdateUiHealthAndDefenceValues();
+
+            _eventBus.Subscribe<ResourceValueChangeEvent>(_ => MarkAsDirtyAndAddToQueue());
         }
 
         public void UpdatePlayerSettings(List<SerializableKeyValuePair<string, string>> updatedSettings)
@@ -531,18 +537,18 @@ namespace FullPotential.Core.Player
                 {
                     using var webRequest = UnityWebRequest.Get(TextureUrl);
 
-                        await webRequest.SendWebRequest();
+                    await webRequest.SendWebRequest();
 
-                        if (webRequest.downloadHandler.data == null)
-                        {
-                            _logger.Error("Failed to download texture");
-                            return;
-                        }
-
-                        System.IO.File.WriteAllBytes(filePath, webRequest.downloadHandler.data);
-                        System.IO.File.WriteAllText(validatePath, TextureUrl);
+                    if (webRequest.downloadHandler.data == null)
+                    {
+                        _logger.Error("Failed to download texture");
+                        return;
                     }
+
+                    System.IO.File.WriteAllBytes(filePath, webRequest.downloadHandler.data);
+                    System.IO.File.WriteAllText(validatePath, TextureUrl);
                 }
+            }
 
             Material newMat;
 
@@ -630,17 +636,20 @@ namespace FullPotential.Core.Player
 
         #region UI Updates
 
+        // todo: should this still exist?
         public void ShowAlertForItemsAddedToInventory(string alertText)
         {
             ShowHudAlertClientRpc(alertText, _clientRpcParams);
         }
 
+        // todo: should this still exist?
         public void AlertOfInventoryRemovals(int itemsRemovedCount)
         {
             var message = _localizer.Translate("ui.alert.itemsremoved");
             ShowHudAlertClientRpc(string.Format(message, itemsRemovedCount), _clientRpcParams);
         }
 
+        // todo: should this still exist?
         public void AlertInventoryIsFull()
         {
             ShowHudAlertClientRpc(_localizer.Translate("ui.alert.itemsatmax"), _clientRpcParams);

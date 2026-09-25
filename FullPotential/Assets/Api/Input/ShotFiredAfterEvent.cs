@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 
 using UnityEngine;
@@ -7,7 +7,7 @@ namespace FullPotential.Api.Input
 {
     // todo: move to standard
     [RegisterEvent]
-    public readonly struct ShotFiredEventArgs : IEventArgs
+    public readonly struct ShotFiredAfterEvent : IEvent
     {
         public FighterBase Fighter { get; }
 
@@ -21,7 +21,7 @@ namespace FullPotential.Api.Input
 
         public GameObject ObjectHit { get; }
 
-        public ShotFiredEventArgs(
+        public ShotFiredAfterEvent(
             FighterBase fighter,
             string slotId,
             Vector3? startPostion = null,

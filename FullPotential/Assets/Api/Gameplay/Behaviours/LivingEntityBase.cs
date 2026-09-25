@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -85,7 +85,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
         private readonly List<ActiveEffect> _activeEffects = new List<ActiveEffect>();
-        private readonly Dictionary<string, int> _resourceValueCache = new Dictionary<string, int>();
+        protected readonly Dictionary<string, int> _resourceValueCache = new Dictionary<string, int>();
 
         private CancellationTokenSource _activeEffectsCancellationTokenSource = new CancellationTokenSource();
         private IEnumerable<IResourceType> _sortedResources;
@@ -194,6 +194,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             AddOrUpdateEffect(effect, change, expiry);
         }
 
+        // todo: should this be the generalised RPC?
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
         protected void ShowHudAlertClientRpc(string announcement, ClientRpcParams clientRpcParams)
@@ -205,6 +206,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             _gameManager.GetUserInterface().HudOverlay.ShowAlert(announcement);
+        }
+
+        // ReSharper disable once UnusedParameter.Global
+        [ClientRpc]
+        protected void NotifyEntityDiedClientRpc(string lastDamageSourceName, string lastDamageItemName, ClientRpcParams clientRpcParams)
+        {
+            PublishEntityDiedEvent(lastDamageSourceName, lastDamageItemName);
         }
 
         #endregion
@@ -309,18 +317,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return value;
         }
 
-        protected void SetResourceInitialValues(Dictionary<string, int> values)
-        {
-            // todo: zzz v0.6 - These should come from the server
-
-            foreach (var kvp in values)
-            {
-                _resourceValueCache[kvp.Key] = ClampResourceValue(kvp.Key, kvp.Value);
-            }
-
-            UpdateUiHealthAndDefenceValues();
-        }
-
         public void TriggerResourceValueUpdate(string typeId, int oldValue, int newValue, bool isSelfInflicted)
         {
             TriggerResourceValueUpdate(typeId, newValue - oldValue, isSelfInflicted);
@@ -329,7 +325,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public void TriggerResourceValueUpdate(string typeId, int change, bool isSelfInflicted)
         {
             var currentValue = ClampResourceValue(typeId, GetResourceValue(typeId));
-            var changeEvent = new ResourceValueChangedEventArgs(this, typeId, currentValue + change, change, isSelfInflicted);
+            var changeEvent = new ResourceValueChangeEvent(this, typeId, currentValue + change, change, isSelfInflicted);
             _eventBus.PublishAsync(changeEvent).Forget();
         }
 
@@ -439,6 +435,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _nameTag.text = displayName;
         }
 
+        // todo: should this still exist?
         public void UpdateUiHealthAndDefenceValues()
         {
             if (!IsClient)
@@ -448,8 +445,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var health = GetResourceValue(ResourceTypeIds.HealthId);
             var maxHealth = GetResourceMax(ResourceTypeIds.HealthId);
-            var values = _gameManager.GetUserInterface().HudOverlay.GetSliderBarValues(health, maxHealth, null);
-            HealthBarSlider.UpdateValues(values.text, values.percent, 1);
+            var (percent, text) = _gameManager.GetUserInterface().HudOverlay.GetSliderBarValues(health, maxHealth, null);
+            HealthBarSlider.UpdateValues(text, percent, 1);
         }
 
         #endregion
@@ -563,9 +560,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             _damageTaken.Clear();
 
-            var deathMessage = GetDeathMessage(name);
-            var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
-            ShowHudAlertClientRpc(deathMessage, nearbyClients);
+            PublishEntityDiedEvent(_lastDamageSourceName, _lastDamageItemName);
+
+            var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, 0);
+            NotifyEntityDiedClientRpc(_lastDamageSourceName, _lastDamageItemName, nearbyClients);
 
             _activeEffectsCancellationTokenSource.Cancel();
             _activeEffectsCancellationTokenSource.Dispose();
@@ -576,35 +574,19 @@ namespace FullPotential.Api.Gameplay.Behaviours
             HandleDeathAfter();
         }
 
-        protected abstract void HandleDeathAfter();
-
-        private string GetDeathMessage(string victimName)
+        protected void PublishEntityDiedEvent(string lastDamageSourceName, string lastDamageItemName)
         {
-            if (gameObject == _gameManager.GetLocalPlayerGameObject())
-            {
-                if (_lastDamageSourceName == victimName)
-                {
-                    return _lastDamageItemName.IsNullOrWhiteSpace()
-                        ? _localizer.Translate("ui.alert.attack.youkilledyourself")
-                        : _localizer.Translate("ui.alert.attack.youkilledyourselfusing", _lastDamageItemName);
-                }
-
-                return _lastDamageItemName.IsNullOrWhiteSpace()
-                    ? _localizer.Translate("ui.alert.attack.youwerekilledby", _lastDamageSourceName)
-                    : _localizer.Translate("ui.alert.attack.youwerekilledbyusing", _lastDamageSourceName, _lastDamageItemName);
-            }
-
-            if (_lastDamageSourceName == victimName)
-            {
-                return _lastDamageItemName.IsNullOrWhiteSpace()
-                    ? _localizer.Translate("ui.alert.attack.victimsuicide", victimName)
-                    : _localizer.Translate("ui.alert.attack.victimsuicideusing", victimName, _lastDamageItemName);
-            }
-
-            return _lastDamageItemName.IsNullOrWhiteSpace()
-                ? _localizer.Translate("ui.alert.attack.victimkilledby", victimName, _lastDamageSourceName)
-                : _localizer.Translate("ui.alert.attack.victimkilledbyusing", victimName, _lastDamageSourceName, _lastDamageItemName);
+            _eventBus.PublishAsync(new EntityDiedAfterEvent(
+                OwnerClientId,
+                name,
+                _entityName.Value.ToString(),
+                transform.position,
+                lastDamageSourceName,
+                lastDamageItemName)
+            ).Forget();
         }
+
+        protected abstract void HandleDeathAfter();
 
         public void ShowHealthChangeToSourceFighter(
             FighterBase sourceFighter,

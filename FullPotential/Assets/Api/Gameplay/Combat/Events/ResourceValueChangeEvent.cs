@@ -1,10 +1,10 @@
-﻿using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Api.Gameplay.Combat.Events
 {
     [RegisterEvent]
-    public readonly struct ResourceValueChangedEventArgs : IEventArgs
+    public readonly struct ResourceValueChangeEvent : IEvent
     {
         public LivingEntityBase LivingEntity { get; }
 
@@ -16,7 +16,7 @@ namespace FullPotential.Api.Gameplay.Combat.Events
 
         public bool IsSelfInflicted { get; }
 
-        public ResourceValueChangedEventArgs(LivingEntityBase livingEntity, string resourceTypeId, int newValue, int change, bool isSelfInflicted)
+        public ResourceValueChangeEvent(LivingEntityBase livingEntity, string resourceTypeId, int newValue, int change, bool isSelfInflicted)
         {
             LivingEntity = livingEntity;
             ResourceTypeId = resourceTypeId;

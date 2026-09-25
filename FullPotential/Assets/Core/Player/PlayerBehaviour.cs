@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -573,7 +573,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            _eventBus.PublishAsync(new AttackHoldEventArgs(_playerFighter, slotId));
+            _eventBus.PublishAsync(new AttackHoldInputEvent(_playerFighter, slotId));
 
             if (!IsHost)
             {
@@ -584,7 +584,7 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         public void AttackHoldServerRpc(string slotId)
         {
-            _eventBus.PublishAsync(new AttackHoldEventArgs(_playerFighter, slotId));
+            _eventBus.PublishAsync(new AttackHoldInputEvent(_playerFighter, slotId));
         }
 
         private void HandleAttackRelease(string slotId)
@@ -602,7 +602,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            _eventBus.PublishAsync(new AttackReleaseEventArgs(_playerFighter, slotId));
+            _eventBus.PublishAsync(new AttackReleaseInputEvent(_playerFighter, slotId));
 
             if (!IsHost)
             {
@@ -613,12 +613,12 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         public void AttackReleaseServerRpc(string slotId)
         {
-            _eventBus.PublishAsync(new AttackReleaseEventArgs(_playerFighter, slotId));
+            _eventBus.PublishAsync(new AttackReleaseInputEvent(_playerFighter, slotId));
         }
 
         private void HandleReload(string slotId)
         {
-            _eventBus.PublishAsync(new ReloadEventArgs(_playerFighter, slotId));
+            _eventBus.PublishAsync(new ReloadInputEvent(_playerFighter, slotId));
 
             if (!IsHost)
             {
@@ -629,7 +629,7 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         public void ReloadServerRpc(string slotId)
         {
-            _eventBus.PublishAsync(new ReloadEventArgs(_playerFighter, slotId));
+            _eventBus.PublishAsync(new ReloadInputEvent(_playerFighter, slotId));
         }
     }
 }

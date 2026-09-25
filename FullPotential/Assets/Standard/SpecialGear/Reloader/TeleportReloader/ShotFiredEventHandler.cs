@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Input;
@@ -9,13 +9,13 @@ using Unity.Netcode;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 {
-    public class ShotFiredEventHandler : IEventHandler<ShotFiredEventArgs>
+    public class ShotFiredEventHandler : IEventHandler<ShotFiredAfterEvent>
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
-        public Timing Timing => Timing.After;
+        public Timing Timing => Timing.Late;
 
-        public UniTask<HandlerResult> HandleEventAsync(ShotFiredEventArgs eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(ShotFiredAfterEvent eventArgs)
         {
             var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Obsolete.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
@@ -31,9 +31,9 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 
             var fighter = eventArgs.Fighter;
 
-            var reloadEventArgs = new ReloadEventArgs(fighter, eventArgs.SlotId);
+            var reloadEventArgs = new ReloadInputEvent(fighter, eventArgs.SlotId);
 
-            ReloadEventArgs.UpdateAmmoCounts(reloadEventArgs);
+            ReloadInputEvent.UpdateAmmoCounts(reloadEventArgs);
 
             return UniTask.FromResult(new HandlerResult());
         }
