@@ -83,6 +83,7 @@
     <Compile Include="Assets\Api\Modding\IMod.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\StringExtensions.cs" />
     <Compile Include="Assets\Api\Obsolete\SerializationExtensions.cs" />
+    <Compile Include="Assets\Api\Gameplay\Inventory\Events\SlotBusyChangeEvent.cs" />
     <Compile Include="Assets\Api\Registry\Weapons\IWeaponVisuals.cs" />
     <Compile Include="Assets\Api\Gameplay\IPlayerFighter.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IAccessoryVisuals.cs" />
@@ -116,6 +117,7 @@
     <Compile Include="Assets\Api\Unity\IUnityHelperUtilities.cs" />
     <Compile Include="Assets\Api\GameManagement\Models\GameSettings.cs" />
     <Compile Include="Assets\Api\Registry\IItemStackType.cs" />
+    <Compile Include="Assets\Api\Gameplay\Combat\Events\ItemChargePercentageChangeEvent.cs" />
     <Compile Include="Assets\Api\Localization\UnitsType.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\Models\InventoryChangesForClient.cs" />
     <Compile Include="Assets\Api\Input\DefaultInputActions.cs" />

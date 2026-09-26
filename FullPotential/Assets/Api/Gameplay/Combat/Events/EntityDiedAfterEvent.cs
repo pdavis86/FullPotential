@@ -2,7 +2,7 @@ using FullPotential.Api.Gameplay.Events;
 
 using UnityEngine;
 
-namespace FullPotential.Assets.Api.Gameplay.Combat.Events
+namespace FullPotential.Api.Gameplay.Combat.Events
 {
     [RegisterEvent]
     public readonly struct EntityDiedAfterEvent : IEvent

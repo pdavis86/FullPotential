@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading;
 
@@ -101,6 +101,7 @@ namespace FullPotential.Core.GameManagement
             // ReSharper disable HeuristicUnreachableCode
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
 
+            // NOTE: Set this to true when testing
             var isTestingLocally = false;
             if (isTestingLocally)
             {

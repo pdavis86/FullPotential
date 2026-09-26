@@ -52,6 +52,7 @@
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\TextMeshProLocalizer.cs" />
     <Compile Include="Assets\Core\Registry\Resources\Stamina.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DontDestroy.cs" />
+    <Compile Include="Assets\Core\Player\Events\LocalPlayerSpawnedEvent.cs" />
     <Compile Include="Assets\Core\Persistence\Local\UserManagement.cs" />
     <Compile Include="Assets\Core\Persistence\Local\Paths.cs" />
     <Compile Include="Assets\Core\Persistence\Https\DataSaver.cs" />

@@ -18,14 +18,11 @@ namespace FullPotential.Core.Gameplay.Events
     public class EventBus : IEventBus
     {
         private readonly IAuditor _logger;
-        private readonly Timing[] _eventTimings;
         private readonly Dictionary<Type, IEventHandlerGroup> _subscriptions = new Dictionary<Type, IEventHandlerGroup>();
 
         public EventBus(IAuditorFactory auditorFactory)
         {
             _logger = auditorFactory.Create(this);
-
-            _eventTimings = new[] { Timing.Early, Timing.Main, Timing.Late };
         }
 
         public void Register(Type eventArgsType)
@@ -67,22 +64,31 @@ namespace FullPotential.Core.Gameplay.Events
             Subscribe(argsType, handler);
         }
 
-        public void Subscribe<TEvent>(Action<TEvent> handlerAction)
+        public void Subscribe<TEvent>(
+            Action<TEvent> handlerAction,
+            NetworkLocation location = NetworkLocation.Both,
+            Timing timing = Timing.Main)
             where TEvent : IEvent
         {
-            var handler = new BasicEventHandler<TEvent>(args =>
-            {
-                handlerAction(args);
-                return UniTask.FromResult(new HandlerResult());
-            });
+            var handler = new BasicEventHandler<TEvent>(
+                args =>
+                {
+                    handlerAction(args);
+                    return UniTask.FromResult(new HandlerResult());
+                },
+                location,
+                timing);
 
             Subscribe(typeof(TEvent), handler);
         }
 
-        public void Subscribe<TEvent>(Func<TEvent, UniTask<HandlerResult>> handlerFunction)
+        public void Subscribe<TEvent>(
+            Func<TEvent, UniTask<HandlerResult>> handlerFunction,
+            NetworkLocation location = NetworkLocation.Both,
+            Timing timing = Timing.Main)
             where TEvent : IEvent
         {
-            var handler = new BasicEventHandler<TEvent>(handlerFunction);
+            var handler = new BasicEventHandler<TEvent>(handlerFunction, location, timing);
             Subscribe(typeof(TEvent), handler);
         }
 
@@ -100,28 +106,39 @@ namespace FullPotential.Core.Gameplay.Events
             _logger.Debug($"Event with args type '{argsType}' was published");
 
             var handlerGroup = (EventHandlerGroup<TEvent>)_subscriptions[argsType];
+            var sortedHanders = handlerGroup.Handlers.OrderBy(h => h.Timing);
+            var filteredHandlers = sortedHanders.Where(h => ShouldHandlerRun(h)).ToList();
+            var isCancelled = false;
 
-            foreach (var timing in _eventTimings)
+            foreach (var handler in filteredHandlers)
             {
-                foreach (var handler in handlerGroup.Handlers)
+                if (isCancelled)
                 {
-                    if (ShouldHandlerRun(handler, timing))
+                    if (handler.Timing != Timing.Always)
                     {
-                        _logger.Debug($"Running handler {handler.GetType().FullName}");
-
-                        var result = await handler.HandleEventAsync(eventArgs);
-
-                        if (result.NextAction == NextAction.Cancel)
-                        {
-                            _logger.Debug($"Handler {handler.GetType().FullName} cancelled the remaining handlers");
-                            return;
-                        }
-
-                        if (result.UpdatedEventArgs is not null and TEvent updatedEventArgs)
-                        {
-                            eventArgs = updatedEventArgs;
-                        }
+                        _logger.Debug($"Not running handler {handler.GetType().FullName} as the event was cancelled");
+                        continue;
                     }
+                    else
+                    {
+                        _logger.Debug($"Running handler {handler.GetType().FullName} even though the event was cancelled");
+                    }
+                }
+
+                // Too much - _logger.Debug($"Running handler {handler.GetType().FullName}");
+
+                var result = await handler.HandleEventAsync(eventArgs);
+
+                if (result.UpdatedEventArgs is not null and TEvent updatedEventArgs)
+                {
+                    _logger.Debug($"Handler {handler.GetType().FullName} updated the event arguments");
+                    eventArgs = updatedEventArgs;
+                }
+
+                if (result.NextAction == NextAction.Cancel)
+                {
+                    isCancelled = true;
+                    _logger.Debug($"Handler {handler.GetType().FullName} cancelled the remaining handlers");
                 }
             }
         }
@@ -138,14 +155,9 @@ namespace FullPotential.Core.Gameplay.Events
             group.Add(handler);
         }
 
-        private bool ShouldHandlerRun<TEvent>(IEventHandler<TEvent> handler, Timing timing)
+        private bool ShouldHandlerRun<TEvent>(IEventHandler<TEvent> handler)
             where TEvent : IEvent
         {
-            if (handler.Timing != timing)
-            {
-                return false;
-            }
-
             return handler.Location switch
             {
                 NetworkLocation.Server => NetworkManager.Singleton.IsServer,

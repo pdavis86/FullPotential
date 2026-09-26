@@ -25,7 +25,6 @@ using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Assets.Api.Gameplay.Combat.Events;
 
 using TMPro;
 

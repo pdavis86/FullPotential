@@ -1,11 +1,9 @@
-﻿using System;
+using System;
 
 namespace FullPotential.Api.Logging
 {
     public interface IAuditor
     {
-        void SetLogLevel(AuditLevel level);
-
         bool IsEnabled(AuditLevel level);
 
         void Debug(string message);

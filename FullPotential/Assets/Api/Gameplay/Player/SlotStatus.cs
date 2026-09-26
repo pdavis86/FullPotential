@@ -1,9 +1,12 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Threading;
 
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Combat.Events;
+using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Items;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Obsolete.Items.Types;
@@ -15,6 +18,7 @@ namespace FullPotential.Api.Gameplay.Player
         private const float ChargeGaugeUpdateSeconds = 0.05f;
 
         private readonly IAuditor _logger;
+        private readonly IEventBus _eventBus;
 
         private CancellationTokenSource _preActionCts;
         private CancellationTokenSource _intraActionCts;
@@ -24,15 +28,18 @@ namespace FullPotential.Api.Gameplay.Player
 
         public string SlotId { get; private set; }
 
-        public bool IsBusy { get; set; }
+        public bool IsBusy { get; private set; }
 
+        // todo: private set?
         public bool IsConsumingResource { get; set; }
 
+        // todo: private set?
         public bool IsIntraActionLooping { get; set; }
 
-        public SlotStatus(IAuditor logger, FighterBase fighter, string slotId)
+        public SlotStatus(IAuditor logger, IEventBus eventBus, FighterBase fighter, string slotId)
         {
             _logger = logger;
+            _eventBus = eventBus;
 
             Fighter = fighter;
             SlotId = slotId;
@@ -66,6 +73,8 @@ namespace FullPotential.Api.Gameplay.Player
 
                 elapsedSeconds += ChargeGaugeUpdateSeconds;
                 item.ChargePercentage = (int)(elapsedSeconds / secondsToTake * 100);
+
+                _eventBus.PublishAsync(new ItemChargePercentageChangeEvent(SlotId)).Forget();
             }
 
             if (_logger.IsEnabled(AuditLevel.Debug))
@@ -148,6 +157,8 @@ namespace FullPotential.Api.Gameplay.Player
 
                 elapsedSeconds += ChargeGaugeUpdateSeconds;
                 item.ChargePercentage = 100 - (int)(elapsedSeconds / secondsToTake * 100);
+
+                _eventBus.PublishAsync(new ItemChargePercentageChangeEvent(SlotId)).Forget();
             }
 
             if (_logger.IsEnabled(AuditLevel.Debug))
@@ -179,6 +190,12 @@ namespace FullPotential.Api.Gameplay.Player
             IsConsumingResource = false;
 
             return true;
+        }
+
+        public void SetBusyState(bool isBusy)
+        {
+            IsBusy = isBusy;
+            _eventBus.PublishAsync(new SlotBusyChangeEvent(SlotId, isBusy)).Forget();
         }
     }
 }

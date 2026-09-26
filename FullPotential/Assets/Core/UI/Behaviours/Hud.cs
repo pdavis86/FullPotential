@@ -1,10 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Gameplay.Player;
+using FullPotential.Api.Input;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
@@ -16,8 +20,12 @@ using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Core.GameManagement;
+using FullPotential.Core.Player.Events;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.UI.Behaviours;
+
+using Newtonsoft.Json.Linq;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -72,6 +80,8 @@ namespace FullPotential.Core.Ui.Behaviours
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
 
+            SubscribeToEvents();
+
             _reloadingTranslation = _localizer.Translate("ui.hub.reloading");
 
             _activeEffectPrefab = _activeEffectsContainer.GetComponent<ActiveEffectsUi>().ActiveEffectPrefab;
@@ -96,17 +106,10 @@ namespace FullPotential.Core.Ui.Behaviours
             }
 
             //todo: use events instead of firing on every update!
-            UpdateResourceBars();
-            UpdateHandOverlays();
             UpdateActiveEffects();
         }
 
         #endregion
-
-        public void Initialise(FighterBase fighter)
-        {
-            _playerFighter = fighter;
-        }
 
         public void ShowAlert(string alertText)
         {
@@ -200,21 +203,6 @@ namespace FullPotential.Core.Ui.Behaviours
             Destroy(icon);
 
             _handIcons.Remove(id);
-        }
-
-        private void UpdateHandOverlays()
-        {
-            var leftItem = _playerFighter.Inventory.GetItemInSlot(HandSlotIds.LeftHand);
-            var leftStatus = _playerFighter.GetSlotStatus(HandSlotIds.LeftHand);
-            UpdateHandDescription(_equippedLeftHandSummary, leftItem);
-            UpdateHandAmmo(_ammoLeft, leftStatus, leftItem);
-            UpdateHandCharge(_chargeLeft, leftItem);
-
-            var rightItem = _playerFighter.Inventory.GetItemInSlot(HandSlotIds.RightHand);
-            var rightStatus = _playerFighter.GetSlotStatus(HandSlotIds.RightHand);
-            UpdateHandDescription(_equippedRightHandSummary, rightItem);
-            UpdateHandAmmo(_ammoRight, rightStatus, rightItem);
-            UpdateHandCharge(_chargeRight, rightItem);
         }
 
         private void UpdateHandDescription(EquippedSummary equippedSummary, ItemBase item)
@@ -339,6 +327,25 @@ namespace FullPotential.Core.Ui.Behaviours
             }
         }
 
+        private void SubscribeToEvents()
+        {
+            var eventBus = DependenciesContext.Dependencies.GetService<IEventBus>();
+            eventBus.Subscribe<LocalPlayerSpawnedEvent>(HandleLocalPlayerSpawn, NetworkLocation.Client, Timing.Always);
+            eventBus.Subscribe<ResourceValueChangeEvent>(HandleResourceValueChange, NetworkLocation.Client, Timing.Always);
+            eventBus.Subscribe<SlotChangeEvent>(e => HandleAttackOrReload(e.SlotId, true, true, true), NetworkLocation.Client, Timing.Always);
+            eventBus.Subscribe<AttackReleaseInputEvent>(e => HandleAttackOrReload(e.SlotId, false, true, false), NetworkLocation.Client, Timing.Always);
+            eventBus.Subscribe<SlotBusyChangeEvent>(e => HandleAttackOrReload(e.SlotId, false, true, false), NetworkLocation.Client, Timing.Always);
+            eventBus.Subscribe<ItemChargePercentageChangeEvent>(e => HandleAttackOrReload(e.SlotId, false, false, true), NetworkLocation.Client, Timing.Always);
+        }
+
+        private void HandleLocalPlayerSpawn(LocalPlayerSpawnedEvent eventArgs)
+        {
+            _playerFighter = eventArgs.Fighter;
+
+            GameManager.Instance.UserInterface.Respawn.SetActive(false);
+            GameManager.Instance.UserInterface.Hud.SetActive(true);
+        }
+
         private void UpdateResourceBars()
         {
             foreach (var resource in _resources)
@@ -351,6 +358,49 @@ namespace FullPotential.Core.Ui.Behaviours
                 var (percent, text) = GetSliderBarValues(value, max, null);
 
                 UpdateSliderBar(id, text, percent, 1);
+            }
+        }
+
+        private void HandleResourceValueChange(ResourceValueChangeEvent eventArgs)
+        {
+            if (eventArgs.LivingEntity != _playerFighter)
+            {
+                return;
+            }
+
+            var max = eventArgs.LivingEntity.GetResourceMax(eventArgs.ResourceTypeId);
+            var (percent, text) = GetSliderBarValues(eventArgs.NewValue, max, null);
+
+            UpdateSliderBar(eventArgs.ResourceTypeId, text, percent, 1);
+        }
+
+        private void HandleAttackOrReload(string slotId, bool isSlotChange, bool isAmmoChange, bool isChargeChange)
+        {
+            if (slotId is not HandSlotIds.LeftHand and not HandSlotIds.RightHand)
+            {
+                return;
+            }
+
+            var item = _playerFighter.Inventory.GetItemInSlot(slotId);
+
+            if (isSlotChange)
+            {
+                var equippedHandSummary = slotId == HandSlotIds.LeftHand ? _equippedLeftHandSummary : _equippedRightHandSummary;
+                UpdateHandDescription(equippedHandSummary, item);
+                UpdateResourceBars();
+            }
+
+            if (isAmmoChange)
+            {
+                var ammoComponent = slotId == HandSlotIds.LeftHand ? _ammoLeft : _ammoRight;
+                var slotStatus = _playerFighter.GetSlotStatus(slotId);
+                UpdateHandAmmo(ammoComponent, slotStatus, item);
+            }
+
+            if (isChargeChange)
+            {
+                var chargeComponent = slotId == HandSlotIds.LeftHand ? _chargeLeft : _chargeRight;
+                UpdateHandCharge(chargeComponent, item);
             }
         }
     }

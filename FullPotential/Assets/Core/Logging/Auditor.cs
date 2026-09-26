@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 
 using FullPotential.Api.Logging;
@@ -7,16 +7,9 @@ namespace FullPotential.Core.Logging
 {
     public class Auditor<T> : IAuditor
     {
-        private AuditLevel _logLevel = AuditLevel.Info;
-
-        public void SetLogLevel(AuditLevel level)
-        {
-            _logLevel = level;
-        }
-
         public bool IsEnabled(AuditLevel level)
         {
-            return level >= _logLevel;
+            return level >= AuditorFactory.Level;
         }
 
         public void Debug(string message)

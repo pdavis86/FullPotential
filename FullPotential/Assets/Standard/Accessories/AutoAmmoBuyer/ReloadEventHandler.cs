@@ -13,8 +13,6 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Models.Player;
 
-using Unity.Netcode;
-
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
@@ -38,11 +36,6 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 
         public UniTask<HandlerResult> HandleEventAsync(ReloadInputEvent eventArgs)
         {
-            if (!NetworkManager.Singleton.IsServer)
-            {
-                return UniTask.FromResult(new HandlerResult());
-            }
-
             var buyerSlotId = Accessory.GetSlotId(AutoAmmoBuyer.TypeIdString, 1);
             var buyerItem = eventArgs.Fighter.Inventory.GetItemInSlot(buyerSlotId);
 

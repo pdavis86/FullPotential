@@ -104,8 +104,6 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            _userInterface.Hud.SetActive(true);
-
             _sceneCamera = Camera.main;
             if (_sceneCamera != null)
             {
@@ -118,11 +116,6 @@ namespace FullPotential.Core.Player
 
             _inFrontOfPlayerCamera.gameObject.SetActive(true);
             _playerCamera.gameObject.SetActive(true);
-
-            if (Debug.isDebugBuild)
-            {
-                _userInterface.DebuggingOverlay.SetActive(true);
-            }
 
             var settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
             var gameSettings = settingsRepository.Get();

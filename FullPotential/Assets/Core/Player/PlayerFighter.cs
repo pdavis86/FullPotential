@@ -21,6 +21,7 @@ using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Environment;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.GameManagement.Data;
+using FullPotential.Core.Player.Events;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Models.Player;
 
@@ -165,18 +166,22 @@ namespace FullPotential.Core.Player
 
             gameObject.name = "Player ID " + NetworkObjectId;
 
+            if (NetworkManager.LocalClientId == OwnerClientId)
+            {
+                GameManager.Instance.UserInterface.Hud.SetActive(true);
+
+                if (Debug.isDebugBuild)
+                {
+                    GameManager.Instance.UserInterface.DebuggingOverlay.SetActive(true);
+                }
+
+                _eventBus.PublishAsync(new LocalPlayerSpawnedEvent(this)).Forget();
+            }
+
             await GetAndLoadCharacterDataAsync(!IsOwner);
 
             var gameObjectCollider = gameObject.GetComponent<Collider>();
             _myHeight = gameObjectCollider.bounds.max.y - gameObjectCollider.bounds.min.y;
-
-            if (NetworkManager.LocalClientId == OwnerClientId)
-            {
-                GameManager.Instance.UserInterface.Respawn.SetActive(false);
-
-                GameManager.Instance.UserInterface.HudOverlay.Initialise(this);
-                GameManager.Instance.UserInterface.Hud.SetActive(true);
-            }
 
             QueueAliveStateChanges();
         }

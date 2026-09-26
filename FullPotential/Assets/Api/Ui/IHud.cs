@@ -1,4 +1,3 @@
-﻿using FullPotential.Api.Gameplay.Behaviours;
 using UnityEngine;
 
 // ReSharper disable UnusedMemberInSuper.Global
@@ -7,8 +6,6 @@ namespace FullPotential.Api.Ui
 {
     public interface IHud
     {
-        void Initialise(FighterBase fighter);
-
         void ShowAlert(string content);
 
         void ToggleDrawingMode(bool isOn);

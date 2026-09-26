@@ -7,7 +7,7 @@ using FullPotential.Api.Utilities.Extensions;
 
 using Unity.Netcode;
 
-namespace FullPotential.Assets.Api.Gameplay.Combat.Events
+namespace FullPotential.Api.Gameplay.Combat.Events
 {
     // todo: move "Handler : IEventHandler<" classes into Core
     public class EntityDiedEventDefaultHandler : IEventHandler<EntityDiedAfterEvent>

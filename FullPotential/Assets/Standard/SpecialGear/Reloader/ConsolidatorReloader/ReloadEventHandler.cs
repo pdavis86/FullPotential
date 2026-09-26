@@ -4,8 +4,6 @@ using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Input;
 using FullPotential.Api.Obsolete.Items.Types;
 
-using Unity.Netcode;
-
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
@@ -18,11 +16,6 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 
         public async UniTask<HandlerResult> HandleEventAsync(ReloadInputEvent eventArgs)
         {
-            if (!NetworkManager.Singleton.IsServer)
-            {
-                return new HandlerResult();
-            }
-
             var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Obsolete.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
             if (reloader == null || reloader.RegistryTypeId != ConsolidatorReloader.TypeIdString)
@@ -37,14 +30,14 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 
             var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);
 
-            slotStatus.IsBusy = true;
+            slotStatus.SetBusyState(true);
 
             var weapon = eventArgs.Fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
             await UniTask.WaitForSeconds(weapon.GetReloadTime());
 
             ReloadInputEvent.UpdateAmmoCounts(eventArgs);
 
-            slotStatus.IsBusy = false;
+            slotStatus.SetBusyState(false);
 
             return new HandlerResult(NextAction.Cancel);
         }

@@ -12,10 +12,16 @@ namespace FullPotential.Api.Gameplay.Events
 
         void Subscribe(Type handlerType);
 
-        void Subscribe<TEvent>(Action<TEvent> handlerAction)
+        void Subscribe<TEvent>(
+            Action<TEvent> handlerAction,
+            NetworkLocation location = NetworkLocation.Both,
+            Timing timing = Timing.Main)
             where TEvent : IEvent;
 
-        void Subscribe<TEvent>(Func<TEvent, UniTask<HandlerResult>> handlerFunction)
+        void Subscribe<TEvent>(
+            Func<TEvent, UniTask<HandlerResult>> handlerFunction,
+            NetworkLocation location = NetworkLocation.Both,
+            Timing timing = Timing.Main)
             where TEvent : IEvent;
 
         UniTask PublishAsync<TEvent>(TEvent eventArgs)

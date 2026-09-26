@@ -4,6 +4,7 @@ namespace FullPotential.Api.Gameplay.Events
     {
         Early,
         Main,
-        Late
+        Late,
+        Always,
     }
 }

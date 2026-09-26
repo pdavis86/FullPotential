@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -61,11 +61,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
             base.Awake();
 
             // todo: add a SlotStatus for each registered slot?
+            // todo: it feels like SlotStatus should be constructed using DI
 
-            var leftSlotStatus = new SlotStatus(_logger, this, HandSlotIds.LeftHand);
+            var leftSlotStatus = new SlotStatus(_logger, _eventBus, this, HandSlotIds.LeftHand);
             _slotStatuses.Add(HandSlotIds.LeftHand, leftSlotStatus);
 
-            var rightSlotStatus = new SlotStatus(_logger, this, HandSlotIds.RightHand);
+            var rightSlotStatus = new SlotStatus(_logger, _eventBus, this, HandSlotIds.RightHand);
             _slotStatuses.Add(HandSlotIds.RightHand, rightSlotStatus);
         }
 
@@ -128,24 +129,19 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public int GetAttributeValue(AttributeAffected attributeAffected)
         {
             //todo: zzz v0.8 - trait-based attributes
-            switch (attributeAffected)
+            return attributeAffected switch
             {
-                case AttributeAffected.Strength:
-                    return 25 + GetAttributeAdjustment(AttributeAffected.Strength);
-
-                case AttributeAffected.Luck:
-                    return 50 + GetAttributeAdjustment(AttributeAffected.Luck);
-
-                default:
-                    throw new Exception("Not yet implemented GetAttributeValue() for " + attributeAffected);
-            }
+                AttributeAffected.Strength => 25 + GetAttributeAdjustment(AttributeAffected.Strength),
+                AttributeAffected.Luck => 50 + GetAttributeAdjustment(AttributeAffected.Luck),
+                _ => throw new Exception("Not yet implemented GetAttributeValue() for " + attributeAffected),
+            };
         }
 
         public override void HandleDeath()
         {
             foreach (var kvp in _slotStatuses)
             {
-                kvp.Value.IsBusy = false;
+                kvp.Value.SetBusyState(false);
                 kvp.Value.StopActiveConsumerBehaviour();
             }
 

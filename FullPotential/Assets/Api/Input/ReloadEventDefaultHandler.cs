@@ -28,7 +28,7 @@ namespace FullPotential.Api.Input
             }
 
             var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);
-            slotStatus.IsBusy = true;
+            slotStatus.SetBusyState(true);
 
             //Lose any remaining ammo
             weapon.UpdateAmmo(0);
@@ -37,7 +37,7 @@ namespace FullPotential.Api.Input
 
             ReloadInputEvent.UpdateAmmoCounts(eventArgs);
 
-            slotStatus.IsBusy = false;
+            slotStatus.SetBusyState(false);
 
             return new HandlerResult();
         }
