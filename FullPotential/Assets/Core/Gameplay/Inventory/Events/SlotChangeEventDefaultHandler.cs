@@ -1,8 +1,9 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Gameplay.Inventory.Events;
 
-namespace FullPotential.Api.Gameplay.Inventory.Events
+namespace FullPotential.Core.Gameplay.Inventory.Events
 {
     public class SlotChangeEventDefaultHandler : IEventHandler<SlotChangeEvent>
     {

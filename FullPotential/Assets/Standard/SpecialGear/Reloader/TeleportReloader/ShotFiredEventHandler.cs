@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Input;
+using FullPotential.Standard.Weapons.Events;
 
 using Unity.Netcode;
 

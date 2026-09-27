@@ -53,7 +53,6 @@
     <Compile Include="Assets\Api\Gameplay\Inventory\IPlayerInventory.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\Timing.cs" />
     <Compile Include="Assets\Api\Logging\IAuditorFactory.cs" />
-    <Compile Include="Assets\Api\Input\ShotFiredAfterEvent.cs" />
     <Compile Include="Assets\Api\Data\ISaveManager.cs" />
     <Compile Include="Assets\Api\Registry\Gear\ISpecialGearVisuals.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\SlotStatus.cs" />
@@ -97,7 +96,6 @@
     <Compile Include="Assets\Api\Registry\IRegisterableType.cs" />
     <Compile Include="Assets\Api\Items\IHasCharge.cs" />
     <Compile Include="Assets\Api\Obsolete\Items\Types\Accessory.cs" />
-    <Compile Include="Assets\Api\Gameplay\Combat\Events\ResourceValueChangeEventDefaultHandler.cs" />
     <Compile Include="Assets\Api\Logging\AuditLevel.cs" />
     <Compile Include="Assets\Api\Registry\IItemVisuals.cs" />
     <Compile Include="Assets\Api\Registry\ITypeRegistry.cs" />
@@ -145,7 +143,6 @@
     <Compile Include="Assets\Api\Obsolete\Items\Types\Consumer.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IArmorVisuals.cs" />
     <Compile Include="Assets\Api\Data\ISettingsRepository.cs" />
-    <Compile Include="Assets\Api\Gameplay\Combat\Events\EntityDiedEventDefaultHandler.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\ColliderExtensions.cs" />
     <Compile Include="Assets\Api\Input\ReloadEventDefaultHandler.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\ArrayExtensions.cs" />
@@ -174,7 +171,6 @@
     <Compile Include="Assets\Api\Gameplay\Events\HandlerResult.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\Events\EntityDiedAfterEvent.cs" />
     <Compile Include="Assets\Api\Utilities\DelayedAction.cs" />
-    <Compile Include="Assets\Api\Gameplay\Inventory\Events\SlotChangeEventDefaultHandler.cs" />
     <Compile Include="Assets\Api\Ioc\Dependency.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IHasSideEffect.cs" />
     <Compile Include="Assets\Api\Utilities\ActionQueue.cs" />

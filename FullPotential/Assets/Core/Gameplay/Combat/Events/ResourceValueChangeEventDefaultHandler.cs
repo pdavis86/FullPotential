@@ -1,8 +1,9 @@
 using Cysharp.Threading.Tasks;
 
+using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 
-namespace FullPotential.Api.Gameplay.Combat.Events
+namespace FullPotential.Core.Gameplay.Combat.Events
 {
     public class ResourceValueChangeEventDefaultHandler : IEventHandler<ResourceValueChangeEvent>
     {

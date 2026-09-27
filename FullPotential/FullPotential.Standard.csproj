@@ -158,6 +158,7 @@
     <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\ShotFiredEventHandler.cs" />
     <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\TeleportReloader.cs" />
     <Compile Include="Assets\Standard\Targeting\ProjectileBehaviour.cs" />
+    <Compile Include="Assets\Standard\Weapons\Events\ShotFiredAfterEvent.cs" />
     <Compile Include="Assets\Standard\Loot\Junk.cs" />
     <Compile Include="Assets\Standard\Weapons\Helpers\AttackHoldEventHandler.cs" />
     <Compile Include="Assets\Standard\Weapons\Crossbow.cs" />

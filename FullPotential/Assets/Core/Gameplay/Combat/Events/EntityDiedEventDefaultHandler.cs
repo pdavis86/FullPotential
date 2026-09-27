@@ -1,13 +1,13 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Utilities.Extensions;
 
-namespace FullPotential.Api.Gameplay.Combat.Events
+namespace FullPotential.Core.Gameplay.Combat.Events
 {
-    // todo: move "Handler : IEventHandler<" classes into Core
     public class EntityDiedEventDefaultHandler : IEventHandler<EntityDiedAfterEvent>
     {
         private readonly IGameManager _gameManager;

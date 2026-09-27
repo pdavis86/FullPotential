@@ -3,9 +3,8 @@ using FullPotential.Api.Gameplay.Events;
 
 using UnityEngine;
 
-namespace FullPotential.Api.Input
+namespace FullPotential.Standard.Weapons.Events
 {
-    // todo: move to standard
     [RegisterEvent]
     public readonly struct ShotFiredAfterEvent : IEvent
     {

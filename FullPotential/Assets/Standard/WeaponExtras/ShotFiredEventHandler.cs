@@ -1,9 +1,9 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Input;
 using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
+using FullPotential.Standard.Weapons.Events;
 
 using UnityEngine;
 
@@ -35,6 +35,7 @@ namespace FullPotential.Standard.WeaponExtras
                 return UniTask.FromResult(new HandlerResult());
             }
 
+            // todo: zzz v0.7 - Bullet comes from real hand position rather than what I see
             _typeRegistry.LoadAddessable<GameObject>(BulletTrailPrefabAddress, prefab =>
             {
                 var projectile = Object.Instantiate(

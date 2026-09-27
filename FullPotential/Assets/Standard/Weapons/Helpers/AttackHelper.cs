@@ -6,10 +6,10 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Player;
-using FullPotential.Api.Input;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Ui;
+using FullPotential.Standard.Weapons.Events;
 
 using Unity.Netcode;
 
