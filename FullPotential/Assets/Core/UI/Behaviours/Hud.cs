@@ -27,6 +27,8 @@ using FullPotential.Core.Player.Events;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.UI.Behaviours;
 
+using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -142,7 +144,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _equippedRightHandAmmo.color = ChangeColorAlpha(_equippedRightHandAmmo.color, newAlpha);
         }
 
-        public void AddSliderBar(string id, Color color)
+        public void AddSliderBar(string id, Color backgroundColor, Color textColor)
         {
             if (_progressBars.ContainsKey(id))
             {
@@ -150,7 +152,8 @@ namespace FullPotential.Core.Ui.Behaviours
             }
 
             var newBar = Instantiate(_resourceBarPrefab, _resourceBarsContainer.transform);
-            newBar.FindInDescendants("Fill").GetComponent<Image>().color = color;
+            newBar.FindInDescendants("Fill").GetComponent<Image>().color = backgroundColor;
+            newBar.FindInDescendants("BarText").GetComponent<TextMeshProUGUI>().color = textColor;
 
             _progressBars.Add(id, newBar);
         }
@@ -242,8 +245,6 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateActiveEffects()
         {
-            // todo: if player dies, clear effects
-
             var scriptsToRemove = _activeEffectScripts
                 .Where(kvp => kvp.Value.GetSecondsRemaining() <= 0)
                 .Select(kvp => kvp.Key)
@@ -287,7 +288,10 @@ namespace FullPotential.Core.Ui.Behaviours
 
             foreach (var resource in _resources)
             {
-                AddSliderBar(resource.TypeId.ToString(), resource.Color.ToUnityColor());
+                AddSliderBar(
+                    resource.TypeId.ToString(),
+                    resource.BackgroundColor.ToUnityColor(),
+                    resource.TextColor.ToUnityColor());
             }
         }
 
@@ -302,6 +306,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _eventBus.SubscribeBehaviour<ItemChargePercentageChangeEvent>(this, e => HandleAttackOrReload(e.Fighter, e.SlotId, false, false, true));
             _eventBus.SubscribeBehaviour<ActiveEffectAddedEvent>(this, HandleActiveEffectAdded);
             _eventBus.SubscribeBehaviour<ActiveEffectUpdatedEvent>(this, HandleActiveEffectUpdated);
+            _eventBus.SubscribeBehaviour<EntityDiedAfterEvent>(this, HandleEntityDied);
         }
 
         private void HandleLocalPlayerSpawn(LocalPlayerSpawnedEvent eventArgs)
@@ -413,6 +418,19 @@ namespace FullPotential.Core.Ui.Behaviours
             }
 
             existingEffectScript.UpdateExpiry(eventArgs.ActiveEffect.Expiry);
+        }
+
+        private void HandleEntityDied(EntityDiedAfterEvent eventArgs)
+        {
+            if (eventArgs.EntityName != _playerFighter.name)
+            {
+                return;
+            }
+
+            foreach (var (_, script) in _activeEffectScripts)
+            {
+                Destroy(script.gameObject);
+            }
         }
     }
 }

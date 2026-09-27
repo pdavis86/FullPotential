@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Drawing;
+
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Registry.Gameplay;
@@ -14,13 +15,16 @@ namespace FullPotential.Standard.Resources
         public const string TypeIdString = "9f026e17-d313-4402-9da6-c5b002e26c64";
 
         private static readonly Guid Id = new Guid(TypeIdString);
-        private static readonly Color ResourceColor = Color.FromArgb(185, 36, 158); // Purple
+        private static readonly Color ResourceBackgroundColor = Color.FromArgb(185, 36, 158); // Purple
+        private static readonly Color ResourceTextColor = Color.FromArgb(255, 255, 255); // White
 
         private readonly IAuditor _logger;
 
         public Guid TypeId => Id;
 
-        public Color Color => ResourceColor;
+        public Color BackgroundColor => ResourceBackgroundColor;
+
+        public Color TextColor => ResourceTextColor;
 
         public bool IsCraftable => false;
 

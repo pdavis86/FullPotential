@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 
 using FullPotential.Api.Gameplay.Behaviours;
@@ -11,11 +11,14 @@ namespace FullPotential.Standard.Resources
         public const string TypeIdString = "378443ee-7942-4cd5-977d-818ee03333e9";
 
         private static readonly Guid Id = new Guid(TypeIdString);
-        private static readonly Color ResourceColor = Color.FromArgb(39, 80, 147); // Blue
+        private static readonly Color ResourceBackgroundColor = Color.FromArgb(39, 80, 147); // Blue
+        private static readonly Color ResourceTextColor = Color.FromArgb(255, 255, 255); // White
 
         public Guid TypeId => Id;
 
-        public Color Color => ResourceColor;
+        public Color BackgroundColor => ResourceBackgroundColor;
+
+        public Color TextColor => ResourceTextColor;
 
         public bool IsCraftable => true;
 

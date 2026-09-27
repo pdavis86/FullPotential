@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Drawing;
+
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Registry.Gameplay;
@@ -9,11 +10,14 @@ namespace FullPotential.Core.Registry.Resources
     public class Health : IResourceType
     {
         private static readonly Guid Id = new Guid(ResourceTypeIds.HealthId);
-        private static readonly Color ResourceColor = Color.FromArgb(156, 42, 50); // Red
+        private static readonly Color ResourceBackgroundColor = Color.FromArgb(156, 42, 50); // Red
+        private static readonly Color ResourceTextColor = Color.FromArgb(255, 255, 255); // White
 
         public Guid TypeId => Id;
 
-        public Color Color => ResourceColor;
+        public Color BackgroundColor => ResourceBackgroundColor;
+
+        public Color TextColor => ResourceTextColor;
 
         public bool IsCraftable => true;
 

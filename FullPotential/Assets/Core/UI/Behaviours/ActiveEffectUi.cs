@@ -68,6 +68,5 @@ namespace FullPotential.Core.UI.Behaviours
         {
             Destroy(gameObject);
         }
-
     }
 }

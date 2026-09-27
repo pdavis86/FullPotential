@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 
 using FullPotential.Api.CoreTypeIds;
@@ -10,11 +10,14 @@ namespace FullPotential.Core.Registry.Resources
     public class Stamina : IResourceType
     {
         private static readonly Guid Id = new Guid(ResourceTypeIds.StaminaId);
-        private static readonly Color ResourceColor = Color.FromArgb(25, 118, 64); // Green
+        private static readonly Color ResourceBackgroundColor = Color.FromArgb(25, 118, 64); // Green
+        private static readonly Color ResourceTextColor = Color.FromArgb(255, 255, 255); // White
 
         public Guid TypeId => Id;
 
-        public Color Color => ResourceColor;
+        public Color BackgroundColor => ResourceBackgroundColor;
+
+        public Color TextColor => ResourceTextColor;
 
         public bool IsCraftable => true;
 
