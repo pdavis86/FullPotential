@@ -624,9 +624,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private async UniTask PeriodicActionToResourceAsync(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position, float delay, DateTime expiry, CancellationToken cancellationToken)
         {
+            var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, resourceEffect, this);
+            AddOrUpdateEffect(resourceEffect, combatResult.Change, expiry);
+
             do
             {
-                ApplySingleValueChangeToResourceInternal(sourceFighter, itemUsed, resourceEffect, position);
+                ApplySingleValueChangeToResourceInternal(sourceFighter, itemUsed, resourceEffect, position, combatResult);
                 await UniTask.WaitForSeconds(delay, cancellationToken: cancellationToken);
 
             } while (DateTime.Now < expiry);
@@ -634,13 +637,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void ApplySingleValueChangeToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position)
         {
-            ApplySingleValueChangeToResourceInternal(sourceFighter, itemUsed, resourceEffect, position);
+            var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, resourceEffect, this);
+            AddOrUpdateEffect(resourceEffect, combatResult.Change, DateTime.Now.AddSeconds(SingleResourceChangeEffectDisplaySeconds));
+
+            ApplySingleValueChangeToResourceInternal(sourceFighter, itemUsed, resourceEffect, position, combatResult);
         }
 
-        private void ApplySingleValueChangeToResourceInternal(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position)
+        private void ApplySingleValueChangeToResourceInternal(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position, CombatResult combatResult)
         {
-            var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, resourceEffect, this);
-
             if (resourceEffect.ResourceTypeIdString == ResourceTypeIds.HealthId)
             {
                 if (combatResult.Change < 0)
@@ -656,7 +660,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             TriggerResourceValueUpdate(resourceEffect.ResourceTypeIdString, combatResult.Change, false);
-            AddOrUpdateEffect(resourceEffect, combatResult.Change, DateTime.Now.AddSeconds(SingleResourceChangeEffectDisplaySeconds));
         }
 
         public void ApplyTemporaryMaxActionToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect)
@@ -729,31 +732,41 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
                 if (multipleAllowed)
                 {
-                    _activeEffects.Add(new ActiveEffect
+                    var anotherActiveEffect = new ActiveEffect
                     {
                         Id = Guid.NewGuid(),
                         Effect = effect,
                         Change = change,
                         Expiry = expiry,
                         ShowExpiry = showExpiry
-                    });
+                    };
+
+                    _activeEffects.Add(anotherActiveEffect);
+
+                    _eventBus.PublishAsync(new ActiveEffectAddedEvent(this, anotherActiveEffect)).Forget();
                 }
                 else
                 {
                     effectMatch.Change = change;
                     effectMatch.Expiry = expiry;
+
+                    _eventBus.PublishAsync(new ActiveEffectUpdatedEvent(this, effectMatch)).Forget();
                 }
             }
             else
             {
-                _activeEffects.Add(new ActiveEffect
+                var newActiveEffect = new ActiveEffect
                 {
                     Id = Guid.NewGuid(),
                     Effect = effect,
                     Change = change,
                     Expiry = expiry,
                     ShowExpiry = showExpiry
-                });
+                };
+
+                _activeEffects.Add(newActiveEffect);
+
+                _eventBus.PublishAsync(new ActiveEffectAddedEvent(this, newActiveEffect)).Forget();
             }
 
             if (OwnerClientId != NetworkManager.Singleton.LocalClientId)

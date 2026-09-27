@@ -5,7 +5,7 @@ namespace FullPotential.Core.Logging
 {
     public class AuditorFactory : IAuditorFactory
     {
-        public static AuditLevel Level { get; set; }
+        public static AuditLevel Level { get; set; } = AuditLevel.Warn;
 
         public IAuditor Create(object sender)
         {

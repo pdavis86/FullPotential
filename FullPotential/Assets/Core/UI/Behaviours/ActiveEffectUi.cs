@@ -1,21 +1,14 @@
-﻿using System;
+using System;
+
 using UnityEngine;
 using UnityEngine.UI;
-
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.UI.Behaviours
 {
     public class ActiveEffectUi : MonoBehaviour
     {
-        #region Inspector Variables
-        // ReSharper disable UnassignedField.Compiler
-
         [SerializeField] private Image _image;
         [SerializeField] private Text _text;
-
-        // ReSharper restore UnassignedField.Compiler
-        #endregion
 
         public Guid Id { get; private set; }
 
@@ -30,28 +23,37 @@ namespace FullPotential.Core.UI.Behaviours
             _image.color = color;
             _effectTranslation = effectTranslation;
             _showExpiry = showExpiry;
+            _expiry = expiry;
 
-            UpdateEffect(expiry);
+            DestroyAfter(Math.Max(GetSecondsRemaining(), 2));
+
+            UpdateEffect();
         }
 
-        public void UpdateEffect(DateTime expiry)
+        public void UpdateEffect()
         {
-            var secondsRemaining = (float)(expiry - DateTime.Now).TotalSeconds;
+            if (_text.IsDestroyed())
+            {
+                // todo: remove
+                Debug.LogWarning("Still trying to update even though I am destroyed...");
 
-            if (expiry != _expiry)
-            {
-                _expiry = expiry;
-                DestroyAfter(Math.Max(secondsRemaining, 2));
+                return;
             }
 
-            if (_showExpiry)
-            {
-                _text.text = _effectTranslation + $" ({secondsRemaining:F1}s)";
-            }
-            else
-            {
-                _text.text = _effectTranslation;
-            }
+            _text.text = _showExpiry
+                ? _effectTranslation + $" ({GetSecondsRemaining():F1}s)"
+                : _effectTranslation;
+        }
+
+        public void UpdateExpiry(DateTime expiry)
+        {
+            _expiry = expiry;
+            DestroyAfter(Math.Max(GetSecondsRemaining(), 2));
+        }
+
+        public float GetSecondsRemaining()
+        {
+            return (float)(_expiry - DateTime.Now).TotalSeconds;
         }
 
         private void DestroyAfter(float timeToLive)

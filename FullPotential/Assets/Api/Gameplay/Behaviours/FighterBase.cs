@@ -229,13 +229,5 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         // ReSharper restore UnassignedField.Global
         #endregion
-
-        // todo: move to Standard
-        public static int GetAvailableAmmo(FighterBase fighter, string slotId)
-        {
-            var weapon = fighter.Inventory.GetItemInSlot<Weapon>(slotId);
-            var ammoTypeId = weapon.WeaponType.AmmunitionTypeIdString;
-            return fighter.Inventory.GetItemStackTotal(ammoTypeId);
-        }
     }
 }

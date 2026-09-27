@@ -74,7 +74,7 @@ namespace FullPotential.Api.Gameplay.Player
                 elapsedSeconds += ChargeGaugeUpdateSeconds;
                 item.ChargePercentage = (int)(elapsedSeconds / secondsToTake * 100);
 
-                _eventBus.PublishAsync(new ItemChargePercentageChangeEvent(SlotId)).Forget();
+                _eventBus.PublishAsync(new ItemChargePercentageChangeEvent(Fighter, SlotId)).Forget();
             }
 
             if (_logger.IsEnabled(AuditLevel.Debug))
@@ -158,7 +158,7 @@ namespace FullPotential.Api.Gameplay.Player
                 elapsedSeconds += ChargeGaugeUpdateSeconds;
                 item.ChargePercentage = 100 - (int)(elapsedSeconds / secondsToTake * 100);
 
-                _eventBus.PublishAsync(new ItemChargePercentageChangeEvent(SlotId)).Forget();
+                _eventBus.PublishAsync(new ItemChargePercentageChangeEvent(Fighter, SlotId)).Forget();
             }
 
             if (_logger.IsEnabled(AuditLevel.Debug))
@@ -195,7 +195,7 @@ namespace FullPotential.Api.Gameplay.Player
         public void SetBusyState(bool isBusy)
         {
             IsBusy = isBusy;
-            _eventBus.PublishAsync(new SlotBusyChangeEvent(SlotId, isBusy)).Forget();
+            _eventBus.PublishAsync(new SlotBusyChangeEvent(Fighter, SlotId, isBusy)).Forget();
         }
     }
 }

@@ -91,6 +91,7 @@
     <Compile Include="Assets\Api\Utilities\Extensions\BufferSerializerExtensions.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\ViableTarget.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\FighterBase.cs" />
+    <Compile Include="Assets\Api\Gameplay\Combat\Events\ActiveEffectAddedEvent.cs" />
     <Compile Include="Assets\Api\Obsolete\CharacterSettingsOld.cs" />
     <Compile Include="Assets\Api\Obsolete\Items\Base\ItemWithTargetingAndShapeBase.cs" />
     <Compile Include="Assets\Api\Registry\IRegisterableType.cs" />
@@ -153,6 +154,7 @@
     <Compile Include="Assets\Api\Obsolete\Items\Types\SpecialGear.cs" />
     <Compile Include="Assets\Api\Scenes\ISceneBehaviour.cs" />
     <Compile Include="Assets\Api\Data\IDataLoader.cs" />
+    <Compile Include="Assets\Api\Gameplay\Combat\Events\ActiveEffectUpdatedEvent.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\LivingEntityBase.cs" />
     <Compile Include="Assets\Api\Obsolete\Attributes.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\SlotIntraAction.cs" />

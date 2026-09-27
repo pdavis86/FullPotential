@@ -25,7 +25,7 @@ using FullPotential.Core.Player.Events;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.UI.Behaviours;
 
-using Newtonsoft.Json.Linq;
+using Unity.Netcode;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -56,6 +56,7 @@ namespace FullPotential.Core.Ui.Behaviours
         private readonly Dictionary<string, GameObject> _progressBars = new Dictionary<string, GameObject>();
         private readonly Dictionary<string, GameObject> _handIcons = new Dictionary<string, GameObject>();
         private readonly List<string> _hiddenSliders = new List<string>();
+        private readonly Dictionary<Guid, ActiveEffectUi> _activeEffectScripts = new Dictionary<Guid, ActiveEffectUi>();
 
         private ILocalizer _localizer;
         private ITypeRegistry _typeRegistry;
@@ -69,7 +70,6 @@ namespace FullPotential.Core.Ui.Behaviours
         private Image _equippedRightHandBackground;
         private EquippedSummary _equippedRightHandSummary;
         private Text _equippedRightHandAmmo;
-        private FighterBase _playerFighter;
         private IEnumerable<IResourceType> _resources;
 
         #region Unity Events Handlers
@@ -100,12 +100,6 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
-            if (_playerFighter == null)
-            {
-                return;
-            }
-
-            //todo: use events instead of firing on every update!
             UpdateActiveEffects();
         }
 
@@ -210,7 +204,7 @@ namespace FullPotential.Core.Ui.Behaviours
             equippedSummary.SetContents(item?.GetDescription(_localizer));
         }
 
-        private void UpdateHandAmmo(Text ammoText, SlotStatus slotStatus, ItemBase item)
+        private void UpdateHandAmmo(LivingEntityBase livingEntity, Text ammoText, SlotStatus slotStatus, ItemBase item)
         {
             if (item is not Weapon weapon
                 || !weapon.IsRanged)
@@ -226,7 +220,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
             ammoText.text = slotStatus.IsBusy
                 ? _reloadingTranslation
-                : $"{weapon.Ammo}/{weapon.GetAmmoMax()} ({FighterBase.GetAvailableAmmo(_playerFighter, slotStatus.SlotId)})";
+                : $"{weapon.Ammo}/{weapon.GetAmmoMax()} ({GetAvailableAmmo(livingEntity, slotStatus.SlotId)})";
         }
 
         private void UpdateHandCharge(ProgressWheel chargeWheel, ItemBase item)
@@ -247,41 +241,20 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateActiveEffects()
         {
-            var existingObjects = GetActiveEffectGameObjects();
+            // todo: if player dies, clear effects
 
-            var activeEffects = _playerFighter.GetActiveEffects()
-                .Where(e => e.Expiry > DateTime.Now)
+            var scriptsToRemove = _activeEffectScripts
+                .Where(kvp => kvp.Value.GetSecondsRemaining() <= 0)
+                .Select(kvp => kvp.Key)
                 .ToList();
-
-            if (activeEffects.Count == 0 && existingObjects.Count > 0)
+            foreach (var scriptToRemove in scriptsToRemove)
             {
-                foreach (var kvp in existingObjects)
-                {
-                    Destroy(kvp.Value);
-                }
-
-                existingObjects.Clear();
-                return;
+                _activeEffectScripts.Remove(scriptToRemove);
             }
 
-            foreach (var activeEffect in activeEffects)
+            foreach (var (_, existingEffectScript) in _activeEffectScripts)
             {
-                if (existingObjects.TryGetValue(activeEffect.Id, out var effectObject))
-                {
-                    var existingEffectScript = effectObject.GetComponent<ActiveEffectUi>();
-                    existingEffectScript.UpdateEffect(activeEffect.Expiry);
-                }
-                else
-                {
-                    var activeEffectObj = Instantiate(_activeEffectPrefab, _activeEffectsContainer.transform);
-                    var activeEffectScript = activeEffectObj.GetComponent<ActiveEffectUi>();
-                    activeEffectScript.SetEffect(
-                        activeEffect.Id,
-                        GetEffectColor(activeEffect.Effect),
-                        _localizer.Translate(activeEffect.Effect),
-                        activeEffect.ShowExpiry,
-                        activeEffect.Expiry);
-                }
+                existingEffectScript.UpdateEffect();
             }
         }
 
@@ -302,16 +275,6 @@ namespace FullPotential.Core.Ui.Behaviours
             return Color.yellow;
         }
 
-        private Dictionary<Guid, GameObject> GetActiveEffectGameObjects()
-        {
-            var results = new Dictionary<Guid, GameObject>();
-            foreach (Transform child in _activeEffectsContainer.transform)
-            {
-                results.Add(child.gameObject.GetComponent<ActiveEffectUi>().Id, child.gameObject);
-            }
-            return results;
-        }
-
         private Color ChangeColorAlpha(Color originalColor, float alpha)
         {
             return new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
@@ -329,31 +292,32 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void SubscribeToEvents()
         {
+            // todo: can events just pass the numbers instead?
             var eventBus = DependenciesContext.Dependencies.GetService<IEventBus>();
             eventBus.Subscribe<LocalPlayerSpawnedEvent>(HandleLocalPlayerSpawn, NetworkLocation.Client, Timing.Always);
             eventBus.Subscribe<ResourceValueChangeEvent>(HandleResourceValueChange, NetworkLocation.Client, Timing.Always);
-            eventBus.Subscribe<SlotChangeEvent>(e => HandleAttackOrReload(e.SlotId, true, true, true), NetworkLocation.Client, Timing.Always);
-            eventBus.Subscribe<AttackReleaseInputEvent>(e => HandleAttackOrReload(e.SlotId, false, true, false), NetworkLocation.Client, Timing.Always);
-            eventBus.Subscribe<SlotBusyChangeEvent>(e => HandleAttackOrReload(e.SlotId, false, true, false), NetworkLocation.Client, Timing.Always);
-            eventBus.Subscribe<ItemChargePercentageChangeEvent>(e => HandleAttackOrReload(e.SlotId, false, false, true), NetworkLocation.Client, Timing.Always);
+            eventBus.Subscribe<SlotChangeEvent>(e => HandleAttackOrReload(e.LivingEntity, e.SlotId, true, true, true), NetworkLocation.Client, Timing.Always);
+            eventBus.Subscribe<AttackReleaseInputEvent>(e => HandleAttackOrReload(e.Fighter, e.SlotId, false, true, false), NetworkLocation.Client, Timing.Always);
+            eventBus.Subscribe<SlotBusyChangeEvent>(e => HandleAttackOrReload(e.Fighter, e.SlotId, false, true, false), NetworkLocation.Client, Timing.Always);
+            eventBus.Subscribe<ItemChargePercentageChangeEvent>(e => HandleAttackOrReload(e.Fighter, e.SlotId, false, false, true), NetworkLocation.Client, Timing.Always);
+            eventBus.Subscribe<ActiveEffectAddedEvent>(HandleActiveEffectAdded, NetworkLocation.Client, Timing.Always);
+            eventBus.Subscribe<ActiveEffectUpdatedEvent>(HandleActiveEffectUpdated, NetworkLocation.Client, Timing.Always);
         }
 
         private void HandleLocalPlayerSpawn(LocalPlayerSpawnedEvent eventArgs)
         {
-            _playerFighter = eventArgs.Fighter;
-
             GameManager.Instance.UserInterface.Respawn.SetActive(false);
             GameManager.Instance.UserInterface.Hud.SetActive(true);
         }
 
-        private void UpdateResourceBars()
+        private void UpdateResourceBars(LivingEntityBase livingEntity)
         {
             foreach (var resource in _resources)
             {
                 var id = resource.TypeId.ToString();
 
-                var value = _playerFighter.GetResourceValue(id);
-                var max = _playerFighter.GetResourceMax(id);
+                var value = livingEntity.GetResourceValue(id);
+                var max = livingEntity.GetResourceMax(id);
 
                 var (percent, text) = GetSliderBarValues(value, max, null);
 
@@ -363,7 +327,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void HandleResourceValueChange(ResourceValueChangeEvent eventArgs)
         {
-            if (eventArgs.LivingEntity != _playerFighter)
+            if (eventArgs.LivingEntity.OwnerClientId != NetworkManager.Singleton.LocalClientId)
             {
                 return;
             }
@@ -374,27 +338,37 @@ namespace FullPotential.Core.Ui.Behaviours
             UpdateSliderBar(eventArgs.ResourceTypeId, text, percent, 1);
         }
 
-        private void HandleAttackOrReload(string slotId, bool isSlotChange, bool isAmmoChange, bool isChargeChange)
+        private void HandleAttackOrReload(LivingEntityBase livingEntity, string slotId, bool isSlotChange, bool isAmmoChange, bool isChargeChange)
         {
             if (slotId is not HandSlotIds.LeftHand and not HandSlotIds.RightHand)
             {
                 return;
             }
 
-            var item = _playerFighter.Inventory.GetItemInSlot(slotId);
+            if (livingEntity.OwnerClientId != NetworkManager.Singleton.LocalClientId)
+            {
+                return;
+            }
+
+            if (livingEntity is not FighterBase fighter)
+            {
+                return;
+            }
+
+            var item = fighter.Inventory.GetItemInSlot(slotId);
 
             if (isSlotChange)
             {
                 var equippedHandSummary = slotId == HandSlotIds.LeftHand ? _equippedLeftHandSummary : _equippedRightHandSummary;
                 UpdateHandDescription(equippedHandSummary, item);
-                UpdateResourceBars();
+                UpdateResourceBars(fighter);
             }
 
             if (isAmmoChange)
             {
                 var ammoComponent = slotId == HandSlotIds.LeftHand ? _ammoLeft : _ammoRight;
-                var slotStatus = _playerFighter.GetSlotStatus(slotId);
-                UpdateHandAmmo(ammoComponent, slotStatus, item);
+                var slotStatus = fighter.GetSlotStatus(slotId);
+                UpdateHandAmmo(fighter, ammoComponent, slotStatus, item);
             }
 
             if (isChargeChange)
@@ -402,6 +376,37 @@ namespace FullPotential.Core.Ui.Behaviours
                 var chargeComponent = slotId == HandSlotIds.LeftHand ? _chargeLeft : _chargeRight;
                 UpdateHandCharge(chargeComponent, item);
             }
+        }
+
+        public int GetAvailableAmmo(LivingEntityBase livingEntity, string slotId)
+        {
+            var weapon = livingEntity.Inventory.GetItemInSlot<Weapon>(slotId);
+            var ammoTypeId = weapon.WeaponType.AmmunitionTypeIdString;
+            return livingEntity.Inventory.GetItemStackTotal(ammoTypeId);
+        }
+
+        private void HandleActiveEffectAdded(ActiveEffectAddedEvent eventArgs)
+        {
+            var activeEffectObj = Instantiate(_activeEffectPrefab, _activeEffectsContainer.transform);
+            var activeEffectScript = activeEffectObj.GetComponent<ActiveEffectUi>();
+            activeEffectScript.SetEffect(
+                eventArgs.ActiveEffect.Id,
+                GetEffectColor(eventArgs.ActiveEffect.Effect),
+                _localizer.Translate(eventArgs.ActiveEffect.Effect),
+                eventArgs.ActiveEffect.ShowExpiry,
+                eventArgs.ActiveEffect.Expiry);
+
+            _activeEffectScripts[eventArgs.ActiveEffect.Id] = activeEffectScript;
+        }
+
+        private void HandleActiveEffectUpdated(ActiveEffectUpdatedEvent eventArgs)
+        {
+            if (!_activeEffectScripts.TryGetValue(eventArgs.ActiveEffect.Id, out var existingEffectScript))
+            {
+                return;
+            }
+
+            existingEffectScript.UpdateExpiry(eventArgs.ActiveEffect.Expiry);
         }
     }
 }

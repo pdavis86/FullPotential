@@ -17,7 +17,6 @@ using FullPotential.Api.Unity;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities;
 using FullPotential.Core.GameManagement.Data;
-using FullPotential.Core.Logging;
 using FullPotential.Core.Networking.Models;
 using FullPotential.Core.Player;
 using FullPotential.Core.Registry;
@@ -87,7 +86,7 @@ namespace FullPotential.Core.GameManagement
             UserInterface = _mainCanvas.GetComponent<UserInterface>();
 
             // NOTE: Uncomment this when testing
-            //AuditorFactory.Level = AuditLevel.Debug;
+            //Logging.AuditorFactory.Level = AuditLevel.Debug;
 
             ServiceManager.RegisterServices();
 
