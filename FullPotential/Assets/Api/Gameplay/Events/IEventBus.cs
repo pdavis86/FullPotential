@@ -12,12 +12,14 @@ namespace FullPotential.Api.Gameplay.Events
 
         void Subscribe(Type handlerType);
 
+        // todo: need to be able to unsubscribe!
         void Subscribe<TEvent>(
             Action<TEvent> handlerAction,
             NetworkLocation location = NetworkLocation.Both,
             Timing timing = Timing.Main)
             where TEvent : IEvent;
 
+        // todo: need to be able to unsubscribe!
         void Subscribe<TEvent>(
             Func<TEvent, UniTask<HandlerResult>> handlerFunction,
             NetworkLocation location = NetworkLocation.Both,

@@ -16,21 +16,16 @@ namespace FullPotential.Core.Ui.Components
         [SerializeField] private TextMeshProUGUI _displayText;
 #pragma warning restore 0649
 
-        public void UpdateValues(string text, float value)
+        public void UpdateValues(float value, float maxValue)
         {
             if (_slider == null)
             {
                 _slider = GetComponent<Slider>();
             }
 
-            _displayText.text = text;
-            _slider.value = value;
-        }
-
-        public void UpdateValues(string text, float value, float maxValue)
-        {
-            UpdateValues(text, value);
             _slider.maxValue = maxValue;
+            _slider.value = value;
+            _displayText.text = $"{value}/{maxValue}";
         }
     }
 }

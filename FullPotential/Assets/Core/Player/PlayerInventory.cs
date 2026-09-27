@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -203,8 +203,6 @@ namespace FullPotential.Core.Player
             //}
 
             MarkAsDirtyAndAddToQueue();
-
-            _playerFighter.UpdateUiHealthAndDefenceValues();
         }
 
         protected override void NotifyOfItemsAdded(IEnumerable<ItemBase> itemsAdded)

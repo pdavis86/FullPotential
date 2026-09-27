@@ -146,11 +146,11 @@ namespace FullPotential.Core.Ui.Behaviours
             _progressBars.Add(id, newBar);
         }
 
-        public void UpdateSliderBar(string id, string text, float value, float maxValue)
+        public void UpdateSliderBar(string id, float value, float maxValue)
         {
             var slider = _progressBars[id].GetComponent<BarSlider>();
 
-            slider.UpdateValues(text, value, maxValue);
+            slider.UpdateValues(value, maxValue);
 
             slider.gameObject.SetActive(!_hiddenSliders.Contains(id));
         }
@@ -314,7 +314,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 var value = livingEntity.GetResourceValue(id);
                 var max = livingEntity.GetResourceMax(id);
 
-                UpdateSliderBar(id, $"{value}/{max}", value, max);
+                UpdateSliderBar(id, value, max);
             }
         }
 
@@ -327,7 +327,6 @@ namespace FullPotential.Core.Ui.Behaviours
 
             UpdateSliderBar(
                 eventArgs.ResourceTypeId,
-                $"{eventArgs.NewValue}/{eventArgs.MaxValue}",
                 eventArgs.NewValue,
                 eventArgs.MaxValue);
         }

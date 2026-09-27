@@ -130,6 +130,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             PopulateResourceValueCache();
 
             _entityName.OnValueChanged += HandleNameChange;
+            _eventBus.Subscribe<ResourceValueChangeEvent>(HandleResourceValueChanged, NetworkLocation.Client, Timing.Always);
         }
 
         protected virtual void Start()
@@ -437,17 +438,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _nameTag.text = displayName;
         }
 
-        // todo: this should be an event handler then delete LivingEntityHealthChangedEventHandler
-        public void UpdateUiHealthAndDefenceValues()
+        private void HandleResourceValueChanged(ResourceValueChangeEvent eventArgs)
         {
-            if (!IsClient)
+            if (eventArgs.ResourceTypeId != ResourceTypeIds.HealthId
+                || eventArgs.LivingEntity != this)
             {
                 return;
             }
 
-            var health = GetResourceValue(ResourceTypeIds.HealthId);
-            var maxHealth = GetResourceMax(ResourceTypeIds.HealthId);
-            HealthBarSlider.UpdateValues($"{health}/{maxHealth}", health, maxHealth);
+            HealthBarSlider.UpdateValues(eventArgs.NewValue, eventArgs.MaxValue);
         }
 
         #endregion

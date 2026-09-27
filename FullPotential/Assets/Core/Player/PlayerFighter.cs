@@ -488,8 +488,6 @@ namespace FullPotential.Core.Player
                 _resourceValueCache[key] = ClampResourceValue(key, value);
             }
 
-            UpdateUiHealthAndDefenceValues();
-
             _eventBus.Subscribe<ResourceValueChangeEvent>(_ => MarkAsDirtyAndAddToQueue());
         }
 
