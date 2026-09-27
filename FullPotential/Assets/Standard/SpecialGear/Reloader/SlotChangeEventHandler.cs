@@ -10,8 +10,6 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Ui;
 using FullPotential.Standard.SpecialSlots;
 
-using Unity.Netcode;
-
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -20,7 +18,9 @@ namespace FullPotential.Standard.SpecialGear.Reloader
 {
     public class SlotChangeEventHandler : IEventHandler<SlotChangeEvent>
     {
+        private readonly IGameManager _gameManager;
         private readonly IHud _hud;
+
         private GameObject _handWarningPrefab;
 
         public NetworkLocation Location => NetworkLocation.Client;
@@ -29,6 +29,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader
 
         public SlotChangeEventHandler(IGameManager gameManager, ITypeRegistry typeRegistry)
         {
+            _gameManager = gameManager;
             _hud = gameManager.GetUserInterface().HudOverlay;
 
             typeRegistry.LoadAddessable<GameObject>(
@@ -38,7 +39,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader
 
         public UniTask<HandlerResult> HandleEventAsync(SlotChangeEvent eventArgs)
         {
-            if (eventArgs.Inventory.OwnerClientId != NetworkManager.Singleton.LocalClientId)
+            if (eventArgs.LivingEntity.gameObject != _gameManager.GetLocalPlayerGameObject())
             {
                 return UniTask.FromResult(new HandlerResult());
             }

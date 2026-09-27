@@ -15,6 +15,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 {
     public class SlotChangeEventHandler : IEventHandler<SlotChangeEvent>
     {
+        private readonly IGameManager _gameManager;
         private readonly IHud _hud;
 
         public NetworkLocation Location => NetworkLocation.Client;
@@ -23,9 +24,8 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public SlotChangeEventHandler(IGameManager gameManager)
         {
+            _gameManager = gameManager;
             _hud = gameManager.GetUserInterface().HudOverlay;
-
-            _hud.ToggleSliderBar(BarrierChargeResource.TypeIdString, false);
         }
 
         public UniTask<HandlerResult> HandleEventAsync(SlotChangeEvent eventArgs)
@@ -37,11 +37,12 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             var isBarrierEquipped = eventArgs.Inventory.GetItemInSlot(BarrierSlot.TypeIdString) != null;
 
-            if (eventArgs.Inventory.OwnerClientId == NetworkManager.Singleton.LocalClientId)
+            if (eventArgs.LivingEntity.gameObject == _gameManager.GetLocalPlayerGameObject())
             {
                 _hud.ToggleSliderBar(BarrierChargeResource.TypeIdString, isBarrierEquipped);
             }
 
+            // todo: only runs on client but checks IsServer
             if (NetworkManager.Singleton.IsServer && !isBarrierEquipped)
             {
                 eventArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, 0, 0, false);

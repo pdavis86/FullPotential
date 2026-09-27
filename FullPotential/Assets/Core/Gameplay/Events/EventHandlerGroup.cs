@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using FullPotential.Api.Gameplay.Events;
 
@@ -12,6 +13,14 @@ namespace FullPotential.Core.Gameplay.Events
         {
             Handlers.Add((IEventHandler<TEvent>)handler);
         }
+
+        public IEnumerable<T> GetHandlersOfType<T>()
+        {
+            return Handlers
+                .Where(h => typeof(T).IsAssignableFrom(h.GetType()))
+                .Select(h => (T)h);
+        }
+
         public bool Remove(object handler)
         {
             return Handlers.Remove((IEventHandler<TEvent>)handler);

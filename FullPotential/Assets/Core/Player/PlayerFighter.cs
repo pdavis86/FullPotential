@@ -211,6 +211,13 @@ namespace FullPotential.Core.Player
             _clientRpcParams.Send.TargetClientIds = new[] { OwnerClientId };
         }
 
+        public override void OnDestroy()
+        {
+            _eventBus.UnsubscribeBehaviour(this);
+
+            base.OnDestroy();
+        }
+
         #endregion
 
         #region ServerRpc calls
@@ -488,7 +495,7 @@ namespace FullPotential.Core.Player
                 _resourceValueCache[key] = ClampResourceValue(key, value);
             }
 
-            _eventBus.Subscribe<ResourceValueChangeEvent>(_ => MarkAsDirtyAndAddToQueue());
+            _eventBus.SubscribeBehaviour<ResourceValueChangeEvent>(this, _ => MarkAsDirtyAndAddToQueue());
         }
 
         public void UpdatePlayerSettings(List<SerializableKeyValuePair<string, string>> updatedSettings)

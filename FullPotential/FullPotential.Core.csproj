@@ -94,6 +94,7 @@
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\TextLocalizer.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiEquipmentTab.cs" />
     <Compile Include="Assets\Core\GameManagement\ServiceManager.cs" />
+    <Compile Include="Assets\Core\Gameplay\Events\IBasicEventHandler.cs" />
     <Compile Include="Assets\Core\Unity\UnityHelperUtilities.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Invigorate.cs" />
     <Compile Include="Assets\Core\Persistence\Local\SettingsRepository.cs" />

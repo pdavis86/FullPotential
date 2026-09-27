@@ -5,8 +5,6 @@ using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Utilities.Extensions;
 
-using Unity.Netcode;
-
 namespace FullPotential.Api.Gameplay.Combat.Events
 {
     // todo: move "Handler : IEventHandler<" classes into Core
@@ -35,7 +33,7 @@ namespace FullPotential.Api.Gameplay.Combat.Events
         {
             var victimName = eventArgs.EntityName;
 
-            if (eventArgs.OwnerClientId == NetworkManager.Singleton.LocalClientId)
+            if (victimName == _gameManager.GetLocalPlayerGameObject().name)
             {
                 if (eventArgs.LastDamageSourceName == victimName)
                 {

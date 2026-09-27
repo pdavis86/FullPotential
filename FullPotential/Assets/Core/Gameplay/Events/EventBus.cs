@@ -11,6 +11,8 @@ using FullPotential.Api.Logging;
 
 using Unity.Netcode;
 
+using UnityEngine;
+
 // ReSharper disable once ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Gameplay.Events
@@ -54,42 +56,50 @@ namespace FullPotential.Core.Gameplay.Events
             }
 
             var argsType = interfaceImplementation.GetGenericArguments()[0];
-
-            if (typeof(BasicEventHandler<>).MakeGenericType(argsType).IsAssignableFrom(handlerType))
-            {
-                return;
-            }
-
             var handler = DependenciesContext.Dependencies.CreateInstance(handlerType);
             Subscribe(argsType, handler);
         }
 
-        public void Subscribe<TEvent>(
-            Action<TEvent> handlerAction,
-            NetworkLocation location = NetworkLocation.Both,
-            Timing timing = Timing.Main)
+        public void SubscribeBehaviour<TEvent>(
+            MonoBehaviour behaviour,
+            Action<TEvent> handlerAction)
             where TEvent : IEvent
         {
-            var handler = new BasicEventHandler<TEvent>(
+            SubscribeBehaviour<TEvent>(
+                behaviour,
                 args =>
                 {
                     handlerAction(args);
                     return UniTask.FromResult(new HandlerResult());
-                },
-                location,
-                timing);
+                });
+        }
 
+        public void SubscribeBehaviour<TEvent>(
+            MonoBehaviour behaviour,
+            Func<TEvent, UniTask<HandlerResult>> handlerFunction)
+            where TEvent : IEvent
+        {
+            var handler = new BasicEventHandler<TEvent>(
+                behaviour,
+                handlerFunction,
+                NetworkLocation.Client,
+                Timing.Always);
             Subscribe(typeof(TEvent), handler);
         }
 
-        public void Subscribe<TEvent>(
-            Func<TEvent, UniTask<HandlerResult>> handlerFunction,
-            NetworkLocation location = NetworkLocation.Both,
-            Timing timing = Timing.Main)
-            where TEvent : IEvent
+        public void UnsubscribeBehaviour(MonoBehaviour behaviour)
         {
-            var handler = new BasicEventHandler<TEvent>(handlerFunction, location, timing);
-            Subscribe(typeof(TEvent), handler);
+            foreach (var typeKvp in _subscriptions)
+            {
+                var typesToRemove = typeKvp.Value.GetHandlersOfType<IBasicEventHandler>()
+                    .Where(h => h.Behaviour == behaviour)
+                    .ToList();
+
+                foreach (var typeToRemove in typesToRemove)
+                {
+                    typeKvp.Value.Remove(typeToRemove);
+                }
+            }
         }
 
         public async UniTask PublishAsync<TEvent>(TEvent eventArgs)
@@ -125,7 +135,7 @@ namespace FullPotential.Core.Gameplay.Events
                     }
                 }
 
-                // Too much - _logger.Debug($"Running handler {handler.GetType().FullName}");
+                // It's too much... _logger.Debug($"Running handler {handler.GetType().FullName}");
 
                 var result = await handler.HandleEventAsync(eventArgs);
 

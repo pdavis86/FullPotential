@@ -130,7 +130,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             PopulateResourceValueCache();
 
             _entityName.OnValueChanged += HandleNameChange;
-            _eventBus.Subscribe<ResourceValueChangeEvent>(HandleResourceValueChanged, NetworkLocation.Client, Timing.Always);
+            _eventBus.SubscribeBehaviour<ResourceValueChangeEvent>(this, HandleResourceValueChanged);
         }
 
         protected virtual void Start()
@@ -168,6 +168,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public override void OnDestroy()
         {
             _entityName.OnValueChanged -= HandleNameChange;
+            _eventBus.UnsubscribeBehaviour(this);
 
             base.OnDestroy();
         }
@@ -577,9 +578,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected void PublishEntityDiedEvent(string lastDamageSourceName, string lastDamageItemName)
         {
             _eventBus.PublishAsync(new EntityDiedAfterEvent(
-                OwnerClientId,
                 name,
-                _entityName.Value.ToString(),
                 transform.position,
                 lastDamageSourceName,
                 lastDamageItemName)

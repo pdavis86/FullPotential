@@ -2,6 +2,8 @@ using System;
 
 using Cysharp.Threading.Tasks;
 
+using UnityEngine;
+
 // ReSharper disable UnusedMember.Global
 
 namespace FullPotential.Api.Gameplay.Events
@@ -12,19 +14,17 @@ namespace FullPotential.Api.Gameplay.Events
 
         void Subscribe(Type handlerType);
 
-        // todo: need to be able to unsubscribe!
-        void Subscribe<TEvent>(
-            Action<TEvent> handlerAction,
-            NetworkLocation location = NetworkLocation.Both,
-            Timing timing = Timing.Main)
+        void SubscribeBehaviour<TEvent>(
+            MonoBehaviour behaviour,
+            Action<TEvent> handlerAction)
             where TEvent : IEvent;
 
-        // todo: need to be able to unsubscribe!
-        void Subscribe<TEvent>(
-            Func<TEvent, UniTask<HandlerResult>> handlerFunction,
-            NetworkLocation location = NetworkLocation.Both,
-            Timing timing = Timing.Main)
+        void SubscribeBehaviour<TEvent>(
+            MonoBehaviour behaviour,
+            Func<TEvent, UniTask<HandlerResult>> handlerFunction)
             where TEvent : IEvent;
+
+        void UnsubscribeBehaviour(MonoBehaviour behaviour);
 
         UniTask PublishAsync<TEvent>(TEvent eventArgs)
             where TEvent : IEvent;

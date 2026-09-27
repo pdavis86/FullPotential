@@ -4,6 +4,8 @@ namespace FullPotential.Api.Logging
 {
     public interface IAuditor
     {
+        // todo: replace string interpolation with template and arguments
+
         bool IsEnabled(AuditLevel level);
 
         void Debug(string message);

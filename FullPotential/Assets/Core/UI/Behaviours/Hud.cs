@@ -13,6 +13,7 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
@@ -21,11 +22,10 @@ using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
+using FullPotential.Core.Player;
 using FullPotential.Core.Player.Events;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.UI.Behaviours;
-
-using Unity.Netcode;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -55,14 +55,16 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private readonly Dictionary<string, GameObject> _progressBars = new Dictionary<string, GameObject>();
         private readonly Dictionary<string, GameObject> _handIcons = new Dictionary<string, GameObject>();
-        private readonly List<string> _hiddenSliders = new List<string>();
         private readonly Dictionary<Guid, ActiveEffectUi> _activeEffectScripts = new Dictionary<Guid, ActiveEffectUi>();
 
+        private IAuditor _logger;
         private ILocalizer _localizer;
         private ITypeRegistry _typeRegistry;
+        private IEventBus _eventBus;
 
         private string _reloadingTranslation;
 
+        private PlayerFighter _playerFighter;
         private GameObject _activeEffectPrefab;
         private Image _equippedLeftHandBackground;
         private EquippedSummary _equippedLeftHandSummary;
@@ -77,8 +79,10 @@ namespace FullPotential.Core.Ui.Behaviours
         // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
+            _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
+            _eventBus = DependenciesContext.Dependencies.GetService<IEventBus>();
 
             SubscribeToEvents();
 
@@ -98,9 +102,14 @@ namespace FullPotential.Core.Ui.Behaviours
         }
 
         // ReSharper disable once UnusedMember.Local
-        private void FixedUpdate()
+        private void Update()
         {
             UpdateActiveEffects();
+        }
+
+        private void OnDestroy()
+        {
+            _eventBus.UnsubscribeBehaviour(this);
         }
 
         #endregion
@@ -151,20 +160,17 @@ namespace FullPotential.Core.Ui.Behaviours
             var slider = _progressBars[id].GetComponent<BarSlider>();
 
             slider.UpdateValues(value, maxValue);
-
-            slider.gameObject.SetActive(!_hiddenSliders.Contains(id));
         }
 
         public void ToggleSliderBar(string id, bool show)
         {
-            if (show)
+            if (!_progressBars.TryGetValue(id, out var slider))
             {
-                _hiddenSliders.Remove(id);
+                _logger.Warn($"Tried to toggle slider {id} but could not find it");
+                return;
             }
-            else if (!_hiddenSliders.Contains(id))
-            {
-                _hiddenSliders.Add(id);
-            }
+
+            slider.GetComponent<BarSlider>().gameObject.SetActive(show);
         }
 
         public void AddHandIcon(string iconId, string slotId, GameObject prefab)
@@ -288,19 +294,20 @@ namespace FullPotential.Core.Ui.Behaviours
         private void SubscribeToEvents()
         {
             // todo: can events just pass the numbers instead?
-            var eventBus = DependenciesContext.Dependencies.GetService<IEventBus>();
-            eventBus.Subscribe<LocalPlayerSpawnedEvent>(HandleLocalPlayerSpawn, NetworkLocation.Client, Timing.Always);
-            eventBus.Subscribe<ResourceValueChangeEvent>(HandleResourceValueChange, NetworkLocation.Client, Timing.Always);
-            eventBus.Subscribe<SlotChangeEvent>(e => HandleAttackOrReload(e.LivingEntity, e.SlotId, true, true, true), NetworkLocation.Client, Timing.Always);
-            eventBus.Subscribe<AttackReleaseInputEvent>(e => HandleAttackOrReload(e.Fighter, e.SlotId, false, true, false), NetworkLocation.Client, Timing.Always);
-            eventBus.Subscribe<SlotBusyChangeEvent>(e => HandleAttackOrReload(e.Fighter, e.SlotId, false, true, false), NetworkLocation.Client, Timing.Always);
-            eventBus.Subscribe<ItemChargePercentageChangeEvent>(e => HandleAttackOrReload(e.Fighter, e.SlotId, false, false, true), NetworkLocation.Client, Timing.Always);
-            eventBus.Subscribe<ActiveEffectAddedEvent>(HandleActiveEffectAdded, NetworkLocation.Client, Timing.Always);
-            eventBus.Subscribe<ActiveEffectUpdatedEvent>(HandleActiveEffectUpdated, NetworkLocation.Client, Timing.Always);
+            _eventBus.SubscribeBehaviour<LocalPlayerSpawnedEvent>(this, HandleLocalPlayerSpawn);
+            _eventBus.SubscribeBehaviour<ResourceValueChangeEvent>(this, HandleResourceValueChange);
+            _eventBus.SubscribeBehaviour<SlotChangeEvent>(this, e => HandleAttackOrReload(e.LivingEntity, e.SlotId, true, true, true));
+            _eventBus.SubscribeBehaviour<AttackReleaseInputEvent>(this, e => HandleAttackOrReload(e.Fighter, e.SlotId, false, true, false));
+            _eventBus.SubscribeBehaviour<SlotBusyChangeEvent>(this, e => HandleAttackOrReload(e.Fighter, e.SlotId, false, true, false));
+            _eventBus.SubscribeBehaviour<ItemChargePercentageChangeEvent>(this, e => HandleAttackOrReload(e.Fighter, e.SlotId, false, false, true));
+            _eventBus.SubscribeBehaviour<ActiveEffectAddedEvent>(this, HandleActiveEffectAdded);
+            _eventBus.SubscribeBehaviour<ActiveEffectUpdatedEvent>(this, HandleActiveEffectUpdated);
         }
 
         private void HandleLocalPlayerSpawn(LocalPlayerSpawnedEvent eventArgs)
         {
+            _playerFighter = eventArgs.Fighter;
+
             GameManager.Instance.UserInterface.Respawn.SetActive(false);
             GameManager.Instance.UserInterface.Hud.SetActive(true);
         }
@@ -320,7 +327,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void HandleResourceValueChange(ResourceValueChangeEvent eventArgs)
         {
-            if (eventArgs.LivingEntity.OwnerClientId != NetworkManager.Singleton.LocalClientId)
+            if (eventArgs.LivingEntity != _playerFighter)
             {
                 return;
             }
@@ -338,12 +345,8 @@ namespace FullPotential.Core.Ui.Behaviours
                 return;
             }
 
-            if (livingEntity.OwnerClientId != NetworkManager.Singleton.LocalClientId)
-            {
-                return;
-            }
-
-            if (livingEntity is not FighterBase fighter)
+            if (livingEntity is not FighterBase fighter
+                || livingEntity != _playerFighter)
             {
                 return;
             }
@@ -380,6 +383,11 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void HandleActiveEffectAdded(ActiveEffectAddedEvent eventArgs)
         {
+            if (eventArgs.LivingEntity != _playerFighter)
+            {
+                return;
+            }
+
             var activeEffectObj = Instantiate(_activeEffectPrefab, _activeEffectsContainer.transform);
             var activeEffectScript = activeEffectObj.GetComponent<ActiveEffectUi>();
             activeEffectScript.SetEffect(
@@ -394,6 +402,11 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void HandleActiveEffectUpdated(ActiveEffectUpdatedEvent eventArgs)
         {
+            if (eventArgs.LivingEntity != _playerFighter)
+            {
+                return;
+            }
+
             if (!_activeEffectScripts.TryGetValue(eventArgs.ActiveEffect.Id, out var existingEffectScript))
             {
                 return;

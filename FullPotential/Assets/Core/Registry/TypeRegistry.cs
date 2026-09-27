@@ -20,6 +20,7 @@ using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
+using FullPotential.Core.Gameplay.Events;
 
 using Unity.Netcode;
 
@@ -143,9 +144,7 @@ namespace FullPotential.Core.Registry
             {
                 LoadAddessable<GameObject>(address, gameObject =>
                 {
-                    var networkObject = gameObject.GetComponent<NetworkObject>();
-
-                    if (networkObject == null)
+                    if (!gameObject.TryGetComponent<NetworkObject>(out var networkObject))
                     {
                         _logger.Error($"Cannot register {address} as a Network Prefab as it does not have a NetworkObject component");
                         return;
@@ -153,7 +152,7 @@ namespace FullPotential.Core.Registry
 
                     //Work-around for https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/1499
                     var hashFiledInfo = typeof(NetworkObject).GetField("GlobalObjectIdHash", BindingFlags.NonPublic | BindingFlags.Instance);
-                    hashFiledInfo!.SetValue(networkObject, GenerateHash(address));
+                    hashFiledInfo.SetValue(networkObject, GenerateHash(address));
 
                     NetworkManager.Singleton.AddNetworkPrefab(gameObject);
                 });
@@ -165,12 +164,10 @@ namespace FullPotential.Core.Registry
 
         private static uint GenerateHash(string input)
         {
-            using (var hasher = MD5.Create())
-            {
-                var inputBytes = Encoding.UTF8.GetBytes(input);
-                var hashBytes = hasher.ComputeHash(inputBytes);
-                return BitConverter.ToUInt32(hashBytes, 0);
-            }
+            using var hasher = MD5.Create();
+            var inputBytes = Encoding.UTF8.GetBytes(input);
+            var hashBytes = hasher.ComputeHash(inputBytes);
+            return BitConverter.ToUInt32(hashBytes, 0);
         }
 
         private void ValidateAndRegister(Type type)
@@ -328,23 +325,16 @@ namespace FullPotential.Core.Registry
 
         public IRegisterableType GetRegistryTypeForItem(ItemBase item)
         {
-            switch (item)
+            return item switch
             {
-                case Api.Obsolete.Items.Types.Accessory:
-                    return GetRegistryTypeById<IAccessoryType>(item.RegistryTypeId);
-                case Api.Obsolete.Items.Types.Armor:
-                    return GetRegistryTypeById<IArmorType>(item.RegistryTypeId);
-                case Api.Obsolete.Items.Types.Weapon:
-                    return GetRegistryTypeById<IWeaponType>(item.RegistryTypeId);
-                case Api.Obsolete.Items.Types.Loot:
-                    return GetRegistryTypeById<ILootType>(item.RegistryTypeId);
-                case ItemStackBase:
-                    return GetItemStackRegistryType(item);
-                case Api.Obsolete.Items.Types.SpecialGear:
-                    return GetRegistryTypeById<ISpecialGearType>(item.RegistryTypeId);
-                default:
-                    return null;
-            }
+                Api.Obsolete.Items.Types.Accessory => GetRegistryTypeById<IAccessoryType>(item.RegistryTypeId),
+                Api.Obsolete.Items.Types.Armor => GetRegistryTypeById<IArmorType>(item.RegistryTypeId),
+                Api.Obsolete.Items.Types.Weapon => GetRegistryTypeById<IWeaponType>(item.RegistryTypeId),
+                Api.Obsolete.Items.Types.Loot => GetRegistryTypeById<ILootType>(item.RegistryTypeId),
+                ItemStackBase => GetItemStackRegistryType(item),
+                Api.Obsolete.Items.Types.SpecialGear => GetRegistryTypeById<ISpecialGearType>(item.RegistryTypeId),
+                _ => null,
+            };
         }
 
         public void LoadAddessable<T>(string address, Action<T> action)
@@ -399,6 +389,11 @@ namespace FullPotential.Core.Registry
 
             foreach (var handlerType in eventHandlerTypes)
             {
+                if (handlerType.IsGenericType && handlerType.GetGenericTypeDefinition() == typeof(BasicEventHandler<>))
+                {
+                    continue;
+                }
+
                 try
                 {
                     _eventBus.Subscribe(handlerType);
