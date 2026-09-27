@@ -10,8 +10,6 @@ namespace FullPotential.Api.Ui
 
         void ToggleDrawingMode(bool isOn);
 
-        (float percent, string text) GetSliderBarValues(float currentValue, float maxValue, string extra);
-
         void UpdateSliderBar(string id, string text, float value, float maxValue);
 
         void ToggleSliderBar(string id, bool show);

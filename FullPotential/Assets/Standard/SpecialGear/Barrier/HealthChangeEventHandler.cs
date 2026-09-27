@@ -66,6 +66,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                     eventArgs.ResourceTypeId,
                     eventArgs.NewValue,
                     eventArgs.Change + barrierCharge,
+                    eventArgs.LivingEntity.GetResourceMax(eventArgs.ResourceTypeId),
                     eventArgs.IsSelfInflicted);
 
                 return UniTask.FromResult(new HandlerResult(updatedEventArgs: updatedEventArgs));

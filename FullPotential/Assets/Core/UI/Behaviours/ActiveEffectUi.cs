@@ -34,9 +34,6 @@ namespace FullPotential.Core.UI.Behaviours
         {
             if (_text.IsDestroyed())
             {
-                // todo: remove
-                Debug.LogWarning("Still trying to update even though I am destroyed...");
-
                 return;
             }
 

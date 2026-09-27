@@ -324,7 +324,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public void TriggerResourceValueUpdate(string typeId, int change, bool isSelfInflicted)
         {
             var currentValue = ClampResourceValue(typeId, GetResourceValue(typeId));
-            var changeEvent = new ResourceValueChangeEvent(this, typeId, currentValue + change, change, isSelfInflicted);
+            var newValue = ClampResourceValue(typeId, currentValue + change);
+            var changeEvent = new ResourceValueChangeEvent(this, typeId, newValue, change, GetResourceMax(typeId), isSelfInflicted);
             _eventBus.PublishAsync(changeEvent).Forget();
         }
 
@@ -332,13 +333,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             newValue = ClampResourceValue(typeId, newValue);
 
-            var locationName = IsServer ? "Server" : "Client";
-            var registeredType = _typeRegistry.GetRegisteredByTypeId<IResourceType>(typeId);
-            _logger.Debug($"{locationName}-{OwnerClientId}: '{_localizer.Translate(registeredType)}' changed from {_resourceValueCache[typeId]} to {newValue}");
+            if (_logger.IsEnabled(AuditLevel.Debug))
+            {
+                var locationName = IsServer ? "Server" : "Client";
+                var registeredType = _typeRegistry.GetRegisteredByTypeId<IResourceType>(typeId);
+                _logger.Debug($"{locationName}-{OwnerClientId}: '{_localizer.Translate(registeredType)}' changed from {_resourceValueCache[typeId]} to {newValue}");
+            }
 
             _resourceValueCache[typeId] = newValue;
 
-            // todo: zzz v0.7 - remove health bar over each player?
             if (IsServer && typeId == ResourceTypeIds.HealthId)
             {
                 var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, 0);
@@ -434,7 +437,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _nameTag.text = displayName;
         }
 
-        // todo: should this still exist?
+        // todo: this should be an event handler then delete LivingEntityHealthChangedEventHandler
         public void UpdateUiHealthAndDefenceValues()
         {
             if (!IsClient)
@@ -444,8 +447,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var health = GetResourceValue(ResourceTypeIds.HealthId);
             var maxHealth = GetResourceMax(ResourceTypeIds.HealthId);
-            var (percent, text) = _gameManager.GetUserInterface().HudOverlay.GetSliderBarValues(health, maxHealth, null);
-            HealthBarSlider.UpdateValues(text, percent, 1);
+            HealthBarSlider.UpdateValues($"{health}/{maxHealth}", health, maxHealth);
         }
 
         #endregion

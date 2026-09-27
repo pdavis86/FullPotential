@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -129,9 +129,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 return;
             }
 
-            var targetFighter = targetGameObject.GetComponent<FighterBase>();
-
-            if (targetFighter == null)
+            if (!targetGameObject.TryGetComponent<FighterBase>(out var targetFighter))
             {
                 _logger.Debug($"Not applying effect {effect.TypeId} to {targetGameObject.name} because they are not an FighterBase");
                 return;
@@ -237,27 +235,25 @@ namespace FullPotential.Core.Gameplay.Combat
             switch (effect)
             {
                 case IResourceEffectType resourceEffect:
-                {
                     if (resourceEffect.EffectActionType is EffectActionType.PeriodicDecrease or EffectActionType.SingleDecrease or EffectActionType.TemporaryMaxDecrease)
                     {
                         adjustedChange *= -1;
                     }
 
                     break;
-                }
+
                 case IAttributeEffect attributeEffect:
-                {
                     if (!attributeEffect.IsTemporaryMaxIncrease)
                     {
                         adjustedChange *= -1;
                     }
 
                     break;
-                }
+
             }
 
-            return new CombatResult 
-            { 
+            return new CombatResult
+            {
                 Change = adjustedChange,
                 IsCriticalHit = isCriticalHit
             };
@@ -330,17 +326,13 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private void ApplyMovementEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IMovementEffectType movementEffect, GameObject targetGameObject)
         {
-            var targetRigidBody = targetGameObject.GetComponent<Rigidbody>();
-
-            if (targetRigidBody == null)
+            if (!targetGameObject.TryGetComponent<Rigidbody>(out var targetRigidBody))
             {
                 _logger.Warn($"Cannot move target '{targetGameObject.name}' as it does not have a RigidBody");
                 return;
             }
 
-            var targetLivingEntity = targetGameObject.GetComponent<LivingEntityBase>();
-
-            if (targetLivingEntity != null)
+            if (targetGameObject.TryGetComponent<LivingEntityBase>(out var targetLivingEntity))
             {
                 targetLivingEntity.SetLastMover(sourceFighter);
             }
@@ -357,9 +349,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 return;
             }
 
-            var targetMoveable = targetGameObject.GetComponent<IMoveable>();
-
-            if (targetMoveable == null)
+            if (!targetGameObject.TryGetComponent<IMoveable>(out var targetMoveable))
             {
                 _logger.Warn($"Cannot apply a movement effect to target '{targetGameObject.name}' as it has no components that implement {nameof(IMoveable)}");
                 return;

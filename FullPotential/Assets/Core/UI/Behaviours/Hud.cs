@@ -133,11 +133,6 @@ namespace FullPotential.Core.Ui.Behaviours
             _equippedRightHandAmmo.color = ChangeColorAlpha(_equippedRightHandAmmo.color, newAlpha);
         }
 
-        public (float percent, string text) GetSliderBarValues(float currentValue, float maxValue, string extra)
-        {
-            return (currentValue / maxValue, $"{currentValue}/{maxValue}" + extra);
-        }
-
         public void AddSliderBar(string id, Color color)
         {
             if (_progressBars.ContainsKey(id))
@@ -319,9 +314,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 var value = livingEntity.GetResourceValue(id);
                 var max = livingEntity.GetResourceMax(id);
 
-                var (percent, text) = GetSliderBarValues(value, max, null);
-
-                UpdateSliderBar(id, text, percent, 1);
+                UpdateSliderBar(id, $"{value}/{max}", value, max);
             }
         }
 
@@ -332,10 +325,11 @@ namespace FullPotential.Core.Ui.Behaviours
                 return;
             }
 
-            var max = eventArgs.LivingEntity.GetResourceMax(eventArgs.ResourceTypeId);
-            var (percent, text) = GetSliderBarValues(eventArgs.NewValue, max, null);
-
-            UpdateSliderBar(eventArgs.ResourceTypeId, text, percent, 1);
+            UpdateSliderBar(
+                eventArgs.ResourceTypeId,
+                $"{eventArgs.NewValue}/{eventArgs.MaxValue}",
+                eventArgs.NewValue,
+                eventArgs.MaxValue);
         }
 
         private void HandleAttackOrReload(LivingEntityBase livingEntity, string slotId, bool isSlotChange, bool isAmmoChange, bool isChargeChange)
