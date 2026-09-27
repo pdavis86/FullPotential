@@ -390,9 +390,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var previousSlotId = previousKvp.Value != null ? previousKvp.Key : null;
 
-            if (!previousSlotId.IsNullOrWhiteSpace() && previousSlotId != slotId)
+            if (!previousSlotId.IsNullOrWhiteSpace())
             {
                 TriggerSlotChangeEvent(null, previousSlotId);
+
+                if (previousSlotId == slotId)
+                {
+                    return;
+                }
             }
 
             TriggerSlotChangeEvent(item.Id, slotId);

@@ -150,8 +150,6 @@ namespace FullPotential.Core.Player
 
         protected override void ApplyEquippedItemChanges(Dictionary<string, string> equippedItems)
         {
-            // todo: this fires twice when trying to unequip an item
-
             if (equippedItems == null || !equippedItems.Any())
             {
                 return;
