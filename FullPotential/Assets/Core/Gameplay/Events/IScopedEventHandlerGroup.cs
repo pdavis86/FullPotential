@@ -1,13 +1,7 @@
-using System.Collections.Generic;
-
-using FullPotential.Api.Gameplay.Events;
-
 namespace FullPotential.Core.Gameplay.Events
 {
-    public interface IScopedEventHandlerGroup : IEventHandlerGroup
+    public interface IScopedEventHandlerGroup
     {
-        HashSet<IScopedEventHandler> Handlers { get; }
-
         void RemoveByOwner(object owner);
     }
 }

@@ -128,7 +128,6 @@
     <Compile Include="Assets\Api\Registry\Gear\IAccessoryType.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\GameObjectExtensions.cs" />
     <Compile Include="Assets\Api\Localization\ILocalizer.cs" />
-    <Compile Include="Assets\Api\Gameplay\Events\IScopedEventHandler.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IAttributeEffect.cs" />
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
     <Compile Include="Assets\Api\Ui\IUiAssistant.cs" />

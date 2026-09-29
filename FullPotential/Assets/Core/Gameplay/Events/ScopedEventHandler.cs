@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 using Cysharp.Threading.Tasks;
 
@@ -6,7 +7,7 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Core.Gameplay.Events
 {
-    public readonly struct ScopedEventHandler<TEvent> : IScopedEventHandler
+    public readonly struct ScopedEventHandler<TEvent> : IEquatable<ScopedEventHandler<TEvent>>
         where TEvent : IEvent
     {
         public object Owner { get; }
@@ -33,6 +34,29 @@ namespace FullPotential.Core.Gameplay.Events
         public UniTask HandleEventAsync(TEvent eventArgs)
         {
             return HandlerFunction(eventArgs);
+        }
+
+        public bool Equals(ScopedEventHandler<TEvent> other)
+        {
+            return EqualityComparer<object>.Default.Equals(Owner, other.Owner)
+                   && EqualityComparer<Func<TEvent, bool>>.Default.Equals(FilterFunction, other.FilterFunction)
+                   && EqualityComparer<Func<TEvent, UniTask>>.Default.Equals(HandlerFunction, other.HandlerFunction);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ScopedEventHandler<TEvent> other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Owner == null ? 0 : EqualityComparer<object>.Default.GetHashCode(Owner);
+                hashCode = (hashCode * 397) ^ (FilterFunction == null ? 0 : EqualityComparer<Func<TEvent, bool>>.Default.GetHashCode(FilterFunction));
+                hashCode = (hashCode * 397) ^ (HandlerFunction == null ? 0 : EqualityComparer<Func<TEvent, UniTask>>.Default.GetHashCode(HandlerFunction));
+                return hashCode;
+            }
         }
     }
 }

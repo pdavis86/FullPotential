@@ -111,7 +111,6 @@
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\StickUiToWorldPosition.cs" />
     <Compile Include="Assets\Core\Gameplay\Drawing\DrawingService.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\MaintainDistance.cs" />
-    <Compile Include="Assets\Core\Gameplay\Events\IEventHandlerGroup.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltips.cs" />
     <Compile Include="Assets\Core\Player\PlayerBehaviour.cs" />
     <Compile Include="Assets\Core\Unity\ShaderUtilities.cs" />

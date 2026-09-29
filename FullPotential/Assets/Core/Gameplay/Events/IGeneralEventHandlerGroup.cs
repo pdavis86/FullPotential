@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-
-using FullPotential.Api.Gameplay.Events;
-
 namespace FullPotential.Core.Gameplay.Events
 {
-    public interface IGeneralEventHandlerGroup : IEventHandlerGroup
+    public interface IGeneralEventHandlerGroup
     {
-        IEnumerable<IEventHandler> GetHandlers();
+        void Add(object handler);
+
+        bool Remove(object handler);
     }
 }

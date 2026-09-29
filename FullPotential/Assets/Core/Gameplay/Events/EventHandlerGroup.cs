@@ -32,10 +32,5 @@ namespace FullPotential.Core.Gameplay.Events
             var typedHandler = (IEventHandler<TEvent>)handler;
             return Handlers.Remove(typedHandler);
         }
-
-        public IEnumerable<IEventHandler> GetHandlers()
-        {
-            return Handlers;
-        }
     }
 }

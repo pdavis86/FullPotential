@@ -84,11 +84,16 @@ namespace FullPotential.Core.Gameplay.Events
             where TEvent : IEvent
         {
             var eventType = typeof(TEvent);
+            ScopedEventHandlerGroup<TEvent> handlerGroup;
 
-            if (!_scopedSubscriptions.TryGetValue(eventType, out var handlerGroup))
+            if (!_scopedSubscriptions.TryGetValue(eventType, out var rawHandlerGroup))
             {
                 handlerGroup = new ScopedEventHandlerGroup<TEvent>();
                 _scopedSubscriptions.Add(eventType, handlerGroup);
+            }
+            else
+            {
+                handlerGroup = (ScopedEventHandlerGroup<TEvent>)rawHandlerGroup;
             }
 
             var handler = new ScopedEventHandler<TEvent>(
@@ -150,13 +155,12 @@ namespace FullPotential.Core.Gameplay.Events
 
             if (_scopedSubscriptions.TryGetValue(argsType, out var scopedHandlerGroup))
             {
-                var scopedHandlers = new List<IScopedEventHandler>(scopedHandlerGroup.Handlers);
+                var typedHandlerGroup = (ScopedEventHandlerGroup<TEvent>)scopedHandlerGroup;
+                var scopedHandlers = new List<ScopedEventHandler<TEvent>>(typedHandlerGroup.Handlers);
                 var scopedTasks = new List<UniTask>(scopedHandlers.Count);
 
-                foreach (var rawHandler in scopedHandlers)
+                foreach (var handler in scopedHandlers)
                 {
-                    var handler = (ScopedEventHandler<TEvent>)rawHandler;
-
                     if (handler.IsSupposedToRun(eventArgs))
                     {
                         scopedTasks.Add(handler.HandleEventAsync(eventArgs));
