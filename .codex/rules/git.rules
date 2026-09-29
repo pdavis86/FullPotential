@@ -1,0 +1,89 @@
+prefix_rule(
+    pattern = ["git", "add"],
+    decision = "forbidden",
+    justification = "Git changes are managed outside Codex."
+)
+
+prefix_rule(
+    pattern = ["git", "commit"],
+    decision = "forbidden",
+    justification = "Git changes are managed outside Codex."
+)
+
+prefix_rule(
+    pattern = ["git", "checkout"],
+    decision = "forbidden",
+    justification = "Git changes are managed outside Codex."
+)
+
+prefix_rule(
+    pattern = ["git", "switch"],
+    decision = "forbidden",
+    justification = "Git changes are managed outside Codex."
+)
+
+prefix_rule(
+    pattern = ["git", "reset"],
+    decision = "forbidden",
+    justification = "Git changes are managed outside Codex."
+)
+
+prefix_rule(
+    pattern = ["git", "restore"],
+    decision = "forbidden",
+    justification = "Git changes are managed outside Codex."
+)
+
+prefix_rule(
+    pattern = ["git", "merge"],
+    decision = "forbidden",
+    justification = "Git changes are managed outside Codex."
+)
+
+prefix_rule(
+    pattern = ["git", "rebase"],
+    decision = "forbidden",
+    justification = "Git changes are managed outside Codex."
+)
+
+prefix_rule(
+    pattern = ["git", "cherry-pick"],
+    decision = "forbidden",
+    justification = "Git changes are managed outside Codex."
+)
+
+prefix_rule(
+    pattern = ["git", "revert"],
+    decision = "forbidden",
+    justification = "Git changes are managed outside Codex."
+)
+
+prefix_rule(
+    pattern = ["git", "clean"],
+    decision = "forbidden",
+    justification = "Git changes are managed outside Codex."
+)
+
+prefix_rule(
+    pattern = ["git", "stash"],
+    decision = "forbidden",
+    justification = "Git changes are managed outside Codex."
+)
+
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "forbidden",
+    justification = "Git changes are managed outside Codex."
+)
+
+prefix_rule(
+    pattern = ["git", "pull"],
+    decision = "forbidden",
+    justification = "Git changes are managed outside Codex."
+)
+
+prefix_rule(
+    pattern = ["git", "fetch"],
+    decision = "forbidden",
+    justification = "Git network operations are managed outside Codex."
+)

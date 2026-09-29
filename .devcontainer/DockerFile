@@ -1,0 +1,13 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0-bookworm-slim
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        curl \
+        ca-certificates \
+        git \
+        procps \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && npm install --global @openai/codex \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*

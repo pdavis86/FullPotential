@@ -1,0 +1,6 @@
+{
+  "name": "FullPotential",
+  "build": {
+    "dockerfile": "Dockerfile"
+  }
+}
