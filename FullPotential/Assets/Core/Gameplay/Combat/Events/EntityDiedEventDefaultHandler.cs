@@ -31,7 +31,7 @@ namespace FullPotential.Core.Gameplay.Combat.Events
 
         private string GetDeathMessage(EntityDiedAfterEvent eventArgs)
         {
-            var victimName = eventArgs.EntityName;
+            var victimName = eventArgs.LivingEntity.name;
 
             if (victimName == _gameManager.GetLocalPlayerGameObject().name)
             {

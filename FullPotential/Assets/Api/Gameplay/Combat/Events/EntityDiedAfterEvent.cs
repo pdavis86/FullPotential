@@ -1,3 +1,4 @@
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 
 using UnityEngine;
@@ -7,7 +8,7 @@ namespace FullPotential.Api.Gameplay.Combat.Events
     [RegisterEvent]
     public readonly struct EntityDiedAfterEvent : IEvent
     {
-        public string EntityName { get; }
+        public LivingEntityBase LivingEntity { get; }
 
         public Vector3 Position { get; }
 
@@ -15,9 +16,9 @@ namespace FullPotential.Api.Gameplay.Combat.Events
 
         public string LastDamageItemName { get; }
 
-        public EntityDiedAfterEvent(string entityName, Vector3 position, string lastDamageSourceName, string lastDamageItemName)
+        public EntityDiedAfterEvent(LivingEntityBase livingEntity, Vector3 position, string lastDamageSourceName, string lastDamageItemName)
         {
-            EntityName = entityName;
+            LivingEntity = livingEntity;
             Position = position;
             LastDamageSourceName = lastDamageSourceName;
             LastDamageItemName = lastDamageItemName;

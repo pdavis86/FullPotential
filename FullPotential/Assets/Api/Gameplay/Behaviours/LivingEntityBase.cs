@@ -133,7 +133,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _eventBus.SubscribeBehaviour<ResourceValueChangeEvent>(
                 this,
                 e => e.LivingEntity == this,
-                HandleResourceValueChanged);
+                HandleResourceValueChangedAsync);
         }
 
         protected virtual void Start()
@@ -443,7 +443,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _nameTag.text = displayName;
         }
 
-        private UniTask HandleResourceValueChanged(ResourceValueChangeEvent eventArgs)
+        private UniTask HandleResourceValueChangedAsync(ResourceValueChangeEvent eventArgs)
         {
             if (eventArgs.ResourceTypeId != ResourceTypeIds.HealthId
                 || eventArgs.LivingEntity != this)
@@ -584,7 +584,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected void PublishEntityDiedEvent(string lastDamageSourceName, string lastDamageItemName)
         {
             _eventBus.PublishAsync(new EntityDiedAfterEvent(
-                    name,
+                    this,
                     transform.position,
                     lastDamageSourceName,
                     lastDamageItemName)
