@@ -116,7 +116,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (!_items.ContainsKey(item.Id))
                 {
-                    _logger.Warn($"Could not remove item with ID {item.Id}. Was this admin crafting?");
+                    _logger.Warn("Could not remove item with ID {0}. Was this admin crafting?", item.Id);
                     continue;
                 }
 
@@ -180,7 +180,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 if (errorIfNotFound)
                 {
-                    _logger.Error($"Could not find the item with {identifierName} '{id}'");
+                    _logger.Error("Could not find the item with {0} '{1}'", identifierName, id);
                 }
                 return null;
             }
@@ -455,7 +455,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            _logger.Debug($"Marking inventory as dirty for '{_characterId}'");
+            _logger.Debug("Marking inventory as dirty for '{0}'", _characterId);
 
             _isDirty = true;
             _saveManager.AddToQueue(_characterId, this);

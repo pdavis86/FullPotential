@@ -47,7 +47,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public async UniTask StartChargeUpLoopAsync(IHasCharge item)
         {
-            _logger.Debug($"StartChargeUpLoopAsync for item '{item}'");
+            _logger.Debug("StartChargeUpLoopAsync for item '{0}'", item);
 
             _preActionCts?.Cancel();
             _preActionCts = new CancellationTokenSource();
@@ -79,7 +79,7 @@ namespace FullPotential.Api.Gameplay.Player
 
             if (_logger.IsEnabled(AuditLevel.Debug))
             {
-                _logger.Debug($"Charged in: {sw.ElapsedMilliseconds}ms and should have taken {secondsUntilDone}s");
+                _logger.Debug("Charged in: {0}ms and should have taken {1}s", sw.ElapsedMilliseconds, secondsUntilDone);
             }
         }
 
@@ -131,7 +131,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public async UniTask StartCooldownLoopAsync(IHasCharge item)
         {
-            _logger.Debug($"StartCooldownLoopAsync for item '{item}'");
+            _logger.Debug("StartCooldownLoopAsync for item '{0}'", item);
 
             _postActionCts?.Cancel();
             _postActionCts = new CancellationTokenSource();
@@ -163,7 +163,7 @@ namespace FullPotential.Api.Gameplay.Player
 
             if (_logger.IsEnabled(AuditLevel.Debug))
             {
-                _logger.Debug($"Cooled in: {sw.ElapsedMilliseconds}ms and should have taken {secondsUntilDone}s");
+                _logger.Debug("Cooled in: {0}ms and should have taken {1}s", sw.ElapsedMilliseconds, secondsUntilDone);
             }
         }
 

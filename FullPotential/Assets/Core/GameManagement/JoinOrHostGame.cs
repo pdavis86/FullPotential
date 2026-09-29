@@ -365,7 +365,7 @@ namespace FullPotential.Core.GameManagement
 
                 if (!string.IsNullOrWhiteSpace(disconnectReason))
                 {
-                    _logger.Warn($"Server refused connection: {disconnectReason}");
+                    _logger.Warn("Server refused connection: {0}", disconnectReason);
                     _gameDetailsError.text = disconnectReason;
                 }
                 else
@@ -453,7 +453,7 @@ namespace FullPotential.Core.GameManagement
                 {
                     NetworkManager.Singleton.Shutdown();
 
-                    _logger.Warn($"Failed to join game after {timeoutSeconds} seconds");
+                    _logger.Warn("Failed to join game after {0} seconds", timeoutSeconds);
 
                     if (!_gameDetailsError.gameObject.activeInHierarchy)
                     {

@@ -617,7 +617,7 @@ namespace FullPotential.Core.Player
         {
             if (!_unclaimedLoot.ContainsKey(id))
             {
-                _logger.Error($"Could not find loot with ID {id}");
+                _logger.Error("Could not find loot with ID {0}", id);
                 return false;
             }
 
@@ -696,7 +696,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            _logger.Debug($"Marking fighter as dirty for '{CharacterId}'");
+            _logger.Debug("Marking fighter as dirty for '{0}'", CharacterId);
 
             IsDirty = true;
             _saveManager.AddToQueue(CharacterId, this);

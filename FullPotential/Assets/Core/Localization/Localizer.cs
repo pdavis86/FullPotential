@@ -106,7 +106,7 @@ namespace FullPotential.Core.Localization
         {
             if (data.Translations == null)
             {
-                _logger.Error($"No translations found in addressable at '{address}'");
+                _logger.Error("No translations found in addressable at '{0}'", address);
                 return;
             }
 
@@ -114,7 +114,7 @@ namespace FullPotential.Core.Localization
             {
                 if (_translations.ContainsKey(item.Key))
                 {
-                    _logger.Warn($"Translations already contains a value for key '{item.Key}'");
+                    _logger.Warn("Translations already contains a value for key '{0}'", item.Key);
                 }
                 else
                 {
@@ -158,7 +158,7 @@ namespace FullPotential.Core.Localization
             {
                 if (_addressesLoaded.Contains(address))
                 {
-                    _logger.Debug($"Skipping '{address}' because it is already loaded");
+                    _logger.Debug("Skipping '{0}' because it is already loaded", address);
                     continue;
                 }
 
@@ -166,7 +166,7 @@ namespace FullPotential.Core.Localization
 
                 if (data.Translations == null)
                 {
-                    _logger.Error($"Failed to load any translations from addressable at '{address}'");
+                    _logger.Error("Failed to load any translations from addressable at '{0}'", address);
                     continue;
                 }
 
@@ -195,7 +195,7 @@ namespace FullPotential.Core.Localization
                 return translation;
             }
 
-            _logger.Warn($"Missing translation for '{id}'");
+            _logger.Warn("Missing translation for '{0}'", id);
             return $"'{id}' translation is missing";
         }
 

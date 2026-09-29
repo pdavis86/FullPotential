@@ -4,18 +4,20 @@ namespace FullPotential.Api.Logging
 {
     public interface IAuditor
     {
-        // todo: replace string interpolation with template and arguments
-
         bool IsEnabled(AuditLevel level);
 
-        void Debug(string message);
+        void Debug(string message, params object[] args);
 
-        void Info(string message);
+        void Info(string message, params object[] args);
 
-        void Warn(string message, Exception exception = null);
+        void Warn(string message, params object[] args);
+
+        void Warn(Exception exception, string message, params object[] args);
 
         void Error(Exception exception);
 
-        void Error(string message, Exception exception = null);
+        void Error(Exception exception, string message, params object[] args);
+
+        void Error(string message, params object[] args);
     }
 }

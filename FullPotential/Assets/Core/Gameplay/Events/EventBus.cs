@@ -32,7 +32,7 @@ namespace FullPotential.Core.Gameplay.Events
 
             if (attribute == null)
             {
-                _logger.Error($"The type '{eventArgsType}' is missing the attribute '{nameof(RegisterEventAttribute)}'");
+                _logger.Error("The type '{0}' is missing the attribute '{1}'", eventArgsType, nameof(RegisterEventAttribute));
                 return;
             }
 
@@ -50,7 +50,7 @@ namespace FullPotential.Core.Gameplay.Events
 
             if (interfaceImplementation == null)
             {
-                _logger.Error($"Type '{handlerType.FullName}' does not implement {typeof(IEventHandler<>).Name}");
+                _logger.Error("Type '{0}' does not implement {1}", handlerType.FullName, typeof(IEventHandler<>).Name);
                 return;
             }
 
@@ -119,11 +119,11 @@ namespace FullPotential.Core.Gameplay.Events
 
             if (!_generalSubscriptions.TryGetValue(argsType, out var rawGeneralHandlerGroup))
             {
-                _logger.Error($"No event with args type '{argsType}' was registered");
+                _logger.Error("No event with args type '{0}' was registered", argsType);
                 return;
             }
 
-            _logger.Debug($"Event with args type '{argsType}' was published");
+            _logger.Debug("Event with args type '{0}' was published", argsType);
 
             var isServer = NetworkManager.Singleton.IsServer;
             var isClient = NetworkManager.Singleton.IsClient;
@@ -136,19 +136,19 @@ namespace FullPotential.Core.Gameplay.Events
                     continue;
                 }
 
-                // It's too much... _logger.Debug($"Running handler {handler.GetType().FullName}");
+                // It's too much... _logger.Debug("Running handler {0}", handler.GetType().FullName);
 
                 var result = await handler.HandleEventAsync(eventArgs);
 
                 if (result.UpdatedEventArgs is not null and TEvent updatedEventArgs)
                 {
-                    _logger.Debug($"Handler {handler.GetType().FullName} updated the event arguments");
+                    _logger.Debug("Handler {0} updated the event arguments", handler.GetType().FullName);
                     eventArgs = updatedEventArgs;
                 }
 
                 if (result.NextAction == NextAction.Cancel)
                 {
-                    _logger.Debug($"Handler {handler.GetType().FullName} cancelled the remaining handlers");
+                    _logger.Debug("Handler {0} cancelled the remaining handlers", handler.GetType().FullName);
                     break;
                 }
             }
@@ -178,7 +178,7 @@ namespace FullPotential.Core.Gameplay.Events
         {
             if (!_generalSubscriptions.TryGetValue(argsType, out var group))
             {
-                _logger.Error($"Handler '{handler.GetType().FullName}' cannot subscribe to event with arguments type '{argsType}' as it has not been registered");
+                _logger.Error("Handler '{0}' cannot subscribe to event with arguments type '{1}' as it has not been registered", handler.GetType().FullName, argsType);
                 return;
             }
 

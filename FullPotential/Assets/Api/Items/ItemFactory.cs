@@ -328,7 +328,7 @@ namespace FullPotential.Api.Items
 
                 if (itemType == null)
                 {
-                    _logger.Error($"No registry type found for '{item.GetType().Name}'");
+                    _logger.Error("No registry type found for '{0}'", item.GetType().Name);
                     return;
                 }
 

@@ -108,7 +108,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
             if (item == null)
             {
-                _logger.Warn("No item found with id " + itemId);
+                _logger.Warn("No item found with id {0}", itemId);
                 return;
             }
 

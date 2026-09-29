@@ -170,7 +170,7 @@ namespace FullPotential.Core.Player
                 {
                     if (!IsValidSlotId(slotId))
                     {
-                        _logger.Warn($"Invalid slot ID {slotId}");
+                        _logger.Warn("Invalid slot ID {0}", slotId);
                         return;
                     }
 
@@ -309,7 +309,7 @@ namespace FullPotential.Core.Player
                     break;
 
                 default:
-                    _logger.Warn("Not yet implemented equipping for slot " + slotId);
+                    _logger.Warn("Not yet implemented equipping for slot {0}", slotId);
                     break;
             }
         }
@@ -337,7 +337,7 @@ namespace FullPotential.Core.Player
                 case Consumer consumer:
                     if (consumer.ResourceType.ItemInHandDefaultPrefab == null)
                     {
-                        _logger.Warn($"No default prefab exists for resource type '{_localizer.Translate(consumer.ResourceType)}'");
+                        _logger.Warn("No default prefab exists for resource type '{0}'", _localizer.Translate(consumer.ResourceType));
                         return;
                     }
 
@@ -354,7 +354,7 @@ namespace FullPotential.Core.Player
                     break;
 
                 default:
-                    _logger.Warn($"Not implemented SpawnItemInHand handling for item type {item.GetType().Name}");
+                    _logger.Warn("Not implemented SpawnItemInHand handling for item type {0}", item.GetType().Name);
                     break;
             }
         }

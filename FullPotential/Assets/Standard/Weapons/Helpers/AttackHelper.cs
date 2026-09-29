@@ -61,7 +61,7 @@ namespace FullPotential.Standard.Weapons.Helpers
                     break;
 
                 default:
-                    _logger.Warn("Not implemented attack for " + itemInHand.Name + " yet");
+                    _logger.Warn("Not implemented attack for {0} yet", itemInHand.Name);
                     return;
             }
         }
@@ -101,7 +101,7 @@ namespace FullPotential.Standard.Weapons.Helpers
         {
             if (weaponInHand.Ammo == 0 || slotStatus.IsBusy)
             {
-                _logger.Debug($"Cancelling UseRangedWeapon(). Ammo: {weaponInHand.Ammo}, IsBusy: {slotStatus.IsBusy}");
+                _logger.Debug("Cancelling UseRangedWeapon(). Ammo: {0}, IsBusy: {1}", weaponInHand.Ammo, slotStatus.IsBusy);
                 return;
             }
 
@@ -125,7 +125,7 @@ namespace FullPotential.Standard.Weapons.Helpers
 
             if (rangedHit.transform == null)
             {
-                _logger.Debug($"Cancelling UseRangedWeapon(). Nothing was hit");
+                _logger.Debug("Cancelling UseRangedWeapon(). Nothing was hit");
                 return;
             }
 

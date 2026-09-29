@@ -84,11 +84,11 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 if (!IsEffectAllowed(target, effect))
                 {
-                    _logger.Debug($"Effect {effect.TypeId} is not permitted against target {target}");
+                _logger.Debug("Effect {0} is not permitted against target {1}", effect.TypeId, target);
                     continue;
                 }
 
-                _logger.Debug($"Applying effect {effect.TypeId} to {target.name}");
+                _logger.Debug("Applying effect {0} to {1}", effect.TypeId, target.name);
 
                 ApplyEffect(sourceFighter, itemUsed, effect, target, position);
 
@@ -131,11 +131,11 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (!targetGameObject.TryGetComponent<FighterBase>(out var targetFighter))
             {
-                _logger.Debug($"Not applying effect {effect.TypeId} to {targetGameObject.name} because they are not an FighterBase");
+                _logger.Debug("Not applying effect {0} to {1} because they are not an FighterBase", effect.TypeId, targetGameObject.name);
                 return;
             }
 
-            _logger.Debug($"Applying effect {effect.TypeId} to {targetFighter.FighterName}");
+            _logger.Debug("Applying effect {0} to {1}", effect.TypeId, targetFighter.FighterName);
 
             switch (effect)
             {
@@ -148,7 +148,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     return;
 
                 default:
-                    _logger.Error($"Not implemented handling for effect {effect}");
+                    _logger.Error("Not implemented handling for effect {0}", effect);
                     return;
             }
         }
@@ -298,7 +298,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     return;
 
                 default:
-                    _logger.Error($"Not implemented handling for affect type {resourceEffect.EffectActionType}");
+                    _logger.Error("Not implemented handling for affect type {0}", resourceEffect.EffectActionType);
                     return;
             }
         }
@@ -328,7 +328,7 @@ namespace FullPotential.Core.Gameplay.Combat
         {
             if (!targetGameObject.TryGetComponent<Rigidbody>(out var targetRigidBody))
             {
-                _logger.Warn($"Cannot move target '{targetGameObject.name}' as it does not have a RigidBody");
+                _logger.Warn("Cannot move target '{0}' as it does not have a RigidBody", targetGameObject.name);
                 return;
             }
 
@@ -345,13 +345,13 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (targetGameObject.GetComponent<NetworkObject>() == null)
             {
-                _logger.Warn($"Cannot apply a movement effect to target '{targetGameObject.name}' as it does not have a NetworkObject component");
+                _logger.Warn("Cannot apply a movement effect to target '{0}' as it does not have a NetworkObject component", targetGameObject.name);
                 return;
             }
 
             if (!targetGameObject.TryGetComponent<IMoveable>(out var targetMoveable))
             {
-                _logger.Warn($"Cannot apply a movement effect to target '{targetGameObject.name}' as it has no components that implement {nameof(IMoveable)}");
+                _logger.Warn("Cannot apply a movement effect to target '{0}' as it has no components that implement {1}", targetGameObject.name, nameof(IMoveable));
                 return;
             }
 
@@ -399,7 +399,7 @@ namespace FullPotential.Core.Gameplay.Combat
                             forwardsBackwardsDirection = -sourceFighter.RigidBody.transform.forward;
                         }
 
-                        _logger.Debug($"Applying {force} force to {targetGameObject.name}");
+                        _logger.Debug("Applying {0} force to {1}", force, targetGameObject.name);
 
                         forceToApply = forwardsBackwardsDirection.normalized * force;
                     }
@@ -431,7 +431,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     break;
 
                 default:
-                    _logger.Error($"Not implemented handling for movement direction {movementEffect.Direction}");
+                _logger.Error("Not implemented handling for movement direction {0}", movementEffect.Direction);
                     return;
             }
 

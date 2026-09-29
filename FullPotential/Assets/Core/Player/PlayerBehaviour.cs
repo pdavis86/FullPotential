@@ -286,7 +286,7 @@ namespace FullPotential.Core.Player
 
             if (interactable == null)
             {
-                _logger.Error("Failed to find the interactable with gameObjectName " + gameObjectName);
+                _logger.Error("Failed to find the interactable with gameObjectName {0}", gameObjectName);
                 return;
             }
 
@@ -550,7 +550,7 @@ namespace FullPotential.Core.Player
 
         private void HandleAttackDown(string slotId)
         {
-            _logger.Debug("OnAttackDown: " + slotId);
+                _logger.Debug("OnAttackDown: {0}", slotId);
 
             if (_userInterface.DrawingPad.activeInHierarchy)
             {
@@ -582,7 +582,7 @@ namespace FullPotential.Core.Player
 
         private void HandleAttackRelease(string slotId)
         {
-            _logger.Debug("OnAttackRelease:" + slotId);
+            _logger.Debug("OnAttackRelease:{0}", slotId);
 
             if (_userInterface.DrawingPad.activeInHierarchy)
             {

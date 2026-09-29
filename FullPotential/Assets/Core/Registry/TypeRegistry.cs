@@ -85,13 +85,13 @@ namespace FullPotential.Core.Registry
                 {
                     if (opHandle.Result == null)
                     {
-                        _logger.Warn($"Failed to find registration GameObject for Mod '{modPrefix}'");
+                        _logger.Warn("Failed to find registration GameObject for Mod '{0}'", modPrefix);
                         return;
                     }
 
                     if (!opHandle.Result.TryGetComponent<IMod>(out var mod))
                     {
-                        _logger.Warn($"Failed to find IMod implementation for Mod '{modPrefix}'");
+                        _logger.Warn("Failed to find IMod implementation for Mod '{0}'", modPrefix);
                         return;
                     }
 
@@ -146,7 +146,7 @@ namespace FullPotential.Core.Registry
                 {
                     if (!gameObject.TryGetComponent<NetworkObject>(out var networkObject))
                     {
-                        _logger.Error($"Cannot register {address} as a Network Prefab as it does not have a NetworkObject component");
+                        _logger.Error("Cannot register {0} as a Network Prefab as it does not have a NetworkObject component", address);
                         return;
                     }
 
@@ -176,7 +176,7 @@ namespace FullPotential.Core.Registry
             {
                 if (!typeof(IRegisterableType).IsAssignableFrom(type))
                 {
-                    _logger.Error($"{type.Name} does not implement {nameof(IRegisterableType)}");
+                    _logger.Error("{0} does not implement {1}", type.Name, nameof(IRegisterableType));
                     return;
                 }
 
@@ -190,11 +190,11 @@ namespace FullPotential.Core.Registry
                     }
                 }
 
-                _logger.Error($"{type.FullName} does not implement any of the valid interfaces");
+                _logger.Error("{0} does not implement any of the valid interfaces", type.FullName);
             }
             catch (Exception ex)
             {
-                _logger.Error($"{type.FullName} failed to register: " + ex);
+                _logger.Error("{0} failed to register: {1}", type.FullName, ex);
             }
         }
 
@@ -204,7 +204,7 @@ namespace FullPotential.Core.Registry
             {
                 if (!typeof(IItemVisuals).IsAssignableFrom(type))
                 {
-                    _logger.Error($"{type.Name} does not implement {nameof(IItemVisuals)}");
+                    _logger.Error("{0} does not implement {1}", type.Name, nameof(IItemVisuals));
                     return;
                 }
 
@@ -213,7 +213,7 @@ namespace FullPotential.Core.Registry
 
                 if (!_registeredTypeIds.Contains(objectAsVisuals.ApplicableToTypeIdString))
                 {
-                    _logger.Error($"{objectAsVisuals.GetType().FullName} refers to a type that is not registered with ID {objectAsVisuals.ApplicableToTypeIdString}");
+                    _logger.Error("{0} refers to a type that is not registered with ID {1}", objectAsVisuals.GetType().FullName, objectAsVisuals.ApplicableToTypeIdString);
                     return;
                 }
 
@@ -225,11 +225,11 @@ namespace FullPotential.Core.Registry
                     }
                 }
 
-                _logger.Error($"{type.FullName} does not implement any of the valid {nameof(IItemVisuals)} interfaces");
+                _logger.Error("{0} does not implement any of the valid {1} interfaces", type.FullName, nameof(IItemVisuals));
             }
             catch (Exception ex)
             {
-                _logger.Error($"{type.FullName} failed to register: " + ex);
+                _logger.Error("{0} failed to register: {1}", type.FullName, ex);
             }
         }
 
@@ -250,7 +250,7 @@ namespace FullPotential.Core.Registry
             var match = list.Cast<T>().FirstOrDefault(x => x.TypeId == objectAsT.TypeId);
             if (match != null)
             {
-                _logger.Error($"A type with ID '{objectAsT.TypeId}' has already been registered");
+                _logger.Error("A type with ID '{0}' has already been registered", objectAsT.TypeId);
                 return true;
             }
 

@@ -154,7 +154,7 @@ namespace FullPotential.Core.GameManagement
 
             if (string.IsNullOrEmpty(connectionPayload.Token))
             {
-                _logger.Warn($"User '{connectionPayload.UserId}' tried to connect with an invalid Player token");
+                _logger.Warn("User '{0}' tried to connect with an invalid Player token", connectionPayload.UserId);
                 return;
             }
 
@@ -165,7 +165,7 @@ namespace FullPotential.Core.GameManagement
 
                 if (NetworkManager.Singleton.ConnectedClients.ContainsKey(originalClientId))
                 {
-                    _logger.Warn($"User '{connectionPayload.UserId}' is already connected");
+                    _logger.Warn("User '{0}' is already connected", connectionPayload.UserId);
 
                     approvalResponse.Reason = _localizer.Translate("ui.connect.alreadyconnected");
 

@@ -12,19 +12,24 @@ namespace FullPotential.Core.Logging
             return level >= AuditorFactory.Level;
         }
 
-        public void Debug(string message)
+        public void Debug(string message, params object[] args)
         {
-            Write(AuditLevel.Debug, message);
+            Write(AuditLevel.Debug, message, null, args);
         }
 
-        public void Info(string message)
+        public void Info(string message, params object[] args)
         {
-            Write(AuditLevel.Info, message);
+            Write(AuditLevel.Info, message, null, args);
         }
 
-        public void Warn(string message, Exception exception = null)
+        public void Warn(string message, params object[] args)
         {
-            Write(AuditLevel.Warn, message);
+            Write(AuditLevel.Warn, message, null, args);
+        }
+
+        public void Warn(Exception exception, string message, params object[] args)
+        {
+            Write(AuditLevel.Warn, message, exception, args);
         }
 
         public void Error(Exception exception)
@@ -32,16 +37,26 @@ namespace FullPotential.Core.Logging
             Write(AuditLevel.Error, null, exception);
         }
 
-        public void Error(string message, Exception exception = null)
+        public void Error(Exception exception, string message, params object[] args)
         {
-            Write(AuditLevel.Error, message);
+            Write(AuditLevel.Error, message, exception, args);
         }
 
-        private void Write(AuditLevel level, string message, Exception exception = null)
+        public void Error(string message, params object[] args)
+        {
+            Write(AuditLevel.Error, message, null, args);
+        }
+
+        private void Write(AuditLevel level, string message, Exception exception = null, params object[] args)
         {
             if (!IsEnabled(level))
             {
                 return;
+            }
+
+            if (args != null && args.Length > 0)
+            {
+                message = string.Format(message, args);
             }
 
             var sb = new StringBuilder(typeof(T).Name);

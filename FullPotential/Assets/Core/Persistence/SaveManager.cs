@@ -38,7 +38,7 @@ namespace FullPotential.Core.Persistence
                 _logger.Warn("Tried saving when not on the server");
             }
 
-            _logger.Debug($"Adding '{saveable.GetType().Name}' to save queue for '{characterId}'");
+            _logger.Debug("Adding '{0}' to save queue for '{1}'", saveable.GetType().Name, characterId);
 
             if (!_queue.ContainsKey(characterId))
             {
@@ -59,7 +59,7 @@ namespace FullPotential.Core.Persistence
                 _logger.Warn("Tried saving when not on the server");
             }
 
-            _logger.Debug($"Processing save queue for '{characterId}'");
+            _logger.Debug("Processing save queue for '{0}'", characterId);
 
             var tasks = GetUniTasksForCharacterId(characterId);
 
@@ -119,11 +119,11 @@ namespace FullPotential.Core.Persistence
         {
             if (!saveable.IsDirty)
             {
-                _logger.Debug($"Did not save '{saveable.GetType().Name}' for user '{characterId}' because it was not dirty");
+                _logger.Debug("Did not save '{0}' for user '{1}' because it was not dirty", saveable.GetType().Name, characterId);
                 return;
             }
 
-            _logger.Debug($"Saving type '{saveable.GetType().Name}' for user {characterId}");
+            _logger.Debug("Saving type '{0}' for user {1}", saveable.GetType().Name, characterId);
 
             try
             {

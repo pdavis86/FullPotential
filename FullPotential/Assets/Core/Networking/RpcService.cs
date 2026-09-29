@@ -37,7 +37,7 @@ namespace FullPotential.Core.Networking
 
         public ClientRpcParams ForNearbyPlayers(Vector3 position)
         {
-            _logger.Debug("Sending RPC call to all clients near " + position);
+            _logger.Debug("Sending RPC call to all clients near {0}", position);
             return new ClientRpcParams();
         }
 
@@ -48,7 +48,7 @@ namespace FullPotential.Core.Networking
 
         public ClientRpcParams ForNearbyPlayersExcept(Vector3 position, IEnumerable<ulong> exceptClientIds)
         {
-            _logger.Debug($"Sending RPC call to all clients except {string.Join(',', exceptClientIds)} near " + position);
+            _logger.Debug("Sending RPC call to all clients except {0} near {1}", string.Join(',', exceptClientIds), position);
 
             var clientIds = NetworkManager.Singleton.ConnectedClientsIds.Except(exceptClientIds);
 

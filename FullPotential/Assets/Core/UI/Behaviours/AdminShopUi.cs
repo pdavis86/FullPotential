@@ -134,7 +134,7 @@ namespace FullPotential.Core.UI.Behaviours
                 }
                 else
                 {
-                    _logger.Warn("Unhandled Attributes type: " + field.FieldType);
+                    _logger.Warn("Unhandled Attributes type: {0}", field.FieldType);
                 }
             }
 

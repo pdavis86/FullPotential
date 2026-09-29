@@ -267,7 +267,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            _logger.Debug($"'{sourceFighter.FighterName}' did {change} health change to '{_entityName.Value}' using '{itemUsed?.Name}'");
+            _logger.Debug("'{0}' did {1} health change to '{2}' using '{3}'", sourceFighter.FighterName, change, _entityName.Value, itemUsed?.Name);
 
             var sourceNetworkObject = sourceFighter.GameObject.GetComponent<NetworkObject>();
             var sourceClientId = sourceNetworkObject != null ? (ulong?)sourceNetworkObject.OwnerClientId : null;
@@ -343,7 +343,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 var locationName = IsServer ? "Server" : "Client";
                 var registeredType = _typeRegistry.GetRegisteredByTypeId<IResourceType>(typeId);
-                _logger.Debug($"{locationName}-{OwnerClientId}: '{_localizer.Translate(registeredType)}' changed from {_resourceValueCache[typeId]} to {newValue}");
+                _logger.Debug("{0}-{1}: '{2}' changed from {3} to {4}", locationName, OwnerClientId, _localizer.Translate(registeredType), _resourceValueCache[typeId], newValue);
             }
 
             _resourceValueCache[typeId] = newValue;
@@ -502,7 +502,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ? "ui.alert.falldamage"
                 : "ui.alert.environmentaldamage");
 
-            _logger.Debug($"{name} collided with {collision.gameObject.name} at velocity {collision.relativeVelocity} with force {force} with cause {cause}");
+            _logger.Debug("{0} collided with {1} at velocity {2} with force {3} with cause {4}", name, collision.gameObject.name, collision.relativeVelocity, force, cause);
 
             var healthChangeRaw = isVelocityDamage
                 ? Vector3.Dot(contactPoint.normal, collision.relativeVelocity)

@@ -34,7 +34,7 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
         {
             if (TranslationId.IsNullOrWhiteSpace())
             {
-                _logger.Warn($"Missing {nameof(TranslationId)} on {gameObject.name} under {transform.parent.gameObject.name}");
+                _logger.Warn("Missing {0} on {1} under {2}", nameof(TranslationId), gameObject.name, transform.parent.gameObject.name);
             }
 
             _textComponent.text = _localizer.Translate(TranslationId);

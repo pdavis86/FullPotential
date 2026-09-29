@@ -174,7 +174,7 @@ namespace FullPotential.Core.Ui.Behaviours
         {
             if (!_progressBars.TryGetValue(id, out var slider))
             {
-                _logger.Warn($"Tried to toggle slider {id} but could not find it");
+                _logger.Warn("Tried to toggle slider {0} but could not find it", id);
                 return;
             }
 
