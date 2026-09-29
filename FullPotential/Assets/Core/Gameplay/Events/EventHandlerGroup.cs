@@ -9,6 +9,8 @@ namespace FullPotential.Core.Gameplay.Events
     {
         public List<IEventHandler<TEvent>> Handlers { get; } = new List<IEventHandler<TEvent>>();
 
+        internal IEventHandler<TEvent>[] HandlersSnapshot { get; private set; } = System.Array.Empty<IEventHandler<TEvent>>();
+
         public void Add(object handler)
         {
             var typedHandler = (IEventHandler<TEvent>)handler;
@@ -25,12 +27,26 @@ namespace FullPotential.Core.Gameplay.Events
             }
 
             Handlers.Insert(insertIndex, typedHandler);
+            RefreshSnapshot();
         }
 
         public bool Remove(object handler)
         {
             var typedHandler = (IEventHandler<TEvent>)handler;
-            return Handlers.Remove(typedHandler);
+            if (!Handlers.Remove(typedHandler))
+            {
+                return false;
+            }
+
+            RefreshSnapshot();
+            return true;
+        }
+
+        private void RefreshSnapshot()
+        {
+            var snapshot = new IEventHandler<TEvent>[Handlers.Count];
+            Handlers.CopyTo(snapshot);
+            HandlersSnapshot = snapshot;
         }
     }
 }

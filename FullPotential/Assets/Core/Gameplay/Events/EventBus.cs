@@ -20,6 +20,7 @@ namespace FullPotential.Core.Gameplay.Events
         private readonly IAuditor _logger;
         private readonly Dictionary<Type, IGeneralEventHandlerGroup> _generalSubscriptions = new Dictionary<Type, IGeneralEventHandlerGroup>();
         private readonly Dictionary<Type, IScopedEventHandlerGroup> _scopedSubscriptions = new Dictionary<Type, IScopedEventHandlerGroup>();
+        private readonly Stack<List<UniTask>> _scopedTaskListPool = new Stack<List<UniTask>>();
 
         public EventBus(IAuditorFactory auditorFactory)
         {
@@ -123,13 +124,16 @@ namespace FullPotential.Core.Gameplay.Events
                 return;
             }
 
-            _logger.Debug("Event with args type '{0}' was published", argsType);
+            if (_logger.IsEnabled(AuditLevel.Debug))
+            {
+                _logger.Debug("Event with args type '{0}' was published", argsType);
+            }
 
             var isServer = NetworkManager.Singleton.IsServer;
             var isClient = NetworkManager.Singleton.IsClient;
 
             var generalHandlerGroup = (EventHandlerGroup<TEvent>)rawGeneralHandlerGroup;
-            foreach (var handler in generalHandlerGroup.Handlers)
+            foreach (var handler in generalHandlerGroup.HandlersSnapshot)
             {
                 if (!IsSupposedToRun(handler, isServer, isClient))
                 {
@@ -142,13 +146,21 @@ namespace FullPotential.Core.Gameplay.Events
 
                 if (result.UpdatedEventArgs is not null and TEvent updatedEventArgs)
                 {
-                    _logger.Debug("Handler {0} updated the event arguments", handler.GetType().FullName);
+                    if (_logger.IsEnabled(AuditLevel.Debug))
+                    {
+                        _logger.Debug("Handler {0} updated the event arguments", handler.GetType().FullName);
+                    }
+
                     eventArgs = updatedEventArgs;
                 }
 
                 if (result.NextAction == NextAction.Cancel)
                 {
-                    _logger.Debug("Handler {0} cancelled the remaining handlers", handler.GetType().FullName);
+                    if (_logger.IsEnabled(AuditLevel.Debug))
+                    {
+                        _logger.Debug("Handler {0} cancelled the remaining handlers", handler.GetType().FullName);
+                    }
+
                     break;
                 }
             }
@@ -156,20 +168,36 @@ namespace FullPotential.Core.Gameplay.Events
             if (_scopedSubscriptions.TryGetValue(argsType, out var scopedHandlerGroup))
             {
                 var typedHandlerGroup = (ScopedEventHandlerGroup<TEvent>)scopedHandlerGroup;
-                var scopedHandlers = new List<ScopedEventHandler<TEvent>>(typedHandlerGroup.Handlers);
-                var scopedTasks = new List<UniTask>(scopedHandlers.Count);
+                var scopedHandlers = typedHandlerGroup.HandlersSnapshot;
 
-                foreach (var handler in scopedHandlers)
+                if (scopedHandlers.Length == 0)
                 {
-                    if (handler.IsSupposedToRun(eventArgs))
-                    {
-                        scopedTasks.Add(handler.HandleEventAsync(eventArgs));
-                    }
+                    return;
                 }
 
-                if (scopedTasks.Count > 0)
+                var scopedTasks = _scopedTaskListPool.Count > 0
+                    ? _scopedTaskListPool.Pop()
+                    : new List<UniTask>();
+
+                try
                 {
-                    await UniTask.WhenAll(scopedTasks);
+                    foreach (var handler in scopedHandlers)
+                    {
+                        if (handler.IsSupposedToRun(eventArgs))
+                        {
+                            scopedTasks.Add(handler.HandleEventAsync(eventArgs));
+                        }
+                    }
+
+                    if (scopedTasks.Count > 0)
+                    {
+                        await UniTask.WhenAll(scopedTasks);
+                    }
+                }
+                finally
+                {
+                    scopedTasks.Clear();
+                    _scopedTaskListPool.Push(scopedTasks);
                 }
             }
         }

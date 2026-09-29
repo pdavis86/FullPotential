@@ -7,22 +7,48 @@ namespace FullPotential.Core.Gameplay.Events
     public class ScopedEventHandlerGroup<TEvent> : IScopedEventHandlerGroup
         where TEvent : IEvent
     {
-        public HashSet<ScopedEventHandler<TEvent>> Handlers { get; } = new HashSet<ScopedEventHandler<TEvent>>();
+        private readonly HashSet<ScopedEventHandler<TEvent>> _handlers = new HashSet<ScopedEventHandler<TEvent>>();
+
+        internal ScopedEventHandler<TEvent>[] HandlersSnapshot { get; private set; } = System.Array.Empty<ScopedEventHandler<TEvent>>();
 
         public bool Add(ScopedEventHandler<TEvent> handler)
         {
-            return Handlers.Add(handler);
+            if (!_handlers.Add(handler))
+            {
+                return false;
+            }
+
+            RefreshSnapshot();
+            return true;
         }
 
         public bool Remove(ScopedEventHandler<TEvent> handler)
         {
-            return Handlers.Remove(handler);
+            if (!_handlers.Remove(handler))
+            {
+                return false;
+            }
+
+            RefreshSnapshot();
+            return true;
         }
 
         public void RemoveByOwner(object owner)
         {
-            Handlers.RemoveWhere(
+            var removedCount = _handlers.RemoveWhere(
                 handler => ReferenceEquals(handler.Owner, owner));
+
+            if (removedCount > 0)
+            {
+                RefreshSnapshot();
+            }
+        }
+
+        private void RefreshSnapshot()
+        {
+            var snapshot = new ScopedEventHandler<TEvent>[_handlers.Count];
+            _handlers.CopyTo(snapshot);
+            HandlersSnapshot = snapshot;
         }
     }
 }
