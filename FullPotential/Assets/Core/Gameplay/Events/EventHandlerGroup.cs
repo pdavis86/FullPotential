@@ -7,17 +7,30 @@ namespace FullPotential.Core.Gameplay.Events
     public class EventHandlerGroup<TEvent> : IGeneralEventHandlerGroup
         where TEvent : IEvent
     {
-        // todo: use sorted list?
-        public HashSet<IEventHandler<TEvent>> Handlers { get; } = new HashSet<IEventHandler<TEvent>>();
+        public List<IEventHandler<TEvent>> Handlers { get; } = new List<IEventHandler<TEvent>>();
 
         public void Add(object handler)
         {
-            Handlers.Add((IEventHandler<TEvent>)handler);
+            var typedHandler = (IEventHandler<TEvent>)handler;
+            if (Handlers.Contains(typedHandler))
+            {
+                return;
+            }
+
+            var insertIndex = 0;
+            while (insertIndex < Handlers.Count
+                   && Handlers[insertIndex].Timing.CompareTo(typedHandler.Timing) <= 0)
+            {
+                insertIndex++;
+            }
+
+            Handlers.Insert(insertIndex, typedHandler);
         }
 
         public bool Remove(object handler)
         {
-            return Handlers.Remove((IEventHandler<TEvent>)handler);
+            var typedHandler = (IEventHandler<TEvent>)handler;
+            return Handlers.Remove(typedHandler);
         }
 
         public IEnumerable<IEventHandler> GetHandlers()

@@ -120,10 +120,13 @@ namespace FullPotential.Core.Gameplay.Events
 
             _logger.Debug($"Event with args type '{argsType}' was published");
 
+            var isServer = NetworkManager.Singleton.IsServer;
+            var isClient = NetworkManager.Singleton.IsClient;
+
             var generalHandlerGroup = (EventHandlerGroup<TEvent>)rawGeneralHandlerGroup;
             foreach (var handler in generalHandlerGroup.Handlers)
             {
-                if (!IsSupposedToRun(handler))
+                if (!IsSupposedToRun(handler, isServer, isClient))
                 {
                     continue;
                 }
@@ -147,14 +150,22 @@ namespace FullPotential.Core.Gameplay.Events
 
             if (_scopedSubscriptions.TryGetValue(argsType, out var scopedHandlerGroup))
             {
-                foreach (var handler in scopedHandlerGroup.Handlers.Select(v => (ScopedEventHandler<TEvent>)v))
-                {
-                    if (!handler.IsSupposedToRun(eventArgs))
-                    {
-                        continue;
-                    }
+                var scopedHandlers = new List<IScopedEventHandler>(scopedHandlerGroup.Handlers);
+                var scopedTasks = new List<UniTask>(scopedHandlers.Count);
 
-                    await handler.HandleEventAsync(eventArgs);
+                foreach (var rawHandler in scopedHandlers)
+                {
+                    var handler = (ScopedEventHandler<TEvent>)rawHandler;
+
+                    if (handler.IsSupposedToRun(eventArgs))
+                    {
+                        scopedTasks.Add(handler.HandleEventAsync(eventArgs));
+                    }
+                }
+
+                if (scopedTasks.Count > 0)
+                {
+                    await UniTask.WhenAll(scopedTasks);
                 }
             }
         }
@@ -168,16 +179,15 @@ namespace FullPotential.Core.Gameplay.Events
             }
 
             group.Add(handler);
-            group.GetHandlers().OrderBy(h => h.Timing);
         }
 
-        private bool IsSupposedToRun<TEvent>(IEventHandler<TEvent> handler)
+        private bool IsSupposedToRun<TEvent>(IEventHandler<TEvent> handler, bool isServer, bool isClient)
             where TEvent : IEvent
         {
             return handler.Location switch
             {
-                NetworkLocation.Server => NetworkManager.Singleton.IsServer,
-                NetworkLocation.Client => NetworkManager.Singleton.IsClient,
+                NetworkLocation.Server => isServer,
+                NetworkLocation.Client => isClient,
                 _ => true,
             };
         }

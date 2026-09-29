@@ -74,8 +74,8 @@
     <Compile Include="Assets\Standard\Shapes\Wall.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Summon.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicGun.cs" />
-    <Compile Include="Assets\Standard\Weapons\Bow.cs" />
     <Compile Include="Assets\Standard\SpecialGear\Barrier\SlotChangeEventHandler.cs" />
+    <Compile Include="Assets\Standard\Weapons\Bow.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Distract.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicHammer.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\StepBack.cs" />
