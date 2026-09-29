@@ -99,6 +99,7 @@ namespace FullPotential.Core.Player
         }
 
         private string _username;
+
         public string Username
         {
             get => _username;
@@ -166,7 +167,7 @@ namespace FullPotential.Core.Player
 
             gameObject.name = "Player ID " + NetworkObjectId;
 
-            if (NetworkManager.LocalClientId == OwnerClientId)
+            if (IsClient && NetworkManager.LocalClientId == OwnerClientId)
             {
                 GameManager.Instance.UserInterface.Hud.SetActive(true);
 
@@ -495,7 +496,14 @@ namespace FullPotential.Core.Player
                 _resourceValueCache[key] = ClampResourceValue(key, value);
             }
 
-            _eventBus.SubscribeBehaviour<ResourceValueChangeEvent>(this, _ => MarkAsDirtyAndAddToQueue());
+            _eventBus.SubscribeBehaviour<ResourceValueChangeEvent>(
+                this,
+                e => e.LivingEntity == this,
+                _ =>
+                {
+                    MarkAsDirtyAndAddToQueue();
+                    return UniTask.CompletedTask;
+                });
         }
 
         public void UpdatePlayerSettings(List<SerializableKeyValuePair<string, string>> updatedSettings)

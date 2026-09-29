@@ -6,6 +6,8 @@ namespace FullPotential.Api.Ui
 {
     public interface IHud
     {
+        // todo: make all of these redundant
+
         void ShowAlert(string content);
 
         void ToggleDrawingMode(bool isOn);

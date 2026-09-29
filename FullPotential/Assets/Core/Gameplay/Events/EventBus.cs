@@ -11,8 +11,6 @@ using FullPotential.Api.Logging;
 
 using Unity.Netcode;
 
-using UnityEngine;
-
 // ReSharper disable once ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Gameplay.Events
@@ -20,7 +18,8 @@ namespace FullPotential.Core.Gameplay.Events
     public class EventBus : IEventBus
     {
         private readonly IAuditor _logger;
-        private readonly Dictionary<Type, IEventHandlerGroup> _subscriptions = new Dictionary<Type, IEventHandlerGroup>();
+        private readonly Dictionary<Type, IGeneralEventHandlerGroup> _generalSubscriptions = new Dictionary<Type, IGeneralEventHandlerGroup>();
+        private readonly Dictionary<Type, IScopedEventHandlerGroup> _scopedSubscriptions = new Dictionary<Type, IScopedEventHandlerGroup>();
 
         public EventBus(IAuditorFactory auditorFactory)
         {
@@ -38,9 +37,9 @@ namespace FullPotential.Core.Gameplay.Events
             }
 
             var groupType = typeof(EventHandlerGroup<>).MakeGenericType(eventArgsType);
-            var group = (IEventHandlerGroup)DependenciesContext.Dependencies.CreateInstance(groupType);
+            var group = (IGeneralEventHandlerGroup)DependenciesContext.Dependencies.CreateInstance(groupType);
 
-            _subscriptions.Add(eventArgsType, group);
+            _generalSubscriptions.Add(eventArgsType, group);
         }
 
         public void Subscribe(Type handlerType)
@@ -60,54 +59,60 @@ namespace FullPotential.Core.Gameplay.Events
             Subscribe(argsType, handler);
         }
 
-        public void SubscribeBehaviour<TEvent>(
-            MonoBehaviour behaviour,
-            Action<TEvent> handlerAction)
-            where TEvent : IEvent
-        {
-            SubscribeBehaviour<TEvent>(
-                behaviour,
-                args =>
-                {
-                    handlerAction(args);
-                    return UniTask.FromResult(new HandlerResult());
-                });
-        }
-
-        public void SubscribeBehaviour<TEvent>(
-            MonoBehaviour behaviour,
+        public EventSubscription<TEvent> Subscribe<TEvent>(
             Func<TEvent, UniTask<HandlerResult>> handlerFunction)
             where TEvent : IEvent
         {
             var handler = new BasicEventHandler<TEvent>(
-                behaviour,
                 handlerFunction,
                 NetworkLocation.Client,
                 Timing.Always);
             Subscribe(typeof(TEvent), handler);
+            return new EventSubscription<TEvent>(handler);
         }
 
-        public void UnsubscribeBehaviour(MonoBehaviour behaviour)
+        public void Unsubscribe<TEvent>(EventSubscription<TEvent> subscription)
+            where TEvent : IEvent
         {
-            foreach (var typeKvp in _subscriptions)
-            {
-                var typesToRemove = typeKvp.Value.GetHandlersOfType<IBasicEventHandler>()
-                    .Where(h => h.Behaviour == behaviour)
-                    .ToList();
+            _generalSubscriptions[typeof(TEvent)].Remove(subscription.Handler);
+        }
 
-                foreach (var typeToRemove in typesToRemove)
-                {
-                    typeKvp.Value.Remove(typeToRemove);
-                }
+        public void SubscribeBehaviour<TEvent>(
+            object owner,
+            Func<TEvent, bool> filterFunction,
+            Func<TEvent, UniTask> handlerFunction)
+            where TEvent : IEvent
+        {
+            var eventType = typeof(TEvent);
+
+            if (!_scopedSubscriptions.TryGetValue(eventType, out var handlerGroup))
+            {
+                handlerGroup = new ScopedEventHandlerGroup<TEvent>();
+                _scopedSubscriptions.Add(eventType, handlerGroup);
+            }
+
+            var handler = new ScopedEventHandler<TEvent>(
+                owner,
+                filterFunction,
+                handlerFunction);
+
+            handlerGroup.Add(handler);
+        }
+
+        public void UnsubscribeBehaviour(object owner)
+        {
+            foreach (var handlerGroup in _scopedSubscriptions.Values)
+            {
+                handlerGroup.RemoveByOwner(owner);
             }
         }
 
         public async UniTask PublishAsync<TEvent>(TEvent eventArgs)
             where TEvent : IEvent
         {
-            var argsType = eventArgs.GetType();
+            var argsType = typeof(TEvent);
 
-            if (!IsEventRegistered(argsType))
+            if (!_generalSubscriptions.TryGetValue(argsType, out var rawGeneralHandlerGroup))
             {
                 _logger.Error($"No event with args type '{argsType}' was registered");
                 return;
@@ -115,24 +120,12 @@ namespace FullPotential.Core.Gameplay.Events
 
             _logger.Debug($"Event with args type '{argsType}' was published");
 
-            var handlerGroup = (EventHandlerGroup<TEvent>)_subscriptions[argsType];
-            var sortedHanders = handlerGroup.Handlers.OrderBy(h => h.Timing);
-            var filteredHandlers = sortedHanders.Where(h => ShouldHandlerRun(h)).ToList();
-            var isCancelled = false;
-
-            foreach (var handler in filteredHandlers)
+            var generalHandlerGroup = (EventHandlerGroup<TEvent>)rawGeneralHandlerGroup;
+            foreach (var handler in generalHandlerGroup.Handlers)
             {
-                if (isCancelled)
+                if (!IsSupposedToRun(handler))
                 {
-                    if (handler.Timing != Timing.Always)
-                    {
-                        _logger.Debug($"Not running handler {handler.GetType().FullName} as the event was cancelled");
-                        continue;
-                    }
-                    else
-                    {
-                        _logger.Debug($"Running handler {handler.GetType().FullName} even though the event was cancelled");
-                    }
+                    continue;
                 }
 
                 // It's too much... _logger.Debug($"Running handler {handler.GetType().FullName}");
@@ -147,25 +140,38 @@ namespace FullPotential.Core.Gameplay.Events
 
                 if (result.NextAction == NextAction.Cancel)
                 {
-                    isCancelled = true;
                     _logger.Debug($"Handler {handler.GetType().FullName} cancelled the remaining handlers");
+                    break;
+                }
+            }
+
+            if (_scopedSubscriptions.TryGetValue(argsType, out var scopedHandlerGroup))
+            {
+                foreach (var handler in scopedHandlerGroup.Handlers.Select(v => (ScopedEventHandler<TEvent>)v))
+                {
+                    if (!handler.IsSupposedToRun(eventArgs))
+                    {
+                        continue;
+                    }
+
+                    await handler.HandleEventAsync(eventArgs);
                 }
             }
         }
 
         private void Subscribe(Type argsType, object handler)
         {
-            if (!_subscriptions.ContainsKey(argsType))
+            if (!_generalSubscriptions.TryGetValue(argsType, out var group))
             {
                 _logger.Error($"Handler '{handler.GetType().FullName}' cannot subscribe to event with arguments type '{argsType}' as it has not been registered");
                 return;
             }
 
-            var group = _subscriptions[argsType];
             group.Add(handler);
+            group.GetHandlers().OrderBy(h => h.Timing);
         }
 
-        private bool ShouldHandlerRun<TEvent>(IEventHandler<TEvent> handler)
+        private bool IsSupposedToRun<TEvent>(IEventHandler<TEvent> handler)
             where TEvent : IEvent
         {
             return handler.Location switch
@@ -174,17 +180,6 @@ namespace FullPotential.Core.Gameplay.Events
                 NetworkLocation.Client => NetworkManager.Singleton.IsClient,
                 _ => true,
             };
-        }
-
-        private bool IsEventRegistered(Type argsType)
-        {
-            if (_subscriptions.ContainsKey(argsType))
-            {
-                return true;
-            }
-
-            _logger.Error("No event handler has been registered for event with arguments type " + argsType);
-            return false;
         }
     }
 }

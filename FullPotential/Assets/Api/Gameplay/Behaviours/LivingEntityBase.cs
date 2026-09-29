@@ -130,7 +130,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
             PopulateResourceValueCache();
 
             _entityName.OnValueChanged += HandleNameChange;
-            _eventBus.SubscribeBehaviour<ResourceValueChangeEvent>(this, HandleResourceValueChanged);
+            _eventBus.SubscribeBehaviour<ResourceValueChangeEvent>(
+                this,
+                e => e.LivingEntity == this,
+                HandleResourceValueChanged);
         }
 
         protected virtual void Start()
@@ -168,6 +171,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public override void OnDestroy()
         {
             _entityName.OnValueChanged -= HandleNameChange;
+
             _eventBus.UnsubscribeBehaviour(this);
 
             base.OnDestroy();
@@ -439,15 +443,17 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _nameTag.text = displayName;
         }
 
-        private void HandleResourceValueChanged(ResourceValueChangeEvent eventArgs)
+        private UniTask HandleResourceValueChanged(ResourceValueChangeEvent eventArgs)
         {
             if (eventArgs.ResourceTypeId != ResourceTypeIds.HealthId
                 || eventArgs.LivingEntity != this)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             HealthBarSlider.UpdateValues(eventArgs.NewValue, eventArgs.MaxValue);
+
+            return UniTask.CompletedTask;
         }
 
         #endregion
@@ -578,10 +584,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected void PublishEntityDiedEvent(string lastDamageSourceName, string lastDamageItemName)
         {
             _eventBus.PublishAsync(new EntityDiedAfterEvent(
-                name,
-                transform.position,
-                lastDamageSourceName,
-                lastDamageItemName)
+                    name,
+                    transform.position,
+                    lastDamageSourceName,
+                    lastDamageItemName)
             ).Forget();
         }
 

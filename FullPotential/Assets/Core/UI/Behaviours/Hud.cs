@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Effects;
@@ -76,6 +78,8 @@ namespace FullPotential.Core.Ui.Behaviours
         private Text _equippedRightHandAmmo;
         private IEnumerable<IResourceType> _resources;
 
+        private EventSubscription<LocalPlayerSpawnedEvent> _localPlayerSpawnedSubscription;
+
         #region Unity Events Handlers
 
         // ReSharper disable once UnusedMember.Local
@@ -111,6 +115,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void OnDestroy()
         {
+            _eventBus.Unsubscribe(_localPlayerSpawnedSubscription);
             _eventBus.UnsubscribeBehaviour(this);
         }
 
@@ -297,24 +302,29 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void SubscribeToEvents()
         {
+            _localPlayerSpawnedSubscription = _eventBus.Subscribe<LocalPlayerSpawnedEvent>(HandleLocalPlayerSpawnAsync);
+
+            // todo: check this filters
             // todo: can events just pass the numbers instead?
-            _eventBus.SubscribeBehaviour<LocalPlayerSpawnedEvent>(this, HandleLocalPlayerSpawn);
-            _eventBus.SubscribeBehaviour<ResourceValueChangeEvent>(this, HandleResourceValueChange);
-            _eventBus.SubscribeBehaviour<SlotChangeEvent>(this, e => HandleAttackOrReload(e.LivingEntity, e.SlotId, true, true, true));
-            _eventBus.SubscribeBehaviour<AttackReleaseInputEvent>(this, e => HandleAttackOrReload(e.Fighter, e.SlotId, false, true, false));
-            _eventBus.SubscribeBehaviour<SlotBusyChangeEvent>(this, e => HandleAttackOrReload(e.Fighter, e.SlotId, false, true, false));
-            _eventBus.SubscribeBehaviour<ItemChargePercentageChangeEvent>(this, e => HandleAttackOrReload(e.Fighter, e.SlotId, false, false, true));
-            _eventBus.SubscribeBehaviour<ActiveEffectAddedEvent>(this, HandleActiveEffectAdded);
-            _eventBus.SubscribeBehaviour<ActiveEffectUpdatedEvent>(this, HandleActiveEffectUpdated);
-            _eventBus.SubscribeBehaviour<EntityDiedAfterEvent>(this, HandleEntityDied);
+            _eventBus.SubscribeBehaviour<ResourceValueChangeEvent>(this, e => e.LivingEntity == _playerFighter, HandleResourceValueChangeAsync);
+            _eventBus.SubscribeBehaviour<SlotChangeEvent>(this, e => e.LivingEntity == _playerFighter, e => HandleAttackOrReloadAsync(e.LivingEntity, e.SlotId, true, true, true));
+            _eventBus.SubscribeBehaviour<AttackReleaseInputEvent>(this, e => e.Fighter == _playerFighter, e => HandleAttackOrReloadAsync(e.Fighter, e.SlotId, false, true, false));
+            _eventBus.SubscribeBehaviour<SlotBusyChangeEvent>(this, e => e.Fighter == _playerFighter, e => HandleAttackOrReloadAsync(e.Fighter, e.SlotId, false, true, false));
+            _eventBus.SubscribeBehaviour<ItemChargePercentageChangeEvent>(this, e => e.Fighter == _playerFighter, e => HandleAttackOrReloadAsync(e.Fighter, e.SlotId, false, false, true));
+            _eventBus.SubscribeBehaviour<ActiveEffectAddedEvent>(this, e => e.LivingEntity == _playerFighter, HandleActiveEffectAddedAsync);
+            _eventBus.SubscribeBehaviour<ActiveEffectUpdatedEvent>(this, e => e.LivingEntity == _playerFighter, HandleActiveEffectUpdatedAsync);
+            _eventBus.SubscribeBehaviour<EntityDiedAfterEvent>(this, e => e.EntityName == _playerFighter.name, HandleEntityDiedAsync);
         }
 
-        private void HandleLocalPlayerSpawn(LocalPlayerSpawnedEvent eventArgs)
+        // todo: find any methods that return a UniTask that do not have the suffix "Async"
+        private UniTask<HandlerResult> HandleLocalPlayerSpawnAsync(LocalPlayerSpawnedEvent eventArgs)
         {
             _playerFighter = eventArgs.Fighter;
 
             GameManager.Instance.UserInterface.Respawn.SetActive(false);
             GameManager.Instance.UserInterface.Hud.SetActive(true);
+
+            return UniTask.FromResult(new HandlerResult());
         }
 
         private void UpdateResourceBars(LivingEntityBase livingEntity)
@@ -330,30 +340,32 @@ namespace FullPotential.Core.Ui.Behaviours
             }
         }
 
-        private void HandleResourceValueChange(ResourceValueChangeEvent eventArgs)
+        private UniTask HandleResourceValueChangeAsync(ResourceValueChangeEvent eventArgs)
         {
             if (eventArgs.LivingEntity != _playerFighter)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             UpdateSliderBar(
                 eventArgs.ResourceTypeId,
                 eventArgs.NewValue,
                 eventArgs.MaxValue);
+
+            return UniTask.CompletedTask;
         }
 
-        private void HandleAttackOrReload(LivingEntityBase livingEntity, string slotId, bool isSlotChange, bool isAmmoChange, bool isChargeChange)
+        private UniTask HandleAttackOrReloadAsync(LivingEntityBase livingEntity, string slotId, bool isSlotChange, bool isAmmoChange, bool isChargeChange)
         {
             if (slotId is not HandSlotIds.LeftHand and not HandSlotIds.RightHand)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             if (livingEntity is not FighterBase fighter
                 || livingEntity != _playerFighter)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             var item = fighter.Inventory.GetItemInSlot(slotId);
@@ -363,6 +375,12 @@ namespace FullPotential.Core.Ui.Behaviours
                 var equippedHandSummary = slotId == HandSlotIds.LeftHand ? _equippedLeftHandSummary : _equippedRightHandSummary;
                 UpdateHandDescription(equippedHandSummary, item);
                 UpdateResourceBars(fighter);
+
+                // todo: var isBarrierEquipped = eventArgs.Inventory.GetItemInSlot(BarrierSlot.TypeIdString) != null;
+                //if (eventArgs.LivingEntity.gameObject == _gameManager.GetLocalPlayerGameObject())
+                //{
+                //    _hud.ToggleSliderBar(BarrierChargeResource.TypeIdString, isBarrierEquipped);
+                //}
             }
 
             if (isAmmoChange)
@@ -377,6 +395,8 @@ namespace FullPotential.Core.Ui.Behaviours
                 var chargeComponent = slotId == HandSlotIds.LeftHand ? _chargeLeft : _chargeRight;
                 UpdateHandCharge(chargeComponent, item);
             }
+
+            return UniTask.CompletedTask;
         }
 
         public int GetAvailableAmmo(LivingEntityBase livingEntity, string slotId)
@@ -386,11 +406,11 @@ namespace FullPotential.Core.Ui.Behaviours
             return livingEntity.Inventory.GetItemStackTotal(ammoTypeId);
         }
 
-        private void HandleActiveEffectAdded(ActiveEffectAddedEvent eventArgs)
+        private UniTask HandleActiveEffectAddedAsync(ActiveEffectAddedEvent eventArgs)
         {
             if (eventArgs.LivingEntity != _playerFighter)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             var activeEffectObj = Instantiate(_activeEffectPrefab, _activeEffectsContainer.transform);
@@ -403,34 +423,40 @@ namespace FullPotential.Core.Ui.Behaviours
                 eventArgs.ActiveEffect.Expiry);
 
             _activeEffectScripts[eventArgs.ActiveEffect.Id] = activeEffectScript;
+
+            return UniTask.CompletedTask;
         }
 
-        private void HandleActiveEffectUpdated(ActiveEffectUpdatedEvent eventArgs)
+        private UniTask HandleActiveEffectUpdatedAsync(ActiveEffectUpdatedEvent eventArgs)
         {
             if (eventArgs.LivingEntity != _playerFighter)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             if (!_activeEffectScripts.TryGetValue(eventArgs.ActiveEffect.Id, out var existingEffectScript))
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             existingEffectScript.UpdateExpiry(eventArgs.ActiveEffect.Expiry);
+
+            return UniTask.CompletedTask;
         }
 
-        private void HandleEntityDied(EntityDiedAfterEvent eventArgs)
+        private UniTask HandleEntityDiedAsync(EntityDiedAfterEvent eventArgs)
         {
             if (eventArgs.EntityName != _playerFighter.name)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             foreach (var (_, script) in _activeEffectScripts)
             {
                 Destroy(script.gameObject);
             }
+
+            return UniTask.CompletedTask;
         }
     }
 }

@@ -81,6 +81,7 @@
     <Compile Include="Assets\Core\Logging\Auditor.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\LookAtMainCamera.cs" />
     <Compile Include="Assets\Core\Player\PlayerInventory.cs" />
+    <Compile Include="Assets\Core\Gameplay\Events\IGeneralEventHandlerGroup.cs" />
     <Compile Include="Assets\Core\Unity\Static\DefaultSceneLoader.cs" />
     <Compile Include="Assets\Core\Environment\LootInteractable.cs" />
     <Compile Include="Assets\Core\UI\Components\CraftingSelector.cs" />
@@ -114,7 +115,9 @@
     <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltips.cs" />
     <Compile Include="Assets\Core\Player\PlayerBehaviour.cs" />
     <Compile Include="Assets\Core\Unity\ShaderUtilities.cs" />
+    <Compile Include="Assets\Core\Gameplay\Events\IScopedEventHandlerGroup.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUi.cs" />
+    <Compile Include="Assets\Core\Gameplay\Events\ScopedEventHandlerGroup.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\DrawingPadUi.cs" />
     <Compile Include="Assets\Core\Persistence\Https\DataLoader.cs" />
     <Compile Include="Assets\Core\Logging\AuditorFactory.cs" />
@@ -142,6 +145,7 @@
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiRow.cs" />
     <Compile Include="Assets\Core\Player\PlayerMovement.cs" />
     <Compile Include="Assets\Core\Environment\SceneService.cs" />
+    <Compile Include="Assets\Core\Gameplay\Events\ScopedEventHandler.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\RespawnUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\SettingsMenuUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiInventoryTab.cs" />
