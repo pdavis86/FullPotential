@@ -14,3 +14,7 @@ Source-control operations are managed by the user outside Codex.
 ## Builds
 
 Do not attempt project builds in this workspace. The .NET build currently fails before compilation because NuGet references the unavailable Windows fallback package folder `C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages`.
+
+## Line endings
+
+Use Windows-style CRLF line endings when making changes to files in this workspace.

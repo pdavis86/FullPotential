@@ -58,7 +58,7 @@ namespace FullPotential.Core.Registry
                 AddToRegister<ISpecialGearType>,
                 AddToRegister<ITargetingType>,
                 AddToRegister<IWeaponType>,
-                AddToRegister<IRegisterableWithSlotType>,
+                AddToRegister<ISlotType>,
                 AddToRegister<IElementType>,
             };
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -59,7 +59,7 @@ namespace FullPotential.Core.Localization
             CacheRegisterableTypeName<ISpecialGearType>();
 
             //NOTE: Add this last to catch anything missed
-            _typeDictionary.Add(typeof(IRegisterableWithSlotType), "slot");
+            _typeDictionary.Add(typeof(ISlotType), "slot");
         }
 
         private void CacheRegisterableTypeName<T>()

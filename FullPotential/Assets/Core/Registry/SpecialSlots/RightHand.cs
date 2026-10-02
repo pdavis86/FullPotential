@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Ui;
 
 namespace FullPotential.Core.Registry.SpecialSlots
 {
-    public class RightHand : IRegisterableWithSlotType
+    public class RightHand : ISlotType
     {
         private static readonly Guid Id = new Guid(HandSlotIds.RightHand);
 

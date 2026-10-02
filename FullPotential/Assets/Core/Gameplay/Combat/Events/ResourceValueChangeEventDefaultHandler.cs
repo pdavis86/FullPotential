@@ -13,7 +13,7 @@ namespace FullPotential.Core.Gameplay.Combat.Events
 
         public UniTask<HandlerResult> HandleEventAsync(ResourceValueChangeEvent eventArgs)
         {
-            eventArgs.LivingEntity.UpdateResourceValue(eventArgs.ResourceTypeId, eventArgs.NewValue);
+            eventArgs.LivingEntity.UpdateResourceValue(eventArgs.ResourceTypeId, eventArgs.NewValue, eventArgs.SourceEntityName, eventArgs.SourceItemName);
             return UniTask.FromResult(new HandlerResult());
         }
     }

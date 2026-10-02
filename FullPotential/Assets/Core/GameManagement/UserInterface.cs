@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
+
 using FullPotential.Api.Ui;
 using FullPotential.Core.Ui.Behaviours;
+
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -41,13 +43,7 @@ namespace FullPotential.Core.GameManagement
 
         private static UserInterface _instance;
 
-        public IHud HudOverlay
-        {
-            get
-            {
-                return _hud = _hud != null ? _hud : Hud.GetComponent<Hud>();
-            }
-        }
+        public IHud HudOverlay => _hud = _hud != null ? _hud : Hud.GetComponent<Hud>();
 
         public GameObject InteractionBubbleOverlay => InteractionBubble;
 

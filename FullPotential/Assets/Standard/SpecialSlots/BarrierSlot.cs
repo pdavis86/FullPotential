@@ -4,7 +4,7 @@ using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.SpecialSlots
 {
-    public class BarrierSlot : IRegisterableWithSlotType
+    public class BarrierSlot : ISlotType
     {
         public const string TypeIdString = "29adbef1-8fe2-47c2-8e91-da33ed83a6c7";
 

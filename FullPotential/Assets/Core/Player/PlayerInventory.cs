@@ -203,6 +203,7 @@ namespace FullPotential.Core.Player
             MarkAsDirtyAndAddToQueue();
         }
 
+        // todo: this should be an event
         protected override void NotifyOfItemsAdded(IEnumerable<ItemBase> itemsAdded)
         {
             var itemsAddedCount = itemsAdded.Count();
@@ -224,6 +225,7 @@ namespace FullPotential.Core.Player
             }
         }
 
+        // todo: this should be an event
         protected override void NotifyOfInventoryFull()
         {
             _playerFighter.AlertInventoryIsFull();
@@ -231,6 +233,7 @@ namespace FullPotential.Core.Player
             //todo: zzz v0.7 - send to storage when inventory full
         }
 
+        // todo: this should be an event
         protected override void NotifyOfItemsRemoved(IEnumerable<ItemBase> itemsRemoved)
         {
             var countRemoved = itemsRemoved.Count(x => x is not ItemStackBase);

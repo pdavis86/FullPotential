@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Ioc;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
@@ -72,7 +72,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 }
             }
 
-            foreach (var type in _typeRegistry.GetRegisteredTypes<IRegisterableWithSlotType>())
+            foreach (var type in _typeRegistry.GetRegisteredTypes<ISlotType>())
             {
                 if (type is Registry.SpecialSlots.LeftHand or Registry.SpecialSlots.RightHand)
                 {

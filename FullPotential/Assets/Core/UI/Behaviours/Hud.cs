@@ -326,9 +326,13 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateResourceBars(LivingEntityBase livingEntity)
         {
+            var resourcesInUse = livingEntity.Inventory.GetResourcesInUse();
+
             foreach (var resource in _resources)
             {
                 var id = resource.TypeId.ToString();
+
+                ToggleSliderBar(id, resourcesInUse.Contains(id));
 
                 var value = livingEntity.GetResourceValue(id);
                 var max = livingEntity.GetResourceMax(id);
@@ -349,11 +353,6 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private UniTask HandleAttackOrReloadAsync(LivingEntityBase livingEntity, string slotId, bool isSlotChange, bool isAmmoChange, bool isChargeChange)
         {
-            if (slotId is not HandSlotIds.LeftHand and not HandSlotIds.RightHand)
-            {
-                return UniTask.CompletedTask;
-            }
-
             if (livingEntity is not FighterBase fighter)
             {
                 return UniTask.CompletedTask;
@@ -366,12 +365,11 @@ namespace FullPotential.Core.Ui.Behaviours
                 var equippedHandSummary = slotId == HandSlotIds.LeftHand ? _equippedLeftHandSummary : _equippedRightHandSummary;
                 UpdateHandDescription(equippedHandSummary, item);
                 UpdateResourceBars(fighter);
+            }
 
-                // todo: var isBarrierEquipped = eventArgs.Inventory.GetItemInSlot(BarrierSlot.TypeIdString) != null;
-                //if (eventArgs.LivingEntity.gameObject == _gameManager.GetLocalPlayerGameObject())
-                //{
-                //    _hud.ToggleSliderBar(BarrierChargeResource.TypeIdString, isBarrierEquipped);
-                //}
+            if (slotId is not HandSlotIds.LeftHand and not HandSlotIds.RightHand)
+            {
+                return UniTask.CompletedTask;
             }
 
             if (isAmmoChange)

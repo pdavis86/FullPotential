@@ -4,6 +4,7 @@ using System.Linq;
 
 using Cysharp.Threading.Tasks;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.Events;
@@ -318,7 +319,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             return _typeRegistry.GetRegisteredTypes<IArmorType>().FirstOrDefault(t => t.TypeId.ToString() == slotId) != null
                    || _typeRegistry.GetRegisteredTypes<IAccessoryType>().FirstOrDefault(t => slotId.StartsWith(t.TypeId.ToString())) != null
-                   || _typeRegistry.GetRegisteredTypes<IRegisterableWithSlotType>().FirstOrDefault(t => t.TypeId.ToString() == slotId) != null;
+                   || _typeRegistry.GetRegisteredTypes<ISlotType>().FirstOrDefault(t => t.TypeId.ToString() == slotId) != null;
         }
 
         private ItemBase MergeItemStacks(ItemStackBase newStack)
@@ -474,6 +475,37 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             ApplyInventoryChanges(changes);
+        }
+
+        public List<string> GetResourcesInUse()
+        {
+            var resourcesInUse = new List<string> { ResourceTypeIds.HealthId, ResourceTypeIds.StaminaId };
+
+            foreach (var value in _equippedItems.Values)
+            {
+                if (value.Item is IResourceConsumer consumer)
+                {
+                    var resourceId = consumer.ResourceType.TypeId.ToString();
+                    if (!resourcesInUse.Contains(resourceId))
+                    {
+                        resourcesInUse.Add(resourceId);
+                    }
+
+                    if (value.Item is SpecialGear specialGear)
+                    {
+                        var otherResourceIds = ((ISpecialGearType)specialGear.RegistryType).ResourceTypeIdsInUse;
+                        foreach (var otherResourceId in otherResourceIds)
+                        {
+                            if (!resourcesInUse.Contains(otherResourceId))
+                            {
+                                resourcesInUse.Add(otherResourceId);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return resourcesInUse;
         }
     }
 }

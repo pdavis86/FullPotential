@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text;
 
@@ -26,6 +26,8 @@ namespace FullPotential.Api.Obsolete.Items.Types
         // ReSharper restore NotAccessedField.Global
         public string ResourceTypeId;
 
+        public string ResourceTypeIds { get; }
+
         public IResourceType ResourceType
         {
             get => _resourceType;
@@ -47,6 +49,8 @@ namespace FullPotential.Api.Obsolete.Items.Types
                 CustomVisualsTypeId = _visuals?.TypeId.ToString();
             }
         }
+
+        string IResourceConsumer.Name => Name;
 
         public SerializableKeyValuePair<string, string>[] CustomData = Array.Empty<SerializableKeyValuePair<string, string>>();
 

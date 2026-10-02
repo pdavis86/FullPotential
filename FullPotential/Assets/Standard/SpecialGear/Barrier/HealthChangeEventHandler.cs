@@ -30,10 +30,9 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public UniTask<HandlerResult> HandleEventAsync(ResourceValueChangeEvent eventArgs)
         {
-            // todo: remove IsSelfInflicted
             if (eventArgs.ResourceTypeId != ResourceTypeIds.HealthId
                 || eventArgs.Change >= 0
-                || eventArgs.IsSelfInflicted)
+                || eventArgs.SourceEntityName == eventArgs.LivingEntity.name)
             {
                 return UniTask.FromResult(new HandlerResult());
             }
@@ -55,7 +54,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             barrier.SetCustomData(CustomDataKeyLastHit, DateTime.UtcNow.ToString("u"));
 
-            eventArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, eventArgs.Change, false);
+            eventArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, eventArgs.Change, eventArgs.SourceEntityName, eventArgs.SourceItemName);
 
             if (barrierCharge < Math.Abs(eventArgs.Change))
             {
@@ -67,7 +66,8 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                     eventArgs.NewValue,
                     eventArgs.Change + barrierCharge,
                     eventArgs.LivingEntity.GetResourceMax(eventArgs.ResourceTypeId),
-                    eventArgs.IsSelfInflicted);
+                    eventArgs.SourceEntityName,
+                    eventArgs.SourceItemName);
 
                 return UniTask.FromResult(new HandlerResult(updatedEventArgs: updatedEventArgs));
             }

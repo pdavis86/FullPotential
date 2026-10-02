@@ -292,6 +292,7 @@ namespace FullPotential.Core.Player
                 case LivingEntityState.Dead:
                     if (OwnerClientId == NetworkManager.LocalClientId)
                     {
+                        // todo: this should be an event
                         GameManager.Instance.UserInterface.HideAllMenus();
                         _aliveStateChanges.PlayForwards(false);
                     }
@@ -303,6 +304,7 @@ namespace FullPotential.Core.Player
                 case LivingEntityState.Respawning:
                     if (OwnerClientId == NetworkManager.LocalClientId)
                     {
+                        // todo: this should be an event
                         _aliveStateChanges.PlayBackwards(true);
                     }
 
@@ -387,8 +389,10 @@ namespace FullPotential.Core.Player
                 }
             });
 
+            // todo: this should be an event
             _aliveStateChanges.Queue(isAlive => _unityHelperUtilities.GetObjectAtRoot(GameObjectNames.SceneCamera).SetActive(!isAlive));
 
+            // todo: this should be an event
             _aliveStateChanges.Queue(isAlive =>
             {
                 if (NetworkManager.LocalClientId == OwnerClientId)
@@ -397,6 +401,7 @@ namespace FullPotential.Core.Player
                 }
             });
 
+            // todo: this should be an event
             _aliveStateChanges.Queue(isAlive =>
             {
                 if (NetworkManager.LocalClientId == OwnerClientId)

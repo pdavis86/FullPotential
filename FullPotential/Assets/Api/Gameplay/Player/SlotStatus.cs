@@ -36,11 +36,14 @@ namespace FullPotential.Api.Gameplay.Player
         // todo: private set?
         public bool IsIntraActionLooping { get; set; }
 
-        public SlotStatus(IAuditor logger, IEventBus eventBus, FighterBase fighter, string slotId)
+        public SlotStatus(IAuditorFactory auditorFactory, IEventBus eventBus)
         {
-            _logger = logger;
+            _logger = auditorFactory.Create(this);
             _eventBus = eventBus;
+        }
 
+        public void Initialise(FighterBase fighter, string slotId)
+        {
             Fighter = fighter;
             SlotId = slotId;
         }

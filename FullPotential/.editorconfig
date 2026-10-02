@@ -61,3 +61,6 @@ dotnet_diagnostic.UNT0008.severity = error # Unity objects should not use null p
 dotnet_diagnostic.UNT0026.severity = warning # GetComponent always allocates
 dotnet_diagnostic.UNT0028.severity = warning # Use non-allocating physics APIs
 dotnet_diagnostic.UNT0039.severity = none # Use RequireComponent attribute when self-invoking GetComponent
+
+# IDE0056: Use index operator
+dotnet_diagnostic.IDE0056.severity = none

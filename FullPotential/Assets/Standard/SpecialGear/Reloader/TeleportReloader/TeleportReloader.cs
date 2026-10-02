@@ -1,7 +1,10 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+
 using FullPotential.Api.Items;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Gear;
+using FullPotential.Standard.Resources;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 {
@@ -14,6 +17,8 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
         public Guid TypeId => Id;
 
         public string SlotIdString => SpecialSlots.RangedWeaponReloaderSlot.TypeIdString;
+
+        public IEnumerable<string> ResourceTypeIdsInUse { get; } = new[] { Energy.TypeIdString };
 
         public string OverrideItemDescription(Api.Obsolete.Items.Types.SpecialGear specialGear, ILocalizer localizer, LevelOfDetail levelOfDetail)
         {

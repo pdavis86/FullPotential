@@ -16,16 +16,26 @@ namespace FullPotential.Api.Gameplay.Combat.Events
 
         public int MaxValue { get; }
 
-        public bool IsSelfInflicted { get; }
+        public string SourceEntityName { get; }
 
-        public ResourceValueChangeEvent(LivingEntityBase livingEntity, string resourceTypeId, int newValue, int change, int maxValue, bool isSelfInflicted)
+        public string SourceItemName { get; }
+
+        public ResourceValueChangeEvent(
+            LivingEntityBase livingEntity,
+            string resourceTypeId,
+            int newValue,
+            int change,
+            int maxValue,
+            string sourceEntityName,
+            string sourceItemName)
         {
             LivingEntity = livingEntity;
             ResourceTypeId = resourceTypeId;
             NewValue = newValue;
             Change = change;
             MaxValue = maxValue;
-            IsSelfInflicted = isSelfInflicted;
+            SourceEntityName = sourceEntityName;
+            SourceItemName = sourceItemName;
         }
     }
 }

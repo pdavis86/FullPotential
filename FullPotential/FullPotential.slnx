@@ -1,6 +1,6 @@
 ﻿<Solution>
-  <Project Path="FullPotential.Core.csproj" />
   <Project Path="FullPotential.Api.csproj" />
+  <Project Path="FullPotential.Core.csproj" />
   <Project Path="FullPotential.Standard.csproj" />
   <Project Path="FullPotential.Api.Tests.csproj" />
   <Project Path="FullPotential.Api.IntegrationTests.csproj" />

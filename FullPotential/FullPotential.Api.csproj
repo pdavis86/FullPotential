@@ -49,6 +49,7 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.4.0f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Api\Registry\Gear\ISlotType.cs" />
     <Compile Include="Assets\Api\CoreTypeIds\ResourceTypeIds.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IPlayerInventory.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\Timing.cs" />
@@ -175,7 +176,6 @@
     <Compile Include="Assets\Api\Ioc\Dependency.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IHasSideEffect.cs" />
     <Compile Include="Assets\Api\Utilities\ActionQueue.cs" />
-    <Compile Include="Assets\Api\Registry\Gear\IRegisterableWithSlotType.cs" />
     <Compile Include="Assets\Api\Scenes\SpawnPoint.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\ICombatService.cs" />
     <Compile Include="Assets\Api\Unity\Constants\Tags.cs" />

@@ -1,6 +1,6 @@
-﻿namespace FullPotential.Api.Registry.Gear
+namespace FullPotential.Api.Registry.Gear
 {
-    public interface IArmorType : IRegisterableWithSlotType
+    public interface IArmorType : ISlotType
     {
     }
 }

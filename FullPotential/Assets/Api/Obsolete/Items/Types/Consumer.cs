@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,6 +39,8 @@ namespace FullPotential.Api.Obsolete.Items.Types
         public int ChargePercentage { get; set; }
 
         public List<IStoppable> Stoppables { get; } = new List<IStoppable>();
+
+        string IResourceConsumer.Name => Name;
 
         public float GetProjectileSpeed()
         {

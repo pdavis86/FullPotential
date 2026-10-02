@@ -1,8 +1,7 @@
-﻿using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data;
 using FullPotential.Api.GameManagement.Events;
 using FullPotential.Api.Ioc;
-using FullPotential.Core.GameManagement;
 
 using Unity.Netcode;
 
@@ -44,9 +43,6 @@ namespace FullPotential.Core.Player
         private float _maxDistanceToBeStanding;
         private bool _isMidJump;
 
-        //Others
-        private UserInterface _userInterface;
-
         #region Unity Event Handlers 
 
         // ReSharper disable once UnusedMember.Local
@@ -56,8 +52,6 @@ namespace FullPotential.Core.Player
             _playerFighter = GetComponent<PlayerFighter>();
 
             _maxDistanceToBeStanding = gameObject.GetComponent<Collider>().bounds.extents.y + 0.1f;
-
-            _userInterface = GameManager.Instance.UserInterface;
 
             var settingsRepository = DependenciesContext.Dependencies.GetService<ISettingsRepository>();
 
@@ -69,6 +63,8 @@ namespace FullPotential.Core.Player
         {
             _smoothLook = Vector2.zero;
             _currentCameraRotationX = 0;
+            _isTryingToJump = false;
+            _isTryingToSprint = false;
             _isMidJump = false;
         }
 
@@ -96,17 +92,23 @@ namespace FullPotential.Core.Player
 
         private void OnMove(InputValue value)
         {
-            _moveVal = value.Get<Vector2>().normalized;
+            if (isActiveAndEnabled)
+            {
+                _moveVal = value.Get<Vector2>().normalized;
+            }
         }
 
         private void OnLook(InputValue value)
         {
-            _lookVal = value.Get<Vector2>();
+            if (isActiveAndEnabled)
+            {
+                _lookVal = value.Get<Vector2>();
+            }
         }
 
         private void OnJump()
         {
-            if (!_userInterface.IsAnyMenuOpen() && IsOnSolidObject())
+            if (isActiveAndEnabled && IsOnSolidObject())
             {
                 _isTryingToJump = true;
             }
@@ -114,7 +116,7 @@ namespace FullPotential.Core.Player
 
         private void OnSprintStart()
         {
-            if (!_userInterface.IsAnyMenuOpen() && IsOnSolidObject())
+            if (isActiveAndEnabled && IsOnSolidObject())
             {
                 _isTryingToSprint = true;
             }
@@ -122,7 +124,10 @@ namespace FullPotential.Core.Player
 
         private void OnSprintStop()
         {
-            _isTryingToSprint = false;
+            if (isActiveAndEnabled)
+            {
+                _isTryingToSprint = false;
+            }
         }
 
         // ReSharper restore UnusedMember.Local
@@ -223,11 +228,6 @@ namespace FullPotential.Core.Player
 
         private void ApplyMovementFromInputs()
         {
-            if (_userInterface.IsAnyMenuOpen())
-            {
-                return;
-            }
-
             if (_isTryingToSprint != _playerFighter.IsSprinting)
             {
                 UpdateSprintStateServerRpc(_isTryingToSprint, _moveVal);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using FullPotential.Api.Gameplay.Player;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Obsolete.Items.Types;
@@ -60,13 +61,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             base.Awake();
 
-            // todo: add a SlotStatus for each registered slot?
-            // todo: it feels like SlotStatus should be constructed using DI
-
-            var leftSlotStatus = new SlotStatus(_logger, _eventBus, this, HandSlotIds.LeftHand);
+            var leftSlotStatus = DependenciesContext.Dependencies.CreateInstance<SlotStatus>();
+            leftSlotStatus.Initialise(this, HandSlotIds.LeftHand);
             _slotStatuses.Add(HandSlotIds.LeftHand, leftSlotStatus);
 
-            var rightSlotStatus = new SlotStatus(_logger, _eventBus, this, HandSlotIds.RightHand);
+            var rightSlotStatus = DependenciesContext.Dependencies.CreateInstance<SlotStatus>();
+            rightSlotStatus.Initialise(this, HandSlotIds.RightHand);
             _slotStatuses.Add(HandSlotIds.RightHand, rightSlotStatus);
         }
 
@@ -185,7 +185,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             if (!isTest)
             {
-                TriggerResourceValueUpdate(resourceTypeId, -resourceCost, true);
+                TriggerResourceValueUpdate(resourceTypeId, -resourceCost, name, resourceConsumerUsingItem.Name);
             }
 
             return true;

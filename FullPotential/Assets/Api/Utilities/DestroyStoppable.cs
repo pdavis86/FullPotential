@@ -1,4 +1,5 @@
-﻿using FullPotential.Api.Gameplay;
+using FullPotential.Api.Gameplay;
+
 using UnityEngine;
 
 namespace FullPotential.Api.Utilities
@@ -14,7 +15,7 @@ namespace FullPotential.Api.Utilities
 
         public void Stop()
         {
-           Object.Destroy(_gameObjectToDestroy);
+            Object.Destroy(_gameObjectToDestroy);
         }
     }
 }

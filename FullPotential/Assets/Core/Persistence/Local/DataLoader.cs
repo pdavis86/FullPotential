@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,7 +20,7 @@ namespace FullPotential.Core.Persistence.Local
 {
     public class DataLoader : IDataLoader
     {
-        private IItemFactory _itemFactory;
+        private readonly IItemFactory _itemFactory;
 
         public DataLoader(IItemFactory itemFactory)
         {

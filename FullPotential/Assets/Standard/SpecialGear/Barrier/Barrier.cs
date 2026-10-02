@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Text;
 
 using FullPotential.Api.Items;
@@ -6,6 +7,7 @@ using FullPotential.Api.Localization;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Utilities;
+using FullPotential.Standard.Resources;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
@@ -18,6 +20,8 @@ namespace FullPotential.Standard.SpecialGear.Barrier
         public Guid TypeId => Id;
 
         public string SlotIdString => SpecialSlots.BarrierSlot.TypeIdString;
+
+        public IEnumerable<string> ResourceTypeIdsInUse { get; } = new[] { Energy.TypeIdString, BarrierChargeResource.TypeIdString };
 
         public string OverrideItemDescription(Api.Obsolete.Items.Types.SpecialGear specialGear, ILocalizer localizer, LevelOfDetail levelOfDetail)
         {

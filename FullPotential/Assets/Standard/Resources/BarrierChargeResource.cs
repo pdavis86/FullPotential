@@ -71,11 +71,11 @@ namespace FullPotential.Standard.Resources
             }
 
             //Consume item resource (-2 to overcome replenish of 1)
-            livingEntity.TriggerResourceValueUpdate(equippedBarrier.ResourceTypeId, -2, true);
+            livingEntity.TriggerResourceValueUpdate(equippedBarrier.ResourceTypeId, -2, targetFighter.name, null);
 
             //Replenish barrier resource
             //todo: zzz v0.8 - trait-based resource recharge
-            livingEntity.TriggerResourceValueUpdate(TypeIdString, Barrier.GetRechargeRate(equippedBarrier), true);
+            livingEntity.TriggerResourceValueUpdate(TypeIdString, Barrier.GetRechargeRate(equippedBarrier), targetFighter.name, null);
         }
     }
 }

@@ -28,8 +28,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-using Object = UnityEngine.Object;
-
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Gameplay.Combat
@@ -84,7 +82,7 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 if (!IsEffectAllowed(target, effect))
                 {
-                _logger.Debug("Effect {0} is not permitted against target {1}", effect.TypeId, target);
+                    _logger.Debug("Effect {0} is not permitted against target {1}", effect.TypeId, target);
                     continue;
                 }
 
@@ -431,7 +429,7 @@ namespace FullPotential.Core.Gameplay.Combat
                     break;
 
                 default:
-                _logger.Error("Not implemented handling for movement direction {0}", movementEffect.Direction);
+                    _logger.Error("Not implemented handling for movement direction {0}", movementEffect.Direction);
                     return;
             }
 
@@ -466,7 +464,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 consumer.Targeting.NetworkPrefabAddress,
                 prefab =>
                 {
-                    var targetingGameObject = Object.Instantiate(prefab, startPosition, Quaternion.identity);
+                    var targetingGameObject = UnityEngine.Object.Instantiate(prefab, startPosition, Quaternion.identity);
 
                     var targetingBehaviour = targetingGameObject.GetComponent<ITargetingBehaviour>();
                     targetingBehaviour.SourceFighter = sourceFighter;
@@ -515,7 +513,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 consumer.Shape.NetworkPrefabAddress,
                 prefab =>
                 {
-                    var shapeGameObject = Object.Instantiate(prefab, spawnPosition, rotation);
+                    var shapeGameObject = UnityEngine.Object.Instantiate(prefab, spawnPosition, rotation);
                     var sceneService = GameManager.Instance.GetSceneBehaviour().GetSceneService();
 
                     shapeGameObject.transform.position = sceneService.GetHeightAdjustedPosition(spawnPosition, shapeGameObject);

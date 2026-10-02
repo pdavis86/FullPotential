@@ -550,7 +550,7 @@ namespace FullPotential.Core.Player
 
         private void HandleAttackDown(string slotId)
         {
-                _logger.Debug("OnAttackDown: {0}", slotId);
+            _logger.Debug("OnAttackDown: {0}", slotId);
 
             if (_userInterface.DrawingPad.activeInHierarchy)
             {
