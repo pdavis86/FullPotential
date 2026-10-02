@@ -659,20 +659,20 @@ namespace FullPotential.Core.Player
 
         #region UI Updates
 
-        // todo: should this still exist?
+        // todo: this should be an event handler
         public void ShowAlertForItemsAddedToInventory(string alertText)
         {
             ShowHudAlertClientRpc(alertText, _clientRpcParams);
         }
 
-        // todo: should this still exist?
+        // todo: this should be an event handler
         public void AlertOfInventoryRemovals(int itemsRemovedCount)
         {
             var message = _localizer.Translate("ui.alert.itemsremoved");
             ShowHudAlertClientRpc(string.Format(message, itemsRemovedCount), _clientRpcParams);
         }
 
-        // todo: should this still exist?
+        // todo: this should be an event handler
         public void AlertInventoryIsFull()
         {
             ShowHudAlertClientRpc(_localizer.Translate("ui.alert.itemsatmax"), _clientRpcParams);

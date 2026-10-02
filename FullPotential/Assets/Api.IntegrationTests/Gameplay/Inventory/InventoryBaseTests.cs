@@ -209,7 +209,7 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
             public void OverrideIsServer(bool newValue)
             {
                 var propInfo = typeof(NetworkBehaviour).GetProperty(nameof(IsServer), BindingFlags.NonPublic | BindingFlags.Instance);
-                propInfo!.SetValue(this, newValue);
+                propInfo.SetValue(this, newValue);
             }
 
             public override void ApplyEquippedItemChange(string itemId, string slotId)
@@ -218,21 +218,6 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
             }
 
             protected override void ApplyEquippedItemChanges(Dictionary<string, string> equippedItems)
-            {
-                //Nothing here
-            }
-
-            protected override void NotifyOfItemsAdded(IEnumerable<ItemBase> itemsAdded)
-            {
-                //Nothing here
-            }
-
-            protected override void NotifyOfInventoryFull()
-            {
-                //Nothing here
-            }
-
-            protected override void NotifyOfItemsRemoved(IEnumerable<ItemBase> itemsRemoved)
             {
                 //Nothing here
             }

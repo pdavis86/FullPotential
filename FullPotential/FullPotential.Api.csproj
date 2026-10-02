@@ -137,6 +137,7 @@
     <Compile Include="Assets\Api\Logging\IAuditor.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesCollection.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\LivingEntityState.cs" />
+    <Compile Include="Assets\Api\Gameplay\Inventory\Events\InventoryChangedEvent.cs" />
     <Compile Include="Assets\Api\Input\ReloadInputEvent.cs" />
     <Compile Include="Assets\Api\Items\IItemFactory.cs" />
     <Compile Include="Assets\Api\Registry\Weapons\IWeaponType.cs" />

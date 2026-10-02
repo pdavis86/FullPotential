@@ -48,6 +48,7 @@ csharp_style_unused_value_expression_statement_preference = true:suggestion
 
 dotnet_diagnostic.IDE0010.severity = none # Add missing cases to switch statement
 dotnet_diagnostic.IDE0051.severity = none # Remove unused private member 
+dotnet_diagnostic.IDE0056.severity = none # Use index operator
 dotnet_diagnostic.IDE0058.severity = suggestion # Remove unnecessary expression value
 dotnet_diagnostic.IDE0059.severity = suggestion # Unnecessary assignment of a value
 dotnet_diagnostic.IDE0060.severity = suggestion # Remove unused parameter
@@ -58,9 +59,6 @@ dotnet_code_quality_unused_parameters = all:suggestion
 
 # Unity
 dotnet_diagnostic.UNT0008.severity = error # Unity objects should not use null propagation
-dotnet_diagnostic.UNT0026.severity = warning # GetComponent always allocates
-dotnet_diagnostic.UNT0028.severity = warning # Use non-allocating physics APIs
+dotnet_diagnostic.UNT0026.severity = error # GetComponent always allocates
+dotnet_diagnostic.UNT0028.severity = error # Use non-allocating physics APIs
 dotnet_diagnostic.UNT0039.severity = none # Use RequireComponent attribute when self-invoking GetComponent
-
-# IDE0056: Use index operator
-dotnet_diagnostic.IDE0056.severity = none

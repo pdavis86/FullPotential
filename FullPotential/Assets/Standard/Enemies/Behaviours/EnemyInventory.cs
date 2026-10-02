@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Items.Base;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -15,21 +14,6 @@ namespace FullPotential.Standard.Enemies.Behaviours
         }
 
         protected override void ApplyEquippedItemChanges(Dictionary<string, string> equippedItems)
-        {
-            //Nothing here
-        }
-
-        protected override void NotifyOfItemsAdded(IEnumerable<ItemBase> itemsAdded)
-        {
-            //Nothing here
-        }
-
-        protected override void NotifyOfInventoryFull()
-        {
-            //Nothing here
-        }
-
-        protected override void NotifyOfItemsRemoved(IEnumerable<ItemBase> itemsRemoved)
         {
             //Nothing here
         }

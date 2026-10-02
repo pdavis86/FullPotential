@@ -8,6 +8,7 @@ using Cysharp.Threading.Tasks;
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Obsolete.Items.Base;
@@ -42,6 +43,11 @@ namespace FullPotential.Core.Player
             base.Awake();
 
             _playerFighter = GetComponent<PlayerFighter>();
+
+            _eventBus.SubscribeBehaviour<InventoryChangedEvent>(
+                this,
+                e => e.Inventory == this,
+                HandleInventoryChangeAsync);
         }
 
         #endregion
@@ -201,55 +207,6 @@ namespace FullPotential.Core.Player
             //}
 
             MarkAsDirtyAndAddToQueue();
-        }
-
-        // todo: this should be an event
-        protected override void NotifyOfItemsAdded(IEnumerable<ItemBase> itemsAdded)
-        {
-            var itemsAddedCount = itemsAdded.Count();
-
-            switch (itemsAddedCount)
-            {
-                case 0:
-                    return;
-
-                case 1:
-                    var alert1Text = _localizer.Translate("ui.alert.itemadded");
-                    _playerFighter.ShowAlertForItemsAddedToInventory(string.Format(alert1Text, itemsAdded.First().GetName(_localizer)));
-                    break;
-
-                default:
-                    var alert2Text = _localizer.Translate("ui.alert.itemsadded");
-                    _playerFighter.ShowAlertForItemsAddedToInventory(string.Format(alert2Text, itemsAddedCount));
-                    break;
-            }
-        }
-
-        // todo: this should be an event
-        protected override void NotifyOfInventoryFull()
-        {
-            _playerFighter.AlertInventoryIsFull();
-
-            //todo: zzz v0.7 - send to storage when inventory full
-        }
-
-        // todo: this should be an event
-        protected override void NotifyOfItemsRemoved(IEnumerable<ItemBase> itemsRemoved)
-        {
-            var countRemoved = itemsRemoved.Count(x => x is not ItemStackBase);
-
-            if (countRemoved == 0)
-            {
-                return;
-            }
-
-            _playerFighter.AlertOfInventoryRemovals(countRemoved);
-
-            var craftingUi = GameManager.Instance.UserInterface.GetCharacterMenuUiCraftingTab();
-            if (craftingUi.gameObject.activeSelf)
-            {
-                craftingUi.ResetUi();
-            }
         }
 
         public KeyValuePair<string, EquippedItem>? GetEquippedWithItemId(string itemId)
@@ -588,6 +545,44 @@ namespace FullPotential.Core.Player
         private string GetShapeCodeWithoutLengths(string shapeCode)
         {
             return Regex.Replace(shapeCode, "(:\\d+)", string.Empty);
+        }
+
+        private UniTask HandleInventoryChangeAsync(InventoryChangedEvent eventArgs)
+        {
+            var itemsAddedCount = eventArgs.ItemsAdded.Count;
+
+            switch (itemsAddedCount)
+            {
+                case 0:
+                    return UniTask.CompletedTask;
+
+                case 1:
+                    var alert1Text = _localizer.Translate("ui.alert.itemadded");
+                    _playerFighter.ShowAlertForItemsAddedToInventory(string.Format(alert1Text, eventArgs.ItemsAdded.First().GetName(_localizer)));
+                    break;
+
+                default:
+                    var alert2Text = _localizer.Translate("ui.alert.itemsadded");
+                    _playerFighter.ShowAlertForItemsAddedToInventory(string.Format(alert2Text, itemsAddedCount));
+                    break;
+            }
+
+            var countRemoved = eventArgs.ItemsRemoved.Count(x => x is not ItemStackBase);
+
+            if (countRemoved > 0)
+            {
+                _playerFighter.AlertOfInventoryRemovals(countRemoved);
+            }
+
+            //todo: _playerFighter.AlertInventoryIsFull();
+
+            var craftingUi = GameManager.Instance.UserInterface.GetCharacterMenuUiCraftingTab();
+            if (craftingUi.gameObject.activeSelf)
+            {
+                craftingUi.ResetUi();
+            }
+
+            return UniTask.CompletedTask;
         }
     }
 }

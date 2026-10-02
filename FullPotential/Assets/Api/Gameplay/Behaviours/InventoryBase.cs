@@ -167,9 +167,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            // todo: fire an event instead - TriggerInventoryChangedEvent
-            NotifyOfItemsRemoved(itemsRemoved);
-            NotifyOfItemsAdded(itemsAdded);
+            _eventBus.PublishAsync(new InventoryChangedEvent(this, itemsAdded.ToArray(), itemsRemoved.ToArray())).Forget();
             ApplyEquippedItemChanges(changes.EquippedItems);
 
             return true;
@@ -413,12 +411,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public abstract void ApplyEquippedItemChange(string itemId, string slotId);
 
         protected abstract void ApplyEquippedItemChanges(Dictionary<string, string> equippedItems);
-
-        protected abstract void NotifyOfItemsAdded(IEnumerable<ItemBase> itemsAdded);
-
-        protected abstract void NotifyOfInventoryFull();
-
-        protected abstract void NotifyOfItemsRemoved(IEnumerable<ItemBase> itemsRemoved);
 
         public void ToggleEquippedItemVisuals(string slotId, bool show)
         {
