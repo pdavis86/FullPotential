@@ -3,7 +3,6 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Api.Gameplay.Inventory.Events
 {
-    [RegisterEvent]
     public readonly struct SlotBusyChangeEvent : IEvent
     {
         public FighterBase Fighter { get; }

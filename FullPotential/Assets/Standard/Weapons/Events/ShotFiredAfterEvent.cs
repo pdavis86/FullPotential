@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Weapons.Events
 {
-    [RegisterEvent]
     public readonly struct ShotFiredAfterEvent : IEvent
     {
         public FighterBase Fighter { get; }

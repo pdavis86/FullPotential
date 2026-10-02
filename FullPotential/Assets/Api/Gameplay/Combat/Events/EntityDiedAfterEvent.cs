@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Combat.Events
 {
-    [RegisterEvent]
     public readonly struct EntityDiedAfterEvent : IEvent
     {
         public LivingEntityBase LivingEntity { get; }

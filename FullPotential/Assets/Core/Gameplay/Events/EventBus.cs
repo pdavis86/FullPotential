@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using Cysharp.Threading.Tasks;
 
@@ -29,12 +28,17 @@ namespace FullPotential.Core.Gameplay.Events
 
         public void Register(Type eventArgsType)
         {
-            var attribute = eventArgsType.GetCustomAttribute<RegisterEventAttribute>();
-
-            if (attribute == null)
+            if (!typeof(IEvent).IsAssignableFrom(eventArgsType))
             {
-                _logger.Error("The type '{0}' is missing the attribute '{1}'", eventArgsType, nameof(RegisterEventAttribute));
+                _logger.Error("The type '{0}' does not implement {1}", eventArgsType, nameof(IEvent));
                 return;
+            }
+
+            var isReadOnlyStruct = eventArgsType.IsValueType
+                && eventArgsType.GetCustomAttributesData().Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute");
+            if (!isReadOnlyStruct)
+            {
+                _logger.Warn("The type '{0}' is not a readonly struct. It will degrade performance", eventArgsType);
             }
 
             var groupType = typeof(EventHandlerGroup<>).MakeGenericType(eventArgsType);

@@ -3,7 +3,6 @@ using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Api.Input
 {
-    [RegisterEvent]
     public readonly struct AttackHoldInputEvent : IEvent
     {
         public FighterBase Fighter { get; }

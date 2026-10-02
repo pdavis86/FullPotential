@@ -4,7 +4,6 @@ using FullPotential.Api.Obsolete.Items.Types;
 
 namespace FullPotential.Api.Input
 {
-    [RegisterEvent]
     public readonly struct ReloadInputEvent : IEvent
     {
         public FighterBase Fighter { get; }

@@ -364,7 +364,7 @@ namespace FullPotential.Core.Registry
         {
             var eventTypes = assembly
                 .GetTypes()
-                .Where(t => t.GetCustomAttribute<RegisterEventAttribute>() != null)
+                .Where(t => t != typeof(IEvent) && typeof(IEvent).IsAssignableFrom(t))
                 .ToList();
 
             foreach (var eventType in eventTypes)
