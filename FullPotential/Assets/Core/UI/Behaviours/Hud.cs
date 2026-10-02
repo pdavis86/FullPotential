@@ -25,7 +25,6 @@ using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
-using FullPotential.Core.Player.Events;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.UI.Behaviours;
 
@@ -316,7 +315,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private UniTask<HandlerResult> HandleLocalPlayerSpawnAsync(LocalPlayerSpawnedEvent eventArgs)
         {
-            _playerFighter = eventArgs.Fighter;
+            _playerFighter = (PlayerFighter)eventArgs.Fighter;
 
             GameManager.Instance.UserInterface.Respawn.SetActive(false);
             GameManager.Instance.UserInterface.Hud.SetActive(true);

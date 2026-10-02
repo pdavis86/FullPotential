@@ -10,8 +10,11 @@ using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.Events;
+using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Obsolete;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity;
@@ -21,7 +24,6 @@ using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Environment;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.GameManagement.Data;
-using FullPotential.Core.Player.Events;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Models.Player;
 
@@ -136,6 +138,16 @@ namespace FullPotential.Core.Player
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
             _shaderUtilities = DependenciesContext.Dependencies.GetService<IShaderUtilities>();
 
+            _eventBus.SubscribeBehaviour<PlayerJoinedEvent>(
+                this,
+                e => e.OwnerClientId == OwnerClientId,
+                HandlePlayerJoinedAsync);
+
+            _eventBus.SubscribeBehaviour<InventoryChangedEvent>(
+                this,
+                e => e.Inventory == this,
+                HandleInventoryChangeAsync);
+
             HealthBarSlider = _healthSlider;
         }
 
@@ -185,6 +197,11 @@ namespace FullPotential.Core.Player
             _myHeight = gameObjectCollider.bounds.max.y - gameObjectCollider.bounds.min.y;
 
             QueueAliveStateChanges();
+
+            if (IsServer)
+            {
+                await _eventBus.PublishAsync(new PlayerJoinedEvent(Username, transform.position, OwnerClientId));
+            }
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -290,24 +307,11 @@ namespace FullPotential.Core.Player
             switch (state)
             {
                 case LivingEntityState.Dead:
-                    if (OwnerClientId == NetworkManager.LocalClientId)
-                    {
-                        // todo: this should be an event
-                        GameManager.Instance.UserInterface.HideAllMenus();
-                        _aliveStateChanges.PlayForwards(false);
-                    }
-
                     _graphicsTransform.gameObject.SetActive(false);
 
                     break;
 
                 case LivingEntityState.Respawning:
-                    if (OwnerClientId == NetworkManager.LocalClientId)
-                    {
-                        // todo: this should be an event
-                        _aliveStateChanges.PlayBackwards(true);
-                    }
-
                     var bodyMaterialForRespawn = _bodyMeshRenderer.material;
                     _shaderUtilities.ChangeRenderMode(bodyMaterialForRespawn, ShaderRenderMode.Fade);
                     // ReSharper disable once Unity.PreferAddressByIdToGraphicsParams
@@ -336,9 +340,13 @@ namespace FullPotential.Core.Player
 
         private void PlayerSpawnStateChange(LivingEntityState state, Vector3 position, Quaternion rotation)
         {
+            HandleLivingEntityStateOnClient();
+
             switch (state)
             {
                 case LivingEntityState.Dead:
+                    _aliveStateChanges.PlayForwards(false);
+
                     RigidBody.isKinematic = true;
                     RigidBody.useGravity = false;
                     GetComponent<Collider>().enabled = false;
@@ -348,6 +356,8 @@ namespace FullPotential.Core.Player
                     break;
 
                 case LivingEntityState.Respawning:
+                    _aliveStateChanges.PlayBackwards(true);
+
                     var sceneService = _gameManager.GetSceneBehaviour().GetSceneService();
                     transform.position = sceneService.GetHeightAdjustedPosition(position, _myHeight);
 
@@ -369,6 +379,26 @@ namespace FullPotential.Core.Player
             }
         }
 
+        // todo: UI stuff needs to be moved out
+        private void HandleLivingEntityStateOnClient()
+        {
+            if (NetworkManager.LocalClientId != OwnerClientId)
+            {
+                return;
+            }
+
+            if (AliveState == LivingEntityState.Dead)
+            {
+                GameManager.Instance.UserInterface.HideAllMenus();
+            }
+
+            var isAlive = AliveState is LivingEntityState.Alive or LivingEntityState.Respawning;
+
+            _unityHelperUtilities.GetObjectAtRoot(GameObjectNames.SceneCamera).SetActive(!isAlive);
+            GameManager.Instance.UserInterface.Hud.SetActive(isAlive);
+            GameManager.Instance.UserInterface.Respawn.SetActive(!isAlive);
+        }
+
         private void QueueAliveStateChanges()
         {
             _aliveStateChanges = new ActionQueue<bool>();
@@ -386,27 +416,6 @@ namespace FullPotential.Core.Player
                 foreach (var obj in _gameObjectsForRespawn)
                 {
                     obj.SetActive(isAlive);
-                }
-            });
-
-            // todo: this should be an event
-            _aliveStateChanges.Queue(isAlive => _unityHelperUtilities.GetObjectAtRoot(GameObjectNames.SceneCamera).SetActive(!isAlive));
-
-            // todo: this should be an event
-            _aliveStateChanges.Queue(isAlive =>
-            {
-                if (NetworkManager.LocalClientId == OwnerClientId)
-                {
-                    GameManager.Instance.UserInterface.Hud.SetActive(isAlive);
-                }
-            });
-
-            // todo: this should be an event
-            _aliveStateChanges.Queue(isAlive =>
-            {
-                if (NetworkManager.LocalClientId == OwnerClientId)
-                {
-                    GameManager.Instance.UserInterface.Respawn.SetActive(!isAlive);
                 }
             });
         }
@@ -467,14 +476,14 @@ namespace FullPotential.Core.Player
             // todo: zzz v0.6 - clean out anything stopping data loading from being async
             LoadFromCharacterData(playerData);
             Inventory.LoadInventory(inventoryData);
+        }
 
-            // todo: playerjoined should be an event
-            if (IsServer)
-            {
-                var msg = _localizer.Translate("ui.alert.playerjoined", Username);
-                var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, OwnerClientId);
-                ShowHudAlertClientRpc(msg, nearbyClients);
-            }
+        private UniTask HandlePlayerJoinedAsync(PlayerJoinedEvent eventArgs)
+        {
+            var msg = _localizer.Translate("ui.alert.playerjoined", eventArgs.Username);
+            var nearbyClients = _rpcService.ForNearbyPlayersExcept(eventArgs.Position, eventArgs.OwnerClientId);
+            ShowHudAlertClientRpc(msg, nearbyClients);
+            return UniTask.CompletedTask;
         }
 
         private void LoadFromCharacterData(CharacterData playerData)
@@ -657,29 +666,6 @@ namespace FullPotential.Core.Player
             BodyParts.RightArm.GetComponent<MeshRenderer>().material = material;
         }
 
-        #region UI Updates
-
-        // todo: this should be an event handler
-        public void ShowAlertForItemsAddedToInventory(string alertText)
-        {
-            ShowHudAlertClientRpc(alertText, _clientRpcParams);
-        }
-
-        // todo: this should be an event handler
-        public void AlertOfInventoryRemovals(int itemsRemovedCount)
-        {
-            var message = _localizer.Translate("ui.alert.itemsremoved");
-            ShowHudAlertClientRpc(string.Format(message, itemsRemovedCount), _clientRpcParams);
-        }
-
-        // todo: this should be an event handler
-        public void AlertInventoryIsFull()
-        {
-            ShowHudAlertClientRpc(_localizer.Translate("ui.alert.itemsatmax"), _clientRpcParams);
-        }
-
-        #endregion
-
         public CharacterData GetCharacterData()
         {
             var saveData = new CharacterData
@@ -726,6 +712,46 @@ namespace FullPotential.Core.Player
             {
                 GameManager.Instance.Quit();
             }
+        }
+
+        private UniTask HandleInventoryChangeAsync(InventoryChangedEvent eventArgs)
+        {
+            var itemsAddedCount = eventArgs.ItemsAdded.Count;
+
+            switch (itemsAddedCount)
+            {
+                case 0:
+                    return UniTask.CompletedTask;
+
+                case 1:
+                    var alert1Text = _localizer.Translate("ui.alert.itemadded");
+                    ShowHudAlertClientRpc(string.Format(alert1Text, eventArgs.ItemsAdded.First().GetName(_localizer)), _clientRpcParams);
+                    break;
+
+                default:
+                    var alert2Text = _localizer.Translate("ui.alert.itemsadded");
+                    ShowHudAlertClientRpc(string.Format(alert2Text, itemsAddedCount), _clientRpcParams);
+                    break;
+            }
+
+            var countRemoved = eventArgs.ItemsRemoved.Count(x => x is not ItemStackBase);
+
+            if (countRemoved > 0)
+            {
+                var message = _localizer.Translate("ui.alert.itemsremoved");
+                ShowHudAlertClientRpc(string.Format(message, countRemoved), _clientRpcParams);
+            }
+
+            // todo: _playerFighter.AlertInventoryIsFull();
+            //ShowHudAlertClientRpc(_localizer.Translate("ui.alert.itemsatmax"), _clientRpcParams);
+
+            var craftingUi = GameManager.Instance.UserInterface.GetCharacterMenuUiCraftingTab();
+            if (craftingUi.gameObject.activeSelf)
+            {
+                craftingUi.ResetUi();
+            }
+
+            return UniTask.CompletedTask;
         }
     }
 }

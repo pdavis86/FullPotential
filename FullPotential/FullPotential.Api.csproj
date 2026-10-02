@@ -128,6 +128,7 @@
     <Compile Include="Assets\Api\Unity\Constants\GameObjectNames.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IAccessoryType.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\GameObjectExtensions.cs" />
+    <Compile Include="Assets\Api\Gameplay\Events\LocalPlayerSpawnedEvent.cs" />
     <Compile Include="Assets\Api\Localization\ILocalizer.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IAttributeEffect.cs" />
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
@@ -164,6 +165,7 @@
     <Compile Include="Assets\Api\Unity\Extensions\Vector2Extensions.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IResourceEffectType.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\IEvent.cs" />
+    <Compile Include="Assets\Api\Gameplay\Events\PlayerJoinedEvent.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector3Extensions.cs" />
     <Compile Include="Assets\Api\Utilities\MathsHelper.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IMovementEffectType.cs" />
