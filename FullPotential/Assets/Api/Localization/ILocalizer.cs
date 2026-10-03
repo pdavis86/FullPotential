@@ -23,7 +23,7 @@ namespace FullPotential.Api.Localization
 
         string Translate(IRegisterableType registeredItem);
 
-        string Translate(string id, params object[] arguments);
+        string Translate(string id, params string[] arguments);
 
         string Translate(int number);
 

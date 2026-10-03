@@ -187,7 +187,7 @@ namespace FullPotential.Standard.Weapons.Helpers
 
             if (consumer.Targeting.IsContinuous)
             {
-                slotStatus.IsConsumingResource = true;
+                slotStatus.StartActiveConsumerBehaviour();
             }
 
             fighter.ConsumeResource(consumer);

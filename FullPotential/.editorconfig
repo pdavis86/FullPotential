@@ -49,6 +49,7 @@ csharp_style_unused_value_expression_statement_preference = true:suggestion
 dotnet_diagnostic.IDE0010.severity = none # Add missing cases to switch statement
 dotnet_diagnostic.IDE0051.severity = none # Remove unused private member 
 dotnet_diagnostic.IDE0056.severity = none # Use index operator
+dotnet_diagnostic.IDE0057.severity = none # Use range operator
 dotnet_diagnostic.IDE0058.severity = suggestion # Remove unnecessary expression value
 dotnet_diagnostic.IDE0059.severity = suggestion # Unnecessary assignment of a value
 dotnet_diagnostic.IDE0060.severity = suggestion # Remove unused parameter

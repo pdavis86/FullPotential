@@ -284,7 +284,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 lootDrop.Shape = GetRandomShapeOrNone();
             }
 
-
+            // todo: use client's culture, not the server's
             var typeTranslation = _localizer.Translate("crafting.loot.type");
             var suffix = int.Parse(lootDrop.GetNameHash().ToString().TrimStart('-').Substring(5));
 
@@ -346,14 +346,9 @@ namespace FullPotential.Core.Gameplay.Crafting
                 + (consumer.Shape != null ? " " + _localizer.Translate(consumer.Shape) : null)
                 + " " + _localizer.Translate(TranslationType.ItemType, nameof(Consumer));
 
-            if (consumer.Effects.Count > 0)
-            {
-                consumer.Name = _localizer.Translate(consumer.Effects.First()) + " " + suffix;
-            }
-            else
-            {
-                consumer.Name = GetItemName(true, consumer, suffix);
-            }
+            consumer.Name = consumer.Effects.Count > 0
+                ? _localizer.Translate(consumer.Effects.First()) + " " + suffix
+                : GetItemName(true, consumer, suffix);
 
             return consumer;
         }

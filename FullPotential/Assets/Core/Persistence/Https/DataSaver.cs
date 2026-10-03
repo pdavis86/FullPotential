@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Net.Mime;
 
 using Cysharp.Threading.Tasks;
@@ -74,7 +74,7 @@ namespace FullPotential.Core.Persistence.Https
 
         public UniTask<List<ItemData>> SaveInventoryAdditionsAndDeletionsAsync(string characterId, List<ItemData> newItems)
         {
-            // todo: SaveInventoryAdditionsAndDeletionsAsync()
+            // todo: zzz v0.8 - HTTPS SaveInventoryAdditionsAndDeletionsAsync()
             throw new System.NotImplementedException();
         }
 

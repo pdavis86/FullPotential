@@ -135,10 +135,7 @@ namespace FullPotential.Core.Gameplay.Events
                 return;
             }
 
-            if (_logger.IsEnabled(AuditLevel.Debug))
-            {
-                _logger.Debug("Event with args type '{0}' was published", argsType);
-            }
+            _logger.Debug("Event with args type '{0}' was published", argsType);
 
             var isServer = NetworkManager.Singleton.IsServer;
             var isClient = NetworkManager.Singleton.IsClient;

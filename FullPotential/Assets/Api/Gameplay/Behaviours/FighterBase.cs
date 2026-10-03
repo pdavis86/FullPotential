@@ -74,7 +74,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             base.Start();
 
-            // todo: how do we add DelayedAction instances from mods?
+            // todo: zzz v0.6 - how do we add DelayedAction instances from mods?
             _consumeResource = new DelayedAction(.5f, () =>
             {
                 foreach (var kvp in _slotStatuses)

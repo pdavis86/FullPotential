@@ -30,11 +30,9 @@ namespace FullPotential.Api.Gameplay.Player
 
         public bool IsBusy { get; private set; }
 
-        // todo: private set?
-        public bool IsConsumingResource { get; set; }
+        public bool IsConsumingResource { get; private set; }
 
-        // todo: private set?
-        public bool IsIntraActionLooping { get; set; }
+        public bool IsIntraActionLooping { get; private set; }
 
         public SlotStatus(IAuditorFactory auditorFactory, IEventBus eventBus)
         {
@@ -175,6 +173,11 @@ namespace FullPotential.Api.Gameplay.Player
             _logger.Debug("StopCooldownLoop");
 
             _postActionCts?.Cancel();
+        }
+
+        public void StartActiveConsumerBehaviour()
+        {
+            IsConsumingResource = true;
         }
 
         public bool StopActiveConsumerBehaviour()

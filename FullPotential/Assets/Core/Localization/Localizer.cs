@@ -16,6 +16,8 @@ using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Localization.Models;
 
+using Unity.Netcode;
+
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -183,6 +185,11 @@ namespace FullPotential.Core.Localization
 
         public string Translate(string id)
         {
+            if (NetworkManager.Singleton.IsConnectedClient && !NetworkManager.Singleton.IsClient)
+            {
+                _logger.Warn("Translate was called on the server instead of the client for id '{0}'", id);
+            }
+
             if (_isLoadingTranslations)
             {
                 return "...";
@@ -212,9 +219,11 @@ namespace FullPotential.Core.Localization
             return "Unexpected IRegisterable type";
         }
 
-        public string Translate(string id, params object[] arguments)
+        public string Translate(string id, params string[] arguments)
         {
-            return string.Format(Translate(id), arguments);
+            return arguments != null && arguments.Length > 0
+                ? string.Format(Translate(id), arguments)
+                : Translate(id);
         }
 
         public string Translate(int input)

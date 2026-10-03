@@ -1,6 +1,7 @@
-﻿using FullPotential.Api.Gameplay.Inventory;
+﻿using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Gameplay.Player.Events;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
@@ -8,6 +9,7 @@ using FullPotential.Core.Player;
 using FullPotential.Core.Ui.Behaviours;
 using FullPotential.Core.Ui.Components;
 using FullPotential.Core.UI.Events;
+
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
@@ -25,7 +27,7 @@ namespace FullPotential.Core.UI.Behaviours
 
         //Services
         private IAuditor _logger;
-        private ILocalizer _localizer;
+        private IEventBus _eventBus;
 
         private PlayerFighter _playerFighter;
         private CharacterMenuUi _characterMenuUi;
@@ -35,7 +37,7 @@ namespace FullPotential.Core.UI.Behaviours
         private void Awake()
         {
             _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
-            _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+            _eventBus = DependenciesContext.Dependencies.GetService<IEventBus>();
 
             _playerFighter = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerFighter>();
 
@@ -97,7 +99,7 @@ namespace FullPotential.Core.UI.Behaviours
 
             if (!success)
             {
-                GameManager.Instance.GetUserInterface().HudOverlay.ShowAlert(_localizer.Translate("ui.drawingpad.alreadyinuse"));
+                _eventBus.Publish(new ShowUiAlertEvent("ui.drawingpad.alreadyinuse"));
                 return;
             }
 

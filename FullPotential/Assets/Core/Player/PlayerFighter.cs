@@ -250,7 +250,6 @@ namespace FullPotential.Core.Player
             AliveState = LivingEntityState.Respawning;
             _eventBus.Publish(new AliveStateChangeEvent(this, true, true));
 
-            // todo: move this
             var spawnPoint = GameManager.Instance.GetSceneBehaviour().GetSpawnPoint();
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             PlayerSpawnStateChangeClientRpc(AliveState, spawnPoint.Position, spawnPoint.Rotation, nearbyClients);
@@ -467,9 +466,8 @@ namespace FullPotential.Core.Player
 
         private UniTask HandlePlayerJoinedAsync(PlayerJoinedEvent eventArgs)
         {
-            var msg = _localizer.Translate("ui.alert.playerjoined", eventArgs.Username);
             var nearbyClients = _rpcService.ForNearbyPlayersExcept(eventArgs.Position, eventArgs.OwnerClientId);
-            ShowHudAlertClientRpc(msg, nearbyClients);
+            ShowHudAlertClientRpc("ui.alert.playerjoined", eventArgs.Username, clientRpcParams: nearbyClients);
             return UniTask.CompletedTask;
         }
 
@@ -702,13 +700,12 @@ namespace FullPotential.Core.Player
                     return UniTask.CompletedTask;
 
                 case 1:
-                    var alert1Text = _localizer.Translate("ui.alert.itemadded");
-                    ShowHudAlertClientRpc(string.Format(alert1Text, eventArgs.ItemsAdded.First().GetName(_localizer)), _clientRpcParams);
+                    // todo: zzz v0.6 - fix use of localizer on server
+                    ShowHudAlertClientRpc("ui.alert.itemadded", eventArgs.ItemsAdded.First().GetName(_localizer), clientRpcParams: _clientRpcParams);
                     break;
 
                 default:
-                    var alert2Text = _localizer.Translate("ui.alert.itemsadded");
-                    ShowHudAlertClientRpc(string.Format(alert2Text, itemsAddedCount), _clientRpcParams);
+                    ShowHudAlertClientRpc("ui.alert.itemsadded", itemsAddedCount.ToString(), clientRpcParams: _clientRpcParams);
                     break;
             }
 
@@ -716,12 +713,11 @@ namespace FullPotential.Core.Player
 
             if (countRemoved > 0)
             {
-                var message = _localizer.Translate("ui.alert.itemsremoved");
-                ShowHudAlertClientRpc(string.Format(message, countRemoved), _clientRpcParams);
+                ShowHudAlertClientRpc("ui.alert.itemsremoved", countRemoved.ToString(), clientRpcParams: _clientRpcParams);
             }
 
-            // todo: _playerFighter.AlertInventoryIsFull();
-            //ShowHudAlertClientRpc(_localizer.Translate("ui.alert.itemsatmax"), _clientRpcParams);
+            // todo: zzz v0.7 - _playerFighter.AlertInventoryIsFull();
+            //ShowHudAlertClientRpc(_clientRpcParams, "ui.alert.itemsatmax");
 
             return UniTask.CompletedTask;
         }

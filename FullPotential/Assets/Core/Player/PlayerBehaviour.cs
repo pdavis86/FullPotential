@@ -12,6 +12,7 @@ using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.Events;
+using FullPotential.Api.Gameplay.Player.Events;
 using FullPotential.Api.Gameplay.Player.Models;
 using FullPotential.Api.Input;
 using FullPotential.Api.Ioc;
@@ -551,7 +552,7 @@ namespace FullPotential.Core.Player
 
             if (item == null)
             {
-                GameManager.Instance.GetUserInterface().HudOverlay.ShowAlert(_localizer.Translate("ui.drawingpad.nomatch"));
+                _eventBus.Publish(new ShowUiAlertEvent("ui.drawingpad.nomatch"));
                 return;
             }
 

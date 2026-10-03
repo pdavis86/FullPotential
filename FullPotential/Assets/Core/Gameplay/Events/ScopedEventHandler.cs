@@ -28,7 +28,7 @@ namespace FullPotential.Core.Gameplay.Events
 
         public bool IsSupposedToRun(TEvent eventArgs)
         {
-            return FilterFunction(eventArgs);
+            return FilterFunction == null || FilterFunction(eventArgs);
         }
 
         public UniTask HandleEventAsync(TEvent eventArgs)

@@ -10,6 +10,7 @@ using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Gameplay.Player;
+using FullPotential.Api.Gameplay.Player.Events;
 using FullPotential.Api.Input;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
@@ -29,6 +30,8 @@ using FullPotential.Core.Ui.Components;
 using FullPotential.Core.UI.Behaviours;
 
 using TMPro;
+
+using Unity.Netcode;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -120,17 +123,31 @@ namespace FullPotential.Core.Ui.Behaviours
 
         #endregion
 
-        public void ShowAlert(string alertText)
+        private UniTask ShowAlertAsync(ShowUiAlertEvent eventArgs)
         {
+            if (!NetworkManager.Singleton.IsClient)
+            {
+                _logger.Error("ShowAlertAsync was called on the server");
+            }
+
+            if (eventArgs.Template.IsNullOrWhiteSpace())
+            {
+                _logger.Warn("ShowAlertAsync was called with no alert text");
+                return UniTask.CompletedTask;
+            }
+
             var alertCount = _alertsContainer.transform.childCount;
             if (alertCount >= 5)
             {
                 Destroy(_alertsContainer.transform.GetChild(0).gameObject);
             }
 
-            var alert = Instantiate(_alertPrefab, _alertsContainer.transform);
+            var alertText = _localizer.Translate(eventArgs.Template, eventArgs.Arguments);
 
+            var alert = Instantiate(_alertPrefab, _alertsContainer.transform);
             alert.GetComponent<SlideOutAlert>().Text.text = alertText;
+
+            return UniTask.CompletedTask;
         }
 
         public void ToggleDrawingMode(bool isOn)
@@ -311,6 +328,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _eventBus.SubscribeBehaviour<ActiveEffectAddedEvent>(this, e => e.LivingEntity == _playerFighter, HandleActiveEffectAddedAsync);
             _eventBus.SubscribeBehaviour<ActiveEffectUpdatedEvent>(this, e => e.LivingEntity == _playerFighter, HandleActiveEffectUpdatedAsync);
             _eventBus.SubscribeBehaviour<EntityDiedAfterEvent>(this, e => e.LivingEntity == _playerFighter, HandleEntityDiedAsync);
+            _eventBus.SubscribeBehaviour<ShowUiAlertEvent>(this, null, ShowAlertAsync);
         }
 
         private UniTask<HandlerResult> HandleLocalPlayerSpawnAsync(LocalPlayerSpawnedEvent eventArgs)

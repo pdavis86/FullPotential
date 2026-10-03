@@ -277,6 +277,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public List<string> ValidateIsCraftable(string[] componentIds, ItemBase itemToCraft)
         {
+            // todo: zzz v0.6 - check these translations are being done client-side
+
             if (componentIds == null || componentIds.Length == 0)
             {
                 return new List<string> { _localizer.Translate("crafting.error.nocomponents") };

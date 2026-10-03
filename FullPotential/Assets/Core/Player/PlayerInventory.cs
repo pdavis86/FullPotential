@@ -88,19 +88,6 @@ namespace FullPotential.Core.Player
             }
         }
 
-        // todo: This should be an event
-        private async UniTask ResetEquipmentUiAsync()
-        {
-            await UniTask.WaitForSeconds(0.1f);
-
-            var equipmentUi = GameManager.Instance.UserInterface.GetCharacterMenuUiEquipmentTab();
-
-            if (equipmentUi.gameObject.activeSelf)
-            {
-                equipmentUi.ResetEquipmentUi(true);
-            }
-        }
-
         public IEnumerable<ItemBase> GetHandItems()
         {
             return _items
@@ -179,26 +166,6 @@ namespace FullPotential.Core.Player
 
                 SpawnEquippedObject(item, slotId);
             }
-
-            if (NetworkManager.LocalClientId == OwnerClientId)
-            {
-                ResetEquipmentUiAsync().Forget();
-            }
-            //else if (!IsServer)
-            //{
-            //    var keysToRemove = new List<string>();
-            //    foreach (var kvp in _items)
-            //    {
-            //        if (GetEquippedWithItemId(kvp.Key) == null)
-            //        {
-            //            keysToRemove.Add(kvp.Key);
-            //        }
-            //    }
-            //    foreach (var key in keysToRemove)
-            //    {
-            //        _items.Remove(key);
-            //    }
-            //}
 
             MarkAsDirtyAndAddToQueue();
         }

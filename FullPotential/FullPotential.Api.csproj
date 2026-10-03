@@ -58,6 +58,7 @@
     <Compile Include="Assets\Api\Registry\Gear\ISpecialGearVisuals.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\SlotStatus.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\Events\AliveStateChangeEvent.cs" />
+    <Compile Include="Assets\Api\Gameplay\Player\Events\ShowUiAlertEvent.cs" />
     <Compile Include="Assets\Api\Data\ISaveable.cs" />
     <Compile Include="Assets\Api\Obsolete\Items\Types\Armor.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\EventSubscription.cs" />

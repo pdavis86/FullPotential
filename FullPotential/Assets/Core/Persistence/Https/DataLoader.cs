@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Cysharp.Threading.Tasks;
@@ -109,7 +109,7 @@ namespace FullPotential.Core.Persistence.Https
 
         public UniTask<List<ItemData>> GetInventoryItemDataAsync(string characterId, IEnumerable<string> itemIds)
         {
-            // todo: GetInventoryItemDataAsync()
+            // todo: zzz v0.8 - HTTPS GetInventoryItemDataAsync()
             throw new NotImplementedException();
         }
 

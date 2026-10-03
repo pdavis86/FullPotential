@@ -11,6 +11,7 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Gameplay.Player.Events;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
@@ -199,18 +200,15 @@ namespace FullPotential.Api.Gameplay.Behaviours
             AddOrUpdateEffect(effect, change, expiry);
         }
 
-        // todo: should this be the generalised RPC?
         // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
-        protected void ShowHudAlertClientRpc(string announcement, ClientRpcParams clientRpcParams)
+        protected void ShowHudAlertClientRpc(
+            string announcement,
+            string argument1 = null,
+            string argument2 = null,
+            ClientRpcParams clientRpcParams = default)
         {
-            // todo: Use events instead of ShowHudAlertClientRpc
-            if (announcement.IsNullOrWhiteSpace())
-            {
-                return;
-            }
-
-            _gameManager.GetUserInterface().HudOverlay.ShowAlert(announcement);
+            _eventBus.Publish(new ShowUiAlertEvent(announcement, new[] { argument1, argument2 }));
         }
 
         // ReSharper disable once UnusedParameter.Global
@@ -498,6 +496,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
+            // todo: zzz v0.6 - fix use of localizer on server
             var cause = _localizer.Translate(contactPoint.normal == Vector3.up
                 ? "ui.alert.falldamage"
                 : "ui.alert.environmentaldamage");
