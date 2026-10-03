@@ -68,6 +68,7 @@
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingBehaviour.cs" />
     <Compile Include="Assets\Api\Items\ItemFactory.cs" />
     <Compile Include="Assets\Api\Data\IUserManagement.cs" />
+    <Compile Include="Assets\Api\GameManagement\IService.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\CombatResult.cs" />
     <Compile Include="Assets\Api\Ui\IUserInterface.cs" />
     <Compile Include="Assets\Api\Gameplay\Drawing\IDrawingService.cs" />
