@@ -284,7 +284,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 lootDrop.Shape = GetRandomShapeOrNone();
             }
 
-            // todo: use client's culture, not the server's
+            // todo: zzz v0.6 - use client's culture, not the server's
             var typeTranslation = _localizer.Translate("crafting.loot.type");
             var suffix = int.Parse(lootDrop.GetNameHash().ToString().TrimStart('-').Substring(5));
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using UnityEngine.AddressableAssets;
 
 namespace FullPotential.Core.GameManagement
@@ -8,7 +9,7 @@ namespace FullPotential.Core.GameManagement
     public class AddressablesManager
     {
         public List<string> ModPrefixes { get; }
-        
+
         public Dictionary<string, List<string>> LocalisationAddresses { get; }
 
         public AddressablesManager()
@@ -29,7 +30,7 @@ namespace FullPotential.Core.GameManagement
         {
             const string suffix = "/Registration";
 
-            var modRegistrationAddresses = stringKeys.Where(x =>  x.EndsWith(suffix));
+            var modRegistrationAddresses = stringKeys.Where(x => x.EndsWith(suffix));
 
             if (!modRegistrationAddresses.Any())
             {
