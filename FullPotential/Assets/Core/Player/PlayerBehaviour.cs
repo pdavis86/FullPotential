@@ -8,8 +8,10 @@ using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Gameplay.Player.Models;
 using FullPotential.Api.Input;
 using FullPotential.Api.Ioc;
@@ -20,6 +22,7 @@ using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete.Items;
 using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Ui;
+using FullPotential.Api.Unity;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
@@ -62,7 +65,7 @@ namespace FullPotential.Core.Player
         private IItemFactory _itemFactory;
         private IDataSaver _dataSaver;
         private IRpcService _rpcService;
-
+        private IUnityHelperUtilities _unityHelperUtilities;
         private bool _hasMenuOpen;
         private UserInterface _userInterface;
         private bool _toggleGameMenu;
@@ -89,11 +92,19 @@ namespace FullPotential.Core.Player
             _itemFactory = DependenciesContext.Dependencies.GetService<IItemFactory>();
             _dataSaver = DependenciesContext.Dependencies.GetService<IDataSaver>();
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
+            _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
 
             _userInterface = GameManager.Instance.UserInterface;
             _drawingPadUi = _userInterface.DrawingPad.GetComponent<DrawingPadUi>();
 
             _drawingPadUi.OnDrawingStop += HandleOnDrawingStop;
+
+            GameManager.Instance.UserInterface.Hud.SetActive(true);
+
+            if (Debug.isDebugBuild)
+            {
+                GameManager.Instance.UserInterface.DebuggingOverlay.SetActive(true);
+            }
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -129,9 +140,24 @@ namespace FullPotential.Core.Player
             UpdateMenuStates();
         }
 
+        private void OnEnable()
+        {
+            _eventBus.SubscribeBehaviour<AliveStateChangeEvent>(
+                this,
+                e => e.LivingEntity == _playerFighter,
+                HandleAliveStateChangeAsync);
+
+            _eventBus.SubscribeBehaviour<InventoryChangedEvent>(
+                this,
+                e => e.Inventory == _playerFighter.Inventory,
+                HandleInventoryChangeAsync);
+        }
+
         // ReSharper disable once UnusedMember.Local
         private void OnDisable()
         {
+            _eventBus.UnsubscribeBehaviour(this);
+
             if (!IsOwner)
             {
                 return;
@@ -566,7 +592,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            _eventBus.PublishAsync(new AttackHoldInputEvent(_playerFighter, slotId));
+            _eventBus.Publish(new AttackHoldInputEvent(_playerFighter, slotId));
 
             if (!IsHost)
             {
@@ -577,7 +603,7 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         public void AttackHoldServerRpc(string slotId)
         {
-            _eventBus.PublishAsync(new AttackHoldInputEvent(_playerFighter, slotId));
+            _eventBus.Publish(new AttackHoldInputEvent(_playerFighter, slotId));
         }
 
         private void HandleAttackRelease(string slotId)
@@ -595,7 +621,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            _eventBus.PublishAsync(new AttackReleaseInputEvent(_playerFighter, slotId));
+            _eventBus.Publish(new AttackReleaseInputEvent(_playerFighter, slotId));
 
             if (!IsHost)
             {
@@ -606,12 +632,12 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         public void AttackReleaseServerRpc(string slotId)
         {
-            _eventBus.PublishAsync(new AttackReleaseInputEvent(_playerFighter, slotId));
+            _eventBus.Publish(new AttackReleaseInputEvent(_playerFighter, slotId));
         }
 
         private void HandleReload(string slotId)
         {
-            _eventBus.PublishAsync(new ReloadInputEvent(_playerFighter, slotId));
+            _eventBus.Publish(new ReloadInputEvent(_playerFighter, slotId));
 
             if (!IsHost)
             {
@@ -622,7 +648,36 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         public void ReloadServerRpc(string slotId)
         {
-            _eventBus.PublishAsync(new ReloadInputEvent(_playerFighter, slotId));
+            _eventBus.Publish(new ReloadInputEvent(_playerFighter, slotId));
+        }
+
+        private UniTask HandleAliveStateChangeAsync(AliveStateChangeEvent eventArgs)
+        {
+            if (NetworkManager.LocalClientId != OwnerClientId)
+            {
+                return UniTask.CompletedTask;
+            }
+
+            if (!eventArgs.IsAlive)
+            {
+                GameManager.Instance.UserInterface.HideAllMenus();
+            }
+
+            _unityHelperUtilities.GetObjectAtRoot(GameObjectNames.SceneCamera).SetActive(!eventArgs.IsAlive);
+            GameManager.Instance.UserInterface.Hud.SetActive(eventArgs.IsAlive);
+            GameManager.Instance.UserInterface.Respawn.SetActive(!eventArgs.IsAlive);
+
+            return UniTask.CompletedTask;
+        }
+
+        private UniTask HandleInventoryChangeAsync(InventoryChangedEvent eventArgs)
+        {
+            var craftingUi = GameManager.Instance.UserInterface.GetCharacterMenuUiCraftingTab();
+            if (craftingUi.gameObject.activeSelf)
+            {
+                craftingUi.ResetUi();
+            }
+            return UniTask.CompletedTask;
         }
     }
 }

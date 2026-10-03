@@ -29,7 +29,7 @@ namespace FullPotential.Standard.Weapons.Helpers
                 && itemWithCharge.IsChargePercentageUsed
                 && itemWithCharge.ChargePercentage <= 0)
             {
-                _eventBus.PublishAsync(new AttackHoldInputEvent(eventArgs.Fighter, eventArgs.SlotId));
+                _eventBus.Publish(new AttackHoldInputEvent(eventArgs.Fighter, eventArgs.SlotId));
                 return UniTask.FromResult(new HandlerResult(NextAction.Cancel));
             }
 

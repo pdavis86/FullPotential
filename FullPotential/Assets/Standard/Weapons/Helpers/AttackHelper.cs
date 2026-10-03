@@ -121,7 +121,7 @@ namespace FullPotential.Standard.Weapons.Helpers
 
             var hitGameObject = rangedHit.transform != null ? rangedHit.transform.gameObject : null;
             var eventArgs = new ShotFiredAfterEvent(fighter, slotId, handPosition, endPos, ammoUsed, hitGameObject);
-            _eventBus.PublishAsync(eventArgs).Forget();
+            _eventBus.Publish(eventArgs);
 
             if (rangedHit.transform == null)
             {

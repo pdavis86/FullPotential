@@ -65,12 +65,13 @@ namespace FullPotential.Core.Gameplay.Events
         }
 
         public EventSubscription<TEvent> Subscribe<TEvent>(
-            Func<TEvent, UniTask<HandlerResult>> handlerFunction)
+            Func<TEvent, UniTask<HandlerResult>> handlerFunction,
+            NetworkLocation networkLocation = NetworkLocation.Client)
             where TEvent : IEvent
         {
             var handler = new BasicEventHandler<TEvent>(
                 handlerFunction,
-                NetworkLocation.Client,
+                networkLocation,
                 Timing.Always);
             Subscribe(typeof(TEvent), handler);
             return new EventSubscription<TEvent>(handler);
@@ -117,7 +118,13 @@ namespace FullPotential.Core.Gameplay.Events
             }
         }
 
-        public async UniTask PublishAsync<TEvent>(TEvent eventArgs)
+        public void Publish<TEvent>(TEvent eventArgs)
+            where TEvent : IEvent
+        {
+            PublishAsync(eventArgs).Forget();
+        }
+
+        private async UniTask PublishAsync<TEvent>(TEvent eventArgs)
             where TEvent : IEvent
         {
             var argsType = typeof(TEvent);

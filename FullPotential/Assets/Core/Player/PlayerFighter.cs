@@ -138,6 +138,15 @@ namespace FullPotential.Core.Player
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
             _shaderUtilities = DependenciesContext.Dependencies.GetService<IShaderUtilities>();
 
+            _eventBus.SubscribeBehaviour<ResourceValueChangeEvent>(
+                this,
+                e => e.LivingEntity == this,
+                _ =>
+                {
+                    MarkAsDirtyAndAddToQueue();
+                    return UniTask.CompletedTask;
+                });
+
             _eventBus.SubscribeBehaviour<PlayerJoinedEvent>(
                 this,
                 e => e.OwnerClientId == OwnerClientId,
@@ -145,7 +154,7 @@ namespace FullPotential.Core.Player
 
             _eventBus.SubscribeBehaviour<InventoryChangedEvent>(
                 this,
-                e => e.Inventory == this,
+                e => e.Inventory == Inventory,
                 HandleInventoryChangeAsync);
 
             HealthBarSlider = _healthSlider;
@@ -181,14 +190,7 @@ namespace FullPotential.Core.Player
 
             if (IsClient && NetworkManager.LocalClientId == OwnerClientId)
             {
-                GameManager.Instance.UserInterface.Hud.SetActive(true);
-
-                if (Debug.isDebugBuild)
-                {
-                    GameManager.Instance.UserInterface.DebuggingOverlay.SetActive(true);
-                }
-
-                _eventBus.PublishAsync(new LocalPlayerSpawnedEvent(this)).Forget();
+                _eventBus.Publish(new LocalPlayerSpawnedEvent(this));
             }
 
             await GetAndLoadCharacterDataAsync(!IsOwner);
@@ -200,7 +202,7 @@ namespace FullPotential.Core.Player
 
             if (IsServer)
             {
-                await _eventBus.PublishAsync(new PlayerJoinedEvent(Username, transform.position, OwnerClientId));
+                _eventBus.Publish(new PlayerJoinedEvent(Username, transform.position, OwnerClientId));
             }
         }
 
@@ -246,9 +248,10 @@ namespace FullPotential.Core.Player
             SetResourceValuesForRespawn();
 
             AliveState = LivingEntityState.Respawning;
+            _eventBus.Publish(new AliveStateChangeEvent(this, true, true));
 
+            // todo: move this
             var spawnPoint = GameManager.Instance.GetSceneBehaviour().GetSpawnPoint();
-
             var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
             PlayerSpawnStateChangeClientRpc(AliveState, spawnPoint.Position, spawnPoint.Rotation, nearbyClients);
         }
@@ -301,6 +304,10 @@ namespace FullPotential.Core.Player
         private void PlayerSpawnStateChangeClientRpc(LivingEntityState state, Vector3 position, Quaternion rotation, ClientRpcParams clientRpcParams)
         {
             AliveState = state;
+            _eventBus.Publish(new AliveStateChangeEvent(
+                this,
+                state is LivingEntityState.Alive or LivingEntityState.Respawning,
+                state == LivingEntityState.Respawning));
 
             PlayerSpawnStateChange(state, position, rotation);
 
@@ -340,8 +347,6 @@ namespace FullPotential.Core.Player
 
         private void PlayerSpawnStateChange(LivingEntityState state, Vector3 position, Quaternion rotation)
         {
-            HandleLivingEntityStateOnClient();
-
             switch (state)
             {
                 case LivingEntityState.Dead:
@@ -377,26 +382,6 @@ namespace FullPotential.Core.Player
 
                     break;
             }
-        }
-
-        // todo: UI stuff needs to be moved out
-        private void HandleLivingEntityStateOnClient()
-        {
-            if (NetworkManager.LocalClientId != OwnerClientId)
-            {
-                return;
-            }
-
-            if (AliveState == LivingEntityState.Dead)
-            {
-                GameManager.Instance.UserInterface.HideAllMenus();
-            }
-
-            var isAlive = AliveState is LivingEntityState.Alive or LivingEntityState.Respawning;
-
-            _unityHelperUtilities.GetObjectAtRoot(GameObjectNames.SceneCamera).SetActive(!isAlive);
-            GameManager.Instance.UserInterface.Hud.SetActive(isAlive);
-            GameManager.Instance.UserInterface.Respawn.SetActive(!isAlive);
         }
 
         private void QueueAliveStateChanges()
@@ -447,7 +432,9 @@ namespace FullPotential.Core.Player
             else if (distanceMoved > 1)
             {
                 _isReadyToBecomeVulnerable = false;
+
                 AliveState = LivingEntityState.Alive;
+                _eventBus.Publish(new AliveStateChangeEvent(this, true));
 
                 var nearbyClients = _rpcService.ForNearbyPlayers(transform.position);
                 PlayerSpawnStateChangeClientRpc(AliveState, Vector3.zero, Quaternion.identity, nearbyClients);
@@ -509,15 +496,6 @@ namespace FullPotential.Core.Player
                 var value = playerData.ValuePools.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value;
                 _resourceValueCache[key] = ClampResourceValue(key, value);
             }
-
-            _eventBus.SubscribeBehaviour<ResourceValueChangeEvent>(
-                this,
-                e => e.LivingEntity == this,
-                _ =>
-                {
-                    MarkAsDirtyAndAddToQueue();
-                    return UniTask.CompletedTask;
-                });
         }
 
         public void UpdatePlayerSettings(List<SerializableKeyValuePair<string, string>> updatedSettings)
@@ -744,12 +722,6 @@ namespace FullPotential.Core.Player
 
             // todo: _playerFighter.AlertInventoryIsFull();
             //ShowHudAlertClientRpc(_localizer.Translate("ui.alert.itemsatmax"), _clientRpcParams);
-
-            var craftingUi = GameManager.Instance.UserInterface.GetCharacterMenuUiCraftingTab();
-            if (craftingUi.gameObject.activeSelf)
-            {
-                craftingUi.ResetUi();
-            }
 
             return UniTask.CompletedTask;
         }

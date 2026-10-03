@@ -13,7 +13,8 @@ namespace FullPotential.Api.Gameplay.Events
         void Subscribe(Type handlerType);
 
         EventSubscription<TEvent> Subscribe<TEvent>(
-            Func<TEvent, UniTask<HandlerResult>> handlerFunction)
+            Func<TEvent, UniTask<HandlerResult>> handlerFunction,
+            NetworkLocation networkLocation = NetworkLocation.Client)
             where TEvent : IEvent;
 
         void Unsubscribe<TEvent>(EventSubscription<TEvent> subscription)
@@ -27,7 +28,7 @@ namespace FullPotential.Api.Gameplay.Events
 
         void UnsubscribeBehaviour(object owner);
 
-        UniTask PublishAsync<TEvent>(TEvent eventArgs)
+        void Publish<TEvent>(TEvent eventArgs)
             where TEvent : IEvent;
     }
 }

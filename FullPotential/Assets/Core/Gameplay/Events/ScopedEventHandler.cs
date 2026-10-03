@@ -50,13 +50,7 @@ namespace FullPotential.Core.Gameplay.Events
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                var hashCode = Owner == null ? 0 : EqualityComparer<object>.Default.GetHashCode(Owner);
-                hashCode = (hashCode * 397) ^ (FilterFunction == null ? 0 : EqualityComparer<Func<TEvent, bool>>.Default.GetHashCode(FilterFunction));
-                hashCode = (hashCode * 397) ^ (HandlerFunction == null ? 0 : EqualityComparer<Func<TEvent, UniTask>>.Default.GetHashCode(HandlerFunction));
-                return hashCode;
-            }
+            return HashCode.Combine(Owner, FilterFunction, HandlerFunction);
         }
     }
 }

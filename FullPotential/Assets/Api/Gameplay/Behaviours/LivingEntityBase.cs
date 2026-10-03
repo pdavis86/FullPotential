@@ -332,7 +332,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var currentValue = ClampResourceValue(typeId, GetResourceValue(typeId));
             var newValue = ClampResourceValue(typeId, currentValue + change);
             var changeEvent = new ResourceValueChangeEvent(this, typeId, newValue, change, GetResourceMax(typeId), sourceEntityName, sourceItemName);
-            _eventBus.PublishAsync(changeEvent).Forget();
+            _eventBus.Publish(changeEvent);
         }
 
         public void UpdateResourceValue(string typeId, int newValue, string sourceEntityName, string sourceItemName)
@@ -583,12 +583,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected void PublishEntityDiedEvent(string lastDamageSourceName, string lastDamageItemName)
         {
-            _eventBus.PublishAsync(new EntityDiedAfterEvent(
+            _eventBus.Publish(new EntityDiedAfterEvent(
                     this,
                     transform.position,
                     lastDamageSourceName,
                     lastDamageItemName)
-            ).Forget();
+            );
         }
 
         protected abstract void HandleDeathAfter();
@@ -749,14 +749,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
                     _activeEffects.Add(anotherActiveEffect);
 
-                    _eventBus.PublishAsync(new ActiveEffectAddedEvent(this, anotherActiveEffect)).Forget();
+                    _eventBus.Publish(new ActiveEffectAddedEvent(this, anotherActiveEffect));
                 }
                 else
                 {
                     effectMatch.Change = change;
                     effectMatch.Expiry = expiry;
 
-                    _eventBus.PublishAsync(new ActiveEffectUpdatedEvent(this, effectMatch)).Forget();
+                    _eventBus.Publish(new ActiveEffectUpdatedEvent(this, effectMatch));
                 }
             }
             else
@@ -772,7 +772,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
                 _activeEffects.Add(newActiveEffect);
 
-                _eventBus.PublishAsync(new ActiveEffectAddedEvent(this, newActiveEffect)).Forget();
+                _eventBus.Publish(new ActiveEffectAddedEvent(this, newActiveEffect));
             }
 
             if (OwnerClientId != NetworkManager.Singleton.LocalClientId)

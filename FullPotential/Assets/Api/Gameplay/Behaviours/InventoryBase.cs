@@ -167,7 +167,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            _eventBus.PublishAsync(new InventoryChangedEvent(this, itemsAdded.ToArray(), itemsRemoved.ToArray())).Forget();
+            _eventBus.Publish(new InventoryChangedEvent(this, itemsAdded.ToArray(), itemsRemoved.ToArray()));
             ApplyEquippedItemChanges(changes.EquippedItems);
 
             return true;
@@ -405,7 +405,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected void TriggerSlotChangeEvent(string itemId, string slotId)
         {
             var changeEvent = new SlotChangeEvent(this, _livingEntity, slotId, itemId);
-            _eventBus.PublishAsync(changeEvent).Forget();
+            _eventBus.Publish(changeEvent);
         }
 
         public abstract void ApplyEquippedItemChange(string itemId, string slotId);

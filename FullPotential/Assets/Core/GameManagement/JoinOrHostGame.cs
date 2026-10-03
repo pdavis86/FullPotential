@@ -291,7 +291,7 @@ namespace FullPotential.Core.GameManagement
 
         private async UniTask HandleSignInResultAsync(SignInResult? signInResult)
         {
-            var isInvalid = (signInResult?.IsInvalid ?? false);
+            var isInvalid = signInResult?.IsInvalid ?? false;
             if (isInvalid || string.IsNullOrWhiteSpace(signInResult?.Token))
             {
                 HandleSignInError(isInvalid ? "ui.signin.invalid" : "ui.signin.error");
