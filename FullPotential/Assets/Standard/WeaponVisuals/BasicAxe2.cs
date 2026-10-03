@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Standard.Weapons;
 
@@ -6,7 +6,7 @@ namespace FullPotential.Standard.WeaponVisuals
 {
     public class BasicAxe2 : IWeaponVisuals
     {
-        private static readonly Guid Id = new Guid("ac8a55d8-6304-47d6-a35d-eecb0319d1ad");
+        private static readonly Guid Id = new Guid("1245711e-f1e3-40d9-95be-0eb2cd420884");
 
         public Guid TypeId => Id;
 

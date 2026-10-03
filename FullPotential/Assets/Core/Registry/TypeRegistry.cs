@@ -20,6 +20,7 @@ using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
+using FullPotential.Assets.Api.GameManagement;
 using FullPotential.Core.Gameplay.Events;
 
 using Unity.Netcode;
@@ -38,45 +39,45 @@ namespace FullPotential.Core.Registry
         private readonly HashSet<string> _registeredTypeIds = new HashSet<string>();
         private readonly Dictionary<Type, IList> _registeredTypeLists = new Dictionary<Type, IList>();
         private readonly Dictionary<string, object> _loadedAddressables = new Dictionary<string, object>();
-        private readonly Func<object, bool>[] _registerTypeFunctions;
-        private readonly Func<object, bool>[] _registerVisualsFunctions;
+        private readonly List<Type> _gameplayTypes;
+        private readonly List<Type> _visualsTypes;
 
         public TypeRegistry(IAuditorFactory auditorFactory, IEventBus eventBus)
         {
             _logger = auditorFactory.Create(this);
             _eventBus = eventBus;
 
-            _registerTypeFunctions = new Func<object, bool>[]
+            _gameplayTypes = new List<Type>
             {
-                AddToRegister<IResourceType>,
-                AddToRegister<IAccessoryType>,
-                AddToRegister<IAmmunitionType>,
-                AddToRegister<IArmorType>,
-                AddToRegister<IEffectType>,
-                AddToRegister<ILootType>,
-                AddToRegister<IShapeType>,
-                AddToRegister<ISpecialGearType>,
-                AddToRegister<ITargetingType>,
-                AddToRegister<IWeaponType>,
-                AddToRegister<ISlotType>,
-                AddToRegister<IElementType>,
+                typeof(IResourceType),
+                typeof(IAccessoryType),
+                typeof(IAmmunitionType),
+                typeof(IArmorType),
+                typeof(IEffectType),
+                typeof(ILootType),
+                typeof(IShapeType),
+                typeof(ISpecialGearType),
+                typeof(ITargetingType),
+                typeof(IWeaponType),
+                typeof(ISlotType),
+                typeof(IElementType),
             };
 
-            _registerVisualsFunctions = new Func<object, bool>[]
+            _visualsTypes = new List<Type>
             {
-                AddToRegister<IAccessoryVisuals>,
-                AddToRegister<IArmorVisuals>,
-                AddToRegister<IShapeVisuals>,
-                AddToRegister<ITargetingVisuals>,
-                AddToRegister<IWeaponVisuals>,
-                AddToRegister<ISpecialGearVisuals>
+                typeof(IAccessoryVisuals),
+                typeof(IArmorVisuals),
+                typeof(IShapeVisuals),
+                typeof(ITargetingVisuals),
+                typeof(IWeaponVisuals),
+                typeof(ISpecialGearVisuals)
             };
         }
 
         public void FindAndRegisterAll(List<string> modPrefixes)
         {
-            RegisterApiTypes();
-            RegisterCoreTypes();
+            RegisterTypesForAssembly(typeof(IGameManager).Assembly);
+            RegisterTypesForAssembly(typeof(TypeRegistry).Assembly);
 
             foreach (var modPrefix in modPrefixes)
             {
@@ -95,51 +96,23 @@ namespace FullPotential.Core.Registry
                         return;
                     }
 
+                    RegisterTypesForAssembly(mod.GetType().Assembly);
                     HandleModRegistration(mod);
                 };
             }
         }
 
-        private void RegisterApiTypes()
+        private void RegisterTypesForAssembly(Assembly assembly)
         {
-            RegisterEventTypes(typeof(IGameManager).Assembly);
-            RegisterEventHandlerTypes(typeof(IGameManager).Assembly);
-        }
-
-        private void RegisterCoreTypes()
-        {
-            // todo: register using Reflection instead of named types
-
-            ValidateAndRegister(typeof(SpecialSlots.LeftHand));
-            ValidateAndRegister(typeof(SpecialSlots.RightHand));
-
-            ValidateAndRegister(typeof(Resources.Health));
-            ValidateAndRegister(typeof(Resources.Stamina));
-
-            ValidateAndRegister(typeof(Effects.Heal));
-            ValidateAndRegister(typeof(Effects.Hurt));
-            ValidateAndRegister(typeof(Effects.Push));
-
-            RegisterEventTypes(typeof(TypeRegistry).Assembly);
-            RegisterEventHandlerTypes(typeof(TypeRegistry).Assembly);
+            var assemblyTypes = assembly.GetTypes();
+            RegisterServices(assemblyTypes);
+            RegisterGameplayTypes(assemblyTypes);
+            RegisterEventTypes(assemblyTypes);
+            RegisterEventHandlerTypes(assemblyTypes);
         }
 
         private void HandleModRegistration(IMod mod)
         {
-            // todo: register using Reflection instead of named types
-
-            mod.RegisterServices();
-
-            foreach (var t in mod.GetRegisterableTypes())
-            {
-                ValidateAndRegister(t);
-            }
-
-            foreach (var t in mod.GetRegisterableVisuals())
-            {
-                ValidateAndRegisterVisuals(t);
-            }
-
             foreach (var address in mod.GetNetworkPrefabAddresses())
             {
                 LoadAddessable<GameObject>(address, gameObject =>
@@ -150,6 +123,7 @@ namespace FullPotential.Core.Registry
                         return;
                     }
 
+                    // todo: zzz v0.8 - Is this work-around still needed?
                     //Work-around for https://github.com/Unity-Technologies/com.unity.netcode.gameobjects/issues/1499
                     var hashFiledInfo = typeof(NetworkObject).GetField("GlobalObjectIdHash", BindingFlags.NonPublic | BindingFlags.Instance);
                     hashFiledInfo.SetValue(networkObject, GenerateHash(address));
@@ -157,9 +131,6 @@ namespace FullPotential.Core.Registry
                     NetworkManager.Singleton.AddNetworkPrefab(gameObject);
                 });
             }
-
-            RegisterEventTypes(mod.GetType().Assembly);
-            RegisterEventHandlerTypes(mod.GetType().Assembly);
         }
 
         private static uint GenerateHash(string input)
@@ -170,7 +141,7 @@ namespace FullPotential.Core.Registry
             return BitConverter.ToUInt32(hashBytes, 0);
         }
 
-        private void ValidateAndRegister(Type type)
+        private void ValidateAndRegisterGameplayType(Type type)
         {
             try
             {
@@ -182,15 +153,10 @@ namespace FullPotential.Core.Registry
 
                 var objectToRegister = DependenciesContext.Dependencies.CreateInstance(type);
 
-                foreach (var functionToRun in _registerTypeFunctions)
+                if (!AddToRegisterForInterface(objectToRegister, _gameplayTypes))
                 {
-                    if (functionToRun(objectToRegister))
-                    {
-                        return;
-                    }
+                    _logger.Error("{0} does not implement any of the valid interfaces", type.FullName);
                 }
-
-                _logger.Error("{0} does not implement any of the valid interfaces", type.FullName);
             }
             catch (Exception ex)
             {
@@ -198,7 +164,7 @@ namespace FullPotential.Core.Registry
             }
         }
 
-        private void ValidateAndRegisterVisuals(Type type)
+        private void ValidateAndRegisterVisualsType(Type type)
         {
             try
             {
@@ -217,15 +183,10 @@ namespace FullPotential.Core.Registry
                     return;
                 }
 
-                foreach (var functionToRun in _registerVisualsFunctions)
+                if (!AddToRegisterForInterface(objectToRegister, _visualsTypes))
                 {
-                    if (functionToRun(objectToRegister))
-                    {
-                        return;
-                    }
+                    _logger.Error("{0} does not implement any of the valid {1} interfaces", type.FullName, nameof(IItemVisuals));
                 }
-
-                _logger.Error("{0} does not implement any of the valid {1} interfaces", type.FullName, nameof(IItemVisuals));
             }
             catch (Exception ex)
             {
@@ -233,29 +194,42 @@ namespace FullPotential.Core.Registry
             }
         }
 
-        private bool AddToRegister<T>(object objectToRegister) where T : IRegisterableType
+        private bool AddToRegisterForInterface(object objectToRegister, List<Type> typeFilter)
         {
-            if (objectToRegister is not T objectAsT)
+            var interfaces = objectToRegister.GetType().GetInterfaces();
+            var registerType = interfaces
+                .Where(i => typeFilter.Contains(i))
+                .OrderBy(i => interfaces.Any(other => other != i && i.IsAssignableFrom(other)))
+                .FirstOrDefault();
+
+            if (registerType == null)
             {
                 return false;
             }
 
-            if (!_registeredTypeLists.ContainsKey(typeof(T)))
+            if (objectToRegister is not IRegisterableType objectAsRegisterable
+                || !registerType.IsInstanceOfType(objectToRegister))
             {
-                _registeredTypeLists.Add(typeof(T), new List<T>());
+                return false;
             }
 
-            var list = _registeredTypeLists[typeof(T)];
+            if (!_registeredTypeLists.ContainsKey(registerType))
+            {
+                var listType = typeof(List<>).MakeGenericType(registerType);
+                _registeredTypeLists.Add(registerType, (IList)Activator.CreateInstance(listType));
+            }
 
-            var match = list.Cast<T>().FirstOrDefault(x => x.TypeId == objectAsT.TypeId);
+            var list = _registeredTypeLists[registerType];
+
+            var match = list.Cast<IRegisterableType>().FirstOrDefault(x => x.TypeId == objectAsRegisterable.TypeId);
             if (match != null)
             {
-                _logger.Error("A type with ID '{0}' has already been registered", objectAsT.TypeId);
+                _logger.Error("A type with ID '{0}' has already been registered", objectAsRegisterable.TypeId);
                 return true;
             }
 
-            _registeredTypeIds.Add(objectAsT.TypeId.ToString());
-            list.Add(objectAsT);
+            _registeredTypeIds.Add(objectAsRegisterable.TypeId.ToString());
+            list.Add(objectToRegister);
 
             return true;
         }
@@ -304,8 +278,7 @@ namespace FullPotential.Core.Registry
             }
 
             var matches = craftablesOfType.Where(x => x.TypeId.ToString() == typeId).ToList();
-
-            if (!matches.Any())
+            if (matches.Count == 0)
             {
                 throw new Exception($"Could not find a match for '{typeof(T).Name}' and '{typeId}'");
             }
@@ -315,7 +288,7 @@ namespace FullPotential.Core.Registry
                 throw new Exception($"How is there more than one match for '{typeof(T).Name}' and '{typeId}'");
             }
 
-            return matches.First();
+            return matches[0];
         }
 
         private IRegisterableType GetItemStackRegistryType(ItemBase item)
@@ -360,10 +333,53 @@ namespace FullPotential.Core.Registry
             }
         }
 
-        private void RegisterEventTypes(Assembly assembly)
+        private void RegisterServices(Type[] assemblyTypes)
         {
-            var eventTypes = assembly
-                .GetTypes()
+            var services = assemblyTypes
+                .Where(type => type.IsClass && !type.IsAbstract)
+                .SelectMany(serviceClass => serviceClass.GetInterfaces()
+                    .Where(serviceInterface => serviceInterface != typeof(IService)
+                        && typeof(IService).IsAssignableFrom(serviceInterface))
+                    .Select(serviceInterface => new { serviceInterface, serviceClass }));
+
+            foreach (var service in services)
+            {
+                DependenciesContext.Dependencies.Register(new Dependency
+                {
+                    Type = service.serviceInterface,
+                    Factory = () => DependenciesContext.Dependencies.CreateInstance(service.serviceClass),
+                    IsSingleton = true
+                });
+            }
+        }
+
+        private void RegisterGameplayTypes(Type[] assemblyTypes)
+        {
+            var classOrStructTypes = assemblyTypes
+                .Where(type => (type.IsClass || (type.IsValueType && !type.IsEnum))
+                    && !type.IsAbstract
+                    && typeof(IRegisterableType).IsAssignableFrom(type))
+                .Except(_gameplayTypes)
+                .Except(_visualsTypes);
+
+            var registerableTypes = classOrStructTypes
+                .Where(type => !typeof(IItemVisuals).IsAssignableFrom(type));
+            foreach (var type in registerableTypes)
+            {
+                ValidateAndRegisterGameplayType(type);
+            }
+
+            var visualsTypes = classOrStructTypes
+                .Where(type => typeof(IItemVisuals).IsAssignableFrom(type));
+            foreach (var type in visualsTypes)
+            {
+                ValidateAndRegisterVisualsType(type);
+            }
+        }
+
+        private void RegisterEventTypes(Type[] assemblyTypes)
+        {
+            var eventTypes = assemblyTypes
                 .Where(t => t != typeof(IEvent) && typeof(IEvent).IsAssignableFrom(t))
                 .ToList();
 
@@ -380,10 +396,9 @@ namespace FullPotential.Core.Registry
             }
         }
 
-        private void RegisterEventHandlerTypes(Assembly assembly)
+        private void RegisterEventHandlerTypes(Type[] assemblyTypes)
         {
-            var eventHandlerTypes = assembly
-                .GetTypes()
+            var eventHandlerTypes = assemblyTypes
                 .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEventHandler<>)))
                 .ToList();
 
