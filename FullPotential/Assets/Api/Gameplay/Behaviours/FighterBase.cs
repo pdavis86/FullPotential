@@ -16,8 +16,8 @@ using UnityEngine;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-// todo: zzz v0.6 - Break this up e.g. combat, equipment, etc.
-// todo: zzz v0.6 - Only use ClientRpc methods for non-state situations (otherwise network variables)
+// todo: Break up FighterBase e.g. combat, equipment, etc.
+// todo: Only use ClientRpc methods for non-state situations (otherwise network variables)
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
@@ -74,7 +74,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             base.Start();
 
-            // todo: zzz v0.6 - how do we add DelayedAction instances from mods?
+            // todo: how do we add DelayedAction instances from mods?
             _consumeResource = new DelayedAction(.5f, () =>
             {
                 foreach (var kvp in _slotStatuses)
@@ -104,7 +104,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ClientRpc]
         public void ApplyMovementForceClientRpc(Vector3 force, ForceMode forceMode, ClientRpcParams clientRpcParams)
         {
-            // todo: zzz v0.6 - Apply position changes on client rather than forces
+            // todo: Apply position changes on client rather than forces
             var targetRigidBody = GetComponent<Rigidbody>();
             targetRigidBody.AddForce(force, forceMode);
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -43,7 +43,7 @@ namespace FullPotential.Api.Items
         {
             ItemBase item;
 
-            // todo: zzz v0.6 - why are the models obsolete but the interfaces are not???
+            // todo: why are the models obsolete but the interfaces are not???
             _lootTypeIds ??= _typeRegistry.GetRegisteredTypes<ILootType>().Select(x => x.TypeId.ToString()).ToList();
             _accessoryTypeIds ??= _typeRegistry.GetRegisteredTypes<IAccessoryType>().Select(x => x.TypeId.ToString()).ToList();
             _armorTypeIds ??= _typeRegistry.GetRegisteredTypes<IArmorType>().Select(x => x.TypeId.ToString()).ToList();
@@ -278,7 +278,7 @@ namespace FullPotential.Api.Items
                 itemData.Properties[nameof(ItemWithTargetingAndShapeBase.ShapeVisualsTypeId)] = complexItem.ShapeVisualsTypeId;
             }
 
-            // todo: zzz v0.6 - why are there separate xxxVisualsTypeId for each type?
+            // todo: why are there separate xxxVisualsTypeId for each type?
             switch (item)
             {
                 case Accessory accessory:
@@ -299,7 +299,7 @@ namespace FullPotential.Api.Items
                     break;
 
                 case ItemStackBase itemStack:
-                    // todo: zzz v0.6 - sort out this BaseName nonsense
+                    // todo: sort out this BaseName nonsense
                     itemData.Properties = new Dictionary<string, string>
                     {
                         { nameof(ItemStackBase.Count) , itemStack.CountForSerialization.ToString() },

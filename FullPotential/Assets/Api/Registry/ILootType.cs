@@ -1,6 +1,6 @@
-﻿namespace FullPotential.Api.Registry
+namespace FullPotential.Api.Registry
 {
-    //todo: zzz v0.6 - Why have registerable loot?
+    //todo: Why have registerable loot?
     public interface ILootType : IRegisterableType
     {
     }

@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 using Cysharp.Threading.Tasks;
 
@@ -14,27 +13,26 @@ namespace FullPotential.Core.Persistence.Local
 {
     public class DataSaver : IDataSaver
     {
-        private IDataLoader _dataLoader;
+        private readonly IDataLoader _dataLoader;
 
         public DataSaver(IDataLoader dataLoader)
         {
             _dataLoader = dataLoader;
         }
 
-        public async UniTask SaveConnectionDetailsAsync(ConnectionDetails connectionDetails)
+        public UniTask SaveConnectionDetailsAsync(ConnectionDetails connectionDetails)
         {
-            // Do nothing
-            await Task.Yield();
+            return UniTask.CompletedTask;
         }
 
-        public async UniTask SaveCharacterDataAsync(CharacterData playerData)
+        public UniTask SaveCharacterDataAsync(CharacterData playerData)
         {
             var filePath = Paths.GetCharacterSavePath(playerData.CharacterId);
 
             var saveJson = playerData.ToJson();
             System.IO.File.WriteAllText(filePath, saveJson);
 
-            await Task.Yield();
+            return UniTask.CompletedTask;
         }
 
         public async UniTask SaveInventoryDataAsync(InventoryData inventoryData)
@@ -55,10 +53,7 @@ namespace FullPotential.Core.Persistence.Local
 
             inventoryData.Items.RemoveAll(x => x.IsDeleted);
 
-            if (inventoryData.EquippedItems == null)
-            {
-                inventoryData.EquippedItems = currentData.EquippedItems;
-            }
+            inventoryData.EquippedItems ??= currentData.EquippedItems;
 
             var slotIdsToDelete = inventoryData.EquippedItems.Where(x => x.Value == null).Select(x => x.Key).ToList();
             foreach (var slotId in slotIdsToDelete)
@@ -84,8 +79,6 @@ namespace FullPotential.Core.Persistence.Local
             var filePath = Paths.GetInventorySavePath(characterId);
             var saveJson = currentData.ToJson();
             System.IO.File.WriteAllText(filePath, saveJson);
-
-            await Task.Yield();
 
             return newItems;
         }

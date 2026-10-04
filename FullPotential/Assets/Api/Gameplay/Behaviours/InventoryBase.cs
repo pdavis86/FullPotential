@@ -33,7 +33,7 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
-    // todo: zzz v0.6 - Use `readonly struct ThingyId(string Id);` instead of string everywhere
+    // todo: Use `readonly struct ThingyId(string Id);` instead of string everywhere
 
     public abstract class InventoryBase : NetworkBehaviour, ISaveable
     {
@@ -125,7 +125,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 _items.Remove(item.Id);
             }
 
-            //todo: zzz v0.6 - should be able to take item stacks when inventory is full if there is space
+            //todo: should be able to take item stacks when inventory is full if there is space
             //if (IsInventoryFull())
             //{
             //    NotifyOfInventoryFull();
@@ -277,7 +277,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public List<string> ValidateIsCraftable(string[] componentIds, ItemBase itemToCraft)
         {
-            // todo: zzz v0.6 - check these translations are being done client-side
+            // todo: check these translations are being done client-side
 
             if (componentIds == null || componentIds.Length == 0)
             {
@@ -286,7 +286,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var components = GetComponentsFromIds(componentIds);
 
-            // todo: zzz v0.6 - move these into type definitions
+            // todo: move these into type definitions
             var errors = new List<string>();
             if (itemToCraft is Consumer consumerItem)
             {

@@ -80,9 +80,7 @@
     <Compile Include="Assets\Api\Gameplay\Combat\Events\ResourceValueChangeEvent.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemBase.cs" />
     <Compile Include="Assets\Api\Registry\Gear\ISpecialGearType.cs" />
-    <Compile Include="Assets\Api\Obsolete\PlayerDataOld.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\SerializableKeyValuePairExtensions.cs" />
-    <Compile Include="Assets\Api\Obsolete\InventoryDataOld.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\JsonExtensions.cs" />
     <Compile Include="Assets\Api\Modding\IMod.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\StringExtensions.cs" />
@@ -96,7 +94,6 @@
     <Compile Include="Assets\Api\Gameplay\Combat\ViableTarget.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\FighterBase.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\Events\ActiveEffectAddedEvent.cs" />
-    <Compile Include="Assets\Api\Obsolete\CharacterSettingsOld.cs" />
     <Compile Include="Assets\Api\Obsolete\Items\Base\ItemWithTargetingAndShapeBase.cs" />
     <Compile Include="Assets\Api\Registry\IRegisterableType.cs" />
     <Compile Include="Assets\Api\Items\IHasCharge.cs" />

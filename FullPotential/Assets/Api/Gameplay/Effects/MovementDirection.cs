@@ -1,5 +1,6 @@
-﻿namespace FullPotential.Api.Gameplay.Effects
+namespace FullPotential.Api.Gameplay.Effects
 {
+    // todo: Should MovementDirection be generalised? Or all types moved into Core?
     public enum MovementDirection
     {
         LeftFromSource,

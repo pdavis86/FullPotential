@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Standard.Effects.Movement
 {
-    // todo: zzz v0.6 - Should movement types be generalised? Or all moved into Core?
     public class Attract : IMovementEffectType
     {
         private static readonly Guid Id = new Guid("0e67f9ac-ef90-467e-ba7e-a4af3d965baa");

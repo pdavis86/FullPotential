@@ -187,7 +187,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ClientRpc]
         private void UpdateHealthValueClientRpc(int newValue, ClientRpcParams clientRpcParams)
         {
-            // todo: zzz v0.6 - Does not work for clients joining mid-battle
+            // todo: Does not work for clients joining mid-battle
             UpdateResourceValue(ResourceTypeIds.HealthId, newValue, null, null);
         }
 
@@ -195,7 +195,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ClientRpc]
         private void AddOrUpdateEffectClientRpc(string effectTypeId, int change, DateTime expiry, ClientRpcParams clientRpcParams)
         {
-            // todo: zzz v0.6 - Does not work for clients joining mid-battle
+            // todo: Does not work for clients joining mid-battle
             var effect = _typeRegistry.GetRegisteredByTypeId<IEffectType>(effectTypeId);
             AddOrUpdateEffect(effect, change, expiry);
         }
@@ -496,7 +496,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            // todo: zzz v0.6 - fix use of localizer on server
+            // todo: fix use of localizer on server
             var cause = _localizer.Translate(contactPoint.normal == Vector3.up
                 ? "ui.alert.falldamage"
                 : "ui.alert.environmentaldamage");
@@ -621,7 +621,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void ApplyPeriodicActionToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position)
         {
-            // todo: zzz v0.6 - replace use of DateTime with TimeProvider to ensure UTC
+            // todo: replace use of DateTime with TimeProvider to ensure UTC
             var delay = itemUsed.GetChargeUpTime();
             var expiry = DateTime.Now.AddSeconds(itemUsed.GetEffectDuration());
             PeriodicActionToResourceAsync(sourceFighter, itemUsed, resourceEffect, position, delay, expiry, _activeEffectsCancellationTokenSource.Token).Forget();

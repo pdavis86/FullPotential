@@ -459,7 +459,7 @@ namespace FullPotential.Core.Player
 
             await UniTask.WhenAll(FetchCharacterData(), FetchInventoryData());
 
-            // todo: zzz v0.6 - clean out anything stopping data loading from being async
+            // todo: clean out anything stopping data loading from being async
             LoadFromCharacterData(playerData);
             Inventory.LoadInventory(inventoryData);
         }
@@ -487,7 +487,7 @@ namespace FullPotential.Core.Player
                 playerData.ValuePools[ResourceTypeIds.HealthId] = GetResourceMax(ResourceTypeIds.HealthId);
             }
 
-            // todo: zzz v0.6 - These should come from the server
+            // todo: These should come from the server
             foreach (var resource in GetResources())
             {
                 var key = resource.TypeId.ToString();
@@ -515,7 +515,7 @@ namespace FullPotential.Core.Player
             }
         }
 
-        // todo: zzz v0.6 - move SetTextureAsync to a repository class
+        // todo: move SetTextureAsync to a repository class
         private async UniTask SetTextureAsync()
         {
             if (Username.IsNullOrWhiteSpace())
@@ -700,7 +700,7 @@ namespace FullPotential.Core.Player
                     return UniTask.CompletedTask;
 
                 case 1:
-                    // todo: zzz v0.6 - fix use of localizer on server
+                    // todo: fix use of localizer on server
                     ShowHudAlertClientRpc("ui.alert.itemadded", eventArgs.ItemsAdded.First().GetName(_localizer), clientRpcParams: _clientRpcParams);
                     break;
 

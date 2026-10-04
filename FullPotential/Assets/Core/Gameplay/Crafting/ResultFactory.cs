@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -203,7 +203,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private int GetAttributeValue(int percentageChance)
         {
-            //todo: zzz v0.6 - Replace all hard-coded 100 values
+            //todo: Replace all hard-coded 100 values
 
             return IsSuccess(percentageChance) ? _random.Next(1, 100) : 0;
         }
@@ -284,7 +284,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                 lootDrop.Shape = GetRandomShapeOrNone();
             }
 
-            // todo: zzz v0.6 - use client's culture, not the server's
+            // todo: use client's culture, not the server's
             var typeTranslation = _localizer.Translate("crafting.loot.type");
             var suffix = int.Parse(lootDrop.GetNameHash().ToString().TrimStart('-').Substring(5));
 

@@ -28,7 +28,7 @@ using UnityEngine;
 
 namespace FullPotential.Core.Player
 {
-    // todo: zzz v0.6 - aim to make this class redundant
+    // todo: aim to make PlayerInventory redundant?
     public class PlayerInventory : InventoryBase, IPlayerInventory
     {
         private Dictionary<string, CombatItemBase> _combatItemsWithShape;
@@ -309,7 +309,7 @@ namespace FullPotential.Core.Player
             var showsOnPlayerCamera = false;
             Action<Transform> manipulateTransform = null;
 
-            //todo: zzz v0.6 - remove special cases
+            //todo: remove special cases
             switch (slotId)
             {
                 case "ddeafb61-0163-4888-b355-16a37d3a33b5" + ";1": //SlotGameObjectName.Amulet:
@@ -374,7 +374,7 @@ namespace FullPotential.Core.Player
         {
             Transform parentTransform = null;
 
-            //todo: zzz v0.6 - remove special cases
+            //todo: remove special cases
             switch (slotId)
             {
                 case ArmorTypeIds.HelmId:

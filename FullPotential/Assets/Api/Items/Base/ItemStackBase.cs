@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 
 namespace FullPotential.Api.Items.Base
 {
-    // todo: zzz v0.6 - remove Serializable
-    // todo: zzz v0.6 - make abstract
+    // todo: remove Serializable
+    // todo: make abstract
     [Serializable]
     public class ItemStackBase : ItemBase
     {

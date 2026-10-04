@@ -1,5 +1,3 @@
-﻿using System.Threading.Tasks;
-
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Data;
@@ -11,26 +9,23 @@ namespace FullPotential.Core.Persistence.Local
     {
         private const string DummyToken = "ThisIsNotARealToken";
 
-        public async UniTask<SignInResult> SignInWithPasswordAsync(string username, string password)
+        public UniTask<SignInResult> SignInWithPasswordAsync(string username, string password)
         {
-            await Task.Yield();
-            return username == password
+            return UniTask.FromResult(username == password
                 ? new SignInResult { UserId = username, Username = username, CharacterId = username, Token = DummyToken }
-                : new SignInResult { UserId = username, Username = username, CharacterId = username, IsInvalid = true };
+                : new SignInResult { UserId = username, Username = username, CharacterId = username, IsInvalid = true });
         }
 
-        public async UniTask<SignInResult> SignInWithTokenAsync(string username, string token)
+        public UniTask<SignInResult> SignInWithTokenAsync(string username, string token)
         {
-            await Task.Yield();
-            return token == DummyToken
+            return UniTask.FromResult(token == DummyToken
                 ? new SignInResult { UserId = username, Username = username, CharacterId = username, Token = DummyToken }
-                : new SignInResult { UserId = username, Username = username, CharacterId = username, IsInvalid = true };
+                : new SignInResult { UserId = username, Username = username, CharacterId = username, IsInvalid = true });
         }
 
-        public async UniTask<bool> SignOutAsync()
+        public UniTask<bool> SignOutAsync()
         {
-            await Task.Yield();
-            return true;
+            return UniTask.FromResult(true);
         }
     }
 }

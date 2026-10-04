@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using FullPotential.Api.Items.Base;
 
@@ -6,7 +6,7 @@ using FullPotential.Api.Items.Base;
 
 namespace FullPotential.Api.Registry
 {
-    //todo: zzz v0.6 - Remove anything from the Registry namespace that is not registerable
+    //todo: Remove anything from the Registry namespace that is not registerable
     public interface ITypeRegistry
     {
         IEnumerable<T> GetRegisteredTypes<T>() where T : IRegisterableType;

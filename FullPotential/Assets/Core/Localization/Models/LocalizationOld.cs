@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using FullPotential.Api.Obsolete;
 
@@ -7,7 +7,7 @@ using FullPotential.Api.Obsolete;
 
 namespace FullPotential.Core.Localization.Models
 {
-    // todo: zzz v0.6 - kill LocalizationOld
+    // todo: kill LocalizationOld
     [Serializable]
     public struct LocalizationOld
     {

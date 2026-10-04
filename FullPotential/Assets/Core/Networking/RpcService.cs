@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 using FullPotential.Api.Logging;
@@ -16,8 +16,8 @@ namespace FullPotential.Core.Networking
     {
         private readonly IAuditor _logger;
 
-        //todo: zzz v0.6 - Implement the calculation of "nearby" players
-        //todo: zzz v0.6 - We suggest developers cache their ulong[] variables or use an array pool to cycle ulong[] instances so that it would cause less heap allocations.
+        //todo: Implement the calculation of "nearby" players
+        //todo: We suggest developers cache their ulong[] variables or use an array pool to cycle ulong[] instances so that it would cause less heap allocations.
 
         public RpcService(IAuditorFactory auditorFactory)
         {
