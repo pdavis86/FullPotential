@@ -2,11 +2,11 @@ using FullPotential.Api.Registry.Gameplay;
 
 namespace FullPotential.Api.Items
 {
-    public interface IResourceConsumer
+    public interface IResourceConsumer : IItem
     {
-        string Name { get; }
+        public const string PropertyKeyResourceTypeId = "ResourceTypeId";
 
-        IResourceType ResourceType { get; }
+        IResourceType ResourceType { get; set; }
 
         int GetResourceCost();
     }

@@ -5,9 +5,9 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Ui;
+using FullPotential.Standard.Items;
 using FullPotential.Standard.SpecialSlots;
 
 using UnityEngine;

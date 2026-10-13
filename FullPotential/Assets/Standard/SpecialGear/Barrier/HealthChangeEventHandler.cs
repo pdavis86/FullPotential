@@ -37,7 +37,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 return UniTask.FromResult(new HandlerResult());
             }
 
-            var barrier = eventArgs.LivingEntity.Inventory.GetItemInSlot<Api.Obsolete.Items.Types.SpecialGear>(BarrierSlot.TypeIdString);
+            var barrier = eventArgs.LivingEntity.Inventory.GetItemInSlot<Items.SpecialGear>(BarrierSlot.TypeIdString);
 
             if (barrier == null)
             {

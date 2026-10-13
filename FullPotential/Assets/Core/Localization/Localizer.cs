@@ -243,17 +243,5 @@ namespace FullPotential.Core.Localization
             var translationKey = string.Join('.', split) + '.' + suffix;
             return Translate(translationKey);
         }
-
-        public Dictionary<T, string> GetDictionaryFromEnum<T>(TranslationType translationType, bool sort = true)
-            where T : Enum
-        {
-            var dictionary = Enum.GetValues(typeof(T))
-                .Cast<T>()
-                .ToDictionary(x => x, x => Translate(translationType, x.ToString()));
-
-            return sort
-                ? dictionary.OrderByValue()
-                : dictionary;
-        }
     }
 }

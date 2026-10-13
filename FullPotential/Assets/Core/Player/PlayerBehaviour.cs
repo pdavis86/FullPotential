@@ -20,8 +20,7 @@ using FullPotential.Api.Items;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
-using FullPotential.Api.Obsolete.Items;
-using FullPotential.Api.Obsolete.Items.Types;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity;
 using FullPotential.Api.Unity.Constants;
@@ -32,7 +31,7 @@ using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.UI.Behaviours;
 using FullPotential.Core.UI.Events;
 using FullPotential.Core.Utilities.UtilityBehaviours;
-using FullPotential.Models.Player;
+using FullPotential.Models.LivingEntity;
 
 using TMPro;
 
@@ -67,6 +66,8 @@ namespace FullPotential.Core.Player
         private IDataSaver _dataSaver;
         private IRpcService _rpcService;
         private IUnityHelperUtilities _unityHelperUtilities;
+        private ITypeRegistry _typeRegistry;
+
         private bool _hasMenuOpen;
         private UserInterface _userInterface;
         private bool _toggleGameMenu;
@@ -94,6 +95,7 @@ namespace FullPotential.Core.Player
             _dataSaver = DependenciesContext.Dependencies.GetService<IDataSaver>();
             _rpcService = DependenciesContext.Dependencies.GetService<IRpcService>();
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
+            _typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
 
             _userInterface = GameManager.Instance.UserInterface;
             _drawingPadUi = _userInterface.DrawingPad.GetComponent<DrawingPadUi>();
@@ -337,21 +339,23 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            var craftableType = (CraftableType)Enum.Parse(typeof(CraftableType), craftableTypeName);
+            var craftableType = _typeRegistry.GetCraftableTypeFromName(craftableTypeName);
 
             var craftedItem = _resultFactory.GetCraftedItem(
                 craftableType,
                 typeId,
                 resourceTypeId,
                 isTwoHanded,
-                components
-            );
+                itemName,
+                components);
 
             if (_playerFighter.PlayerInventory.ValidateIsCraftable(componentIdArray, craftedItem).Any())
             {
                 _logger.Warn("Someone tried cheating: validation was skipped");
                 return;
             }
+
+            craftedItem.CharacterId = _playerFighter.CharacterId;
 
             if (!string.IsNullOrWhiteSpace(itemName))
             {
@@ -377,8 +381,11 @@ namespace FullPotential.Core.Player
         {
             GameManager.Instance.CheckIsAdmin();
 
-            var loot = JsonUtility.FromJson<Loot>(serialisedLoot);
+            var model = serialisedLoot.FromJson<ItemData>();
+
+            var loot = _itemFactory.GetItemFromData(model);
             loot.Id = Guid.NewGuid().ToString();
+            _itemFactory.FillTypesFromIds(model, loot);
 
             ((PlayerInventory)_playerFighter.Inventory).AddItemAsAdmin(loot);
 

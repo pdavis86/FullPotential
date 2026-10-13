@@ -9,7 +9,6 @@ using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Items;
 using FullPotential.Api.Logging;
-using FullPotential.Api.Obsolete.Items.Types;
 
 namespace FullPotential.Api.Gameplay.Player
 {
@@ -202,6 +201,11 @@ namespace FullPotential.Api.Gameplay.Player
         {
             IsBusy = isBusy;
             _eventBus.Publish(new SlotBusyChangeEvent(Fighter, SlotId, isBusy));
+        }
+
+        public static string GetSlotId(string typeId, int index)
+        {
+            return $"{typeId};{index}";
         }
     }
 }

@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Input;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Weapons;
-using FullPotential.Models.Player;
+using FullPotential.Models.LivingEntity;
+using FullPotential.Standard.Items;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -36,7 +37,7 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 
         public UniTask<HandlerResult> HandleEventAsync(ReloadInputEvent eventArgs)
         {
-            var buyerSlotId = Accessory.GetSlotId(AutoAmmoBuyer.TypeIdString, 1);
+            var buyerSlotId = SlotStatus.GetSlotId(AutoAmmoBuyer.TypeIdString, 1);
             var buyerItem = eventArgs.Fighter.Inventory.GetItemInSlot(buyerSlotId);
 
             if (buyerItem == null)
@@ -61,13 +62,11 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
                 return UniTask.FromResult(new HandlerResult());
             }
 
-            var newItemStack = new ItemStackBase
-            {
-                RegistryType = ammoType,
-                Id = Guid.NewGuid().ToString(),
-                BaseName = _localizer.Translate(ammoType),
-                Count = ammoType.MaxStackSize
-            };
+            var newItemStack = _typeRegistry.GetItemTypeMapping<IAmmunitionType>().CreateNew();
+            newItemStack.Id = Guid.NewGuid().ToString();
+            newItemStack.RegistryType = ammoType;
+            newItemStack.Name = _localizer.Translate(ammoType);
+            newItemStack.Properties = new Dictionary<string, string> { { nameof(ItemStackBase.Count), ammoType.MaxStackSize.ToString() } };
 
             var addedToInventory = fighter.Inventory.ApplyInventoryChanges(new InventoryData
             {

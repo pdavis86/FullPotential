@@ -1,6 +1,8 @@
-﻿namespace FullPotential.Api.Registry.Weapons
+using FullPotential.Api.Registry.Gear;
+
+namespace FullPotential.Api.Registry.Weapons
 {
-    public interface IWeaponType : IRegisterableType
+    public interface IWeaponType : ICraftableType
     {
         /// <summary>
         /// This weapon is used primarily for defense

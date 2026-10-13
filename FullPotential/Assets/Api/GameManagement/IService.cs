@@ -1,4 +1,4 @@
-namespace FullPotential.Assets.Api.GameManagement
+namespace FullPotential.Api.GameManagement
 {
     public interface IService
     {

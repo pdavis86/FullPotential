@@ -1,11 +1,11 @@
-﻿using System.Linq;
+using System.Linq;
 
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Items;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Unity.Constants;
@@ -75,9 +75,9 @@ namespace FullPotential.Standard.Targeting
 
             _startDirection.Value = Direction;
 
-            _visualsPrefabAddress.Value = !string.IsNullOrWhiteSpace(Consumer.TargetingVisuals?.PrefabAddress)
-                ? Consumer.TargetingVisuals.PrefabAddress
-                : _typeRegistry.GetRegisteredTypes<ITargetingVisuals>()
+            _visualsPrefabAddress.Value = !string.IsNullOrWhiteSpace(Consumer.TargetingVisualsType?.PrefabAddress)
+                ? Consumer.TargetingVisualsType.PrefabAddress
+                : _typeRegistry.GetRegisteredTypes<IItemVisuals>()
                     .FirstOrDefault(v => v.ApplicableToTypeIdString.ToString() == PointToPoint.TypeIdString)
                     ?.PrefabAddress ?? string.Empty;
         }

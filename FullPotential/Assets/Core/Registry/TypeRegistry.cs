@@ -6,10 +6,13 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
+using Cysharp.Threading.Tasks;
+
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
-using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Modding;
 using FullPotential.Api.Registry;
@@ -20,7 +23,6 @@ using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
-using FullPotential.Assets.Api.GameManagement;
 using FullPotential.Core.Gameplay.Events;
 
 using Unity.Netcode;
@@ -36,11 +38,13 @@ namespace FullPotential.Core.Registry
     {
         private readonly IAuditor _logger;
         private readonly IEventBus _eventBus;
+        private readonly List<Type> _gameplayTypes;
         private readonly HashSet<string> _registeredTypeIds = new HashSet<string>();
         private readonly Dictionary<Type, IList> _registeredTypeLists = new Dictionary<Type, IList>();
         private readonly Dictionary<string, object> _loadedAddressables = new Dictionary<string, object>();
-        private readonly List<Type> _gameplayTypes;
-        private readonly List<Type> _visualsTypes;
+        private readonly List<IItemTypeMapping> _itemTypeMappings = new List<IItemTypeMapping>();
+
+        private HashSet<string> _attributeIds = new HashSet<string>();
 
         public TypeRegistry(IAuditorFactory auditorFactory, IEventBus eventBus)
         {
@@ -62,18 +66,9 @@ namespace FullPotential.Core.Registry
                 typeof(ISlotType),
                 typeof(IElementType),
             };
-
-            _visualsTypes = new List<Type>
-            {
-                typeof(IAccessoryVisuals),
-                typeof(IArmorVisuals),
-                typeof(IShapeVisuals),
-                typeof(ITargetingVisuals),
-                typeof(IWeaponVisuals),
-                typeof(ISpecialGearVisuals)
-            };
         }
 
+        // todo: this returns before all registration is done!
         public void FindAndRegisterAll(List<string> modPrefixes)
         {
             RegisterTypesForAssembly(typeof(IGameManager).Assembly);
@@ -100,6 +95,8 @@ namespace FullPotential.Core.Registry
                     HandleModRegistration(mod);
                 };
             }
+
+            _attributeIds = null;
         }
 
         private void RegisterTypesForAssembly(Assembly assembly)
@@ -109,6 +106,8 @@ namespace FullPotential.Core.Registry
             RegisterGameplayTypes(assemblyTypes);
             RegisterEventTypes(assemblyTypes);
             RegisterEventHandlerTypes(assemblyTypes);
+            AddAttributeIds(assemblyTypes);
+            AddItemTypeMappings(assemblyTypes);
         }
 
         private void HandleModRegistration(IMod mod)
@@ -174,6 +173,7 @@ namespace FullPotential.Core.Registry
                     return;
                 }
 
+                // todo: check this, might be too complicated now we only have IItemVisuals
                 var objectToRegister = DependenciesContext.Dependencies.CreateInstance(type);
                 var objectAsVisuals = (IItemVisuals)objectToRegister;
 
@@ -183,7 +183,7 @@ namespace FullPotential.Core.Registry
                     return;
                 }
 
-                if (!AddToRegisterForInterface(objectToRegister, _visualsTypes))
+                if (!AddToRegisterForInterface(objectToRegister, null))
                 {
                     _logger.Error("{0} does not implement any of the valid {1} interfaces", type.FullName, nameof(IItemVisuals));
                 }
@@ -198,7 +198,7 @@ namespace FullPotential.Core.Registry
         {
             var interfaces = objectToRegister.GetType().GetInterfaces();
             var registerType = interfaces
-                .Where(i => typeFilter.Contains(i))
+                .Where(i => typeFilter == null || typeFilter.Contains(i))
                 .OrderBy(i => interfaces.Any(other => other != i && i.IsAssignableFrom(other)))
                 .FirstOrDefault();
 
@@ -216,6 +216,7 @@ namespace FullPotential.Core.Registry
             if (!_registeredTypeLists.ContainsKey(registerType))
             {
                 var listType = typeof(List<>).MakeGenericType(registerType);
+
                 _registeredTypeLists.Add(registerType, (IList)Activator.CreateInstance(listType));
             }
 
@@ -238,7 +239,7 @@ namespace FullPotential.Core.Registry
         {
             if (!_registeredTypeLists.ContainsKey(typeof(T)))
             {
-                throw new Exception($"Unexpected type '{typeof(T).Name}'");
+                throw new Exception($"Non-registered type '{typeof(T).Name}'");
             }
 
             return _registeredTypeLists[typeof(T)].Cast<T>();
@@ -247,6 +248,22 @@ namespace FullPotential.Core.Registry
         public T GetRegisteredByTypeId<T>(string typeIdString) where T : IRegisterableType
         {
             return GetRegisteredTypes<T>().FirstOrDefault(x => x.TypeId.ToString() == typeIdString);
+        }
+
+        public IRegisterableType GetAnyRegisteredTypeById(string typeIdString)
+        {
+            foreach (var list in _registeredTypeLists)
+            {
+                foreach (IRegisterableType type in list.Value)
+                {
+                    if (type.TypeId.ToString() == typeIdString)
+                    {
+                        return type;
+                    }
+                }
+            }
+
+            return null;
         }
 
         public IRegisterableType GetAnyRegisteredBySlotId(string typeIdString)
@@ -291,25 +308,6 @@ namespace FullPotential.Core.Registry
             return matches[0];
         }
 
-        private IRegisterableType GetItemStackRegistryType(ItemBase item)
-        {
-            return _registeredTypeLists[typeof(IAmmunitionType)].Cast<IAmmunitionType>().FirstOrDefault(x => x.TypeId.ToString() == item.RegistryTypeId);
-        }
-
-        public IRegisterableType GetRegistryTypeForItem(ItemBase item)
-        {
-            return item switch
-            {
-                Api.Obsolete.Items.Types.Accessory => GetRegistryTypeById<IAccessoryType>(item.RegistryTypeId),
-                Api.Obsolete.Items.Types.Armor => GetRegistryTypeById<IArmorType>(item.RegistryTypeId),
-                Api.Obsolete.Items.Types.Weapon => GetRegistryTypeById<IWeaponType>(item.RegistryTypeId),
-                Api.Obsolete.Items.Types.Loot => GetRegistryTypeById<ILootType>(item.RegistryTypeId),
-                ItemStackBase => GetItemStackRegistryType(item),
-                Api.Obsolete.Items.Types.SpecialGear => GetRegistryTypeById<ISpecialGearType>(item.RegistryTypeId),
-                _ => null,
-            };
-        }
-
         public void LoadAddessable<T>(string address, Action<T> action)
         {
             //Addressables.ReleaseInstance(go) : Destroys objects created by Addressables.InstantiateAsync(address)
@@ -330,6 +328,24 @@ namespace FullPotential.Core.Registry
 
                     action(prefab);
                 };
+            }
+        }
+
+        public async UniTask LoadAddessableAsync<T>(string address, Action<T> action)
+        {
+            if (_loadedAddressables.TryGetValue(address, out var loadedAddressable))
+            {
+                action((T)loadedAddressable);
+            }
+            else
+            {
+                var asyncOp = Addressables.LoadAssetAsync<T>(address);
+
+                var prefab = await asyncOp.Task;
+
+                _loadedAddressables.TryAdd(address, prefab);
+
+                action(prefab);
             }
         }
 
@@ -359,8 +375,7 @@ namespace FullPotential.Core.Registry
                 .Where(type => (type.IsClass || (type.IsValueType && !type.IsEnum))
                     && !type.IsAbstract
                     && typeof(IRegisterableType).IsAssignableFrom(type))
-                .Except(_gameplayTypes)
-                .Except(_visualsTypes);
+                .Except(_gameplayTypes);
 
             var registerableTypes = classOrStructTypes
                 .Where(type => !typeof(IItemVisuals).IsAssignableFrom(type));
@@ -418,6 +433,52 @@ namespace FullPotential.Core.Registry
                     _logger.Error(ex);
                 }
             }
+        }
+
+        private void AddAttributeIds(Type[] assemblyTypes)
+        {
+            var attributeTypes = assemblyTypes
+                .Where(t => t.IsClass && typeof(IAttribute).IsAssignableFrom(t))
+                .ToList();
+
+            foreach (var attributeType in attributeTypes)
+            {
+                // todo: check on typeId instead
+                _attributeIds.Add(attributeType.Name);
+            }
+        }
+
+        private void AddItemTypeMappings(Type[] assemblyTypes)
+        {
+            var mappingTypes = assemblyTypes
+                .Where(t => t.IsClass && typeof(IItemTypeMapping).IsAssignableFrom(t))
+                .ToList();
+
+            _itemTypeMappings.AddRange(mappingTypes.Select(m => (IItemTypeMapping)DependenciesContext.Dependencies.CreateInstance(m)));
+        }
+
+        public IItemTypeMapping GetItemTypeMapping<T>()
+            where T : IRegisterableType
+        {
+            return _itemTypeMappings.First(m => m.GroupType == typeof(T));
+        }
+
+        public IItemTypeMapping GetCraftableItemTypeMapping(Type craftableType)
+        {
+            if (craftableType is not ICraftableType)
+            {
+                _logger.Warn("'{0}' is not a craftable type", craftableType);
+                return null;
+            }
+
+            return _itemTypeMappings.First(m => m.GroupType == craftableType);
+        }
+
+        public Type GetCraftableTypeFromName(string craftableTypeName)
+        {
+            return _itemTypeMappings
+                .First(m => m.GroupType.Name == craftableTypeName)
+                .GroupType;
         }
     }
 }

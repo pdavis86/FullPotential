@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Obsolete.Items.Types;
+using FullPotential.Standard.Items;
 
 namespace FullPotential.Standard.Weapons.Events
 {

@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Obsolete.Items.Types;
+using FullPotential.Api.Items;
 
 // ReSharper disable UnusedParameter.Global
 

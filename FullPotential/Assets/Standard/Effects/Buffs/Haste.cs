@@ -1,6 +1,7 @@
-﻿using System;
-using FullPotential.Api.Obsolete;
+using System;
+
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Gameplay.Attributes;
 
 namespace FullPotential.Standard.Effects.Buffs
 {
@@ -12,6 +13,6 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public bool IsTemporaryMaxIncrease => true;
 
-        public AttributeAffected AttributeAffectedToAffect => AttributeAffected.Speed;
+        public string AttributeId => Speed.TypeId;
     }
 }

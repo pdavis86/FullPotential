@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Obsolete.Items.Types;
+using FullPotential.Api.Items;
 using FullPotential.Api.Registry.Targeting;
 
 namespace FullPotential.Standard.Targeting

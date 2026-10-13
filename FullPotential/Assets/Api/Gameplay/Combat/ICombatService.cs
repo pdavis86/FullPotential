@@ -1,6 +1,6 @@
-﻿using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Obsolete.Items.Base;
-using FullPotential.Api.Obsolete.Items.Types;
+using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Items;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.Effects;
 
 using UnityEngine;

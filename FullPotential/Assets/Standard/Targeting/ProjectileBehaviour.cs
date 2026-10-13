@@ -1,13 +1,14 @@
-﻿using System.Linq;
+using System.Linq;
 
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Items;
 using FullPotential.Api.Logging;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Standard.Weapons.Helpers;
 
 using Unity.Collections;
 using Unity.Netcode;
@@ -57,18 +58,18 @@ namespace FullPotential.Standard.Targeting
 
             var rigidBody = GetComponent<Rigidbody>();
 
-            var shotDirection = Consumer.GetShotDirection(Direction);
+            var shotDirection = AttackHelper.GetShotDirection(Consumer, Direction);
 
             rigidBody.AddForce(20f * Consumer.GetProjectileSpeed() * shotDirection, ForceMode.VelocityChange);
 
-            if (Consumer.Shape != null)
+            if (Consumer.ShapeType != null)
             {
                 rigidBody.useGravity = true;
             }
 
-            _visualsPrefabAddress.Value = !string.IsNullOrWhiteSpace(Consumer.TargetingVisuals?.PrefabAddress)
-                ? Consumer.TargetingVisuals.PrefabAddress
-                : _typeRegistry.GetRegisteredTypes<ITargetingVisuals>()
+            _visualsPrefabAddress.Value = !string.IsNullOrWhiteSpace(Consumer.TargetingVisualsType?.PrefabAddress)
+                ? Consumer.TargetingVisualsType.PrefabAddress
+                : _typeRegistry.GetRegisteredTypes<IItemVisuals>()
                     .FirstOrDefault(v => v.ApplicableToTypeIdString.ToString() == Projectile.TypeIdString)
                     ?.PrefabAddress ?? string.Empty;
         }

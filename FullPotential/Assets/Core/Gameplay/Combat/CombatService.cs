@@ -4,19 +4,20 @@ using System.Linq;
 
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay;
+using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Items;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
-using FullPotential.Api.Obsolete;
-using FullPotential.Api.Obsolete.Items.Base;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities;
@@ -71,7 +72,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 ApplyMovementEffect(sourceFighter, null, _pushEffect, target);
             }
 
-            var itemUsedEffects = itemUsed?.Effects ?? new List<IEffectType>();
+            var itemUsedEffects = itemUsed?.EffectTypes ?? new List<IEffectType>();
 
             if (!itemUsedEffects.Any())
             {
@@ -150,9 +151,10 @@ namespace FullPotential.Core.Gameplay.Combat
                     return;
             }
         }
+
         private float GetSourceCriticalHitChance(FighterBase sourceFighter)
         {
-            var luckValue = sourceFighter.GetAttributeValue(AttributeAffected.Luck);
+            var luckValue = sourceFighter.GetAdjustedAttributeValue(Luck.TypeId);
 
             if (luckValue < 20)
             {
@@ -175,7 +177,7 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 if (sourceFighter != null)
                 {
-                    change = LivingEntityBase.GetAdjustedStrength(sourceFighter.GetAttributeValue(AttributeAffected.Strength));
+                    change = LivingEntityBase.GetAdjustedStrength(sourceFighter.GetAdjustedAttributeValue(Strength.TypeId));
                 }
                 else
                 {
@@ -189,16 +191,21 @@ namespace FullPotential.Core.Gameplay.Combat
                     : itemUsed.GetSingleEffectValueChange();
             }
 
-            var weapon = itemUsed as Weapon;
 
-            if (weapon != null && weapon.IsRanged)
+            if (itemUsed != null
+                && itemUsed is CombatItemBase combatItem
+                && itemUsed.RegistryType is IWeaponType weaponType)
             {
-                change /= weapon.GetAmmoPerSecond();
-            }
+                var isMeleeWeapon = weaponType.AmmunitionTypeIdString.IsNullOrWhiteSpace();
 
-            if (isCriticalHit)
-            {
-                change *= 2;
+                if (isMeleeWeapon)
+                {
+                    change *= 2;
+                }
+                else
+                {
+                    change /= combatItem.GetAmmoPerSecond();
+                }
             }
 
             if (itemUsed != null && itemUsed.IsTwoHanded)
@@ -206,7 +213,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 change *= 2;
             }
 
-            if (weapon != null && weapon.IsMelee)
+            if (isCriticalHit)
             {
                 change *= 2;
             }
@@ -263,11 +270,11 @@ namespace FullPotential.Core.Gameplay.Combat
 
             var armorItems = _typeRegistry
                 .GetRegisteredTypes<IArmorType>()
-                .Select(x => targetLivingEntity.Inventory.GetItemInSlot<Armor>(x.TypeId.ToString()));
+                .Select(x => targetLivingEntity.Inventory.GetItemInSlot<ItemBase>(x.TypeId.ToString()));
 
             var sum = armorItems
                 .Where(x => x != null)
-                .Sum(a => a.Attributes.Strength);
+                .Sum(a => a.Attributes.GetIntValue(Strength.TypeId));
 
             var targetDefenceValue = (int)Math.Floor((float)sum / armorItems.Count());
 
@@ -310,7 +317,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private void ApplyMaintainDistance(FighterBase sourceFighter, CombatItemBase itemUsed, GameObject targetGameObject)
         {
-            if (itemUsed is not Consumer consumer || !consumer.Targeting.IsContinuous)
+            if (itemUsed is not Consumer consumer || !consumer.TargetingType.IsContinuous)
             {
                 _logger.Warn("MaintainDistance has been incorrectly applied to an item");
                 return;
@@ -354,7 +361,7 @@ namespace FullPotential.Core.Gameplay.Combat
             }
 
             var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
-            var strength = itemUsed?.Attributes.Strength ?? sourceFighter.GetAttributeValue(AttributeAffected.Strength);
+            var strength = itemUsed?.Attributes.GetIntValue(Strength.TypeId) ?? sourceFighter.GetAdjustedAttributeValue(Strength.TypeId);
             var rawForce = MathsHelper.GetHighInHighOutInRange(strength, 100, 300);
 
             var force = adjustForGravity
@@ -455,13 +462,13 @@ namespace FullPotential.Core.Gameplay.Combat
 
         public void SpawnTargetingGameObject(FighterBase sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction)
         {
-            if (consumer.Targeting.NetworkPrefabAddress.IsNullOrWhiteSpace())
+            if (consumer.TargetingType.NetworkPrefabAddress.IsNullOrWhiteSpace())
             {
                 return;
             }
 
             _typeRegistry.LoadAddessable<GameObject>(
-                consumer.Targeting.NetworkPrefabAddress,
+                consumer.TargetingType.NetworkPrefabAddress,
                 prefab =>
                 {
                     var targetingGameObject = UnityEngine.Object.Instantiate(prefab, startPosition, Quaternion.identity);
@@ -473,7 +480,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
                     targetingGameObject.NetworkSpawn(_logger);
 
-                    if (consumer.Targeting.IsContinuous)
+                    if (consumer.TargetingType.IsContinuous)
                     {
                         targetingGameObject.transform.parent = sourceFighter.Transform;
                     }
@@ -484,7 +491,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
         public void SpawnShapeGameObject(FighterBase sourceFighter, Consumer consumer, GameObject target, Vector3 fallbackPosition, Vector3 lookDirection)
         {
-            if (consumer.Shape == null)
+            if (consumer.ShapeType == null)
             {
                 _logger.Debug("Cancelling SpawnShapeGameObject because there was no Shape");
                 return;
@@ -510,7 +517,7 @@ namespace FullPotential.Core.Gameplay.Combat
             rotation.z = 0;
 
             _typeRegistry.LoadAddessable<GameObject>(
-                consumer.Shape.NetworkPrefabAddress,
+                consumer.ShapeType.NetworkPrefabAddress,
                 prefab =>
                 {
                     var shapeGameObject = UnityEngine.Object.Instantiate(prefab, spawnPosition, rotation);

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using FullPotential.Api.Items;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Standard.Resources;
@@ -20,7 +21,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 
         public IEnumerable<string> ResourceTypeIdsInUse { get; } = new[] { Energy.TypeIdString };
 
-        public string OverrideItemDescription(Api.Obsolete.Items.Types.SpecialGear specialGear, ILocalizer localizer, LevelOfDetail levelOfDetail)
+        public string OverrideItemDescription(ItemBase item, ILocalizer localizer, LevelOfDetail levelOfDetail)
         {
             return null;
         }

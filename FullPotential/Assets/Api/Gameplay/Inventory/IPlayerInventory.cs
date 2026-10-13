@@ -1,17 +1,12 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Obsolete.Items.Base;
 
 namespace FullPotential.Api.Gameplay.Inventory
 {
-    public interface IPlayerInventory
+    public interface IPlayerInventory : IInventory
     {
-        List<CombatItemBase> GetComponentsFromIds(string[] componentIds);
-
-        List<string> ValidateIsCraftable(string[] componentIds, ItemBase itemToCraft);
-
         IEnumerable<ItemBase> GetHandItems();
 
         IEnumerable<ItemBase> GetCompatibleItems(string slotId);

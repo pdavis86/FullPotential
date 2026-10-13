@@ -1,8 +1,8 @@
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
+using FullPotential.Standard.Items;
 using FullPotential.Standard.Weapons.Events;
 
 using UnityEngine;

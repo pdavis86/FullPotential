@@ -1,10 +1,11 @@
-﻿using System;
+using System;
+
 using FullPotential.Api.CoreTypeIds;
-using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry;
 
 namespace FullPotential.Standard.ArmorVisuals
 {
-    public class LeatherBoots : IArmorVisuals
+    public class LeatherBoots : IItemVisuals
     {
         private static readonly Guid Id = new Guid("e42aefc3-2834-4f61-897f-5fb62d439b56");
 

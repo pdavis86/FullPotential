@@ -1,10 +1,11 @@
-﻿using System;
-using FullPotential.Api.Registry.Shapes;
+using System;
+
+using FullPotential.Api.Registry;
 using FullPotential.Standard.Shapes;
 
 namespace FullPotential.Standard.ShapeVisuals
 {
-    public class ZoneOfFlames : IShapeVisuals
+    public class ZoneOfFlames : IItemVisuals
     {
         private static readonly Guid Id = new Guid("ac703f12-4d5c-4b76-98f9-045c10b40fd0");
 

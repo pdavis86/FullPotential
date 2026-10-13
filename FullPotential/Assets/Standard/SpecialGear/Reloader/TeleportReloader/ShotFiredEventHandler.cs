@@ -18,9 +18,9 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 
         public UniTask<HandlerResult> HandleEventAsync(ShotFiredAfterEvent eventArgs)
         {
-            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Obsolete.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Items.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
-            if (reloader == null || reloader.RegistryTypeId != TeleportReloader.TypeIdString)
+            if (reloader == null || reloader.RegistryType.TypeId.ToString() != TeleportReloader.TypeIdString)
             {
                 return UniTask.FromResult(new HandlerResult());
             }
@@ -34,7 +34,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 
             var reloadEventArgs = new ReloadInputEvent(fighter, eventArgs.SlotId);
 
-            ReloadInputEvent.UpdateAmmoCounts(reloadEventArgs);
+            ReloadEventDefaultHandler.UpdateAmmoCounts(reloadEventArgs);
 
             return UniTask.FromResult(new HandlerResult());
         }

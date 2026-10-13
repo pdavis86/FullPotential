@@ -1,10 +1,10 @@
-﻿using System.Linq;
+using System.Linq;
 
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Items;
 using FullPotential.Api.Logging;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Unity.Constants;
@@ -66,9 +66,9 @@ namespace FullPotential.Standard.Shapes
 
             _timeBetweenEffects = Consumer.GetChargeUpTime();
 
-            _visualsPrefabAddress.Value = !string.IsNullOrWhiteSpace(Consumer.ShapeVisuals?.PrefabAddress)
-                ? Consumer.ShapeVisuals.PrefabAddress
-                : _typeRegistry.GetRegisteredTypes<IShapeVisuals>()
+            _visualsPrefabAddress.Value = !string.IsNullOrWhiteSpace(Consumer.ShapeVisualsType?.PrefabAddress)
+                ? Consumer.ShapeVisualsType.PrefabAddress
+                : _typeRegistry.GetRegisteredTypes<IItemVisuals>()
                     .FirstOrDefault(v => v.ApplicableToTypeIdString.ToString() == Zone.TypeIdString)
                     ?.PrefabAddress ?? string.Empty;
         }

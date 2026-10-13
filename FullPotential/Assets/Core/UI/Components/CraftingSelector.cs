@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Obsolete.Items;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;
@@ -27,7 +26,7 @@ namespace FullPotential.Core.UI.Components
         public Dropdown ResourceDropdown;
         // ReSharper restore UnassignedField.Global
 
-        private Dictionary<CraftableType, string> _craftableTypes;
+        private Dictionary<Type, string> _craftableTypes;
         private Dictionary<IAccessoryType, string> _accessoryTypes;
         private Dictionary<IArmorType, string> _armorTypes;
         private Dictionary<IResourceType, string> _resourceTypes;
@@ -67,22 +66,22 @@ namespace FullPotential.Core.UI.Components
 
         #endregion
 
-        public CraftableType GetTypeToCraft()
+        public Type GetTypeToCraft()
         {
             return _craftableTypes.ElementAt(TypeDropdown.value).Key;
         }
 
-        public string GetSubTypeId(CraftableType craftableType)
+        public string GetSubTypeId(Type craftableType)
         {
-            switch (craftableType)
+            return craftableType switch
             {
-                case CraftableType.Accessory: return _accessoryTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
-                case CraftableType.Armor: return _armorTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
-                case CraftableType.Weapon: return _weaponTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
-                case CraftableType.Consumer: return null;
-                case CraftableType.SpecialGear: return _specialTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
-                default: throw new InvalidOperationException($"Unknown craftable type: '{craftableType}'");
-            }
+                IAccessoryType => _accessoryTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString(),
+                IArmorType => _armorTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString(),
+                IWeaponType => _weaponTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString(),
+                IConsumerType => null,
+                ISpecialGearType => _specialTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString(),
+                _ => throw new InvalidOperationException($"Unknown craftable type: '{craftableType}'"),
+            };
         }
 
         public string GetResourceTypeId()
@@ -92,7 +91,7 @@ namespace FullPotential.Core.UI.Components
 
         public bool IsTwoHandedSelected()
         {
-            return GetTypeToCraft() == CraftableType.Weapon
+            return GetTypeToCraft() == typeof(IWeaponType)
                 && HandednessDropdown.options.Count > 0
                 && HandednessDropdown.value == 1;
         }
@@ -105,23 +104,23 @@ namespace FullPotential.Core.UI.Components
             var typeToCraft = GetTypeToCraft();
             switch (typeToCraft)
             {
-                case CraftableType.Accessory:
+                case IAccessoryType:
                     SubTypeDropdown.AddOptions(_accessoryTypes.Select(x => x.Value).ToList());
                     break;
 
-                case CraftableType.Armor:
+                case IArmorType:
                     SubTypeDropdown.AddOptions(_armorTypes.Select(x => x.Value).ToList());
                     break;
 
-                case CraftableType.Weapon:
+                case IWeaponType:
                     SubTypeDropdown.AddOptions(_weaponTypes.Select(x => x.Value).ToList());
                     break;
 
-                case CraftableType.Consumer:
+                case IConsumerType:
                     SetupResourcesDropDown();
                     break;
 
-                case CraftableType.SpecialGear:
+                case ISpecialGearType:
                     SubTypeDropdown.AddOptions(_specialTypes.Select(x => x.Value).ToList());
                     SetupResourcesDropDown();
                     break;
@@ -139,7 +138,7 @@ namespace FullPotential.Core.UI.Components
                 SubTypeDropdown.gameObject.SetActive(false);
             }
 
-            HandednessDropdown.gameObject.SetActive(typeToCraft == CraftableType.Weapon && _optionalTwoHandedWeaponIndexes.Contains(SubTypeDropdown.value));
+            HandednessDropdown.gameObject.SetActive(typeToCraft == typeof(IWeaponType) && _optionalTwoHandedWeaponIndexes.Contains(SubTypeDropdown.value));
         }
 
         private void SetupResourcesDropDown()
@@ -156,7 +155,14 @@ namespace FullPotential.Core.UI.Components
             var localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
             var typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
 
-            _craftableTypes = localizer.GetDictionaryFromEnum<CraftableType>(TranslationType.ItemType);
+            _craftableTypes = new Dictionary<Type, string>
+            {
+                { typeof(IAccessoryType), localizer.Translate(nameof(IAccessoryType)) },
+                { typeof(IArmorType), localizer.Translate(nameof(IArmorType)) },
+                { typeof(IWeaponType), localizer.Translate(nameof(IWeaponType)) },
+                { typeof(IConsumerType), localizer.Translate(nameof(IConsumerType)) },
+                { typeof(ISpecialGearType), localizer.Translate(nameof(ISpecialGearType)) },
+            };
 
             _accessoryTypes = typeRegistry.GetRegisteredTypes<IAccessoryType>()
                 .ToDictionary(x => x, x => localizer.Translate(x))

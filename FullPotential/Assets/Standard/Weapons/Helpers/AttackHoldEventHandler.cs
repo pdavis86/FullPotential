@@ -5,7 +5,7 @@ using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Input;
 using FullPotential.Api.Items;
 using FullPotential.Api.Logging;
-using FullPotential.Api.Obsolete.Items.Types;
+using FullPotential.Standard.Items;
 
 namespace FullPotential.Standard.Weapons.Helpers
 {
@@ -29,8 +29,7 @@ namespace FullPotential.Standard.Weapons.Helpers
             var item = eventArgs.Fighter.Inventory.GetItemInSlot(eventArgs.SlotId);
             var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);
 
-            if (item is Weapon weapon
-                && weapon.Attributes.IsAutomatic)
+            if (item is Weapon weapon && weapon.IsAutomatic)
             {
                 slotStatus.StartIntraActionLoopAsync(new SlotIntraAction
                 {

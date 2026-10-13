@@ -16,13 +16,11 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
-using FullPotential.Api.Obsolete.Items.Base;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Models.Player;
+using FullPotential.Models.LivingEntity;
 
 using Unity.Netcode;
 
@@ -214,7 +212,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public int TakeCountFromItemStacks(string typeId, int count)
         {
             var matches = _items
-                .Where(x => x.Value.RegistryTypeId == typeId)
+                .Where(x => x.Value is ItemStackBase && x.Value?.RegistryType?.TypeId.ToString() == typeId)
                 .Select(x => (ItemStackBase)x.Value)
                 .OrderBy(x => x.Count);
 
@@ -248,6 +246,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             MarkAsDirtyAndAddToQueue();
 
             return count - countRemaining;
+
         }
 
         public int GetItemStackTotal(string typeId)
@@ -255,18 +254,18 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return _items
                 .Where(
                     i => i.Value is ItemStackBase itemStack
-                    && itemStack.RegistryTypeId == typeId)
+                    && itemStack.RegistryType.TypeId.ToString() == typeId)
                 .Select(i => (ItemStackBase)i.Value)
                 .Sum(i => i.Count);
         }
 
-        public List<CombatItemBase> GetComponentsFromIds(string[] componentIds)
+        public List<ItemBase> GetComponentsFromIds(string[] componentIds)
         {
             //Check that the components are actually in the player's inventory and load them in the order they are given
-            var components = new List<CombatItemBase>();
+            var components = new List<ItemBase>();
             foreach (var id in componentIds)
             {
-                var match = GetItemWithId<CombatItemBase>(id);
+                var match = GetItemWithId<ItemBase>(id);
                 if (match != null)
                 {
                     components.Add(match);
@@ -275,39 +274,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return components;
         }
 
-        public List<string> ValidateIsCraftable(string[] componentIds, ItemBase itemToCraft)
+        public IEnumerable<string> ValidateIsCraftable(string[] componentIds, ItemBase itemToCraft)
         {
-            // todo: check these translations are being done client-side
-
             if (componentIds == null || componentIds.Length == 0)
             {
-                return new List<string> { _localizer.Translate("crafting.error.nocomponents") };
+                return new List<string> { "crafting.error.nocomponents" };
             }
 
             var components = GetComponentsFromIds(componentIds);
 
-            // todo: move these into type definitions
-            var errors = new List<string>();
-            if (itemToCraft is Consumer consumerItem)
-            {
-                if (consumerItem.EffectIds.Length == 0)
-                {
-                    errors.Add(_localizer.Translate("crafting.error.missingeffect"));
-                }
-            }
-            else if (itemToCraft is Weapon weapon)
-            {
-                if (components.Count > 8)
-                {
-                    errors.Add(_localizer.Translate("crafting.error.toomanycomponents"));
-                }
-                if (components.Count > 4 && !weapon.IsTwoHanded)
-                {
-                    errors.Add(_localizer.Translate("crafting.error.toomanyforonehanded"));
-                }
-            }
-
-            return errors;
+            return itemToCraft.ValidateCraftingAttempt(components);
         }
 
         protected bool IsValidSlotId(string slotId)
@@ -333,7 +309,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var partiallyFullStacks = _items
                 .Where(
                     i => i.Value is ItemStackBase oldStack
-                    && oldStack.RegistryTypeId == newStack.RegistryTypeId
+                    && oldStack.RegistryType.TypeId.ToString() == newStack.RegistryType.TypeId.ToString()
                     && oldStack.Count < oldStack.MaxSize)
                 .Select(i => (ItemStackBase)i.Value);
 
@@ -485,9 +461,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
                         resourcesInUse.Add(resourceId);
                     }
 
-                    if (value.Item is SpecialGear specialGear)
+                    if (value.Item.RegistryType is ISpecialGearType specialGearType)
                     {
-                        var otherResourceIds = ((ISpecialGearType)specialGear.RegistryType).ResourceTypeIdsInUse;
+                        var otherResourceIds = specialGearType.ResourceTypeIdsInUse;
                         foreach (var otherResourceId in otherResourceIds)
                         {
                             if (!resourcesInUse.Contains(otherResourceId))
@@ -500,6 +476,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
 
             return resourcesInUse;
+        }
+
+        public void SetEquippedItemVisuals(string slotId, GameObject newObj)
+        {
+            _equippedItems[slotId].GameObject = newObj;
         }
     }
 }

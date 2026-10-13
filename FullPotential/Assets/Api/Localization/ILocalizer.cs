@@ -1,4 +1,3 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -28,7 +27,5 @@ namespace FullPotential.Api.Localization
         string Translate(int number);
 
         string Translate(float number, int decimalPlaces = 1);
-
-        Dictionary<T, string> GetDictionaryFromEnum<T>(TranslationType translationType, bool sort = true) where T : Enum;
     }
 }

@@ -7,7 +7,7 @@ using FullPotential.Api.Data;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Models.GameManagement;
-using FullPotential.Models.Player;
+using FullPotential.Models.LivingEntity;
 
 using UnityEngine;
 using UnityEngine.Networking;
@@ -27,48 +27,42 @@ namespace FullPotential.Core.Persistence.Https
         public async UniTask SaveConnectionDetailsAsync(ConnectionDetails connectionDetails)
         {
             var json = JsonUtility.ToJson(connectionDetails);
-            using (var request = UnityWebRequest.Post(BaseAddress + "Instance/SaveConnectionDetails", json, MediaTypeNames.Application.Json))
+            using var request = UnityWebRequest.Post(BaseAddress + "Instance/SaveConnectionDetails", json, MediaTypeNames.Application.Json);
+            SetAuthenticationHeader(request);
+
+            await request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
             {
-                SetAuthenticationHeader(request);
-
-                await request.SendWebRequest();
-
-                if (request.result != UnityWebRequest.Result.Success)
-                {
-                    LogFailure(request);
-                }
+                LogFailure(request);
             }
         }
 
         public async UniTask SaveCharacterDataAsync(CharacterData playerData)
         {
             var json = playerData.ToJson();
-            using (var request = UnityWebRequest.Post(BaseAddress + "Character/SaveCharacterData", json, MediaTypeNames.Application.Json))
+            using var request = UnityWebRequest.Post(BaseAddress + "Character/SaveCharacterData", json, MediaTypeNames.Application.Json);
+            SetAuthenticationHeader(request);
+
+            await request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
             {
-                SetAuthenticationHeader(request);
-
-                await request.SendWebRequest();
-
-                if (request.result != UnityWebRequest.Result.Success)
-                {
-                    LogFailure(request);
-                }
+                LogFailure(request);
             }
         }
 
         public async UniTask SaveInventoryDataAsync(InventoryData inventoryData)
         {
             var json = inventoryData.ToJson();
-            using (var request = UnityWebRequest.Post(BaseAddress + "Character/SaveInventoryData", json, MediaTypeNames.Application.Json))
+            using var request = UnityWebRequest.Post(BaseAddress + "Character/SaveInventoryData", json, MediaTypeNames.Application.Json);
+            SetAuthenticationHeader(request);
+
+            await request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
             {
-                SetAuthenticationHeader(request);
-
-                await request.SendWebRequest();
-
-                if (request.result != UnityWebRequest.Result.Success)
-                {
-                    LogFailure(request);
-                }
+                LogFailure(request);
             }
         }
 

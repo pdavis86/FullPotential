@@ -50,7 +50,7 @@ namespace FullPotential.Standard.Resources
                 return;
             }
 
-            var equippedBarrier = targetFighter.Inventory.GetItemInSlot<Api.Obsolete.Items.Types.SpecialGear>(BarrierSlot.TypeIdString);
+            var equippedBarrier = targetFighter.Inventory.GetItemInSlot<Items.SpecialGear>(BarrierSlot.TypeIdString);
 
             if (equippedBarrier == null)
             {
@@ -71,7 +71,7 @@ namespace FullPotential.Standard.Resources
             }
 
             //Consume item resource (-2 to overcome replenish of 1)
-            livingEntity.TriggerResourceValueUpdate(equippedBarrier.ResourceTypeId, -2, targetFighter.name, null);
+            livingEntity.TriggerResourceValueUpdate(equippedBarrier.ResourceType.TypeId.ToString(), -2, targetFighter.name, null);
 
             //Replenish barrier resource
             //todo: zzz v0.8 - trait-based resource recharge

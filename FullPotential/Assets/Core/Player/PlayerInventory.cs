@@ -10,15 +10,15 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Obsolete.Items.Base;
-using FullPotential.Api.Obsolete.Items.Types;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
-using FullPotential.Models.Player;
+using FullPotential.Models.LivingEntity;
 
 using Unity.Netcode;
 
@@ -91,7 +91,7 @@ namespace FullPotential.Core.Player
         public IEnumerable<ItemBase> GetHandItems()
         {
             return _items
-                .Where(x => x.Value is Weapon or Consumer)
+                .Where(x => x.Value.RegistryType is IWeaponType or IConsumerType)
                 .Select(x => x.Value)
                 .OrderBy(x => x.Name);
         }
@@ -106,13 +106,13 @@ namespace FullPotential.Core.Player
             }
 
             var matches = _items
-                .Where(x => !x.Value.RegistryTypeId.IsNullOrWhiteSpace() && slotId.StartsWith(x.Value.RegistryTypeId));
+                .Where(x => x.Value.RegistryType != null && slotId.StartsWith(x.Value.RegistryType.TypeId.ToString()));
 
             if (!matches.Any())
             {
                 matches = _items.Where(
-                    i => i.Value is SpecialGear specialGear
-                         && slotId.StartsWith(((ISpecialGearType)specialGear.RegistryType).SlotIdString));
+                    i => i.Value.RegistryType is ISpecialGearType specialGearType
+                         && slotId.StartsWith(specialGearType.SlotIdString));
             }
 
             return matches
@@ -204,249 +204,16 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            if (item is SpecialGear)
+            if (item is IHasItemVisuals itemWithVisuals)
             {
-                InstantiateCustomGearVisuals(slotId, item);
-                return;
+                itemWithVisuals.InstantiateItemVisuals(_playerFighter, slotId);
             }
-
-            if (item is Accessory)
-            {
-                InstantiateAccessoryVisuals(slotId, item);
-                return;
-            }
-
-            if (item is Armor)
-            {
-                InstantiateArmorVisuals(slotId, item);
-                return;
-            }
-
-            switch (slotId)
-            {
-                case HandSlotIds.LeftHand:
-                case HandSlotIds.RightHand:
-                    SpawnItemInHand(slotId, item);
-                    break;
-
-                default:
-                    _logger.Warn("Not yet implemented equipping for slot {0}", slotId);
-                    break;
-            }
-        }
-
-        private void SpawnItemInHand(string slotId, ItemBase item)
-        {
-            if (!NetworkManager.Singleton.IsClient)
-            {
-                _logger.Error("Tried to spawn a GameObject on a server");
-                return;
-            }
-
-            switch (item)
-            {
-                case Weapon weapon:
-                    _typeRegistry.LoadAddessable<GameObject>(
-                       weapon.Visuals.PrefabAddress,
-                       prefab =>
-                       {
-                           InstantiateInPlayerHand(slotId, prefab, new Vector3(0, 90));
-                       });
-
-                    break;
-
-                case Consumer consumer:
-                    if (consumer.ResourceType.ItemInHandDefaultPrefab == null)
-                    {
-                        _logger.Warn("No default prefab exists for resource type '{0}'", _localizer.Translate(consumer.ResourceType));
-                        return;
-                    }
-
-                    _typeRegistry.LoadAddessable<GameObject>(
-                        consumer.ResourceType.ItemInHandDefaultPrefab,
-                        prefab =>
-                        {
-                            if (prefab != null)
-                            {
-                                InstantiateInPlayerHand(slotId, prefab, null);
-                            }
-                        });
-
-                    break;
-
-                default:
-                    _logger.Warn("Not implemented SpawnItemInHand handling for item type {0}", item.GetType().Name);
-                    break;
-            }
-        }
-
-        private void InstantiateInPlayerHand(string slotId, GameObject prefab, Vector3? rotation)
-        {
-            var newObj = Instantiate(prefab, _playerFighter.InFrontOfPlayer.transform);
-
-            newObj.transform.localPosition = slotId == HandSlotIds.LeftHand
-                ? _playerFighter.Positions.LeftHand.localPosition
-                : _playerFighter.Positions.RightHand.localPosition;
-
-            if (rotation.HasValue)
-            {
-                newObj.transform.localEulerAngles = rotation.Value;
-            }
-
-            if (IsOwner)
-            {
-                newObj.SetGameLayerRecursive(_playerFighter.InFrontOfPlayer.layer);
-            }
-
-            _equippedItems[slotId].GameObject = newObj;
-        }
-
-        private void InstantiateAccessoryVisuals(
-            string slotId,
-            ItemBase item)
-        {
-            Transform parentTransform = null;
-            var showsOnPlayerCamera = false;
-            Action<Transform> manipulateTransform = null;
-
-            //todo: remove special cases
-            switch (slotId)
-            {
-                case "ddeafb61-0163-4888-b355-16a37d3a33b5" + ";1": //SlotGameObjectName.Amulet:
-                    const float amuletForwardMultiplier = 0.2f;
-                    parentTransform = _playerFighter.GraphicsTransform;
-                    manipulateTransform = t => t.position += t.forward * amuletForwardMultiplier;
-                    break;
-
-                case "6d4bce60-dda6-4a88-82fd-c2b086065c8b" + ";1": //SlotGameObjectName.Belt:
-                    parentTransform = _playerFighter.GraphicsTransform;
-                    break;
-
-                case "b74b00f9-9cf1-4758-9e22-b4fbd4d1cea0" + ";1": //SlotGameObjectName.LeftRing:
-                    parentTransform = _playerFighter.BodyParts.LeftArm;
-                    showsOnPlayerCamera = true;
-                    break;
-
-                case "b74b00f9-9cf1-4758-9e22-b4fbd4d1cea0" + ";2": //SlotGameObjectName.RightRing:
-                    parentTransform = _playerFighter.BodyParts.RightArm;
-                    showsOnPlayerCamera = true;
-                    break;
-            }
-
-            var thisClient = NetworkManager.LocalClientId == OwnerClientId;
-
-            if (!showsOnPlayerCamera && thisClient)
-            {
-                return;
-            }
-
-            if (item is not Accessory accessoryItem)
-            {
-                _logger.Error("Item is not an accessory");
-                return;
-            }
-
-            if (accessoryItem.Visuals == null)
-            {
-                return;
-            }
-
-            _typeRegistry.LoadAddessable<GameObject>(
-                accessoryItem.Visuals.PrefabAddress,
-                prefab =>
-                {
-                    var newObj = Instantiate(prefab, parentTransform);
-
-                    manipulateTransform?.Invoke(newObj.transform);
-
-                    if (showsOnPlayerCamera && thisClient)
-                    {
-                        newObj.SetGameLayerRecursive(LayerMask.NameToLayer(Layers.InFrontOfPlayer));
-                    }
-
-                    _equippedItems[slotId].GameObject = newObj;
-                });
-        }
-
-        private void InstantiateArmorVisuals(
-            string slotId,
-            ItemBase item)
-        {
-            Transform parentTransform = null;
-
-            //todo: remove special cases
-            switch (slotId)
-            {
-                case ArmorTypeIds.HelmId:
-                    parentTransform = _playerFighter.BodyParts.Head;
-                    break;
-
-                case ArmorTypeIds.ChestId:
-                case ArmorTypeIds.LegsId:
-                case ArmorTypeIds.FeetId:
-                    parentTransform = _playerFighter.GraphicsTransform;
-                    break;
-            }
-
-            if (item is not Armor armorItem)
-            {
-                _logger.Error("Item is not armor");
-                return;
-            }
-
-            if (NetworkManager.LocalClientId == OwnerClientId)
-            {
-                return;
-            }
-
-            if (armorItem.Visuals == null)
-            {
-                return;
-            }
-
-            _typeRegistry.LoadAddessable<GameObject>(
-                armorItem.Visuals.PrefabAddress,
-                prefab =>
-                {
-                    var newObj = Instantiate(prefab, parentTransform);
-                    _equippedItems[slotId].GameObject = newObj;
-                });
-        }
-
-        private void InstantiateCustomGearVisuals(
-            string slotId,
-            ItemBase item)
-        {
-            if (item is not SpecialGear specialGearItem)
-            {
-                _logger.Error("Item is not special gear");
-                return;
-            }
-
-            if (NetworkManager.LocalClientId == OwnerClientId)
-            {
-                return;
-            }
-
-            if (specialGearItem.Visuals == null)
-            {
-                return;
-            }
-
-            _typeRegistry.LoadAddessable<GameObject>(
-                specialGearItem.Visuals.PrefabAddress,
-                prefab =>
-                {
-                    var newObj = Instantiate(prefab, _playerFighter.GraphicsTransform);
-                    _equippedItems[slotId].GameObject = newObj;
-                });
         }
 
         public void AddItemAsAdmin(ItemBase item)
         {
             GameManager.Instance.CheckIsAdmin();
 
-            _itemFactory.FillTypesFromIds(item);
             _items.Add(item.Id, item);
 
             MarkAsDirtyAndAddToQueue();

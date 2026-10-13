@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,8 +21,8 @@ namespace FullPotential.Core.Persistence
     {
         private readonly IAuditor _logger;
         private readonly Dictionary<string, List<ISaveable>> _queue = new Dictionary<string, List<ISaveable>>();
+        private readonly IDataSaver _dataSaver;
 
-        private IDataSaver _dataSaver;
         private bool _isProcessingQueue;
 
         public SaveManager(IAuditorFactory auditorFactory, IDataSaver dataSaver)

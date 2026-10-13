@@ -7,7 +7,7 @@ using FullPotential.Api.Data;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Models.GameManagement;
-using FullPotential.Models.Player;
+using FullPotential.Models.LivingEntity;
 using FullPotential.Models.Utilities;
 
 using Newtonsoft.Json.Linq;

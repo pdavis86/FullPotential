@@ -1,26 +1,14 @@
-using System;
-
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 
 namespace FullPotential.Api.Items.Base
 {
-    // todo: remove Serializable
-    // todo: make abstract
-    [Serializable]
-    public class ItemStackBase : ItemBase
+    public abstract class ItemStackBase : ItemBase
     {
-        public int CountForSerialization;
-        public string BaseName;
-
         public int Count
         {
-            get => int.Parse(PropertyDictionary[nameof(Count)]);
-            set
-            {
-                CountForSerialization = value;
-                PropertyDictionary[nameof(Count)] = value.ToString();
-            }
+            get => int.Parse(Properties[nameof(Count)]);
+            set => Properties[nameof(Count)] = value.ToString();
         }
 
         public int MaxSize => ((IItemStackType)RegistryType).MaxStackSize;
@@ -29,7 +17,8 @@ namespace FullPotential.Api.Items.Base
         {
             return $"{localizer.Translate(RegistryType)} ({Count})";
         }
-        public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full, string itemName = null)
+
+        public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full)
         {
             return levelOfDetail == LevelOfDetail.Full ? GetName(localizer) : null;
         }

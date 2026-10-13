@@ -1,6 +1,7 @@
-﻿using System;
-using FullPotential.Api.Obsolete;
+using System;
+
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Gameplay.Attributes;
 
 namespace FullPotential.Standard.Effects.Debuffs
 {
@@ -12,6 +13,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public bool IsTemporaryMaxIncrease => false;
 
-        public AttributeAffected AttributeAffectedToAffect => AttributeAffected.Strength;
+        public string AttributeId => Strength.TypeId;
     }
 }

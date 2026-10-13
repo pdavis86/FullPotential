@@ -1,10 +1,11 @@
-﻿using System;
-using FullPotential.Api.Registry.Weapons;
+using System;
+
+using FullPotential.Api.Registry;
 using FullPotential.Standard.Weapons;
 
 namespace FullPotential.Standard.WeaponVisuals
 {
-    public class BasicCrossbow : IWeaponVisuals
+    public class BasicCrossbow : IItemVisuals
     {
         private static readonly Guid Id = new Guid("e599c546-2b9d-4e29-9fe2-abfa09eaeb91");
 

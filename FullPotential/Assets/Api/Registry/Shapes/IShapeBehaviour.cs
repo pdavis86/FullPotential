@@ -1,5 +1,5 @@
-﻿using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Obsolete.Items.Types;
+using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Items;
 
 using UnityEngine;
 

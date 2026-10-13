@@ -2,12 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Logging;
-using FullPotential.Api.Obsolete;
-using FullPotential.Api.Obsolete.Items.Base;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
@@ -16,15 +13,16 @@ using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Models.Player;
+using FullPotential.Models.LivingEntity;
+
+using Range = FullPotential.Api.Gameplay.Attributes.Range;
 
 namespace FullPotential.Api.Items
 {
     public class ItemFactory : IItemFactory
     {
         private readonly IAuditor _logger;
-
-        private ITypeRegistry _typeRegistry;
+        private readonly ITypeRegistry _typeRegistry;
 
         private List<string> _lootTypeIds;
         private List<string> _accessoryTypeIds;
@@ -43,7 +41,6 @@ namespace FullPotential.Api.Items
         {
             ItemBase item;
 
-            // todo: why are the models obsolete but the interfaces are not???
             _lootTypeIds ??= _typeRegistry.GetRegisteredTypes<ILootType>().Select(x => x.TypeId.ToString()).ToList();
             _accessoryTypeIds ??= _typeRegistry.GetRegisteredTypes<IAccessoryType>().Select(x => x.TypeId.ToString()).ToList();
             _armorTypeIds ??= _typeRegistry.GetRegisteredTypes<IArmorType>().Select(x => x.TypeId.ToString()).ToList();
@@ -53,128 +50,44 @@ namespace FullPotential.Api.Items
 
             if (_lootTypeIds.Contains(model.RegistryTypeId))
             {
-                item = new Loot
-                {
-                    Id = model.Id,
-                    CharacterId = model.CharacterId,
-                    RegistryTypeId = model.RegistryTypeId,
-                    Name = model.Name,
-                    Attributes = GetAttributes(model.Attributes),
-                    EffectIds = model.EffectIds.Select(x => x).ToArray(),
-                    Effects = GetEffects(model),
-                    TargetingTypeId = GetStringProperty(model, nameof(ItemWithTargetingAndShapeBase.TargetingTypeId)),
-                    TargetingVisualsTypeId = GetStringProperty(model, nameof(ItemWithTargetingAndShapeBase.TargetingVisualsTypeId)),
-                    ShapeTypeId = GetStringProperty(model, nameof(ItemWithTargetingAndShapeBase.ShapeTypeId)),
-                    ShapeVisualsTypeId = GetStringProperty(model, nameof(ItemWithTargetingAndShapeBase.ShapeVisualsTypeId))
-                };
+                item = _typeRegistry.GetItemTypeMapping<ILootType>().CreateNew();
             }
             else if (_accessoryTypeIds.Contains(model.RegistryTypeId))
             {
-                item = new Accessory
-                {
-                    Id = model.Id,
-                    CharacterId = model.CharacterId,
-                    RegistryTypeId = model.RegistryTypeId,
-                    Name = model.Name,
-                    Attributes = GetAttributes(model.Attributes),
-                    EffectIds = model.EffectIds.Select(x => x).ToArray(),
-                    Effects = GetEffects(model),
-                    AccessoryVisualsTypeId = GetStringProperty(model, nameof(Accessory.AccessoryVisualsTypeId))
-                };
+                item = _typeRegistry.GetItemTypeMapping<IAccessoryType>().CreateNew();
             }
             else if (_armorTypeIds.Contains(model.RegistryTypeId))
             {
-                item = new Armor
-                {
-                    Id = model.Id,
-                    CharacterId = model.CharacterId,
-                    RegistryTypeId = model.RegistryTypeId,
-                    Name = model.Name,
-                    Attributes = GetAttributes(model.Attributes),
-                    EffectIds = model.EffectIds.Select(x => x).ToArray(),
-                    Effects = GetEffects(model),
-                    ArmorVisualsTypeId = GetStringProperty(model, nameof(Armor.ArmorVisualsTypeId))
-                };
+                item = _typeRegistry.GetItemTypeMapping<IArmorType>().CreateNew();
             }
             else if (_weaponTypeIds.Contains(model.RegistryTypeId))
             {
-                item = new Weapon
-                {
-                    Id = model.Id,
-                    CharacterId = model.CharacterId,
-                    RegistryTypeId = model.RegistryTypeId,
-                    Name = model.Name,
-                    Attributes = GetAttributes(model.Attributes),
-                    EffectIds = model.EffectIds.Select(x => x).ToArray(),
-                    Effects = GetEffects(model),
-                    WeaponVisualsTypeId = GetStringProperty(model, nameof(Weapon.WeaponVisualsTypeId)),
-                    Ammo = GetIntProperty(model, nameof(Weapon.Ammo))
-                };
+                item = _typeRegistry.GetItemTypeMapping<IWeaponType>().CreateNew();
             }
             else if (_ammunitionTypeIds.Contains(model.RegistryTypeId))
             {
-                item = new ItemStackBase
-                {
-                    Id = model.Id,
-                    CharacterId = model.CharacterId,
-                    RegistryTypeId = model.RegistryTypeId,
-                    Name = model.Name,
-                    Count = GetIntProperty(model, nameof(ItemStackBase.Count)),
-                    BaseName = GetStringProperty(model, nameof(ItemStackBase.BaseName))
-                };
+                item = _typeRegistry.GetItemTypeMapping<IAmmunitionType>().CreateNew();
             }
             else if (_specialTypeIds.Contains(model.RegistryTypeId))
             {
-                item = new SpecialGear
-                {
-                    Id = model.Id,
-                    CharacterId = model.CharacterId,
-                    RegistryTypeId = model.RegistryTypeId,
-                    Name = model.Name,
-                    Attributes = GetAttributes(model.Attributes),
-                    EffectIds = model.EffectIds.Select(x => x).ToArray(),
-                    Effects = GetEffects(model),
-                    IsTwoHanded = GetBoolProperty(model, nameof(SpecialGear.IsTwoHanded)),
-                    CustomVisualsTypeId = GetStringProperty(model, nameof(SpecialGear.CustomVisualsTypeId)),
-                    ResourceTypeId = GetStringProperty(model, nameof(SpecialGear.ResourceTypeId)),
-                    CustomData = model.Properties
-                        .Where(kvp => kvp.Key != nameof(SpecialGear.CustomVisualsTypeId) && kvp.Key != nameof(SpecialGear.ResourceTypeId))
-                        .Select(kvp => new SerializableKeyValuePair<string, string>(kvp.Key, kvp.Value))
-                        .ToArray()
-                };
+                item = _typeRegistry.GetItemTypeMapping<ISpecialGearType>().CreateNew();
             }
-            else if (model.Properties.GetStringValueOrNull(nameof(Consumer.ResourceTypeId)) != null)
+            else if (model.Properties.GetStringValueOrNull(IResourceConsumer.PropertyKeyResourceTypeId) != null)
             {
-                item = new Consumer
-                {
-                    Id = model.Id,
-                    CharacterId = model.CharacterId,
-                    RegistryTypeId = model.RegistryTypeId,
-                    Name = model.Name,
-                    Attributes = GetAttributes(model.Attributes),
-                    EffectIds = model.EffectIds.Select(x => x).ToArray(),
-                    Effects = GetEffects(model),
-                    IsTwoHanded = GetBoolProperty(model, nameof(Consumer.IsTwoHanded)),
-                    TargetingTypeId = GetStringProperty(model, nameof(Consumer.TargetingTypeId)),
-                    TargetingVisualsTypeId = GetStringProperty(model, nameof(Consumer.TargetingVisualsTypeId)),
-                    ShapeTypeId = GetStringProperty(model, nameof(Consumer.ShapeTypeId)),
-                    ShapeVisualsTypeId = GetStringProperty(model, nameof(Consumer.ShapeVisualsTypeId)),
-                    ResourceTypeId = GetStringProperty(model, nameof(Consumer.ResourceTypeId))
-                };
+                item = _typeRegistry.GetItemTypeMapping<IConsumerType>().CreateNew();
             }
             else
             {
                 throw new Exception("Unexpected type");
             }
 
-            if (item is CombatItemBase combatItem)
-            {
-                combatItem.ShapeCode = GetStringProperty(model, nameof(CombatItemBase.ShapeCode));
-            }
+            item.Id = model.Id;
+            item.CharacterId = model.CharacterId;
+            item.Name = model.Name;
 
             FillAttributeDictionary(model, item);
             FillPropertyDictionary(model, item);
-            FillTypesFromIds(item);
+            FillTypesFromIds(model, item);
 
             return item;
         }
@@ -183,148 +96,87 @@ namespace FullPotential.Api.Items
         {
             if (model.Attributes == null)
             {
+                item.Attributes = new Dictionary<string, string>();
                 return;
             }
 
+            item.Attributes = new Dictionary<string, string>();
+
+            // todo: zzz v0.8 - Remove backwards compatibility: item.Attributes = new Dictionary<string, string>(model.Attributes);
             foreach (var kvp in model.Attributes)
             {
-                item.AttributeDictionary[kvp.Key] = kvp.Value;
+                var adjustedKey = kvp.Key switch
+                {
+                    "Strength" => Strength.TypeId,
+                    "Efficiency" => Efficiency.TypeId,
+                    "Range" => Range.TypeId,
+                    "Accuracy" => Accuracy.TypeId,
+                    "Speed" => Speed.TypeId,
+                    "Recovery" => Recovery.TypeId,
+                    "Duration" => Duration.TypeId,
+                    "Luck" => Luck.TypeId,
+                    _ => kvp.Key,
+                };
+
+                if (adjustedKey is "IsAutomatic" or "ExtraAmmoPerShot")
+                {
+                    continue;
+                }
+
+                item.Attributes[adjustedKey] = kvp.Value;
             }
         }
 
         private void FillPropertyDictionary(ItemData model, ItemBase item)
         {
-            foreach (var kvp in model.Properties)
+            if (model.Properties == null)
             {
-                item.PropertyDictionary[kvp.Key] = kvp.Value;
+                item.Properties = new Dictionary<string, string>();
+                return;
             }
-        }
 
-        private Attributes GetAttributes(Dictionary<string, string> attributes)
-        {
-            return new Attributes
-            {
-                IsAutomatic = attributes.ContainsKey(nameof(Attributes.IsAutomatic)) ? bool.Parse(attributes[nameof(Attributes.IsAutomatic)]) : false,
-                ExtraAmmoPerShot = attributes.ContainsKey(nameof(Attributes.ExtraAmmoPerShot)) ? byte.Parse(attributes[nameof(Attributes.ExtraAmmoPerShot)]) : (byte)0,
-                Strength = attributes.ContainsKey(nameof(Attributes.Strength)) ? int.Parse(attributes[nameof(Attributes.Strength)]) : 0,
-                Efficiency = attributes.ContainsKey(nameof(Attributes.Efficiency)) ? int.Parse(attributes[nameof(Attributes.Efficiency)]) : 0,
-                Range = attributes.ContainsKey(nameof(Attributes.Range)) ? int.Parse(attributes[nameof(Attributes.Range)]) : 0,
-                Accuracy = attributes.ContainsKey(nameof(Attributes.Accuracy)) ? int.Parse(attributes[nameof(Attributes.Accuracy)]) : 0,
-                Speed = attributes.ContainsKey(nameof(Attributes.Speed)) ? int.Parse(attributes[nameof(Attributes.Speed)]) : 0,
-                Recovery = attributes.ContainsKey(nameof(Attributes.Recovery)) ? int.Parse(attributes[nameof(Attributes.Recovery)]) : 0,
-                Duration = attributes.ContainsKey(nameof(Attributes.Duration)) ? int.Parse(attributes[nameof(Attributes.Duration)]) : 0,
-                Luck = attributes.ContainsKey(nameof(Attributes.Luck)) ? int.Parse(attributes[nameof(Attributes.Luck)]) : 0
-            };
-        }
+            item.Properties = new Dictionary<string, string>(model.Properties);
 
-        private Dictionary<string, string> GetAttributeDictionary(Attributes attributes)
-        {
-            return new Dictionary<string, string>
-            {
-                { nameof(Attributes.IsAutomatic), attributes.IsAutomatic.ToString() },
-                { nameof(Attributes.ExtraAmmoPerShot), attributes.ExtraAmmoPerShot.ToString() },
-                { nameof(Attributes.Strength), attributes.Strength.ToString() },
-                { nameof(Attributes.Efficiency), attributes.Efficiency.ToString() },
-                { nameof(Attributes.Range), attributes.Range.ToString() },
-                { nameof(Attributes.Accuracy), attributes.Accuracy.ToString() },
-                { nameof(Attributes.Speed), attributes.Speed.ToString() },
-                { nameof(Attributes.Recovery), attributes.Recovery.ToString() },
-                { nameof(Attributes.Duration), attributes.Duration.ToString() },
-                { nameof(Attributes.Luck), attributes.Luck.ToString() },
-            };
-        }
-
-        private bool GetBoolProperty(ItemData model, string key)
-        {
-            return model.Properties.ContainsKey(key) ? bool.Parse(model.Properties[key]) : false;
-        }
-
-        private int GetIntProperty(ItemData model, string key)
-        {
-            return model.Properties.ContainsKey(key) ? int.Parse(model.Properties[key]) : 0;
-        }
-
-        private string GetStringProperty(ItemData model, string key)
-        {
-            return model.Properties.ContainsKey(key) ? model.Properties[key] : null;
+            // todo: zzz v0.8 - Remove backwards compatibility
+            item.Properties["IsAutomatic"] = model.Attributes?.GetStringValueOrNull("IsAutomatic");
+            item.Properties["ExtraAmmoPerShot"] = model.Attributes?.GetStringValueOrNull("ExtraAmmoPerShot");
         }
 
         public ItemData GetDataFromItem(string characterId, ItemBase item)
         {
-            var itemData = new ItemData
+            var model = new ItemData
             {
                 Id = item.Id,
                 CharacterId = characterId,
-                RegistryTypeId = item.RegistryTypeId,
-                Name = item.Name
+                RegistryTypeId = item.RegistryType?.TypeId.ToString(),
+                Name = item.Name,
+                Attributes = GetNonDefaultValues(item.Attributes),
+                Properties = GetNonDefaultValues(item.Properties),
             };
 
-            if (item is CombatItemBase combatItem)
+            if (item is IHasEffects itemWithEffects)
             {
-                itemData.Attributes = GetAttributeDictionary(combatItem.Attributes);
-                itemData.EffectIds = combatItem.EffectIds?.Select(x => x).ToList() ?? new List<string>();
-                itemData.Properties = new Dictionary<string, string>
-                {
-                    { nameof(CombatItemBase.IsTwoHanded), combatItem.IsTwoHanded.ToString() },
-                    { nameof(CombatItemBase.ShapeCode), combatItem.ShapeCode },
-                };
+                model.EffectIds = itemWithEffects.EffectTypes.Select(t => t.TypeId.ToString()).ToList();
             }
 
-            if (item is ItemWithTargetingAndShapeBase complexItem)
-            {
-                itemData.Properties[nameof(ItemWithTargetingAndShapeBase.TargetingTypeId)] = complexItem.TargetingTypeId;
-                itemData.Properties[nameof(ItemWithTargetingAndShapeBase.TargetingVisualsTypeId)] = complexItem.TargetingVisualsTypeId;
-                itemData.Properties[nameof(ItemWithTargetingAndShapeBase.ShapeTypeId)] = complexItem.ShapeTypeId;
-                itemData.Properties[nameof(ItemWithTargetingAndShapeBase.ShapeVisualsTypeId)] = complexItem.ShapeVisualsTypeId;
-            }
-
-            // todo: why are there separate xxxVisualsTypeId for each type?
-            switch (item)
-            {
-                case Accessory accessory:
-                    itemData.Properties[nameof(Accessory.AccessoryVisualsTypeId)] = accessory.AccessoryVisualsTypeId;
-                    break;
-
-                case Armor armor:
-                    itemData.Properties[nameof(Armor.ArmorVisualsTypeId)] = armor.ArmorVisualsTypeId;
-                    break;
-
-                case Weapon weapon:
-                    itemData.Properties[nameof(Weapon.WeaponVisualsTypeId)] = weapon.WeaponVisualsTypeId;
-                    itemData.Properties[nameof(Weapon.Ammo)] = weapon.Ammo.ToString();
-                    break;
-
-                case Consumer consumer:
-                    itemData.Properties[nameof(Consumer.ResourceTypeId)] = consumer.ResourceTypeId;
-                    break;
-
-                case ItemStackBase itemStack:
-                    // todo: sort out this BaseName nonsense
-                    itemData.Properties = new Dictionary<string, string>
-                    {
-                        { nameof(ItemStackBase.Count) , itemStack.CountForSerialization.ToString() },
-                        { nameof(ItemStackBase.BaseName), itemStack.BaseName }
-                    };
-                    break;
-
-                case SpecialGear specialGear:
-                    itemData.Properties[nameof(SpecialGear.CustomVisualsTypeId)] = specialGear.CustomVisualsTypeId;
-                    itemData.Properties[nameof(SpecialGear.ResourceTypeId)] = specialGear.ResourceTypeId;
-                    foreach (var kvp in specialGear.CustomData)
-                    {
-                        itemData.Properties[kvp.Key] = kvp.Value;
-                    }
-                    break;
-            }
-
-            return itemData;
+            return model;
         }
 
-        public void FillTypesFromIds(ItemBase item)
+        private Dictionary<string, string> GetNonDefaultValues(Dictionary<string, string> input)
         {
-            if (!string.IsNullOrWhiteSpace(item.RegistryTypeId) && item.RegistryType == null)
+            var nonDefaultAttributes = input.Where(
+                kvp => !string.IsNullOrWhiteSpace(kvp.Value)
+                && kvp.Value != "0"
+                && !kvp.Value.Equals(bool.FalseString, StringComparison.OrdinalIgnoreCase));
+
+            return nonDefaultAttributes.ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        public void FillTypesFromIds(ItemData model, ItemBase item)
+        {
+            if (!string.IsNullOrWhiteSpace(model.RegistryTypeId) && item.RegistryType == null)
             {
-                var itemType = _typeRegistry.GetRegistryTypeForItem(item);
+                var itemType = _typeRegistry.GetAnyRegisteredTypeById(model.RegistryTypeId);
 
                 if (itemType == null)
                 {
@@ -335,97 +187,58 @@ namespace FullPotential.Api.Items
                 item.RegistryType = itemType;
             }
 
-            if (item is ItemWithTargetingAndShapeBase withTargetingAndShape && !string.IsNullOrWhiteSpace(withTargetingAndShape.TargetingTypeId))
+            if (item is IHasTargetingAndShape withTargetingAndShape)
             {
-                withTargetingAndShape.Targeting = _typeRegistry.GetRegisteredTypes<ITargetingType>()
-                    .First(x => x.TypeId.ToString() == withTargetingAndShape.TargetingTypeId);
-
-                withTargetingAndShape.TargetingVisuals = _typeRegistry.GetRegisteredTypes<ITargetingVisuals>()
-                    .FirstOrDefault(v => v.TypeId.ToString() == withTargetingAndShape.TargetingVisualsTypeId);
-
-                if (!string.IsNullOrWhiteSpace(withTargetingAndShape.ShapeTypeId))
+                var targetingTypeId = item.Properties.GetStringValueOrNull(IHasTargetingAndShape.PropertyKeyTargetingTypeId);
+                if (!string.IsNullOrWhiteSpace(targetingTypeId))
                 {
-                    withTargetingAndShape.Shape = _typeRegistry.GetRegisteredTypes<IShapeType>()
-                        .First(x => x.TypeId.ToString() == withTargetingAndShape.ShapeTypeId);
+                    withTargetingAndShape.TargetingType = _typeRegistry.GetRegisteredTypes<ITargetingType>()
+                        .First(x => x.TypeId.ToString() == targetingTypeId);
 
-                    withTargetingAndShape.ShapeVisuals = _typeRegistry.GetRegisteredTypes<IShapeVisuals>()
-                        .FirstOrDefault(v => v.TypeId.ToString() == withTargetingAndShape.ShapeVisualsTypeId);
+                    withTargetingAndShape.TargetingVisualsType = _typeRegistry.GetRegisteredTypes<IItemVisuals>()
+                        .FirstOrDefault(v => v.TypeId.ToString() == item.Properties.GetStringValueOrNull(IHasTargetingAndShape.PropertyKeyTargetingVisualsTypeId));
+                }
+
+                var shapeTypeId = item.Properties.GetStringValueOrNull(IHasTargetingAndShape.PropertyKeyShapeTypeId);
+                if (!string.IsNullOrWhiteSpace(shapeTypeId))
+                {
+                    withTargetingAndShape.ShapeType = _typeRegistry.GetRegisteredTypes<IShapeType>()
+                        .First(x => x.TypeId.ToString() == shapeTypeId);
+
+                    withTargetingAndShape.ShapeVisualsType = _typeRegistry.GetRegisteredTypes<IItemVisuals>()
+                        .FirstOrDefault(v => v.TypeId.ToString() == item.Properties.GetStringValueOrNull(IHasTargetingAndShape.PropertyKeyShapeVisualsTypeId));
                 }
             }
 
-            if (item is Consumer consumer)
+            if (item is IResourceConsumer consumer)
             {
                 consumer.ResourceType = _typeRegistry.GetRegisteredTypes<IResourceType>()
-                    .First(x => x.TypeId.ToString() == consumer.ResourceTypeId);
-            }
-            else if (item is SpecialGear specialGear)
-            {
-                specialGear.ResourceType = _typeRegistry.GetRegisteredTypes<IResourceType>()
-                    .First(x => x.TypeId.ToString() == specialGear.ResourceTypeId);
+                    .First(x => x.TypeId.ToString() == item.Properties[IResourceConsumer.PropertyKeyResourceTypeId]);
             }
 
             if (item is IHasItemVisuals itemWithVisuals)
             {
-                switch (item)
+                // todo: zzz v0.9 - Remove backwards compatibility
+                var visualsTypeId = item.Properties.GetStringValueOrNull("AccessoryVisualsTypeId")
+                    ?? item.Properties.GetStringValueOrNull("ArmorVisualsTypeId")
+                    ?? item.Properties.GetStringValueOrNull("CustomVisualsTypeId")
+                    ?? item.Properties.GetStringValueOrNull("WeaponVisualsTypeId");
+
+                // todo: surely I should match on the visualsTypeId?!
+                if (!string.IsNullOrWhiteSpace(visualsTypeId))
                 {
-                    case Weapon:
-                        SetItemVisuals<IWeaponVisuals>(itemWithVisuals, item);
-                        break;
-
-                    case Armor:
-                        SetItemVisuals<IArmorVisuals>(itemWithVisuals, item);
-                        break;
-
-                    case Accessory:
-                        SetItemVisuals<IAccessoryVisuals>(itemWithVisuals, item);
-                        break;
-
-                    case SpecialGear:
-                        SetItemVisuals<ISpecialGearVisuals>(itemWithVisuals, item);
-                        break;
+                    itemWithVisuals.Visuals = _typeRegistry.GetRegisteredTypes<IItemVisuals>()
+                        .FirstOrDefault(v => v.ApplicableToTypeIdString == item.RegistryType.TypeId.ToString());
                 }
             }
 
-            if (item is CombatItemBase combatItem)
+            if (model.EffectIds != null && item is IHasEffects itemWithEffects)
             {
-                if (combatItem.EffectIds != null && combatItem.EffectIds.Length > 0 && combatItem.Effects == null)
-                {
-                    combatItem.Effects = combatItem.EffectIds
-                        .Select(x => _typeRegistry.GetRegisteredByTypeId<IEffectType>(x))
-                        .Where(x => x != null)
-                        .ToList();
-                }
-
-                //For backwards compatibility
-                combatItem.Effects ??= new List<IEffectType>();
-                if (!combatItem.Effects.Any())
-                {
-                    combatItem.Effects.Add(_typeRegistry.GetRegisteredByTypeId<IEffectType>(EffectTypeIds.HurtId));
-                }
+                itemWithEffects.EffectTypes = model.EffectIds
+                    .Select(x => _typeRegistry.GetRegisteredByTypeId<IEffectType>(x))
+                    .Where(x => x != null)
+                    .ToList();
             }
-        }
-
-        private void SetItemVisuals<T>(IHasItemVisuals itemWithVisuals, ItemBase item)
-            where T : IItemVisuals
-        {
-            if (itemWithVisuals.VisualsTypeId.IsNullOrWhiteSpace())
-            {
-                itemWithVisuals.Visuals = _typeRegistry.GetRegisteredTypes<T>()
-                    .FirstOrDefault(v => v.ApplicableToTypeIdString == item.RegistryType.TypeId.ToString());
-            }
-            else
-            {
-                itemWithVisuals.Visuals = _typeRegistry.GetRegisteredTypes<T>()
-                    .FirstOrDefault(v => v.TypeId.ToString() == itemWithVisuals.VisualsTypeId);
-            }
-        }
-
-        private List<IEffectType> GetEffects(ItemData model)
-        {
-            return model.EffectIds
-                .Select(x => _typeRegistry.GetRegisteredByTypeId<IEffectType>(x))
-                .Where(x => x != null)
-                .ToList();
         }
     }
 }

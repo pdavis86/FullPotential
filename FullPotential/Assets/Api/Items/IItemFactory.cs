@@ -1,5 +1,5 @@
-﻿using FullPotential.Api.Items.Base;
-using FullPotential.Models.Player;
+using FullPotential.Api.Items.Base;
+using FullPotential.Models.LivingEntity;
 
 namespace FullPotential.Api.Items
 {
@@ -9,6 +9,6 @@ namespace FullPotential.Api.Items
 
         ItemData GetDataFromItem(string characterId, ItemBase item);
 
-        void FillTypesFromIds(ItemBase item);
+        void FillTypesFromIds(ItemData model, ItemBase item);
     }
 }

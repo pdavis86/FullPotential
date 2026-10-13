@@ -4,6 +4,7 @@ using System.Linq;
 
 using Cysharp.Threading.Tasks;
 
+using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Effects;
@@ -17,7 +18,6 @@ using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
@@ -229,23 +229,19 @@ namespace FullPotential.Core.Ui.Behaviours
             equippedSummary.SetContents(item?.GetDescription(_localizer));
         }
 
-        private void UpdateHandAmmo(LivingEntityBase livingEntity, Text ammoText, SlotStatus slotStatus, ItemBase item)
+        private void UpdateHandAmmo(IPlayerFighter playerFighter, Text ammoText, SlotStatus slotStatus, ItemBase item)
         {
-            if (item is not Weapon weapon
-                || !weapon.IsRanged)
+            var uiText = item.GetTextForUiComponent(ammoText.name, playerFighter);
+
+            if (string.IsNullOrWhiteSpace(uiText))
             {
                 ammoText.transform.parent.gameObject.SetActive(false);
                 return;
             }
 
-            if (!ammoText.gameObject.activeInHierarchy)
-            {
-                ammoText.transform.parent.gameObject.SetActive(true);
-            }
-
             ammoText.text = slotStatus.IsBusy
                 ? _reloadingTranslation
-                : $"{weapon.Ammo}/{weapon.GetAmmoMax()} ({GetAvailableAmmo(livingEntity, slotStatus.SlotId)})";
+                : uiText;
         }
 
         private void UpdateHandCharge(ProgressWheel chargeWheel, ItemBase item)
@@ -379,8 +375,12 @@ namespace FullPotential.Core.Ui.Behaviours
 
             if (isSlotChange)
             {
-                var equippedHandSummary = slotId == HandSlotIds.LeftHand ? _equippedLeftHandSummary : _equippedRightHandSummary;
-                UpdateHandDescription(equippedHandSummary, item);
+                if (slotId is HandSlotIds.LeftHand or HandSlotIds.RightHand)
+                {
+                    var equippedHandSummary = slotId == HandSlotIds.LeftHand ? _equippedLeftHandSummary : _equippedRightHandSummary;
+                    UpdateHandDescription(equippedHandSummary, item);
+                }
+
                 UpdateResourceBars(fighter);
             }
 
@@ -393,7 +393,7 @@ namespace FullPotential.Core.Ui.Behaviours
             {
                 var ammoComponent = slotId == HandSlotIds.LeftHand ? _ammoLeft : _ammoRight;
                 var slotStatus = fighter.GetSlotStatus(slotId);
-                UpdateHandAmmo(fighter, ammoComponent, slotStatus, item);
+                UpdateHandAmmo((IPlayerFighter)livingEntity, ammoComponent, slotStatus, item);
             }
 
             if (isChargeChange)
@@ -403,13 +403,6 @@ namespace FullPotential.Core.Ui.Behaviours
             }
 
             return UniTask.CompletedTask;
-        }
-
-        public int GetAvailableAmmo(LivingEntityBase livingEntity, string slotId)
-        {
-            var weapon = livingEntity.Inventory.GetItemInSlot<Weapon>(slotId);
-            var ammoTypeId = weapon.WeaponType.AmmunitionTypeIdString;
-            return livingEntity.Inventory.GetItemStackTotal(ammoTypeId);
         }
 
         private UniTask HandleActiveEffectAddedAsync(ActiveEffectAddedEvent eventArgs)

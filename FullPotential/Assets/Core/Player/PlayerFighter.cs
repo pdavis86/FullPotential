@@ -25,7 +25,7 @@ using FullPotential.Core.Environment;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.GameManagement.Data;
 using FullPotential.Core.Ui.Components;
-using FullPotential.Models.Player;
+using FullPotential.Models.LivingEntity;
 
 using Unity.Netcode;
 
@@ -116,9 +116,9 @@ namespace FullPotential.Core.Player
 
         public override Transform LookTransform => _playerCamera.transform;
 
-        public Transform GraphicsTransform => _graphicsTransform;
-
         protected override IBarSlider HealthBarSlider { get; set; }
+
+        public GameObject InFrontOfPlayerGameObject => InFrontOfPlayer;
 
         #endregion
 
@@ -720,6 +720,11 @@ namespace FullPotential.Core.Player
             //ShowHudAlertClientRpc(_clientRpcParams, "ui.alert.itemsatmax");
 
             return UniTask.CompletedTask;
+        }
+
+        public bool IsLocalClient()
+        {
+            return NetworkManager.Singleton.LocalClientId == OwnerClientId;
         }
     }
 }

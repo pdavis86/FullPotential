@@ -2,19 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
-using FullPotential.Api.Obsolete;
-using FullPotential.Api.Obsolete.Items;
-using FullPotential.Api.Obsolete.Items.Base;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
@@ -60,8 +56,13 @@ namespace FullPotential.Core.Gameplay.Crafting
                 .ToList();
         }
 
-        private int ComputeAttribute(IList<CombatItemBase> components, Func<CombatItemBase, int> getProp, bool allowMax = true)
+        public int ComputeAttribute(IList<ItemBase> components, string attributeId, bool allowMax = true)
         {
+            int getProp(ItemBase x)
+            {
+                return x.Attributes.GetIntValue(attributeId);
+            }
+
             var withValue = components.Where(x => getProp(x) > 0).ToList();
 
             if (!withValue.Any())
@@ -80,46 +81,42 @@ namespace FullPotential.Core.Gameplay.Crafting
             return result == 0 ? 1 : result;
         }
 
-        private ITargetingType GetTargeting(IList<IHasTargetingAndShape> components)
+        public void SetTargetingAndShape(IHasTargetingAndShape item, IList<ItemBase> components)
         {
-            //Exactly one targeting option
-            var targetingComponent = components.FirstOrDefault(x => x.Targeting != null);
+            var relevantComponents = components.OfType<IHasTargetingAndShape>().ToList();
 
-            if (targetingComponent == null)
+            var targetingComponent = relevantComponents.FirstOrDefault(x => x.TargetingType != null);
+
+            item.TargetingType = targetingComponent == null
+                ? _typeRegistry.GetRegisteredTypes<ITargetingType>().FirstOrDefault()
+                : targetingComponent.TargetingType;
+
+            if (item.TargetingType == null || !item.TargetingType.CanHaveShape)
             {
-                return _typeRegistry.GetRegisteredTypes<ITargetingType>().FirstOrDefault();
+                return;
             }
 
-            return targetingComponent.Targeting;
-        }
-
-        private IShapeType GetShapeOrNone(ITargetingType targeting, IList<IHasTargetingAndShape> components)
-        {
-            //Only one shape, if any
-            if (!targeting.CanHaveShape)
-            {
-                return null;
-            }
-
-            var shapeComponent = components.FirstOrDefault(x => x.Shape != null);
+            var shapeComponent = relevantComponents.FirstOrDefault(x => x.ShapeType != null);
 
             if (shapeComponent == null)
             {
-                return null;
+                return;
             }
 
-            return _shapeTypes.FirstOrDefault(x => x.TypeId == shapeComponent.Shape.TypeId);
+            item.ShapeType = _shapeTypes.FirstOrDefault(x => x.TypeId == shapeComponent.ShapeType.TypeId);
         }
 
-        private List<IEffectType> GetEffects(CraftableType craftableType, IList<CombatItemBase> components, ITargetingType targeting = null)
+        public void SetEffects(IHasEffects item, IList<ItemBase> components)
         {
             const string buff = "Buff";
             const string debuff = "Debuff";
             const string other = "Other";
 
-            var effects = components
-                .Where(x => x.Effects != null)
-                .SelectMany(x => x.Effects)
+            var relevantComponents = components.OfType<IHasEffects>().ToList();
+
+            var effects = relevantComponents
+                .Where(x => x.EffectTypes != null)
+                .SelectMany(x => x.EffectTypes)
                 .GroupBy(x => x.TypeId)
                 .Select(x => x.First());
 
@@ -154,23 +151,25 @@ namespace FullPotential.Core.Gameplay.Crafting
                         return other;
                     });
 
-            if (craftableType is CraftableType.Armor or CraftableType.Accessory)
+            var itemBase = (ItemBase)item;
+
+            if (itemBase.RegistryType is IArmorType or IAccessoryType)
             {
-                return effects
+                item.EffectTypes = effects
                     .Where(x => effectTypeLookup[x] == buff)
                     .ToList();
             }
 
-            if (craftableType == CraftableType.Weapon)
+            if (itemBase.RegistryType is IWeaponType)
             {
-                return effects
+                item.EffectTypes = effects
                     .Where(x => effectTypeLookup[x] == debuff)
                     .ToList();
             }
 
-            if (craftableType != CraftableType.Consumer)
+            if (item is not Consumer consumer)
             {
-                throw new Exception($"Unexpected craftingType '{craftableType}'");
+                return;
             }
 
             if (effects.Any(x => effectTypeLookup[x] == buff))
@@ -185,7 +184,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     .Where(x => effectTypeLookup[x] != buff);
             }
 
-            if (targeting != null && !targeting.IsContinuous)
+            if (consumer.TargetingType != null && !consumer.TargetingType.IsContinuous)
             {
                 effects = effects
                     .Where(x =>
@@ -193,7 +192,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                         || movementEffect.Direction != MovementDirection.MaintainDistance);
             }
 
-            return effects.ToList();
+            item.EffectTypes = effects.ToList();
         }
 
         private bool IsSuccess(int percentageChance)
@@ -233,26 +232,34 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         public ItemBase GetLootDrop()
         {
-            var lootDrop = new Loot
-            {
-                Id = Guid.NewGuid().ToString(),
-                Attributes = new Attributes
-                {
-                    IsAutomatic = IsSuccess(50),
-                    ExtraAmmoPerShot = IsSuccess(20) ? Convert.ToByte(_random.Next(1, MaxExtraAmmo + 1)) : (byte)0,
-                    Strength = GetAttributeValue(75),
-                    Efficiency = GetAttributeValue(75),
-                    Range = GetAttributeValue(75),
-                    Accuracy = GetAttributeValue(75),
-                    Speed = GetAttributeValue(75),
-                    Recovery = GetAttributeValue(75),
-                    Duration = GetAttributeValue(75),
-                    Luck = GetAttributeValue(75)
-                },
-                RegistryType = _lootTypes
+            var lootDrop = _typeRegistry.GetItemTypeMapping<ILootType>().CreateNew();
+
+            // todo: loot tables
+            //var lootDrop = new Loot
+            //{
+            //    Id = Guid.NewGuid().ToString(),
+            //    Attributes = new Dictionary<string, string>
+            //    {
+            //        { "IsAutomatic", IsSuccess(50).ToString() },
+            //        { "ExtraAmmoPerShot", (IsSuccess(20) ? Convert.ToByte(_random.Next(1, MaxExtraAmmo + 1)) : (byte)0).ToString() },
+            //        { "Strength", GetAttributeValue(75).ToString() },
+            //        { "Efficiency", GetAttributeValue(75).ToString() },
+            //        { "Range", GetAttributeValue(75).ToString() },
+            //        { "Accuracy", GetAttributeValue(75).ToString() },
+            //        { "Speed", GetAttributeValue(75).ToString() },
+            //        { "Recovery", GetAttributeValue(75).ToString() },
+            //        { "Duration", GetAttributeValue(75).ToString() },
+            //        { "Luck", GetAttributeValue(75).ToString() },
+            //    },
+            //    RegistryType = _lootTypes
+            //        .OrderBy(_ => _random.Next())
+            //        .First()
+            //};
+
+            lootDrop.Id = Guid.NewGuid().ToString();
+            lootDrop.RegistryType = _lootTypes
                     .OrderBy(_ => _random.Next())
-                    .First()
-            };
+                    .First();
 
             if (IsSuccess(50))
             {
@@ -278,17 +285,24 @@ namespace FullPotential.Core.Gameplay.Crafting
                     effects.Add(effect);
                 }
 
-                lootDrop.Effects = effects.ToList();
+                if (lootDrop is IHasEffects lootWithEffects)
+                {
+                    lootWithEffects.EffectTypes = effects.ToList();
+                }
 
-                lootDrop.Targeting = GetRandomTargetingOrNone();
-                lootDrop.Shape = GetRandomShapeOrNone();
+                if (lootDrop is IHasTargetingAndShape consumer)
+                {
+                    consumer.TargetingType = GetRandomTargetingOrNone();
+                    consumer.ShapeType = GetRandomShapeOrNone();
+                }
             }
 
-            // todo: use client's culture, not the server's
             var typeTranslation = _localizer.Translate("crafting.loot.type");
-            var suffix = int.Parse(lootDrop.GetNameHash().ToString().TrimStart('-').Substring(5));
+            var suffix = lootDrop is CombatItemBase combatItem
+                ? int.Parse(combatItem.GetNameHash().ToString().TrimStart('-').Substring(5)).ToString("D5")
+                : null;
 
-            lootDrop.Name = $"{_localizer.Translate(lootDrop.RegistryType)} ({typeTranslation} #{suffix.ToString("D5", _localizer.CurrentCulture)})";
+            lootDrop.Name = $"{_localizer.Translate(lootDrop.RegistryType)} ({typeTranslation} #{suffix})";
 
             return lootDrop;
         }
@@ -301,13 +315,14 @@ namespace FullPotential.Core.Gameplay.Crafting
 
             var randomCount = _random.Next(randomAmmo.MinDropCount, randomAmmo.MaxDropCount);
 
-            return new ItemStackBase
-            {
-                RegistryType = randomAmmo,
-                Id = Guid.NewGuid().ToString(),
-                BaseName = _localizer.Translate(randomAmmo),
-                Count = randomCount
-            };
+            var item = _typeRegistry.GetItemTypeMapping<IAmmunitionType>().CreateNew();
+
+            item.Id = Guid.NewGuid().ToString();
+            item.RegistryType = randomAmmo;
+            item.Name = _localizer.Translate(randomAmmo);
+            item.Properties = new Dictionary<string, string> { { nameof(ItemStackBase.Count), randomCount.ToString() } };
+
+            return item;
         }
 
         private int GetMinBiasedNumber(int min, int max)
@@ -315,220 +330,40 @@ namespace FullPotential.Core.Gameplay.Crafting
             return min + (int)Math.Round((max - min) * Math.Pow(_random.NextDouble(), 3), 0);
         }
 
-        private Consumer GetConsumer(CraftableType craftableType, string resourceTypeId, IList<CombatItemBase> components)
-        {
-            var relevantComponents = components.OfType<IHasTargetingAndShape>().ToList();
-
-            var targeting = GetTargeting(relevantComponents);
-
-            var resourceType = _typeRegistry.GetRegisteredByTypeId<IResourceType>(resourceTypeId);
-
-            var consumer = new Consumer
-            {
-                Id = Guid.NewGuid().ToString(),
-                ResourceType = resourceType,
-                Targeting = targeting,
-                Shape = GetShapeOrNone(targeting, relevantComponents),
-                Attributes = new Attributes
-                {
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                    Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
-                    Range = ComputeAttribute(components, x => x.Attributes.Range),
-                    Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
-                    Speed = ComputeAttribute(components, x => x.Attributes.Speed),
-                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery),
-                    Duration = ComputeAttribute(components, x => x.Attributes.Duration)
-                },
-                Effects = GetEffects(craftableType, components, targeting)
-            };
-
-            var suffix = _localizer.Translate(consumer.Targeting)
-                + (consumer.Shape != null ? " " + _localizer.Translate(consumer.Shape) : null)
-                + " " + _localizer.Translate(TranslationType.ItemType, nameof(Consumer));
-
-            consumer.Name = consumer.Effects.Count > 0
-                ? _localizer.Translate(consumer.Effects.First()) + " " + suffix
-                : GetItemName(true, consumer, suffix);
-
-            return consumer;
-        }
-
         private string GetItemNamePrefix(bool isAttack)
         {
             return _localizer.Translate(TranslationType.CraftingNamePrefix, isAttack ? "attack" : "defence");
         }
 
-        private string GetItemName(bool isAttack, CombatItemBase item, string customSuffix = null)
+        public void SetItemName(ItemBase item, bool isAttack, string customSuffix = null)
         {
             var suffix = string.IsNullOrWhiteSpace(customSuffix)
                 ? _localizer.Translate(item.RegistryType)
                 : customSuffix;
-            return $"{GetItemNamePrefix(isAttack)} {item.Attributes.Strength} {suffix}";
+            item.Name = $"{GetItemNamePrefix(isAttack)} {item.Attributes.GetIntValue(Strength.TypeId)} {suffix}";
         }
 
-        private Weapon GetMeleeWeapon(IWeaponType craftableType, IList<CombatItemBase> components, bool isTwoHanded)
+        public ItemBase GetCraftedItem(Type craftableType, string typeId, string resourceTypeId, bool isTwoHanded, string itemName, IList<ItemBase> components)
         {
-            var weapon = new Weapon
+            var properties = new Dictionary<string, string>
             {
-                RegistryType = craftableType,
-                Id = Guid.NewGuid().ToString(),
-                IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
-                Attributes = new Attributes
-                {
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                    Speed = ComputeAttribute(components, x => x.Attributes.Speed),
-                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
-                },
-                Effects = GetEffects(CraftableType.Weapon, components)
-            };
-            weapon.Name = GetItemName(true, weapon);
-            return weapon;
-        }
-
-        private Weapon GetRangedWeapon(IWeaponType craftableType, IList<CombatItemBase> components, bool isTwoHanded)
-        {
-            var weapon = new Weapon
-            {
-                RegistryType = craftableType,
-                Id = Guid.NewGuid().ToString(),
-                IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
-                Attributes = new Attributes
-                {
-                    IsAutomatic = craftableType.AllowAutomatic && components.Any(x => x.Attributes.IsAutomatic),
-                    ExtraAmmoPerShot = components.FirstOrDefault(x => x.Attributes.ExtraAmmoPerShot > 0)?.Attributes.ExtraAmmoPerShot ?? 0,
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                    Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
-                    Range = ComputeAttribute(components, x => x.Attributes.Range),
-                    Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
-                    Speed = ComputeAttribute(components, x => x.Attributes.Speed),
-                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
-                },
-                Effects = GetEffects(CraftableType.Weapon, components)
-            };
-            weapon.Name = GetItemName(true, weapon);
-            weapon.Ammo = weapon.GetAmmoMax();
-            return weapon;
-        }
-
-        private Weapon GetDefensiveWeapon(IWeaponType craftableType, IList<CombatItemBase> components, bool isTwoHanded)
-        {
-            var weapon = new Weapon
-            {
-                RegistryType = craftableType,
-                Id = Guid.NewGuid().ToString(),
-                IsTwoHanded = craftableType.EnforceTwoHanded || (craftableType.AllowTwoHanded && isTwoHanded),
-                Attributes = new Attributes
-                {
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                    Speed = ComputeAttribute(components, x => x.Attributes.Speed),
-                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
-                },
-                Effects = GetEffects(CraftableType.Weapon, components)
-            };
-            weapon.Name = GetItemName(false, weapon);
-            return weapon;
-        }
-
-        private Armor GetArmor(IArmorType craftableType, IList<CombatItemBase> components)
-        {
-            var armor = new Armor
-            {
-                RegistryType = craftableType,
-                Id = Guid.NewGuid().ToString(),
-                Attributes = new Attributes
-                {
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength)
-                },
-                Effects = GetEffects(CraftableType.Armor, components)
-            };
-            armor.Name = GetItemName(false, armor);
-            return armor;
-        }
-
-        private Accessory GetAccessory(IAccessoryType craftableType, IList<CombatItemBase> components)
-        {
-            var accessory = new Accessory
-            {
-                RegistryType = craftableType,
-                Id = Guid.NewGuid().ToString(),
-                Name = craftableType.GetType().Name.ToSpacedString(),
-                Attributes = new Attributes
-                {
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                    Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
-                    Speed = ComputeAttribute(components, x => x.Attributes.Speed),
-                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery)
-                },
-                Effects = GetEffects(CraftableType.Accessory, components)
-            };
-            return accessory;
-        }
-
-        private SpecialGear GetSpecialGear(ISpecialGearType craftableType, string resourceTypeId, IList<CombatItemBase> components)
-        {
-            var resourceType = resourceTypeId.IsNullOrWhiteSpace()
-                ? null
-                : _typeRegistry.GetRegisteredByTypeId<IResourceType>(resourceTypeId);
-
-            var specialGear = new SpecialGear
-            {
-                RegistryType = craftableType,
-                Id = Guid.NewGuid().ToString(),
-                Name = craftableType.GetType().Name.ToSpacedString(),
-                ResourceType = resourceType,
-                Attributes = new Attributes
-                {
-                    Strength = ComputeAttribute(components, x => x.Attributes.Strength),
-                    Efficiency = ComputeAttribute(components, x => x.Attributes.Efficiency),
-                    Range = ComputeAttribute(components, x => x.Attributes.Range),
-                    Accuracy = ComputeAttribute(components, x => x.Attributes.Accuracy),
-                    Speed = ComputeAttribute(components, x => x.Attributes.Speed),
-                    Recovery = ComputeAttribute(components, x => x.Attributes.Recovery),
-                    Duration = ComputeAttribute(components, x => x.Attributes.Duration),
-                    Luck = ComputeAttribute(components, x => x.Attributes.Luck),
-                },
+                { IResourceConsumer.PropertyKeyResourceTypeId, resourceTypeId  },
+                { nameof(CombatItemBase.IsTwoHanded), isTwoHanded.ToString() }
             };
 
-            return specialGear;
-        }
+            var craftedItem = _typeRegistry
+                .GetCraftableItemTypeMapping(craftableType)
+                .GetItemFromCrafting(components, typeId, itemName, properties);
 
-        public ItemBase GetCraftedItem(CraftableType craftableType, string typeId, string resourceTypeId, bool isTwoHanded, IList<CombatItemBase> components)
-        {
-            switch (craftableType)
+            if (craftedItem == null)
             {
-                case CraftableType.Consumer:
-                    return GetConsumer(craftableType, resourceTypeId, components);
-
-                case CraftableType.Weapon:
-                    var weaponType = _typeRegistry.GetRegisteredByTypeId<IWeaponType>(typeId);
-                    if (weaponType.IsDefensive)
-                    {
-                        return GetDefensiveWeapon(weaponType, components, isTwoHanded);
-                    }
-
-                    if (weaponType.AmmunitionTypeIdString == null)
-                    {
-                        return GetMeleeWeapon(weaponType, components, isTwoHanded);
-                    }
-
-                    return GetRangedWeapon(weaponType, components, isTwoHanded);
-
-                case CraftableType.Armor:
-                    var craftableArmor = _typeRegistry.GetRegisteredByTypeId<IArmorType>(typeId);
-                    return GetArmor(craftableArmor, components);
-
-                case CraftableType.Accessory:
-                    var craftableAccessory = _typeRegistry.GetRegisteredByTypeId<IAccessoryType>(typeId);
-                    return GetAccessory(craftableAccessory, components);
-
-                case CraftableType.SpecialGear:
-                    var craftableSpecial = _typeRegistry.GetRegisteredByTypeId<ISpecialGearType>(typeId);
-                    return GetSpecialGear(craftableSpecial, resourceTypeId, components);
-
-                default:
-                    throw new Exception($"Unexpected craftable category '{craftableType}'");
+                throw new Exception($"Unexpected craftable category '{craftableType}'");
             }
-        }
 
+            craftedItem.Id = Guid.NewGuid().ToString();
+            craftedItem.RegistryType ??= _typeRegistry.GetAnyRegisteredTypeById(typeId);
+
+            return craftedItem;
+        }
     }
 }

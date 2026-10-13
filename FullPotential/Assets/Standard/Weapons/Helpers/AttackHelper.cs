@@ -2,13 +2,18 @@ using System;
 
 using Cysharp.Threading.Tasks;
 
+using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Player;
+using FullPotential.Api.Items;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Logging;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Ui;
+using FullPotential.Api.Unity.Extensions;
+using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Standard.Items;
 using FullPotential.Standard.Weapons.Events;
 
 using Unity.Netcode;
@@ -109,14 +114,14 @@ namespace FullPotential.Standard.Weapons.Helpers
                 ? fighter.Positions.LeftHand.position
                 : fighter.Positions.RightHand.position;
 
-            var shotDirection = weaponInHand.GetShotDirection(fighter.LookTransform.forward);
+            var shotDirection = GetShotDirection(weaponInHand, fighter.LookTransform.forward);
 
             var endPos = Physics.Raycast(fighter.LookTransform.position, shotDirection, out var rangedHit, MaximumRange)
                 ? rangedHit.point
                 : handPosition + (shotDirection * MaximumRange);
 
             var ammoUsed = Math.Min(
-                1 + weaponInHand.Attributes.ExtraAmmoPerShot,
+                1 + weaponInHand.Attributes.GetIntValue("ExtraAmmoPerShot"),
                 weaponInHand.Ammo);
 
             var hitGameObject = rangedHit.transform != null ? rangedHit.transform.gameObject : null;
@@ -185,7 +190,7 @@ namespace FullPotential.Standard.Weapons.Helpers
                 return;
             }
 
-            if (consumer.Targeting.IsContinuous)
+            if (consumer.TargetingType.IsContinuous)
             {
                 slotStatus.StartActiveConsumerBehaviour();
             }
@@ -200,9 +205,9 @@ namespace FullPotential.Standard.Weapons.Helpers
 
         private void SpawnConsumerGameObjects(FighterBase fighter, string slotId, Consumer consumer)
         {
-            var targets = consumer.Targeting.GetTargets(fighter, consumer);
+            var targets = consumer.TargetingType.GetTargets(fighter, consumer);
 
-            if (targets == null || consumer.Shape == null)
+            if (targets == null || consumer.ShapeType == null)
             {
                 var handPosition = slotId == HandSlotIds.LeftHand
                     ? fighter.Positions.LeftHand.position
@@ -222,10 +227,18 @@ namespace FullPotential.Standard.Weapons.Helpers
                     }
                 }
             }
-            else if (consumer.Shape != null)
+            else if (consumer.ShapeType != null)
             {
                 _combatService.SpawnShapeGameObject(fighter, consumer, null, fighter.Transform.position, fighter.Transform.forward);
             }
+        }
+
+        public static Vector3 GetShotDirection(ItemBase item, Vector3 aimDirection)
+        {
+            const float MaximumAccuracyAngleDeviation = 4;
+
+            var maxAccuracyAngleDeviation = (101 - item.Attributes.GetIntValue(Accuracy.TypeId)) / 100f * MaximumAccuracyAngleDeviation;
+            return aimDirection.AddNoiseOnAngle(-maxAccuracyAngleDeviation, maxAccuracyAngleDeviation);
         }
     }
 }

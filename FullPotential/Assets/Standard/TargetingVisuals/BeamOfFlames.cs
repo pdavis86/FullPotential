@@ -1,10 +1,11 @@
-﻿using System;
-using FullPotential.Api.Registry.Targeting;
+using System;
+
+using FullPotential.Api.Registry;
 using FullPotential.Standard.Targeting;
 
 namespace FullPotential.Standard.TargetingVisuals
 {
-    public class BeamOfFlames : ITargetingVisuals
+    public class BeamOfFlames : IItemVisuals
     {
         private static readonly Guid Id = new Guid("4853434d-e4c9-47f9-a536-5d9a045cf3f2");
 

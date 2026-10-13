@@ -7,13 +7,11 @@ using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
-using FullPotential.Api.Obsolete;
-using FullPotential.Api.Obsolete.Items.Base;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
 using FullPotential.Core.Player;
@@ -45,6 +43,7 @@ namespace FullPotential.Core.UI.Behaviours
         private IAuditor _logger;
         private IResultFactory _resultFactory;
         private ILocalizer _localizer;
+        private IItemFactory _itemFactory;
 
         private List<IEffectType> _registeredEffects;
         private List<ITargetingType> _registeredTargetingOptions;
@@ -62,6 +61,7 @@ namespace FullPotential.Core.UI.Behaviours
             _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
             _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
+            _itemFactory = DependenciesContext.Dependencies.GetService<IItemFactory>();
 
             var typeRegistry = DependenciesContext.Dependencies.GetService<ITypeRegistry>();
             _registeredEffects = typeRegistry.GetRegisteredTypes<IEffectType>().ToList();
@@ -101,43 +101,25 @@ namespace FullPotential.Core.UI.Behaviours
             _attributeSliderBehaviours = new List<NameAndValueSlider>();
             _attributeToggleBehaviours = new List<NameAndToggle>();
 
-            foreach (var field in typeof(Attributes).GetFields())
+            foreach (var attributeName in new[] { "Strength", "Efficiency", "Range", "Accuracy", "Speed", "Recovery", "Duration", "Luck", "ExtraAmmoPerShot" })
             {
-                if (field.FieldType == typeof(int))
+                var slider = Instantiate(_nameAndValueSliderPrefab, _attributesScrollViewContentParent.transform);
+                var behaviour = slider.GetComponent<NameAndValueSlider>();
+                behaviour.Name.text = attributeName;
+                if (attributeName == "ExtraAmmoPerShot")
                 {
-                    var slider = Instantiate(_nameAndValueSliderPrefab, _attributesScrollViewContentParent.transform);
-                    var behaviour = slider.GetComponent<NameAndValueSlider>();
-                    behaviour.Name.text = field.Name;
-
-                    _attributeSliderBehaviours.Add(behaviour);
-                }
-                else if (field.FieldType == typeof(bool))
-                {
-                    var toggle = Instantiate(_nameAndTogglePrefab, _attributesScrollViewContentParent.transform);
-                    var behaviour = toggle.GetComponent<NameAndToggle>();
-                    behaviour.Name.text = field.Name;
-
-                    _attributeToggleBehaviours.Add(behaviour);
-                }
-                else if (field.Name == nameof(Attributes.ExtraAmmoPerShot))
-                {
-                    var slider = Instantiate(_nameAndValueSliderPrefab, _attributesScrollViewContentParent.transform);
-                    var behaviour = slider.GetComponent<NameAndValueSlider>();
-                    behaviour.Name.text = field.Name;
                     behaviour.Slider.maxValue = ResultFactory.MaxExtraAmmo;
-
-                    _attributeSliderBehaviours.Add(behaviour);
-
-                    //Work-around for UI quirk
                     behaviour.Slider.value = 1;
                     behaviour.Slider.value = 0;
                 }
-                else
-                {
-                    _logger.Warn("Unhandled Attributes type: {0}", field.FieldType);
-                }
+
+                _attributeSliderBehaviours.Add(behaviour);
             }
 
+            var automaticToggle = Instantiate(_nameAndTogglePrefab, _attributesScrollViewContentParent.transform);
+            var automaticBehaviour = automaticToggle.GetComponent<NameAndToggle>();
+            automaticBehaviour.Name.text = "IsAutomatic";
+            _attributeToggleBehaviours.Add(automaticBehaviour);
             ResetSliders();
         }
 
@@ -206,30 +188,20 @@ namespace FullPotential.Core.UI.Behaviours
             }
         }
 
-        private Attributes GetAttributes()
+        private Dictionary<string, string> GetAttributes()
         {
-            var attributes = (object)new Attributes();
-
-            foreach (var field in typeof(Attributes).GetFields())
+            var attributes = new Dictionary<string, string>();
+            foreach (var slider in _attributeSliderBehaviours)
             {
-                if (field.FieldType == typeof(int))
-                {
-                    var slider = _attributeSliderBehaviours.First(s => s.Name.text == field.Name);
-                    field.SetValue(attributes, (int)slider.Slider.value);
-                }
-                else if (field.FieldType == typeof(bool))
-                {
-                    var toggle = _attributeToggleBehaviours.First(t => t.Name.text == field.Name);
-                    field.SetValue(attributes, toggle.Toggle.isOn);
-                }
-                else if (field.FieldType == typeof(byte))
-                {
-                    var slider = _attributeSliderBehaviours.First(s => s.Name.text == field.Name);
-                    field.SetValue(attributes, (byte)slider.Slider.value);
-                }
+                attributes[slider.Name.text] = ((int)slider.Slider.value).ToString();
             }
 
-            return (Attributes)attributes;
+            foreach (var toggle in _attributeToggleBehaviours)
+            {
+                attributes[toggle.Name.text] = toggle.Toggle.isOn.ToString();
+            }
+
+            return attributes;
         }
 
         private List<IEffectType> GetEffects()
@@ -262,15 +234,14 @@ namespace FullPotential.Core.UI.Behaviours
             return _registeredShapes.FirstOrDefault(x => x.GetType().Name == typeName);
         }
 
-        private Loot GetLootFromChoices()
+        private CombatItemBase GetLootFromChoices()
         {
-            return new Loot
-            {
-                Attributes = GetAttributes(),
-                Effects = GetEffects(),
-                Targeting = GetTargeting(),
-                Shape = GetShape()
-            };
+            var consumer = DependenciesContext.Dependencies.CreateInstance<Consumer>();
+            consumer.Attributes = GetAttributes();
+            consumer.EffectTypes = GetEffects();
+            consumer.TargetingType = GetTargeting();
+            consumer.ShapeType = GetShape();
+            return consumer;
         }
 
         private ItemBase GetCraftableItem()
@@ -283,25 +254,30 @@ namespace FullPotential.Core.UI.Behaviours
                 _craftingSelector.GetSubTypeId(typeToCraft),
                 _craftingSelector.GetResourceTypeId(),
                 _craftingSelector.IsTwoHandedSelected(),
-                new List<CombatItemBase> { component });
+                null,
+                new List<ItemBase> { component });
         }
 
         // ReSharper disable once UnusedMember.Global
         public void DisplayResultsText()
         {
             var item = GetCraftableItem();
-            _resultsText.text = item.GetDescription(_localizer, LevelOfDetail.Full, _itemNameInputField.text);
+            item.Name = _itemNameInputField.text;
+            _resultsText.text = item.GetDescription(_localizer, LevelOfDetail.Full);
         }
 
         // ReSharper disable once UnusedMember.Global
         public void CraftItem()
         {
             var component = GetLootFromChoices();
-            var componentJson = JsonUtility.ToJson(component);
+
+            var playerFighter = GameManager.Instance.GetLocalPlayerGameObject().GetComponent<PlayerFighter>();
+            var itemData = _itemFactory.GetDataFromItem(playerFighter.CharacterId, component);
+
             var craftableType = _craftingSelector.GetTypeToCraft();
 
             GameManager.Instance.GetLocalPlayerGameObject().GetComponent<PlayerBehaviour>().CraftItemAsAdminServerRpc(
-                componentJson,
+                itemData.ToJson(),
                 craftableType.ToString(),
                 _craftingSelector.GetSubTypeId(craftableType),
                 _craftingSelector.GetResourceTypeId(),

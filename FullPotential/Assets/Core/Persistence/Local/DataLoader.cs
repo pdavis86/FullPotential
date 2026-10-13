@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using FullPotential.Api.Data;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Models.GameManagement;
-using FullPotential.Models.Player;
+using FullPotential.Models.LivingEntity;
 
 namespace FullPotential.Core.Persistence.Local
 {

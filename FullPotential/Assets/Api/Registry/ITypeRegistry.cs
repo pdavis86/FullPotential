@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
-using FullPotential.Api.Items.Base;
+
+using Cysharp.Threading.Tasks;
+
+using FullPotential.Api.Items;
 
 // ReSharper disable UnusedMemberInSuper.Global
 
@@ -15,8 +18,16 @@ namespace FullPotential.Api.Registry
 
         IRegisterableType GetAnyRegisteredBySlotId(string typeIdString);
 
-        IRegisterableType GetRegistryTypeForItem(ItemBase item);
-
         void LoadAddessable<T>(string address, Action<T> action);
+
+        UniTask LoadAddessableAsync<T>(string address, Action<T> action);
+
+        IItemTypeMapping GetItemTypeMapping<T>() where T : IRegisterableType;
+
+        IItemTypeMapping GetCraftableItemTypeMapping(Type craftableType);
+
+        IRegisterableType GetAnyRegisteredTypeById(string typeIdString);
+
+        Type GetCraftableTypeFromName(string craftableTypeName);
     }
 }

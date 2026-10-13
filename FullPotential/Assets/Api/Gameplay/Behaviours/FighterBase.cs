@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
-using FullPotential.Api.Obsolete;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities;
 
@@ -21,7 +20,7 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
-    public abstract class FighterBase : LivingEntityBase, IMoveable
+    public abstract class FighterBase : LivingEntityBase, IFighter, IMoveable
     {
         #region Inspector Variables
         // ReSharper disable UnassignedField.Global
@@ -51,6 +50,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public abstract GameObject GameObject { get; }
 
         public string FighterName => _entityName.Value.ToString();
+
+        public Transform GraphicsTransform => _graphicsTransform;
+
+        PositionTransforms IFighter.Positions => Positions;
+
+        BodyPartTransforms IFighter.BodyParts => BodyParts;
 
         #endregion
 
@@ -115,7 +120,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             return _slotStatuses.Any(
                 kvp => kvp.Value.IsConsumingResource
-                && Inventory.GetItemInSlot(kvp.Key) is Consumer consumer
+                && Inventory.GetItemInSlot(kvp.Key) is IResourceConsumer consumer
                 && consumer.ResourceType.TypeId.ToString() == typeId);
         }
 
@@ -126,14 +131,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : null;
         }
 
-        public int GetAttributeValue(AttributeAffected attributeAffected)
+        public int GetAdjustedAttributeValue(string attributeId)
         {
             //todo: zzz v0.8 - trait-based attributes
-            return attributeAffected switch
+            return attributeId switch
             {
-                AttributeAffected.Strength => 25 + GetAttributeAdjustment(AttributeAffected.Strength),
-                AttributeAffected.Luck => 50 + GetAttributeAdjustment(AttributeAffected.Luck),
-                _ => throw new Exception("Not yet implemented GetAttributeValue() for " + attributeAffected),
+                Strength.TypeId => 25 + GetAttributeAdjustment(attributeId),
+                Luck.TypeId => 50 + GetAttributeAdjustment(attributeId),
+                _ => throw new Exception("Not yet implemented GetAttributeValue() for " + attributeId),
             };
         }
 
@@ -200,34 +205,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var consumer = Inventory.GetItemInSlot<Consumer>(slotStatus.SlotId);
 
-            if (ConsumeResource(consumer, consumer.Targeting.IsContinuous))
+            if (ConsumeResource(consumer, consumer.TargetingType.IsContinuous))
             {
                 return;
             }
 
             slotStatus.StopActiveConsumerBehaviour();
         }
-
-        #region Nested Classes
-        // ReSharper disable UnassignedField.Global
-
-        [Serializable]
-        public struct PositionTransforms
-        {
-            public Transform LeftHand;
-            public Transform RightHand;
-        }
-
-        [Serializable]
-        public struct BodyPartTransforms
-        {
-            public Transform Head;
-            public Transform Body;
-            public Transform LeftArm;
-            public Transform RightArm;
-        }
-
-        // ReSharper restore UnassignedField.Global
-        #endregion
     }
 }

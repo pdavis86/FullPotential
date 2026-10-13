@@ -1,5 +1,3 @@
-﻿using FullPotential.Api.Obsolete;
-
 namespace FullPotential.Api.Registry.Effects
 {
     public interface IAttributeEffect : IEffectType
@@ -10,8 +8,8 @@ namespace FullPotential.Api.Registry.Effects
         bool IsTemporaryMaxIncrease { get; }
 
         /// <summary>
-        /// The attribute which will be affected
+        /// The ID of the attribute which will be affected
         /// </summary>
-        AttributeAffected AttributeAffectedToAffect { get; }
+        string AttributeId { get; }
     }
 }

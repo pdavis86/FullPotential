@@ -102,7 +102,15 @@ namespace FullPotential.Core.GameManagement
             var addressablesManager = new AddressablesManager();
 
             var typeRegistry = (TypeRegistry)DependenciesContext.Dependencies.GetService<ITypeRegistry>();
-            typeRegistry.FindAndRegisterAll(addressablesManager.ModPrefixes);
+
+            try
+            {
+                typeRegistry.FindAndRegisterAll(addressablesManager.ModPrefixes);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex);
+            }
 
             await _localizer.LoadAvailableCulturesAsync(addressablesManager.LocalisationAddresses);
             await _localizer.LoadLocalizationFilesAsync(_settingsRepository.Get().Culture);

@@ -17,7 +17,7 @@ using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Obsolete;
-using FullPotential.Api.Obsolete.Items.Base;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
@@ -686,12 +686,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return _activeEffects;
         }
 
-        protected int GetAttributeAdjustment(AttributeAffected attributeAffected)
+        protected int GetAttributeAdjustment(string attributeId)
         {
             return _activeEffects
                 .Where(x =>
                     x.Effect is IAttributeEffect attributeEffect
-                    && attributeEffect.AttributeAffectedToAffect == attributeAffected)
+                    && attributeEffect.AttributeId == attributeId)
                 .Sum(x => x.Change * (x.Effect is IAttributeEffect attributeEffect && attributeEffect.IsTemporaryMaxIncrease ? 1 : -1));
         }
 

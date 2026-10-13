@@ -7,7 +7,6 @@ using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
-using FullPotential.Api.Obsolete.Items.Base;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
@@ -33,7 +32,7 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private GameObject _inventoryRowPrefab;
 #pragma warning restore 0649
 
-        private readonly List<CombatItemBase> _components = new List<CombatItemBase>();
+        private readonly List<ItemBase> _components = new List<ItemBase>();
 
         private PlayerFighter _playerFighter;
         private PlayerBehaviour _playerBehaviour;
@@ -195,13 +194,15 @@ namespace FullPotential.Core.Ui.Behaviours
                 _craftingSelector.GetSubTypeId(craftableType),
                 _craftingSelector.GetResourceTypeId(),
                 _craftingSelector.IsTwoHandedSelected(),
+                null,
                 _components
             );
 
             var errors = _playerFighter.PlayerInventory.ValidateIsCraftable(_components.Select(x => x.Id).ToArray(), craftedItem);
             if (errors.Any())
             {
-                _craftErrors.text = string.Join(System.Environment.NewLine, errors);
+                var translatedErrors = errors.Select(x => _localizer.Translate(x));
+                _craftErrors.text = string.Join(System.Environment.NewLine, translatedErrors);
                 _craftButton.interactable = false;
                 return;
             }

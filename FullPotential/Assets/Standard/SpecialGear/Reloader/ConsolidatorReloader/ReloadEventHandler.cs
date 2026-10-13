@@ -2,7 +2,8 @@ using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Input;
-using FullPotential.Api.Obsolete.Items.Types;
+using FullPotential.Standard.Items;
+using FullPotential.Standard.Weapons.Events;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -16,9 +17,9 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 
         public async UniTask<HandlerResult> HandleEventAsync(ReloadInputEvent eventArgs)
         {
-            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Api.Obsolete.Items.Types.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Items.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
-            if (reloader == null || reloader.RegistryTypeId != ConsolidatorReloader.TypeIdString)
+            if (reloader == null || reloader.RegistryType.TypeId.ToString() != ConsolidatorReloader.TypeIdString)
             {
                 return new HandlerResult();
             }
@@ -28,14 +29,21 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
                 return new HandlerResult();
             }
 
+            var weapon = eventArgs.Fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
+            var availableAmmo = eventArgs.Fighter.Inventory.GetItemStackTotal(weapon.WeaponType.AmmunitionTypeIdString);
+
+            if (availableAmmo == 0)
+            {
+                return new HandlerResult(NextAction.Cancel);
+            }
+
             var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);
 
             slotStatus.SetBusyState(true);
 
-            var weapon = eventArgs.Fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
             await UniTask.WaitForSeconds(weapon.GetReloadTime());
 
-            ReloadInputEvent.UpdateAmmoCounts(eventArgs);
+            ReloadEventDefaultHandler.UpdateAmmoCounts(eventArgs);
 
             slotStatus.SetBusyState(false);
 

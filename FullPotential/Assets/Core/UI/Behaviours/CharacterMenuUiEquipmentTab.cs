@@ -1,12 +1,14 @@
+using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
-using FullPotential.Api.Obsolete.Items.Types;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Extensions;
+using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.Player;
@@ -68,7 +70,7 @@ namespace FullPotential.Core.Ui.Behaviours
             {
                 for (var i = 1; i <= type.SlotCount; i++)
                 {
-                    InstantiateSlot(Accessory.GetSlotId(type.TypeId.ToString(), i), type.SlotSpritePrefabAddress, _rhs.transform);
+                    InstantiateSlot(SlotStatus.GetSlotId(type.TypeId.ToString(), i), type.SlotSpritePrefabAddress, _rhs.transform);
                 }
             }
 
@@ -116,17 +118,14 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void SetSlot(GameObject slot, ItemBase item)
         {
-            var slotUi = slot.GetComponent<InventoryUiSlot>();
-
-            if (slotUi == null)
+            if (!slot.TryGetComponent<InventoryUiSlot>(out var slotUi))
             {
                 return;
             }
 
             slotUi.Image.color = item != null ? Color.grey : Color.clear;
 
-            var tooltip = slot.GetComponent<Tooltip>();
-            if (tooltip != null)
+            if (slot.TryGetComponent<Tooltip>(out var tooltip))
             {
                 tooltip.ClearHandlers();
 
@@ -169,7 +168,7 @@ namespace FullPotential.Core.Ui.Behaviours
                     var item = _playerFighter.Inventory.GetItemInSlot(slot.name);
                     SetSlot(slot.gameObject, item);
 
-                    if (item is Weapon weapon && weapon.IsTwoHanded)
+                    if (item.RegistryType is IWeaponType && item.Properties.GetBoolValue(nameof(CombatItemBase.IsTwoHanded)))
                     {
                         var otherSlotName = slot.name == HandSlotIds.LeftHand
                             ? HandSlotIds.RightHand

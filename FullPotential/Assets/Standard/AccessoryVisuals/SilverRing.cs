@@ -1,10 +1,11 @@
-﻿using System;
-using FullPotential.Api.Registry.Gear;
+using System;
+
+using FullPotential.Api.Registry;
 using FullPotential.Standard.Accessories;
 
 namespace FullPotential.Standard.AccessoryVisuals
 {
-    public class SilverRing : IAccessoryVisuals
+    public class SilverRing : IItemVisuals
     {
         private static readonly Guid Id = new Guid("c70a9495-0ef7-48fb-9b16-aad5fe7b29ad");
 

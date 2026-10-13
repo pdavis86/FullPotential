@@ -50,12 +50,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Standard\Effects\Buffs\ManaTap.cs" />
+    <Compile Include="Assets\Standard\Items\AmmunitionItemMapper.cs" />
     <Compile Include="Assets\Standard\Weapons\Staff.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Earth.cs" />
+    <Compile Include="Assets\Standard\Items\Weapon.cs" />
     <Compile Include="Assets\Standard\ShapeVisuals\WallOfFlames.cs" />
     <Compile Include="Assets\Standard\Resources\Energy.cs" />
     <Compile Include="Assets\Standard\SpecialGear\Reloader\ConsolidatorReloader\ReloadEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Launch.cs" />
+    <Compile Include="Assets\Standard\Items\Base\StandardItemBase.cs" />
     <Compile Include="Assets\Standard\Scenes\Behaviours\ShopInteractable.cs" />
     <Compile Include="Assets\Standard\ArmorVisuals\LeatherJerkin.cs" />
     <Compile Include="Assets\Standard\Enemies\Behaviours\EnemyFighter.cs" />
@@ -73,6 +76,7 @@
     <Compile Include="Assets\Standard\Effects\Debuffs\LifeDrain.cs" />
     <Compile Include="Assets\Standard\Shapes\Wall.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Summon.cs" />
+    <Compile Include="Assets\Standard\Items\SpecialGearItemMapper.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicGun.cs" />
     <Compile Include="Assets\Standard\Weapons\Bow.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Distract.cs" />
@@ -90,6 +94,8 @@
     <Compile Include="Assets\Standard\Effects\Buffs\Regeneration.cs" />
     <Compile Include="Assets\Standard\Shapes\Zone.cs" />
     <Compile Include="Assets\Standard\Accessories\Belt.cs" />
+    <Compile Include="Assets\Standard\Weapons\Events\ReloadEventDefaultHandler.cs" />
+    <Compile Include="Assets\Standard\Items\LootItemMapper.cs" />
     <Compile Include="Assets\Standard\Weapons\Helpers\AttackHelper.cs" />
     <Compile Include="Assets\Standard\Armor\Feet.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Ice.cs" />
@@ -113,10 +119,13 @@
     <Compile Include="Assets\Standard\Effects\Debuffs\ManaDrain.cs" />
     <Compile Include="Assets\Standard\WeaponExtras\ShotFiredEventHandler.cs" />
     <Compile Include="Assets\Standard\Weapons\Axe.cs" />
+    <Compile Include="Assets\Standard\Items\SpecialGear.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Weaken.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicShield.cs" />
+    <Compile Include="Assets\Standard\Items\ArmorItemMapper.cs" />
     <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\ReloadEventHandler.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicSword.cs" />
+    <Compile Include="Assets\Standard\Items\Armor.cs" />
     <Compile Include="Assets\Standard\Targeting\PointToPointBehaviour.cs" />
     <Compile Include="Assets\Standard\AccessoryVisuals\SilverNecklace.cs" />
     <Compile Include="Assets\Standard\Weapons\Shield.cs" />
@@ -136,9 +145,11 @@
     <Compile Include="Assets\Standard\SpecialGear\Reloader\SlotChangeEventHandler.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicAxe2.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Focus.cs" />
+    <Compile Include="Assets\Standard\Items\Accessory.cs" />
     <Compile Include="Assets\Standard\Shapes\ZoneBehaviour.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicBow.cs" />
     <Compile Include="Assets\Standard\Armor\Legs.cs" />
+    <Compile Include="Assets\Standard\Items\Ammunition.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Haste.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Plummet.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Courage.cs" />
@@ -152,11 +163,13 @@
     <Compile Include="Assets\Standard\WeaponExtras\ProjectileWithTrail.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicStaff.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicSword2.cs" />
+    <Compile Include="Assets\Standard\Items\AccessoryItemMapper.cs" />
     <Compile Include="Assets\Standard\Accessories\Amulet.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicGun2.cs" />
     <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\ShotFiredEventHandler.cs" />
     <Compile Include="Assets\Standard\SpecialGear\Reloader\TeleportReloader\TeleportReloader.cs" />
     <Compile Include="Assets\Standard\Targeting\ProjectileBehaviour.cs" />
+    <Compile Include="Assets\Standard\Items\WeaponItemMapper.cs" />
     <Compile Include="Assets\Standard\Weapons\Events\ShotFiredAfterEvent.cs" />
     <Compile Include="Assets\Standard\Loot\Junk.cs" />
     <Compile Include="Assets\Standard\Weapons\Helpers\AttackHoldEventHandler.cs" />
@@ -165,6 +178,7 @@
     <Compile Include="Assets\Standard\WeaponVisuals\BasicHammer2.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveRight.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicAxe.cs" />
+    <Compile Include="Assets\Standard\Items\Loot.cs" />
     <Compile Include="Assets\Standard\Targeting\WithinReach.cs" />
     <Compile Include="Assets\Standard\Enemies\Behaviours\EnemyInventory.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Stengthen.cs" />

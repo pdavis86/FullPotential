@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Items;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Obsolete;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Utilities;
+using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.Resources;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
@@ -23,8 +25,10 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public IEnumerable<string> ResourceTypeIdsInUse { get; } = new[] { Energy.TypeIdString, BarrierChargeResource.TypeIdString };
 
-        public string OverrideItemDescription(Api.Obsolete.Items.Types.SpecialGear specialGear, ILocalizer localizer, LevelOfDetail levelOfDetail)
+        public string OverrideItemDescription(ItemBase item, ILocalizer localizer, LevelOfDetail levelOfDetail)
         {
+            var specialGear = item as Items.SpecialGear;
+
             var sb = new StringBuilder();
 
             if (levelOfDetail == LevelOfDetail.Full)
@@ -40,8 +44,8 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             specialGear.AppendToDescription(
                 sb,
                 localizer,
-                specialGear.Attributes.Recovery,
-                nameof(Attributes.Recovery),
+                specialGear.Attributes.GetIntValue(Recovery.TypeId),
+                nameof(Recovery),
                 nameof(Barrier),
                 localizer.Translate(GetRechargeDelay(specialGear)),
                 UnitsType.Time);
@@ -49,8 +53,8 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             specialGear.AppendToDescription(
                 sb,
                 localizer,
-                specialGear.Attributes.Speed,
-                nameof(Attributes.Speed),
+                specialGear.Attributes.GetIntValue(Speed.TypeId),
+                nameof(Speed),
                 nameof(Barrier),
                 localizer.Translate(GetRechargeRate(specialGear)),
                 UnitsType.UnitPerTime);
@@ -58,15 +62,15 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             return sb.ToString().Trim();
         }
 
-        public static float GetRechargeDelay(Api.Obsolete.Items.Types.SpecialGear specialGear)
+        public static float GetRechargeDelay(Items.SpecialGear specialGear)
         {
-            var returnValue = MathsHelper.GetHighInLowOutInRange(specialGear.Attributes.Recovery, 0.5f, 5f);
+            var returnValue = MathsHelper.GetHighInLowOutInRange(specialGear.Attributes.GetIntValue(Recovery.TypeId), 0.5f, 5f);
             return returnValue;
         }
 
-        public static int GetRechargeRate(Api.Obsolete.Items.Types.SpecialGear specialGear)
+        public static int GetRechargeRate(Items.SpecialGear specialGear)
         {
-            var returnValue = (int)MathsHelper.GetHighInLowOutInRange(specialGear.Attributes.Speed, 1, 10);
+            var returnValue = (int)MathsHelper.GetHighInLowOutInRange(specialGear.Attributes.GetIntValue(Speed.TypeId), 1, 10);
             return returnValue;
         }
     }
