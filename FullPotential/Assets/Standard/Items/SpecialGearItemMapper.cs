@@ -34,7 +34,7 @@ namespace FullPotential.Standard.Items
 
         public ItemBase GetItemFromCrafting(IList<ItemBase> components, string itemTypeId, string itemName, Dictionary<string, string> properties)
         {
-            // todo zzz v0.6 - Cannot inject IResultFactory as it is not ready to be used yet
+            // todo: zzz v0.6 - Cannot inject IResultFactory as it is not ready to be used yet
             var resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
 
             var resourceTypeId = properties.GetStringValueOrNull(IResourceConsumer.PropertyKeyResourceTypeId);
@@ -48,14 +48,14 @@ namespace FullPotential.Standard.Items
             specialGear.ResourceType = resourceType;
             specialGear.Attributes = new Dictionary<string, string>
             {
-                { Strength.TypeId, resultFactory.ComputeAttribute(components, Strength.TypeId).ToString() },
-                { Efficiency.TypeId, resultFactory.ComputeAttribute(components, Efficiency.TypeId).ToString() },
-                { Range.TypeId, resultFactory.ComputeAttribute(components, Range.TypeId).ToString() },
-                { Accuracy.TypeId, resultFactory.ComputeAttribute(components, Accuracy.TypeId).ToString() },
-                { Speed.TypeId, resultFactory.ComputeAttribute(components, Speed.TypeId).ToString() },
-                { Recovery.TypeId, resultFactory.ComputeAttribute(components, Recovery.TypeId).ToString() },
-                { Duration.TypeId, resultFactory.ComputeAttribute(components, Duration.TypeId).ToString() },
-                { Luck.TypeId, resultFactory.ComputeAttribute(components, Luck.TypeId).ToString() },
+                { Strength.TypeIdString, resultFactory.ComputeAttribute(components, Strength.TypeIdString).ToString() },
+                { Efficiency.TypeIdString, resultFactory.ComputeAttribute(components, Efficiency.TypeIdString).ToString() },
+                { Range.TypeIdString, resultFactory.ComputeAttribute(components, Range.TypeIdString).ToString() },
+                { Accuracy.TypeIdString, resultFactory.ComputeAttribute(components, Accuracy.TypeIdString).ToString() },
+                { Speed.TypeIdString, resultFactory.ComputeAttribute(components, Speed.TypeIdString).ToString() },
+                { Recovery.TypeIdString, resultFactory.ComputeAttribute(components, Recovery.TypeIdString).ToString() },
+                { Duration.TypeIdString, resultFactory.ComputeAttribute(components, Duration.TypeIdString).ToString() },
+                { Luck.TypeIdString, resultFactory.ComputeAttribute(components, Luck.TypeIdString).ToString() },
             };
             specialGear.Properties = properties;
 

@@ -18,7 +18,7 @@ namespace FullPotential.Standard.Items.Base
         //    if (EffectTypes != null && EffectTypes.Count > 0)
         //    {
         //        var localisedEffects = EffectTypes.Select(localizer.Translate);
-        //        sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(EffectTypes))}: {string.Join(", ", localisedEffects)}\n");
+        //        sb.Append($"{localizer.Translate(TranslationType.Item, nameof(EffectTypes))}: {string.Join(", ", localisedEffects)}\n");
         //    }
 
         //    AppendToDescription(sb, localizer, Properties.GetBoolValue(nameof(Weapon.IsAutomatic)), nameof(Weapon.IsAutomatic));

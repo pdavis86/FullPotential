@@ -13,6 +13,6 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public bool IsTemporaryMaxIncrease => true;
 
-        public string AttributeId => Speed.TypeId;
+        public string AttributeId => Speed.TypeIdString;
     }
 }

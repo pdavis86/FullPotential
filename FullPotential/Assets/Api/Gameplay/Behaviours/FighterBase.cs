@@ -136,8 +136,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
             //todo: zzz v0.8 - trait-based attributes
             return attributeId switch
             {
-                Strength.TypeId => 25 + GetAttributeAdjustment(attributeId),
-                Luck.TypeId => 50 + GetAttributeAdjustment(attributeId),
+                Strength.TypeIdString => 25 + GetAttributeAdjustment(attributeId),
+                Luck.TypeIdString => 50 + GetAttributeAdjustment(attributeId),
                 _ => throw new Exception("Not yet implemented GetAttributeValue() for " + attributeId),
             };
         }

@@ -106,6 +106,14 @@ namespace FullPotential.Core.Ui.Behaviours
             _equippedRightHandSummary = _equippedRightHand.GetComponent<EquippedSummary>();
             _equippedRightHandAmmo = _equippedRightHand.transform.GetChild(0).GetComponent<Text>();
 
+            _ammoLeft.transform.parent.gameObject.SetActive(false);
+            _ammoRight.transform.parent.gameObject.SetActive(false);
+            _chargeLeft.gameObject.SetActive(false);
+            _chargeRight.gameObject.SetActive(false);
+
+            _equippedLeftHandSummary.gameObject.SetActive(false);
+            _equippedRightHandSummary.gameObject.SetActive(false);
+
             SetupResourceBars();
         }
 
@@ -226,18 +234,15 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateHandDescription(EquippedSummary equippedSummary, ItemBase item)
         {
+            equippedSummary.gameObject.SetActive(item != null);
             equippedSummary.SetContents(item?.GetDescription(_localizer));
         }
 
         private void UpdateHandAmmo(IPlayerFighter playerFighter, Text ammoText, SlotStatus slotStatus, ItemBase item)
         {
-            var uiText = item.GetTextForUiComponent(ammoText.name, playerFighter);
+            var uiText = item?.GetTextForUiComponent(ammoText.name, playerFighter);
 
-            if (string.IsNullOrWhiteSpace(uiText))
-            {
-                ammoText.transform.parent.gameObject.SetActive(false);
-                return;
-            }
+            ammoText.transform.parent.gameObject.SetActive(!string.IsNullOrWhiteSpace(uiText));
 
             ammoText.text = slotStatus.IsBusy
                 ? _reloadingTranslation

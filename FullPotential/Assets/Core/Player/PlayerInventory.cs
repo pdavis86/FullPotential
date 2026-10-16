@@ -204,7 +204,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            if (item is IHasItemVisuals itemWithVisuals)
+            if (item is IHasItemVisuals itemWithVisuals && itemWithVisuals.Visuals != null)
             {
                 itemWithVisuals.InstantiateItemVisuals(_playerFighter, slotId);
             }

@@ -30,7 +30,7 @@ namespace FullPotential.Standard.Items
 
         public ItemBase GetItemFromCrafting(IList<ItemBase> components, string itemTypeId, string itemName, Dictionary<string, string> properties)
         {
-            // todo zzz v0.6 - Cannot inject IResultFactory as it is not ready to be used yet
+            // todo: zzz v0.6 - Cannot inject IResultFactory as it is not ready to be used yet
             var resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
 
             var armor = DependenciesContext.Dependencies.CreateInstance<Armor>();
@@ -38,7 +38,7 @@ namespace FullPotential.Standard.Items
             armor.RegistryType = _typeRegistry.GetRegisteredByTypeId<IArmorType>(itemTypeId);
             armor.Attributes = new Dictionary<string, string>
             {
-                { Strength.TypeId, resultFactory.ComputeAttribute(components, Strength.TypeId).ToString() },
+                { Strength.TypeIdString, resultFactory.ComputeAttribute(components, Strength.TypeIdString).ToString() },
             };
             armor.Properties = properties;
 

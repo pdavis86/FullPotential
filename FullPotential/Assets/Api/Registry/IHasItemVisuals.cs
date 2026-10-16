@@ -4,7 +4,7 @@ namespace FullPotential.Api.Registry
 {
     public interface IHasItemVisuals
     {
-        IItemVisuals Visuals { set; }
+        IItemVisuals Visuals { get; set; }
 
         void InstantiateItemVisuals(IPlayerFighter playerFighter, string slotId);
     }

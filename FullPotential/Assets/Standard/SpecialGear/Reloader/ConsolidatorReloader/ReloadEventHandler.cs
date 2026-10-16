@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Input;
+using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.Items;
 using FullPotential.Standard.Weapons.Events;
 
@@ -24,17 +25,23 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
                 return new HandlerResult();
             }
 
-            if (!eventArgs.Fighter.ConsumeResource(reloader))
+            var weapon = eventArgs.Fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
+
+            if (weapon.WeaponType.AmmunitionTypeIdString.IsNullOrWhiteSpace())
             {
                 return new HandlerResult();
             }
 
-            var weapon = eventArgs.Fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
             var availableAmmo = eventArgs.Fighter.Inventory.GetItemStackTotal(weapon.WeaponType.AmmunitionTypeIdString);
 
-            if (availableAmmo == 0)
+            if (availableAmmo == 0 || availableAmmo == weapon.GetAmmoMax())
             {
                 return new HandlerResult(NextAction.Cancel);
+            }
+
+            if (!eventArgs.Fighter.ConsumeResource(reloader))
+            {
+                return new HandlerResult();
             }
 
             var slotStatus = eventArgs.Fighter.GetSlotStatus(eventArgs.SlotId);

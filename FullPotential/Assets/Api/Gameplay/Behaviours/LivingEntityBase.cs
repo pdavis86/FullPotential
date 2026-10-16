@@ -664,7 +664,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            TriggerResourceValueUpdate(resourceEffect.ResourceTypeIdString, combatResult.Change, sourceFighter.name, itemUsed.Name);
+            TriggerResourceValueUpdate(resourceEffect.ResourceTypeIdString, combatResult.Change, sourceFighter.name, itemUsed?.Name);
         }
 
         public void ApplyTemporaryMaxActionToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect)

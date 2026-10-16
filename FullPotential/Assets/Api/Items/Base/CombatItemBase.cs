@@ -89,18 +89,18 @@ namespace FullPotential.Api.Items.Base
 
         public float GetEffectDuration()
         {
-            var returnValue = Attributes.GetIntValue(Duration.TypeId) / 10f;
+            var returnValue = Attributes.GetIntValue(Duration.TypeIdString) / 10f;
             return returnValue;
         }
 
         public float GetChargeUpTime()
         {
-            return GetChargeUpOrCooldownTime(Attributes.GetIntValue(Speed.TypeId));
+            return GetChargeUpOrCooldownTime(Attributes.GetIntValue(Speed.TypeIdString));
         }
 
         public float GetCooldownTime()
         {
-            return GetChargeUpOrCooldownTime(Attributes.GetIntValue(Recovery.TypeId));
+            return GetChargeUpOrCooldownTime(Attributes.GetIntValue(Recovery.TypeIdString));
         }
 
         public float GetDamagePerSecond(float damagePerItem, int numberOfItems, float itemsPerSecond, float reloadTime)
@@ -112,7 +112,7 @@ namespace FullPotential.Api.Items.Base
 
         public int GetResourceCost()
         {
-            var returnValue = MathsHelper.GetHighInLowOutInRange(Attributes.GetIntValue(Efficiency.TypeId), 5, 50);
+            var returnValue = MathsHelper.GetHighInLowOutInRange(Attributes.GetIntValue(Efficiency.TypeIdString), 5, 50);
 
             //todo: zzz v0.8 - trait-based mana cost
 
@@ -121,7 +121,7 @@ namespace FullPotential.Api.Items.Base
 
         public int GetSingleEffectValueChange()
         {
-            return LivingEntityBase.GetAdjustedStrength(Attributes.GetIntValue(Strength.TypeId));
+            return LivingEntityBase.GetAdjustedStrength(Attributes.GetIntValue(Strength.TypeIdString));
         }
 
         public int GetPeriodicEffectValueChange()
@@ -157,20 +157,20 @@ namespace FullPotential.Api.Items.Base
         public int GetAmmoMax()
         {
             const int ammoCap = 100;
-            var returnValue = (int)(Attributes.GetIntValue(Efficiency.TypeId) / 100f * ammoCap);
+            var returnValue = (int)(Attributes.GetIntValue(Efficiency.TypeIdString) / 100f * ammoCap);
             return returnValue;
         }
 
         public float GetReloadTime()
         {
-            var returnValue = MathsHelper.GetHighInLowOutInRange(Attributes.GetIntValue(Recovery.TypeId), 0.5f, 5);
+            var returnValue = MathsHelper.GetHighInLowOutInRange(Attributes.GetIntValue(Recovery.TypeIdString), 0.5f, 5);
             return returnValue;
         }
 
         public float GetDelayBetweenShots()
         {
             //Roughly 2-6 bullets per second
-            var returnValue = MathsHelper.GetHighInLowOutInRange(Attributes.GetIntValue(Speed.TypeId), 0.07f, 0.4f);
+            var returnValue = MathsHelper.GetHighInLowOutInRange(Attributes.GetIntValue(Speed.TypeIdString), 0.07f, 0.4f);
             return returnValue;
         }
 

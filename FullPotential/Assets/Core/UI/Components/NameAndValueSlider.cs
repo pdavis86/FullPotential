@@ -11,6 +11,7 @@ namespace FullPotential.Core.UI.Components
     {
         // ReSharper disable MemberCanBePrivate.Global
         // ReSharper disable UnassignedField.Global
+        public string Id;
         public Text Name;
         public Slider Slider;
         // ReSharper restore MemberCanBePrivate.Global

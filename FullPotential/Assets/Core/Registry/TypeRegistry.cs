@@ -65,6 +65,7 @@ namespace FullPotential.Core.Registry
                 typeof(IWeaponType),
                 typeof(ISlotType),
                 typeof(IElementType),
+                typeof(IAttribute),
             };
         }
 
@@ -465,7 +466,7 @@ namespace FullPotential.Core.Registry
 
         public IItemTypeMapping GetCraftableItemTypeMapping(Type craftableType)
         {
-            if (craftableType is not ICraftableType)
+            if (!typeof(ICraftableType).IsAssignableFrom(craftableType))
             {
                 _logger.Warn("'{0}' is not a craftable type", craftableType);
                 return null;

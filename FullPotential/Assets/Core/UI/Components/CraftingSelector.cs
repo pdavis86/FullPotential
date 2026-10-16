@@ -73,15 +73,30 @@ namespace FullPotential.Core.UI.Components
 
         public string GetSubTypeId(Type craftableType)
         {
-            return craftableType switch
+            if (craftableType == typeof(IAccessoryType))
             {
-                IAccessoryType => _accessoryTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString(),
-                IArmorType => _armorTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString(),
-                IWeaponType => _weaponTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString(),
-                IConsumerType => null,
-                ISpecialGearType => _specialTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString(),
-                _ => throw new InvalidOperationException($"Unknown craftable type: '{craftableType}'"),
-            };
+                return _accessoryTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
+            }
+            else if (craftableType == typeof(IArmorType))
+            {
+                return _armorTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
+            }
+            else if (craftableType == typeof(IWeaponType))
+            {
+                return _weaponTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
+            }
+            else if (craftableType == typeof(IConsumerType))
+            {
+                return null;
+            }
+            else if (craftableType == typeof(ISpecialGearType))
+            {
+                return _specialTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
+            }
+            else
+            {
+                throw new InvalidOperationException($"Unknown craftable type: '{craftableType}'");
+            }
         }
 
         public string GetResourceTypeId()
@@ -102,30 +117,30 @@ namespace FullPotential.Core.UI.Components
             ResourceDropdown.gameObject.SetActive(false);
 
             var typeToCraft = GetTypeToCraft();
-            switch (typeToCraft)
+            if (typeToCraft == typeof(IAccessoryType))
             {
-                case IAccessoryType:
-                    SubTypeDropdown.AddOptions(_accessoryTypes.Select(x => x.Value).ToList());
-                    break;
-
-                case IArmorType:
-                    SubTypeDropdown.AddOptions(_armorTypes.Select(x => x.Value).ToList());
-                    break;
-
-                case IWeaponType:
-                    SubTypeDropdown.AddOptions(_weaponTypes.Select(x => x.Value).ToList());
-                    break;
-
-                case IConsumerType:
-                    SetupResourcesDropDown();
-                    break;
-
-                case ISpecialGearType:
-                    SubTypeDropdown.AddOptions(_specialTypes.Select(x => x.Value).ToList());
-                    SetupResourcesDropDown();
-                    break;
-
-                default: throw new InvalidOperationException($"Unknown crafting type: '{typeToCraft}'");
+                SubTypeDropdown.AddOptions(_accessoryTypes.Select(x => x.Value).ToList());
+            }
+            else if (typeToCraft == typeof(IArmorType))
+            {
+                SubTypeDropdown.AddOptions(_armorTypes.Select(x => x.Value).ToList());
+            }
+            else if (typeToCraft == typeof(IWeaponType))
+            {
+                SubTypeDropdown.AddOptions(_weaponTypes.Select(x => x.Value).ToList());
+            }
+            else if (typeToCraft == typeof(IConsumerType))
+            {
+                SetupResourcesDropDown();
+            }
+            else if (typeToCraft == typeof(ISpecialGearType))
+            {
+                SubTypeDropdown.AddOptions(_specialTypes.Select(x => x.Value).ToList());
+                SetupResourcesDropDown();
+            }
+            else
+            {
+                throw new InvalidOperationException($"Unknown crafting type: '{typeToCraft}'");
             }
 
             if (SubTypeDropdown.options.Any())
@@ -157,11 +172,11 @@ namespace FullPotential.Core.UI.Components
 
             _craftableTypes = new Dictionary<Type, string>
             {
-                { typeof(IAccessoryType), localizer.Translate(nameof(IAccessoryType)) },
-                { typeof(IArmorType), localizer.Translate(nameof(IArmorType)) },
-                { typeof(IWeaponType), localizer.Translate(nameof(IWeaponType)) },
-                { typeof(IConsumerType), localizer.Translate(nameof(IConsumerType)) },
-                { typeof(ISpecialGearType), localizer.Translate(nameof(ISpecialGearType)) },
+                { typeof(IAccessoryType), localizer.Translate(TranslationType.ItemType, nameof(IAccessoryType)) },
+                { typeof(IArmorType), localizer.Translate(TranslationType.ItemType, nameof(IArmorType)) },
+                { typeof(IWeaponType), localizer.Translate(TranslationType.ItemType, nameof(IWeaponType)) },
+                { typeof(IConsumerType), localizer.Translate(TranslationType.ItemType, nameof(IConsumerType)) },
+                { typeof(ISpecialGearType), localizer.Translate(TranslationType.ItemType, nameof(ISpecialGearType)) },
             };
 
             _accessoryTypes = typeRegistry.GetRegisteredTypes<IAccessoryType>()

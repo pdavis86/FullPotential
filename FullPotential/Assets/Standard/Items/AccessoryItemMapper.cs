@@ -31,7 +31,7 @@ namespace FullPotential.Standard.Items
 
         public ItemBase GetItemFromCrafting(IList<ItemBase> components, string itemTypeId, string itemName, Dictionary<string, string> properties)
         {
-            // todo zzz v0.6 - Cannot inject IResultFactory as it is not ready to be used yet
+            // todo: zzz v0.6 - Cannot inject IResultFactory as it is not ready to be used yet
             var resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
 
             var accessory = DependenciesContext.Dependencies.CreateInstance<Accessory>();
@@ -39,10 +39,10 @@ namespace FullPotential.Standard.Items
             accessory.RegistryType = _typeRegistry.GetRegisteredByTypeId<IAccessoryType>(itemTypeId);
             accessory.Attributes = new Dictionary<string, string>
             {
-                { Strength.TypeId, resultFactory.ComputeAttribute(components, Strength.TypeId).ToString() },
-                { Efficiency.TypeId, resultFactory.ComputeAttribute(components, Efficiency.TypeId).ToString() },
-                { Speed.TypeId, resultFactory.ComputeAttribute(components, Speed.TypeId).ToString() },
-                { Recovery.TypeId, resultFactory.ComputeAttribute(components, Recovery.TypeId).ToString() },
+                { Strength.TypeIdString, resultFactory.ComputeAttribute(components, Strength.TypeIdString).ToString() },
+                { Efficiency.TypeIdString, resultFactory.ComputeAttribute(components, Efficiency.TypeIdString).ToString() },
+                { Speed.TypeIdString, resultFactory.ComputeAttribute(components, Speed.TypeIdString).ToString() },
+                { Recovery.TypeIdString, resultFactory.ComputeAttribute(components, Recovery.TypeIdString).ToString() },
             };
             accessory.Properties = properties;
 

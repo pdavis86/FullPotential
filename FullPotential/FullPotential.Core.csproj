@@ -149,6 +149,7 @@
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiInventoryTab.cs" />
     <Compile Include="Assets\Core\Gameplay\Events\EventHandlerGroup.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Heal.cs" />
+    <Compile Include="Assets\Core\Gameplay\Crafting\AdminCraftingLootItem.cs" />
     <Compile Include="Assets\Core\Registry\TypeRegistry.cs" />
   </ItemGroup>
   <ItemGroup>

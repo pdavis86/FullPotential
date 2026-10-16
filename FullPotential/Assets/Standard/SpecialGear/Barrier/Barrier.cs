@@ -44,7 +44,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             specialGear.AppendToDescription(
                 sb,
                 localizer,
-                specialGear.Attributes.GetIntValue(Recovery.TypeId),
+                specialGear.Attributes.GetIntValue(Recovery.TypeIdString),
                 nameof(Recovery),
                 nameof(Barrier),
                 localizer.Translate(GetRechargeDelay(specialGear)),
@@ -53,7 +53,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             specialGear.AppendToDescription(
                 sb,
                 localizer,
-                specialGear.Attributes.GetIntValue(Speed.TypeId),
+                specialGear.Attributes.GetIntValue(Speed.TypeIdString),
                 nameof(Speed),
                 nameof(Barrier),
                 localizer.Translate(GetRechargeRate(specialGear)),
@@ -64,13 +64,13 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public static float GetRechargeDelay(Items.SpecialGear specialGear)
         {
-            var returnValue = MathsHelper.GetHighInLowOutInRange(specialGear.Attributes.GetIntValue(Recovery.TypeId), 0.5f, 5f);
+            var returnValue = MathsHelper.GetHighInLowOutInRange(specialGear.Attributes.GetIntValue(Recovery.TypeIdString), 0.5f, 5f);
             return returnValue;
         }
 
         public static int GetRechargeRate(Items.SpecialGear specialGear)
         {
-            var returnValue = (int)MathsHelper.GetHighInLowOutInRange(specialGear.Attributes.GetIntValue(Speed.TypeId), 1, 10);
+            var returnValue = (int)MathsHelper.GetHighInLowOutInRange(specialGear.Attributes.GetIntValue(Speed.TypeIdString), 1, 10);
             return returnValue;
         }
     }

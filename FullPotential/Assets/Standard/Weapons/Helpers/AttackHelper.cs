@@ -237,7 +237,7 @@ namespace FullPotential.Standard.Weapons.Helpers
         {
             const float MaximumAccuracyAngleDeviation = 4;
 
-            var maxAccuracyAngleDeviation = (101 - item.Attributes.GetIntValue(Accuracy.TypeId)) / 100f * MaximumAccuracyAngleDeviation;
+            var maxAccuracyAngleDeviation = (101 - item.Attributes.GetIntValue(Accuracy.TypeIdString)) / 100f * MaximumAccuracyAngleDeviation;
             return aimDirection.AddNoiseOnAngle(-maxAccuracyAngleDeviation, maxAccuracyAngleDeviation);
         }
     }

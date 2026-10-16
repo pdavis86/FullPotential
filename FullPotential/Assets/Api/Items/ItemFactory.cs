@@ -107,14 +107,14 @@ namespace FullPotential.Api.Items
             {
                 var adjustedKey = kvp.Key switch
                 {
-                    "Strength" => Strength.TypeId,
-                    "Efficiency" => Efficiency.TypeId,
-                    "Range" => Range.TypeId,
-                    "Accuracy" => Accuracy.TypeId,
-                    "Speed" => Speed.TypeId,
-                    "Recovery" => Recovery.TypeId,
-                    "Duration" => Duration.TypeId,
-                    "Luck" => Luck.TypeId,
+                    "Strength" => Strength.TypeIdString,
+                    "Efficiency" => Efficiency.TypeIdString,
+                    "Range" => Range.TypeIdString,
+                    "Accuracy" => Accuracy.TypeIdString,
+                    "Speed" => Speed.TypeIdString,
+                    "Recovery" => Recovery.TypeIdString,
+                    "Duration" => Duration.TypeIdString,
+                    "Luck" => Luck.TypeIdString,
                     _ => kvp.Key,
                 };
 
@@ -164,6 +164,11 @@ namespace FullPotential.Api.Items
 
         private Dictionary<string, string> GetNonDefaultValues(Dictionary<string, string> input)
         {
+            if (input == null)
+            {
+                return new Dictionary<string, string>();
+            }
+
             var nonDefaultAttributes = input.Where(
                 kvp => !string.IsNullOrWhiteSpace(kvp.Value)
                 && kvp.Value != "0"
@@ -224,8 +229,13 @@ namespace FullPotential.Api.Items
                     ?? item.Properties.GetStringValueOrNull("CustomVisualsTypeId")
                     ?? item.Properties.GetStringValueOrNull("WeaponVisualsTypeId");
 
-                // todo: surely I should match on the visualsTypeId?!
                 if (!string.IsNullOrWhiteSpace(visualsTypeId))
+                {
+                    // todo: surely I should match on the visualsTypeId?!
+                    itemWithVisuals.Visuals = _typeRegistry.GetRegisteredTypes<IItemVisuals>()
+                        .FirstOrDefault(v => v.ApplicableToTypeIdString == item.RegistryType.TypeId.ToString());
+                }
+                else if (item.RegistryType != null)
                 {
                     itemWithVisuals.Visuals = _typeRegistry.GetRegisteredTypes<IItemVisuals>()
                         .FirstOrDefault(v => v.ApplicableToTypeIdString == item.RegistryType.TypeId.ToString());

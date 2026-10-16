@@ -168,7 +168,9 @@ namespace FullPotential.Core.Ui.Behaviours
                     var item = _playerFighter.Inventory.GetItemInSlot(slot.name);
                     SetSlot(slot.gameObject, item);
 
-                    if (item.RegistryType is IWeaponType && item.Properties.GetBoolValue(nameof(CombatItemBase.IsTwoHanded)))
+                    if (item?.RegistryType != null
+                        && item.RegistryType is IWeaponType
+                        && item.Properties.GetBoolValue(nameof(CombatItemBase.IsTwoHanded)))
                     {
                         var otherSlotName = slot.name == HandSlotIds.LeftHand
                             ? HandSlotIds.RightHand

@@ -12,23 +12,23 @@
     },
 	
 	{
-      "Key": "item.type.weapon",
+      "Key": "item.type.iweapontype",
       "Value": "Weapon"
     },
     {
-      "Key": "item.type.armor",
+      "Key": "item.type.iarmortype",
       "Value": "Armor"
     },
     {
-      "Key": "item.type.accessory",
+      "Key": "item.type.iaccessorytype",
       "Value": "Accessory"
     },
     {
-      "Key": "item.type.consumer",
+      "Key": "item.type.iconsumertype",
       "Value": "Consumer"
     },
     {
-      "Key": "item.type.specialgear",
+      "Key": "item.type.ispecialgeartype",
       "Value": "Custom"
     },
 	
@@ -103,22 +103,36 @@
       "Key": "crafting.error.toomanyforonehanded",
       "Value": "Too many components for a one-handed weapon"
     },
+	
+    
+    {
+      "Key": "item.targetingtype",
+      "Value": "Targeting"
+    },
+    {
+      "Key": "item.shapetype",
+      "Value": "Shape"
+    },
+    {
+      "Key": "item.effecttypes",
+      "Value": "Effects"
+    },
     
     
     {
-      "Key": "attribute.units.time",
+      "Key": "item.units.time",
       "Value": "s"
     },
     {
-      "Key": "attribute.units.unitpertime",
+      "Key": "item.units.unitpertime",
       "Value": "/s"
     },
     {
-      "Key": "attribute.units.percent",
+      "Key": "item.units.percent",
       "Value": "%"
     },
     {
-      "Key": "attribute.units.distance",
+      "Key": "item.units.distance",
       "Value": "m"
     },
 

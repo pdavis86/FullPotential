@@ -24,6 +24,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 {
     public class ResultFactory : IResultFactory
     {
+        // todo: move this to ExtraAmmoPerShot
         public const int MaxExtraAmmo = 3;
 
         private readonly Random _random = new Random();
@@ -160,6 +161,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     .ToList();
             }
 
+            // todo: allow push on weapons for knockback
             if (itemBase.RegistryType is IWeaponType)
             {
                 item.EffectTypes = effects
@@ -340,7 +342,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             var suffix = string.IsNullOrWhiteSpace(customSuffix)
                 ? _localizer.Translate(item.RegistryType)
                 : customSuffix;
-            item.Name = $"{GetItemNamePrefix(isAttack)} {item.Attributes.GetIntValue(Strength.TypeId)} {suffix}";
+            item.Name = $"{GetItemNamePrefix(isAttack)} {item.Attributes.GetIntValue(Strength.TypeIdString)} {suffix}";
         }
 
         public ItemBase GetCraftedItem(Type craftableType, string typeId, string resourceTypeId, bool isTwoHanded, string itemName, IList<ItemBase> components)

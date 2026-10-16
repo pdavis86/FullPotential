@@ -53,7 +53,7 @@ namespace FullPotential.Api.Items
 
         public float GetProjectileSpeed()
         {
-            var castSpeed = Attributes.GetIntValue(Speed.TypeId) / 50f;
+            var castSpeed = Attributes.GetIntValue(Speed.TypeIdString) / 50f;
             var returnValue = castSpeed < 0.5
                 ? 0.5f
                 : castSpeed;
@@ -93,18 +93,18 @@ namespace FullPotential.Api.Items
 
             if (TargetingType != null)
             {
-                sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(TargetingType))}: {localizer.Translate(TargetingType)}\n");
+                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(TargetingType))}: {localizer.Translate(TargetingType)}\n");
             }
 
             if (ShapeType != null)
             {
-                sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(ShapeType))}: {localizer.Translate(ShapeType)}\n");
+                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(ShapeType))}: {localizer.Translate(ShapeType)}\n");
             }
 
             if (EffectTypes != null && EffectTypes.Count > 0)
             {
                 var localisedEffects = EffectTypes.Select(localizer.Translate);
-                sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(EffectTypes))}: {string.Join(", ", localisedEffects)}\n");
+                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(EffectTypes))}: {string.Join(", ", localisedEffects)}\n");
             }
 
             var resourceConsumptionType = localizer.Translate(ResourceType);
@@ -112,7 +112,7 @@ namespace FullPotential.Api.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Efficiency.TypeId),
+                Attributes.GetIntValue(Efficiency.TypeIdString),
                 nameof(Efficiency),
                 AliasSegmentConsumer,
                 $"{GetResourceCost()} {resourceConsumptionType}");
@@ -120,7 +120,7 @@ namespace FullPotential.Api.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Range.TypeId),
+                Attributes.GetIntValue(Range.TypeIdString),
                 nameof(Range),
                 AliasSegmentItem,
                 localizer.Translate(GetRangeForDisplay()),
@@ -129,16 +129,16 @@ namespace FullPotential.Api.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Accuracy.TypeId),
+                Attributes.GetIntValue(Accuracy.TypeIdString),
                 nameof(Accuracy),
                 AliasSegmentItem,
-                Attributes.GetIntValue(Accuracy.TypeId).ToString(),
+                Attributes.GetIntValue(Accuracy.TypeIdString).ToString(),
                 UnitsType.Percent);
 
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Speed.TypeId),
+                Attributes.GetIntValue(Speed.TypeIdString),
                 nameof(Speed),
                 AliasSegmentConsumer,
                 localizer.Translate(GetChargeUpTime()),
@@ -147,7 +147,7 @@ namespace FullPotential.Api.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Recovery.TypeId),
+                Attributes.GetIntValue(Recovery.TypeIdString),
                 nameof(Recovery),
                 AliasSegmentConsumer,
                 localizer.Translate(GetCooldownTime()),
@@ -156,7 +156,7 @@ namespace FullPotential.Api.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Duration.TypeId),
+                Attributes.GetIntValue(Duration.TypeIdString),
                 nameof(Duration),
                 AliasSegmentConsumer,
                 localizer.Translate(GetEffectDuration()),
@@ -168,7 +168,7 @@ namespace FullPotential.Api.Items
                 AppendToDescription(
                     sb,
                     localizer,
-                    Attributes.GetIntValue(Strength.TypeId),
+                    Attributes.GetIntValue(Strength.TypeIdString),
                     nameof(Strength),
                     AliasSegmentConsumer,
                     localizer.Translate(changePerSecond),
@@ -202,7 +202,7 @@ namespace FullPotential.Api.Items
 
         public float GetRange()
         {
-            var returnValue = (Attributes.GetIntValue(Range.TypeId) / 100f * 15) + 5;
+            var returnValue = (Attributes.GetIntValue(Range.TypeIdString) / 100f * 15) + 5;
             return returnValue;
         }
 

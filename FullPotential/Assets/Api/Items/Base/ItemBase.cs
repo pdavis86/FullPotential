@@ -44,7 +44,7 @@ namespace FullPotential.Api.Items.Base
             }
 
             var aliasTranslation = localizer.Translate(TranslationType.AttributeAlias, aliasSegment + "." + attributeName);
-            var aliasUnits = unitsType == null ? null : localizer.Translate(TranslationType.AttributeUnits, unitsType.ToString());
+            var aliasUnits = unitsType == null ? null : localizer.Translate(TranslationType.ItemUnits, unitsType.ToString());
             var originalTranslation = localizer.Translate(TranslationType.Attribute, attributeName);
             builder.Append($"{aliasTranslation}: {aliasValue}{aliasUnits} ({originalTranslation}: {attributeValue})\n");
         }

@@ -89,21 +89,21 @@ namespace FullPotential.Standard.Items
             if (EffectTypes != null && EffectTypes.Count > 0)
             {
                 var localisedEffects = EffectTypes.Select(localizer.Translate);
-                sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(EffectTypes))}: {string.Join(", ", localisedEffects)}\n");
+                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(EffectTypes))}: {string.Join(", ", localisedEffects)}\n");
             }
 
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Strength.TypeId),
+                Attributes.GetIntValue(Strength.TypeIdString),
                 nameof(Strength),
                 AliasSegmentDefensive,
-                localizer.Translate(nameof(Strength)));
+                localizer.Translate(TranslationType.Attribute, nameof(Strength)));
 
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Speed.TypeId),
+                Attributes.GetIntValue(Speed.TypeIdString),
                 nameof(Speed),
                 AliasSegmentMelee,
                 localizer.Translate(GetChargeUpTime()),
@@ -112,7 +112,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Recovery.TypeId),
+                Attributes.GetIntValue(Recovery.TypeIdString),
                 nameof(Recovery),
                 AliasSegmentMelee,
                 localizer.Translate(GetCooldownTime()),
@@ -121,7 +121,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Strength.TypeId),
+                Attributes.GetIntValue(Strength.TypeIdString),
                 nameof(Strength),
                 AliasSegmentItem,
                 localizer.Translate(GetDefensiveDps()),
@@ -143,13 +143,13 @@ namespace FullPotential.Standard.Items
             if (EffectTypes != null && EffectTypes.Count > 0)
             {
                 var localisedEffects = EffectTypes.Select(localizer.Translate);
-                sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(EffectTypes))}: {string.Join(", ", localisedEffects)}\n");
+                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(EffectTypes))}: {string.Join(", ", localisedEffects)}\n");
             }
 
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Speed.TypeId),
+                Attributes.GetIntValue(Speed.TypeIdString),
                 nameof(Speed),
                 AliasSegmentMelee,
                 localizer.Translate(GetChargeUpTime()),
@@ -158,7 +158,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Recovery.TypeId),
+                Attributes.GetIntValue(Recovery.TypeIdString),
                 nameof(Recovery),
                 AliasSegmentMelee,
                 localizer.Translate(GetCooldownTime()),
@@ -167,7 +167,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Strength.TypeId),
+                Attributes.GetIntValue(Strength.TypeIdString),
                 nameof(Strength),
                 AliasSegmentItem,
                 localizer.Translate(GetMeleeDps()),
@@ -189,7 +189,7 @@ namespace FullPotential.Standard.Items
             if (EffectTypes != null && EffectTypes.Count > 0)
             {
                 var localisedEffects = EffectTypes.Select(localizer.Translate);
-                sb.Append($"{localizer.Translate(TranslationType.Attribute, nameof(EffectTypes))}: {string.Join(", ", localisedEffects)}\n");
+                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(EffectTypes))}: {string.Join(", ", localisedEffects)}\n");
             }
 
             AppendToDescription(sb, localizer, IsAutomatic, nameof(IsAutomatic));
@@ -200,7 +200,7 @@ namespace FullPotential.Standard.Items
                 AppendToDescription(
                     sb,
                     localizer,
-                    Attributes.GetIntValue(Efficiency.TypeId),
+                    Attributes.GetIntValue(Efficiency.TypeIdString),
                     nameof(Efficiency),
                     AliasSegmentRanged,
                     localizer.Translate(GetAmmoMax()));
@@ -209,7 +209,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Accuracy.TypeId),
+                Attributes.GetIntValue(Accuracy.TypeIdString),
                 nameof(Accuracy),
                 AliasSegmentItem,
                 localizer.Translate(TranslationType.Attribute, nameof(Accuracy)),
@@ -218,7 +218,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Speed.TypeId),
+                Attributes.GetIntValue(Speed.TypeIdString),
                 nameof(Speed),
                 AliasSegmentRanged,
                 localizer.Translate(GetAmmoPerSecond()),
@@ -227,7 +227,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Recovery.TypeId),
+                Attributes.GetIntValue(Recovery.TypeIdString),
                 nameof(Recovery),
                 AliasSegmentRanged,
                 localizer.Translate(GetReloadTime()),
@@ -236,7 +236,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Strength.TypeId),
+                Attributes.GetIntValue(Strength.TypeIdString),
                 nameof(Strength),
                 AliasSegmentItem,
                 localizer.Translate(GetRangedDps()),

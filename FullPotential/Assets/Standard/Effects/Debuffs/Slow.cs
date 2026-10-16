@@ -13,6 +13,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public bool IsTemporaryMaxIncrease => false;
 
-        public string AttributeId => Speed.TypeId;
+        public string AttributeId => Speed.TypeIdString;
     }
 }
