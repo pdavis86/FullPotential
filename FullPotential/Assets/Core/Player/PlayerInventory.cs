@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
@@ -13,16 +11,11 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Weapons;
-using FullPotential.Api.Ui;
-using FullPotential.Api.Unity.Constants;
-using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Models.LivingEntity;
 
 using Unity.Netcode;
-
-using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
@@ -91,7 +84,7 @@ namespace FullPotential.Core.Player
         public IEnumerable<ItemBase> GetHandItems()
         {
             return _items
-                .Where(x => x.Value.RegistryType is IWeaponType or IConsumerType)
+                .Where(x => x.Value.RegistryType is null or IWeaponType)
                 .Select(x => x.Value)
                 .OrderBy(x => x.Name);
         }
@@ -168,12 +161,6 @@ namespace FullPotential.Core.Player
             }
 
             MarkAsDirtyAndAddToQueue();
-        }
-
-        public KeyValuePair<string, EquippedItem>? GetEquippedWithItemId(string itemId)
-        {
-            var match = _equippedItems.FirstOrDefault(x => x.Value?.Item?.Id == itemId);
-            return match.Value == null ? null : match;
         }
 
         private void DespawnEquippedObject(string slotId)
@@ -273,6 +260,13 @@ namespace FullPotential.Core.Player
         private string GetShapeCodeWithoutLengths(string shapeCode)
         {
             return Regex.Replace(shapeCode, "(:\\d+)", string.Empty);
+        }
+
+        public Dictionary<string, string> GetEquippedItems()
+        {
+            return _equippedItems.ToDictionary(
+                x => x.Key,
+                x => x.Value.Item?.Id);
         }
     }
 }

@@ -212,7 +212,7 @@ namespace FullPotential.Standard.Items
                 Attributes.GetIntValue(Accuracy.TypeIdString),
                 nameof(Accuracy),
                 AliasSegmentItem,
-                localizer.Translate(TranslationType.Attribute, nameof(Accuracy)),
+                Attributes.GetStringValueOrNull(Accuracy.TypeIdString),
                 UnitsType.Percent);
 
             AppendToDescription(

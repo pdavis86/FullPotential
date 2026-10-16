@@ -29,12 +29,16 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 
             if (weapon.WeaponType.AmmunitionTypeIdString.IsNullOrWhiteSpace())
             {
-                return new HandlerResult();
+                return new HandlerResult(NextAction.Cancel);
+            }
+
+            if (weapon.Ammo == weapon.GetAmmoMax())
+            {
+                return new HandlerResult(NextAction.Cancel);
             }
 
             var availableAmmo = eventArgs.Fighter.Inventory.GetItemStackTotal(weapon.WeaponType.AmmunitionTypeIdString);
-
-            if (availableAmmo == 0 || availableAmmo == weapon.GetAmmoMax())
+            if (availableAmmo == 0)
             {
                 return new HandlerResult(NextAction.Cancel);
             }

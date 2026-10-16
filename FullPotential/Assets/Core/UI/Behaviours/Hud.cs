@@ -162,7 +162,7 @@ namespace FullPotential.Core.Ui.Behaviours
         {
             _crosshairs.SetActive(!isOn);
 
-            var newAlpha = isOn ? 1 : 0.5f;
+            var newAlpha = isOn ? 1 : 0.25f;
 
             _equippedLeftHandBackground.color = ChangeColorAlpha(_equippedLeftHandBackground.color, newAlpha);
 

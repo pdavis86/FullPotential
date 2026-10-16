@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
@@ -30,7 +30,7 @@ namespace FullPotential.Core.Ui.Components
             GameObject rowPrefab,
             IPlayerInventory playerInventory,
             Action<GameObject, GameObject, ItemBase> toggleAction,
-            string typeId = null,
+            string slotId = null,
             bool showEquippedItems = true,
             Action<IPlayerInventory, string, InventoryUiRow> assignDrawingAction = null
         )
@@ -43,9 +43,11 @@ namespace FullPotential.Core.Ui.Components
             var rowRectTransform = rowPrefab.GetComponent<RectTransform>();
             var rowCounter = 0;
 
-            var itemsForSlot = typeId is HandSlotIds.LeftHand or HandSlotIds.RightHand
+            var itemsForSlot = slotId is HandSlotIds.LeftHand or HandSlotIds.RightHand
                 ? playerInventory.GetHandItems()
-                : playerInventory.GetCompatibleItems(typeId);
+                : playerInventory.GetCompatibleItems(slotId);
+
+            var equippedItems = playerInventory.GetEquippedItems();
 
             if (!itemsForSlot.Any())
             {
@@ -55,7 +57,7 @@ namespace FullPotential.Core.Ui.Components
 
             foreach (var item in itemsForSlot)
             {
-                var isEquipped = playerInventory.GetEquippedWithItemId(item.Id) != null;
+                var isEquipped = equippedItems.Any(x => x.Value == item.Id);
 
                 if (isEquipped && !showEquippedItems)
                 {
@@ -74,8 +76,11 @@ namespace FullPotential.Core.Ui.Components
                         var rowToggle = row.GetComponent<Toggle>();
                         rowToggle.isOn = true;
 
-                        var rowImage = row.GetComponent<Image>();
-                        rowImage.color = Color.green;
+                        var colors = rowToggle.colors;
+                        colors.normalColor = equippedItems.ContainsKey(slotId) && equippedItems[slotId] == item.Id
+                            ? Color.green
+                            : Color.grey;
+                        rowToggle.colors = colors;
                     }
 
                     toggleAction(row, slot, item);

@@ -206,6 +206,8 @@ namespace FullPotential.Core.Ui.Behaviours
 
                 var playerInventory = (PlayerInventory)_playerFighter.Inventory;
                 playerInventory.EquipItemServerRpc(item.Id, slot.name);
+
+                ResetEquipmentUi(true);
             });
         }
 

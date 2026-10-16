@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 
-using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items.Base;
 
 namespace FullPotential.Api.Gameplay.Inventory
@@ -11,12 +10,12 @@ namespace FullPotential.Api.Gameplay.Inventory
 
         IEnumerable<ItemBase> GetCompatibleItems(string slotId);
 
-        KeyValuePair<string, EquippedItem>? GetEquippedWithItemId(string itemId);
-
         string GetAssignedShape(string itemId);
 
         bool SetAssignedShape(string itemId, string shape);
 
         ItemBase GetItemFromAssignedShape(string shape);
+
+        Dictionary<string, string> GetEquippedItems();
     }
 }
