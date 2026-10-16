@@ -68,7 +68,7 @@ namespace FullPotential.Standard.Shapes
 
             _visualsPrefabAddress.Value = !string.IsNullOrWhiteSpace(Consumer.ShapeVisualsType?.PrefabAddress)
                 ? Consumer.ShapeVisualsType.PrefabAddress
-                : _typeRegistry.GetRegisteredTypes<IItemVisuals>()
+                : _typeRegistry.GetRegisteredTypes<IItemVisualsType>()
                     .FirstOrDefault(v => v.ApplicableToTypeIdString.ToString() == Zone.TypeIdString)
                     ?.PrefabAddress ?? string.Empty;
         }

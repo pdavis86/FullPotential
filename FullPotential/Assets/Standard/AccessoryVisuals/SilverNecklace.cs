@@ -5,7 +5,7 @@ using FullPotential.Standard.Accessories;
 
 namespace FullPotential.Standard.AccessoryVisuals
 {
-    public class SilverNecklace : IItemVisuals
+    public class SilverNecklace : IItemVisualsType
     {
         private static readonly Guid Id = new Guid("e02761e5-5155-4b61-8f1c-8feb240a420c");
 

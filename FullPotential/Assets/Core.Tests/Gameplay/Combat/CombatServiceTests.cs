@@ -50,7 +50,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
                 Mock.Of<IRpcService>());
         }
 
-        // todo: move this to standard
+        // todo: zzz v0.6 - Create Standard.Tests and move this code there
         //    [Test]
         //    public void GetDamageValueFromAttack_GivenItemsWithAttributesAll50_SameBaseDamage()
         //    {

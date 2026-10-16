@@ -5,7 +5,7 @@ using FullPotential.Standard.Shapes;
 
 namespace FullPotential.Standard.ShapeVisuals
 {
-    public class ZoneOfFlames : IItemVisuals
+    public class ZoneOfFlames : IItemVisualsType
     {
         private static readonly Guid Id = new Guid("ac703f12-4d5c-4b76-98f9-045c10b40fd0");
 

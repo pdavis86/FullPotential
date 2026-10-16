@@ -5,7 +5,7 @@ using FullPotential.Standard.Weapons;
 
 namespace FullPotential.Standard.WeaponVisuals
 {
-    public class BasicAxe : IItemVisuals
+    public class BasicAxe : IItemVisualsType
     {
         private static readonly Guid Id = new Guid("ac8a55d8-6304-47d6-a35d-eecb0319d1ad");
 

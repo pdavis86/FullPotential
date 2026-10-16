@@ -36,14 +36,14 @@ namespace FullPotential.Api.Items
         public List<IStoppable> Stoppables { get; } = new List<IStoppable>();
 
         public ITargetingType TargetingType { get; set; }
-        public IItemVisuals TargetingVisualsType { get; set; }
-        public IItemVisuals ShapeVisualsType { get; set; }
+        public IItemVisualsType TargetingVisualsType { get; set; }
+        public IItemVisualsType ShapeVisualsType { get; set; }
         public IShapeType ShapeType { get; set; }
         public IResourceType ResourceType { get; set; }
 
         public string VisualsTypeId { get; set; }
 
-        public IItemVisuals Visuals { get; set; }
+        public IItemVisualsType Visuals { get; set; }
 
         public Consumer(IAuditorFactory auditorFactory, ITypeRegistry typeRegistry)
         {

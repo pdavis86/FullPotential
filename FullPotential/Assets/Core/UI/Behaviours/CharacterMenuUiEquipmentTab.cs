@@ -167,16 +167,6 @@ namespace FullPotential.Core.Ui.Behaviours
                 {
                     var item = _playerFighter.Inventory.GetItemInSlot(slot.name);
                     SetSlot(slot.gameObject, item);
-
-                    if (item?.RegistryType != null
-                        && item.RegistryType is IWeaponType
-                        && item.Properties.GetBoolValue(nameof(CombatItemBase.IsTwoHanded)))
-                    {
-                        var otherSlotName = slot.name == HandSlotIds.LeftHand
-                            ? HandSlotIds.RightHand
-                            : HandSlotIds.LeftHand;
-                        SetSlot(_rhs.transform.Find(otherSlotName).gameObject, null);
-                    }
                 }
             }
         }
@@ -203,13 +193,15 @@ namespace FullPotential.Core.Ui.Behaviours
             toggle.onValueChanged.AddListener(_ =>
             {
                 Tooltips.HideTooltip();
-
-                var playerInventory = (PlayerInventory)_playerFighter.Inventory;
-                playerInventory.EquipItemServerRpc(item.Id, slot.name);
-
+                EquipItem(item, slot.name);
                 ResetEquipmentUi(true);
             });
         }
 
+        private void EquipItem(ItemBase item, string slotId)
+        {
+            var playerInventory = (PlayerInventory)_playerFighter.Inventory;
+            playerInventory.EquipItemServerRpc(item.Id, slotId);
+        }
     }
 }

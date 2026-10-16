@@ -1,12 +1,14 @@
-﻿using System;
-using FullPotential.Api.CoreTypeIds;
+using System;
+
 using FullPotential.Api.Registry.Gear;
 
 namespace FullPotential.Standard.Armor
 {
     public class Chest : IArmorType
     {
-        private static readonly Guid Id = new Guid(ArmorTypeIds.ChestId);
+        public const string TypeIdString = "2419fcac-217e-48d8-9770-76c5ff27c9f8";
+
+        private static readonly Guid Id = new Guid(TypeIdString);
 
         public Guid TypeId => Id;
 

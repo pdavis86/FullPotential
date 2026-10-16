@@ -11,8 +11,8 @@ namespace FullPotential.Core.Gameplay.Crafting
     public class AdminCraftingLootItem : CombatItemBase, IHasTargetingAndShape, IResourceConsumer
     {
         public ITargetingType TargetingType { get; set; }
-        public IItemVisuals TargetingVisualsType { get; set; }
-        public IItemVisuals ShapeVisualsType { get; set; }
+        public IItemVisualsType TargetingVisualsType { get; set; }
+        public IItemVisualsType ShapeVisualsType { get; set; }
         public IShapeType ShapeType { get; set; }
         public IResourceType ResourceType { get; set; }
 

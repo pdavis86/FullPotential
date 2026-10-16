@@ -5,7 +5,7 @@ using FullPotential.Standard.Targeting;
 
 namespace FullPotential.Standard.TargetingVisuals
 {
-    public class ProjectileFlames : IItemVisuals
+    public class ProjectileFlames : IItemVisualsType
     {
         private static readonly Guid Id = new Guid("5f901588-e3cc-442d-9330-7897f198b211");
 

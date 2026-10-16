@@ -23,7 +23,7 @@ namespace FullPotential.Standard.Items
 
         public IResourceType ResourceType { get; set; }
 
-        public IItemVisuals Visuals { get; set; }
+        public IItemVisualsType Visuals { get; set; }
 
         public SerializableKeyValuePair<string, string>[] CustomData = Array.Empty<SerializableKeyValuePair<string, string>>();
 

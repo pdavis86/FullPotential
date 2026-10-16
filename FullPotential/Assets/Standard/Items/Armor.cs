@@ -8,6 +8,7 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Standard.Armor;
 
 using UnityEngine;
 
@@ -17,7 +18,7 @@ namespace FullPotential.Standard.Items
     {
         private readonly ITypeRegistry _typeRegistry;
 
-        public IItemVisuals Visuals { get; set; }
+        public IItemVisualsType Visuals { get; set; }
 
         public Armor(ITypeRegistry typeRegistry)
         {
@@ -61,7 +62,7 @@ namespace FullPotential.Standard.Items
 
             Transform parentTransform = null;
 
-            parentTransform = slotId == ArmorTypeIds.HelmId
+            parentTransform = slotId == Helm.TypeIdString
                 ? playerFighter.BodyParts.Head
                 : playerFighter.GraphicsTransform;
 
@@ -69,7 +70,7 @@ namespace FullPotential.Standard.Items
                 Visuals.PrefabAddress,
                 prefab =>
                     {
-                        var newObj = UnityEngine.Object.Instantiate(prefab, parentTransform);
+                        var newObj = Object.Instantiate(prefab, parentTransform);
                         playerFighter.Inventory.SetEquippedItemVisuals(slotId, newObj);
                     });
         }

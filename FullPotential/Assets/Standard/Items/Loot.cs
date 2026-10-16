@@ -15,9 +15,9 @@ namespace FullPotential.Standard.Items
         //public string TargetingTypeId { get; set; }
         public ITargetingType TargetingType { get; set; }
         //public string TargetingVisualsTypeId { get; set; }
-        public IItemVisuals TargetingVisualsType { get; set; }
+        public IItemVisualsType TargetingVisualsType { get; set; }
         //public string ShapeVisualsTypeId { get; set; }
-        public IItemVisuals ShapeVisualsType { get; set; }
+        public IItemVisualsType ShapeVisualsType { get; set; }
         //public string ShapeTypeId { get; set; }
         public IShapeType ShapeType { get; set; }
         //public List<string> EffectIds { get; set; }

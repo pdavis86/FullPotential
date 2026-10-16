@@ -58,7 +58,6 @@
     <Compile Include="Assets\Standard\Resources\Energy.cs" />
     <Compile Include="Assets\Standard\SpecialGear\Reloader\ConsolidatorReloader\ReloadEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Launch.cs" />
-    <Compile Include="Assets\Standard\Items\Base\StandardItemBase.cs" />
     <Compile Include="Assets\Standard\Scenes\Behaviours\ShopInteractable.cs" />
     <Compile Include="Assets\Standard\ArmorVisuals\LeatherJerkin.cs" />
     <Compile Include="Assets\Standard\Enemies\Behaviours\EnemyFighter.cs" />
@@ -69,6 +68,7 @@
     <Compile Include="Assets\Standard\Registration.cs" />
     <Compile Include="Assets\Standard\Weapons\Helpers\AttackReleaseEventHandler.cs" />
     <Compile Include="Assets\Standard\SpecialGearVisuals\BasicWard.cs" />
+    <Compile Include="Assets\Standard\Effects\Heal.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Conjure.cs" />
     <Compile Include="Assets\Standard\TargetingVisuals\BeamVisualsBehaviour.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicDagger.cs" />
@@ -83,6 +83,7 @@
     <Compile Include="Assets\Standard\WeaponVisuals\BasicHammer.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\StepBack.cs" />
     <Compile Include="Assets\Standard\Resources\Mana.cs" />
+    <Compile Include="Assets\Standard\Effects\Exhaust.cs" />
     <Compile Include="Assets\Standard\Targeting\Self.cs" />
     <Compile Include="Assets\Standard\TargetingVisuals\ITargetingVisualsBehaviour.cs" />
     <Compile Include="Assets\Standard\Accessories\AutoAmmoBuyer\AutoAmmoBuyer.cs" />
@@ -157,6 +158,7 @@
     <Compile Include="Assets\Standard\Effects\Movement\ShoveLeft.cs" />
     <Compile Include="Assets\Standard\SpecialGear\Barrier\ChargeChangeEventHandler.cs" />
     <Compile Include="Assets\Standard\Armor\Chest.cs" />
+    <Compile Include="Assets\Standard\Effects\Invigorate.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Air.cs" />
     <Compile Include="Assets\Standard\TargetingVisuals\BeamOfFlames.cs" />
     <Compile Include="Assets\Standard\ShapeVisuals\ZoneOfFlames.cs" />

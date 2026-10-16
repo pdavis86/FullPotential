@@ -67,7 +67,6 @@
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\AdminShopUi.cs" />
     <Compile Include="Assets\Core\Networking\Models\ConnectionPayload.cs" />
-    <Compile Include="Assets\Core\Registry\Effects\Exhaust.cs" />
     <Compile Include="Assets\Core\Persistence\Https\UserManagement.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DebuggingActiveState.cs" />
     <Compile Include="Assets\Core\Gameplay\Events\BasicEventHandler.cs" />
@@ -98,7 +97,6 @@
     <Compile Include="Assets\Core\Gameplay\Events\IBasicEventHandler.cs" />
     <Compile Include="Assets\Core\Unity\UnityHelperUtilities.cs" />
     <Compile Include="Assets\Core\Gameplay\Inventory\Events\SlotChangeEventDefaultHandler.cs" />
-    <Compile Include="Assets\Core\Registry\Effects\Invigorate.cs" />
     <Compile Include="Assets\Core\Persistence\Local\SettingsRepository.cs" />
     <Compile Include="Assets\Core\UI\Components\NameAndToggle.cs" />
     <Compile Include="Assets\Core\UI\Components\SlideOutAlert.cs" />
@@ -148,7 +146,6 @@
     <Compile Include="Assets\Core\UI\Behaviours\SettingsMenuUi.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiInventoryTab.cs" />
     <Compile Include="Assets\Core\Gameplay\Events\EventHandlerGroup.cs" />
-    <Compile Include="Assets\Core\Registry\Effects\Heal.cs" />
     <Compile Include="Assets\Core\Gameplay\Crafting\AdminCraftingLootItem.cs" />
     <Compile Include="Assets\Core\Registry\TypeRegistry.cs" />
   </ItemGroup>

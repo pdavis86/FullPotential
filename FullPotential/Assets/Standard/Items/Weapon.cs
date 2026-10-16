@@ -54,7 +54,7 @@ namespace FullPotential.Standard.Items
             set => Properties[nameof(ExtraAmmoPerShot)] = value.ToString();
         }
 
-        public IItemVisuals Visuals { get; set; }
+        public IItemVisualsType Visuals { get; set; }
 
         public Weapon(ITypeRegistry typeRegistry)
         {

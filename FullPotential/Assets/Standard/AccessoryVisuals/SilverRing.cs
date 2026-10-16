@@ -5,7 +5,7 @@ using FullPotential.Standard.Accessories;
 
 namespace FullPotential.Standard.AccessoryVisuals
 {
-    public class SilverRing : IItemVisuals
+    public class SilverRing : IItemVisualsType
     {
         private static readonly Guid Id = new Guid("c70a9495-0ef7-48fb-9b16-aad5fe7b29ad");
 

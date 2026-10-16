@@ -168,15 +168,15 @@ namespace FullPotential.Core.Registry
         {
             try
             {
-                if (!typeof(IItemVisuals).IsAssignableFrom(type))
+                if (!typeof(IItemVisualsType).IsAssignableFrom(type))
                 {
-                    _logger.Error("{0} does not implement {1}", type.Name, nameof(IItemVisuals));
+                    _logger.Error("{0} does not implement {1}", type.Name, nameof(IItemVisualsType));
                     return;
                 }
 
                 // todo: check this, might be too complicated now we only have IItemVisuals
                 var objectToRegister = DependenciesContext.Dependencies.CreateInstance(type);
-                var objectAsVisuals = (IItemVisuals)objectToRegister;
+                var objectAsVisuals = (IItemVisualsType)objectToRegister;
 
                 if (!_registeredTypeIds.Contains(objectAsVisuals.ApplicableToTypeIdString))
                 {
@@ -186,7 +186,7 @@ namespace FullPotential.Core.Registry
 
                 if (!AddToRegisterForInterface(objectToRegister, null))
                 {
-                    _logger.Error("{0} does not implement any of the valid {1} interfaces", type.FullName, nameof(IItemVisuals));
+                    _logger.Error("{0} does not implement any of the valid {1} interfaces", type.FullName, nameof(IItemVisualsType));
                 }
             }
             catch (Exception ex)
@@ -379,14 +379,14 @@ namespace FullPotential.Core.Registry
                 .Except(_gameplayTypes);
 
             var registerableTypes = classOrStructTypes
-                .Where(type => !typeof(IItemVisuals).IsAssignableFrom(type));
+                .Where(type => !typeof(IItemVisualsType).IsAssignableFrom(type));
             foreach (var type in registerableTypes)
             {
                 ValidateAndRegisterGameplayType(type);
             }
 
             var visualsTypes = classOrStructTypes
-                .Where(type => typeof(IItemVisuals).IsAssignableFrom(type));
+                .Where(type => typeof(IItemVisualsType).IsAssignableFrom(type));
             foreach (var type in visualsTypes)
             {
                 ValidateAndRegisterVisualsType(type);

@@ -5,7 +5,7 @@ using FullPotential.Standard.Weapons;
 
 namespace FullPotential.Standard.WeaponVisuals
 {
-    public class BasicDagger : IItemVisuals
+    public class BasicDagger : IItemVisualsType
     {
         private static readonly Guid Id = new Guid("9c52dc28-4a47-4164-bd22-f83967dd3c22");
 

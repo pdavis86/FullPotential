@@ -20,11 +20,11 @@ namespace FullPotential.Api.Items
 
         //string TargetingVisualsTypeId { get; set; }
 
-        IItemVisuals TargetingVisualsType { get; set; }
+        IItemVisualsType TargetingVisualsType { get; set; }
 
         //string ShapeVisualsTypeId { get; set; }
 
-        IItemVisuals ShapeVisualsType { get; set; }
+        IItemVisualsType ShapeVisualsType { get; set; }
 
         //string ShapeTypeId { get; set; }
 

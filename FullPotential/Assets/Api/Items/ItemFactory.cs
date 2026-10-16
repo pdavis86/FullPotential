@@ -139,7 +139,9 @@ namespace FullPotential.Api.Items
 
             // todo: zzz v0.8 - Remove backwards compatibility
             item.Properties["IsAutomatic"] = model.Attributes?.GetStringValueOrNull("IsAutomatic");
+            item.Attributes.Remove("IsAutomatic");
             item.Properties["ExtraAmmoPerShot"] = model.Attributes?.GetStringValueOrNull("ExtraAmmoPerShot");
+            item.Attributes.Remove("ExtraAmmoPerShot");
         }
 
         public ItemData GetDataFromItem(string characterId, ItemBase item)
@@ -200,7 +202,7 @@ namespace FullPotential.Api.Items
                     withTargetingAndShape.TargetingType = _typeRegistry.GetRegisteredTypes<ITargetingType>()
                         .First(x => x.TypeId.ToString() == targetingTypeId);
 
-                    withTargetingAndShape.TargetingVisualsType = _typeRegistry.GetRegisteredTypes<IItemVisuals>()
+                    withTargetingAndShape.TargetingVisualsType = _typeRegistry.GetRegisteredTypes<IItemVisualsType>()
                         .FirstOrDefault(v => v.TypeId.ToString() == item.Properties.GetStringValueOrNull(IHasTargetingAndShape.PropertyKeyTargetingVisualsTypeId));
                 }
 
@@ -210,7 +212,7 @@ namespace FullPotential.Api.Items
                     withTargetingAndShape.ShapeType = _typeRegistry.GetRegisteredTypes<IShapeType>()
                         .First(x => x.TypeId.ToString() == shapeTypeId);
 
-                    withTargetingAndShape.ShapeVisualsType = _typeRegistry.GetRegisteredTypes<IItemVisuals>()
+                    withTargetingAndShape.ShapeVisualsType = _typeRegistry.GetRegisteredTypes<IItemVisualsType>()
                         .FirstOrDefault(v => v.TypeId.ToString() == item.Properties.GetStringValueOrNull(IHasTargetingAndShape.PropertyKeyShapeVisualsTypeId));
                 }
             }
@@ -232,12 +234,12 @@ namespace FullPotential.Api.Items
                 if (!string.IsNullOrWhiteSpace(visualsTypeId))
                 {
                     // todo: surely I should match on the visualsTypeId?!
-                    itemWithVisuals.Visuals = _typeRegistry.GetRegisteredTypes<IItemVisuals>()
+                    itemWithVisuals.Visuals = _typeRegistry.GetRegisteredTypes<IItemVisualsType>()
                         .FirstOrDefault(v => v.ApplicableToTypeIdString == item.RegistryType.TypeId.ToString());
                 }
                 else if (item.RegistryType != null)
                 {
-                    itemWithVisuals.Visuals = _typeRegistry.GetRegisteredTypes<IItemVisuals>()
+                    itemWithVisuals.Visuals = _typeRegistry.GetRegisteredTypes<IItemVisualsType>()
                         .FirstOrDefault(v => v.ApplicableToTypeIdString == item.RegistryType.TypeId.ToString());
                 }
             }

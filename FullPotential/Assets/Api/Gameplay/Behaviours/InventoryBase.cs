@@ -18,6 +18,7 @@ using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Models.LivingEntity;
@@ -362,22 +363,39 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected void HandleSlotChange(ItemBase item, string slotId)
         {
-            var previousKvp = _equippedItems
-                .FirstOrDefault(x => x.Value.Item != null && x.Value?.Item.Id == item.Id);
-
+            var previousKvp = _equippedItems.FirstOrDefault(x => x.Value?.Item?.Id == item.Id);
             var previousSlotId = previousKvp.Value != null ? previousKvp.Key : null;
 
             if (!previousSlotId.IsNullOrWhiteSpace())
             {
                 TriggerSlotChangeEvent(null, previousSlotId);
 
-                if (previousSlotId == slotId)
+                var isUnEquipping = previousSlotId == slotId;
+                if (isUnEquipping)
                 {
                     return;
                 }
             }
 
+            var otherSlotId = slotId == HandSlotIds.LeftHand
+                ? HandSlotIds.RightHand
+                : HandSlotIds.LeftHand;
+            var otherItem = GetItemInSlot(otherSlotId);
+
+            if (otherItem != null
+                && (IsTwoHandedWeapon(otherItem) || IsTwoHandedWeapon(item)))
+            {
+                TriggerSlotChangeEvent(null, otherSlotId);
+            }
+
             TriggerSlotChangeEvent(item.Id, slotId);
+        }
+
+        private bool IsTwoHandedWeapon(ItemBase item)
+        {
+            return item?.RegistryType != null
+                && item.RegistryType is IWeaponType
+                && item.Properties.GetBoolValue(nameof(CombatItemBase.IsTwoHanded));
         }
 
         protected void TriggerSlotChangeEvent(string itemId, string slotId)

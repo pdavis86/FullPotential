@@ -19,7 +19,7 @@ namespace FullPotential.Standard.Items
     {
         private readonly ITypeRegistry _typeRegistry;
 
-        public IItemVisuals Visuals { get; set; }
+        public IItemVisualsType Visuals { get; set; }
 
         public Accessory(ITypeRegistry typeRegistry)
         {

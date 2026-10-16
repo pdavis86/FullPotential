@@ -98,7 +98,6 @@
     <Compile Include="Assets\Api\Registry\IRegisterableType.cs" />
     <Compile Include="Assets\Api\Items\IHasCharge.cs" />
     <Compile Include="Assets\Api\Logging\AuditLevel.cs" />
-    <Compile Include="Assets\Api\Registry\IItemVisuals.cs" />
     <Compile Include="Assets\Api\Registry\ITypeRegistry.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\NextAction.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemStackBase.cs" />
@@ -161,12 +160,12 @@
     <Compile Include="Assets\Api\Gameplay\Behaviours\LivingEntityBase.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\SlotIntraAction.cs" />
     <Compile Include="Assets\Api\Registry\Elements\IElementType.cs" />
-    <Compile Include="Assets\Api\CoreTypeIds\ArmorTypeIds.cs" />
     <Compile Include="Assets\Api\Items\LevelOfDetail.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector2Extensions.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IResourceEffectType.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\IEvent.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\PlayerJoinedEvent.cs" />
+    <Compile Include="Assets\Api\Registry\IItemVisualsType.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector3Extensions.cs" />
     <Compile Include="Assets\Api\Utilities\MathsHelper.cs" />
     <Compile Include="Assets\Api\Items\Consumer.cs" />
