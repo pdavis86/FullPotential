@@ -161,7 +161,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     .ToList();
             }
 
-            // todo: allow push on weapons for knockback
+            // todo: zzz v0.8 - allow push on weapons for knockback
             if (itemBase.RegistryType is IWeaponType)
             {
                 item.EffectTypes = effects

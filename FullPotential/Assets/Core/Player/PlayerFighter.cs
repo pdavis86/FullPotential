@@ -443,24 +443,19 @@ namespace FullPotential.Core.Player
 
         private async UniTask GetAndLoadCharacterDataAsync(bool reduced)
         {
-            CharacterData playerData = null;
-            InventoryData inventoryData = null;
-
             async UniTask FetchCharacterData()
             {
-                playerData = await _dataLoader.GetCharacterDataAsync(CharacterId);
+                var playerData = await _dataLoader.GetCharacterDataAsync(CharacterId);
+                LoadFromCharacterData(playerData);
             }
 
             async UniTask FetchInventoryData()
             {
-                inventoryData = await _dataLoader.GetInventoryDataAsync(CharacterId, reduced);
+                var inventoryData = await _dataLoader.GetInventoryDataAsync(CharacterId, reduced);
+                Inventory.LoadInventory(inventoryData);
             }
 
             await UniTask.WhenAll(FetchCharacterData(), FetchInventoryData());
-
-            // todo: clean out anything stopping data loading from being async
-            LoadFromCharacterData(playerData);
-            Inventory.LoadInventory(inventoryData);
         }
 
         private UniTask HandlePlayerJoinedAsync(PlayerJoinedEvent eventArgs)

@@ -15,9 +15,6 @@ using UnityEngine;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-// todo: Break up FighterBase e.g. combat, equipment, etc.
-// todo: Only use ClientRpc methods for non-state situations (otherwise network variables)
-
 namespace FullPotential.Api.Gameplay.Behaviours
 {
     public abstract class FighterBase : LivingEntityBase, IFighter, IMoveable
@@ -109,7 +106,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         [ClientRpc]
         public void ApplyMovementForceClientRpc(Vector3 force, ForceMode forceMode, ClientRpcParams clientRpcParams)
         {
-            // todo: Apply position changes on client rather than forces
+            // todo: zzz v0.8 - Apply position changes on client rather than forces
             var targetRigidBody = GetComponent<Rigidbody>();
             targetRigidBody.AddForce(force, forceMode);
         }
