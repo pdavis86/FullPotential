@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+
 using FullPotential.Api.Registry.Elements;
 
 namespace FullPotential.Standard.Effects.Elements

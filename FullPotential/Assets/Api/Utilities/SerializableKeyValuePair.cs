@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 // ReSharper disable InconsistentNaming
 
-namespace FullPotential.Api.Obsolete
+namespace FullPotential.Api.Utilities
 {
     [Serializable]
     public struct SerializableKeyValuePair<K, V>

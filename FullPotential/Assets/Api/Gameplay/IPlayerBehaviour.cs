@@ -1,4 +1,5 @@
-﻿using Unity.Netcode;
+using Unity.Netcode;
+
 using UnityEngine;
 
 // ReSharper disable UnusedParameter.Global

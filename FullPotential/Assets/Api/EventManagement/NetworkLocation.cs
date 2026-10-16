@@ -1,7 +1,6 @@
-﻿
 // ReSharper disable UnusedMember.Global
 
-namespace FullPotential.Api.Gameplay.Events
+namespace FullPotential.Api.EventManagement
 {
     public enum NetworkLocation
     {

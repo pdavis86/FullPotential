@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Data;
-using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Gameplay.Player.Models;
@@ -19,7 +19,6 @@ using FullPotential.Api.Networking;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Weapons;
-using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Models.LivingEntity;
 

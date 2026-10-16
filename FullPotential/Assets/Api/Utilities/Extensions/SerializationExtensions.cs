@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+
+using FullPotential.Api.Utilities;
 
 using Unity.Netcode;
 
 // ReSharper disable UnusedMember.Global
 
-namespace FullPotential.Api.Obsolete
+namespace FullPotential.Api.Utilities.Extensions
 {
     public static class SerializationExtensions
     {

@@ -1,5 +1,7 @@
-﻿using FullPotential.Api.Ioc;
+using FullPotential.Api.Ioc;
+
 using Moq;
+
 using NUnit.Framework;
 
 namespace FullPotential.Api.IntegrationTests.TestHelpers

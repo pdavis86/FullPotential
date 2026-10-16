@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.EventManagement;
 
 namespace FullPotential.Core.Gameplay.Events
 {

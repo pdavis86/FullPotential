@@ -1,5 +1,6 @@
-﻿using FullPotential.Core.GameManagement;
+using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
+
 using UnityEngine;
 
 // ReSharper disable UnusedType.Global

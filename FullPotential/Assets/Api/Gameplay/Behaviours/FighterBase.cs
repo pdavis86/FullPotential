@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
-using FullPotential.Api.Ui;
 using FullPotential.Api.Utilities;
 
 using Unity.Netcode;

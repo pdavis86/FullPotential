@@ -14,7 +14,6 @@ using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
-using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 

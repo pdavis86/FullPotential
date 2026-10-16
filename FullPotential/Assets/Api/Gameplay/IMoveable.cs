@@ -1,4 +1,5 @@
-﻿using Unity.Netcode;
+using Unity.Netcode;
+
 using UnityEngine;
 
 namespace FullPotential.Api.Gameplay

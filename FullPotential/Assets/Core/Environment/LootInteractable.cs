@@ -1,9 +1,11 @@
-﻿using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
+
 using Unity.Netcode;
+
 using UnityEngine.InputSystem;
 
 // ReSharper disable ClassNeverInstantiated.Global

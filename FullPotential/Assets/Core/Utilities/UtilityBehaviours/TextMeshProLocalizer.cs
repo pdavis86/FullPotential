@@ -1,8 +1,10 @@
-﻿using FullPotential.Api.Ioc;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Utilities.Extensions;
+
 using TMPro;
+
 using UnityEngine;
 
 // ReSharper disable once UnusedType.Global

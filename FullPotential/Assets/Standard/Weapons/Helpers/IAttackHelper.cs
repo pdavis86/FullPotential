@@ -1,5 +1,5 @@
-using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay.Behaviours;
 
 namespace FullPotential.Standard.Weapons.Helpers
 {

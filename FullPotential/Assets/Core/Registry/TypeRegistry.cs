@@ -8,8 +8,8 @@ using System.Text;
 
 using Cysharp.Threading.Tasks;
 
+using FullPotential.Api.EventManagement;
 using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
@@ -174,7 +174,6 @@ namespace FullPotential.Core.Registry
                     return;
                 }
 
-                // todo: check this, might be too complicated now we only have IItemVisuals
                 var objectToRegister = DependenciesContext.Dependencies.CreateInstance(type);
                 var objectAsVisuals = (IItemVisualsType)objectToRegister;
 
@@ -444,8 +443,8 @@ namespace FullPotential.Core.Registry
 
             foreach (var attributeType in attributeTypes)
             {
-                // todo: check on typeId instead
-                _attributeIds.Add(attributeType.Name);
+                var instance = (IAttribute)DependenciesContext.Dependencies.CreateInstance(attributeType);
+                _attributeIds.Add(instance.TypeId.ToString());
             }
         }
 

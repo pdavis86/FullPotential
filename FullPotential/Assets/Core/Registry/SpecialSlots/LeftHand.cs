@@ -1,7 +1,7 @@
 using System;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Registry.Gear;
-using FullPotential.Api.Ui;
 
 namespace FullPotential.Core.Registry.SpecialSlots
 {

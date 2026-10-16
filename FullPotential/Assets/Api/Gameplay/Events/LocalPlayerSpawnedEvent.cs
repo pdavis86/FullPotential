@@ -1,4 +1,4 @@
-using FullPotential.Api.Gameplay;
+using FullPotential.Api.EventManagement;
 
 namespace FullPotential.Api.Gameplay.Events
 {

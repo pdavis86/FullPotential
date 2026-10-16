@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+
 using FullPotential.Api.Registry.Weapons;
 
 // ReSharper disable once ClassNeverInstantiated.Global

@@ -1,5 +1,5 @@
+using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Gameplay.Events;
 
 using UnityEngine;
 

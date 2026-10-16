@@ -1,5 +1,6 @@
-﻿using FullPotential.Api.Logging;
+using FullPotential.Api.Logging;
 using FullPotential.Api.Scenes;
+
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global

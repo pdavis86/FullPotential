@@ -1,4 +1,5 @@
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Player;
 
 using UnityEngine;
 

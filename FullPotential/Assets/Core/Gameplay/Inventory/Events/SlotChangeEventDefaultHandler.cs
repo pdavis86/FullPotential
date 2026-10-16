@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Inventory.Events;
 
 namespace FullPotential.Core.Gameplay.Inventory.Events

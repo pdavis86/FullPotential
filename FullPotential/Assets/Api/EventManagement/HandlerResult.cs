@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Gameplay.Events
+namespace FullPotential.Api.EventManagement
 {
     public readonly struct HandlerResult
     {

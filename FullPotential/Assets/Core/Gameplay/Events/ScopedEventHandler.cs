@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.EventManagement;
 
 namespace FullPotential.Core.Gameplay.Events
 {

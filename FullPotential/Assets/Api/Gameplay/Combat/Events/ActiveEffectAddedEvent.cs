@@ -1,6 +1,6 @@
+using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Effects;
-using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Api.Gameplay.Combat.Events
 {

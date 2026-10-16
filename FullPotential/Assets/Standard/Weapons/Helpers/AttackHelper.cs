@@ -2,15 +2,15 @@ using System;
 
 using Cysharp.Threading.Tasks;
 
+using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
-using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Logging;
-using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.Items;

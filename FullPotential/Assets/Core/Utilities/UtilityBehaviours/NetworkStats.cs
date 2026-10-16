@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+
 using Unity.Netcode;
+
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global

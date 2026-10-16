@@ -1,5 +1,7 @@
-﻿using FullPotential.Api.Unity.Extensions;
+using FullPotential.Api.Unity.Extensions;
+
 using NUnit.Framework;
+
 using UnityEngine;
 
 namespace FullPotential.Api.Tests.Utilities.Extensions

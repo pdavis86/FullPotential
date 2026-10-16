@@ -15,7 +15,6 @@ using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Obsolete;
 using FullPotential.Api.Ui;
 using FullPotential.Api.Unity;
 using FullPotential.Api.Unity.Constants;

@@ -1,4 +1,4 @@
-﻿using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player.Events;
 using FullPotential.Api.Ioc;

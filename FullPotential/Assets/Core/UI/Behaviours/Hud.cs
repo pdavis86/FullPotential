@@ -4,6 +4,8 @@ using System.Linq;
 
 using Cysharp.Threading.Tasks;
 
+using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat.Events;
@@ -12,7 +14,7 @@ using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Gameplay.Player.Events;
-using FullPotential.Api.Input;
+using FullPotential.Api.Input.Events;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;

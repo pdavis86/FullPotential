@@ -2,7 +2,7 @@ using System;
 
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.EventManagement;
 
 // Resharper disable UnusedMember.Global
 

@@ -1,4 +1,4 @@
-﻿namespace FullPotential.Api.Ui
+namespace FullPotential.Api.CoreTypeIds
 {
     public static class HandSlotIds
     {

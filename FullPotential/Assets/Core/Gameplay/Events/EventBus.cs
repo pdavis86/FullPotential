@@ -4,7 +4,7 @@ using System.Linq;
 
 using Cysharp.Threading.Tasks;
 
-using FullPotential.Api.Gameplay.Events;
+using FullPotential.Api.EventManagement;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Logging;
 

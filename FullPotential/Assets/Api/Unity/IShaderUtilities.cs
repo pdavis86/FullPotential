@@ -1,4 +1,5 @@
-﻿using FullPotential.Api.Unity.Constants;
+using FullPotential.Api.Unity.Constants;
+
 using UnityEngine;
 
 namespace FullPotential.Api.Unity

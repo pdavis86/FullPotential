@@ -2,7 +2,7 @@ using System;
 
 using UnityEngine;
 
-namespace FullPotential.Api.Gameplay
+namespace FullPotential.Api.Gameplay.Player
 {
     [Serializable]
     public struct BodyPartTransforms

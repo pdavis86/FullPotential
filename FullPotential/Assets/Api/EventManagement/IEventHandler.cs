@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 
-namespace FullPotential.Api.Gameplay.Events
+namespace FullPotential.Api.EventManagement
 {
     public interface IEventHandler
     {

@@ -21,7 +21,6 @@ using Unity.Netcode;
 
 namespace FullPotential.Core.Player
 {
-    // todo: aim to make PlayerInventory redundant?
     public class PlayerInventory : InventoryBase, IPlayerInventory
     {
         private Dictionary<string, CombatItemBase> _combatItemsWithShape;

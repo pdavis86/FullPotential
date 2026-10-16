@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
+using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Behaviours;
-using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Items.Base;
 
 namespace FullPotential.Api.Gameplay.Inventory.Events

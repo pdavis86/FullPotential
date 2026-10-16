@@ -1,4 +1,5 @@
-﻿using Unity.Netcode.Components;
+using Unity.Netcode.Components;
+
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global

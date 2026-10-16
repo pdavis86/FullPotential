@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using FullPotential.Api.Data;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Obsolete;
+using FullPotential.Api.Utilities;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.GameManagement.Data;
 using FullPotential.Core.Player;

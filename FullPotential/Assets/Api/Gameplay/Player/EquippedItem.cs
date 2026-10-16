@@ -1,4 +1,5 @@
-﻿using FullPotential.Api.Items.Base;
+using FullPotential.Api.Items.Base;
+
 using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Player

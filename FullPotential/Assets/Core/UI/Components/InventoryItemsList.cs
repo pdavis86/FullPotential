@@ -1,16 +1,18 @@
 using System;
 using System.Linq;
+
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
-using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Gameplay.Tooltips;
 using FullPotential.Core.UI.Behaviours;
+
 using UnityEngine;
 using UnityEngine.UI;
 

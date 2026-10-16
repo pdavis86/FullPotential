@@ -1,8 +1,8 @@
 using Cysharp.Threading.Tasks;
 
+using FullPotential.Api.EventManagement;
 using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat.Events;
-using FullPotential.Api.Gameplay.Events;
 using FullPotential.Api.Gameplay.Player.Events;
 using FullPotential.Api.Utilities.Extensions;
 

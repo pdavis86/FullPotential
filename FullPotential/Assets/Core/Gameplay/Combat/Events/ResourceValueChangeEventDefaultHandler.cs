@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 
+using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Combat.Events;
-using FullPotential.Api.Gameplay.Events;
 
 namespace FullPotential.Core.Gameplay.Combat.Events
 {

@@ -14,7 +14,6 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Items
 {
-    // todo: remove [Serializable] from almost everywhere
     public class Accessory : CombatItemBase, IHasItemVisuals
     {
         private readonly ITypeRegistry _typeRegistry;

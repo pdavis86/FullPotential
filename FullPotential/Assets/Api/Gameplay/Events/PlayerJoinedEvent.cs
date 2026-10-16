@@ -1,3 +1,5 @@
+using FullPotential.Api.EventManagement;
+
 using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Events

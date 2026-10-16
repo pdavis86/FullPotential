@@ -1,9 +1,11 @@
 using System;
 using System.Linq;
+
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Unity.Extensions;
+
 using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global

@@ -1,5 +1,6 @@
-﻿using FullPotential.Api.Ioc;
+using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 
