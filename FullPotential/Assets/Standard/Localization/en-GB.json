@@ -1,617 +1,147 @@
 {
   "Culture": "en-GB",
   "Name": "English (United Kingdom)",
-  "Translations": [	
-	{
-      "Key": "accessorytype.amulet",
-      "Value": "Amulet"
-    },
-    {
-      "Key": "accessorytype.belt",
-      "Value": "Belt"
-    },
-    {
-      "Key": "accessorytype.ring",
-      "Value": "Ring"
-    },
-    {
-      "Key": "accessorytype.reloader",
-      "Value": "Ranged Weapon Reloader"
-    },
-    {
-      "Key": "accessorytype.barrier",
-      "Value": "Barrier"
-    },
-    {
-      "Key": "accessorytype.autoammobuyer",
-      "Value": "Auto Ammo Buyer"
-    },
-
-
-    {
-      "Key": "armortype.helm",
-      "Value": "Helm"
-    },
-    {
-      "Key": "armortype.chest",
-      "Value": "Chest"
-    },
-    {
-      "Key": "armortype.legs",
-      "Value": "Legs"
-    },
-    {
-      "Key": "armortype.feet",
-      "Value": "Feet"
-    },
-	
-	
-    {
-      "Key": "loottype.scrap",
-      "Value": "Scrap"
-    },
-    {
-      "Key": "loottype.shard",
-      "Value": "Shard"
-    },
-    {
-      "Key": "loottype.junk",
-      "Value": "Junk"
-    },
-
-
-    {
-      "Key": "ammunitiontype.arrow",
-      "Value": "Arrow"
-    },
-	{
-      "Key": "ammunitiontype.bullet",
-      "Value": "Bullet"
-    },
-
-
-    {
-      "Key": "weapontype.axe",
-      "Value": "Axe"
-    },
-    {
-      "Key": "weapontype.bow",
-      "Value": "Bow"
-    },
-    {
-      "Key": "weapontype.crossbow",
-      "Value": "Crossbow"
-    },
-    {
-      "Key": "weapontype.dagger",
-      "Value": "Dagger"
-    },
-    {
-      "Key": "weapontype.gun",
-      "Value": "Gun"
-    },
-    {
-      "Key": "weapontype.hammer",
-      "Value": "Hammer"
-    },
-    {
-      "Key": "weapontype.shield",
-      "Value": "Shield"
-    },
-    {
-      "Key": "weapontype.staff",
-      "Value": "Staff"
-    },
-    {
-      "Key": "weapontype.sword",
-      "Value": "Sword"
-    },
-	
-	
-    {
-      "Key": "valuepooltype.mana",
-      "Value": "Mana"
-    },
-    {
-      "Key": "valuepooltype.energy",
-      "Value": "Energy"
-    },
-    
-
-    {
-      "Key": "shapetype.wall",
-      "Value": "Wall"
-    },
-    {
-      "Key": "shapetype.zone",
-      "Value": "Zone"
-    },
-
-
-    {
-      "Key": "targetingtype.pointtopoint",
-      "Value": "Point-to-point"
-    },
-    {
-      "Key": "targetingtype.projectile",
-      "Value": "Projectile"
-    },
-    {
-      "Key": "targetingtype.self",
-      "Value": "Self"
-    },
-    {
-      "Key": "targetingtype.withinreach",
-      "Value": "Within Reach"
-    },
-    
-    
-    {
-      "Key": "effecttype.resilience",
-      "Value": "Resilience"
-    },
-    {
-      "Key": "effecttype.resilience.description",
-      "Value": "Boosts max HP"
-    },
-    {
-      "Key": "effecttype.focus",
-      "Value": "Focus"
-    },
-    {
-      "Key": "effecttype.focus.description",
-      "Value": "Boosts max mana"
-    },
-    {
-      "Key": "effecttype.haste",
-      "Value": "Haste"
-    },
-    {
-      "Key": "effecttype.haste.description",
-      "Value": "Boosts speed attribute"
-    },
-    {
-      "Key": "effecttype.lifetap",
-      "Value": "Life Tap"
-    },
-    {
-      "Key": "effecttype.lifetap.description",
-      "Value": "Periodically steals HP from a target with the Life Drain debuff"
-    },
-    {
-      "Key": "effecttype.manatap",
-      "Value": "Mana Tap"
-    },
-    {
-      "Key": "effecttype.manatap.description",
-      "Value": "Periodically steals mana from a target with the Mana Drain debuff"
-    },
-    {
-      "Key": "effecttype.regeneration",
-      "Value": "Regeneration"
-    },
-    {
-      "Key": "effecttype.regeneration.description",
-      "Value": "Periodically increases your HP"
-    },
-    {
-      "Key": "effecttype.strengthen",
-      "Value": "Strengthen"
-    },
-    {
-      "Key": "effecttype.strengthen.description",
-      "Value": "Boosts strength attribute"
-    },
-    {
-      "Key": "effecttype.surge",
-      "Value": "Surge"
-    },
-    {
-      "Key": "effecttype.surge.description",
-      "Value": "Boosts max energy"
-    },
-    {
-      "Key": "effecttype.endurance",
-      "Value": "Endurance"
-    },
-    {
-      "Key": "effecttype.endurance.description",
-      "Value": "Increases max stamina"
-    },
-
-
-    {
-      "Key": "effecttype.distract",
-      "Value": "Distract"
-    },
-    {
-      "Key": "effecttype.distract.description",
-      "Value": "Decreases max mana"
-    },
-    {
-      "Key": "effecttype.wound",
-      "Value": "Wound"
-    },
-    {
-      "Key": "effecttype.wound.description",
-      "Value": "Decreases max HP"
-    },
-    {
-      "Key": "effecttype.lifedrain",
-      "Value": "Life Drain"
-    },
-    {
-      "Key": "effecttype.lifedrain.description",
-      "Value": "Periodically steals HP to give to the originator"
-    },
-    {
-      "Key": "effecttype.manadrain",
-      "Value": "Mana Drain"
-    },
-    {
-      "Key": "effecttype.manadrain.description",
-      "Value": "Periodically steals mana to give to the originator"
-    },
-    {
-      "Key": "effecttype.poison",
-      "Value": "Poison"
-    },
-    {
-      "Key": "effecttype.poison.description",
-      "Value": "Periodically decreases your HP"
-    },
-    {
-      "Key": "effecttype.slow",
-      "Value": "Slow"
-    },
-    {
-      "Key": "effecttype.slow.description",
-      "Value": "Decreases speed attribute"
-    },
-    {
-      "Key": "effecttype.weaken",
-      "Value": "Weakness"
-    },
-    {
-      "Key": "effecttype.weakness.description",
-      "Value": "Decreases strength attribute"
-    },
-    {
-      "Key": "effecttype.shortcircuit",
-      "Value": "Short Circuit"
-    },
-    {
-      "Key": "effecttype.shortcircuit.description",
-      "Value": "Decreases max energy"
-    },
-    {
-      "Key": "effecttype.lethargy",
-      "Value": "Lethargy"
-    },
-    {
-      "Key": "effecttype.lethargy.description",
-      "Value": "Decreases max stamina"
-    },
-
-
-    {
-      "Key": "effecttype.air",
-      "Value": "Air"
-    },
-    {
-      "Key": "effecttype.air.description",
-      "Value": "Imbue with the Air element"
-    },
-    {
-      "Key": "effecttype.earth",
-      "Value": "Earth"
-    },
-    {
-      "Key": "effecttype.earth.description",
-      "Value": "Imbue with the Earth element"
-    },
-    {
-      "Key": "effecttype.fire",
-      "Value": "Fire"
-    },
-    {
-      "Key": "effecttype.fire.description",
-      "Value": "Imbue with the Fire element"
-    },
-    {
-      "Key": "effecttype.ice",
-      "Value": "Ice"
-    },
-    {
-      "Key": "effecttype.ice.description",
-      "Value": "Imbue with the Ice element"
-    },
-    {
-      "Key": "effecttype.lightning",
-      "Value": "Lightning"
-    },
-    {
-      "Key": "effecttype.lightning.description",
-      "Value": "Imbue with the Lightning element"
-    },
-    {
-      "Key": "effecttype.water",
-      "Value": "Water"
-    },
-    {
-      "Key": "effecttype.water.description",
-      "Value": "Imbue with the Water element"
-    },
-
-
-    {
-      "Key": "effecttype.conjure",
-      "Value": "WiP Conjure"
-    },
-    {
-      "Key": "effecttype.conjure.description",
-      "Value": "WiP"
-    },
-    {
-      "Key": "effecttype.float",
-      "Value": "WiP Float"
-    },
-    {
-      "Key": "effecttype.float.description",
-      "Value": "Reduces fall damage"
-    },
-    {
-      "Key": "effecttype.reflect",
-      "Value": "WiP Reflect"
-    },
-    {
-      "Key": "effecttype.reflect.description",
-      "Value": "Reflect damage back at the attacker"
-    },
-    {
-      "Key": "effecttype.summon",
-      "Value": "WiP Summon"
-    },
-    {
-      "Key": "effecttype.summon.description",
-      "Value": "Summon entities to act as shields or weapons"
-    },
-    
-    
-    {
-      "Key": "effecttype.attract",
-      "Value": "Attract"
-    },
-    {
-      "Key": "effecttype.attract.description",
-      "Value": "Pulls a target towards the source"
-    },
-    {
-      "Key": "effecttype.hold",
-      "Value": "Hold"
-    },
-    {
-      "Key": "effecttype.hold.description",
-      "Value": "Holds the target a set distance away"
-    },
-    {
-      "Key": "effecttype.launch",
-      "Value": "Launch"
-    },
-    {
-      "Key": "effecttype.launch.description",
-      "Value": "Launch target into the air"
-    },
-    {
-      "Key": "effecttype.lunge",
-      "Value": "Lunge"
-    },
-    {
-      "Key": "effecttype.lunge.description",
-      "Value": "Moves the target forwards"
-    },
-    {
-      "Key": "effecttype.plummet",
-      "Value": "Plummet"
-    },
-    {
-      "Key": "effecttype.plummet.description",
-      "Value": "Causes the target to fall rapidly"
-    },
-    {
-      "Key": "effecttype.repel",
-      "Value": "Repel"
-    },
-    {
-      "Key": "effecttype.repel.description",
-      "Value": "Repels a target away from the source"
-    },
-    {
-      "Key": "effecttype.shoveleft",
-      "Value": "Shove Left"
-    },
-    {
-      "Key": "effecttype.shoveleft.description",
-      "Value": "Move a target to their left"
-    },
-    {
-      "Key": "effecttype.shoveright",
-      "Value": "Shove Right"
-    },
-    {
-      "Key": "effecttype.shoveright.description",
-      "Value": "Move a target to their right"
-    },
-    {
-      "Key": "effecttype.stepback",
-      "Value": "Step Back"
-    },
-    {
-      "Key": "effecttype.stepback.description",
-      "Value": "Causes your target to move backwards"
-    },
-	
-	
-    {
-      "Key": "customgeartype.consolidatorreloader",
-      "Value": "Consolidator Reloader"
-    },
-    {
-      "Key": "customgeartype.teleportreloader",
-      "Value": "Teleport Reloader"
-    },
-    {
-      "Key": "customgeartype.barrier",
-      "Value": "Barrier"
-    },
-	
-    {
-      "Key": "resourcetype.barrierchargeresource",
-      "Value": "Barrier Charge"
-    },
-	
-	
-	{
-      "Key": "noweaponreloader",
-      "Value": "No weapon reloader equipped.\nRemaining ammo will be lost when you reload!"
-    },
-	
-	
-	{
-      "Key": "slot.rangedweaponreloaderslot",
-      "Value": "Weapon Reloader"
-    },
-	{
-      "Key": "slot.autoammobuyerslot",
-      "Value": "Auto Ammo Buyer"
-    },
-	{
-      "Key": "slot.barrierslot",
-      "Value": "Barrier"
-    },
-	
-	
-    {
-      "Key": "attribute.alias.barrier.recovery",
-      "Value": "Recharge delay"
-    },
-    {
-      "Key": "attribute.alias.barrier.speed",
-      "Value": "Recharge rate"
-    },
-    {
-      "Key": "attribute.resourceconsumptiontype",
-      "Value": "Consumes"
-    },
-
-
-    {
-      "Key": "attribute.strength",
-      "Value": "Strength"
-    },
-    {
-      "Key": "attribute.efficiency",
-      "Value": "Efficiency"
-    },
-    {
-      "Key": "attribute.range",
-      "Value": "Range"
-    },
-    {
-      "Key": "attribute.accuracy",
-      "Value": "Accuracy"
-    },
-    {
-      "Key": "attribute.speed",
-      "Value": "Speed"
-    },
-    {
-      "Key": "attribute.recovery",
-      "Value": "Recovery"
-    },
-    {
-      "Key": "attribute.duration",
-      "Value": "Duration"
-    },
-    {
-      "Key": "attribute.effects",
-      "Value": "Effects"
-    },
-    {
-      "Key": "attribute.luck",
-      "Value": "Luck"
-    },
-	
-	
-	{
-      "Key": "attribute.alias.item.strength",
-      "Value": "Est. DPS"
-    },
-    {
-      "Key": "attribute.alias.item.range",
-      "Value": "Range"
-    },
-    {
-      "Key": "attribute.alias.item.accuracy",
-      "Value": "Accuracy"
-    },
-	
-	
-    {
-      "Key": "attribute.alias.defensiveitem.strength",
-      "Value": "Defence"
-    },
-	
-	
-    {
-      "Key": "attribute.alias.consumer.strength",
-      "Value": "Est. change"
-    },
-    {
-      "Key": "attribute.alias.consumer.efficiency",
-      "Value": "Resource cost"
-    },
-    {
-      "Key": "attribute.alias.consumer.speed",
-      "Value": "Charge Time"
-    },
-    {
-      "Key": "attribute.alias.consumer.recovery",
-      "Value": "Cooldown Time"
-    },
-    {
-      "Key": "attribute.alias.consumer.duration",
-      "Value": "Effect duration"
-    },
-	
-	
-    {
-      "Key": "attribute.alias.effects.speed",
-      "Value": "Time between effects"
-    },
-	
-	
-    {
-      "Key": "attribute.alias.rangedweapon.efficiency",
-      "Value": "Max. Ammo"
-    },
-    {
-      "Key": "attribute.alias.rangedweapon.speed",
-      "Value": "Fire Rate"
-    },
-    {
-      "Key": "attribute.alias.rangedweapon.recovery",
-      "Value": "Reload Time"
-    },
-	
-	
-    {
-      "Key": "attribute.alias.meleeweapon.speed",
-      "Value": "Wind Up Time"
-    },
-    {
-      "Key": "attribute.alias.meleeweapon.recovery",
-      "Value": "Cooldown Time"
-    }
-  ]
+  "Translations": {
+    "accessorytype.amulet": "Amulet",
+    "accessorytype.autoammobuyer": "Auto Ammo Buyer",
+    "accessorytype.barrier": "Barrier",
+    "accessorytype.belt": "Belt",
+    "accessorytype.reloader": "Ranged Weapon Reloader",
+    "accessorytype.ring": "Ring",
+    "ammunitiontype.arrow": "Arrow",
+    "ammunitiontype.bullet": "Bullet",
+    "armortype.chest": "Chest",
+    "armortype.feet": "Feet",
+    "armortype.helm": "Helm",
+    "armortype.legs": "Legs",
+    "attribute.accuracy": "Accuracy",
+    "attribute.alias.barrier.recovery": "Recharge delay",
+    "attribute.alias.barrier.speed": "Recharge rate",
+    "attribute.alias.consumer.duration": "Effect duration",
+    "attribute.alias.consumer.efficiency": "Resource cost",
+    "attribute.alias.consumer.recovery": "Cooldown Time",
+    "attribute.alias.consumer.speed": "Charge Time",
+    "attribute.alias.consumer.strength": "Est. change",
+    "attribute.alias.defensiveitem.strength": "Defence",
+    "attribute.alias.effects.speed": "Time between effects",
+    "attribute.alias.item.accuracy": "Accuracy",
+    "attribute.alias.item.range": "Range",
+    "attribute.alias.item.strength": "Est. DPS",
+    "attribute.alias.meleeweapon.recovery": "Cooldown Time",
+    "attribute.alias.meleeweapon.speed": "Wind Up Time",
+    "attribute.alias.rangedweapon.efficiency": "Max. Ammo",
+    "attribute.alias.rangedweapon.recovery": "Reload Time",
+    "attribute.alias.rangedweapon.speed": "Fire Rate",
+    "attribute.duration": "Duration",
+    "attribute.effects": "Effects",
+    "attribute.efficiency": "Efficiency",
+    "attribute.luck": "Luck",
+    "attribute.range": "Range",
+    "attribute.recovery": "Recovery",
+    "attribute.resourceconsumptiontype": "Consumes",
+    "attribute.speed": "Speed",
+    "attribute.strength": "Strength",
+    "customgeartype.barrier": "Barrier",
+    "customgeartype.consolidatorreloader": "Consolidator Reloader",
+    "customgeartype.teleportreloader": "Teleport Reloader",
+    "effecttype.air": "Air",
+    "effecttype.air.description": "Imbue with the Air element",
+    "effecttype.attract": "Attract",
+    "effecttype.attract.description": "Pulls a target towards the source",
+    "effecttype.conjure": "WiP Conjure",
+    "effecttype.conjure.description": "WiP",
+    "effecttype.distract": "Distract",
+    "effecttype.distract.description": "Decreases max mana",
+    "effecttype.earth": "Earth",
+    "effecttype.earth.description": "Imbue with the Earth element",
+    "effecttype.endurance": "Endurance",
+    "effecttype.endurance.description": "Increases max stamina",
+    "effecttype.fire": "Fire",
+    "effecttype.fire.description": "Imbue with the Fire element",
+    "effecttype.float": "WiP Float",
+    "effecttype.float.description": "Reduces fall damage",
+    "effecttype.focus": "Focus",
+    "effecttype.focus.description": "Boosts max mana",
+    "effecttype.haste": "Haste",
+    "effecttype.haste.description": "Boosts speed attribute",
+    "effecttype.hold": "Hold",
+    "effecttype.hold.description": "Holds the target a set distance away",
+    "effecttype.ice": "Ice",
+    "effecttype.ice.description": "Imbue with the Ice element",
+    "effecttype.launch": "Launch",
+    "effecttype.launch.description": "Launch target into the air",
+    "effecttype.lethargy": "Lethargy",
+    "effecttype.lethargy.description": "Decreases max stamina",
+    "effecttype.lifedrain": "Life Drain",
+    "effecttype.lifedrain.description": "Periodically steals HP to give to the originator",
+    "effecttype.lifetap": "Life Tap",
+    "effecttype.lifetap.description": "Periodically steals HP from a target with the Life Drain debuff",
+    "effecttype.lightning": "Lightning",
+    "effecttype.lightning.description": "Imbue with the Lightning element",
+    "effecttype.lunge": "Lunge",
+    "effecttype.lunge.description": "Moves the target forwards",
+    "effecttype.manadrain": "Mana Drain",
+    "effecttype.manadrain.description": "Periodically steals mana to give to the originator",
+    "effecttype.manatap": "Mana Tap",
+    "effecttype.manatap.description": "Periodically steals mana from a target with the Mana Drain debuff",
+    "effecttype.plummet": "Plummet",
+    "effecttype.plummet.description": "Causes the target to fall rapidly",
+    "effecttype.poison": "Poison",
+    "effecttype.poison.description": "Periodically decreases your HP",
+    "effecttype.reflect": "WiP Reflect",
+    "effecttype.reflect.description": "Reflect damage back at the attacker",
+    "effecttype.regeneration": "Regeneration",
+    "effecttype.regeneration.description": "Periodically increases your HP",
+    "effecttype.repel": "Repel",
+    "effecttype.repel.description": "Repels a target away from the source",
+    "effecttype.resilience": "Resilience",
+    "effecttype.resilience.description": "Boosts max HP",
+    "effecttype.shortcircuit": "Short Circuit",
+    "effecttype.shortcircuit.description": "Decreases max energy",
+    "effecttype.shoveleft": "Shove Left",
+    "effecttype.shoveleft.description": "Move a target to their left",
+    "effecttype.shoveright": "Shove Right",
+    "effecttype.shoveright.description": "Move a target to their right",
+    "effecttype.slow": "Slow",
+    "effecttype.slow.description": "Decreases speed attribute",
+    "effecttype.stepback": "Step Back",
+    "effecttype.stepback.description": "Causes your target to move backwards",
+    "effecttype.strengthen": "Strengthen",
+    "effecttype.strengthen.description": "Boosts strength attribute",
+    "effecttype.summon": "WiP Summon",
+    "effecttype.summon.description": "Summon entities to act as shields or weapons",
+    "effecttype.surge": "Surge",
+    "effecttype.surge.description": "Boosts max energy",
+    "effecttype.water": "Water",
+    "effecttype.water.description": "Imbue with the Water element",
+    "effecttype.weaken": "Weakness",
+    "effecttype.weakness.description": "Decreases strength attribute",
+    "effecttype.wound": "Wound",
+    "effecttype.wound.description": "Decreases max HP",
+    "loottype.junk": "Junk",
+    "loottype.scrap": "Scrap",
+    "loottype.shard": "Shard",
+    "noweaponreloader": "No weapon reloader equipped.\nRemaining ammo will be lost when you reload!",
+    "resourcetype.barrierchargeresource": "Barrier Charge",
+    "shapetype.wall": "Wall",
+    "shapetype.zone": "Zone",
+    "slot.autoammobuyerslot": "Auto Ammo Buyer",
+    "slot.barrierslot": "Barrier",
+    "slot.rangedweaponreloaderslot": "Weapon Reloader",
+    "targetingtype.pointtopoint": "Point-to-point",
+    "targetingtype.projectile": "Projectile",
+    "targetingtype.self": "Self",
+    "targetingtype.withinreach": "Within Reach",
+    "valuepooltype.energy": "Energy",
+    "valuepooltype.mana": "Mana",
+    "weapontype.axe": "Axe",
+    "weapontype.bow": "Bow",
+    "weapontype.crossbow": "Crossbow",
+    "weapontype.dagger": "Dagger",
+    "weapontype.gun": "Gun",
+    "weapontype.hammer": "Hammer",
+    "weapontype.shield": "Shield",
+    "weapontype.staff": "Staff",
+    "weapontype.sword": "Sword",
+  }
 }

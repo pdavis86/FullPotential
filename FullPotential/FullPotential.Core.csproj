@@ -118,7 +118,7 @@
     <Compile Include="Assets\Core\Persistence\Https\DataLoader.cs" />
     <Compile Include="Assets\Core\Logging\AuditorFactory.cs" />
     <Compile Include="Assets\Core\Gameplay\Events\EventBus.cs" />
-    <Compile Include="Assets\Core\Localization\Models\LocalizationOld.cs" />
+    <Compile Include="Assets\Core\Localization\Models\LocalizationData.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\Hud.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\CombatService.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Hurt.cs" />

@@ -64,6 +64,7 @@ namespace FullPotential.Core.UI.Behaviours
                 null,
                 null,
                 true,
+                false,
                 HandleAssignedShapeButtonClick
             );
         }

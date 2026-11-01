@@ -1,460 +1,107 @@
 {
   "Culture": "en-GB",
   "Name": "English (United Kingdom)",
-  "Translations": [
-	{
-      "Key": "slot.lefthand",
-      "Value": "Left Hand"
-    },
-	{
-      "Key": "slot.righthand",
-      "Value": "Right Hand"
-    },
-	
-	{
-      "Key": "item.type.iweapontype",
-      "Value": "Weapon"
-    },
-    {
-      "Key": "item.type.iarmortype",
-      "Value": "Armor"
-    },
-    {
-      "Key": "item.type.iaccessorytype",
-      "Value": "Accessory"
-    },
-    {
-      "Key": "item.type.iconsumertype",
-      "Value": "Custom weapon"
-    },
-    {
-      "Key": "item.type.icustomgeartype",
-      "Value": "Custom gear"
-    },
-	
-	
-    {
-      "Key": "valuepooltype.health",
-      "Value": "Health"
-    },
-    {
-      "Key": "valuepooltype.stamina",
-      "Value": "Stamina"
-    },
-    
-	
-    {
-      "Key": "item.name",
-      "Value": "Name"
-    },
-    {
-      "Key": "item.registrytype",
-      "Value": "Type"
-    },
-    {
-      "Key": "item.resourcetype",
-      "Value": "Consumes"
-    },
-
-
-    {
-      "Key": "crafting.loot.type",
-      "Value": "Type"
-    },
-
-
-    {
-      "Key": "crafting.handedness.one",
-      "Value": "One-handed"
-    },
-    {
-      "Key": "crafting.handedness.two",
-      "Value": "Two-handed"
-    },
-
-
-    {
-      "Key": "crafting.name.prefix.attack",
-      "Value": "Attack"
-    },
-    {
-      "Key": "crafting.name.prefix.defence",
-      "Value": "Defence"
-    },
-
-
-    {
-      "Key": "crafting.error.missingeffect",
-      "Value": "At least one effect must be included"
-    },
-    {
-      "Key": "crafting.error.toomanycomponents",
-      "Value": "Too many components"
-    },
-    {
-      "Key": "crafting.error.toomanyforonehanded",
-      "Value": "Too many components for a one-handed weapon"
-    },
-	
-    
-    {
-      "Key": "item.targetingtype",
-      "Value": "Targeting"
-    },
-    {
-      "Key": "item.shapetype",
-      "Value": "Shape"
-    },
-    {
-      "Key": "item.effecttypes",
-      "Value": "Effects"
-    },
-    
-    
-    {
-      "Key": "item.units.time",
-      "Value": "s"
-    },
-    {
-      "Key": "item.units.unitpertime",
-      "Value": "/s"
-    },
-    {
-      "Key": "item.units.percent",
-      "Value": "%"
-    },
-    {
-      "Key": "item.units.distance",
-      "Value": "m"
-    },
-
-
-    {
-      "Key": "ui.quit",
-      "Value": "Quit"
-    },
-    {
-      "Key": "ui.save",
-      "Value": "Save"
-    },
-    {
-      "Key": "ui.signout",
-      "Value": "Sign Out"
-    },
-
-
-    {
-      "Key": "ui.signin.username",
-      "Value": "Username..."
-    },
-    {
-      "Key": "ui.signin.password",
-      "Value": "Password..."
-    },
-    {
-      "Key": "ui.signin.button",
-      "Value": "Sign In"
-    },
-    {
-      "Key": "ui.signin.intro",
-      "Value": "Please sign in"
-    },
-    {
-      "Key": "ui.signin.missing",
-      "Value": "Please provide username and password"
-    },
-    {
-      "Key": "ui.signin.signingin",
-      "Value": "Signing in..."
-    },
-    {
-      "Key": "ui.signin.error",
-      "Value": "Sorry, something went wrong"
-    },
-    {
-      "Key": "ui.signin.fail",
-      "Value": "Sorry, there is a service issue"
-    },
-    {
-      "Key": "ui.signin.invalid",
-      "Value": "Invalid username or password"
-    },
-
-
-    {
-      "Key": "ui.connect.intro",
-      "Value": "Welcome {0}!"
-    },
-    {
-      "Key": "ui.connect.address",
-      "Value": "Address..."
-    },
-    {
-      "Key": "ui.connect.port",
-      "Value": "Port..."
-    },
-    {
-      "Key": "ui.connect.create",
-      "Value": "Create"
-    },
-    {
-      "Key": "ui.connect.join",
-      "Value": "Join"
-    },
-    {
-      "Key": "ui.connect.joining",
-      "Value": "Joining..."
-    },
-    {
-      "Key": "ui.connect.jointimeout",
-      "Value": "Failed to join game"
-    },
-    {
-      "Key": "ui.connect.portnotfree",
-      "Value": "Port is in use"
-    },
-    {
-      "Key": "ui.connect.disconnected",
-      "Value": "The server disconnected you"
-    },
-    {
-      "Key": "ui.connect.alreadyconnected",
-      "Value": "You are already connected"
-    },
-    {
-      "Key": "ui.connect.incompatible",
-      "Value": "Your game version is incompatible with the server"
-    },
-    {
-      "Key": "ui.connect.nodetails",
-      "Value": "Failed to get instance details"
-    },
-
-
-    {
-      "Key": "ui.debugging.host",
-      "Value": "Host"
-    },
-
-    {
-      "Key": "ui.main.forcerespawn",
-      "Value": "Force Respawn"
-    },
-    {
-      "Key": "ui.main.settings",
-      "Value": "Settings"
-    },
-    {
-      "Key": "ui.main.disconnect",
-      "Value": "Disconnect"
-    },
-
-
-    {
-      "Key": "ui.character.tabs.equipment",
-      "Value": "Equipment"
-    },
-	
-	
-    {
-      "Key": "ui.character.tabs.inventory",
-      "Value": "Inventory"
-    },
-	
-	
-    {
-      "Key": "ui.character.tabs.crafting",
-      "Value": "Crafting"
-    },
-    {
-      "Key": "ui.character.tabs.crafting.craft",
-      "Value": "Craft"
-    },
-	
-	
-    {
-      "Key": "ui.drawingpad.alreadyinuse",
-      "Value": "That shape is already assigned"
-    },
-	{
-      "Key": "ui.drawingpad.nomatch",
-      "Value": "That shape is not assigned to any item"
-    },
-
-
-    {
-      "Key": "ui.interact.shop",
-      "Value": "Press '{0}' to shop"
-    },
-    {
-      "Key": "ui.interact.loot",
-      "Value": "Press '{0}' to loot"
-    },
-
-
-    {
-      "Key": "ui.settings.appsettings",
-      "Value": "Application Settings"
-    },
-    {
-      "Key": "ui.settings.resolution",
-      "Value": "Resolution"
-    },
-    {
-      "Key": "ui.settings.fullscreen",
-      "Value": "Fullscreen"
-    },
-    {
-      "Key": "ui.settings.gamesettings",
-      "Value": "Game Settings"
-    },
-    {
-      "Key": "ui.settings.fov",
-      "Value": "Field of View"
-    },
-    {
-      "Key": "ui.settings.language",
-      "Value": "Language"
-    },
-    {
-      "Key": "ui.settings.looksensitivity",
-      "Value": "Look Sensitivity"
-    },
-    {
-      "Key": "ui.settings.looksmoothness",
-      "Value": "Look Smoothness"
-    },
-    {
-      "Key": "ui.settings.playersettings",
-      "Value": "Skin URL"
-    },
-    {
-      "Key": "ui.settings.skin",
-      "Value": "Skin URL"
-    },
-    {
-      "Key": "ui.settings.skinplaceholder",
-      "Value": "Enter URL..."
-    },
-
-
-    {
-      "Key": "ui.alert.itemadded",
-      "Value": "{0} was added"
-    },
-    {
-      "Key": "ui.alert.itemsadded",
-      "Value": "Added {0} items"
-    },
-    {
-      "Key": "ui.alert.itemsremoved",
-      "Value": "Used {0} items"
-    },
-    {
-      "Key": "ui.alert.itemsatmax",
-      "Value": "Your inventory is at max"
-    },
-    {
-      "Key": "ui.alert.playerjoined",
-      "Value": "'{0}' joined the game"
-    },
-	
-	
-    {
-      "Key": "ui.alert.unknownattacker",
-      "Value": "someone"
-    },
-    {
-      "Key": "ui.alert.falldamage",
-      "Value": "fall damage"
-    },
-    {
-      "Key": "ui.alert.environmentaldamage",
-      "Value": "environmental damage"
-    },
-    {
-      "Key": "ui.alert.attack.noitem",
-      "Value": "their fist"
-    },
-    {
-      "Key": "ui.alert.attack.youwerekilledby",
-      "Value": "You were killed by '{0}'"
-    },
-    {
-      "Key": "ui.alert.attack.youwerekilledbyusing",
-      "Value": "You were killed by '{0}' using '{1}'"
-    },
-    {
-      "Key": "ui.alert.attack.youkilledyourself",
-      "Value": "You killed yourself"
-    },
-    {
-      "Key": "ui.alert.attack.youkilledyourselfusing",
-      "Value": "You killed yourself using '{0}'"
-    },
-    {
-      "Key": "ui.alert.attack.victimkilledby",
-      "Value": "'{0}' was killed by '{1}'"
-    },
-    {
-      "Key": "ui.alert.attack.victimkilledbyusing",
-      "Value": "'{0}' was killed by '{1}' using '{2}'"
-    },
-    {
-      "Key": "ui.alert.attack.victimsuicide",
-      "Value": "'{0}' committed suicide"
-    },
-    {
-      "Key": "ui.alert.attack.victimsuicideusing",
-      "Value": "'{0}' committed suicide using '{1}'"
-    },
-
-
-    {
-      "Key": "ui.respawn.youdied",
-      "Value": "You Died!"
-    },
-    {
-      "Key": "ui.respawn.respawn",
-      "Value": "Respawn"
-    },
-    
-    
-    {
-      "Key": "ui.hub.reloading",
-      "Value": "Reloading..."
-    },
-    
-    
-    {
-      "Key": "combat.attack.critical",
-      "Value": "CRIT:"
-    },
-	
-	
-	{
-      "Key": "effecttype.heal",
-      "Value": "Heal"
-    },
-    {
-      "Key": "effecttype.heal.description",
-      "Value": "Restores some HP"
-    },
-    {
-      "Key": "effecttype.hurt",
-      "Value": "Hurt"
-    },
-    {
-      "Key": "effecttype.hurt.description",
-      "Value": "Removes some HP"
-    },
-	{
-      "Key": "effecttype.push",
-      "Value": "Push"
-    },
-    {
-      "Key": "effecttype.push.description",
-      "Value": "Pushes a target away from the source"
-    }
-  ]
+  "Translations": {
+    "combat.attack.critical": "CRIT:",
+    "crafting.error.missingeffect": "At least one effect must be included",
+    "crafting.error.toomanycomponents": "Too many components",
+    "crafting.error.toomanyforonehanded": "Too many components for a one-handed weapon",
+    "crafting.handedness.one": "One-handed",
+    "crafting.handedness.two": "Two-handed",
+    "crafting.loot.type": "Type",
+    "crafting.name.prefix.attack": "Attack",
+    "crafting.name.prefix.defence": "Defence",
+    "effecttype.heal": "Heal",
+    "effecttype.heal.description": "Restores some HP",
+    "effecttype.hurt": "Hurt",
+    "effecttype.hurt.description": "Removes some HP",
+    "effecttype.push": "Push",
+    "effecttype.push.description": "Pushes a target away from the source",
+    "item.effecttypes": "Effects",
+    "item.name": "Name",
+    "item.registrytype": "Type",
+    "item.resourcetype": "Consumes",
+    "item.shapetype": "Shape",
+    "item.targetingtype": "Targeting",
+    "item.type.iaccessorytype": "Accessory",
+    "item.type.iarmortype": "Armor",
+    "item.type.iconsumertype": "Custom weapon",
+    "item.type.icustomgeartype": "Custom gear",
+    "item.type.iweapontype": "Weapon",
+    "item.units.distance": "m",
+    "item.units.percent": "%",
+    "item.units.time": "s",
+    "item.units.unitpertime": "/s",
+    "slot.lefthand": "Left Hand",
+    "slot.righthand": "Right Hand",
+    "ui.alert.attack.noitem": "their fist",
+    "ui.alert.attack.victimkilledby": "'{0}' was killed by '{1}'",
+    "ui.alert.attack.victimkilledbyusing": "'{0}' was killed by '{1}' using '{2}'",
+    "ui.alert.attack.victimsuicide": "'{0}' committed suicide",
+    "ui.alert.attack.victimsuicideusing": "'{0}' committed suicide using '{1}'",
+    "ui.alert.attack.youkilledyourself": "You killed yourself",
+    "ui.alert.attack.youkilledyourselfusing": "You killed yourself using '{0}'",
+    "ui.alert.attack.youwerekilledby": "You were killed by '{0}'",
+    "ui.alert.attack.youwerekilledbyusing": "You were killed by '{0}' using '{1}'",
+    "ui.alert.environmentaldamage": "environmental damage",
+    "ui.alert.falldamage": "fall damage",
+    "ui.alert.itemadded": "{0} was added",
+    "ui.alert.itemsadded": "Added {0} items",
+    "ui.alert.itemsatmax": "Your inventory is at max",
+    "ui.alert.itemsremoved": "Used {0} items",
+    "ui.alert.playerjoined": "'{0}' joined the game",
+    "ui.alert.unknownattacker": "someone",
+    "ui.character.tabs.crafting": "Crafting",
+    "ui.character.tabs.crafting.craft": "Craft",
+    "ui.character.tabs.equipment": "Equipment",
+    "ui.character.tabs.inventory": "Inventory",
+    "ui.connect.address": "Address...",
+    "ui.connect.alreadyconnected": "You are already connected",
+    "ui.connect.create": "Create",
+    "ui.connect.disconnected": "The server disconnected you",
+    "ui.connect.incompatible": "Your game version is incompatible with the server",
+    "ui.connect.intro": "Welcome {0}!",
+    "ui.connect.join": "Join",
+    "ui.connect.joining": "Joining...",
+    "ui.connect.jointimeout": "Failed to join game",
+    "ui.connect.nodetails": "Failed to get instance details",
+    "ui.connect.port": "Port...",
+    "ui.connect.portnotfree": "Port is in use",
+    "ui.debugging.host": "Host",
+    "ui.drawingpad.alreadyinuse": "That shape is already assigned",
+    "ui.drawingpad.nomatch": "That shape is not assigned to any item",
+    "ui.hub.reloading": "Reloading...",
+    "ui.interact.loot": "Press '{0}' to loot",
+    "ui.interact.shop": "Press '{0}' to shop",
+    "ui.main.disconnect": "Disconnect",
+    "ui.main.forcerespawn": "Force Respawn",
+    "ui.main.settings": "Settings",
+    "ui.quit": "Quit",
+    "ui.respawn.respawn": "Respawn",
+    "ui.respawn.youdied": "You Died!",
+    "ui.save": "Save",
+    "ui.settings.appsettings": "Application Settings",
+    "ui.settings.fov": "Field of View",
+    "ui.settings.fullscreen": "Fullscreen",
+    "ui.settings.gamesettings": "Game Settings",
+    "ui.settings.language": "Language",
+    "ui.settings.looksensitivity": "Look Sensitivity",
+    "ui.settings.looksmoothness": "Look Smoothness",
+    "ui.settings.playersettings": "Skin URL",
+    "ui.settings.resolution": "Resolution",
+    "ui.settings.skin": "Skin URL",
+    "ui.settings.skinplaceholder": "Enter URL...",
+    "ui.signin.button": "Sign In",
+    "ui.signin.error": "Sorry, something went wrong",
+    "ui.signin.fail": "Sorry, there is a service issue",
+    "ui.signin.intro": "Please sign in",
+    "ui.signin.invalid": "Invalid username or password",
+    "ui.signin.missing": "Please provide username and password",
+    "ui.signin.password": "Password...",
+    "ui.signin.signingin": "Signing in...",
+    "ui.signin.username": "Username...",
+    "ui.signout": "Sign Out",
+    "valuepooltype.health": "Health",
+    "valuepooltype.stamina": "Stamina",
+  }
 }

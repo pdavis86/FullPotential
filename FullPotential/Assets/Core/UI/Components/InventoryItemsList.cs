@@ -8,6 +8,7 @@ using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Gameplay.Tooltips;
@@ -34,6 +35,7 @@ namespace FullPotential.Core.Ui.Components
             Action<GameObject, GameObject, ItemBase> toggleAction,
             string slotId = null,
             bool showEquippedItems = true,
+            bool excludeItemStacks = true,
             Action<IPlayerInventory, string, InventoryUiRow> assignDrawingAction = null
         )
         {
@@ -48,6 +50,11 @@ namespace FullPotential.Core.Ui.Components
             var itemsForSlot = slotId is HandSlotIds.LeftHand or HandSlotIds.RightHand
                 ? playerInventory.GetHandItems()
                 : playerInventory.GetCompatibleItems(slotId);
+
+            if (excludeItemStacks)
+            {
+                itemsForSlot = itemsForSlot.Where(x => x.RegistryType is not IItemStackType);
+            }
 
             var equippedItems = playerInventory.GetEquippedItems();
 
@@ -69,7 +76,7 @@ namespace FullPotential.Core.Ui.Components
                 var row = UnityEngine.Object.Instantiate(rowPrefab, componentsContainer.transform);
                 var rowScript = row.GetComponent<InventoryUiRow>();
 
-                rowScript.Text.text = item.Name;
+                rowScript.Text.text = item.Name.OrIfNullOrWhitespace("Unnamed " + localizer.Translate(item.RegistryType));
 
                 if (toggleAction != null)
                 {

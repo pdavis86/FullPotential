@@ -76,7 +76,7 @@ namespace FullPotential.Core.Localization
             _typeDictionary.Add(interfaceType, interfaceType.Name.Substring(1).ToLower());
         }
 
-        private async Task<LocalizationOld> LoadCultureFileAsync(string address)
+        private async Task<LocalizationData> LoadCultureFileAsync(string address)
         {
             try
             {
@@ -91,7 +91,7 @@ namespace FullPotential.Core.Localization
                 var loadTask = Addressables.LoadAssetAsync<TextAsset>(address).Task;
                 await loadTask;
 
-                var data = JsonUtility.FromJson<LocalizationOld>(loadTask.Result.text);
+                var data = loadTask.Result.text.FromJson<LocalizationData>();
 
                 Addressables.Release(loadTask.Result);
 
@@ -104,7 +104,7 @@ namespace FullPotential.Core.Localization
             }
         }
 
-        private void ExtractTranslations(LocalizationOld data, string address)
+        private void ExtractTranslations(LocalizationData data, string address)
         {
             if (data.Translations == null)
             {
