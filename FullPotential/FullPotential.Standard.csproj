@@ -108,7 +108,6 @@
     <Compile Include="Assets\Standard\Effects\Movement\Attract.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Poison.cs" />
     <Compile Include="Assets\Standard\Armor\Helm.cs" />
-    <Compile Include="Assets\Standard\Effects\Debuffs\Fear.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Fire.cs" />
     <Compile Include="Assets\Standard\SpecialSlots\RangedWeaponReloaderSlot.cs" />
     <Compile Include="Assets\Standard\Weapons\Helpers\IAttackHelper.cs" />
@@ -135,6 +134,7 @@
     <Compile Include="Assets\Standard\Effects\Support\Reflect.cs" />
     <Compile Include="Assets\Standard\Shapes\WallBehaviour.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Lunge.cs" />
+    <Compile Include="Assets\Standard\Effects\Buffs\Resilience.cs" />
     <Compile Include="Assets\Standard\Accessories\AutoAmmoBuyer\ReloadEventHandler.cs" />
     <Compile Include="Assets\Standard\AccessoryVisuals\LeatherBelt.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Float.cs" />
@@ -153,7 +153,6 @@
     <Compile Include="Assets\Standard\Items\Ammunition.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Haste.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Plummet.cs" />
-    <Compile Include="Assets\Standard\Effects\Buffs\Courage.cs" />
     <Compile Include="Assets\Standard\Scenes\Behaviours\SceneObjectsLevel001.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\ShoveLeft.cs" />
     <Compile Include="Assets\Standard\SpecialGear\Barrier\ChargeChangeEventHandler.cs" />
@@ -184,6 +183,7 @@
     <Compile Include="Assets\Standard\Targeting\WithinReach.cs" />
     <Compile Include="Assets\Standard\Enemies\Behaviours\EnemyInventory.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Stengthen.cs" />
+    <Compile Include="Assets\Standard\Effects\Debuffs\Wound.cs" />
     <Compile Include="Assets\Standard\SpecialGear\Reloader\ConsolidatorReloader\ConsolidatorReloader.cs" />
     <Compile Include="Assets\Standard\Effects\Buffs\Surge.cs" />
     <Compile Include="Assets\Standard\Weapons\Gun.cs" />

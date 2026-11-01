@@ -425,17 +425,25 @@ namespace FullPotential.Core.Ui.Behaviours
 
             _activeEffectScripts[eventArgs.ActiveEffect.Id] = activeEffectScript;
 
+            UpdateValuePoolBars(eventArgs.LivingEntity);
+
             return UniTask.CompletedTask;
         }
 
         private UniTask HandleActiveEffectUpdatedAsync(ActiveEffectUpdatedEvent eventArgs)
         {
-            if (!_activeEffectScripts.TryGetValue(eventArgs.ActiveEffect.Id, out var existingEffectScript))
+            UpdateValuePoolBars(eventArgs.LivingEntity);
+
+            if (eventArgs.ActiveEffect == null
+                || !_activeEffectScripts.TryGetValue(eventArgs.ActiveEffect.Id, out var existingEffectScript))
             {
                 return UniTask.CompletedTask;
             }
 
-            existingEffectScript.UpdateExpiry(eventArgs.ActiveEffect.Expiry);
+            if (existingEffectScript != null)
+            {
+                existingEffectScript.UpdateExpiry(eventArgs.ActiveEffect.Expiry);
+            }
 
             return UniTask.CompletedTask;
         }

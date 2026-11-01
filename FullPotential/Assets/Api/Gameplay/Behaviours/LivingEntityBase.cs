@@ -297,7 +297,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public int GetValuePoolValue(string typeId)
         {
-            return _valuePoolValueCache[typeId];
+            return ClampValuePoolValue(typeId, _valuePoolValueCache[typeId]);
         }
 
         protected int ClampValuePoolValue(string typeId, int value)
@@ -326,8 +326,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void TriggerValuePoolValueUpdate(string typeId, int change, string sourceEntityName, string sourceItemName)
         {
-            var currentValue = ClampValuePoolValue(typeId, GetValuePoolValue(typeId));
-            var newValue = ClampValuePoolValue(typeId, currentValue + change);
+            var currentValue = GetValuePoolValue(typeId);
+            var newValue = currentValue + change;
             var changeEvent = new ValuePoolValueChangeEvent(this, typeId, newValue, change, GetValuePoolMax(typeId), sourceEntityName, sourceItemName);
             _eventBus.Publish(changeEvent);
         }
@@ -671,8 +671,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var expiry = DateTime.Now.AddSeconds(itemUsed.GetEffectDuration());
 
             var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, valuePoolEffect, this);
-            TriggerValuePoolValueUpdate(valuePoolEffect.ValuePoolTypeIdString, combatResult.Change, sourceFighter.name, itemUsed.Name);
             AddOrUpdateEffect(valuePoolEffect, combatResult.Change, expiry);
+            TriggerValuePoolValueUpdate(valuePoolEffect.ValuePoolTypeIdString, 0, sourceFighter.name, itemUsed.Name);
         }
 
         public List<ActiveEffect> GetActiveEffects()
@@ -786,9 +786,28 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 .Where(x => x.Expiry < DateTime.Now)
                 .ToList();
 
+            var valuePoolsNeedingUpdates = expiredEffects
+                .Where(x =>
+                    x.Effect is IValuePoolEffectType valuePoolEffect
+                    && valuePoolEffect.EffectActionType is EffectActionType.TemporaryMaxIncrease or EffectActionType.TemporaryMaxDecrease)
+                .Select(x => ((IValuePoolEffectType)x.Effect).ValuePoolTypeIdString)
+                .Distinct()
+                .ToList();
+
+            var anyEffectRemoved = false;
             foreach (var activeEffect in expiredEffects)
             {
-                _activeEffects.Remove(activeEffect);
+                anyEffectRemoved |= _activeEffects.Remove(activeEffect);
+            }
+
+            if (anyEffectRemoved)
+            {
+                _eventBus.Publish(new ActiveEffectUpdatedEvent(this, null));
+            }
+
+            foreach (var valuePoolTypeId in valuePoolsNeedingUpdates)
+            {
+                TriggerValuePoolValueUpdate(valuePoolTypeId, 0, null, null);
             }
         }
 

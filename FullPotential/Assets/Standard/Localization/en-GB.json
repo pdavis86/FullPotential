@@ -147,11 +147,11 @@
     
     
     {
-      "Key": "effecttype.courage",
-      "Value": "Courage"
+      "Key": "effecttype.resilience",
+      "Value": "Resilience"
     },
     {
-      "Key": "effecttype.courage.description",
+      "Key": "effecttype.resilience.description",
       "Value": "Boosts max HP"
     },
     {
@@ -229,11 +229,11 @@
       "Value": "Decreases max mana"
     },
     {
-      "Key": "effecttype.fear",
-      "Value": "Fear"
+      "Key": "effecttype.wound",
+      "Value": "Wound"
     },
     {
-      "Key": "effecttype.fear.description",
+      "Key": "effecttype.wound.description",
       "Value": "Decreases max HP"
     },
     {
