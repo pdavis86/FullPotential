@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using FullPotential.Api.Utilities;
-
 namespace FullPotential.Api.Utilities.Extensions
 {
     public static class DictionaryExtensions

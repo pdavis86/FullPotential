@@ -15,13 +15,13 @@ using Range = FullPotential.Api.Gameplay.Attributes.Range;
 
 namespace FullPotential.Standard.Items
 {
-    public class SpecialGearItemMapper : IItemTypeMapping
+    public class CustomGearItemMapper : IItemTypeMapping
     {
         private readonly ITypeRegistry _typeRegistry;
 
-        public Type GroupType => typeof(ISpecialGearType);
+        public Type GroupType => typeof(ICustomGearType);
 
-        public SpecialGearItemMapper(
+        public CustomGearItemMapper(
             ITypeRegistry typeRegistry)
         {
             _typeRegistry = typeRegistry;
@@ -29,7 +29,7 @@ namespace FullPotential.Standard.Items
 
         public ItemBase CreateNew()
         {
-            return DependenciesContext.Dependencies.CreateInstance<SpecialGear>();
+            return DependenciesContext.Dependencies.CreateInstance<CustomGear>();
         }
 
         public ItemBase GetItemFromCrafting(IList<ItemBase> components, string itemTypeId, string itemName, Dictionary<string, string> properties)
@@ -45,10 +45,10 @@ namespace FullPotential.Standard.Items
                 ? null
                 : _typeRegistry.GetRegisteredByTypeId<IValuePoolType>(valuePoolTypeId);
 
-            var specialGear = DependenciesContext.Dependencies.CreateInstance<SpecialGear>();
-            specialGear.RegistryType = _typeRegistry.GetRegisteredByTypeId<ISpecialGearType>(itemTypeId);
-            specialGear.ValuePoolType = valuePoolType;
-            specialGear.Attributes = new Dictionary<string, string>
+            var customGear = DependenciesContext.Dependencies.CreateInstance<CustomGear>();
+            customGear.RegistryType = _typeRegistry.GetRegisteredByTypeId<ICustomGearType>(itemTypeId);
+            customGear.ValuePoolType = valuePoolType;
+            customGear.Attributes = new Dictionary<string, string>
             {
                 { Strength.TypeIdString, resultFactory.ComputeAttribute(components, Strength.TypeIdString).ToString() },
                 { Efficiency.TypeIdString, resultFactory.ComputeAttribute(components, Efficiency.TypeIdString).ToString() },
@@ -59,12 +59,12 @@ namespace FullPotential.Standard.Items
                 { Duration.TypeIdString, resultFactory.ComputeAttribute(components, Duration.TypeIdString).ToString() },
                 { Luck.TypeIdString, resultFactory.ComputeAttribute(components, Luck.TypeIdString).ToString() },
             };
-            specialGear.Properties = properties;
+            customGear.Properties = properties;
 
-            resultFactory.SetEffects(specialGear, components);
-            resultFactory.SetItemName(specialGear, true);
+            resultFactory.SetEffects(customGear, components);
+            resultFactory.SetItemName(customGear, true);
 
-            return specialGear;
+            return customGear;
         }
     }
 }

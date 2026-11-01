@@ -72,6 +72,7 @@
     <Compile Include="Assets\Api\Gameplay\Combat\CombatResult.cs" />
     <Compile Include="Assets\Api\Ui\IUserInterface.cs" />
     <Compile Include="Assets\Api\Gameplay\Attributes\Range.cs" />
+    <Compile Include="Assets\Api\Registry\Gear\ICustomGearType.cs" />
     <Compile Include="Assets\Api\Gameplay\Drawing\IDrawingService.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IIsSideEffect.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\Interactable.cs" />
@@ -80,7 +81,6 @@
     <Compile Include="Assets\Api\EventManagement\IEvent.cs" />
     <Compile Include="Assets\Api\Gameplay\Attributes\Strength.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemBase.cs" />
-    <Compile Include="Assets\Api\Registry\Gear\ISpecialGearType.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\SerializableKeyValuePairExtensions.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\JsonExtensions.cs" />
     <Compile Include="Assets\Api\Modding\IMod.cs" />

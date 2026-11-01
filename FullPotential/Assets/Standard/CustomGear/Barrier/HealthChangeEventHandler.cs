@@ -11,7 +11,7 @@ using FullPotential.Standard.SpecialSlots;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Standard.SpecialGear.Barrier
+namespace FullPotential.Standard.CustomGear.Barrier
 {
     public class HealthChangeEventHandler : IEventHandler<ValuePoolValueChangeEvent>
     {
@@ -37,7 +37,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 return UniTask.FromResult(new HandlerResult());
             }
 
-            var barrier = eventArgs.LivingEntity.Inventory.GetItemInSlot<Items.SpecialGear>(BarrierSlot.TypeIdString);
+            var barrier = eventArgs.LivingEntity.Inventory.GetItemInSlot<Items.CustomGear>(BarrierSlot.TypeIdString);
 
             if (barrier == null)
             {

@@ -103,8 +103,8 @@ namespace FullPotential.Core.Player
             if (!matches.Any())
             {
                 matches = _items.Where(
-                    i => i.Value.RegistryType is ISpecialGearType specialGearType
-                         && slotId.StartsWith(specialGearType.SlotIdString));
+                    i => i.Value.RegistryType is ICustomGearType customGearType
+                         && slotId.StartsWith(customGearType.SlotIdString));
             }
 
             return matches

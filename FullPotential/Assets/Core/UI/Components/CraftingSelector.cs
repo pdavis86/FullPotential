@@ -31,7 +31,7 @@ namespace FullPotential.Core.UI.Components
         private Dictionary<IArmorType, string> _armorTypes;
         private Dictionary<IValuePoolType, string> _valuePoolTypes;
         private Dictionary<IWeaponType, string> _weaponTypes;
-        private Dictionary<ISpecialGearType, string> _specialTypes;
+        private Dictionary<ICustomGearType, string> _customGearTypes;
         private List<string> _handednessOptions;
         private List<int?> _optionalTwoHandedWeaponIndexes;
 
@@ -89,9 +89,9 @@ namespace FullPotential.Core.UI.Components
             {
                 return null;
             }
-            else if (craftableType == typeof(ISpecialGearType))
+            else if (craftableType == typeof(ICustomGearType))
             {
-                return _specialTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
+                return _customGearTypes.ElementAt(SubTypeDropdown.value).Key.TypeId.ToString();
             }
             else
             {
@@ -133,9 +133,9 @@ namespace FullPotential.Core.UI.Components
             {
                 SetupValuePoolsDropDown();
             }
-            else if (typeToCraft == typeof(ISpecialGearType))
+            else if (typeToCraft == typeof(ICustomGearType))
             {
-                SubTypeDropdown.AddOptions(_specialTypes.Select(x => x.Value).ToList());
+                SubTypeDropdown.AddOptions(_customGearTypes.Select(x => x.Value).ToList());
                 SetupValuePoolsDropDown();
             }
             else
@@ -176,7 +176,7 @@ namespace FullPotential.Core.UI.Components
                 { typeof(IArmorType), localizer.Translate(TranslationType.ItemType, nameof(IArmorType)) },
                 { typeof(IWeaponType), localizer.Translate(TranslationType.ItemType, nameof(IWeaponType)) },
                 { typeof(IConsumerType), localizer.Translate(TranslationType.ItemType, nameof(IConsumerType)) },
-                { typeof(ISpecialGearType), localizer.Translate(TranslationType.ItemType, nameof(ISpecialGearType)) },
+                { typeof(ICustomGearType), localizer.Translate(TranslationType.ItemType, nameof(ICustomGearType)) },
             };
 
             _accessoryTypes = typeRegistry.GetRegisteredTypes<IAccessoryType>()
@@ -196,7 +196,7 @@ namespace FullPotential.Core.UI.Components
                 .ToDictionary(x => x, x => localizer.Translate(x))
                 .OrderByValue();
 
-            _specialTypes = typeRegistry.GetRegisteredTypes<ISpecialGearType>()
+            _customGearTypes = typeRegistry.GetRegisteredTypes<ICustomGearType>()
                 .ToDictionary(x => x, x => localizer.Translate(x))
                 .OrderByValue();
 

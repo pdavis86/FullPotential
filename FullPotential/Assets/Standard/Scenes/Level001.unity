@@ -2703,6 +2703,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -85
       objectReference: {fileID: 0}
+    - target: {fileID: 5081276653019582283, guid: d175f1aa2496ff643962c37ac0cc076a,
+        type: 3}
+      propertyPath: ValuePoolDropdown
+      value: 
+      objectReference: {fileID: 989234486}
     - target: {fileID: 5081276653019582284, guid: d175f1aa2496ff643962c37ac0cc076a,
         type: 3}
       propertyPath: m_Name
@@ -2863,6 +2868,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -25
       objectReference: {fileID: 0}
+    - target: {fileID: 7067169396669910962, guid: d175f1aa2496ff643962c37ac0cc076a,
+        type: 3}
+      propertyPath: m_Name
+      value: ResultValuePool
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2884,6 +2894,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fc9da38756154ca45a5eb699b6286d8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &989234486 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3093035762925490102, guid: d175f1aa2496ff643962c37ac0cc076a,
+    type: 3}
+  m_PrefabInstance: {fileID: 989234483}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d0b652f32a2cc243917e4028fa0f046, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1013574000
@@ -3718,12 +3740,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 1041214752
   InScenePlacedSourceGlobalObjectIdHash: 0
+  m_InScenePlacedDisabledByDefault: 0
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
+  m_InScenePlaced: 1
   ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
+  SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1

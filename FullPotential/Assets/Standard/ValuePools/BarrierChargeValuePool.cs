@@ -5,7 +5,7 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Standard.SpecialGear.Barrier;
+using FullPotential.Standard.CustomGear.Barrier;
 using FullPotential.Standard.SpecialSlots;
 
 namespace FullPotential.Standard.ValuePools
@@ -50,7 +50,7 @@ namespace FullPotential.Standard.ValuePools
                 return;
             }
 
-            var equippedBarrier = targetFighter.Inventory.GetItemInSlot<Items.SpecialGear>(BarrierSlot.TypeIdString);
+            var equippedBarrier = targetFighter.Inventory.GetItemInSlot<Items.CustomGear>(BarrierSlot.TypeIdString);
 
             if (equippedBarrier == null)
             {

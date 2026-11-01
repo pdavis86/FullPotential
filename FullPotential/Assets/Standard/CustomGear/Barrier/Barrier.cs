@@ -11,9 +11,9 @@ using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.ValuePools;
 
-namespace FullPotential.Standard.SpecialGear.Barrier
+namespace FullPotential.Standard.CustomGear.Barrier
 {
-    public class Barrier : ISpecialGearType
+    public class Barrier : ICustomGearType
     {
         public const string TypeIdString = "17a6e875-cccd-46f0-b525-fe15cfdd8096";
 
@@ -27,50 +27,50 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public string OverrideItemDescription(ItemBase item, ILocalizer localizer, LevelOfDetail levelOfDetail)
         {
-            var specialGear = item as Items.SpecialGear;
+            var customGear = item as Items.CustomGear;
 
             var sb = new StringBuilder();
 
             if (levelOfDetail == LevelOfDetail.Full)
             {
-                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(specialGear.Name))}: {specialGear.Name}" + "\n");
+                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(customGear.Name))}: {customGear.Name}" + "\n");
 
-                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(specialGear.RegistryType))}: {localizer.Translate(this)}" + "\n");
+                sb.Append($"{localizer.Translate(TranslationType.Item, nameof(customGear.RegistryType))}: {localizer.Translate(this)}" + "\n");
             }
 
-            var valuePoolConsumptionType = localizer.Translate(specialGear.ValuePoolType);
-            sb.Append($"{localizer.Translate(TranslationType.Item, nameof(specialGear.ValuePoolType))}: {valuePoolConsumptionType}" + "\n");
+            var valuePoolConsumptionType = localizer.Translate(customGear.ValuePoolType);
+            sb.Append($"{localizer.Translate(TranslationType.Item, nameof(customGear.ValuePoolType))}: {valuePoolConsumptionType}" + "\n");
 
-            specialGear.AppendToDescription(
+            customGear.AppendToDescription(
                 sb,
                 localizer,
-                specialGear.Attributes.GetIntValue(Recovery.TypeIdString),
+                customGear.Attributes.GetIntValue(Recovery.TypeIdString),
                 nameof(Recovery),
                 nameof(Barrier),
-                localizer.Translate(GetRechargeDelay(specialGear)),
+                localizer.Translate(GetRechargeDelay(customGear)),
                 UnitsType.Time);
 
-            specialGear.AppendToDescription(
+            customGear.AppendToDescription(
                 sb,
                 localizer,
-                specialGear.Attributes.GetIntValue(Speed.TypeIdString),
+                customGear.Attributes.GetIntValue(Speed.TypeIdString),
                 nameof(Speed),
                 nameof(Barrier),
-                localizer.Translate(GetRechargeRate(specialGear)),
+                localizer.Translate(GetRechargeRate(customGear)),
                 UnitsType.UnitPerTime);
 
             return sb.ToString().Trim();
         }
 
-        public static float GetRechargeDelay(Items.SpecialGear specialGear)
+        public static float GetRechargeDelay(Items.CustomGear customGear)
         {
-            var returnValue = MathsHelper.GetHighInLowOutInRange(specialGear.Attributes.GetIntValue(Recovery.TypeIdString), 0.5f, 5f);
+            var returnValue = MathsHelper.GetHighInLowOutInRange(customGear.Attributes.GetIntValue(Recovery.TypeIdString), 0.5f, 5f);
             return returnValue;
         }
 
-        public static int GetRechargeRate(Items.SpecialGear specialGear)
+        public static int GetRechargeRate(Items.CustomGear customGear)
         {
-            var returnValue = (int)MathsHelper.GetHighInLowOutInRange(specialGear.Attributes.GetIntValue(Speed.TypeIdString), 1, 10);
+            var returnValue = (int)MathsHelper.GetHighInLowOutInRange(customGear.Attributes.GetIntValue(Speed.TypeIdString), 1, 10);
             return returnValue;
         }
     }

@@ -453,15 +453,15 @@
 	
 	
     {
-      "Key": "specialgeartype.consolidatorreloader",
+      "Key": "customgeartype.consolidatorreloader",
       "Value": "Consolidator Reloader"
     },
     {
-      "Key": "specialgeartype.teleportreloader",
+      "Key": "customgeartype.teleportreloader",
       "Value": "Teleport Reloader"
     },
     {
-      "Key": "specialgeartype.barrier",
+      "Key": "customgeartype.barrier",
       "Value": "Barrier"
     },
 	

@@ -7,7 +7,7 @@ using FullPotential.Standard.Items;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
+namespace FullPotential.Standard.CustomGear.Reloader.TeleportReloader
 {
     // todo: TeleportReloader should trigger on shot fired (I guess allow a normal reload)
     public class ReloadEventHandler : IEventHandler<ReloadInputEvent>
@@ -18,7 +18,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
 
         public UniTask<HandlerResult> HandleEventAsync(ReloadInputEvent eventArgs)
         {
-            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Items.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Items.CustomGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
             if (reloader == null || reloader.RegistryType.TypeId.ToString() != TeleportReloader.TypeIdString)
             {

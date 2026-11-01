@@ -7,11 +7,11 @@ using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Standard.ValuePools;
 
-namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
+namespace FullPotential.Standard.CustomGear.Reloader.ConsolidatorReloader
 {
-    public class TeleportReloader : ISpecialGearType
+    public class ConsolidatorReloader : ICustomGearType
     {
-        public const string TypeIdString = "80c23584-9c2b-45d0-9922-5a4cbc1616a1";
+        public const string TypeIdString = "575ed70f-f5de-4ffa-93fb-a6c1cc404f30";
 
         private static readonly Guid Id = new Guid(TypeIdString);
 

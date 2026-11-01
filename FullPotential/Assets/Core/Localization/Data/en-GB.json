@@ -25,11 +25,11 @@
     },
     {
       "Key": "item.type.iconsumertype",
-      "Value": "Consumer"
+      "Value": "Custom weapon"
     },
     {
-      "Key": "item.type.ispecialgeartype",
-      "Value": "Custom"
+      "Key": "item.type.icustomgeartype",
+      "Value": "Custom gear"
     },
 	
 	

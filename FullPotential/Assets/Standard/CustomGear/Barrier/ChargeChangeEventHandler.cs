@@ -7,7 +7,7 @@ using FullPotential.Standard.SpecialSlots;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Standard.SpecialGear.Barrier
+namespace FullPotential.Standard.CustomGear.Barrier
 {
     public class ChargeChangeEventHandler : IEventHandler<ValuePoolValueChangeEvent>
     {

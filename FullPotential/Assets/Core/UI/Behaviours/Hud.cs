@@ -53,8 +53,8 @@ namespace FullPotential.Core.Ui.Behaviours
         [SerializeField] private GameObject _crosshairs;
         [SerializeField] private GameObject _handIconContainerLeft;
         [SerializeField] private GameObject _handIconContainerRight;
-        [SerializeField] private GameObject _resourceBarsContainer;
-        [SerializeField] private GameObject _resourceBarPrefab;
+        [SerializeField] private GameObject _valuePoolBarsContainer;
+        [SerializeField] private GameObject _valuePoolBarPrefab;
         [SerializeField] private Text _ammoLeft;
         [SerializeField] private Text _ammoRight;
         [SerializeField] private ProgressWheel _chargeLeft;
@@ -182,7 +182,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 return;
             }
 
-            var newBar = Instantiate(_resourceBarPrefab, _resourceBarsContainer.transform);
+            var newBar = Instantiate(_valuePoolBarPrefab, _valuePoolBarsContainer.transform);
             newBar.FindInDescendants("Fill").GetComponent<Image>().color = backgroundColor;
             newBar.FindInDescendants("BarText").GetComponent<TextMeshProUGUI>().color = textColor;
 

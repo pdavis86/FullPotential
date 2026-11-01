@@ -29,7 +29,7 @@ namespace FullPotential.Api.Items
         private List<string> _armorTypeIds;
         private List<string> _weaponTypeIds;
         private List<string> _ammunitionTypeIds;
-        private List<string> _specialTypeIds;
+        private List<string> _customGearTypeIds;
 
         public ItemFactory(IAuditorFactory auditorFactory, ITypeRegistry typeRegistry)
         {
@@ -46,7 +46,7 @@ namespace FullPotential.Api.Items
             _armorTypeIds ??= _typeRegistry.GetRegisteredTypes<IArmorType>().Select(x => x.TypeId.ToString()).ToList();
             _weaponTypeIds ??= _typeRegistry.GetRegisteredTypes<IWeaponType>().Select(x => x.TypeId.ToString()).ToList();
             _ammunitionTypeIds ??= _typeRegistry.GetRegisteredTypes<IAmmunitionType>().Select(x => x.TypeId.ToString()).ToList();
-            _specialTypeIds ??= _typeRegistry.GetRegisteredTypes<ISpecialGearType>().Select(x => x.TypeId.ToString()).ToList();
+            _customGearTypeIds ??= _typeRegistry.GetRegisteredTypes<ICustomGearType>().Select(x => x.TypeId.ToString()).ToList();
 
             if (_lootTypeIds.Contains(model.RegistryTypeId))
             {
@@ -68,9 +68,9 @@ namespace FullPotential.Api.Items
             {
                 item = _typeRegistry.GetItemTypeMapping<IAmmunitionType>().CreateNew();
             }
-            else if (_specialTypeIds.Contains(model.RegistryTypeId))
+            else if (_customGearTypeIds.Contains(model.RegistryTypeId))
             {
-                item = _typeRegistry.GetItemTypeMapping<ISpecialGearType>().CreateNew();
+                item = _typeRegistry.GetItemTypeMapping<ICustomGearType>().CreateNew();
             }
             else if (model.Properties.GetStringValueOrNull(IValuePoolConsumer.PropertyKeyResourceTypeId) != null
                 || model.Properties.GetStringValueOrNull(IValuePoolConsumer.PropertyKeyValuePoolTypeId) != null)

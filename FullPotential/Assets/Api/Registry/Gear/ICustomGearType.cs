@@ -6,7 +6,7 @@ using FullPotential.Api.Localization;
 
 namespace FullPotential.Api.Registry.Gear
 {
-    public interface ISpecialGearType : ICraftableType
+    public interface ICustomGearType : ICraftableType
     {
         string SlotIdString { get; }
 

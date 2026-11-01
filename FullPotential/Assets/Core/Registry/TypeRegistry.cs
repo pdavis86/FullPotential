@@ -60,7 +60,7 @@ namespace FullPotential.Core.Registry
                 typeof(IEffectType),
                 typeof(ILootType),
                 typeof(IShapeType),
-                typeof(ISpecialGearType),
+                typeof(ICustomGearType),
                 typeof(ITargetingType),
                 typeof(IWeaponType),
                 typeof(ISlotType),

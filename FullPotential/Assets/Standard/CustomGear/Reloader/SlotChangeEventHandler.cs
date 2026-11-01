@@ -15,7 +15,7 @@ using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Standard.SpecialGear.Reloader
+namespace FullPotential.Standard.CustomGear.Reloader
 {
     public class SlotChangeEventHandler : IEventHandler<SlotChangeEvent>
     {

@@ -10896,7 +10896,7 @@ GameObject:
   - component: {fileID: 1720213559}
   - component: {fileID: 1720213560}
   m_Layer: 5
-  m_Name: Resources
+  m_Name: ValuePools
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15948,8 +15948,8 @@ MonoBehaviour:
   _crosshairs: {fileID: 7011060654755292104}
   _handIconContainerLeft: {fileID: 270164336}
   _handIconContainerRight: {fileID: 289738958}
-  _resourceBarsContainer: {fileID: 1720213558}
-  _resourceBarPrefab: {fileID: 304277964046646525, guid: 08c65327abc86bd4ab3c899cee1a7164,
+  _valuePoolBarsContainer: {fileID: 1720213558}
+  _valuePoolBarPrefab: {fileID: 304277964046646525, guid: 08c65327abc86bd4ab3c899cee1a7164,
     type: 3}
   _ammoLeft: {fileID: 1715200632}
   _ammoRight: {fileID: 1678711891}

@@ -1,9 +1,9 @@
 using System;
 
 using FullPotential.Api.Registry;
-using FullPotential.Standard.SpecialGear.Barrier;
+using FullPotential.Standard.CustomGear.Barrier;
 
-namespace FullPotential.Standard.SpecialGearVisuals
+namespace FullPotential.Standard.CustomGearVisuals
 {
     public class BasicWard : IItemVisualsType
     {

@@ -17,7 +17,7 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Items
 {
-    public class SpecialGear : CombatItemBase, IValuePoolConsumer, IHasItemVisuals
+    public class CustomGear : CombatItemBase, IValuePoolConsumer, IHasItemVisuals
     {
         private readonly ITypeRegistry _typeRegistry;
 
@@ -27,14 +27,14 @@ namespace FullPotential.Standard.Items
 
         public SerializableKeyValuePair<string, string>[] CustomData = Array.Empty<SerializableKeyValuePair<string, string>>();
 
-        public SpecialGear(ITypeRegistry typeRegistry)
+        public CustomGear(ITypeRegistry typeRegistry)
         {
             _typeRegistry = typeRegistry;
         }
 
         public override string GetDescription(ILocalizer localizer, LevelOfDetail levelOfDetail = LevelOfDetail.Full)
         {
-            var specialType = (ISpecialGearType)RegistryType;
+            var specialType = (ICustomGearType)RegistryType;
             var descriptionOverride = specialType.OverrideItemDescription(this, localizer, levelOfDetail);
 
             if (!descriptionOverride.IsNullOrWhiteSpace())

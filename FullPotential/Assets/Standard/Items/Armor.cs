@@ -1,6 +1,5 @@
 using System.Text;
 
-using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Items;

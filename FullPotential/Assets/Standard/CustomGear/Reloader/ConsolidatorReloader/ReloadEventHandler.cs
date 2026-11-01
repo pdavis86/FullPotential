@@ -8,7 +8,7 @@ using FullPotential.Standard.Weapons.Events;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
-namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
+namespace FullPotential.Standard.CustomGear.Reloader.ConsolidatorReloader
 {
     public class ReloadEventHandler : IEventHandler<ReloadInputEvent>
     {
@@ -18,7 +18,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 
         public async UniTask<HandlerResult> HandleEventAsync(ReloadInputEvent eventArgs)
         {
-            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Items.SpecialGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Items.CustomGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
             if (reloader == null || reloader.RegistryType.TypeId.ToString() != ConsolidatorReloader.TypeIdString)
             {

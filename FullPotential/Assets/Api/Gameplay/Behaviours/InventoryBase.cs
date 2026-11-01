@@ -478,9 +478,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
                         valuePoolsInUse.Add(valuePoolId);
                     }
 
-                    if (value.Item.RegistryType is ISpecialGearType specialGearType)
+                    if (value.Item.RegistryType is ICustomGearType customGearType)
                     {
-                        var otherValuePoolIds = specialGearType.ValuePoolTypeIdsInUse;
+                        var otherValuePoolIds = customGearType.ValuePoolTypeIdsInUse;
                         foreach (var otherValuePoolId in otherValuePoolIds)
                         {
                             if (!valuePoolsInUse.Contains(otherValuePoolId))
