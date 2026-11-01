@@ -2,13 +2,15 @@ using System.Collections.Generic;
 
 using FullPotential.Api.Items.Base;
 
+using FullPotential.Api.CoreTypeIds;
+
 namespace FullPotential.Api.Gameplay.Inventory
 {
     public interface IPlayerInventory : IInventory
     {
         IEnumerable<ItemBase> GetHandItems();
 
-        IEnumerable<ItemBase> GetCompatibleItems(string slotId);
+        IEnumerable<ItemBase> GetCompatibleItems(SlotId? slotId);
 
         string GetAssignedShape(string itemId);
 
@@ -16,6 +18,6 @@ namespace FullPotential.Api.Gameplay.Inventory
 
         ItemBase GetItemFromAssignedShape(string shape);
 
-        Dictionary<string, string> GetEquippedItems();
+        Dictionary<SlotId, string> GetEquippedItems();
     }
 }

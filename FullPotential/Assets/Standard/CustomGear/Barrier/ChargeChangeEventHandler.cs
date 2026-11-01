@@ -7,6 +7,8 @@ using FullPotential.Standard.SpecialSlots;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
+using FullPotential.Api.CoreTypeIds;
+
 namespace FullPotential.Standard.CustomGear.Barrier
 {
     public class ChargeChangeEventHandler : IEventHandler<ValuePoolValueChangeEvent>
@@ -25,7 +27,7 @@ namespace FullPotential.Standard.CustomGear.Barrier
             var remainingCharge = eventArgs.LivingEntity.GetValuePoolValue(BarrierChargeValuePool.TypeIdString);
             var showVisuals = remainingCharge > 0;
 
-            eventArgs.LivingEntity.Inventory.ToggleEquippedItemVisuals(BarrierSlot.TypeIdString, showVisuals);
+            eventArgs.LivingEntity.Inventory.ToggleEquippedItemVisuals(SlotId.FromString(BarrierSlot.TypeIdString), showVisuals);
 
             return UniTask.FromResult(new HandlerResult());
         }

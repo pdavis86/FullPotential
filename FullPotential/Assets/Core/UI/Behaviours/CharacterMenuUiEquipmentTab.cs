@@ -17,6 +17,9 @@ using UnityEngine.UI;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
+using FullPotential.Api.CoreTypeIds;
+using System;
+
 namespace FullPotential.Core.Ui.Behaviours
 {
     public class CharacterMenuUiEquipmentTab : MonoBehaviour
@@ -59,7 +62,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
             foreach (var slotType in armorTypes)
             {
-                InstantiateSlot(slotType.TypeId.ToString(), slotType.SlotSpritePrefabAddress, _lhs.transform);
+                InstantiateSlot(new SlotId(slotType.TypeId), slotType.SlotSpritePrefabAddress, _lhs.transform);
             }
 
             var accessoryTypes = _typeRegistry.GetRegisteredTypes<IAccessoryType>();
@@ -78,14 +81,14 @@ namespace FullPotential.Core.Ui.Behaviours
                     continue;
                 }
 
-                InstantiateSlot(type.TypeId.ToString(), type.SlotSpritePrefabAddress, _rhs.transform);
+                InstantiateSlot(new SlotId(type.TypeId), type.SlotSpritePrefabAddress, _rhs.transform);
             }
         }
 
-        private void InstantiateSlot(string slotId, string spritePrefabAddress, Transform parentTransform)
+        private void InstantiateSlot(SlotId slotId, string spritePrefabAddress, Transform parentTransform)
         {
             var equipmentSlot = Instantiate(_slotPrefab, parentTransform);
-            equipmentSlot.name = slotId;
+            equipmentSlot.name = slotId.ToString();
 
             var button = equipmentSlot.GetComponent<Button>();
             button.onClick.AddListener(() => OnSlotClick(equipmentSlot));
@@ -108,7 +111,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 return;
             }
 
-            LoadInventoryItems(clickedObject, clickedObject.name);
+            LoadInventoryItems(clickedObject, SlotId.FromString(clickedObject.name));
 
             _lastClickedSlot = clickedObject;
         }
@@ -154,21 +157,21 @@ namespace FullPotential.Core.Ui.Behaviours
 
             if (reloadSlots)
             {
-                foreach (Transform slot in _lhs.transform)
+                foreach (var container in new[] { _lhs.transform, _rhs.transform })
                 {
-                    var item = _playerFighter.Inventory.GetItemInSlot(slot.name);
-                    SetSlot(slot.gameObject, item);
-                }
-
-                foreach (Transform slot in _rhs.transform)
-                {
-                    var item = _playerFighter.Inventory.GetItemInSlot(slot.name);
-                    SetSlot(slot.gameObject, item);
+                    foreach (Transform slot in container)
+                    {
+                        if (SlotId.TryParse(slot.name, out var slotId))
+                        {
+                            var item = _playerFighter.Inventory.GetItemInSlot(slotId);
+                            SetSlot(slot.gameObject, item);
+                        }
+                    }
                 }
             }
         }
 
-        private void LoadInventoryItems(GameObject slot, string typeId)
+        private void LoadInventoryItems(GameObject slot, SlotId slotId)
         {
             _componentsContainer.SetActive(true);
 
@@ -179,7 +182,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 _inventoryRowPrefab,
                 _playerFighter.PlayerInventory,
                 HandleRowToggle,
-                typeId
+                slotId
             );
         }
 
@@ -195,10 +198,10 @@ namespace FullPotential.Core.Ui.Behaviours
             });
         }
 
-        private void EquipItem(ItemBase item, string slotId)
+        private void EquipItem(ItemBase item, string slotIdString)
         {
             var playerInventory = (PlayerInventory)_playerFighter.Inventory;
-            playerInventory.EquipItemServerRpc(item.Id, slotId);
+            playerInventory.EquipItemServerRpc(item.Id, slotIdString);
         }
     }
 }

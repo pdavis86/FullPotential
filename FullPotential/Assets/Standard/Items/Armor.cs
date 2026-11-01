@@ -11,6 +11,8 @@ using FullPotential.Standard.Armor;
 
 using UnityEngine;
 
+using FullPotential.Api.CoreTypeIds;
+
 namespace FullPotential.Standard.Items
 {
     public class Armor : CombatItemBase, IHasItemVisuals
@@ -52,7 +54,7 @@ namespace FullPotential.Standard.Items
             return sb.ToString().Trim();
         }
 
-        public void InstantiateItemVisuals(IPlayerFighter playerFighter, string slotId)
+        public void InstantiateItemVisuals(IPlayerFighter playerFighter, SlotId slotId)
         {
             if (Visuals == null)
             {
@@ -61,7 +63,7 @@ namespace FullPotential.Standard.Items
 
             Transform parentTransform = null;
 
-            parentTransform = slotId == Helm.TypeIdString
+            parentTransform = slotId.ToString() == Helm.TypeIdString
                 ? playerFighter.BodyParts.Head
                 : playerFighter.GraphicsTransform;
 

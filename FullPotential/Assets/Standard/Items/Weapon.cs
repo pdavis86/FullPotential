@@ -280,7 +280,7 @@ namespace FullPotential.Standard.Items
             return $"{Ammo}/{GetAmmoMax()} ({availableAmmo})";
         }
 
-        public void InstantiateItemVisuals(IPlayerFighter playerFighter, string slotId)
+        public void InstantiateItemVisuals(IPlayerFighter playerFighter, SlotId slotId)
         {
             _typeRegistry.LoadAddessable<GameObject>(
                Visuals.PrefabAddress,

@@ -220,9 +220,9 @@ namespace FullPotential.Api.Items
             return null;
         }
 
-        public void InstantiateItemVisuals(IPlayerFighter playerFighter, string slotId)
+        public void InstantiateItemVisuals(IPlayerFighter playerFighter, SlotId slotId)
         {
-            if (slotId is not HandSlotIds.LeftHand or HandSlotIds.RightHand)
+            if (slotId != HandSlotIds.LeftHand && slotId != HandSlotIds.RightHand)
             {
                 return;
             }

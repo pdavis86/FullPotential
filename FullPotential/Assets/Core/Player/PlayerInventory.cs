@@ -19,6 +19,8 @@ using Unity.Netcode;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
+using FullPotential.Api.CoreTypeIds;
+
 namespace FullPotential.Core.Player
 {
     public class PlayerInventory : InventoryBase, IPlayerInventory
@@ -43,7 +45,7 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         public void EquipItemServerRpc(string itemId, string slotId)
         {
-            EquipItemAsync(itemId, slotId).Forget();
+            EquipItemAsync(itemId, SlotId.FromString(slotId)).Forget();
         }
 
         #endregion
@@ -52,10 +54,10 @@ namespace FullPotential.Core.Player
         [ClientRpc]
         private void EquipItemClientRpc(string itemId, string slotId, ClientRpcParams clientRpcParams)
         {
-            EquipItemAsync(itemId, slotId).Forget();
+            EquipItemAsync(itemId, SlotId.FromString(slotId)).Forget();
         }
 
-        private async UniTask EquipItemAsync(string itemId, string slotId)
+        private async UniTask EquipItemAsync(string itemId, SlotId slotId)
         {
             ItemBase item;
             if (!_items.ContainsKey(itemId))
@@ -76,7 +78,7 @@ namespace FullPotential.Core.Player
                 MarkAsDirtyAndAddToQueue();
 
                 var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, 0);
-                EquipItemClientRpc(itemId, slotId, nearbyClients);
+                EquipItemClientRpc(itemId, slotId.ToString(), nearbyClients);
             }
         }
 
@@ -88,7 +90,7 @@ namespace FullPotential.Core.Player
                 .OrderBy(x => x.Name);
         }
 
-        public IEnumerable<ItemBase> GetCompatibleItems(string slotId)
+        public IEnumerable<ItemBase> GetCompatibleItems(SlotId? slotId)
         {
             if (slotId == null)
             {
@@ -98,13 +100,13 @@ namespace FullPotential.Core.Player
             }
 
             var matches = _items
-                .Where(x => x.Value.RegistryType != null && slotId.StartsWith(x.Value.RegistryType.TypeId.ToString()));
+                .Where(x => x.Value.RegistryType != null && slotId.Value.ToString().StartsWith(x.Value.RegistryType.TypeId.ToString()));
 
             if (!matches.Any())
             {
                 matches = _items.Where(
                     i => i.Value.RegistryType is ICustomGearType customGearType
-                         && slotId.StartsWith(customGearType.SlotIdString));
+                         && slotId.Value.ToString().StartsWith(customGearType.SlotId.ToString()));
             }
 
             return matches
@@ -121,9 +123,9 @@ namespace FullPotential.Core.Player
                 .ToDictionary(x => x.Key, x => (CombatItemBase)x.Value);
         }
 
-        public override void ApplyEquippedItemChange(string itemId, string slotId)
+        public override void ApplyEquippedItemChange(string itemId, SlotId slotId)
         {
-            var changes = new Dictionary<string, string> { { slotId, itemId } };
+            var changes = new Dictionary<string, string> { { slotId.ToString(), itemId } };
             ApplyEquippedItemChanges(changes);
         }
 
@@ -137,7 +139,7 @@ namespace FullPotential.Core.Player
             foreach (var kvp in equippedItems)
             {
                 var item = kvp.Value.IsNullOrWhiteSpace() ? null : _items[kvp.Value];
-                var slotId = kvp.Key;
+                var slotId = SlotId.FromString(kvp.Key);
 
                 _playerFighter.GetSlotStatus(slotId)?.StopActiveConsumerBehaviour();
 
@@ -162,7 +164,7 @@ namespace FullPotential.Core.Player
             MarkAsDirtyAndAddToQueue();
         }
 
-        private void DespawnEquippedObject(string slotId)
+        private void DespawnEquippedObject(SlotId slotId)
         {
             if (!_equippedItems.ContainsKey(slotId))
             {
@@ -181,7 +183,7 @@ namespace FullPotential.Core.Player
             _equippedItems[slotId].GameObject = null;
         }
 
-        private void SpawnEquippedObject(ItemBase item, string slotId)
+        private void SpawnEquippedObject(ItemBase item, SlotId slotId)
         {
             DespawnEquippedObject(slotId);
 
@@ -261,7 +263,7 @@ namespace FullPotential.Core.Player
             return Regex.Replace(shapeCode, "(:\\d+)", string.Empty);
         }
 
-        public Dictionary<string, string> GetEquippedItems()
+        public Dictionary<SlotId, string> GetEquippedItems()
         {
             return _equippedItems.ToDictionary(
                 x => x.Key,

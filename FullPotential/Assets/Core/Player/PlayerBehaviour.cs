@@ -549,7 +549,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            if (e.SlotId.IsNullOrWhiteSpace())
+            if (e.SlotId == null)
             {
                 _logger.Error("No slot was set so cannot equip any item");
                 return;
@@ -564,7 +564,7 @@ namespace FullPotential.Core.Player
             }
 
             var playerInventory = (PlayerInventory)_playerFighter.Inventory;
-            playerInventory.EquipItemServerRpc(item.Id, e.SlotId);
+            playerInventory.EquipItemServerRpc(item.Id, e.SlotId.ToString());
         }
 
         private async UniTask SaveLootAndUpdatePlayerAsync()
@@ -582,7 +582,7 @@ namespace FullPotential.Core.Player
             _playerFighter.Inventory.ApplyChangesClientRpc(changes, clientParams);
         }
 
-        private void HandleAttackDown(string slotId)
+        private void HandleAttackDown(SlotId slotId)
         {
             _logger.Debug("OnAttackDown: {0}", slotId);
 
@@ -593,7 +593,7 @@ namespace FullPotential.Core.Player
             }
         }
 
-        private void HandleAttackHold(string slotId)
+        private void HandleAttackHold(SlotId slotId)
         {
             if (IsCharacterInputDisabled())
             {
@@ -604,17 +604,17 @@ namespace FullPotential.Core.Player
 
             if (!IsHost)
             {
-                AttackHoldServerRpc(slotId);
+                AttackHoldServerRpc(slotId.ToString());
             }
         }
 
         [ServerRpc]
         public void AttackHoldServerRpc(string slotId)
         {
-            _eventBus.Publish(new AttackHoldInputEvent(_playerFighter, slotId));
+            _eventBus.Publish(new AttackHoldInputEvent(_playerFighter, SlotId.FromString(slotId)));
         }
 
-        private void HandleAttackRelease(string slotId)
+        private void HandleAttackRelease(SlotId slotId)
         {
             _logger.Debug("OnAttackRelease:{0}", slotId);
 
@@ -633,30 +633,30 @@ namespace FullPotential.Core.Player
 
             if (!IsHost)
             {
-                AttackReleaseServerRpc(slotId);
+                AttackReleaseServerRpc(slotId.ToString());
             }
         }
 
         [ServerRpc]
         public void AttackReleaseServerRpc(string slotId)
         {
-            _eventBus.Publish(new AttackReleaseInputEvent(_playerFighter, slotId));
+            _eventBus.Publish(new AttackReleaseInputEvent(_playerFighter, SlotId.FromString(slotId)));
         }
 
-        private void HandleReload(string slotId)
+        private void HandleReload(SlotId slotId)
         {
             _eventBus.Publish(new ReloadInputEvent(_playerFighter, slotId));
 
             if (!IsHost)
             {
-                ReloadServerRpc(slotId);
+                ReloadServerRpc(slotId.ToString());
             }
         }
 
         [ServerRpc]
         public void ReloadServerRpc(string slotId)
         {
-            _eventBus.Publish(new ReloadInputEvent(_playerFighter, slotId));
+            _eventBus.Publish(new ReloadInputEvent(_playerFighter, SlotId.FromString(slotId)));
         }
 
         private UniTask HandleAliveStateChangeAsync(AliveStateChangeEvent eventArgs)

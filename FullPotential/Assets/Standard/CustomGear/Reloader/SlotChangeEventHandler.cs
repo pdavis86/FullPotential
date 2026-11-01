@@ -45,32 +45,30 @@ namespace FullPotential.Standard.CustomGear.Reloader
                 return UniTask.FromResult(new HandlerResult());
             }
 
-            if (eventArgs.SlotId is not HandSlotIds.LeftHand
-                and not HandSlotIds.RightHand
-                and not RangedWeaponReloaderSlot.TypeIdString)
+            var reloaderSlotId = SlotId.FromString(RangedWeaponReloaderSlot.TypeIdString);
+            if (eventArgs.SlotId != HandSlotIds.LeftHand
+                && eventArgs.SlotId != HandSlotIds.RightHand
+                && eventArgs.SlotId != reloaderSlotId)
             {
                 return UniTask.FromResult(new HandlerResult());
             }
 
-            var reloaderEquipped = eventArgs.Inventory.GetItemInSlot(RangedWeaponReloaderSlot.TypeIdString);
+            var reloaderEquipped = eventArgs.Inventory.GetItemInSlot(reloaderSlotId);
 
-            switch (eventArgs.SlotId)
+            if (eventArgs.SlotId == HandSlotIds.LeftHand || eventArgs.SlotId == HandSlotIds.RightHand)
             {
-                case HandSlotIds.LeftHand:
-                case HandSlotIds.RightHand:
-                    AddOrRemoveHandIcon(eventArgs.Inventory, eventArgs.SlotId, reloaderEquipped);
-                    break;
-
-                case RangedWeaponReloaderSlot.TypeIdString:
-                    AddOrRemoveHandIcon(eventArgs.Inventory, HandSlotIds.LeftHand, reloaderEquipped);
-                    AddOrRemoveHandIcon(eventArgs.Inventory, HandSlotIds.RightHand, reloaderEquipped);
-                    break;
+                AddOrRemoveHandIcon(eventArgs.Inventory, eventArgs.SlotId, reloaderEquipped);
+            }
+            else
+            {
+                AddOrRemoveHandIcon(eventArgs.Inventory, HandSlotIds.LeftHand, reloaderEquipped);
+                AddOrRemoveHandIcon(eventArgs.Inventory, HandSlotIds.RightHand, reloaderEquipped);
             }
 
             return UniTask.FromResult(new HandlerResult());
         }
 
-        private void AddOrRemoveHandIcon(InventoryBase inventory, string slotId, ItemBase reloaderEquipped)
+        private void AddOrRemoveHandIcon(InventoryBase inventory, SlotId slotId, ItemBase reloaderEquipped)
         {
             var iconId = $"{slotId};ReloaderWarning";
             var isRangedWeapon = inventory.GetItemInSlot(slotId) is Weapon weapon && weapon.IsRanged;

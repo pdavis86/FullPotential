@@ -8,6 +8,8 @@ using Unity.Netcode;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
+using FullPotential.Api.CoreTypeIds;
+
 namespace FullPotential.Standard.CustomGear.Reloader.TeleportReloader
 {
     public class ShotFiredEventHandler : IEventHandler<ShotFiredAfterEvent>
@@ -18,7 +20,7 @@ namespace FullPotential.Standard.CustomGear.Reloader.TeleportReloader
 
         public UniTask<HandlerResult> HandleEventAsync(ShotFiredAfterEvent eventArgs)
         {
-            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Items.CustomGear>(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+            var reloader = eventArgs.Fighter.Inventory.GetItemInSlot<Items.CustomGear>(SlotId.FromString(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString));
 
             if (reloader == null || reloader.RegistryType.TypeId.ToString() != TeleportReloader.TypeIdString)
             {

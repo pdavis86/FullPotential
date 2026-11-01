@@ -3,13 +3,15 @@ using FullPotential.Api.Gameplay.Behaviours;
 
 using UnityEngine;
 
+using FullPotential.Api.CoreTypeIds;
+
 namespace FullPotential.Standard.Weapons.Events
 {
     public readonly struct ShotFiredAfterEvent : IEvent
     {
         public FighterBase Fighter { get; }
 
-        public string SlotId { get; }
+        public SlotId SlotId { get; }
 
         public Vector3? StartPosition { get; }
 
@@ -21,7 +23,7 @@ namespace FullPotential.Standard.Weapons.Events
 
         public ShotFiredAfterEvent(
             FighterBase fighter,
-            string slotId,
+            SlotId slotId,
             Vector3? startPostion = null,
             Vector3? endPosition = null,
             int? ammoUsed = null,

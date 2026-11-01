@@ -20,6 +20,8 @@ using UnityEngine;
 
 // ReSharper disable ClassNeverInstantiated.Local
 
+using FullPotential.Api.CoreTypeIds;
+
 namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
 {
     public class InventoryBaseTests : MonoBehaviourTestsBase
@@ -212,7 +214,7 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
                 propInfo.SetValue(this, newValue);
             }
 
-            public override void ApplyEquippedItemChange(string itemId, string slotId)
+            public override void ApplyEquippedItemChange(string itemId, SlotId slotId)
             {
                 //Nothing here
             }

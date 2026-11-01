@@ -270,7 +270,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             var armorItems = _typeRegistry
                 .GetRegisteredTypes<IArmorType>()
-                .Select(x => targetLivingEntity.Inventory.GetItemInSlot<ItemBase>(x.TypeId.ToString()));
+                .Select(x => targetLivingEntity.Inventory.GetItemInSlot<ItemBase>(new SlotId(x.TypeId)));
 
             var sum = armorItems
                 .Where(x => x != null)

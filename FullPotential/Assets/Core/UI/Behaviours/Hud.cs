@@ -207,7 +207,7 @@ namespace FullPotential.Core.Ui.Behaviours
             slider.GetComponent<BarSlider>().gameObject.SetActive(show);
         }
 
-        public void AddHandIcon(string iconId, string slotId, GameObject prefab)
+        public void AddHandIcon(string iconId, SlotId slotId, GameObject prefab)
         {
             if (_handIcons.ContainsKey(iconId))
             {
@@ -371,7 +371,7 @@ namespace FullPotential.Core.Ui.Behaviours
             return UniTask.CompletedTask;
         }
 
-        private UniTask HandleAttackOrReloadAsync(LivingEntityBase livingEntity, string slotId, bool isSlotChange, bool isAmmoChange, bool isChargeChange)
+        private UniTask HandleAttackOrReloadAsync(LivingEntityBase livingEntity, SlotId slotId, bool isSlotChange, bool isAmmoChange, bool isChargeChange)
         {
             if (livingEntity is not FighterBase fighter)
             {
@@ -382,7 +382,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
             if (isSlotChange)
             {
-                if (slotId is HandSlotIds.LeftHand or HandSlotIds.RightHand)
+                if (slotId == HandSlotIds.LeftHand || slotId == HandSlotIds.RightHand)
                 {
                     var equippedHandSummary = slotId == HandSlotIds.LeftHand ? _equippedLeftHandSummary : _equippedRightHandSummary;
                     UpdateHandDescription(equippedHandSummary, item);
@@ -391,7 +391,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 UpdateValuePoolBars(fighter);
             }
 
-            if (slotId is not HandSlotIds.LeftHand and not HandSlotIds.RightHand)
+            if (slotId != HandSlotIds.LeftHand && slotId != HandSlotIds.RightHand)
             {
                 return UniTask.CompletedTask;
             }

@@ -4,11 +4,13 @@ using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 
+using FullPotential.Api.CoreTypeIds;
+
 namespace FullPotential.Api.Registry.Gear
 {
     public interface ICustomGearType : ICraftableType
     {
-        string SlotIdString { get; }
+        SlotId SlotId { get; }
 
         IEnumerable<string> ValuePoolTypeIdsInUse { get; }
 

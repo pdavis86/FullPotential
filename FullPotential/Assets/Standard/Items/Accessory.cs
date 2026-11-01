@@ -12,6 +12,8 @@ using FullPotential.Standard.Accessories;
 
 using UnityEngine;
 
+using FullPotential.Api.CoreTypeIds;
+
 namespace FullPotential.Standard.Items
 {
     public class Accessory : CombatItemBase, IHasItemVisuals
@@ -51,7 +53,7 @@ namespace FullPotential.Standard.Items
             return sb.ToString().Trim();
         }
 
-        public void InstantiateItemVisuals(IPlayerFighter playerFighter, string slotId)
+        public void InstantiateItemVisuals(IPlayerFighter playerFighter, SlotId slotId)
         {
             if (Visuals == null)
             {
@@ -63,7 +65,7 @@ namespace FullPotential.Standard.Items
             Action<Transform> manipulateTransform = null;
 
             //todo: remove special cases
-            switch (slotId)
+            switch (slotId.ToString())
             {
                 case Amulet.TypeIdString + ";1":
                     const float amuletForwardMultiplier = 0.2f;

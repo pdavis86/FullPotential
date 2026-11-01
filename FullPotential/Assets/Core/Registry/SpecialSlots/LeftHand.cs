@@ -7,7 +7,7 @@ namespace FullPotential.Core.Registry.SpecialSlots
 {
     public class LeftHand : ISlotType
     {
-        private static readonly Guid Id = new Guid(HandSlotIds.LeftHand);
+        private static readonly Guid Id = new Guid(HandSlotIds.LeftHand.ToString());
 
         public Guid TypeId => Id;
 

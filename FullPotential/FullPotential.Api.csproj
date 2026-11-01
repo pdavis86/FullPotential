@@ -150,6 +150,7 @@
     <Compile Include="Assets\Api\Registry\Effects\ICustomEffectType.cs" />
     <Compile Include="Assets\Api\Gameplay\Attributes\Accuracy.cs" />
     <Compile Include="Assets\Api\Data\ISettingsRepository.cs" />
+    <Compile Include="Assets\Api\CoreTypeIds\SlotId.cs" />
     <Compile Include="Assets\Api\EventManagement\EventSubscription.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\ColliderExtensions.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\ArrayExtensions.cs" />

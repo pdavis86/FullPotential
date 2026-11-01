@@ -33,7 +33,7 @@ namespace FullPotential.Core.Ui.Components
             GameObject rowPrefab,
             IPlayerInventory playerInventory,
             Action<GameObject, GameObject, ItemBase> toggleAction,
-            string slotId = null,
+            SlotId? slotId = null,
             bool showEquippedItems = true,
             bool excludeItemStacks = true,
             Action<IPlayerInventory, string, InventoryUiRow> assignDrawingAction = null
@@ -47,7 +47,7 @@ namespace FullPotential.Core.Ui.Components
             var rowRectTransform = rowPrefab.GetComponent<RectTransform>();
             var rowCounter = 0;
 
-            var itemsForSlot = slotId is HandSlotIds.LeftHand or HandSlotIds.RightHand
+            var itemsForSlot = slotId == HandSlotIds.LeftHand || slotId == HandSlotIds.RightHand
                 ? playerInventory.GetHandItems()
                 : playerInventory.GetCompatibleItems(slotId);
 
@@ -86,7 +86,7 @@ namespace FullPotential.Core.Ui.Components
                         rowToggle.isOn = true;
 
                         var colors = rowToggle.colors;
-                        colors.normalColor = equippedItems.ContainsKey(slotId) && equippedItems[slotId] == item.Id
+                        colors.normalColor = slotId.HasValue && equippedItems.ContainsKey(slotId.Value) && equippedItems[slotId.Value] == item.Id
                             ? Color.green
                             : Color.grey;
                         rowToggle.colors = colors;

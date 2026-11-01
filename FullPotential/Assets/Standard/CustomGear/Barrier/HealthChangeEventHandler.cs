@@ -37,7 +37,7 @@ namespace FullPotential.Standard.CustomGear.Barrier
                 return UniTask.FromResult(new HandlerResult());
             }
 
-            var barrier = eventArgs.LivingEntity.Inventory.GetItemInSlot<Items.CustomGear>(BarrierSlot.TypeIdString);
+            var barrier = eventArgs.LivingEntity.Inventory.GetItemInSlot<Items.CustomGear>(SlotId.FromString(BarrierSlot.TypeIdString));
 
             if (barrier == null)
             {

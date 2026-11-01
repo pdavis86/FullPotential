@@ -42,7 +42,7 @@ namespace FullPotential.Standard.Weapons.Helpers
             _eventBus = eventBus;
         }
 
-        public void AttackWithItemInHand(FighterBase fighter, string slotId, bool isAutoFire = false)
+        public void AttackWithItemInHand(FighterBase fighter, SlotId slotId, bool isAutoFire = false)
         {
             if (fighter.AliveState != LivingEntityState.Alive)
             {
@@ -84,7 +84,7 @@ namespace FullPotential.Standard.Weapons.Helpers
             }
         }
 
-        private void UseWeapon(FighterBase fighter, string slotId, Weapon weaponInHand, bool isAutoFire)
+        private void UseWeapon(FighterBase fighter, SlotId slotId, Weapon weaponInHand, bool isAutoFire)
         {
             var slotStatus = fighter.GetSlotStatus(slotId);
 
@@ -102,7 +102,7 @@ namespace FullPotential.Standard.Weapons.Helpers
             UseMeleeWeapon(fighter, slotId, weaponInHand);
         }
 
-        private void UseRangedWeapon(FighterBase fighter, string slotId, SlotStatus slotStatus, Weapon weaponInHand)
+        private void UseRangedWeapon(FighterBase fighter, SlotId slotId, SlotStatus slotStatus, Weapon weaponInHand)
         {
             if (weaponInHand.Ammo == 0 || slotStatus.IsBusy)
             {
@@ -143,7 +143,7 @@ namespace FullPotential.Standard.Weapons.Helpers
             }
         }
 
-        private void UseMeleeWeapon(FighterBase fighter, string slotId, Weapon weaponInHand)
+        private void UseMeleeWeapon(FighterBase fighter, SlotId slotId, Weapon weaponInHand)
         {
             var slotStatus = fighter.GetSlotStatus(slotId);
 
@@ -165,7 +165,7 @@ namespace FullPotential.Standard.Weapons.Helpers
             slotStatus.StartCooldownLoopAsync(weaponInHand).Forget();
         }
 
-        private void UseConsumer(FighterBase fighter, string slotId, Consumer consumer)
+        private void UseConsumer(FighterBase fighter, SlotId slotId, Consumer consumer)
         {
             if (consumer == null)
             {
@@ -203,7 +203,7 @@ namespace FullPotential.Standard.Weapons.Helpers
             }
         }
 
-        private void SpawnConsumerGameObjects(FighterBase fighter, string slotId, Consumer consumer)
+        private void SpawnConsumerGameObjects(FighterBase fighter, SlotId slotId, Consumer consumer)
         {
             var targets = consumer.TargetingType.GetTargets(fighter, consumer);
 

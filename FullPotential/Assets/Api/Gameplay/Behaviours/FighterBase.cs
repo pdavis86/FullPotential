@@ -32,7 +32,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Other Variables
 
-        private readonly Dictionary<string, SlotStatus> _slotStatuses = new Dictionary<string, SlotStatus>();
+        private readonly Dictionary<SlotId, SlotStatus> _slotStatuses = new Dictionary<SlotId, SlotStatus>();
 
         private DelayedAction _consumeValuePool;
 
@@ -121,7 +121,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 && consumer.ValuePoolType.TypeId.ToString() == typeId);
         }
 
-        public SlotStatus GetSlotStatus(string slotId)
+        public SlotStatus GetSlotStatus(SlotId slotId)
         {
             return _slotStatuses.ContainsKey(slotId)
                 ? _slotStatuses[slotId]

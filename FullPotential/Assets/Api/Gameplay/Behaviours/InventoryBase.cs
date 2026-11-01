@@ -31,8 +31,6 @@ using UnityEngine;
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
-    // todo: Use `readonly struct ThingyId(string Id);` instead of string everywhere
-
     public abstract class InventoryBase : NetworkBehaviour, ISaveable
     {
         // ReSharper disable InconsistentNaming
@@ -50,7 +48,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected string _characterId;
         protected bool _hasInventoryLoaded;
         protected Dictionary<string, ItemBase> _items;
-        protected Dictionary<string, EquippedItem> _equippedItems;
+        protected Dictionary<SlotId, EquippedItem> _equippedItems;
         // ReSharper restore InconsistentNaming
 
         public bool IsDirty => _isDirty || _items.Any(x => x.Value.IsDirty);
@@ -71,7 +69,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _livingEntity = GetComponent<LivingEntityBase>();
 
             _items = new Dictionary<string, ItemBase>();
-            _equippedItems = new Dictionary<string, EquippedItem>();
+            _equippedItems = new Dictionary<SlotId, EquippedItem>();
         }
 
         #endregion
@@ -96,7 +94,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 foreach (var kvp in inventoryData.EquippedItems)
                 {
-                    TriggerSlotChangeEvent(kvp.Value, kvp.Key);
+                    TriggerSlotChangeEvent(kvp.Value, SlotId.FromString(kvp.Key));
                 }
             }
 
@@ -196,13 +194,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return CastItemAsType<T>(item, errorIfNotFound, "ID", id);
         }
 
-        public T GetItemInSlot<T>(string slotId, bool errorIfNotFound = false) where T : ItemBase
+        public T GetItemInSlot<T>(SlotId slotId, bool errorIfNotFound = false) where T : ItemBase
         {
             var item = GetItemInSlot(slotId);
-            return CastItemAsType<T>(item, errorIfNotFound, "slot ID", slotId);
+            return CastItemAsType<T>(item, errorIfNotFound, "slot ID", slotId.ToString());
         }
 
-        public ItemBase GetItemInSlot(string slotId)
+        public ItemBase GetItemInSlot(SlotId slotId)
         {
             return _equippedItems.TryGetValue(slotId, out var equippedItem)
                 ? equippedItem.Item
@@ -286,16 +284,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return itemToCraft.ValidateCraftingAttempt(components);
         }
 
-        protected bool IsValidSlotId(string slotId)
+        protected bool IsValidSlotId(SlotId slotId)
         {
-            if (slotId is HandSlotIds.LeftHand or HandSlotIds.RightHand)
+            if (slotId == HandSlotIds.LeftHand || slotId == HandSlotIds.RightHand)
             {
                 return true;
             }
 
-            return _typeRegistry.GetRegisteredTypes<IArmorType>().FirstOrDefault(t => t.TypeId.ToString() == slotId) != null
-                   || _typeRegistry.GetRegisteredTypes<IAccessoryType>().FirstOrDefault(t => slotId.StartsWith(t.TypeId.ToString())) != null
-                   || _typeRegistry.GetRegisteredTypes<ISlotType>().FirstOrDefault(t => t.TypeId.ToString() == slotId) != null;
+            return _typeRegistry.GetRegisteredTypes<IArmorType>().FirstOrDefault(t => t.TypeId.ToString() == slotId.ToString()) != null
+                   || _typeRegistry.GetRegisteredTypes<IAccessoryType>().FirstOrDefault(t => slotId.ToString().StartsWith(t.TypeId.ToString())) != null
+                   || _typeRegistry.GetRegisteredTypes<ISlotType>().FirstOrDefault(t => t.TypeId.ToString() == slotId.ToString()) != null;
         }
 
         private ItemBase MergeItemStacks(ItemStackBase newStack)
@@ -360,13 +358,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return null;
         }
 
-        protected void HandleSlotChange(ItemBase item, string slotId)
+        protected void HandleSlotChange(ItemBase item, SlotId slotId)
         {
             var previousKvp = _equippedItems.FirstOrDefault(x => x.Value?.Item?.Id == item.Id);
-            var previousSlotId = previousKvp.Value != null ? previousKvp.Key : null;
-
-            if (!previousSlotId.IsNullOrWhiteSpace())
+            if (previousKvp.Value != null)
             {
+                var previousSlotId = previousKvp.Key;
                 TriggerSlotChangeEvent(null, previousSlotId);
 
                 var isUnEquipping = previousSlotId == slotId;
@@ -376,15 +373,18 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            var otherSlotId = slotId == HandSlotIds.LeftHand
+            if (slotId == HandSlotIds.LeftHand || slotId == HandSlotIds.RightHand)
+            {
+                var otherSlotId = slotId == HandSlotIds.LeftHand
                 ? HandSlotIds.RightHand
                 : HandSlotIds.LeftHand;
-            var otherItem = GetItemInSlot(otherSlotId);
+                var otherItem = GetItemInSlot(otherSlotId);
 
-            if (otherItem != null
-                && (IsTwoHandedWeapon(otherItem) || IsTwoHandedWeapon(item)))
-            {
-                TriggerSlotChangeEvent(null, otherSlotId);
+                if (otherItem != null
+                    && (IsTwoHandedWeapon(otherItem) || IsTwoHandedWeapon(item)))
+                {
+                    TriggerSlotChangeEvent(null, otherSlotId);
+                }
             }
 
             TriggerSlotChangeEvent(item.Id, slotId);
@@ -397,17 +397,17 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 && item.Properties.GetBoolValue(nameof(CombatItemBase.IsTwoHanded));
         }
 
-        protected void TriggerSlotChangeEvent(string itemId, string slotId)
+        protected void TriggerSlotChangeEvent(string itemId, SlotId slotId)
         {
             var changeEvent = new SlotChangeEvent(this, _livingEntity, slotId, itemId);
             _eventBus.Publish(changeEvent);
         }
 
-        public abstract void ApplyEquippedItemChange(string itemId, string slotId);
+        public abstract void ApplyEquippedItemChange(string itemId, SlotId slotId);
 
         protected abstract void ApplyEquippedItemChanges(Dictionary<string, string> equippedItems);
 
-        public void ToggleEquippedItemVisuals(string slotId, bool show)
+        public void ToggleEquippedItemVisuals(SlotId slotId, bool show)
         {
             if (!_equippedItems.ContainsKey(slotId)
                 || _equippedItems[slotId].GameObject == null)
@@ -424,7 +424,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             {
                 CharacterId = _characterId,
                 Items = _items.Select(x => _itemFactory.GetDataFromItem(_characterId, x.Value)).ToList(),
-                EquippedItems = _equippedItems.ToDictionary(x => x.Key, x => x.Value.Item?.Id)
+                EquippedItems = _equippedItems.ToDictionary(x => x.Key.ToString(), x => x.Value.Item?.Id)
             };
 
             _isDirty = false;
@@ -495,7 +495,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return valuePoolsInUse;
         }
 
-        public void SetEquippedItemVisuals(string slotId, GameObject newObj)
+        public void SetEquippedItemVisuals(SlotId slotId, GameObject newObj)
         {
             _equippedItems[slotId].GameObject = newObj;
         }

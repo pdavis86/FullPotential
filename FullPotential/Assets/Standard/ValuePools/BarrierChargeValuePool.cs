@@ -8,6 +8,8 @@ using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.CustomGear.Barrier;
 using FullPotential.Standard.SpecialSlots;
 
+using FullPotential.Api.CoreTypeIds;
+
 namespace FullPotential.Standard.ValuePools
 {
     public class BarrierChargeValuePool : IValuePoolType
@@ -50,7 +52,7 @@ namespace FullPotential.Standard.ValuePools
                 return;
             }
 
-            var equippedBarrier = targetFighter.Inventory.GetItemInSlot<Items.CustomGear>(BarrierSlot.TypeIdString);
+            var equippedBarrier = targetFighter.Inventory.GetItemInSlot<Items.CustomGear>(SlotId.FromString(BarrierSlot.TypeIdString));
 
             if (equippedBarrier == null)
             {

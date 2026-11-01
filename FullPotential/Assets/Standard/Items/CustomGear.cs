@@ -15,6 +15,8 @@ using FullPotential.Api.Utilities.Extensions;
 
 using UnityEngine;
 
+using FullPotential.Api.CoreTypeIds;
+
 namespace FullPotential.Standard.Items
 {
     public class CustomGear : CombatItemBase, IValuePoolConsumer, IHasItemVisuals
@@ -95,7 +97,7 @@ namespace FullPotential.Standard.Items
             return null;
         }
 
-        public void InstantiateItemVisuals(IPlayerFighter playerFighter, string slotId)
+        public void InstantiateItemVisuals(IPlayerFighter playerFighter, SlotId slotId)
         {
             if (Visuals == null)
             {

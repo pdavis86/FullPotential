@@ -11,6 +11,8 @@ using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.ValuePools;
 
+using FullPotential.Api.CoreTypeIds;
+
 namespace FullPotential.Standard.CustomGear.Barrier
 {
     public class Barrier : ICustomGearType
@@ -21,7 +23,7 @@ namespace FullPotential.Standard.CustomGear.Barrier
 
         public Guid TypeId => Id;
 
-        public string SlotIdString => SpecialSlots.BarrierSlot.TypeIdString;
+        public SlotId SlotId => FullPotential.Api.CoreTypeIds.SlotId.FromString(SpecialSlots.BarrierSlot.TypeIdString);
 
         public IEnumerable<string> ValuePoolTypeIdsInUse { get; } = new[] { Energy.TypeIdString, BarrierChargeValuePool.TypeIdString };
 

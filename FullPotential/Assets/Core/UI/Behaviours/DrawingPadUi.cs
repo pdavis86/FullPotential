@@ -15,6 +15,8 @@ using UnityEngine.UI;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
+using FullPotential.Api.CoreTypeIds;
+
 namespace FullPotential.Core.UI.Behaviours
 {
     public class DrawingPadUi : MonoBehaviour
@@ -53,7 +55,7 @@ namespace FullPotential.Core.UI.Behaviours
         private List<string> _drawnShapes;
         private string _eventSource;
         private string _itemId;
-        private string _slotId;
+        private SlotId? _slotId;
 
         // ReSharper disable once UnusedMember.Local
         private void Awake()
@@ -88,7 +90,7 @@ namespace FullPotential.Core.UI.Behaviours
             _itemId = itemId;
         }
 
-        public void InitialiseForEquip(string eventSource, string slotId)
+        public void InitialiseForEquip(string eventSource, SlotId slotId)
         {
             if (!_eventSource.IsNullOrWhiteSpace())
             {
@@ -210,7 +212,7 @@ namespace FullPotential.Core.UI.Behaviours
 
             try
             {
-                OnDrawingStop?.Invoke(this, new OnDrawingStopEventArgs(_eventSource, finalShape, _itemId, _slotId));
+                OnDrawingStop?.Invoke(this, new OnDrawingStopEventArgs(_eventSource, finalShape, _itemId, _slotId.Value));
             }
             finally
             {

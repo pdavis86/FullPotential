@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Threading;
 
@@ -9,6 +10,8 @@ using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Items;
 using FullPotential.Api.Logging;
+
+using FullPotential.Api.CoreTypeIds;
 
 namespace FullPotential.Api.Gameplay.Player
 {
@@ -25,7 +28,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public FighterBase Fighter { get; private set; }
 
-        public string SlotId { get; private set; }
+        public SlotId SlotId { get; private set; }
 
         public bool IsBusy { get; private set; }
 
@@ -39,7 +42,7 @@ namespace FullPotential.Api.Gameplay.Player
             _eventBus = eventBus;
         }
 
-        public void Initialise(FighterBase fighter, string slotId)
+        public void Initialise(FighterBase fighter, SlotId slotId)
         {
             Fighter = fighter;
             SlotId = slotId;
@@ -203,9 +206,9 @@ namespace FullPotential.Api.Gameplay.Player
             _eventBus.Publish(new SlotBusyChangeEvent(Fighter, SlotId, isBusy));
         }
 
-        public static string GetSlotId(string typeId, int index)
+        public static SlotId GetSlotId(string typeId, int index)
         {
-            return $"{typeId};{index}";
+            return new SlotId(Guid.Parse(typeId), index);
         }
     }
 }

@@ -7,6 +7,8 @@ using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Standard.ValuePools;
 
+using FullPotential.Api.CoreTypeIds;
+
 namespace FullPotential.Standard.CustomGear.Reloader.TeleportReloader
 {
     public class TeleportReloader : ICustomGearType
@@ -17,7 +19,7 @@ namespace FullPotential.Standard.CustomGear.Reloader.TeleportReloader
 
         public Guid TypeId => Id;
 
-        public string SlotIdString => SpecialSlots.RangedWeaponReloaderSlot.TypeIdString;
+        public SlotId SlotId => FullPotential.Api.CoreTypeIds.SlotId.FromString(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
         public IEnumerable<string> ValuePoolTypeIdsInUse { get; } = new[] { Energy.TypeIdString };
 
