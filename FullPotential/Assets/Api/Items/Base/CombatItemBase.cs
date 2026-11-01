@@ -110,7 +110,7 @@ namespace FullPotential.Api.Items.Base
             return damagePerItem * numberOfItems / ((numberOfItems / itemsPerSecond) + reloadTime);
         }
 
-        public int GetResourceCost()
+        public int GetValuePoolCost()
         {
             var returnValue = MathsHelper.GetHighInLowOutInRange(Attributes.GetIntValue(Efficiency.TypeIdString), 5, 50);
 

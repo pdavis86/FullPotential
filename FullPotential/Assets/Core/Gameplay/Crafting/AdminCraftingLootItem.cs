@@ -8,13 +8,13 @@ using FullPotential.Api.Registry.Targeting;
 
 namespace FullPotential.Core.Gameplay.Crafting
 {
-    public class AdminCraftingLootItem : CombatItemBase, IHasTargetingAndShape, IResourceConsumer
+    public class AdminCraftingLootItem : CombatItemBase, IHasTargetingAndShape, IValuePoolConsumer
     {
         public ITargetingType TargetingType { get; set; }
         public IItemVisualsType TargetingVisualsType { get; set; }
         public IItemVisualsType ShapeVisualsType { get; set; }
         public IShapeType ShapeType { get; set; }
-        public IResourceType ResourceType { get; set; }
+        public IValuePoolType ValuePoolType { get; set; }
 
         public override string GetTextForUiComponent(string id, IPlayerFighter playerFighter)
         {

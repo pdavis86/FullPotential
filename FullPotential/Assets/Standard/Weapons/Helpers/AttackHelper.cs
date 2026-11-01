@@ -184,9 +184,9 @@ namespace FullPotential.Standard.Weapons.Helpers
 
             slotStatus.StartCooldownLoopAsync(consumer).Forget();
 
-            if (!fighter.ConsumeResource(consumer, isTest: true))
+            if (!fighter.ConsumeValuePool(consumer, isTest: true))
             {
-                _logger.Error("Cancelling UseConsumer as there was not enough of the resource");
+                _logger.Error("Cancelling UseConsumer as there was not enough of the valuePool");
                 return;
             }
 
@@ -195,7 +195,7 @@ namespace FullPotential.Standard.Weapons.Helpers
                 slotStatus.StartActiveConsumerBehaviour();
             }
 
-            fighter.ConsumeResource(consumer);
+            fighter.ConsumeValuePool(consumer);
 
             if (NetworkManager.Singleton.IsServer)
             {

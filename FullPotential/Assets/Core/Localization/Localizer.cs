@@ -49,7 +49,7 @@ namespace FullPotential.Core.Localization
         {
             _typeDictionary.Clear();
 
-            CacheRegisterableTypeName<IResourceType>();
+            CacheRegisterableTypeName<IValuePoolType>();
             CacheRegisterableTypeName<IArmorType>();
             CacheRegisterableTypeName<IAccessoryType>();
             CacheRegisterableTypeName<IWeaponType>();

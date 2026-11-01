@@ -6,7 +6,7 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Standard.Effects.Debuffs
 {
-    public class Lethargy : IResourceEffectType
+    public class Lethargy : IValuePoolEffectType
     {
         private static readonly Guid Id = new Guid("260ff724-0708-42fa-81ab-45af911e6daf");
 
@@ -14,6 +14,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public EffectActionType EffectActionType => EffectActionType.TemporaryMaxDecrease;
 
-        public string ResourceTypeIdString => ResourceTypeIds.StaminaId;
+        public string ValuePoolTypeIdString => ValuePoolTypeIds.StaminaId;
     }
 }

@@ -133,9 +133,9 @@ namespace FullPotential.Core.Gameplay.Crafting
                                 : debuff;
                         }
 
-                        if (x is IResourceEffectType resourceEffect)
+                        if (x is IValuePoolEffectType valuePoolEffect)
                         {
-                            switch (resourceEffect.EffectActionType)
+                            switch (valuePoolEffect.EffectActionType)
                             {
                                 case EffectActionType.PeriodicIncrease:
                                 case EffectActionType.SingleIncrease:
@@ -345,11 +345,11 @@ namespace FullPotential.Core.Gameplay.Crafting
             item.Name = $"{GetItemNamePrefix(isAttack)} {item.Attributes.GetIntValue(Strength.TypeIdString)} {suffix}";
         }
 
-        public ItemBase GetCraftedItem(Type craftableType, string typeId, string resourceTypeId, bool isTwoHanded, string itemName, IList<ItemBase> components)
+        public ItemBase GetCraftedItem(Type craftableType, string typeId, string valuePoolTypeId, bool isTwoHanded, string itemName, IList<ItemBase> components)
         {
             var properties = new Dictionary<string, string>
             {
-                { IResourceConsumer.PropertyKeyResourceTypeId, resourceTypeId  },
+                { IValuePoolConsumer.PropertyKeyValuePoolTypeId, valuePoolTypeId },
                 { nameof(CombatItemBase.IsTwoHanded), isTwoHanded.ToString() }
             };
 

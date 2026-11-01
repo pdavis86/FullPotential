@@ -43,7 +43,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
     {
         private const int VelocityThreshold = 3;
         private const int ForceThreshold = 1000;
-        private const int SingleResourceChangeEffectDisplaySeconds = 3;
+        private const int SingleValuePoolChangeEffectDisplaySeconds = 3;
 
         #region Inspector Variables
 #pragma warning disable 0649
@@ -84,16 +84,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
         private readonly List<ActiveEffect> _activeEffects = new List<ActiveEffect>();
-        protected readonly Dictionary<string, int> _resourceValueCache = new Dictionary<string, int>();
+        protected readonly Dictionary<string, int> _valuePoolValueCache = new Dictionary<string, int>();
 
         private CancellationTokenSource _activeEffectsCancellationTokenSource = new CancellationTokenSource();
-        private IEnumerable<IResourceType> _sortedResources;
+        private IEnumerable<IValuePoolType> _sortedValuePools;
 
         private FighterBase _fighterWhoMovedMeLast;
         private Rigidbody _rb;
 
         //Action-related
-        private DelayedAction _replenishResources;
+        private DelayedAction _replenishValuePools;
         private DelayedAction _consumeStamina;
 
         #endregion
@@ -127,20 +127,20 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _eventBus = DependenciesContext.Dependencies.GetService<IEventBus>();
             _sceneService = _gameManager.GetSceneBehaviour().GetSceneService();
 
-            PopulateResourceValueCache();
+            PopulateValuePoolValueCache();
 
             _entityName.OnValueChanged += HandleNameChange;
-            _eventBus.SubscribeBehaviour<ResourceValueChangeEvent>(
+            _eventBus.SubscribeBehaviour<ValuePoolValueChangeEvent>(
                 this,
                 e => e.LivingEntity == this,
-                HandleResourceValueChangedAsync);
+                HandleValuePoolValueChangedAsync);
         }
 
         protected virtual void Start()
         {
             AliveState = LivingEntityState.Alive;
 
-            SetupResourceReplenishing();
+            SetupValuePoolReplenishing();
             SetupStaminaConsumption();
         }
 
@@ -187,7 +187,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private void UpdateHealthValueClientRpc(int newValue, ClientRpcParams clientRpcParams)
         {
             // todo: Does not work for clients joining mid-battle
-            UpdateResourceValue(ResourceTypeIds.HealthId, newValue, null, null);
+            UpdateValuePoolValue(ValuePoolTypeIds.HealthId, newValue, null, null);
         }
 
         // ReSharper disable once UnusedParameter.Local
@@ -228,28 +228,28 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #endregion
 
-        #region Resource Management
+        #region ValuePool Management
 
-        protected IEnumerable<IResourceType> GetResources()
+        protected IEnumerable<IValuePoolType> GetValuePools()
         {
-            return _sortedResources;
+            return _sortedValuePools;
         }
 
-        protected Dictionary<string, int> GetResourceDictionaryForSave()
+        protected Dictionary<string, int> GetValuePoolDictionaryForSave()
         {
-            return GetResources().ToDictionary(
+            return GetValuePools().ToDictionary(
                 x => x.TypeId.ToString(),
-                x => GetResourceValue(x.TypeId.ToString()));
+                x => GetValuePoolValue(x.TypeId.ToString()));
         }
 
-        private void SetupResourceReplenishing()
+        private void SetupValuePoolReplenishing()
         {
-            //todo: zzz v0.8 - trait-based resource replenish (not just every .2 seconds)
-            _replenishResources = new DelayedAction(.2f, () =>
+            //todo: zzz v0.8 - trait-based valuePool replenish (not just every .2 seconds)
+            _replenishValuePools = new DelayedAction(.2f, () =>
             {
-                foreach (var resource in GetResources())
+                foreach (var valuePool in GetValuePools())
                 {
-                    resource.ReplenishBehaviour?.Invoke(this);
+                    valuePool.ReplenishBehaviour?.Invoke(this);
                 }
             });
         }
@@ -284,23 +284,23 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        private void PopulateResourceValueCache()
+        private void PopulateValuePoolValueCache()
         {
-            _sortedResources = _typeRegistry.GetRegisteredTypes<IResourceType>()
+            _sortedValuePools = _typeRegistry.GetRegisteredTypes<IValuePoolType>()
                 .OrderBy(x => x.TypeId);
 
-            foreach (var resource in _sortedResources)
+            foreach (var valuePool in _sortedValuePools)
             {
-                _resourceValueCache.Add(resource.TypeId.ToString(), 9999);
+                _valuePoolValueCache.Add(valuePool.TypeId.ToString(), 9999);
             }
         }
 
-        public int GetResourceValue(string typeId)
+        public int GetValuePoolValue(string typeId)
         {
-            return _resourceValueCache[typeId];
+            return _valuePoolValueCache[typeId];
         }
 
-        protected int ClampResourceValue(string typeId, int value)
+        protected int ClampValuePoolValue(string typeId, int value)
         {
             if (value < 0)
             {
@@ -308,66 +308,66 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
             else
             {
-                var resourceMax = GetResourceMax(typeId);
+                var valuePoolMax = GetValuePoolMax(typeId);
 
-                if (value > resourceMax)
+                if (value > valuePoolMax)
                 {
-                    value = resourceMax;
+                    value = valuePoolMax;
                 }
             }
 
             return value;
         }
 
-        public void TriggerResourceValueUpdate(string typeId, int oldValue, int newValue, string sourceEntityName, string sourceItemName)
+        public void TriggerValuePoolValueUpdate(string typeId, int oldValue, int newValue, string sourceEntityName, string sourceItemName)
         {
-            TriggerResourceValueUpdate(typeId, newValue - oldValue, sourceEntityName, sourceItemName);
+            TriggerValuePoolValueUpdate(typeId, newValue - oldValue, sourceEntityName, sourceItemName);
         }
 
-        public void TriggerResourceValueUpdate(string typeId, int change, string sourceEntityName, string sourceItemName)
+        public void TriggerValuePoolValueUpdate(string typeId, int change, string sourceEntityName, string sourceItemName)
         {
-            var currentValue = ClampResourceValue(typeId, GetResourceValue(typeId));
-            var newValue = ClampResourceValue(typeId, currentValue + change);
-            var changeEvent = new ResourceValueChangeEvent(this, typeId, newValue, change, GetResourceMax(typeId), sourceEntityName, sourceItemName);
+            var currentValue = ClampValuePoolValue(typeId, GetValuePoolValue(typeId));
+            var newValue = ClampValuePoolValue(typeId, currentValue + change);
+            var changeEvent = new ValuePoolValueChangeEvent(this, typeId, newValue, change, GetValuePoolMax(typeId), sourceEntityName, sourceItemName);
             _eventBus.Publish(changeEvent);
         }
 
-        public void UpdateResourceValue(string typeId, int newValue, string sourceEntityName, string sourceItemName)
+        public void UpdateValuePoolValue(string typeId, int newValue, string sourceEntityName, string sourceItemName)
         {
-            newValue = ClampResourceValue(typeId, newValue);
+            newValue = ClampValuePoolValue(typeId, newValue);
 
             if (_logger.IsEnabled(AuditLevel.Debug))
             {
                 var locationName = IsServer ? "Server" : "Client";
-                var registeredType = _typeRegistry.GetRegisteredByTypeId<IResourceType>(typeId);
-                _logger.Debug("{0}-{1}: '{2}' changed from {3} to {4} by {5} using '{6}'", locationName, OwnerClientId, _localizer.Translate(registeredType), _resourceValueCache[typeId], newValue, sourceEntityName, sourceItemName);
+                var registeredType = _typeRegistry.GetRegisteredByTypeId<IValuePoolType>(typeId);
+                _logger.Debug("{0}-{1}: '{2}' changed from {3} to {4} by {5} using '{6}'", locationName, OwnerClientId, _localizer.Translate(registeredType), _valuePoolValueCache[typeId], newValue, sourceEntityName, sourceItemName);
             }
 
-            _resourceValueCache[typeId] = newValue;
+            _valuePoolValueCache[typeId] = newValue;
 
-            if (IsServer && typeId == ResourceTypeIds.HealthId)
+            if (IsServer && typeId == ValuePoolTypeIds.HealthId)
             {
                 var nearbyClients = _rpcService.ForNearbyPlayersExcept(transform.position, 0);
                 UpdateHealthValueClientRpc(newValue, nearbyClients);
             }
         }
 
-        protected void SetResourceValuesForRespawn()
+        protected void SetValuePoolValuesForRespawn()
         {
-            var resourceKeys = _resourceValueCache.Keys.ToList();
-            foreach (var resourceTypeId in resourceKeys)
+            var valuePoolKeys = _valuePoolValueCache.Keys.ToList();
+            foreach (var valuePoolTypeId in valuePoolKeys)
             {
-                TriggerResourceValueUpdate(resourceTypeId, GetResourceValue(resourceTypeId), GetResourceMax(resourceTypeId), name, null);
+                TriggerValuePoolValueUpdate(valuePoolTypeId, GetValuePoolValue(valuePoolTypeId), GetValuePoolMax(valuePoolTypeId), name, null);
             }
         }
 
-        public int GetResourceMax(string resourceTypeId)
+        public int GetValuePoolMax(string valuePoolTypeId)
         {
-            //todo: zzz v0.8 - trait-based resource max
-            return 100 + GetResourceMaxAdjustment(resourceTypeId);
+            //todo: zzz v0.8 - trait-based valuePool max
+            return 100 + GetValuePoolMaxAdjustment(valuePoolTypeId);
         }
 
-        public abstract bool IsConsumingResource(string typeId);
+        public abstract bool IsConsumingValuePool(string typeId);
 
         #endregion
 
@@ -387,7 +387,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected bool IsConsumingStamina()
         {
-            if (IsSprinting && GetResourceValue(ResourceTypeIds.StaminaId) < GetStaminaCost())
+            if (IsSprinting && GetValuePoolValue(ValuePoolTypeIds.StaminaId) < GetStaminaCost())
             {
                 IsSprinting = false;
             }
@@ -404,11 +404,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     return;
                 }
 
-                var staminaValue = GetResourceValue(ResourceTypeIds.StaminaId);
+                var staminaValue = GetValuePoolValue(ValuePoolTypeIds.StaminaId);
                 var staminaCost = GetStaminaCost();
                 if (staminaValue >= staminaCost)
                 {
-                    TriggerResourceValueUpdate(ResourceTypeIds.StaminaId, -staminaCost / 2, name, null);
+                    TriggerValuePoolValueUpdate(ValuePoolTypeIds.StaminaId, -staminaCost / 2, name, null);
                 }
             });
         }
@@ -440,9 +440,9 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _nameTag.text = displayName;
         }
 
-        private UniTask HandleResourceValueChangedAsync(ResourceValueChangeEvent eventArgs)
+        private UniTask HandleValuePoolValueChangedAsync(ValuePoolValueChangeEvent eventArgs)
         {
-            if (eventArgs.ResourceTypeId != ResourceTypeIds.HealthId
+            if (eventArgs.ValuePoolTypeId != ValuePoolTypeIds.HealthId
                 || eventArgs.LivingEntity != this)
             {
                 return UniTask.CompletedTask;
@@ -470,7 +470,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void ReplenishAndConsume()
         {
-            _replenishResources.TryPerformAction();
+            _replenishValuePools.TryPerformAction();
             _consumeStamina.TryPerformAction();
         }
 
@@ -518,7 +518,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 ShowHealthChangeToSourceFighter(_fighterWhoMovedMeLast, contactPoint.point, healthChange, false);
             }
 
-            TriggerResourceValueUpdate(ResourceTypeIds.HealthId, healthChange, null, cause);
+            TriggerValuePoolValueUpdate(ValuePoolTypeIds.HealthId, healthChange, null, cause);
         }
 
         #endregion
@@ -618,38 +618,38 @@ namespace FullPotential.Api.Gameplay.Behaviours
             AddOrUpdateEffect(attributeEffect, change, expiry);
         }
 
-        public void ApplyPeriodicActionToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position)
+        public void ApplyPeriodicActionToValuePool(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position)
         {
             // todo: replace use of DateTime with TimeProvider to ensure UTC
             var delay = itemUsed.GetChargeUpTime();
             var expiry = DateTime.Now.AddSeconds(itemUsed.GetEffectDuration());
-            PeriodicActionToResourceAsync(sourceFighter, itemUsed, resourceEffect, position, delay, expiry, _activeEffectsCancellationTokenSource.Token).Forget();
+            PeriodicActionToValuePoolAsync(sourceFighter, itemUsed, valuePoolEffect, position, delay, expiry, _activeEffectsCancellationTokenSource.Token).Forget();
         }
 
-        private async UniTask PeriodicActionToResourceAsync(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position, float delay, DateTime expiry, CancellationToken cancellationToken)
+        private async UniTask PeriodicActionToValuePoolAsync(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position, float delay, DateTime expiry, CancellationToken cancellationToken)
         {
-            var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, resourceEffect, this);
-            AddOrUpdateEffect(resourceEffect, combatResult.Change, expiry);
+            var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, valuePoolEffect, this);
+            AddOrUpdateEffect(valuePoolEffect, combatResult.Change, expiry);
 
             do
             {
-                ApplySingleValueChangeToResourceInternal(sourceFighter, itemUsed, resourceEffect, position, combatResult);
+                ApplySingleValueChangeToValuePoolInternal(sourceFighter, itemUsed, valuePoolEffect, position, combatResult);
                 await UniTask.WaitForSeconds(delay, cancellationToken: cancellationToken);
 
             } while (DateTime.Now < expiry);
         }
 
-        public void ApplySingleValueChangeToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position)
+        public void ApplySingleValueChangeToValuePool(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position)
         {
-            var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, resourceEffect, this);
-            AddOrUpdateEffect(resourceEffect, combatResult.Change, DateTime.Now.AddSeconds(SingleResourceChangeEffectDisplaySeconds));
+            var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, valuePoolEffect, this);
+            AddOrUpdateEffect(valuePoolEffect, combatResult.Change, DateTime.Now.AddSeconds(SingleValuePoolChangeEffectDisplaySeconds));
 
-            ApplySingleValueChangeToResourceInternal(sourceFighter, itemUsed, resourceEffect, position, combatResult);
+            ApplySingleValueChangeToValuePoolInternal(sourceFighter, itemUsed, valuePoolEffect, position, combatResult);
         }
 
-        private void ApplySingleValueChangeToResourceInternal(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, Vector3? position, CombatResult combatResult)
+        private void ApplySingleValueChangeToValuePoolInternal(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position, CombatResult combatResult)
         {
-            if (resourceEffect.ResourceTypeIdString == ResourceTypeIds.HealthId)
+            if (valuePoolEffect.ValuePoolTypeIdString == ValuePoolTypeIds.HealthId)
             {
                 if (combatResult.Change < 0)
                 {
@@ -663,16 +663,16 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            TriggerResourceValueUpdate(resourceEffect.ResourceTypeIdString, combatResult.Change, sourceFighter.name, itemUsed?.Name);
+            TriggerValuePoolValueUpdate(valuePoolEffect.ValuePoolTypeIdString, combatResult.Change, sourceFighter.name, itemUsed?.Name);
         }
 
-        public void ApplyTemporaryMaxActionToResource(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect)
+        public void ApplyTemporaryMaxActionToValuePool(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect)
         {
             var expiry = DateTime.Now.AddSeconds(itemUsed.GetEffectDuration());
 
-            var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, resourceEffect, this);
-            TriggerResourceValueUpdate(resourceEffect.ResourceTypeIdString, combatResult.Change, sourceFighter.name, itemUsed.Name);
-            AddOrUpdateEffect(resourceEffect, combatResult.Change, expiry);
+            var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, valuePoolEffect, this);
+            TriggerValuePoolValueUpdate(valuePoolEffect.ValuePoolTypeIdString, combatResult.Change, sourceFighter.name, itemUsed.Name);
+            AddOrUpdateEffect(valuePoolEffect, combatResult.Change, expiry);
         }
 
         public List<ActiveEffect> GetActiveEffects()
@@ -694,13 +694,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 .Sum(x => x.Change * (x.Effect is IAttributeEffect attributeEffect && attributeEffect.IsTemporaryMaxIncrease ? 1 : -1));
         }
 
-        private int GetResourceMaxAdjustment(string resourceTypeId)
+        private int GetValuePoolMaxAdjustment(string valuePoolTypeId)
         {
             return _activeEffects
                 .Where(x =>
-                    x.Effect is IResourceEffectType resourceEffect
-                    && resourceEffect.ResourceTypeIdString == resourceTypeId
-                    && resourceEffect.EffectActionType is EffectActionType.TemporaryMaxIncrease or EffectActionType.TemporaryMaxDecrease)
+                    x.Effect is IValuePoolEffectType valuePoolEffect
+                    && valuePoolEffect.ValuePoolTypeIdString == valuePoolTypeId
+                    && valuePoolEffect.EffectActionType is EffectActionType.TemporaryMaxIncrease or EffectActionType.TemporaryMaxDecrease)
                 .Sum(x => x.Change);
         }
 
@@ -711,27 +711,27 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void AddOrUpdateEffect(IEffectType effect, int change, DateTime expiry)
         {
-            var resourceEffect = effect as IResourceEffectType;
+            var valuePoolEffect = effect as IValuePoolEffectType;
 
             //todo: zzz v0.7 - Add health single decrease effect to a UI options list that can be changed
-            var hideEffectFromFighter = resourceEffect != null
-                && resourceEffect.EffectActionType == EffectActionType.SingleDecrease
-                && resourceEffect.ResourceTypeIdString == ResourceTypeIds.HealthId;
+            var hideEffectFromFighter = valuePoolEffect != null
+                && valuePoolEffect.EffectActionType == EffectActionType.SingleDecrease
+                && valuePoolEffect.ValuePoolTypeIdString == ValuePoolTypeIds.HealthId;
 
             if (hideEffectFromFighter)
             {
                 return;
             }
 
-            var showExpiry = !(resourceEffect != null
-                && resourceEffect.EffectActionType is EffectActionType.SingleDecrease or EffectActionType.SingleIncrease);
+            var showExpiry = !(valuePoolEffect != null
+                && valuePoolEffect.EffectActionType is EffectActionType.SingleDecrease or EffectActionType.SingleIncrease);
 
             var effectMatch = _activeEffects.FirstOrDefault(x => x.Effect == effect);
 
             if (effectMatch != null)
             {
                 var multipleAllowed =
-                    (resourceEffect != null && DoesActionTypeAllowMultiple(resourceEffect.EffectActionType))
+                    (valuePoolEffect != null && DoesActionTypeAllowMultiple(valuePoolEffect.EffectActionType))
                     || effect is IAttributeEffect;
 
                 if (multipleAllowed)

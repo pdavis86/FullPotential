@@ -2,27 +2,27 @@ using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Combat.Events;
-using FullPotential.Standard.Resources;
+using FullPotential.Standard.ValuePools;
 using FullPotential.Standard.SpecialSlots;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class ChargeChangeEventHandler : IEventHandler<ResourceValueChangeEvent>
+    public class ChargeChangeEventHandler : IEventHandler<ValuePoolValueChangeEvent>
     {
         public NetworkLocation Location => NetworkLocation.Client;
 
         public Timing Timing => Timing.Late;
 
-        public UniTask<HandlerResult> HandleEventAsync(ResourceValueChangeEvent eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(ValuePoolValueChangeEvent eventArgs)
         {
-            if (eventArgs.ResourceTypeId != BarrierChargeResource.TypeIdString)
+            if (eventArgs.ValuePoolTypeId != BarrierChargeValuePool.TypeIdString)
             {
                 return UniTask.FromResult(new HandlerResult());
             }
 
-            var remainingCharge = eventArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString);
+            var remainingCharge = eventArgs.LivingEntity.GetValuePoolValue(BarrierChargeValuePool.TypeIdString);
             var showVisuals = remainingCharge > 0;
 
             eventArgs.LivingEntity.Inventory.ToggleEquippedItemVisuals(BarrierSlot.TypeIdString, showVisuals);

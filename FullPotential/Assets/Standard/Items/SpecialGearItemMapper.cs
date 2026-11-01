@@ -37,15 +37,17 @@ namespace FullPotential.Standard.Items
             // todo: zzz v0.6 - Cannot inject IResultFactory as it is not ready to be used yet
             var resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
 
-            var resourceTypeId = properties.GetStringValueOrNull(IResourceConsumer.PropertyKeyResourceTypeId);
+            var valuePoolTypeId = properties.ContainsKey(IValuePoolConsumer.PropertyKeyResourceTypeId)
+                   ? properties[IValuePoolConsumer.PropertyKeyResourceTypeId]
+                   : properties.GetStringValueOrNull(IValuePoolConsumer.PropertyKeyValuePoolTypeId);
 
-            var resourceType = resourceTypeId.IsNullOrWhiteSpace()
+            var valuePoolType = valuePoolTypeId.IsNullOrWhiteSpace()
                 ? null
-                : _typeRegistry.GetRegisteredByTypeId<IResourceType>(resourceTypeId);
+                : _typeRegistry.GetRegisteredByTypeId<IValuePoolType>(valuePoolTypeId);
 
             var specialGear = DependenciesContext.Dependencies.CreateInstance<SpecialGear>();
             specialGear.RegistryType = _typeRegistry.GetRegisteredByTypeId<ISpecialGearType>(itemTypeId);
-            specialGear.ResourceType = resourceType;
+            specialGear.ValuePoolType = valuePoolType;
             specialGear.Attributes = new Dictionary<string, string>
             {
                 { Strength.TypeIdString, resultFactory.ComputeAttribute(components, Strength.TypeIdString).ToString() },

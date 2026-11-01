@@ -32,7 +32,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
                 return UniTask.FromResult(new HandlerResult());
             }
 
-            if (!eventArgs.Fighter.ConsumeResource(reloader, slowDrain: true, isTest: true))
+            if (!eventArgs.Fighter.ConsumeValuePool(reloader, slowDrain: true, isTest: true))
             {
                 return UniTask.FromResult(new HandlerResult());
             }

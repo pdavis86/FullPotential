@@ -25,7 +25,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.TeleportReloader
                 return UniTask.FromResult(new HandlerResult());
             }
 
-            if (!eventArgs.Fighter.ConsumeResource(reloader, true, !NetworkManager.Singleton.IsServer))
+            if (!eventArgs.Fighter.ConsumeValuePool(reloader, true, !NetworkManager.Singleton.IsServer))
             {
                 return UniTask.FromResult(new HandlerResult());
             }

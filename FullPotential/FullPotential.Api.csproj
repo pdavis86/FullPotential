@@ -50,7 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Api\Registry\Gear\ISlotType.cs" />
-    <Compile Include="Assets\Api\CoreTypeIds\ResourceTypeIds.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IPlayerInventory.cs" />
     <Compile Include="Assets\Api\Logging\IAuditorFactory.cs" />
     <Compile Include="Assets\Api\Data\ISaveManager.cs" />
@@ -61,6 +60,8 @@
     <Compile Include="Assets\Api\Data\ISaveable.cs" />
     <Compile Include="Assets\Api\Unity\Constants\ShaderRenderMode.cs" />
     <Compile Include="Assets\Api\GameManagement\Models\SignInResult.cs" />
+    <Compile Include="Assets\Api\CoreTypeIds\ValuePoolTypeIds.cs" />
+    <Compile Include="Assets\Api\Items\IValuePoolConsumer.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\MovementDirection.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingBehaviour.cs" />
     <Compile Include="Assets\Api\Items\ItemFactory.cs" />
@@ -77,9 +78,7 @@
     <Compile Include="Assets\Api\Gameplay\Player\EquippedItem.cs" />
     <Compile Include="Assets\Api\Registry\ILootType.cs" />
     <Compile Include="Assets\Api\EventManagement\IEvent.cs" />
-    <Compile Include="Assets\Api\Items\IResourceConsumer.cs" />
     <Compile Include="Assets\Api\Gameplay\Attributes\Strength.cs" />
-    <Compile Include="Assets\Api\Gameplay\Combat\Events\ResourceValueChangeEvent.cs" />
     <Compile Include="Assets\Api\Items\Base\ItemBase.cs" />
     <Compile Include="Assets\Api\Registry\Gear\ISpecialGearType.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\SerializableKeyValuePairExtensions.cs" />
@@ -91,7 +90,6 @@
     <Compile Include="Assets\Api\EventManagement\IEventHandler.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IConsumerType.cs" />
     <Compile Include="Assets\Api\Gameplay\IPlayerFighter.cs" />
-    <Compile Include="Assets\Api\Input\Events\DefaultInputActions.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\InventoryBase.cs" />
     <Compile Include="Assets\Api\EventManagement\NetworkLocation.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\BufferSerializerExtensions.cs" />
@@ -112,16 +110,17 @@
     <Compile Include="Assets\Api\Registry\Weapons\IAmmunitionType.cs" />
     <Compile Include="Assets\Api\Gameplay\IStoppable.cs" />
     <Compile Include="Assets\Api\GameManagement\Events\GameSettingsUpdatedEventArgs.cs" />
-    <Compile Include="Assets\Api\Registry\Gameplay\IResourceType.cs" />
     <Compile Include="Assets\Api\Localization\TranslationType.cs" />
     <Compile Include="Assets\Api\Gameplay\IPlayerBehaviour.cs" />
     <Compile Include="Assets\Api\Unity\IUnityHelperUtilities.cs" />
     <Compile Include="Assets\Api\GameManagement\Models\GameSettings.cs" />
     <Compile Include="Assets\Api\Registry\IItemStackType.cs" />
+    <Compile Include="Assets\Api\Gameplay\Combat\Events\ValuePoolValueChangeEvent.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\Events\ItemChargePercentageChangeEvent.cs" />
     <Compile Include="Assets\Api\Localization\UnitsType.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\BodyPartTransforms.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\Models\InventoryChangesForClient.cs" />
+    <Compile Include="Assets\Api\Input\DefaultInputActions.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IInventory.cs" />
     <Compile Include="Assets\Api\Utilities\DestroyStoppable.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IAttribute.cs" />
@@ -133,6 +132,7 @@
     <Compile Include="Assets\Api\Unity\Extensions\GameObjectExtensions.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\LocalPlayerSpawnedEvent.cs" />
     <Compile Include="Assets\Api\Localization\ILocalizer.cs" />
+    <Compile Include="Assets\Api\Registry\Gameplay\IValuePoolType.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IAttributeEffect.cs" />
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
     <Compile Include="Assets\Api\Ui\IUiAssistant.cs" />
@@ -163,7 +163,6 @@
     <Compile Include="Assets\Api\Registry\Elements\IElementType.cs" />
     <Compile Include="Assets\Api\Items\LevelOfDetail.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector2Extensions.cs" />
-    <Compile Include="Assets\Api\Registry\Effects\IResourceEffectType.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\PlayerJoinedEvent.cs" />
     <Compile Include="Assets\Api\Registry\IItemVisualsType.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector3Extensions.cs" />
@@ -177,6 +176,7 @@
     <Compile Include="Assets\Api\Registry\Gear\ICraftableType.cs" />
     <Compile Include="Assets\Api\Items\IItemTypeMapping.cs" />
     <Compile Include="Assets\Api\Ioc\Dependency.cs" />
+    <Compile Include="Assets\Api\Registry\Effects\IValuePoolEffectType.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IHasSideEffect.cs" />
     <Compile Include="Assets\Api\Utilities\ActionQueue.cs" />
     <Compile Include="Assets\Api\Scenes\SpawnPoint.cs" />
@@ -206,8 +206,8 @@
     <Compile Include="Assets\Api\Utilities\Extensions\EnumerableExtensions.cs" />
     <Compile Include="Assets\Api\Input\Events\ReloadInputEvent.cs" />
     <Compile Include="Assets\Api\Registry\IHasPrefab.cs" />
-    <Compile Include="Assets\Api\CoreTypeIds\EffectTypeIds.cs" />
     <Compile Include="Assets\Api\CoreTypeIds\HandSlotIds.cs" />
+    <Compile Include="Assets\Api\CoreTypeIds\EffectTypeIds.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\EffectActionType.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -50,7 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\TextMeshProLocalizer.cs" />
-    <Compile Include="Assets\Core\Registry\Resources\Stamina.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DontDestroy.cs" />
     <Compile Include="Assets\Core\Persistence\Local\UserManagement.cs" />
     <Compile Include="Assets\Core\Persistence\Local\Paths.cs" />
@@ -80,6 +79,7 @@
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\LookAtMainCamera.cs" />
     <Compile Include="Assets\Core\Player\PlayerInventory.cs" />
     <Compile Include="Assets\Core\Gameplay\Events\IGeneralEventHandlerGroup.cs" />
+    <Compile Include="Assets\Core\Gameplay\Combat\Events\ValuePoolValueChangeEventDefaultHandler.cs" />
     <Compile Include="Assets\Core\Unity\Static\DefaultSceneLoader.cs" />
     <Compile Include="Assets\Core\Environment\LootInteractable.cs" />
     <Compile Include="Assets\Core\UI\Components\CraftingSelector.cs" />
@@ -87,7 +87,6 @@
     <Compile Include="Assets\Core\GameManagement\Prefabs.cs" />
     <Compile Include="Assets\Core\Gameplay\Crafting\ResultFactory.cs" />
     <Compile Include="Assets\Core\GameManagement\AddressablesManager.cs" />
-    <Compile Include="Assets\Core\Registry\Resources\Health.cs" />
     <Compile Include="Assets\Core\Networking\ClientNetworkTransform.cs" />
     <Compile Include="Assets\Core\GameManagement\Data\LocalGameData.cs" />
     <Compile Include="Assets\Core\GameManagement\GameManager.cs" />
@@ -99,6 +98,7 @@
     <Compile Include="Assets\Core\Gameplay\Inventory\Events\SlotChangeEventDefaultHandler.cs" />
     <Compile Include="Assets\Core\Persistence\Local\SettingsRepository.cs" />
     <Compile Include="Assets\Core\UI\Components\NameAndToggle.cs" />
+    <Compile Include="Assets\Core\Registry\ValuePools\Health.cs" />
     <Compile Include="Assets\Core\UI\Components\SlideOutAlert.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiCraftingTab.cs" />
     <Compile Include="Assets\Core\GameManagement\Data\CharacterSettingKey.cs" />
@@ -123,11 +123,11 @@
     <Compile Include="Assets\Core\Gameplay\Combat\CombatService.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Hurt.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiSlot.cs" />
+    <Compile Include="Assets\Core\Registry\ValuePools\Stamina.cs" />
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsStartup.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectsUi.cs" />
     <Compile Include="Assets\Core\Persistence\Local\DataLoader.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\DestroyOnTriggerEnter.cs" />
-    <Compile Include="Assets\Core\Gameplay\Combat\Events\ResourceValueChangeEventDefaultHandler.cs" />
     <Compile Include="Assets\Core\Persistence\Https\HttpsPersistenceBase.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\DebuggingUi.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\NetworkStats.cs" />

@@ -29,7 +29,7 @@ namespace FullPotential.Api.Gameplay.Player
 
         public bool IsBusy { get; private set; }
 
-        public bool IsConsumingResource { get; private set; }
+        public bool IsConsumingValuePool { get; private set; }
 
         public bool IsIntraActionLooping { get; private set; }
 
@@ -176,12 +176,12 @@ namespace FullPotential.Api.Gameplay.Player
 
         public void StartActiveConsumerBehaviour()
         {
-            IsConsumingResource = true;
+            IsConsumingValuePool = true;
         }
 
         public bool StopActiveConsumerBehaviour()
         {
-            if (!IsConsumingResource)
+            if (!IsConsumingValuePool)
             {
                 return false;
             }
@@ -192,7 +192,7 @@ namespace FullPotential.Api.Gameplay.Player
 
             activeConsumer.StopStoppables();
 
-            IsConsumingResource = false;
+            IsConsumingValuePool = false;
 
             return true;
         }

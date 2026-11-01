@@ -464,35 +464,35 @@ namespace FullPotential.Api.Gameplay.Behaviours
             ApplyInventoryChanges(changes);
         }
 
-        public List<string> GetResourcesInUse()
+        public List<string> GetValuePoolsInUse()
         {
-            var resourcesInUse = new List<string> { ResourceTypeIds.HealthId, ResourceTypeIds.StaminaId };
+            var valuePoolsInUse = new List<string> { ValuePoolTypeIds.HealthId, ValuePoolTypeIds.StaminaId };
 
             foreach (var value in _equippedItems.Values)
             {
-                if (value.Item is IResourceConsumer consumer)
+                if (value.Item is IValuePoolConsumer consumer)
                 {
-                    var resourceId = consumer.ResourceType.TypeId.ToString();
-                    if (!resourcesInUse.Contains(resourceId))
+                    var valuePoolId = consumer.ValuePoolType.TypeId.ToString();
+                    if (!valuePoolsInUse.Contains(valuePoolId))
                     {
-                        resourcesInUse.Add(resourceId);
+                        valuePoolsInUse.Add(valuePoolId);
                     }
 
                     if (value.Item.RegistryType is ISpecialGearType specialGearType)
                     {
-                        var otherResourceIds = specialGearType.ResourceTypeIdsInUse;
-                        foreach (var otherResourceId in otherResourceIds)
+                        var otherValuePoolIds = specialGearType.ValuePoolTypeIdsInUse;
+                        foreach (var otherValuePoolId in otherValuePoolIds)
                         {
-                            if (!resourcesInUse.Contains(otherResourceId))
+                            if (!valuePoolsInUse.Contains(otherValuePoolId))
                             {
-                                resourcesInUse.Add(otherResourceId);
+                                valuePoolsInUse.Add(otherValuePoolId);
                             }
                         }
                     }
                 }
             }
 
-            return resourcesInUse;
+            return valuePoolsInUse;
         }
 
         public void SetEquippedItemVisuals(string slotId, GameObject newObj)

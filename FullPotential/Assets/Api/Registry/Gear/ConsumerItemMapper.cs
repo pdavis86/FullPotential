@@ -42,7 +42,11 @@ namespace FullPotential.Api.Registry.Gear
 
             var consumer = DependenciesContext.Dependencies.CreateInstance<Consumer>();
 
-            consumer.ResourceType = _typeRegistry.GetRegisteredByTypeId<IResourceType>(properties[IResourceConsumer.PropertyKeyResourceTypeId]);
+            var valuePoolTypeId = properties.ContainsKey(IValuePoolConsumer.PropertyKeyResourceTypeId)
+                   ? properties[IValuePoolConsumer.PropertyKeyResourceTypeId]
+                   : properties.GetStringValueOrNull(IValuePoolConsumer.PropertyKeyValuePoolTypeId);
+
+            consumer.ValuePoolType = _typeRegistry.GetRegisteredByTypeId<IValuePoolType>(valuePoolTypeId);
 
             consumer.Attributes = new Dictionary<string, string>
             {

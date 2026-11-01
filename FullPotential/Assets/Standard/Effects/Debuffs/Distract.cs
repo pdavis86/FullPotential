@@ -2,11 +2,11 @@ using System;
 
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Standard.Resources;
+using FullPotential.Standard.ValuePools;
 
 namespace FullPotential.Standard.Effects.Debuffs
 {
-    public class Distract : IResourceEffectType
+    public class Distract : IValuePoolEffectType
     {
         private static readonly Guid Id = new Guid("fb2fcd58-8a90-46de-8368-731773230835");
 
@@ -14,6 +14,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public EffectActionType EffectActionType => EffectActionType.TemporaryMaxDecrease;
 
-        public string ResourceTypeIdString => Mana.TypeIdString;
+        public string ValuePoolTypeIdString => Mana.TypeIdString;
     }
 }

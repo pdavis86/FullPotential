@@ -2,11 +2,11 @@ using System;
 
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Standard.Resources;
+using FullPotential.Standard.ValuePools;
 
 namespace FullPotential.Standard.Effects.Buffs
 {
-    public class Surge : IResourceEffectType
+    public class Surge : IValuePoolEffectType
     {
         private static readonly Guid Id = new Guid("b1edb96d-da2b-49b3-bac3-80c9b1dfe9d6");
 
@@ -14,6 +14,6 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public EffectActionType EffectActionType => EffectActionType.TemporaryMaxIncrease;
 
-        public string ResourceTypeIdString => Energy.TypeIdString;
+        public string ValuePoolTypeIdString => Energy.TypeIdString;
     }
 }

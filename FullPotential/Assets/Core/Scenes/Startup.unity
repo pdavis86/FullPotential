@@ -15949,7 +15949,7 @@ MonoBehaviour:
   _handIconContainerLeft: {fileID: 270164336}
   _handIconContainerRight: {fileID: 289738958}
   _resourceBarsContainer: {fileID: 1720213558}
-  _resourceBarPrefab: {fileID: 6070853217532367212, guid: 885fcf4cc83eb934c8b19213c1e83ef1,
+  _resourceBarPrefab: {fileID: 304277964046646525, guid: 08c65327abc86bd4ab3c899cee1a7164,
     type: 3}
   _ammoLeft: {fileID: 1715200632}
   _ammoRight: {fileID: 1678711891}

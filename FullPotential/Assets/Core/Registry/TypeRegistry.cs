@@ -53,7 +53,7 @@ namespace FullPotential.Core.Registry
 
             _gameplayTypes = new List<Type>
             {
-                typeof(IResourceType),
+                typeof(IValuePoolType),
                 typeof(IAccessoryType),
                 typeof(IAmmunitionType),
                 typeof(IArmorType),

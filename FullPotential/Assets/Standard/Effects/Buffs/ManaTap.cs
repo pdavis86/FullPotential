@@ -2,11 +2,11 @@ using System;
 
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Standard.Resources;
+using FullPotential.Standard.ValuePools;
 
 namespace FullPotential.Standard.Effects.Buffs
 {
-    public class ManaTap : IResourceEffectType, IIsSideEffect
+    public class ManaTap : IValuePoolEffectType, IIsSideEffect
     {
         public const string TypeIdString = "06629efd-6a9b-4627-8b02-37e8dab135a1";
 
@@ -16,6 +16,6 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public EffectActionType EffectActionType => EffectActionType.PeriodicIncrease;
 
-        public string ResourceTypeIdString => Mana.TypeIdString;
+        public string ValuePoolTypeIdString => Mana.TypeIdString;
     }
 }

@@ -138,8 +138,8 @@ namespace FullPotential.Core.Gameplay.Combat
 
             switch (effect)
             {
-                case IResourceEffectType resourceEffect:
-                    ApplyResourceEffect(sourceFighter, itemUsed, resourceEffect, targetFighter, position);
+                case IValuePoolEffectType valuePoolEffect:
+                    ApplyValuePoolEffect(sourceFighter, itemUsed, valuePoolEffect, targetFighter, position);
                     return;
 
                 case IAttributeEffect attributeEffect:
@@ -167,9 +167,9 @@ namespace FullPotential.Core.Gameplay.Combat
 
         public float GetEffectBaseChange(FighterBase sourceFighter, CombatItemBase itemUsed, IEffectType effect, bool isCriticalHit)
         {
-            var resourceEffect = effect as IResourceEffectType;
+            var valuePoolEffect = effect as IValuePoolEffectType;
 
-            var isPeriodic = resourceEffect?.EffectActionType is EffectActionType.PeriodicDecrease or EffectActionType.PeriodicIncrease;
+            var isPeriodic = valuePoolEffect?.EffectActionType is EffectActionType.PeriodicDecrease or EffectActionType.PeriodicIncrease;
 
             float change;
 
@@ -239,8 +239,8 @@ namespace FullPotential.Core.Gameplay.Combat
 
             switch (effect)
             {
-                case IResourceEffectType resourceEffect:
-                    if (resourceEffect.EffectActionType is EffectActionType.PeriodicDecrease or EffectActionType.SingleDecrease or EffectActionType.TemporaryMaxDecrease)
+                case IValuePoolEffectType valuePoolEffect:
+                    if (valuePoolEffect.EffectActionType is EffectActionType.PeriodicDecrease or EffectActionType.SingleDecrease or EffectActionType.TemporaryMaxDecrease)
                     {
                         adjustedChange *= -1;
                     }
@@ -283,27 +283,27 @@ namespace FullPotential.Core.Gameplay.Combat
             return defenceRatio;
         }
 
-        private void ApplyResourceEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IResourceEffectType resourceEffect, FighterBase targetFighter, Vector3? position)
+        private void ApplyValuePoolEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect, FighterBase targetFighter, Vector3? position)
         {
-            switch (resourceEffect.EffectActionType)
+            switch (valuePoolEffect.EffectActionType)
             {
                 case EffectActionType.PeriodicDecrease:
                 case EffectActionType.PeriodicIncrease:
-                    targetFighter.ApplyPeriodicActionToResource(sourceFighter, itemUsed, resourceEffect, position);
+                    targetFighter.ApplyPeriodicActionToValuePool(sourceFighter, itemUsed, valuePoolEffect, position);
                     return;
 
                 case EffectActionType.SingleDecrease:
                 case EffectActionType.SingleIncrease:
-                    targetFighter.ApplySingleValueChangeToResource(sourceFighter, itemUsed, resourceEffect, position);
+                    targetFighter.ApplySingleValueChangeToValuePool(sourceFighter, itemUsed, valuePoolEffect, position);
                     return;
 
                 case EffectActionType.TemporaryMaxDecrease:
                 case EffectActionType.TemporaryMaxIncrease:
-                    targetFighter.ApplyTemporaryMaxActionToResource(sourceFighter, itemUsed, resourceEffect);
+                    targetFighter.ApplyTemporaryMaxActionToValuePool(sourceFighter, itemUsed, valuePoolEffect);
                     return;
 
                 default:
-                    _logger.Error("Not implemented handling for affect type {0}", resourceEffect.EffectActionType);
+                    _logger.Error("Not implemented handling for affect type {0}", valuePoolEffect.EffectActionType);
                     return;
             }
         }

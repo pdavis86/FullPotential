@@ -3,11 +3,11 @@ using System;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Standard.Effects.Buffs;
-using FullPotential.Standard.Resources;
+using FullPotential.Standard.ValuePools;
 
 namespace FullPotential.Standard.Effects.Debuffs
 {
-    public class ManaDrain : IResourceEffectType, IHasSideEffect
+    public class ManaDrain : IValuePoolEffectType, IHasSideEffect
     {
         private static readonly Guid Id = new Guid("e1ab10b2-fcae-4f25-a11f-ac5aeeadbdce");
 
@@ -15,7 +15,7 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public EffectActionType EffectActionType => EffectActionType.PeriodicDecrease;
 
-        public string ResourceTypeIdString => Mana.TypeIdString;
+        public string ValuePoolTypeIdString => Mana.TypeIdString;
 
         public string SideEffectTypeIdString => ManaTap.TypeIdString;
     }

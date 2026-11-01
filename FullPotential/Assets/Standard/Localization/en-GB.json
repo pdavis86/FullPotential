@@ -106,6 +106,16 @@
       "Key": "weapontype.sword",
       "Value": "Sword"
     },
+	
+	
+    {
+      "Key": "valuepooltype.mana",
+      "Value": "Mana"
+    },
+    {
+      "Key": "valuepooltype.energy",
+      "Value": "Energy"
+    },
     
 
     {

@@ -23,13 +23,13 @@ namespace FullPotential.Core.UI.Components
         public Dropdown TypeDropdown;
         public Dropdown SubTypeDropdown;
         public Dropdown HandednessDropdown;
-        public Dropdown ResourceDropdown;
+        public Dropdown ValuePoolDropdown;
         // ReSharper restore UnassignedField.Global
 
         private Dictionary<Type, string> _craftableTypes;
         private Dictionary<IAccessoryType, string> _accessoryTypes;
         private Dictionary<IArmorType, string> _armorTypes;
-        private Dictionary<IResourceType, string> _resourceTypes;
+        private Dictionary<IValuePoolType, string> _valuePoolTypes;
         private Dictionary<IWeaponType, string> _weaponTypes;
         private Dictionary<ISpecialGearType, string> _specialTypes;
         private List<string> _handednessOptions;
@@ -99,9 +99,9 @@ namespace FullPotential.Core.UI.Components
             }
         }
 
-        public string GetResourceTypeId()
+        public string GetValuePoolTypeId()
         {
-            return _resourceTypes.ElementAt(ResourceDropdown.value).Key.TypeId.ToString();
+            return _valuePoolTypes.ElementAt(ValuePoolDropdown.value).Key.TypeId.ToString();
         }
 
         public bool IsTwoHandedSelected()
@@ -114,7 +114,7 @@ namespace FullPotential.Core.UI.Components
         private void UpdateSecondaryDropDowns()
         {
             SubTypeDropdown.ClearOptions();
-            ResourceDropdown.gameObject.SetActive(false);
+            ValuePoolDropdown.gameObject.SetActive(false);
 
             var typeToCraft = GetTypeToCraft();
             if (typeToCraft == typeof(IAccessoryType))
@@ -131,12 +131,12 @@ namespace FullPotential.Core.UI.Components
             }
             else if (typeToCraft == typeof(IConsumerType))
             {
-                SetupResourcesDropDown();
+                SetupValuePoolsDropDown();
             }
             else if (typeToCraft == typeof(ISpecialGearType))
             {
                 SubTypeDropdown.AddOptions(_specialTypes.Select(x => x.Value).ToList());
-                SetupResourcesDropDown();
+                SetupValuePoolsDropDown();
             }
             else
             {
@@ -156,13 +156,13 @@ namespace FullPotential.Core.UI.Components
             HandednessDropdown.gameObject.SetActive(typeToCraft == typeof(IWeaponType) && _optionalTwoHandedWeaponIndexes.Contains(SubTypeDropdown.value));
         }
 
-        private void SetupResourcesDropDown()
+        private void SetupValuePoolsDropDown()
         {
-            var options = _resourceTypes.Select(kvp => kvp.Value).ToList();
+            var options = _valuePoolTypes.Select(kvp => kvp.Value).ToList();
 
-            ResourceDropdown.ClearOptions();
-            ResourceDropdown.AddOptions(options);
-            ResourceDropdown.gameObject.SetActive(true);
+            ValuePoolDropdown.ClearOptions();
+            ValuePoolDropdown.AddOptions(options);
+            ValuePoolDropdown.gameObject.SetActive(true);
         }
 
         private void FillDataVariables()
@@ -187,7 +187,7 @@ namespace FullPotential.Core.UI.Components
                 .ToDictionary(x => x, x => localizer.Translate(x))
                 .OrderByValue();
 
-            _resourceTypes = typeRegistry.GetRegisteredTypes<IResourceType>()
+            _valuePoolTypes = typeRegistry.GetRegisteredTypes<IValuePoolType>()
                 .Where(r => r.IsCraftable)
                 .ToDictionary(x => x, x => localizer.Translate(x))
                 .OrderByValue();

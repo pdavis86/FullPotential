@@ -6,7 +6,7 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Standard.Effects.Buffs
 {
-    public class Regeneration : IResourceEffectType
+    public class Regeneration : IValuePoolEffectType
     {
         private static readonly Guid Id = new Guid("158d1f0e-994d-49f7-a649-33ff336b8309");
 
@@ -14,6 +14,6 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public EffectActionType EffectActionType => EffectActionType.PeriodicIncrease;
 
-        public string ResourceTypeIdString => ResourceTypeIds.HealthId;
+        public string ValuePoolTypeIdString => ValuePoolTypeIds.HealthId;
     }
 }

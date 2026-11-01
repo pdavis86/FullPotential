@@ -6,7 +6,7 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Standard.Effects
 {
-    public class Exhaust : IResourceEffectType
+    public class Exhaust : IValuePoolEffectType
     {
         public const string TypeIdString = "5b6ccdf4-261f-440d-9033-35a63ca6fc52";
 
@@ -16,6 +16,6 @@ namespace FullPotential.Standard.Effects
 
         public EffectActionType EffectActionType => EffectActionType.SingleDecrease;
 
-        public string ResourceTypeIdString => ResourceTypeIds.StaminaId;
+        public string ValuePoolTypeIdString => ValuePoolTypeIds.StaminaId;
     }
 }

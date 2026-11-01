@@ -2,11 +2,11 @@ using System;
 
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Standard.Resources;
+using FullPotential.Standard.ValuePools;
 
 namespace FullPotential.Standard.Effects.Debuffs
 {
-    public class ShortCircuit : IResourceEffectType
+    public class ShortCircuit : IValuePoolEffectType
     {
         private static readonly Guid Id = new Guid("434fc4a7-dcbc-44b8-86d6-5815a42eea0b");
 
@@ -14,6 +14,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public EffectActionType EffectActionType => EffectActionType.TemporaryMaxDecrease;
 
-        public string ResourceTypeIdString => Energy.TypeIdString;
+        public string ValuePoolTypeIdString => Energy.TypeIdString;
     }
 }

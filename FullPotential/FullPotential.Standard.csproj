@@ -55,7 +55,6 @@
     <Compile Include="Assets\Standard\Effects\Elements\Earth.cs" />
     <Compile Include="Assets\Standard\Items\Weapon.cs" />
     <Compile Include="Assets\Standard\ShapeVisuals\WallOfFlames.cs" />
-    <Compile Include="Assets\Standard\Resources\Energy.cs" />
     <Compile Include="Assets\Standard\SpecialGear\Reloader\ConsolidatorReloader\ReloadEventHandler.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Launch.cs" />
     <Compile Include="Assets\Standard\Scenes\Behaviours\ShopInteractable.cs" />
@@ -82,7 +81,6 @@
     <Compile Include="Assets\Standard\Effects\Debuffs\Distract.cs" />
     <Compile Include="Assets\Standard\WeaponVisuals\BasicHammer.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\StepBack.cs" />
-    <Compile Include="Assets\Standard\Resources\Mana.cs" />
     <Compile Include="Assets\Standard\Effects\Exhaust.cs" />
     <Compile Include="Assets\Standard\Targeting\Self.cs" />
     <Compile Include="Assets\Standard\TargetingVisuals\ITargetingVisualsBehaviour.cs" />
@@ -99,11 +97,14 @@
     <Compile Include="Assets\Standard\Items\LootItemMapper.cs" />
     <Compile Include="Assets\Standard\Weapons\Helpers\AttackHelper.cs" />
     <Compile Include="Assets\Standard\Armor\Feet.cs" />
+    <Compile Include="Assets\Standard\ValuePools\Energy.cs" />
+    <Compile Include="Assets\Standard\ValuePools\BarrierChargeValuePool.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Ice.cs" />
     <Compile Include="Assets\Standard\TargetingVisuals\ProjectileFlames.cs" />
     <Compile Include="Assets\Standard\Loot\Shard.cs" />
     <Compile Include="Assets\Standard\ArmorVisuals\LeatherGreaves.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Lethargy.cs" />
+    <Compile Include="Assets\Standard\ValuePools\Mana.cs" />
     <Compile Include="Assets\Standard\Effects\Movement\Attract.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\Poison.cs" />
     <Compile Include="Assets\Standard\Armor\Helm.cs" />
@@ -138,7 +139,6 @@
     <Compile Include="Assets\Standard\AccessoryVisuals\LeatherBelt.cs" />
     <Compile Include="Assets\Standard\Effects\Support\Float.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Water.cs" />
-    <Compile Include="Assets\Standard\Resources\BarrierChargeResource.cs" />
     <Compile Include="Assets\Standard\Weapons\Hammer.cs" />
     <Compile Include="Assets\Standard\ArmorVisuals\LeatherBoots.cs" />
     <Compile Include="Assets\Standard\Effects\Debuffs\ShortCircuit.cs" />

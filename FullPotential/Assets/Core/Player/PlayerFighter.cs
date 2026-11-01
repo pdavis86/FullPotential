@@ -137,7 +137,7 @@ namespace FullPotential.Core.Player
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
             _shaderUtilities = DependenciesContext.Dependencies.GetService<IShaderUtilities>();
 
-            _eventBus.SubscribeBehaviour<ResourceValueChangeEvent>(
+            _eventBus.SubscribeBehaviour<ValuePoolValueChangeEvent>(
                 this,
                 e => e.LivingEntity == this,
                 _ =>
@@ -244,7 +244,7 @@ namespace FullPotential.Core.Player
         [ServerRpc]
         private void RespawnServerRpc()
         {
-            SetResourceValuesForRespawn();
+            SetValuePoolValuesForRespawn();
 
             AliveState = LivingEntityState.Respawning;
             _eventBus.Publish(new AliveStateChangeEvent(this, true, true));
@@ -475,18 +475,18 @@ namespace FullPotential.Core.Player
                 _entityName.Value = Username;
             }
 
-            var health = playerData.ValuePools.FirstOrDefault(kvp => kvp.Key == ResourceTypeIds.HealthId);
+            var health = playerData.ValuePools.FirstOrDefault(kvp => kvp.Key == ValuePoolTypeIds.HealthId);
             if (health.Value == 0)
             {
-                playerData.ValuePools[ResourceTypeIds.HealthId] = GetResourceMax(ResourceTypeIds.HealthId);
+                playerData.ValuePools[ValuePoolTypeIds.HealthId] = GetValuePoolMax(ValuePoolTypeIds.HealthId);
             }
 
             // todo: These should come from the server
-            foreach (var resource in GetResources())
+            foreach (var valuePool in GetValuePools())
             {
-                var key = resource.TypeId.ToString();
-                var value = playerData.ValuePools.FirstOrDefault(x => x.Key == resource.TypeId.ToString()).Value;
-                _resourceValueCache[key] = ClampResourceValue(key, value);
+                var key = valuePool.TypeId.ToString();
+                var value = playerData.ValuePools.FirstOrDefault(x => x.Key == valuePool.TypeId.ToString()).Value;
+                _valuePoolValueCache[key] = ClampValuePoolValue(key, value);
             }
         }
 
@@ -642,7 +642,7 @@ namespace FullPotential.Core.Player
             {
                 CharacterId = CharacterId,
                 Settings = _characterSettings.ToDictionary(x => x.Key, x => x.Value),
-                ValuePools = GetResourceDictionaryForSave()
+                ValuePools = GetValuePoolDictionaryForSave()
             };
 
             IsDirty = false;

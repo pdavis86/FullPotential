@@ -80,7 +80,7 @@ namespace FullPotential.Core.Ui.Behaviours
         private Image _equippedRightHandBackground;
         private EquippedSummary _equippedRightHandSummary;
         private Text _equippedRightHandAmmo;
-        private IEnumerable<IResourceType> _resources;
+        private IEnumerable<IValuePoolType> _valuePools;
 
         private EventSubscription<LocalPlayerSpawnedEvent> _localPlayerSpawnedSubscription;
 
@@ -116,7 +116,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _equippedLeftHandSummary.gameObject.SetActive(false);
             _equippedRightHandSummary.gameObject.SetActive(false);
 
-            SetupResourceBars();
+            SetupValuePoolBars();
         }
 
         // ReSharper disable once UnusedMember.Local
@@ -286,9 +286,9 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private Color GetEffectColor(IEffectType effect)
         {
-            if (effect is IResourceEffectType resourceEffect)
+            if (effect is IValuePoolEffectType valuePoolEffect)
             {
-                if (resourceEffect.EffectActionType is EffectActionType.SingleIncrease
+                if (valuePoolEffect.EffectActionType is EffectActionType.SingleIncrease
                     or EffectActionType.PeriodicIncrease
                     or EffectActionType.TemporaryMaxIncrease)
                 {
@@ -306,16 +306,16 @@ namespace FullPotential.Core.Ui.Behaviours
             return new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
         }
 
-        private void SetupResourceBars()
+        private void SetupValuePoolBars()
         {
-            _resources = _typeRegistry.GetRegisteredTypes<IResourceType>();
+            _valuePools = _typeRegistry.GetRegisteredTypes<IValuePoolType>();
 
-            foreach (var resource in _resources)
+            foreach (var valuePool in _valuePools)
             {
                 AddSliderBar(
-                    resource.TypeId.ToString(),
-                    resource.BackgroundColor.ToUnityColor(),
-                    resource.TextColor.ToUnityColor());
+                    valuePool.TypeId.ToString(),
+                    valuePool.BackgroundColor.ToUnityColor(),
+                    valuePool.TextColor.ToUnityColor());
             }
         }
 
@@ -323,7 +323,7 @@ namespace FullPotential.Core.Ui.Behaviours
         {
             _localPlayerSpawnedSubscription = _eventBus.Subscribe<LocalPlayerSpawnedEvent>(HandleLocalPlayerSpawnAsync);
 
-            _eventBus.SubscribeBehaviour<ResourceValueChangeEvent>(this, e => e.LivingEntity == _playerFighter, HandleResourceValueChangeAsync);
+            _eventBus.SubscribeBehaviour<ValuePoolValueChangeEvent>(this, e => e.LivingEntity == _playerFighter, HandleValuePoolValueChangeAsync);
             _eventBus.SubscribeBehaviour<SlotChangeEvent>(this, e => e.LivingEntity == _playerFighter, e => HandleAttackOrReloadAsync(e.LivingEntity, e.SlotId, true, true, true));
             _eventBus.SubscribeBehaviour<AttackReleaseInputEvent>(this, e => e.Fighter == _playerFighter, e => HandleAttackOrReloadAsync(e.Fighter, e.SlotId, false, true, false));
             _eventBus.SubscribeBehaviour<SlotBusyChangeEvent>(this, e => e.Fighter == _playerFighter, e => HandleAttackOrReloadAsync(e.Fighter, e.SlotId, false, true, false));
@@ -344,27 +344,27 @@ namespace FullPotential.Core.Ui.Behaviours
             return UniTask.FromResult(new HandlerResult());
         }
 
-        private void UpdateResourceBars(LivingEntityBase livingEntity)
+        private void UpdateValuePoolBars(LivingEntityBase livingEntity)
         {
-            var resourcesInUse = livingEntity.Inventory.GetResourcesInUse();
+            var valuePoolsInUse = livingEntity.Inventory.GetValuePoolsInUse();
 
-            foreach (var resource in _resources)
+            foreach (var valuePool in _valuePools)
             {
-                var id = resource.TypeId.ToString();
+                var id = valuePool.TypeId.ToString();
 
-                ToggleSliderBar(id, resourcesInUse.Contains(id));
+                ToggleSliderBar(id, valuePoolsInUse.Contains(id));
 
-                var value = livingEntity.GetResourceValue(id);
-                var max = livingEntity.GetResourceMax(id);
+                var value = livingEntity.GetValuePoolValue(id);
+                var max = livingEntity.GetValuePoolMax(id);
 
                 UpdateSliderBar(id, value, max);
             }
         }
 
-        private UniTask HandleResourceValueChangeAsync(ResourceValueChangeEvent eventArgs)
+        private UniTask HandleValuePoolValueChangeAsync(ValuePoolValueChangeEvent eventArgs)
         {
             UpdateSliderBar(
-                eventArgs.ResourceTypeId,
+                eventArgs.ValuePoolTypeId,
                 eventArgs.NewValue,
                 eventArgs.MaxValue);
 
@@ -388,7 +388,7 @@ namespace FullPotential.Core.Ui.Behaviours
                     UpdateHandDescription(equippedHandSummary, item);
                 }
 
-                UpdateResourceBars(fighter);
+                UpdateValuePoolBars(fighter);
             }
 
             if (slotId is not HandSlotIds.LeftHand and not HandSlotIds.RightHand)

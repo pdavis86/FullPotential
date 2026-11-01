@@ -34,20 +34,12 @@
 	
 	
     {
-      "Key": "resourcetype.health",
+      "Key": "valuepooltype.health",
       "Value": "Health"
     },
     {
-      "Key": "resourcetype.stamina",
+      "Key": "valuepooltype.stamina",
       "Value": "Stamina"
-    },
-    {
-      "Key": "resourcetype.mana",
-      "Value": "Mana"
-    },
-    {
-      "Key": "resourcetype.energy",
-      "Value": "Energy"
     },
     
 	

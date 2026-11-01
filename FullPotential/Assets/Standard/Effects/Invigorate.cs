@@ -6,7 +6,7 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Standard.Effects
 {
-    public class Invigorate : IResourceEffectType
+    public class Invigorate : IValuePoolEffectType
     {
         public const string TypeIdString = "f7843e9c-4914-4e80-a86f-aaf202262b63";
 
@@ -16,6 +16,6 @@ namespace FullPotential.Standard.Effects
 
         public EffectActionType EffectActionType => EffectActionType.SingleIncrease;
 
-        public string ResourceTypeIdString => ResourceTypeIds.StaminaId;
+        public string ValuePoolTypeIdString => ValuePoolTypeIds.StaminaId;
     }
 }

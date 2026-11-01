@@ -6,7 +6,7 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Standard.Effects.Buffs
 {
-    public class LifeTap : IResourceEffectType, IIsSideEffect
+    public class LifeTap : IValuePoolEffectType, IIsSideEffect
     {
         public const string TypeIdString = "eabd80bd-e4aa-4d58-be24-9ec8106b2c9c";
 
@@ -16,6 +16,6 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public EffectActionType EffectActionType => EffectActionType.PeriodicIncrease;
 
-        public string ResourceTypeIdString => ResourceTypeIds.HealthId;
+        public string ValuePoolTypeIdString => ValuePoolTypeIds.HealthId;
     }
 }

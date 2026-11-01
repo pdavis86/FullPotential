@@ -6,7 +6,7 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Standard.Effects.Debuffs
 {
-    public class Fear : IResourceEffectType
+    public class Fear : IValuePoolEffectType
     {
         private static readonly Guid Id = new Guid("cc67431d-09d7-4c62-9fde-2dc5aa596ac7");
 
@@ -14,6 +14,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public EffectActionType EffectActionType => EffectActionType.TemporaryMaxDecrease;
 
-        public string ResourceTypeIdString => ResourceTypeIds.HealthId;
+        public string ValuePoolTypeIdString => ValuePoolTypeIds.HealthId;
     }
 }

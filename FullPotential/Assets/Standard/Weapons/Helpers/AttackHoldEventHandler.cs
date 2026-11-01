@@ -47,7 +47,7 @@ namespace FullPotential.Standard.Weapons.Helpers
 
             if (item is Consumer consumer)
             {
-                if (!eventArgs.Fighter.ConsumeResource(consumer, isTest: true))
+                if (!eventArgs.Fighter.ConsumeValuePool(consumer, isTest: true))
                 {
                     return UniTask.FromResult(new HandlerResult());
                 }

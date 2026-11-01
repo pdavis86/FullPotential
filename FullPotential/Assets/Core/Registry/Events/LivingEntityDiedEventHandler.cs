@@ -8,15 +8,15 @@ using FullPotential.Api.Gameplay.Combat.Events;
 
 namespace FullPotential.Core.Registry.Events
 {
-    public class LivingEntityDiedEventHandler : IEventHandler<ResourceValueChangeEvent>
+    public class LivingEntityDiedEventHandler : IEventHandler<ValuePoolValueChangeEvent>
     {
         public NetworkLocation Location => NetworkLocation.Server;
 
         public Timing Timing => Timing.Late;
 
-        public UniTask<HandlerResult> HandleEventAsync(ResourceValueChangeEvent eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(ValuePoolValueChangeEvent eventArgs)
         {
-            if (eventArgs.NewValue > 0 || eventArgs.ResourceTypeId != ResourceTypeIds.HealthId)
+            if (eventArgs.NewValue > 0 || eventArgs.ValuePoolTypeId != ValuePoolTypeIds.HealthId)
             {
                 return UniTask.FromResult(new HandlerResult());
             }

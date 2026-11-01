@@ -1,8 +1,8 @@
-﻿using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Gameplay.Effects;
 
 namespace FullPotential.Api.Registry.Effects
 {
-    public interface IResourceEffectType : IEffectType
+    public interface IValuePoolEffectType : IEffectType
     {
         /// <summary>
         /// The underlying result of applying this effect
@@ -10,8 +10,8 @@ namespace FullPotential.Api.Registry.Effects
         EffectActionType EffectActionType { get; }
 
         /// <summary>
-        /// The Id of the resource type which will be affected
+        /// The Id of the valuePool type which will be affected
         /// </summary>
-        string ResourceTypeIdString { get; }
+        string ValuePoolTypeIdString { get; }
     }
 }

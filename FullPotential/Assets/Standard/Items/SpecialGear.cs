@@ -17,11 +17,11 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Items
 {
-    public class SpecialGear : CombatItemBase, IResourceConsumer, IHasItemVisuals
+    public class SpecialGear : CombatItemBase, IValuePoolConsumer, IHasItemVisuals
     {
         private readonly ITypeRegistry _typeRegistry;
 
-        public IResourceType ResourceType { get; set; }
+        public IValuePoolType ValuePoolType { get; set; }
 
         public IItemVisualsType Visuals { get; set; }
 
@@ -50,9 +50,9 @@ namespace FullPotential.Standard.Items
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(RegistryType))}: {localizer.Translate(RegistryType)}" + "\n");
             }
 
-            if (ResourceType != null)
+            if (ValuePoolType != null)
             {
-                var resourceConsumptionType = localizer.Translate(ResourceType);
+                var valuePoolConsumptionType = localizer.Translate(ValuePoolType);
 
                 AppendToDescription(
                     sb,
@@ -60,7 +60,7 @@ namespace FullPotential.Standard.Items
                     Attributes.GetIntValue(Efficiency.TypeIdString),
                     nameof(Efficiency),
                     Consumer.AliasSegmentConsumer,
-                    $"{GetResourceCost()} {resourceConsumptionType}");
+                    $"{GetValuePoolCost()} {valuePoolConsumptionType}");
             }
 
             return sb.ToString().Trim();

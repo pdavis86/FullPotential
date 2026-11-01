@@ -72,7 +72,8 @@ namespace FullPotential.Api.Items
             {
                 item = _typeRegistry.GetItemTypeMapping<ISpecialGearType>().CreateNew();
             }
-            else if (model.Properties.GetStringValueOrNull(IResourceConsumer.PropertyKeyResourceTypeId) != null)
+            else if (model.Properties.GetStringValueOrNull(IValuePoolConsumer.PropertyKeyResourceTypeId) != null
+                || model.Properties.GetStringValueOrNull(IValuePoolConsumer.PropertyKeyValuePoolTypeId) != null)
             {
                 item = _typeRegistry.GetItemTypeMapping<IConsumerType>().CreateNew();
             }
@@ -217,10 +218,14 @@ namespace FullPotential.Api.Items
                 }
             }
 
-            if (item is IResourceConsumer consumer)
+            if (item is IValuePoolConsumer consumer)
             {
-                consumer.ResourceType = _typeRegistry.GetRegisteredTypes<IResourceType>()
-                    .First(x => x.TypeId.ToString() == item.Properties[IResourceConsumer.PropertyKeyResourceTypeId]);
+                var valuePoolTypeId = item.Properties.ContainsKey(IValuePoolConsumer.PropertyKeyResourceTypeId)
+                   ? item.Properties[IValuePoolConsumer.PropertyKeyResourceTypeId]
+                   : item.Properties.GetStringValueOrNull(IValuePoolConsumer.PropertyKeyValuePoolTypeId);
+
+                consumer.ValuePoolType = _typeRegistry.GetRegisteredTypes<IValuePoolType>()
+                    .First(x => x.TypeId.ToString() == valuePoolTypeId);
             }
 
             if (item is IHasItemVisuals itemWithVisuals)

@@ -9,7 +9,7 @@ using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Standard.Resources;
+using FullPotential.Standard.ValuePools;
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
@@ -23,7 +23,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
         public string SlotIdString => SpecialSlots.BarrierSlot.TypeIdString;
 
-        public IEnumerable<string> ResourceTypeIdsInUse { get; } = new[] { Energy.TypeIdString, BarrierChargeResource.TypeIdString };
+        public IEnumerable<string> ValuePoolTypeIdsInUse { get; } = new[] { Energy.TypeIdString, BarrierChargeValuePool.TypeIdString };
 
         public string OverrideItemDescription(ItemBase item, ILocalizer localizer, LevelOfDetail levelOfDetail)
         {
@@ -38,8 +38,8 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(specialGear.RegistryType))}: {localizer.Translate(this)}" + "\n");
             }
 
-            var resourceConsumptionType = localizer.Translate(specialGear.ResourceType);
-            sb.Append($"{localizer.Translate(TranslationType.Item, nameof(specialGear.ResourceType))}: {resourceConsumptionType}" + "\n");
+            var valuePoolConsumptionType = localizer.Translate(specialGear.ValuePoolType);
+            sb.Append($"{localizer.Translate(TranslationType.Item, nameof(specialGear.ValuePoolType))}: {valuePoolConsumptionType}" + "\n");
 
             specialGear.AppendToDescription(
                 sb,

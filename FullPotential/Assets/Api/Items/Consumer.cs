@@ -21,7 +21,7 @@ using UnityEngine;
 
 namespace FullPotential.Api.Items
 {
-    public class Consumer : CombatItemBase, IHasTargetingAndShape, IResourceConsumer, IHasCharge, IHasItemVisuals
+    public class Consumer : CombatItemBase, IHasTargetingAndShape, IValuePoolConsumer, IHasCharge, IHasItemVisuals
     {
         public const string AliasSegmentConsumer = "consumer";
 
@@ -38,7 +38,7 @@ namespace FullPotential.Api.Items
         public IItemVisualsType TargetingVisualsType { get; set; }
         public IItemVisualsType ShapeVisualsType { get; set; }
         public IShapeType ShapeType { get; set; }
-        public IResourceType ResourceType { get; set; }
+        public IValuePoolType ValuePoolType { get; set; }
 
         public string VisualsTypeId { get; set; }
 
@@ -60,17 +60,17 @@ namespace FullPotential.Api.Items
             return returnValue;
         }
 
-        public float GetResourceChangePerSecond()
+        public float GetValuePoolChangePerSecond()
         {
             var healthEffects = EffectTypes
-                .Where(e => e is IResourceEffectType se && se.ResourceTypeIdString == ResourceTypeIds.HealthId)
-                .Select(e => (IResourceEffectType)e)
+                .Where(e => e is IValuePoolEffectType se && se.ValuePoolTypeIdString == ValuePoolTypeIds.HealthId)
+                .Select(e => (IValuePoolEffectType)e)
                 .ToList();
 
-            var resourceChange = GetSingleEffectValueChange();
+            var valuePoolChange = GetSingleEffectValueChange();
 
             var singleEffects = healthEffects.Where(se => se.EffectActionType is EffectActionType.SingleDecrease or EffectActionType.SingleIncrease);
-            var singleChangeSum = singleEffects.Sum(_ => resourceChange);
+            var singleChangeSum = singleEffects.Sum(_ => valuePoolChange);
 
             var periodicChange = GetPeriodicEffectValueChange();
 
@@ -110,7 +110,7 @@ namespace FullPotential.Api.Items
                 sb.Append($"{localizer.Translate(TranslationType.Item, nameof(EffectTypes))}: {string.Join(", ", localisedEffects)}\n");
             }
 
-            var resourceConsumptionType = localizer.Translate(ResourceType);
+            var valuePoolConsumptionType = localizer.Translate(ValuePoolType);
 
             AppendToDescription(
                 sb,
@@ -118,7 +118,7 @@ namespace FullPotential.Api.Items
                 Attributes.GetIntValue(Efficiency.TypeIdString),
                 nameof(Efficiency),
                 AliasSegmentConsumer,
-                $"{GetResourceCost()} {resourceConsumptionType}");
+                $"{GetValuePoolCost()} {valuePoolConsumptionType}");
 
             AppendToDescription(
                 sb,
@@ -165,7 +165,7 @@ namespace FullPotential.Api.Items
                 localizer.Translate(GetEffectDuration()),
                 UnitsType.Time);
 
-            var changePerSecond = GetResourceChangePerSecond();
+            var changePerSecond = GetValuePoolChangePerSecond();
             if (changePerSecond != 0)
             {
                 AppendToDescription(
@@ -227,19 +227,19 @@ namespace FullPotential.Api.Items
                 return;
             }
 
-            if (ResourceType.ItemInHandDefaultPrefab == null)
+            if (ValuePoolType.ItemInHandDefaultPrefab == null)
             {
-                _logger.Warn("No default prefab exists for resource type '{0}'", ResourceType);
+                _logger.Warn("No default prefab exists for valuePool type '{0}'", ValuePoolType);
                 return;
             }
 
             _typeRegistry.LoadAddessable<GameObject>(
-                ResourceType.ItemInHandDefaultPrefab,
+                ValuePoolType.ItemInHandDefaultPrefab,
                 prefab =>
                 {
                     if (prefab == null)
                     {
-                        _logger.Warn("No prefab found for resource type '{0}'", ResourceType);
+                        _logger.Warn("No prefab found for valuePool type '{0}'", ValuePoolType);
                         return;
                     }
 

@@ -2,11 +2,11 @@ using System;
 
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
-using FullPotential.Standard.Resources;
+using FullPotential.Standard.ValuePools;
 
 namespace FullPotential.Standard.Effects.Buffs
 {
-    public class Focus : IResourceEffectType
+    public class Focus : IValuePoolEffectType
     {
         private static readonly Guid Id = new Guid("d19cde18-e5dd-4fc2-b14f-da7daa5014d4");
 
@@ -14,6 +14,6 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public EffectActionType EffectActionType => EffectActionType.TemporaryMaxIncrease;
 
-        public string ResourceTypeIdString => Mana.TypeIdString;
+        public string ValuePoolTypeIdString => Mana.TypeIdString;
     }
 }

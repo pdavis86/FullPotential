@@ -6,7 +6,7 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Standard.Effects
 {
-    public class Heal : IResourceEffectType
+    public class Heal : IValuePoolEffectType
     {
         public const string TypeIdString = "091e97b6-e3c1-4fa0-961c-cbf831e755b5";
 
@@ -16,6 +16,6 @@ namespace FullPotential.Standard.Effects
 
         public EffectActionType EffectActionType => EffectActionType.SingleIncrease;
 
-        public string ResourceTypeIdString => ResourceTypeIds.HealthId;
+        public string ValuePoolTypeIdString => ValuePoolTypeIds.HealthId;
     }
 }

@@ -16,7 +16,7 @@ namespace FullPotential.Api.Gameplay.Crafting
         ItemBase GetCraftedItem(
             Type craftableType,
             string typeId,
-            string resourceTypeId,
+            string valuePoolTypeId,
             bool isTwoHanded,
             string itemName,
             IList<ItemBase> components);

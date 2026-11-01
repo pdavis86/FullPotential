@@ -8,23 +8,23 @@ using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.SpecialGear.Barrier;
 using FullPotential.Standard.SpecialSlots;
 
-namespace FullPotential.Standard.Resources
+namespace FullPotential.Standard.ValuePools
 {
-    public class BarrierChargeResource : IResourceType
+    public class BarrierChargeValuePool : IValuePoolType
     {
         public const string TypeIdString = "9f026e17-d313-4402-9da6-c5b002e26c64";
 
         private static readonly Guid Id = new Guid(TypeIdString);
-        private static readonly Color ResourceBackgroundColor = Color.FromArgb(185, 36, 158); // Purple
-        private static readonly Color ResourceTextColor = Color.FromArgb(255, 255, 255); // White
+        private static readonly Color ValuePoolBackgroundColor = Color.FromArgb(185, 36, 158); // Purple
+        private static readonly Color ValuePoolTextColor = Color.FromArgb(255, 255, 255); // White
 
         private readonly IAuditor _logger;
 
         public Guid TypeId => Id;
 
-        public Color BackgroundColor => ResourceBackgroundColor;
+        public Color BackgroundColor => ValuePoolBackgroundColor;
 
-        public Color TextColor => ResourceTextColor;
+        public Color TextColor => ValuePoolTextColor;
 
         public bool IsCraftable => false;
 
@@ -32,21 +32,21 @@ namespace FullPotential.Standard.Resources
 
         public Action<LivingEntityBase> ReplenishBehaviour => PerformReplenish;
 
-        public BarrierChargeResource(IAuditorFactory auditorFactory)
+        public BarrierChargeValuePool(IAuditorFactory auditorFactory)
         {
             _logger = auditorFactory.Create(this);
         }
 
         private void PerformReplenish(LivingEntityBase livingEntity)
         {
-            if (livingEntity.GetResourceValue(TypeIdString) >= livingEntity.GetResourceMax(TypeIdString))
+            if (livingEntity.GetValuePoolValue(TypeIdString) >= livingEntity.GetValuePoolMax(TypeIdString))
             {
                 return;
             }
 
             if (livingEntity is not FighterBase targetFighter)
             {
-                _logger.Error("LivingEntity was not a fighter. Cannot replenish barrier resource");
+                _logger.Error("LivingEntity was not a fighter. Cannot replenish barrier valuePool");
                 return;
             }
 
@@ -70,12 +70,12 @@ namespace FullPotential.Standard.Resources
                 }
             }
 
-            //Consume item resource (-2 to overcome replenish of 1)
-            livingEntity.TriggerResourceValueUpdate(equippedBarrier.ResourceType.TypeId.ToString(), -2, targetFighter.name, null);
+            //Consume item valuePool (-2 to overcome replenish of 1)
+            livingEntity.TriggerValuePoolValueUpdate(equippedBarrier.ValuePoolType.TypeId.ToString(), -2, targetFighter.name, null);
 
-            //Replenish barrier resource
-            //todo: zzz v0.8 - trait-based resource recharge
-            livingEntity.TriggerResourceValueUpdate(TypeIdString, Barrier.GetRechargeRate(equippedBarrier), targetFighter.name, null);
+            //Replenish barrier valuePool
+            //todo: zzz v0.8 - trait-based valuePool recharge
+            livingEntity.TriggerValuePoolValueUpdate(TypeIdString, Barrier.GetRechargeRate(equippedBarrier), targetFighter.name, null);
         }
     }
 }

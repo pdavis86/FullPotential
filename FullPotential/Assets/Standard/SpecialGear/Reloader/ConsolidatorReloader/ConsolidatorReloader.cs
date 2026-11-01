@@ -5,7 +5,7 @@ using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Gear;
-using FullPotential.Standard.Resources;
+using FullPotential.Standard.ValuePools;
 
 namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 {
@@ -19,7 +19,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
 
         public string SlotIdString => SpecialSlots.RangedWeaponReloaderSlot.TypeIdString;
 
-        public IEnumerable<string> ResourceTypeIdsInUse { get; } = new[] { Energy.TypeIdString };
+        public IEnumerable<string> ValuePoolTypeIdsInUse { get; } = new[] { Energy.TypeIdString };
 
         public string OverrideItemDescription(ItemBase item, ILocalizer localizer, LevelOfDetail levelOfDetail)
         {

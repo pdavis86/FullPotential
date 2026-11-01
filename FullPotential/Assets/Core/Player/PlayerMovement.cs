@@ -157,7 +157,7 @@ namespace FullPotential.Core.Player
                 return;
             }
 
-            _playerFighter.IsSprinting = moveVal != Vector2.zero && _playerFighter.GetResourceValue(ResourceTypeIds.StaminaId) >= _playerFighter.GetStaminaCost();
+            _playerFighter.IsSprinting = moveVal != Vector2.zero && _playerFighter.GetValuePoolValue(ValuePoolTypeIds.StaminaId) >= _playerFighter.GetStaminaCost();
         }
 
         private void MoveAndLook(Vector2 moveVal, Vector2 lookVal)

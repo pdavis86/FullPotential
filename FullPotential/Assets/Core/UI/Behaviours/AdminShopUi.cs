@@ -259,7 +259,7 @@ namespace FullPotential.Core.UI.Behaviours
             return _resultFactory.GetCraftedItem(
                 typeToCraft,
                 _craftingSelector.GetSubTypeId(typeToCraft),
-                _craftingSelector.GetResourceTypeId(),
+                _craftingSelector.GetValuePoolTypeId(),
                 _craftingSelector.IsTwoHandedSelected(),
                 _itemNameInputField.text,
                 new List<ItemBase> { component });
@@ -286,7 +286,7 @@ namespace FullPotential.Core.UI.Behaviours
                 itemData.ToJson(),
                 craftableType.Name,
                 _craftingSelector.GetSubTypeId(craftableType),
-                _craftingSelector.GetResourceTypeId(),
+                _craftingSelector.GetValuePoolTypeId(),
                 _craftingSelector.IsTwoHandedSelected(),
                 _itemNameInputField.text);
 

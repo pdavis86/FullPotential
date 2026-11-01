@@ -94,10 +94,10 @@ namespace FullPotential.Core.Ui.Behaviours
             var componentIds = string.Join(',', _components.Select(x => x.Id));
             var selectedType = _craftingSelector.GetTypeToCraft();
             var selectedSubType = _craftingSelector.GetSubTypeId(selectedType);
-            var resourceTypeId = _craftingSelector.GetResourceTypeId();
+            var valuePoolTypeId = _craftingSelector.GetValuePoolTypeId();
             var isTwoHanded = _craftingSelector.IsTwoHandedSelected();
 
-            _playerBehaviour.CraftItemServerRpc(componentIds, selectedType.ToString(), selectedSubType, resourceTypeId, isTwoHanded, _craftName.text);
+            _playerBehaviour.CraftItemServerRpc(componentIds, selectedType.ToString(), selectedSubType, valuePoolTypeId, isTwoHanded, _craftName.text);
         }
 
         // ReSharper disable once MemberCanBePrivate.Global
@@ -192,7 +192,7 @@ namespace FullPotential.Core.Ui.Behaviours
             var craftedItem = _resultFactory.GetCraftedItem(
                 craftableType,
                 _craftingSelector.GetSubTypeId(craftableType),
-                _craftingSelector.GetResourceTypeId(),
+                _craftingSelector.GetValuePoolTypeId(),
                 _craftingSelector.IsTwoHandedSelected(),
                 null,
                 _components

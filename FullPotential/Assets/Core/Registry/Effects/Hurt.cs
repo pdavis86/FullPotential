@@ -6,7 +6,7 @@ using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Core.Registry.Effects
 {
-    public class Hurt : IResourceEffectType
+    public class Hurt : IValuePoolEffectType
     {
         private static readonly Guid Id = new Guid(EffectTypeIds.HurtId);
 
@@ -14,6 +14,6 @@ namespace FullPotential.Core.Registry.Effects
 
         public EffectActionType EffectActionType => EffectActionType.SingleDecrease;
 
-        public string ResourceTypeIdString => ResourceTypeIds.HealthId;
+        public string ValuePoolTypeIdString => ValuePoolTypeIds.HealthId;
     }
 }

@@ -43,7 +43,7 @@ namespace FullPotential.Standard.SpecialGear.Reloader.ConsolidatorReloader
                 return new HandlerResult(NextAction.Cancel);
             }
 
-            if (!eventArgs.Fighter.ConsumeResource(reloader))
+            if (!eventArgs.Fighter.ConsumeValuePool(reloader))
             {
                 return new HandlerResult();
             }

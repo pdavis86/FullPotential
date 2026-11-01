@@ -6,14 +6,14 @@ using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Logging;
-using FullPotential.Standard.Resources;
+using FullPotential.Standard.ValuePools;
 using FullPotential.Standard.SpecialSlots;
 
 // ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.SpecialGear.Barrier
 {
-    public class HealthChangeEventHandler : IEventHandler<ResourceValueChangeEvent>
+    public class HealthChangeEventHandler : IEventHandler<ValuePoolValueChangeEvent>
     {
         public const string CustomDataKeyLastHit = "LastHit";
 
@@ -28,9 +28,9 @@ namespace FullPotential.Standard.SpecialGear.Barrier
             _logger = auditorFactory.Create(this);
         }
 
-        public UniTask<HandlerResult> HandleEventAsync(ResourceValueChangeEvent eventArgs)
+        public UniTask<HandlerResult> HandleEventAsync(ValuePoolValueChangeEvent eventArgs)
         {
-            if (eventArgs.ResourceTypeId != ResourceTypeIds.HealthId
+            if (eventArgs.ValuePoolTypeId != ValuePoolTypeIds.HealthId
                 || eventArgs.Change >= 0
                 || eventArgs.SourceEntityName == eventArgs.LivingEntity.name)
             {
@@ -44,7 +44,7 @@ namespace FullPotential.Standard.SpecialGear.Barrier
                 return UniTask.FromResult(new HandlerResult());
             }
 
-            var barrierCharge = eventArgs.LivingEntity.GetResourceValue(BarrierChargeResource.TypeIdString);
+            var barrierCharge = eventArgs.LivingEntity.GetValuePoolValue(BarrierChargeValuePool.TypeIdString);
 
             if (barrierCharge <= 0)
             {
@@ -54,18 +54,18 @@ namespace FullPotential.Standard.SpecialGear.Barrier
 
             barrier.SetCustomData(CustomDataKeyLastHit, DateTime.UtcNow.ToString("u"));
 
-            eventArgs.LivingEntity.TriggerResourceValueUpdate(BarrierChargeResource.TypeIdString, eventArgs.Change, eventArgs.SourceEntityName, eventArgs.SourceItemName);
+            eventArgs.LivingEntity.TriggerValuePoolValueUpdate(BarrierChargeValuePool.TypeIdString, eventArgs.Change, eventArgs.SourceEntityName, eventArgs.SourceItemName);
 
             if (barrierCharge < Math.Abs(eventArgs.Change))
             {
                 _logger.Debug("Barrier nearly depleted. Taking partial damage");
 
-                var updatedEventArgs = new ResourceValueChangeEvent(
+                var updatedEventArgs = new ValuePoolValueChangeEvent(
                     eventArgs.LivingEntity,
-                    eventArgs.ResourceTypeId,
+                    eventArgs.ValuePoolTypeId,
                     eventArgs.NewValue,
                     eventArgs.Change + barrierCharge,
-                    eventArgs.LivingEntity.GetResourceMax(eventArgs.ResourceTypeId),
+                    eventArgs.LivingEntity.GetValuePoolMax(eventArgs.ValuePoolTypeId),
                     eventArgs.SourceEntityName,
                     eventArgs.SourceItemName);
 

@@ -34,7 +34,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private readonly Dictionary<string, SlotStatus> _slotStatuses = new Dictionary<string, SlotStatus>();
 
-        private DelayedAction _consumeResource;
+        private DelayedAction _consumeValuePool;
 
         #endregion
 
@@ -77,7 +77,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             base.Start();
 
             // todo: how do we add DelayedAction instances from mods?
-            _consumeResource = new DelayedAction(.5f, () =>
+            _consumeValuePool = new DelayedAction(.5f, () =>
             {
                 foreach (var kvp in _slotStatuses)
                 {
@@ -95,7 +95,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            _consumeResource.TryPerformAction();
+            _consumeValuePool.TryPerformAction();
         }
 
         // ReSharper restore UnusedMemberHierarchy.Global
@@ -113,12 +113,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #endregion
 
-        public override bool IsConsumingResource(string typeId)
+        public override bool IsConsumingValuePool(string typeId)
         {
             return _slotStatuses.Any(
-                kvp => kvp.Value.IsConsumingResource
-                && Inventory.GetItemInSlot(kvp.Key) is IResourceConsumer consumer
-                && consumer.ResourceType.TypeId.ToString() == typeId);
+                kvp => kvp.Value.IsConsumingValuePool
+                && Inventory.GetItemInSlot(kvp.Key) is IValuePoolConsumer consumer
+                && consumer.ValuePoolType.TypeId.ToString() == typeId);
         }
 
         public SlotStatus GetSlotStatus(string slotId)
@@ -167,27 +167,27 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return false;
         }
 
-        public bool ConsumeResource(IResourceConsumer resourceConsumerUsingItem, bool slowDrain = false, bool isTest = false)
+        public bool ConsumeValuePool(IValuePoolConsumer valuePoolConsumerUsingItem, bool slowDrain = false, bool isTest = false)
         {
-            var resourceCost = resourceConsumerUsingItem.GetResourceCost();
-            var resourceTypeId = resourceConsumerUsingItem.ResourceType.TypeId.ToString();
+            var valuePoolCost = valuePoolConsumerUsingItem.GetValuePoolCost();
+            var valuePoolTypeId = valuePoolConsumerUsingItem.ValuePoolType.TypeId.ToString();
 
             if (slowDrain)
             {
-                // todo: zzz v0.8 - trait-based resource cost?
-                resourceCost = (int)Math.Ceiling(resourceCost / 10f) + 1;
+                // todo: zzz v0.8 - trait-based valuePool cost?
+                valuePoolCost = (int)Math.Ceiling(valuePoolCost / 10f) + 1;
             }
 
-            var currentValue = GetResourceValue(resourceTypeId);
+            var currentValue = GetValuePoolValue(valuePoolTypeId);
 
-            if (currentValue < resourceCost)
+            if (currentValue < valuePoolCost)
             {
                 return false;
             }
 
             if (!isTest)
             {
-                TriggerResourceValueUpdate(resourceTypeId, -resourceCost, name, resourceConsumerUsingItem.Name);
+                TriggerValuePoolValueUpdate(valuePoolTypeId, -valuePoolCost, name, valuePoolConsumerUsingItem.Name);
             }
 
             return true;
@@ -195,14 +195,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void CheckIfActiveConsumerNeedsToStop(SlotStatus slotStatus)
         {
-            if (!slotStatus.IsConsumingResource)
+            if (!slotStatus.IsConsumingValuePool)
             {
                 return;
             }
 
             var consumer = Inventory.GetItemInSlot<Consumer>(slotStatus.SlotId);
 
-            if (ConsumeResource(consumer, consumer.TargetingType.IsContinuous))
+            if (ConsumeValuePool(consumer, consumer.TargetingType.IsContinuous))
             {
                 return;
             }

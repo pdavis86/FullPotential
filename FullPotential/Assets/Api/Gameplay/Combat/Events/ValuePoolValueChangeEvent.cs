@@ -3,11 +3,11 @@ using FullPotential.Api.Gameplay.Behaviours;
 
 namespace FullPotential.Api.Gameplay.Combat.Events
 {
-    public readonly struct ResourceValueChangeEvent : IEvent
+    public readonly struct ValuePoolValueChangeEvent : IEvent
     {
         public LivingEntityBase LivingEntity { get; }
 
-        public string ResourceTypeId { get; }
+        public string ValuePoolTypeId { get; }
 
         public int NewValue { get; }
 
@@ -19,9 +19,9 @@ namespace FullPotential.Api.Gameplay.Combat.Events
 
         public string SourceItemName { get; }
 
-        public ResourceValueChangeEvent(
+        public ValuePoolValueChangeEvent(
             LivingEntityBase livingEntity,
-            string resourceTypeId,
+            string valuePoolTypeId,
             int newValue,
             int change,
             int maxValue,
@@ -29,7 +29,7 @@ namespace FullPotential.Api.Gameplay.Combat.Events
             string sourceItemName)
         {
             LivingEntity = livingEntity;
-            ResourceTypeId = resourceTypeId;
+            ValuePoolTypeId = valuePoolTypeId;
             NewValue = newValue;
             Change = change;
             MaxValue = maxValue;
