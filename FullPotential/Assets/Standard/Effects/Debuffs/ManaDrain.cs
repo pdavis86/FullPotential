@@ -3,6 +3,7 @@ using System;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
+using FullPotential.Api.Registry.Effects;
 using FullPotential.Standard.Effects.Buffs;
 using FullPotential.Standard.ValuePools;
 
@@ -16,6 +17,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public ValuePoolTypeId ValuePoolTypeId => Mana.Id;
 
-        public string SideEffectTypeIdString => ManaTap.TypeIdString;
+        public EffectTypeId SideEffectTypeId => ManaTap.Id;
     }
 }

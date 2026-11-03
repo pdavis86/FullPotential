@@ -92,7 +92,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 if (sourceFighter != null && effect is IHasSideEffect withSideEffect)
                 {
-                    var sideEffect = _typeRegistry.GetRegisteredByTypeId<IEffectType>(withSideEffect.SideEffectTypeIdString);
+                    var sideEffect = _typeRegistry.GetRegisteredByTypeId<IEffectType>(withSideEffect.SideEffectTypeId);
                     ApplyEffect(null, itemUsed, sideEffect, sourceFighter.GameObject, position);
                 }
             }

@@ -4,6 +4,7 @@ using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
+using FullPotential.Api.Registry.Effects;
 using FullPotential.Standard.Effects.Buffs;
 
 namespace FullPotential.Standard.Effects.Debuffs
@@ -16,6 +17,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public ValuePoolTypeId ValuePoolTypeId => ValuePoolTypeIds.HealthId;
 
-        public string SideEffectTypeIdString => LifeTap.TypeIdString;
+        public EffectTypeId SideEffectTypeId => LifeTap.Id;
     }
 }

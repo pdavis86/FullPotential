@@ -33,6 +33,7 @@ using Unity.Collections;
 using Unity.Netcode;
 
 using UnityEngine;
+using FullPotential.Api.Registry.Effects;
 
 
 namespace FullPotential.Api.Gameplay.Behaviours
@@ -183,7 +184,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private void AddOrUpdateEffectClientRpc(string effectTypeId, int change, DateTime expiry, ClientRpcParams clientRpcParams)
         {
             // todo: Does not work for clients joining mid-battle
-            var effect = _typeRegistry.GetRegisteredByTypeId<IEffectType>(effectTypeId);
+            var effect = _typeRegistry.GetRegisteredByTypeId<IEffectType>(EffectTypeId.FromString(effectTypeId));
             AddOrUpdateEffect(effect, change, expiry);
         }
 

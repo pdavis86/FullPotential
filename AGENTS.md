@@ -1,3 +1,7 @@
+## Project files
+
+When adding a source file, add it to the appropriate explicit `<Compile Include>` list in the generated `.csproj` as well.
+
 ## Git
 
 Codex may use read-only Git commands to inspect the repository, including:
