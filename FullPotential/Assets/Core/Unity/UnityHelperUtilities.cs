@@ -4,7 +4,6 @@ using FullPotential.Api.Unity;
 
 using UnityEngine;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Unity
 {

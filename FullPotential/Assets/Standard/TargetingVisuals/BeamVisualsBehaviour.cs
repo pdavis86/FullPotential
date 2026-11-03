@@ -1,6 +1,5 @@
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.TargetingVisuals
 {
@@ -16,20 +15,17 @@ namespace FullPotential.Standard.TargetingVisuals
 
         public bool IsLocalOwner { get; set; }
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _cylinderParentTransform = transform.GetChild(0);
             _cylinderTransform = _cylinderParentTransform.GetChild(0);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             AdjustForFieldOfView();
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnDestroy()
         {
             Destroy(_cylinderParentTransform.gameObject);

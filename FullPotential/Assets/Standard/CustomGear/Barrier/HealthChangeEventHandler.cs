@@ -9,7 +9,6 @@ using FullPotential.Api.Logging;
 using FullPotential.Standard.ValuePools;
 using FullPotential.Standard.SpecialSlots;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.CustomGear.Barrier
 {

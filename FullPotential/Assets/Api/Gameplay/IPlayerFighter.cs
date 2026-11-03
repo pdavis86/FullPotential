@@ -4,7 +4,6 @@ using FullPotential.Models.LivingEntity;
 
 using UnityEngine;
 
-// ReSharper disable UnusedMember.Global
 
 namespace FullPotential.Api.Gameplay
 {

@@ -33,8 +33,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-// ReSharper disable VirtualMemberNeverOverridden.Global
-// ReSharper disable MemberCanBePrivate.Global
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
@@ -47,19 +45,14 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Inspector Variables
 #pragma warning disable 0649
-        // ReSharper disable InconsistentNaming
 
-        // ReSharper disable UnassignedField.Global
         [SerializeField] private TextMeshProUGUI _nameTag;
         [SerializeField] protected Transform _graphicsTransform;
-        // ReSharper restore UnassignedField.Global
 
-        // ReSharper restore InconsistentNaming
 #pragma warning restore 0649
         #endregion
 
         #region Protected variables
-        // ReSharper disable InconsistentNaming
 
         protected string _lastDamageSourceName;
         protected string _lastDamageItemName;
@@ -77,7 +70,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected InventoryBase _inventory;
 
-        // ReSharper restore InconsistentNaming
         #endregion
 
         #region Other Variables
@@ -113,7 +105,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         #endregion
 
         #region Unity Events Handlers
-        // ReSharper disable UnusedMemberHierarchy.Global
 
         protected virtual void Awake()
         {
@@ -162,7 +153,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             ReplenishAndConsume();
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnCollisionEnter(Collision collision)
         {
             HandleCollision(collision);
@@ -177,12 +167,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
             base.OnDestroy();
         }
 
-        // ReSharper restore UnusedMemberHierarchy.Global
         #endregion
 
         #region ClientRpc calls
 
-        // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
         private void UpdateHealthValueClientRpc(int newValue, ClientRpcParams clientRpcParams)
         {
@@ -190,7 +178,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             UpdateValuePoolValue(ValuePoolTypeIds.HealthId, newValue, null, null);
         }
 
-        // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
         private void AddOrUpdateEffectClientRpc(string effectTypeId, int change, DateTime expiry, ClientRpcParams clientRpcParams)
         {
@@ -199,7 +186,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             AddOrUpdateEffect(effect, change, expiry);
         }
 
-        // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
         protected void ShowHudAlertClientRpc(
             string announcement,
@@ -210,7 +196,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _eventBus.Publish(new ShowUiAlertEvent(announcement, new[] { argument1, argument2 }));
         }
 
-        // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
         protected void NotifyEntityDiedClientRpc(string lastDamageSourceName, string lastDamageItemName, ClientRpcParams clientRpcParams)
         {

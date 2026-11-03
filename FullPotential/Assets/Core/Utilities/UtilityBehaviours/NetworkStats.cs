@@ -4,7 +4,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 //NOTE: Copied and adapted from the NetworkStats class from https://github.com/Unity-Technologies/com.unity.multiplayer.samples.coop/releases/tag/v0.2.1
 
@@ -18,11 +17,9 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
         // The client receives that pong response and stops its time.
         // The RPC value is using a moving average, so we don't have a value that moves too much, but is still reactive to RTT changes.
 
-        // ReSharper disable FieldCanBeMadeReadOnly.Local
         [SerializeField]
         [Tooltip("The interval to send ping RPCs to calculate the RTT. The bigger the number, the less reactive the stat will be to RTT changes")]
         private float _pingIntervalSeconds = 0.1f;
-        // ReSharper restore FieldCanBeMadeReadOnly.Local
 
         public float LastRtt { get; private set; }
 
@@ -45,7 +42,6 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
             _pongClientParams.Send.TargetClientIds = new[] { OwnerClientId };
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             if (IsServer)
@@ -64,7 +60,6 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
             }
         }
 
-        // ReSharper disable once UnusedParameter.Local
 #pragma warning disable CS0618 // Type or member is obsolete
         [ServerRpc(RequireOwnership = false)]
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -74,7 +69,6 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
             PongClientRpc(pingId, _pongClientParams);
         }
 
-        // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
         private void PongClientRpc(int pingId, ClientRpcParams clientRpcParams)
         {

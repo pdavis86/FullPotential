@@ -11,19 +11,15 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
 
 namespace FullPotential.Standard.Scenes.Behaviours
 {
     public class SceneObjectsLevel001 : NetworkBehaviour, ISceneBehaviour
     {
 #pragma warning disable 0649
-        // ReSharper disable FieldCanBeMadeReadOnly.Local
         [SerializeField] private GameObject _enemyPrefab;
         [SerializeField] private float _spawnVariationMin = -4f;
         [SerializeField] private float _spawnVariationMax = 4f;
-        // ReSharper restore FieldCanBeMadeReadOnly.Local
 #pragma warning restore 0649
 
         private IGameManager _gameManager;
@@ -40,11 +36,9 @@ namespace FullPotential.Standard.Scenes.Behaviours
         {
             get => _attributes;
 
-            // ReSharper disable once UnusedMember.Global
             set => _attributes = value;
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _gameManager = DependenciesContext.Dependencies.GetService<IGameManager>();
@@ -52,7 +46,6 @@ namespace FullPotential.Standard.Scenes.Behaviours
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             _unityHelperUtilities.GetObjectAtRoot(GameObjectNames.SceneCanvas).SetActive(true);

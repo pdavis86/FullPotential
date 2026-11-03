@@ -38,7 +38,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Ui.Behaviours
 {
@@ -86,7 +85,6 @@ namespace FullPotential.Core.Ui.Behaviours
 
         #region Unity Events Handlers
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
@@ -119,7 +117,6 @@ namespace FullPotential.Core.Ui.Behaviours
             SetupValuePoolBars();
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void Update()
         {
             UpdateActiveEffects();

@@ -3,8 +3,6 @@ using FullPotential.Api.Items;
 
 using UnityEngine;
 
-// ReSharper disable UnusedMemberInSuper.Global
-// ReSharper disable UnusedMember.Global
 
 namespace FullPotential.Api.Registry.Shapes
 {

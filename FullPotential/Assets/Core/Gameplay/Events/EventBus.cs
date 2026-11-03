@@ -10,7 +10,6 @@ using FullPotential.Api.Logging;
 
 using Unity.Netcode;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Gameplay.Events
 {

@@ -2,7 +2,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-// ReSharper disable UnusedParameter.Global
 
 namespace FullPotential.Api.Gameplay
 {

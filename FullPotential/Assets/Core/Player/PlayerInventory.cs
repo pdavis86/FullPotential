@@ -17,7 +17,6 @@ using FullPotential.Models.LivingEntity;
 
 using Unity.Netcode;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 using FullPotential.Api.CoreTypeIds;
 
@@ -30,7 +29,6 @@ namespace FullPotential.Core.Player
 
         #region Unity Events Handlers
 
-        // ReSharper disable once UnusedMember.Local
         protected override void Awake()
         {
             base.Awake();
@@ -50,7 +48,6 @@ namespace FullPotential.Core.Player
 
         #endregion
 
-        // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
         private void EquipItemClientRpc(string itemId, string slotId, ClientRpcParams clientRpcParams)
         {

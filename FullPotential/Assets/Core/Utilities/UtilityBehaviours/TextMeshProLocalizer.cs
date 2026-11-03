@@ -7,7 +7,6 @@ using TMPro;
 
 using UnityEngine;
 
-// ReSharper disable once UnusedType.Global
 
 namespace FullPotential.Core.Utilities.UtilityBehaviours
 {
@@ -19,10 +18,8 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
         private IAuditor _logger;
         private ILocalizer _localizer;
 
-        // ReSharper disable once UnassignedField.Global
         public string TranslationId;
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _textComponent = GetComponent<TextMeshProUGUI>();
@@ -31,7 +28,6 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
             if (TranslationId.IsNullOrWhiteSpace())

@@ -6,7 +6,6 @@ using FullPotential.Standard.Weapons.Events;
 
 using Unity.Netcode;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 using FullPotential.Api.CoreTypeIds;
 

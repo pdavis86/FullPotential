@@ -17,7 +17,6 @@ using UnityEngine;
 
 namespace FullPotential.Standard.Targeting
 {
-    // ReSharper disable once UnusedType.Global
     public class ProjectileBehaviour : NetworkBehaviour, ITargetingBehaviour
     {
         private IAuditor _logger;
@@ -34,7 +33,6 @@ namespace FullPotential.Standard.Targeting
 
         private readonly NetworkVariable<FixedString4096Bytes> _visualsPrefabAddress = new NetworkVariable<FixedString4096Bytes>();
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
@@ -44,7 +42,6 @@ namespace FullPotential.Standard.Targeting
             _visualsPrefabAddress.OnValueChanged += HandleVisualsPrefabAddressValueChanged;
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             if (!IsServer)
@@ -74,7 +71,6 @@ namespace FullPotential.Standard.Targeting
                     ?.PrefabAddress ?? string.Empty;
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnTriggerEnter(Collider other)
         {
             if (!IsServer)

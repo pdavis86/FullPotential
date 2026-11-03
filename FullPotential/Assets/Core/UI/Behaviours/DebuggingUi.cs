@@ -8,8 +8,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
 
 namespace FullPotential.Core.Ui.Behaviours
 {
@@ -26,13 +24,11 @@ namespace FullPotential.Core.Ui.Behaviours
         private GameObject _playerObj;
         private NetworkStats _networkStats;
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             if (!Debug.isDebugBuild)
@@ -47,7 +43,6 @@ namespace FullPotential.Core.Ui.Behaviours
             InvokeRepeating(nameof(GetFps), 1, 1);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnGUI()
         {
             var networkStats = GetNetworkStats();

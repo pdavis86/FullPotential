@@ -2,8 +2,6 @@
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnassignedField.Global
 
 namespace FullPotential.Core.GameManagement
 {

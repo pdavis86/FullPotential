@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Gameplay.Tooltips
 {

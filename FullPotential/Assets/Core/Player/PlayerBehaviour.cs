@@ -39,7 +39,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Player
 {
@@ -81,7 +80,6 @@ namespace FullPotential.Core.Player
 
         #region Unity Event handlers
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _playerFighter = GetComponent<PlayerFighter>();
@@ -110,7 +108,6 @@ namespace FullPotential.Core.Player
             }
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             if (!IsOwner)
@@ -136,7 +133,6 @@ namespace FullPotential.Core.Player
             Camera.main.fieldOfView = gameSettings.FieldOfView;
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             CheckForInteractable();
@@ -156,7 +152,6 @@ namespace FullPotential.Core.Player
                 HandleInventoryChangeAsync);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnDisable()
         {
             _eventBus.UnsubscribeBehaviour(this);
@@ -183,67 +178,56 @@ namespace FullPotential.Core.Player
 
         #region Input Event Handlers
 
-        // ReSharper disable once UnusedMember.Local
         private void OnOpenCharacterMenu()
         {
             _toggleCharacterMenu = true;
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnCancel()
         {
             _toggleGameMenu = true;
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnAttackDownLeft()
         {
             HandleAttackDown(HandSlotIds.LeftHand);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnAttackHoldLeft()
         {
             HandleAttackHold(HandSlotIds.LeftHand);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnAttackReleaseLeft()
         {
             HandleAttackRelease(HandSlotIds.LeftHand);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnAttackDownRight()
         {
             HandleAttackDown(HandSlotIds.RightHand);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnAttackHoldRight()
         {
             HandleAttackHold(HandSlotIds.RightHand);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnAttackReleaseRight()
         {
             HandleAttackRelease(HandSlotIds.RightHand);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnReloadLeft()
         {
             HandleReload(HandSlotIds.LeftHand);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnReloadRight()
         {
             HandleReload(HandSlotIds.RightHand);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnInteract()
         {
             if (IsCharacterInputDisabled())
@@ -266,7 +250,6 @@ namespace FullPotential.Core.Player
             }
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnShowCursorStart()
         {
             if (IsCharacterInputDisabled())
@@ -278,7 +261,6 @@ namespace FullPotential.Core.Player
             _userInterface.DrawingPad.SetActive(true);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnShowCursorStop()
         {
             _userInterface.HudOverlay.ToggleDrawingMode(false);
@@ -409,7 +391,6 @@ namespace FullPotential.Core.Player
 
         #region ClientRpc calls
 
-        // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
         public void ShowHealthChangeClientRpc(Vector3 position, int change, bool isCritical, ClientRpcParams clientRpcParams)
         {

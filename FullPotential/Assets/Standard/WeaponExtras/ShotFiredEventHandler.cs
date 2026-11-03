@@ -7,7 +7,6 @@ using FullPotential.Standard.Weapons.Events;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.WeaponExtras
 {

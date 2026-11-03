@@ -18,7 +18,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Local
 
 using FullPotential.Api.CoreTypeIds;
 
@@ -199,7 +198,6 @@ namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
 
         private class MyInventory : InventoryBase
         {
-            // ReSharper disable UnusedMember.Local
 
             public Dictionary<string, ItemBase> Items => _items;
 

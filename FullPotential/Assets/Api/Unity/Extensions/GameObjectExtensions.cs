@@ -4,7 +4,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-// ReSharper disable UnusedMember.Global
 
 namespace FullPotential.Api.Unity.Extensions
 {

@@ -6,17 +6,12 @@ using UnityEngine.UI;
 
 namespace FullPotential.Core.UI.Components
 {
-    // ReSharper disable ClassNeverInstantiated.Global
 
     public class NameAndValueSlider : MonoBehaviour
     {
-        // ReSharper disable MemberCanBePrivate.Global
-        // ReSharper disable UnassignedField.Global
         public string Id;
         public Text Name;
         public Slider Slider;
-        // ReSharper restore MemberCanBePrivate.Global
-        // ReSharper restore UnassignedField.Global
 
 #pragma warning disable 0649
         [SerializeField] private Text _value;
@@ -24,7 +19,6 @@ namespace FullPotential.Core.UI.Components
 
         private ILocalizer _localizer;
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             Slider.onValueChanged.AddListener(SliderOnValueChanged);

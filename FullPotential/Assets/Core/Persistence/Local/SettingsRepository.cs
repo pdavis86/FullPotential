@@ -8,7 +8,6 @@ using FullPotential.Core.Localization;
 
 using UnityEngine;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Persistence.Local
 {

@@ -13,7 +13,6 @@ using FullPotential.Standard.SpecialSlots;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.CustomGear.Reloader
 {

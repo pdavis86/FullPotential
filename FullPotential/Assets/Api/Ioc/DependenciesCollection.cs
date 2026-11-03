@@ -6,7 +6,6 @@ using System.Reflection;
 
 using UnityEngine;
 
-// ReSharper disable UnusedMember.Global
 
 namespace FullPotential.Api.Ioc
 {

@@ -13,7 +13,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-// ReSharper disable UnusedParameter.Local
 
 namespace FullPotential.Core.Persistence
 {

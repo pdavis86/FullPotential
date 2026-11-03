@@ -31,7 +31,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Player
 {
@@ -66,7 +65,6 @@ namespace FullPotential.Core.Player
         #endregion
 
         #region Inspector Variables
-        // ReSharper disable UnassignedField.Global
 #pragma warning disable 0649
         [SerializeField] private Behaviour[] _behavioursToDisable;
         [SerializeField] private Behaviour[] _behavioursForRespawn;
@@ -77,7 +75,6 @@ namespace FullPotential.Core.Player
         [SerializeField] private BarSlider _healthSlider;
         public GameObject InFrontOfPlayer;
 #pragma warning restore 0649
-        // ReSharper restore UnassignedField.Global
         #endregion
 
         #region Properties
@@ -123,7 +120,6 @@ namespace FullPotential.Core.Player
 
         #region Unity Event Handlers
 
-        // ReSharper disable once UnusedMember.Local
         protected override void Awake()
         {
             base.Awake();
@@ -159,7 +155,6 @@ namespace FullPotential.Core.Player
             HealthBarSlider = _healthSlider;
         }
 
-        // ReSharper disable once UnusedMember.Local
         protected override async void Start()
         {
             base.Start();
@@ -205,7 +200,6 @@ namespace FullPotential.Core.Player
             }
         }
 
-        // ReSharper disable once UnusedMember.Global
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
@@ -279,7 +273,6 @@ namespace FullPotential.Core.Player
 
         #region ClientRpc calls
 
-        // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
         private void SpawnLootChestClientRpc(string id, Vector3 position, ClientRpcParams clientRpcParams)
         {
@@ -297,7 +290,6 @@ namespace FullPotential.Core.Player
             lootScript.UnclaimedLootId = id;
         }
 
-        // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
         private void PlayerSpawnStateChangeClientRpc(LivingEntityState state, Vector3 position, Quaternion rotation, ClientRpcParams clientRpcParams)
         {
@@ -319,7 +311,6 @@ namespace FullPotential.Core.Player
                 case LivingEntityState.Respawning:
                     var bodyMaterialForRespawn = _bodyMeshRenderer.material;
                     _shaderUtilities.ChangeRenderMode(bodyMaterialForRespawn, ShaderRenderMode.Fade);
-                    // ReSharper disable once Unity.PreferAddressByIdToGraphicsParams
                     bodyMaterialForRespawn.SetColor("_BaseColor", new Color(1f, 1f, 1f, 0.2f));
                     ApplyMaterial(bodyMaterialForRespawn);
 
@@ -334,7 +325,6 @@ namespace FullPotential.Core.Player
             }
         }
 
-        // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
         private void NowOkToQuitClientRpc(bool isDisconnecting, ClientRpcParams clientRpcParams)
         {

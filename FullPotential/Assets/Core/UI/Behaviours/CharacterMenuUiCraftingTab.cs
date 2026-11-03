@@ -16,7 +16,6 @@ using FullPotential.Core.UI.Components;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Ui.Behaviours
 {
@@ -41,7 +40,6 @@ namespace FullPotential.Core.Ui.Behaviours
         private IResultFactory _resultFactory;
         private ILocalizer _localizer;
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _playerFighter = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerFighter>();
@@ -60,13 +58,11 @@ namespace FullPotential.Core.Ui.Behaviours
             _craftingSelector.HandednessDropdown.onValueChanged.AddListener(HandednessOnValueChanged);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
             ResetUi();
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnDisable()
         {
             _componentsContainer.transform.DestroyChildren();
@@ -100,7 +96,6 @@ namespace FullPotential.Core.Ui.Behaviours
             _playerBehaviour.CraftItemServerRpc(componentIds, selectedType.ToString(), selectedSubType, valuePoolTypeId, isTwoHanded, _craftName.text);
         }
 
-        // ReSharper disable once MemberCanBePrivate.Global
         public void AddComponent(string itemId)
         {
             var item = _playerFighter.Inventory.GetItemWithId<CombatItemBase>(itemId);
@@ -114,7 +109,6 @@ namespace FullPotential.Core.Ui.Behaviours
             _components.Add(item);
         }
 
-        // ReSharper disable once MemberCanBePrivate.Global
         public void RemoveComponent(string itemId)
         {
             var item = _components.FirstOrDefault(x => x.Id == itemId);

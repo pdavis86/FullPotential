@@ -2,7 +2,6 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 
-// ReSharper disable UnusedMemberInSuper.Global
 
 namespace FullPotential.Api.Items
 {

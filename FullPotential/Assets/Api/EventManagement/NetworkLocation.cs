@@ -1,4 +1,3 @@
-// ReSharper disable UnusedMember.Global
 
 namespace FullPotential.Api.EventManagement
 {

@@ -4,7 +4,6 @@ using FullPotential.Api.Unity.Constants;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-// ReSharper disable Unity.PreferAddressByIdToGraphicsParams
 
 namespace FullPotential.Core.Unity
 {

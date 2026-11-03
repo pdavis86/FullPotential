@@ -9,7 +9,6 @@ using Unity.Netcode;
 
 using UnityEngine.InputSystem;
 
-// ReSharper disable UnusedType.Global
 
 namespace FullPotential.Standard.Scenes.Behaviours
 {
@@ -19,7 +18,6 @@ namespace FullPotential.Standard.Scenes.Behaviours
         private ILocalizer _localizer;
         private IUnityHelperUtilities _unityHelperUtilities;
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _gameManager = DependenciesContext.Dependencies.GetService<IGameManager>();

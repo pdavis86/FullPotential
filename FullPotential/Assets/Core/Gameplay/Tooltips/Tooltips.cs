@@ -2,7 +2,6 @@
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Gameplay.Tooltips
 {
@@ -15,7 +14,6 @@ namespace FullPotential.Core.Gameplay.Tooltips
         private Vector3 _underOffset;
         private Vector3 _leftOffset;
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             if (_instance != null && _instance != this)
@@ -30,7 +28,6 @@ namespace FullPotential.Core.Gameplay.Tooltips
             gameObject.SetActive(false);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             if (gameObject.activeSelf)
@@ -46,7 +43,6 @@ namespace FullPotential.Core.Gameplay.Tooltips
             }
         }
 
-        // ReSharper disable once MemberCanBePrivate.Global
         public void Show(string tooltipText)
         {
             const int padding = 15;
@@ -59,7 +55,6 @@ namespace FullPotential.Core.Gameplay.Tooltips
             _leftOffset = new Vector3(-_rect.sizeDelta.x - 1, 1);
         }
 
-        // ReSharper disable once MemberCanBePrivate.Global
         public void Hide()
         {
             gameObject.SetActive(false);

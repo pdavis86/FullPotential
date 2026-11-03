@@ -13,21 +13,16 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-// ReSharper disable MemberCanBePrivate.Global
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
     public abstract class FighterBase : LivingEntityBase, IFighter, IMoveable
     {
         #region Inspector Variables
-        // ReSharper disable UnassignedField.Global
-        // ReSharper disable InconsistentNaming
 
         public PositionTransforms Positions;
         public BodyPartTransforms BodyParts;
 
-        // ReSharper restore UnassignedField.Global
-        // ReSharper restore InconsistentNaming
         #endregion
 
         #region Other Variables
@@ -57,7 +52,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         #endregion
 
         #region Unity Events Handlers
-        // ReSharper disable UnusedMemberHierarchy.Global
 
         protected override void Awake()
         {
@@ -98,7 +92,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _consumeValuePool.TryPerformAction();
         }
 
-        // ReSharper restore UnusedMemberHierarchy.Global
         #endregion
 
         #region ClientRpc calls

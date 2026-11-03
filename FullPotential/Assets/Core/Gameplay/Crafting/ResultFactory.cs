@@ -18,7 +18,6 @@ using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Registry;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Gameplay.Crafting
 {

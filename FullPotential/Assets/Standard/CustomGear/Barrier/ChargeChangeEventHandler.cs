@@ -5,7 +5,6 @@ using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Standard.ValuePools;
 using FullPotential.Standard.SpecialSlots;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 using FullPotential.Api.CoreTypeIds;
 

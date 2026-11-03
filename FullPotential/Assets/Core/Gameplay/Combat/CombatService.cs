@@ -29,7 +29,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Gameplay.Combat
 {

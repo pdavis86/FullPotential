@@ -4,7 +4,6 @@ using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Ui
 {

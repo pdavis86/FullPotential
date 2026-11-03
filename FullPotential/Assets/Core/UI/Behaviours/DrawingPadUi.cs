@@ -13,7 +13,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 using FullPotential.Api.CoreTypeIds;
 
@@ -27,10 +26,8 @@ namespace FullPotential.Core.UI.Behaviours
         private const int MinimumMarkers = 4;
         private const int DistanceTolerance = 20;
 
-        // ReSharper disable InconsistentNaming
         private const float _lineThickness = 1f;
         private const float _minDistanceToDraw = .1f;
-        // ReSharper restore InconsistentNaming
 
 #pragma warning disable 0649
         [SerializeField] private Material _drawMaterial;
@@ -57,7 +54,6 @@ namespace FullPotential.Core.UI.Behaviours
         private string _itemId;
         private SlotId? _slotId;
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _canvasRenderer = GetComponent<CanvasRenderer>();
@@ -73,7 +69,6 @@ namespace FullPotential.Core.UI.Behaviours
             _drawingService = DependenciesContext.Dependencies.GetService<IDrawingService>();
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             Draw();

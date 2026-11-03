@@ -12,7 +12,6 @@ using FullPotential.Core.UI.Events;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.UI.Behaviours
 {
@@ -33,7 +32,6 @@ namespace FullPotential.Core.UI.Behaviours
         private CharacterMenuUi _characterMenuUi;
         private DrawingPadUi _drawingPadUi;
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
@@ -47,7 +45,6 @@ namespace FullPotential.Core.UI.Behaviours
             _drawingPadUi.OnDrawingStop += HandleOnDrawingStop;
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
             LoadInventory();

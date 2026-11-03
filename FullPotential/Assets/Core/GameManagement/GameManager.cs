@@ -26,7 +26,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.GameManagement
 {
@@ -67,8 +66,6 @@ namespace FullPotential.Core.GameManagement
 
         #region Unity Event Handlers
 
-        // ReSharper disable once Unity.IncorrectMethodSignature
-        // ReSharper disable once UnusedMember.Local
 #pragma warning disable UNT0006 // Incorrect message signature
         private async Task Awake()
 #pragma warning restore UNT0006 // Incorrect message signature
@@ -126,7 +123,6 @@ namespace FullPotential.Core.GameManagement
             _ = SceneManager.LoadSceneAsync(1);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             _logger.Debug("Setting up periodic save");
@@ -134,7 +130,6 @@ namespace FullPotential.Core.GameManagement
             _periodicSave = new DelayedAction(15f, () => SaveData(), false);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             if (_serverHasBeenStarted)

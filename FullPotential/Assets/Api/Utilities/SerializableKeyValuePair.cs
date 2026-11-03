@@ -1,6 +1,5 @@
 using System;
 
-// ReSharper disable InconsistentNaming
 
 namespace FullPotential.Api.Utilities
 {

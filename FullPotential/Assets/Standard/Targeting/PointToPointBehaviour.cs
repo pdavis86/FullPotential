@@ -19,7 +19,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.Targeting
 {
@@ -46,7 +45,6 @@ namespace FullPotential.Standard.Targeting
 
         public Vector3 Direction { get; set; }
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
@@ -57,7 +55,6 @@ namespace FullPotential.Standard.Targeting
             _visualsPrefabAddress.OnValueChanged += HandleVisualsPrefabAddressValueChanged;
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             if (!IsServer)
@@ -87,7 +84,6 @@ namespace FullPotential.Standard.Targeting
             _combatService.ApplyEffects(SourceFighter, Consumer, _hit.transform.gameObject, _hit.point);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             if (!IsServer)
@@ -136,7 +132,6 @@ namespace FullPotential.Standard.Targeting
             Destroy(_visualsGameObject);
         }
 
-        // ReSharper disable once UnusedParameter.Local
         [ClientRpc]
         private void UpdateVisualsClientRpc(bool isHitting, Vector3 hitPoint, Vector3 origin, Vector3 direction, float maxRange, ClientRpcParams clientRpcParams)
         {

@@ -6,14 +6,11 @@ using FullPotential.Core.Ui.Behaviours;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.GameManagement
 {
     public class UserInterface : MonoBehaviour, IUserInterface
     {
-        // ReSharper disable UnassignedField.Global
-        // ReSharper disable MemberCanBePrivate.Global
 
         //Overlays
         public GameObject TooltipOverlay;
@@ -30,8 +27,6 @@ namespace FullPotential.Core.GameManagement
         public GameObject DrawingPad;
         private GameObject _customMenu;
 
-        // ReSharper restore MemberCanBePrivate.Global
-        // ReSharper restore UnassignedField.Global
 
         //Behaviours
         private Hud _hud;
@@ -47,7 +42,6 @@ namespace FullPotential.Core.GameManagement
 
         public GameObject InteractionBubbleOverlay => InteractionBubble;
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             if (_instance != null && _instance != this)

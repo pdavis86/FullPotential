@@ -14,7 +14,6 @@ namespace FullPotential.Core.Gameplay.Tooltips
         [SerializeField] private string _translationKey;
 #pragma warning restore CS0649
 
-        // ReSharper disable once UnusedMember.Global
         public void Start()
         {
             var localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
@@ -23,7 +22,6 @@ namespace FullPotential.Core.Gameplay.Tooltips
             OnPointerEnterForTooltip += ShowTooltip;
         }
 
-        // ReSharper disable once UnusedMember.Global
         public void OnDestroy()
         {
             OnPointerEnterForTooltip -= ShowTooltip;

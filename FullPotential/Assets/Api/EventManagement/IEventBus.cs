@@ -2,7 +2,6 @@ using System;
 
 using Cysharp.Threading.Tasks;
 
-// ReSharper disable UnusedMember.Global
 
 namespace FullPotential.Api.EventManagement
 {

@@ -3,7 +3,6 @@ using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Ui.Components
 {
@@ -14,7 +13,6 @@ namespace FullPotential.Core.Ui.Components
         [SerializeField] private Text _text;
 #pragma warning restore 0649
 
-        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             SetTransparency(0.25f);

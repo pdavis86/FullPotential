@@ -5,7 +5,6 @@ using FullPotential.Api.Unity.Extensions;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Gameplay.Drawing
 {

@@ -3,7 +3,6 @@ using FullPotential.Api.Scenes;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Environment
 {

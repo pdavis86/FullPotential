@@ -1,6 +1,5 @@
 using UnityEngine;
 
-// ReSharper disable UnusedMemberInSuper.Global
 
 using FullPotential.Api.CoreTypeIds;
 

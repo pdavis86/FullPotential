@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-// ReSharper disable UnusedType.Global
 
 namespace FullPotential.Core.Utilities.UtilityBehaviours
 {
@@ -10,8 +9,6 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
         [SerializeReference] private GameObject _gameObjectToDestroy;
 #pragma warning restore 0649
 
-        // ReSharper disable once UnusedMember.Local
-        // ReSharper disable once UnusedParameter.Local
         private void OnTriggerEnter(Collider other)
         {
             Destroy(_gameObjectToDestroy);

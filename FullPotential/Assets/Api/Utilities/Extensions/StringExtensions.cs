@@ -1,5 +1,4 @@
-﻿// ReSharper disable UnusedMember.Global
-
+﻿
 using System.Text;
 using System.Text.RegularExpressions;
 

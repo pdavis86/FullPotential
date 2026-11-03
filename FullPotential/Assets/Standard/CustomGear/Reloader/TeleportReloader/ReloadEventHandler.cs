@@ -5,7 +5,6 @@ using FullPotential.Api.Input.Events;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.Items;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 using FullPotential.Api.CoreTypeIds;
 

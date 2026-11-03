@@ -14,7 +14,6 @@ using FullPotential.Api.Registry.Weapons;
 using FullPotential.Models.LivingEntity;
 using FullPotential.Standard.Items;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 {

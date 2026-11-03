@@ -1,5 +1,4 @@
 ﻿
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace FullPotential.Api.GameManagement.Models
 {

@@ -4,7 +4,6 @@ using FullPotential.Api.Modding;
 
 using UnityEngine;
 
-// ReSharper disable UnusedType.Global
 
 namespace FullPotential.Standard
 {

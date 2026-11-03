@@ -2,7 +2,6 @@ using System;
 
 using FullPotential.Api.Registry.Weapons;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.Ammo
 {

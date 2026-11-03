@@ -8,7 +8,6 @@ using Unity.Netcode;
 
 using UnityEngine.InputSystem;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Environment
 {
@@ -18,7 +17,6 @@ namespace FullPotential.Core.Environment
 
         private ILocalizer _localizer;
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             RequiresServerCheck = false;

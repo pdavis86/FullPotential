@@ -8,7 +8,6 @@ using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable UnusedType.Global
 
 namespace FullPotential.Core.Utilities.UtilityBehaviours
 {
@@ -20,12 +19,10 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
         private IAuditor _logger;
         private ILocalizer _localizer;
 
-        // ReSharper disable once UnassignedField.Global
         public string TranslationId;
 
         public string[] Arguments;
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _textComponent = GetComponent<Text>();
@@ -34,7 +31,6 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
             if (TranslationId.IsNullOrWhiteSpace())
@@ -46,7 +42,6 @@ namespace FullPotential.Core.Utilities.UtilityBehaviours
 
             if (Arguments != null && Arguments.Any())
             {
-                // ReSharper disable once CoVariantArrayConversion
                 _textComponent.text = string.Format(baseTranslation, Arguments);
             }
             else

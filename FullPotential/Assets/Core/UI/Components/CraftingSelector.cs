@@ -13,18 +13,15 @@ using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.UI.Components
 {
     public class CraftingSelector : MonoBehaviour
     {
-        // ReSharper disable UnassignedField.Global
         public Dropdown TypeDropdown;
         public Dropdown SubTypeDropdown;
         public Dropdown HandednessDropdown;
         public Dropdown ValuePoolDropdown;
-        // ReSharper restore UnassignedField.Global
 
         private Dictionary<Type, string> _craftableTypes;
         private Dictionary<IAccessoryType, string> _accessoryTypes;
@@ -37,7 +34,6 @@ namespace FullPotential.Core.UI.Components
 
         #region "Event Handlers"
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             FillDataVariables();
@@ -53,7 +49,6 @@ namespace FullPotential.Core.UI.Components
             UpdateSecondaryDropDowns();
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
             TypeDropdown.value = 0;

@@ -4,8 +4,6 @@ using FullPotential.Api.Unity.Constants;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
 
 namespace FullPotential.Core.SceneObjects
 {
@@ -13,13 +11,11 @@ namespace FullPotential.Core.SceneObjects
     {
         private IUnityHelperUtilities _unityHelperUtilities;
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _unityHelperUtilities = DependenciesContext.Dependencies.GetService<IUnityHelperUtilities>();
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             _unityHelperUtilities.GetObjectAtRoot(GameObjectNames.SceneCanvas).SetActive(true);

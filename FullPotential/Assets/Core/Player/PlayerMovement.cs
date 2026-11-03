@@ -8,7 +8,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Player
 {
@@ -19,13 +18,11 @@ namespace FullPotential.Core.Player
         private Vector2 _lookSmoothness = new Vector2(3f, 3f);
 
 #pragma warning disable 0649
-        // ReSharper disable FieldCanBeMadeReadOnly.Local
         [SerializeField] private Camera _playerCamera;
         [SerializeField] private float _speed = 5f;
         [SerializeField] private float _cameraRotationLimit = 85f;
         [SerializeField] private float _jumpForceMultiplier = 10500f;
         [SerializeField] private int _sprintStoppingFactor = 65;
-        // ReSharper restore FieldCanBeMadeReadOnly.Local
 #pragma warning restore 0649
 
         private Rigidbody _rb;
@@ -45,7 +42,6 @@ namespace FullPotential.Core.Player
 
         #region Unity Event Handlers 
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
@@ -58,7 +54,6 @@ namespace FullPotential.Core.Player
             settingsRepository.GameSettingsUpdated += OnGameSettingsUpdated;
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
             _smoothLook = Vector2.zero;
@@ -68,7 +63,6 @@ namespace FullPotential.Core.Player
             _isMidJump = false;
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             ApplyMovementFromInputs();
@@ -87,7 +81,6 @@ namespace FullPotential.Core.Player
         #endregion
 
         #region Input Event Handlers
-        // ReSharper disable UnusedMember.Local
 #pragma warning disable IDE0051 // Remove unused private members
 
         private void OnMove(InputValue value)
@@ -130,7 +123,6 @@ namespace FullPotential.Core.Player
             }
         }
 
-        // ReSharper restore UnusedMember.Local
 #pragma warning restore IDE0051 // Remove unused private members
         #endregion
 

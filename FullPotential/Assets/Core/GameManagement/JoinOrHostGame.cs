@@ -21,7 +21,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.GameManagement
 {
@@ -41,12 +40,8 @@ namespace FullPotential.Core.GameManagement
         [SerializeField] private GameObject _signingInMessage;
 #pragma warning restore 0649
 
-        // ReSharper disable MemberCanBePrivate.Global
-        // ReSharper disable UnassignedField.Global
         public GameObject[] TabOrder;
 
-        // ReSharper restore UnassignedField.Global
-        // ReSharper restore MemberCanBePrivate.Global
 
         private IAuditor _logger;
         private IDataLoader _dataLoader;
@@ -67,7 +62,6 @@ namespace FullPotential.Core.GameManagement
         private DateTime _joinAttempt;
         private bool _shiftTab;
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
@@ -83,7 +77,6 @@ namespace FullPotential.Core.GameManagement
             _signinPassword.onSubmit.AddListener(_ => HandleSignInClick());
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             _networkManager = NetworkManager.Singleton;
@@ -93,13 +86,9 @@ namespace FullPotential.Core.GameManagement
             _networkManager.OnClientDisconnectCallback += OnClientDisconnect;
         }
 
-        // ReSharper disable once Unity.IncorrectMethodSignature
-        // ReSharper disable once UnusedMember.Local
 #pragma warning disable UNT0006
         private async UniTask OnEnable()
         {
-            // ReSharper disable HeuristicUnreachableCode
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
 
             // NOTE: Set this to true when testing
             var isTestingLocally = false;
@@ -136,7 +125,6 @@ namespace FullPotential.Core.GameManagement
         }
 #pragma warning restore UNT0006
 
-        // ReSharper disable once UnusedMember.Local
         private void OnDisable()
         {
             if (_networkManager != null)
@@ -145,7 +133,6 @@ namespace FullPotential.Core.GameManagement
             }
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnTabPress()
         {
             if (_shiftTab)
@@ -157,7 +144,6 @@ namespace FullPotential.Core.GameManagement
             _uiAssistant.SelectNextGameObject(TabOrder, true);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnShiftTabPress()
         {
             _shiftTab = true;
@@ -172,49 +158,41 @@ namespace FullPotential.Core.GameManagement
 
         #region Button Event Handlers
 
-        // ReSharper disable once UnusedMember.Global
         public void HandleUsernameAfterEdit(string value)
         {
             _username = value;
         }
 
-        // ReSharper disable once UnusedMember.Global
         public void HandlePasswordAfterEdit(string value)
         {
             _password = value;
         }
 
-        // ReSharper disable once UnusedMember.Global
         public void HandleNetworkAddressAfterEdit(string value)
         {
             _networkAddress = value;
         }
 
-        // ReSharper disable once UnusedMember.Global
         public void HandleNetworkPortAfterEdit(string value)
         {
             _networkPort = value;
         }
 
-        // ReSharper disable once UnusedMember.Global
         public void HandleHostAfterClick()
         {
             HostGameInternal();
         }
 
-        // ReSharper disable once UnusedMember.Global
         public void HandleJoinAfterClick()
         {
             JoinGameInternal();
         }
 
-        // ReSharper disable once UnusedMember.Global
         public void HandleQuitClick()
         {
             GameManager.Instance.Quit();
         }
 
-        // ReSharper disable once MemberCanBePrivate.Global
         public void HandleSignInClick()
         {
             if (_username.IsNullOrWhiteSpace())
@@ -227,7 +205,6 @@ namespace FullPotential.Core.GameManagement
             SignInWithPasswordAsync().Forget();
         }
 
-        // ReSharper disable once UnusedMember.Global
         public void HandleSignOutClick()
         {
             SignOutAsync().Forget();
@@ -333,7 +310,6 @@ namespace FullPotential.Core.GameManagement
             }
         }
 
-        // ReSharper disable once UnusedMember.Global
         public async UniTask SignOutAsync()
         {
             GameManager.Instance.LocalGameDataStore.SignInResult = null;

@@ -6,7 +6,6 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// ReSharper disable UnusedType.Global
 
 namespace FullPotential.Core.Unity.Static
 {

@@ -4,18 +4,15 @@ using FullPotential.Api.Ui;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.Enemies.Behaviours
 {
     public class EnemyFighter : FighterBase
     {
         #region Inspector Variables
-        // ReSharper disable UnassignedField.Compiler
 
         [SerializeField] private GameObject _healthSliderParent;
 
-        // ReSharper restore UnassignedField.Compiler
         #endregion
 
         #region Properties

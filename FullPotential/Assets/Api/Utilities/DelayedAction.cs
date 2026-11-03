@@ -2,8 +2,6 @@ using System;
 
 using UnityEngine;
 
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMethodReturnValue.Global
 
 namespace FullPotential.Api.Utilities
 {

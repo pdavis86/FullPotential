@@ -26,14 +26,11 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-// ReSharper disable UnusedMemberHierarchy.Global
-// ReSharper disable MemberCanBePrivate.Global
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
     public abstract class InventoryBase : NetworkBehaviour, ISaveable
     {
-        // ReSharper disable InconsistentNaming
         protected IAuditor _logger;
         protected IItemFactory _itemFactory;
         protected ITypeRegistry _typeRegistry;
@@ -49,7 +46,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected bool _hasInventoryLoaded;
         protected Dictionary<string, ItemBase> _items;
         protected Dictionary<SlotId, EquippedItem> _equippedItems;
-        // ReSharper restore InconsistentNaming
 
         public bool IsDirty => _isDirty || _items.Any(x => x.Value.IsDirty);
 
@@ -74,7 +70,6 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #endregion
 
-        // ReSharper disable once UnusedParameter.Global
         [ClientRpc]
         public void ApplyChangesClientRpc(InventoryChangesForClient changes, ClientRpcParams clientRpcParams)
         {

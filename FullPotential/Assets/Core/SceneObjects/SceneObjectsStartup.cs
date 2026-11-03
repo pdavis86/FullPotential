@@ -4,14 +4,11 @@ using FullPotential.Api.Unity.Constants;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable UnusedType.Global
 
 namespace FullPotential.Core.SceneObjects
 {
     public class SceneObjectsStartup : MonoBehaviour
     {
-        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             //NOTE: Should use IUnityHelperUtilities but the game has not initialized yet

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 
 using Unity.Netcode;
 
-// ReSharper disable UnusedMember.Global
 
 namespace FullPotential.Api.Utilities.Extensions
 {

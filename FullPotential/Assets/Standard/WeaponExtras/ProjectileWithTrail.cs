@@ -8,7 +8,6 @@ using FullPotential.Api.Unity.Extensions;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Standard.WeaponExtras
 {
@@ -27,7 +26,6 @@ namespace FullPotential.Standard.WeaponExtras
         private Vector3 _startPosition;
         private float _journeyLength;
 
-        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
@@ -38,7 +36,6 @@ namespace FullPotential.Standard.WeaponExtras
             _journeyLength = Vector3.Distance(_startPosition, TargetPosition);
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             var timeTaken = Time.time - _startTime;

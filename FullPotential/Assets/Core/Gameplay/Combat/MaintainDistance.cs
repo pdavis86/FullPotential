@@ -5,23 +5,19 @@ using FullPotential.Core.Networking;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Gameplay.Combat
 {
     public class MaintainDistance : MonoBehaviour
     {
-        // ReSharper disable UnassignedField.Global
         public FighterBase SourceFighter;
         public float Distance;
         public Consumer Consumer;
-        // ReSharper restore UnassignedField.Global
 
         private GameObject _targetPositionGameObject;
         private FixedJoint _joint;
         private ClientNetworkTransform _clientTransform;
 
-        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             CreateNewJoint();
@@ -33,14 +29,11 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void FixedUpdate()
         {
             _targetPositionGameObject.transform.position = SourceFighter.Transform.position + (SourceFighter.LookTransform.forward * Distance);
         }
 
-        // ReSharper disable once UnusedMember.Local
-        // ReSharper disable once UnusedParameter.Local
         private void OnJointBreak(float value)
         {
             Cleanup();

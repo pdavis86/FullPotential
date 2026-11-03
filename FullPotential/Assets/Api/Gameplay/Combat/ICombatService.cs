@@ -5,7 +5,6 @@ using FullPotential.Api.Registry.Effects;
 
 using UnityEngine;
 
-// ReSharper disable UnusedMember.Global
 
 namespace FullPotential.Api.Gameplay.Combat
 {

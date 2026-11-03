@@ -124,7 +124,6 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
     [ExcludeFromCodeCoverage]
     public class TestWeaponType : IWeaponType
     {
-        // ReSharper disable UnassignedGetOnlyAutoProperty
         public Guid TypeId { get; }
         public bool IsDefensive { get; }
         public string AmmunitionTypeIdString { get; set; }

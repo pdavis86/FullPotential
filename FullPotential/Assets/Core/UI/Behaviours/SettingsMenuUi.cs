@@ -14,7 +14,6 @@ using FullPotential.Core.Player;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable UnusedType.Global
 
 namespace FullPotential.Core.Ui.Behaviours
 {
@@ -44,7 +43,6 @@ namespace FullPotential.Core.Ui.Behaviours
 
         #region Unity Event handlers
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _availableResolutions = Screen.resolutions
@@ -62,7 +60,6 @@ namespace FullPotential.Core.Ui.Behaviours
             _languageDropDown.AddOptions(_cultures.Select(x => x.Value).ToList());
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
             LoadApplicationSettings();
@@ -72,7 +69,6 @@ namespace FullPotential.Core.Ui.Behaviours
             _isRevertRequired = true;
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnDisable()
         {
             RevertUnsavedSettings();
@@ -80,32 +76,27 @@ namespace FullPotential.Core.Ui.Behaviours
 
         #endregion
 
-        // ReSharper disable once UnusedMember.Global
         public void SetResolution(int index)
         {
             var selectedResolution = _availableResolutions[index];
             Screen.SetResolution(selectedResolution.width, selectedResolution.height, _fullscreenToggle.isOn);
         }
 
-        // ReSharper disable once UnusedMember.Global
         public void ToggleFullscreen(bool isOn)
         {
             Screen.SetResolution(Screen.width, Screen.height, isOn);
         }
 
-        // ReSharper disable once UnusedMember.Global
         public void SetFieldOfView(float degrees)
         {
             Camera.main.fieldOfView = degrees;
         }
 
-        // ReSharper disable once UnusedMember.Global
         public void SetLanguage(int index)
         {
             _newCultureIndex = index;
         }
 
-        // ReSharper disable once UnusedMember.Global
         public async void HandleSaveAndCloseAfterClick()
         {
             await SaveGameSettings();

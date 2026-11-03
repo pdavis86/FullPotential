@@ -1,3 +1,4 @@
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
@@ -14,11 +15,6 @@ using FullPotential.Core.UI.Behaviours;
 
 using UnityEngine;
 using UnityEngine.UI;
-
-// ReSharper disable ClassNeverInstantiated.Global
-
-using FullPotential.Api.CoreTypeIds;
-using System;
 
 namespace FullPotential.Core.Ui.Behaviours
 {
@@ -39,7 +35,6 @@ namespace FullPotential.Core.Ui.Behaviours
         private GameObject _lastClickedSlot;
         private PlayerFighter _playerFighter;
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
@@ -49,7 +44,6 @@ namespace FullPotential.Core.Ui.Behaviours
             InstantiateSlots();
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
             _playerFighter = GameManager.Instance.LocalGameDataStore.PlayerGameObject.GetComponent<PlayerFighter>();
@@ -102,7 +96,6 @@ namespace FullPotential.Core.Ui.Behaviours
                 });
         }
 
-        // ReSharper disable once UnusedMember.Global
         private void OnSlotClick(GameObject clickedObject)
         {
             if (_lastClickedSlot == clickedObject)

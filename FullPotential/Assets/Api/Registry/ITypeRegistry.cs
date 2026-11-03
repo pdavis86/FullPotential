@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Items;
 
-// ReSharper disable UnusedMemberInSuper.Global
 
 namespace FullPotential.Api.Registry
 {

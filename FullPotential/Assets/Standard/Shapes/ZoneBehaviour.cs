@@ -37,7 +37,6 @@ namespace FullPotential.Standard.Shapes
 
         public Vector3 Direction { get; set; }
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
@@ -47,7 +46,6 @@ namespace FullPotential.Standard.Shapes
             _visualsPrefabAddress.OnValueChanged += HandleVisualsPrefabAddressValueChanged;
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void Start()
         {
             if (!IsServer)
@@ -73,7 +71,6 @@ namespace FullPotential.Standard.Shapes
                     ?.PrefabAddress ?? string.Empty;
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnTriggerStay(Collider other)
         {
             if (!IsServer)

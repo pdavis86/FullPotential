@@ -30,7 +30,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Registry
 {

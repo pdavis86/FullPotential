@@ -2,7 +2,6 @@ using System.Collections.Generic;
 
 using FullPotential.Api.Gameplay.Behaviours;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 using FullPotential.Api.CoreTypeIds;
 

@@ -2,7 +2,6 @@ using Unity.Netcode.Components;
 
 using UnityEngine;
 
-// ReSharper disable ClassNeverInstantiated.Global
 
 namespace FullPotential.Core.Networking
 {

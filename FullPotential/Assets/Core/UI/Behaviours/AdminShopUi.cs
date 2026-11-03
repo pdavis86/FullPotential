@@ -20,7 +20,6 @@ using FullPotential.Core.UI.Components;
 using UnityEngine;
 using UnityEngine.UI;
 
-// ReSharper disable UnusedType.Global
 
 namespace FullPotential.Core.UI.Behaviours
 {
@@ -55,7 +54,6 @@ namespace FullPotential.Core.UI.Behaviours
         private List<NameAndToggle> _targetingToggleBehaviours;
         private List<NameAndToggle> _shapeToggleBehaviours;
 
-        // ReSharper disable once UnusedMember.Local
         private void Awake()
         {
             _resultFactory = DependenciesContext.Dependencies.GetService<IResultFactory>();
@@ -73,7 +71,6 @@ namespace FullPotential.Core.UI.Behaviours
             InstantiateShapeControls();
         }
 
-        // ReSharper disable once UnusedMember.Local
         private void OnEnable()
         {
             // todo: zzz v0.7 - Handle when inventory is full
@@ -264,14 +261,12 @@ namespace FullPotential.Core.UI.Behaviours
                 new List<ItemBase> { component });
         }
 
-        // ReSharper disable once UnusedMember.Global
         public void DisplayResultsText()
         {
             var item = GetCraftableItem();
             _resultsText.text = item.GetDescription(_localizer, LevelOfDetail.Full);
         }
 
-        // ReSharper disable once UnusedMember.Global
         public void CraftItem()
         {
             var component = GetLootFromChoices();
