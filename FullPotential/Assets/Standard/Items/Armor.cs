@@ -45,7 +45,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Strength.TypeIdString),
+                Attributes.GetValueOrZero(Strength.Id),
                 nameof(Strength),
                 AliasSegmentDefensive,
                 localizer.Translate(TranslationType.Attribute, nameof(Strength)));

@@ -5,6 +5,7 @@ using System.Text;
 
 using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay;
+using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 
@@ -20,8 +21,7 @@ namespace FullPotential.Api.Items.Base
 
         public string Name { get; set; }
 
-        // todo: make Attributes a Dictionary<AttributeTypeId, int>
-        public Dictionary<string, string> Attributes { get; set; }
+        public Dictionary<AttributeTypeId, int> Attributes { get; set; }
 
         public Dictionary<string, string> Properties { get; set; }
 

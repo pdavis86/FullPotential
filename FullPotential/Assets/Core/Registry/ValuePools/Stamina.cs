@@ -9,11 +9,10 @@ namespace FullPotential.Core.Registry.ValuePools
 {
     public class Stamina : IValuePoolType
     {
-        private static readonly Guid Id = new Guid(ValuePoolTypeIds.StaminaId);
         private static readonly Color ValuePoolBackgroundColor = Color.FromArgb(25, 118, 64); // Green
         private static readonly Color ValuePoolTextColor = Color.FromArgb(255, 255, 255); // White
 
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid(ValuePoolTypeIds.StaminaId);
 
         public Color BackgroundColor => ValuePoolBackgroundColor;
 

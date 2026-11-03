@@ -1,3 +1,5 @@
+using FullPotential.Api.Gameplay.Attributes;
+
 namespace FullPotential.Api.Registry.Effects
 {
     public interface IAttributeEffect : IEffectType
@@ -10,6 +12,6 @@ namespace FullPotential.Api.Registry.Effects
         /// <summary>
         /// The ID of the attribute which will be affected
         /// </summary>
-        string AttributeId { get; }
+        AttributeTypeId AttributeId { get; }
     }
 }

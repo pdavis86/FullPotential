@@ -56,22 +56,22 @@ namespace FullPotential.Core.Gameplay.Crafting
                 .ToList();
         }
 
-        public int ComputeAttribute(IList<ItemBase> components, string attributeId, bool allowMax = true)
+        public int ComputeAttribute(IList<ItemBase> components, AttributeTypeId attributeId, bool allowMax = true)
         {
-            int getProp(ItemBase x)
+            int getAttributeValue(ItemBase x)
             {
-                return x.Attributes.GetIntValue(attributeId);
+                return x.Attributes.GetValueOrZero(attributeId);
             }
 
-            var withValue = components.Where(x => getProp(x) > 0).ToList();
+            var withValue = components.Where(x => getAttributeValue(x) > 0).ToList();
 
             if (!withValue.Any())
             {
                 return 1;
             }
 
-            var min = withValue.Min(getProp);
-            var max = withValue.Max(getProp);
+            var min = withValue.Min(getAttributeValue);
+            var max = withValue.Max(getAttributeValue);
             var topEndSkew = max - ((max - min) / 10);
 
             var result = allowMax
@@ -341,7 +341,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             var suffix = string.IsNullOrWhiteSpace(customSuffix)
                 ? _localizer.Translate(item.RegistryType)
                 : customSuffix;
-            item.Name = $"{GetItemNamePrefix(isAttack)} {item.Attributes.GetIntValue(Strength.TypeIdString)} {suffix}";
+            item.Name = $"{GetItemNamePrefix(isAttack)} {item.Attributes.GetValueOrZero(Strength.Id)} {suffix}";
         }
 
         public ItemBase GetCraftedItem(Type craftableType, string typeId, string valuePoolTypeId, bool isTwoHanded, string itemName, IList<ItemBase> components)

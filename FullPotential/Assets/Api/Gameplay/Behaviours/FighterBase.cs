@@ -121,15 +121,20 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 : null;
         }
 
-        public int GetAdjustedAttributeValue(string attributeId)
+        public int GetAdjustedAttributeValue(AttributeTypeId attributeId)
         {
             //todo: zzz v0.8 - trait-based attributes
-            return attributeId switch
+            if (attributeId == Strength.Id)
             {
-                Strength.TypeIdString => 25 + GetAttributeAdjustment(attributeId),
-                Luck.TypeIdString => 50 + GetAttributeAdjustment(attributeId),
-                _ => throw new Exception("Not yet implemented GetAttributeValue() for " + attributeId),
-            };
+                return 25 + GetAttributeAdjustment(attributeId);
+            }
+
+            if (attributeId == Luck.Id)
+            {
+                return 50 + GetAttributeAdjustment(attributeId);
+            }
+
+            throw new Exception("Not yet implemented GetAttributeValue() for " + attributeId);
         }
 
         public override void HandleDeath()

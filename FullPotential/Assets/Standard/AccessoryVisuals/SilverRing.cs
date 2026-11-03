@@ -7,9 +7,7 @@ namespace FullPotential.Standard.AccessoryVisuals
 {
     public class SilverRing : IItemVisualsType
     {
-        private static readonly Guid Id = new Guid("c70a9495-0ef7-48fb-9b16-aad5fe7b29ad");
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid("c70a9495-0ef7-48fb-9b16-aad5fe7b29ad");
 
         public string PrefabAddress => "Standard/Prefabs/Accessories/Ring.prefab";
 

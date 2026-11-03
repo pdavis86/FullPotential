@@ -153,6 +153,7 @@
     <Compile Include="Assets\Api\CoreTypeIds\SlotId.cs" />
     <Compile Include="Assets\Api\EventManagement\EventSubscription.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\ColliderExtensions.cs" />
+    <Compile Include="Assets\Api\Gameplay\Attributes\AttributeTypeId.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\ArrayExtensions.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\Events\SlotChangeEvent.cs" />
     <Compile Include="Assets\Api\Scenes\ISceneBehaviour.cs" />

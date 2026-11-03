@@ -9,9 +9,7 @@ namespace FullPotential.Standard.Effects.Debuffs
 {
     public class ManaDrain : IValuePoolEffectType, IHasSideEffect
     {
-        private static readonly Guid Id = new Guid("e1ab10b2-fcae-4f25-a11f-ac5aeeadbdce");
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid("e1ab10b2-fcae-4f25-a11f-ac5aeeadbdce");
 
         public EffectActionType EffectActionType => EffectActionType.PeriodicDecrease;
 

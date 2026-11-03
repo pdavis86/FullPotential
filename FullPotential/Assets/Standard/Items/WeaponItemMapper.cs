@@ -50,27 +50,27 @@ namespace FullPotential.Standard.Items
 
             if (weaponType.IsDefensive || weaponType.AmmunitionTypeIdString == null)
             {
-                weapon.Attributes = new Dictionary<string, string>
+                weapon.Attributes = new Dictionary<AttributeTypeId, int>
                 {
-                    { Strength.TypeIdString, resultFactory.ComputeAttribute(components, Strength.TypeIdString).ToString() },
-                    { Speed.TypeIdString, resultFactory.ComputeAttribute(components, Speed.TypeIdString).ToString() },
-                    { Recovery.TypeIdString, resultFactory.ComputeAttribute(components, Recovery.TypeIdString).ToString() },
+                    { Strength.Id, resultFactory.ComputeAttribute(components, Strength.Id) },
+                    { Speed.Id, resultFactory.ComputeAttribute(components, Speed.Id) },
+                    { Recovery.Id, resultFactory.ComputeAttribute(components, Recovery.Id) },
                 };
             }
             else
             {
-                weapon.Attributes = new Dictionary<string, string>
+                weapon.Attributes = new Dictionary<AttributeTypeId, int>
                 {
-                    { Strength.TypeIdString, resultFactory.ComputeAttribute(components, Strength.TypeIdString).ToString() },
-                    { Efficiency.TypeIdString, resultFactory.ComputeAttribute(components, Efficiency.TypeIdString).ToString() },
-                    { Range.TypeIdString, resultFactory.ComputeAttribute(components, Range.TypeIdString).ToString() },
-                    { Accuracy.TypeIdString, resultFactory.ComputeAttribute(components, Accuracy.TypeIdString).ToString() },
-                    { Speed.TypeIdString, resultFactory.ComputeAttribute(components, Speed.TypeIdString).ToString() },
-                    { Recovery.TypeIdString, resultFactory.ComputeAttribute(components, Recovery.TypeIdString).ToString() },
+                    { Strength.Id, resultFactory.ComputeAttribute(components, Strength.Id) },
+                    { Efficiency.Id, resultFactory.ComputeAttribute(components, Efficiency.Id) },
+                    { Range.Id, resultFactory.ComputeAttribute(components, Range.Id) },
+                    { Accuracy.Id, resultFactory.ComputeAttribute(components, Accuracy.Id) },
+                    { Speed.Id, resultFactory.ComputeAttribute(components, Speed.Id) },
+                    { Recovery.Id, resultFactory.ComputeAttribute(components, Recovery.Id) },
                 };
 
                 weapon.IsAutomatic = weaponType.AllowAutomatic && components.Any(x => x.Properties.GetBoolValue(nameof(weapon.IsAutomatic)));
-                weapon.ExtraAmmoPerShot = components.FirstOrDefault(x => x.Properties.GetIntValue(nameof(weapon.ExtraAmmoPerShot)) > 0)?.Properties.GetIntValue(nameof(weapon.ExtraAmmoPerShot)) ?? 0;
+                weapon.ExtraAmmoPerShot = components.FirstOrDefault(x => x.Properties.GetIntValueOrZero(nameof(weapon.ExtraAmmoPerShot)) > 0)?.Properties.GetIntValueOrZero(nameof(weapon.ExtraAmmoPerShot)) ?? 0;
                 weapon.Ammo = weapon.GetAmmoMax();
             }
 

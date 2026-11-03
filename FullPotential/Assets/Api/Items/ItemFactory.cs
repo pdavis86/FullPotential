@@ -97,34 +97,34 @@ namespace FullPotential.Api.Items
         {
             if (model.Attributes == null)
             {
-                item.Attributes = new Dictionary<string, string>();
+                item.Attributes = new Dictionary<AttributeTypeId, int>();
                 return;
             }
 
-            item.Attributes = new Dictionary<string, string>();
+            item.Attributes = new Dictionary<AttributeTypeId, int>();
 
             // todo: zzz v0.8 - Remove backwards compatibility: item.Attributes = new Dictionary<string, string>(model.Attributes);
             foreach (var kvp in model.Attributes)
             {
-                var adjustedKey = kvp.Key switch
-                {
-                    "Strength" => Strength.TypeIdString,
-                    "Efficiency" => Efficiency.TypeIdString,
-                    "Range" => Range.TypeIdString,
-                    "Accuracy" => Accuracy.TypeIdString,
-                    "Speed" => Speed.TypeIdString,
-                    "Recovery" => Recovery.TypeIdString,
-                    "Duration" => Duration.TypeIdString,
-                    "Luck" => Luck.TypeIdString,
-                    _ => kvp.Key,
-                };
-
-                if (adjustedKey is "IsAutomatic" or "ExtraAmmoPerShot")
+                if (kvp.Key is "IsAutomatic" or "ExtraAmmoPerShot")
                 {
                     continue;
                 }
 
-                item.Attributes[adjustedKey] = kvp.Value;
+                var adjustedKey = kvp.Key switch
+                {
+                    "Strength" => Strength.Id,
+                    "Efficiency" => Efficiency.Id,
+                    "Range" => Range.Id,
+                    "Accuracy" => Accuracy.Id,
+                    "Speed" => Speed.Id,
+                    "Recovery" => Recovery.Id,
+                    "Duration" => Duration.Id,
+                    "Luck" => Luck.Id,
+                    _ => AttributeTypeId.FromString(kvp.Key),
+                };
+
+                item.Attributes[adjustedKey] = int.Parse(kvp.Value);
             }
         }
 
@@ -140,9 +140,7 @@ namespace FullPotential.Api.Items
 
             // todo: zzz v0.8 - Remove backwards compatibility
             item.Properties["IsAutomatic"] = model.Attributes?.GetStringValueOrNull("IsAutomatic");
-            item.Attributes.Remove("IsAutomatic");
             item.Properties["ExtraAmmoPerShot"] = model.Attributes?.GetStringValueOrNull("ExtraAmmoPerShot");
-            item.Attributes.Remove("ExtraAmmoPerShot");
         }
 
         public ItemData GetDataFromItem(string characterId, ItemBase item)
@@ -153,7 +151,7 @@ namespace FullPotential.Api.Items
                 CharacterId = characterId,
                 RegistryTypeId = item.RegistryType?.TypeId.ToString(),
                 Name = item.Name,
-                Attributes = GetNonDefaultValues(item.Attributes),
+                Attributes = item.Attributes.ToDictionary(x => x.Key.ToString(), x => x.Value.ToString()),
                 Properties = GetNonDefaultValues(item.Properties),
             };
 

@@ -18,11 +18,9 @@ namespace FullPotential.Standard.CustomGear.Barrier
     {
         public const string TypeIdString = "17a6e875-cccd-46f0-b525-fe15cfdd8096";
 
-        private static readonly Guid Id = new Guid(TypeIdString);
+        public Guid TypeId { get; } = new Guid(TypeIdString);
 
-        public Guid TypeId => Id;
-
-        public SlotId SlotId => FullPotential.Api.CoreTypeIds.SlotId.FromString(SpecialSlots.BarrierSlot.TypeIdString);
+        public SlotId SlotId => SlotId.FromString(SpecialSlots.BarrierSlot.TypeIdString);
 
         public IEnumerable<string> ValuePoolTypeIdsInUse { get; } = new[] { Energy.TypeIdString, BarrierChargeValuePool.TypeIdString };
 
@@ -45,7 +43,7 @@ namespace FullPotential.Standard.CustomGear.Barrier
             customGear.AppendToDescription(
                 sb,
                 localizer,
-                customGear.Attributes.GetIntValue(Recovery.TypeIdString),
+                customGear.Attributes.GetValueOrZero(Recovery.Id),
                 nameof(Recovery),
                 nameof(Barrier),
                 localizer.Translate(GetRechargeDelay(customGear)),
@@ -54,7 +52,7 @@ namespace FullPotential.Standard.CustomGear.Barrier
             customGear.AppendToDescription(
                 sb,
                 localizer,
-                customGear.Attributes.GetIntValue(Speed.TypeIdString),
+                customGear.Attributes.GetValueOrZero(Speed.Id),
                 nameof(Speed),
                 nameof(Barrier),
                 localizer.Translate(GetRechargeRate(customGear)),
@@ -65,13 +63,13 @@ namespace FullPotential.Standard.CustomGear.Barrier
 
         public static float GetRechargeDelay(Items.CustomGear customGear)
         {
-            var returnValue = MathsHelper.GetHighInLowOutInRange(customGear.Attributes.GetIntValue(Recovery.TypeIdString), 0.5f, 5f);
+            var returnValue = MathsHelper.GetHighInLowOutInRange(customGear.Attributes.GetValueOrZero(Recovery.Id), 0.5f, 5f);
             return returnValue;
         }
 
         public static int GetRechargeRate(Items.CustomGear customGear)
         {
-            var returnValue = (int)MathsHelper.GetHighInLowOutInRange(customGear.Attributes.GetIntValue(Speed.TypeIdString), 1, 10);
+            var returnValue = (int)MathsHelper.GetHighInLowOutInRange(customGear.Attributes.GetValueOrZero(Speed.Id), 1, 10);
             return returnValue;
         }
     }

@@ -8,8 +8,8 @@ namespace FullPotential.Api.Gameplay.Attributes
     {
         public const string TypeIdString = "0f2e5b87-76ba-42db-9e3e-a56e5a44ef1d";
 
-        private static readonly Guid Id = new Guid(TypeIdString);
+        public static readonly AttributeTypeId Id = AttributeTypeId.FromString(TypeIdString);
 
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid(TypeIdString);
     }
 }

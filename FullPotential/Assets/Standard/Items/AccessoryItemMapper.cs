@@ -37,12 +37,12 @@ namespace FullPotential.Standard.Items
             var accessory = DependenciesContext.Dependencies.CreateInstance<Accessory>();
 
             accessory.RegistryType = _typeRegistry.GetRegisteredByTypeId<IAccessoryType>(itemTypeId);
-            accessory.Attributes = new Dictionary<string, string>
+            accessory.Attributes = new Dictionary<AttributeTypeId, int>
             {
-                { Strength.TypeIdString, resultFactory.ComputeAttribute(components, Strength.TypeIdString).ToString() },
-                { Efficiency.TypeIdString, resultFactory.ComputeAttribute(components, Efficiency.TypeIdString).ToString() },
-                { Speed.TypeIdString, resultFactory.ComputeAttribute(components, Speed.TypeIdString).ToString() },
-                { Recovery.TypeIdString, resultFactory.ComputeAttribute(components, Recovery.TypeIdString).ToString() },
+                { Strength.Id, resultFactory.ComputeAttribute(components, Strength.Id) },
+                { Efficiency.Id, resultFactory.ComputeAttribute(components, Efficiency.Id) },
+                { Speed.Id, resultFactory.ComputeAttribute(components, Speed.Id) },
+                { Recovery.Id, resultFactory.ComputeAttribute(components, Recovery.Id) },
             };
             accessory.Properties = properties;
 

@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using FullPotential.Api.Gameplay.Attributes;
+
 namespace FullPotential.Api.Utilities.Extensions
 {
     public static class DictionaryExtensions
@@ -17,7 +19,7 @@ namespace FullPotential.Api.Utilities.Extensions
             return dictionary.ContainsKey(key) ? dictionary[key] : null;
         }
 
-        public static int GetIntValue<T>(this Dictionary<T, string> dictionary, T key)
+        public static int GetIntValueOrZero<T>(this Dictionary<T, string> dictionary, T key)
         {
             return dictionary.TryGetValue(key, out var value) && value != null ? int.Parse(value) : 0;
         }
@@ -25,6 +27,11 @@ namespace FullPotential.Api.Utilities.Extensions
         public static bool GetBoolValue<T>(this Dictionary<T, string> dictionary, T key)
         {
             return dictionary.TryGetValue(key, out var value) && value != null && bool.Parse(value);
+        }
+
+        public static int GetValueOrZero(this Dictionary<AttributeTypeId, int> dictionary, AttributeTypeId key)
+        {
+            return dictionary.TryGetValue(key, out var value) ? value : 0;
         }
 
         public static List<SerializableKeyValuePair<string, string>> GetSerializableKeyValuePairList(this Dictionary<string, string> dictionary)

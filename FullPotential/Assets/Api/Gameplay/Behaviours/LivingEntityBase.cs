@@ -8,6 +8,7 @@ using Cysharp.Threading.Tasks;
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.EventManagement;
 using FullPotential.Api.GameManagement;
+using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Effects;
@@ -670,7 +671,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return _activeEffects;
         }
 
-        protected int GetAttributeAdjustment(string attributeId)
+        protected int GetAttributeAdjustment(AttributeTypeId attributeId)
         {
             return _activeEffects
                 .Where(x =>

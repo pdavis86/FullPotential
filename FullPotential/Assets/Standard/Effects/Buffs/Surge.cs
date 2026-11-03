@@ -8,9 +8,7 @@ namespace FullPotential.Standard.Effects.Buffs
 {
     public class Surge : IValuePoolEffectType
     {
-        private static readonly Guid Id = new Guid("b1edb96d-da2b-49b3-bac3-80c9b1dfe9d6");
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid("b1edb96d-da2b-49b3-bac3-80c9b1dfe9d6");
 
         public EffectActionType EffectActionType => EffectActionType.TemporaryMaxIncrease;
 

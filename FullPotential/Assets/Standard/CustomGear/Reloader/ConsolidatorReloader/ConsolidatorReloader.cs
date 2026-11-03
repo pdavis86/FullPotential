@@ -14,11 +14,9 @@ namespace FullPotential.Standard.CustomGear.Reloader.ConsolidatorReloader
     {
         public const string TypeIdString = "575ed70f-f5de-4ffa-93fb-a6c1cc404f30";
 
-        private static readonly Guid Id = new Guid(TypeIdString);
+        public Guid TypeId { get; } = new Guid(TypeIdString);
 
-        public Guid TypeId => Id;
-
-        public SlotId SlotId => FullPotential.Api.CoreTypeIds.SlotId.FromString(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+        public SlotId SlotId => SlotId.FromString(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
         public IEnumerable<string> ValuePoolTypeIdsInUse { get; } = new[] { Energy.TypeIdString };
 

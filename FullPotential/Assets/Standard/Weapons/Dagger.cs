@@ -8,9 +8,7 @@ namespace FullPotential.Standard.Weapons
     {
         public const string TypeIdString = "6eabecda-d308-48b2-b7d3-93c7800df8c2";
 
-        private static readonly Guid Id = new Guid(TypeIdString);
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid(TypeIdString);
 
         public bool IsDefensive => false;
 

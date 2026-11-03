@@ -153,7 +153,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private float GetSourceCriticalHitChance(FighterBase sourceFighter)
         {
-            var luckValue = sourceFighter.GetAdjustedAttributeValue(Luck.TypeIdString);
+            var luckValue = sourceFighter.GetAdjustedAttributeValue(Luck.Id);
 
             if (luckValue < 20)
             {
@@ -176,7 +176,7 @@ namespace FullPotential.Core.Gameplay.Combat
             {
                 if (sourceFighter != null)
                 {
-                    change = LivingEntityBase.GetAdjustedStrength(sourceFighter.GetAdjustedAttributeValue(Strength.TypeIdString));
+                    change = LivingEntityBase.GetAdjustedStrength(sourceFighter.GetAdjustedAttributeValue(Strength.Id));
                 }
                 else
                 {
@@ -273,7 +273,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
             var sum = armorItems
                 .Where(x => x != null)
-                .Sum(a => a.Attributes.GetIntValue(Strength.TypeIdString));
+                .Sum(a => a.Attributes.GetValueOrZero(Strength.Id));
 
             var targetDefenceValue = (int)Math.Floor((float)sum / armorItems.Count());
 
@@ -360,7 +360,7 @@ namespace FullPotential.Core.Gameplay.Combat
             }
 
             var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
-            var strength = itemUsed?.Attributes.GetIntValue(Strength.TypeIdString) ?? sourceFighter.GetAdjustedAttributeValue(Strength.TypeIdString);
+            var strength = itemUsed?.Attributes.GetValueOrZero(Strength.Id) ?? sourceFighter.GetAdjustedAttributeValue(Strength.Id);
             var rawForce = MathsHelper.GetHighInHighOutInRange(strength, 100, 300);
 
             var force = adjustForGravity

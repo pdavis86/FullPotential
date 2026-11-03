@@ -36,9 +36,9 @@ namespace FullPotential.Standard.Items
             var armor = DependenciesContext.Dependencies.CreateInstance<Armor>();
 
             armor.RegistryType = _typeRegistry.GetRegisteredByTypeId<IArmorType>(itemTypeId);
-            armor.Attributes = new Dictionary<string, string>
+            armor.Attributes = new Dictionary<AttributeTypeId, int>
             {
-                { Strength.TypeIdString, resultFactory.ComputeAttribute(components, Strength.TypeIdString).ToString() },
+                { Strength.Id, resultFactory.ComputeAttribute(components, Strength.Id) },
             };
             armor.Properties = properties;
 

@@ -9,9 +9,7 @@ namespace FullPotential.Standard.Ammo
     {
         public const string TypeIdString = "130cc39d-e7db-4b8b-bb09-53a5d68fa05d";
 
-        private static readonly Guid Id = new Guid(TypeIdString);
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid(TypeIdString);
 
         public int MaxStackSize => 500;
 

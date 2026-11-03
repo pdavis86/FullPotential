@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 
+using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry;
@@ -21,7 +22,7 @@ namespace FullPotential.Api.Gameplay.Crafting
             string itemName,
             IList<ItemBase> components);
 
-        int ComputeAttribute(IList<ItemBase> components, string attributeId, bool allowMax = true);
+        int ComputeAttribute(IList<ItemBase> components, AttributeTypeId attributeId, bool allowMax = true);
 
         void SetTargetingAndShape(IHasTargetingAndShape item, IList<ItemBase> components);
 

@@ -58,7 +58,7 @@ namespace FullPotential.Standard.Items
                 AppendToDescription(
                     sb,
                     localizer,
-                    Attributes.GetIntValue(Efficiency.TypeIdString),
+                    Attributes.GetValueOrZero(Efficiency.Id),
                     nameof(Efficiency),
                     Consumer.AliasSegmentConsumer,
                     $"{GetValuePoolCost()} {valuePoolConsumptionType}");

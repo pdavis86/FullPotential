@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
@@ -49,7 +50,7 @@ namespace FullPotential.Core.UI.Behaviours
         private List<IShapeType> _registeredShapes;
 
         private List<NameAndValueSlider> _attributeSliderBehaviours;
-        private List<NameAndToggle> _attributeToggleBehaviours;
+        private List<NameAndToggle> _propertyToggleBehaviours;
         private List<NameAndToggle> _effectToggleBehaviours;
         private List<NameAndToggle> _targetingToggleBehaviours;
         private List<NameAndToggle> _shapeToggleBehaviours;
@@ -95,7 +96,7 @@ namespace FullPotential.Core.UI.Behaviours
         private void InstantiateAttributeControls()
         {
             _attributeSliderBehaviours = new List<NameAndValueSlider>();
-            _attributeToggleBehaviours = new List<NameAndToggle>();
+            _propertyToggleBehaviours = new List<NameAndToggle>();
 
             foreach (var attribute in _typeRegistry.GetRegisteredTypes<IAttribute>())
             {
@@ -120,7 +121,7 @@ namespace FullPotential.Core.UI.Behaviours
             var automaticBehaviour = automaticToggle.GetComponent<NameAndToggle>();
             automaticBehaviour.Id = "IsAutomatic";
             automaticBehaviour.Name.text = "IsAutomatic";
-            _attributeToggleBehaviours.Add(automaticBehaviour);
+            _propertyToggleBehaviours.Add(automaticBehaviour);
 
             ResetSliders();
         }
@@ -179,7 +180,7 @@ namespace FullPotential.Core.UI.Behaviours
 
         private void ResetToggles()
         {
-            var allToggles = _attributeToggleBehaviours
+            var allToggles = _propertyToggleBehaviours
                 .Union(_effectToggleBehaviours)
                 .Union(_targetingToggleBehaviours)
                 .Union(_shapeToggleBehaviours);
@@ -190,20 +191,26 @@ namespace FullPotential.Core.UI.Behaviours
             }
         }
 
-        private Dictionary<string, string> GetAttributes()
+        private Dictionary<AttributeTypeId, int> GetAttributes()
         {
-            var attributes = new Dictionary<string, string>();
+            var attributes = new Dictionary<AttributeTypeId, int>();
             foreach (var slider in _attributeSliderBehaviours)
             {
-                attributes[slider.Id] = ((int)slider.Slider.value).ToString();
-            }
-
-            foreach (var toggle in _attributeToggleBehaviours)
-            {
-                attributes[toggle.Id] = toggle.Toggle.isOn.ToString();
+                attributes[AttributeTypeId.FromString(slider.Id)] = (int)slider.Slider.value;
             }
 
             return attributes;
+        }
+
+        private Dictionary<string, string> GetProperties()
+        {
+            var properties = new Dictionary<string, string>();
+            foreach (var toggle in _propertyToggleBehaviours)
+            {
+                properties[toggle.Id] = toggle.Toggle.isOn.ToString();
+            }
+
+            return properties;
         }
 
         private List<IEffectType> GetEffects()
@@ -241,6 +248,7 @@ namespace FullPotential.Core.UI.Behaviours
             var lootItem = DependenciesContext.Dependencies.CreateInstance<AdminCraftingLootItem>();
             lootItem.RegistryType = _typeRegistry.GetRegisteredTypes<ILootType>().First();
             lootItem.Attributes = GetAttributes();
+            lootItem.Properties = GetProperties();
             lootItem.EffectTypes = GetEffects();
             lootItem.TargetingType = GetTargeting();
             lootItem.ShapeType = GetShape();

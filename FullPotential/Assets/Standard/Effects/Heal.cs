@@ -10,9 +10,7 @@ namespace FullPotential.Standard.Effects
     {
         public const string TypeIdString = "091e97b6-e3c1-4fa0-961c-cbf831e755b5";
 
-        private static readonly Guid Id = new Guid(TypeIdString);
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid(TypeIdString);
 
         public EffectActionType EffectActionType => EffectActionType.SingleIncrease;
 

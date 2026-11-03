@@ -7,9 +7,7 @@ namespace FullPotential.Standard.Effects.Movement
 {
     public class StepBack : IMovementEffectType
     {
-        private static readonly Guid Id = new Guid("90781986-e490-4115-a7f6-7864c3ed1e41");
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid("90781986-e490-4115-a7f6-7864c3ed1e41");
 
         public MovementDirection Direction => MovementDirection.Backwards;
     }

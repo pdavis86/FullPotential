@@ -8,9 +8,7 @@ namespace FullPotential.Core.Registry.Effects
 {
     public class Push : IMovementEffectType
     {
-        private static readonly Guid Id = new Guid(EffectTypeIds.PushId);
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid(EffectTypeIds.PushId);
 
         public MovementDirection Direction => MovementDirection.AwayFromSource;
     }

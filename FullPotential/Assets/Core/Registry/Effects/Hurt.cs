@@ -8,9 +8,7 @@ namespace FullPotential.Core.Registry.Effects
 {
     public class Hurt : IValuePoolEffectType
     {
-        private static readonly Guid Id = new Guid(EffectTypeIds.HurtId);
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid(EffectTypeIds.HurtId);
 
         public EffectActionType EffectActionType => EffectActionType.SingleDecrease;
 

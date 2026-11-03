@@ -10,11 +10,10 @@ namespace FullPotential.Standard.ValuePools
     {
         public const string TypeIdString = "89ec3ecf-badb-4e55-91b0-b288ca358010";
 
-        private static readonly Guid Id = new Guid(TypeIdString);
         private static readonly Color ValuePoolBackgroundColor = Color.FromArgb(255, 255, 0); // Yellow
         private static readonly Color ValuePoolTextColor = Color.FromArgb(0, 0, 0); // Black
 
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid(TypeIdString);
 
         public Color BackgroundColor => ValuePoolBackgroundColor;
 

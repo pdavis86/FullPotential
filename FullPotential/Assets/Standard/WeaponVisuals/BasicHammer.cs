@@ -7,9 +7,7 @@ namespace FullPotential.Standard.WeaponVisuals
 {
     public class BasicHammer : IItemVisualsType
     {
-        private static readonly Guid Id = new Guid("f729f525-634a-40ec-b51b-6590039a9d0c");
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid("f729f525-634a-40ec-b51b-6590039a9d0c");
 
         public string PrefabAddress => "Standard/Prefabs/Weapons/Hammer.prefab";
 

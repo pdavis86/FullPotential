@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 
 using FullPotential.Api.Gameplay;
+using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
@@ -17,7 +18,7 @@ namespace FullPotential.Api.Items
 
         string Name { get; }
 
-        Dictionary<string, string> Attributes { get; }
+        Dictionary<AttributeTypeId, int> Attributes { get; }
 
         Dictionary<string, string> Properties { get; }
 

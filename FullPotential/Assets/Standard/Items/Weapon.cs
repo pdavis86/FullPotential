@@ -38,7 +38,7 @@ namespace FullPotential.Standard.Items
 
         public int Ammo
         {
-            get => Properties.GetIntValue(nameof(Ammo));
+            get => Properties.GetIntValueOrZero(nameof(Ammo));
             set => Properties[nameof(Ammo)] = value.ToString();
         }
 
@@ -50,7 +50,7 @@ namespace FullPotential.Standard.Items
 
         public int ExtraAmmoPerShot
         {
-            get => Properties.GetIntValue(nameof(ExtraAmmoPerShot));
+            get => Properties.GetIntValueOrZero(nameof(ExtraAmmoPerShot));
             set => Properties[nameof(ExtraAmmoPerShot)] = value.ToString();
         }
 
@@ -95,7 +95,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Strength.TypeIdString),
+                Attributes.GetValueOrZero(Strength.Id),
                 nameof(Strength),
                 AliasSegmentDefensive,
                 localizer.Translate(TranslationType.Attribute, nameof(Strength)));
@@ -103,7 +103,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Speed.TypeIdString),
+                Attributes.GetValueOrZero(Speed.Id),
                 nameof(Speed),
                 AliasSegmentMelee,
                 localizer.Translate(GetChargeUpTime()),
@@ -112,7 +112,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Recovery.TypeIdString),
+                Attributes.GetValueOrZero(Recovery.Id),
                 nameof(Recovery),
                 AliasSegmentMelee,
                 localizer.Translate(GetCooldownTime()),
@@ -121,7 +121,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Strength.TypeIdString),
+                Attributes.GetValueOrZero(Strength.Id),
                 nameof(Strength),
                 AliasSegmentItem,
                 localizer.Translate(GetDefensiveDps()),
@@ -149,7 +149,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Speed.TypeIdString),
+                Attributes.GetValueOrZero(Speed.Id),
                 nameof(Speed),
                 AliasSegmentMelee,
                 localizer.Translate(GetChargeUpTime()),
@@ -158,7 +158,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Recovery.TypeIdString),
+                Attributes.GetValueOrZero(Recovery.Id),
                 nameof(Recovery),
                 AliasSegmentMelee,
                 localizer.Translate(GetCooldownTime()),
@@ -167,7 +167,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Strength.TypeIdString),
+                Attributes.GetValueOrZero(Strength.Id),
                 nameof(Strength),
                 AliasSegmentItem,
                 localizer.Translate(GetMeleeDps()),
@@ -200,7 +200,7 @@ namespace FullPotential.Standard.Items
                 AppendToDescription(
                     sb,
                     localizer,
-                    Attributes.GetIntValue(Efficiency.TypeIdString),
+                    Attributes.GetValueOrZero(Efficiency.Id),
                     nameof(Efficiency),
                     AliasSegmentRanged,
                     localizer.Translate(GetAmmoMax()));
@@ -209,16 +209,16 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Accuracy.TypeIdString),
+                Attributes.GetValueOrZero(Accuracy.Id),
                 nameof(Accuracy),
                 AliasSegmentItem,
-                Attributes.GetStringValueOrNull(Accuracy.TypeIdString),
+                Attributes.GetValueOrZero(Accuracy.Id).ToString(),
                 UnitsType.Percent);
 
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Speed.TypeIdString),
+                Attributes.GetValueOrZero(Speed.Id),
                 nameof(Speed),
                 AliasSegmentRanged,
                 localizer.Translate(GetAmmoPerSecond()),
@@ -227,7 +227,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Recovery.TypeIdString),
+                Attributes.GetValueOrZero(Recovery.Id),
                 nameof(Recovery),
                 AliasSegmentRanged,
                 localizer.Translate(GetReloadTime()),
@@ -236,7 +236,7 @@ namespace FullPotential.Standard.Items
             AppendToDescription(
                 sb,
                 localizer,
-                Attributes.GetIntValue(Strength.TypeIdString),
+                Attributes.GetValueOrZero(Strength.Id),
                 nameof(Strength),
                 AliasSegmentItem,
                 localizer.Translate(GetRangedDps()),

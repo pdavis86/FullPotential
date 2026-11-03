@@ -7,9 +7,7 @@ namespace FullPotential.Standard.WeaponVisuals
 {
     public class BasicGun : IItemVisualsType
     {
-        private static readonly Guid Id = new Guid("5e495402-176e-4727-9dd1-e63b6044ab1f");
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid("5e495402-176e-4727-9dd1-e63b6044ab1f");
 
         public string PrefabAddress => "Standard/Prefabs/Weapons/Gun.prefab";
 

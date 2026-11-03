@@ -7,9 +7,7 @@ namespace FullPotential.Standard.ShapeVisuals
 {
     public class ZoneOfFlames : IItemVisualsType
     {
-        private static readonly Guid Id = new Guid("ac703f12-4d5c-4b76-98f9-045c10b40fd0");
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid("ac703f12-4d5c-4b76-98f9-045c10b40fd0");
 
         public string PrefabAddress => "Standard/Prefabs/Shapes/ZoneVisuals.prefab";
 

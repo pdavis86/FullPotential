@@ -7,12 +7,10 @@ namespace FullPotential.Standard.Effects.Buffs
 {
     public class Strengthen : IAttributeEffect
     {
-        private static readonly Guid Id = new Guid("d1a00141-2014-43a3-8c2d-4422d93b8428");
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid("d1a00141-2014-43a3-8c2d-4422d93b8428");
 
         public bool IsTemporaryMaxIncrease => true;
 
-        public string AttributeId => Strength.TypeIdString;
+        public AttributeTypeId AttributeId => Strength.Id;
     }
 }

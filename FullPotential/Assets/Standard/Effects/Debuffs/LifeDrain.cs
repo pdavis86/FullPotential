@@ -9,9 +9,7 @@ namespace FullPotential.Standard.Effects.Debuffs
 {
     public class LifeDrain : IValuePoolEffectType, IHasSideEffect
     {
-        private static readonly Guid Id = new Guid("fe828022-b20d-4204-a6ff-8fada0e75bb5");
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid("fe828022-b20d-4204-a6ff-8fada0e75bb5");
 
         public EffectActionType EffectActionType => EffectActionType.PeriodicDecrease;
 

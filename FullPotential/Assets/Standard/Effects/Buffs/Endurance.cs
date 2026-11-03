@@ -8,9 +8,7 @@ namespace FullPotential.Standard.Effects.Buffs
 {
     public class Endurance : IValuePoolEffectType
     {
-        private static readonly Guid Id = new Guid("29fa3077-627c-4cc2-9efc-8293ad7ce52d");
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid("29fa3077-627c-4cc2-9efc-8293ad7ce52d");
 
         public EffectActionType EffectActionType => EffectActionType.TemporaryMaxIncrease;
 

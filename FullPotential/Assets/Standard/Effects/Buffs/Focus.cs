@@ -8,9 +8,7 @@ namespace FullPotential.Standard.Effects.Buffs
 {
     public class Focus : IValuePoolEffectType
     {
-        private static readonly Guid Id = new Guid("d19cde18-e5dd-4fc2-b14f-da7daa5014d4");
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid("d19cde18-e5dd-4fc2-b14f-da7daa5014d4");
 
         public EffectActionType EffectActionType => EffectActionType.TemporaryMaxIncrease;
 

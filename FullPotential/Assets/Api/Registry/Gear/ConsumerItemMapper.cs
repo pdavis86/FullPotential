@@ -48,15 +48,15 @@ namespace FullPotential.Api.Registry.Gear
 
             consumer.ValuePoolType = _typeRegistry.GetRegisteredByTypeId<IValuePoolType>(valuePoolTypeId);
 
-            consumer.Attributes = new Dictionary<string, string>
+            consumer.Attributes = new Dictionary<AttributeTypeId, int>
             {
-                { Strength.TypeIdString, resultFactory.ComputeAttribute(components, Strength.TypeIdString).ToString() },
-                { Efficiency.TypeIdString, resultFactory.ComputeAttribute(components, Efficiency.TypeIdString).ToString() },
-                { Range.TypeIdString, resultFactory.ComputeAttribute(components, Range.TypeIdString).ToString() },
-                { Accuracy.TypeIdString, resultFactory.ComputeAttribute(components, Accuracy.TypeIdString).ToString() },
-                { Speed.TypeIdString, resultFactory.ComputeAttribute(components, Speed.TypeIdString).ToString() },
-                { Recovery.TypeIdString, resultFactory.ComputeAttribute(components, Recovery.TypeIdString).ToString() },
-                { Duration.TypeIdString, resultFactory.ComputeAttribute(components, Duration.TypeIdString).ToString() },
+                { Strength.Id, resultFactory.ComputeAttribute(components, Strength.Id) },
+                { Efficiency.Id, resultFactory.ComputeAttribute(components, Efficiency.Id) },
+                { Range.Id, resultFactory.ComputeAttribute(components, Range.Id) },
+                { Accuracy.Id, resultFactory.ComputeAttribute(components, Accuracy.Id) },
+                { Speed.Id, resultFactory.ComputeAttribute(components, Speed.Id) },
+                { Recovery.Id, resultFactory.ComputeAttribute(components, Recovery.Id) },
+                { Duration.Id, resultFactory.ComputeAttribute(components, Duration.Id) },
             };
 
             consumer.Properties = properties;

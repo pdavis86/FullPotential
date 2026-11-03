@@ -120,8 +120,9 @@ namespace FullPotential.Standard.Weapons.Helpers
                 ? rangedHit.point
                 : handPosition + (shotDirection * MaximumRange);
 
+            // todo: hard-coded ExtraAmmoPerShot
             var ammoUsed = Math.Min(
-                1 + weaponInHand.Attributes.GetIntValue("ExtraAmmoPerShot"),
+                1 + weaponInHand.Properties.GetIntValueOrZero("ExtraAmmoPerShot"),
                 weaponInHand.Ammo);
 
             var hitGameObject = rangedHit.transform != null ? rangedHit.transform.gameObject : null;
@@ -237,7 +238,7 @@ namespace FullPotential.Standard.Weapons.Helpers
         {
             const float MaximumAccuracyAngleDeviation = 4;
 
-            var maxAccuracyAngleDeviation = (101 - item.Attributes.GetIntValue(Accuracy.TypeIdString)) / 100f * MaximumAccuracyAngleDeviation;
+            var maxAccuracyAngleDeviation = (101 - item.Attributes.GetValueOrZero(Accuracy.Id)) / 100f * MaximumAccuracyAngleDeviation;
             return aimDirection.AddNoiseOnAngle(-maxAccuracyAngleDeviation, maxAccuracyAngleDeviation);
         }
     }

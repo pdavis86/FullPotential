@@ -47,6 +47,8 @@ csharp_style_implicit_object_creation_when_type_is_apparent = false
 csharp_style_unused_value_expression_statement_preference = true:suggestion
 
 dotnet_diagnostic.IDE0010.severity = none # Add missing cases to switch statement
+dotnet_diagnostic.IDE0022.severity = suggestion # Use block body for method
+dotnet_diagnostic.IDE0024.severity = suggestion # Use block body for operator
 dotnet_diagnostic.IDE0051.severity = none # Remove unused private member 
 dotnet_diagnostic.IDE0056.severity = none # Use index operator
 dotnet_diagnostic.IDE0057.severity = none # Use range operator

@@ -7,12 +7,10 @@ namespace FullPotential.Standard.Effects.Buffs
 {
     public class Haste : IAttributeEffect
     {
-        private static readonly Guid Id = new Guid("bff9d019-bd6d-4971-8abe-6bb816199464");
-
-        public Guid TypeId => Id;
+        public Guid TypeId { get; } = new Guid("bff9d019-bd6d-4971-8abe-6bb816199464");
 
         public bool IsTemporaryMaxIncrease => true;
 
-        public string AttributeId => Speed.TypeIdString;
+        public AttributeTypeId AttributeId => Speed.Id;
     }
 }
