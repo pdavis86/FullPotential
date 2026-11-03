@@ -126,7 +126,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
     {
         public Guid TypeId { get; }
         public bool IsDefensive { get; }
-        public string AmmunitionTypeIdString { get; set; }
+        public AmmunitionTypeId? AmmunitionTypeId { get; set; }
         public bool AllowAutomatic { get; }
         public bool AllowTwoHanded { get; }
         public bool EnforceTwoHanded { get; }

@@ -26,7 +26,7 @@ namespace FullPotential.Standard.CustomGear.Reloader.ConsolidatorReloader
 
             var weapon = eventArgs.Fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
 
-            if (weapon.WeaponType.AmmunitionTypeIdString.IsNullOrWhiteSpace())
+            if (!weapon.IsRanged)
             {
                 return new HandlerResult(NextAction.Cancel);
             }
@@ -36,7 +36,7 @@ namespace FullPotential.Standard.CustomGear.Reloader.ConsolidatorReloader
                 return new HandlerResult(NextAction.Cancel);
             }
 
-            var availableAmmo = eventArgs.Fighter.Inventory.GetItemStackTotal(weapon.WeaponType.AmmunitionTypeIdString);
+            var availableAmmo = eventArgs.Fighter.Inventory.GetItemStackTotal(weapon.WeaponType.AmmunitionTypeId?.ToString());
             if (availableAmmo == 0)
             {
                 return new HandlerResult(NextAction.Cancel);

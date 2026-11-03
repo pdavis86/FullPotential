@@ -48,7 +48,12 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 
             var equippedWeapon = fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
 
-            var ammoTypeId = equippedWeapon.WeaponType.AmmunitionTypeIdString;
+            if (!equippedWeapon.IsRanged)
+            {
+                return UniTask.FromResult(new HandlerResult());
+            }
+
+            var ammoTypeId = equippedWeapon.WeaponType.AmmunitionTypeId?.ToString();
             var ammoType = _typeRegistry.GetRegisteredByTypeId<IAmmunitionType>(ammoTypeId);
 
             var ammoRemaining = fighter.Inventory.GetItemStackTotal(ammoTypeId);

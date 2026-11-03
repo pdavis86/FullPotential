@@ -26,9 +26,9 @@ namespace FullPotential.Standard.Items
 
         public IWeaponType WeaponType => (IWeaponType)RegistryType;
 
-        public bool IsRanged => WeaponType.AmmunitionTypeIdString != null;
+        public bool IsRanged => WeaponType.AmmunitionTypeId != null;
 
-        public bool IsMelee => WeaponType.AmmunitionTypeIdString == null;
+        public bool IsMelee => WeaponType.AmmunitionTypeId == null;
 
         public bool IsDefensive => WeaponType.IsDefensive;
 
@@ -274,7 +274,7 @@ namespace FullPotential.Standard.Items
                 return null;
             }
 
-            var ammoTypeId = WeaponType.AmmunitionTypeIdString;
+            var ammoTypeId = WeaponType.AmmunitionTypeId?.ToString();
             var availableAmmo = playerFighter.Inventory.GetItemStackTotal(ammoTypeId);
 
             return $"{Ammo}/{GetAmmoMax()} ({availableAmmo})";

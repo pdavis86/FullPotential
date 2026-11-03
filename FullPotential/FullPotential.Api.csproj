@@ -98,6 +98,7 @@
     <Compile Include="Assets\Api\Gameplay\Combat\Events\ActiveEffectAddedEvent.cs" />
     <Compile Include="Assets\Api\Registry\IRegisterableType.cs" />
     <Compile Include="Assets\Api\Items\IHasCharge.cs" />
+    <Compile Include="Assets\Api\Registry\Weapons\AmmunitionTypeId.cs" />
     <Compile Include="Assets\Api\Logging\AuditLevel.cs" />
     <Compile Include="Assets\Api\Registry\ITypeRegistry.cs" />
     <Compile Include="Assets\Api\EventManagement\HandlerResult.cs" />

@@ -195,7 +195,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 && itemUsed is CombatItemBase combatItem
                 && itemUsed.RegistryType is IWeaponType weaponType)
             {
-                var isMeleeWeapon = weaponType.AmmunitionTypeIdString.IsNullOrWhiteSpace();
+                var isMeleeWeapon = weaponType.AmmunitionTypeId == null;
 
                 if (isMeleeWeapon)
                 {

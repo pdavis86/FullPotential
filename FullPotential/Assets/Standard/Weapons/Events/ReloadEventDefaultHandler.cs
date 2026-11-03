@@ -21,7 +21,7 @@ namespace FullPotential.Standard.Weapons.Events
                 return new HandlerResult();
             }
 
-            var ammoInInventory = eventArgs.Fighter.Inventory.GetItemStackTotal(weapon.WeaponType.AmmunitionTypeIdString);
+            var ammoInInventory = eventArgs.Fighter.Inventory.GetItemStackTotal(weapon.WeaponType.AmmunitionTypeId?.ToString());
 
             if (ammoInInventory == 0)
             {
@@ -49,7 +49,7 @@ namespace FullPotential.Standard.Weapons.Events
 
             var equippedWeapon = fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
 
-            var ammoTypeId = equippedWeapon.WeaponType.AmmunitionTypeIdString;
+            var ammoTypeId = equippedWeapon.WeaponType.AmmunitionTypeId?.ToString();
             var ammoNeeded = equippedWeapon.GetAmmoMax() - equippedWeapon.Ammo;
 
             var countTaken = fighter.Inventory.TakeCountFromItemStacks(ammoTypeId, ammoNeeded);

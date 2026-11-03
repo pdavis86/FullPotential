@@ -49,7 +49,7 @@ namespace FullPotential.Standard.Items
             weapon.RegistryType = weaponType;
             weapon.Properties = properties;
 
-            if (weaponType.IsDefensive || weaponType.AmmunitionTypeIdString == null)
+            if (weaponType.IsDefensive || weapon.IsMelee)
             {
                 weapon.Attributes = new Dictionary<AttributeTypeId, int>
                 {

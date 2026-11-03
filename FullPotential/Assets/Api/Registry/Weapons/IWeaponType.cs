@@ -10,9 +10,9 @@ namespace FullPotential.Api.Registry.Weapons
         bool IsDefensive { get; }
 
         /// <summary>
-        /// Optional, what type of ammunition is used
+        /// Optional, ID of ammunition used
         /// </summary>
-        string AmmunitionTypeIdString { get; }
+        AmmunitionTypeId? AmmunitionTypeId { get; }
 
         /// <summary>
         /// Whether the weapon has the capability of automatic fire

@@ -26,7 +26,7 @@ namespace FullPotential.Standard.CustomGear.Reloader.TeleportReloader
 
             var weapon = eventArgs.Fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
 
-            if (weapon.WeaponType.AmmunitionTypeIdString.IsNullOrWhiteSpace())
+            if (!weapon.IsRanged)
             {
                 return UniTask.FromResult(new HandlerResult());
             }

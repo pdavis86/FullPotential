@@ -13,7 +13,7 @@ namespace FullPotential.Standard.Weapons
 
         public bool IsDefensive => false;
 
-        public string AmmunitionTypeIdString => Arrow.TypeIdString;
+        public AmmunitionTypeId? AmmunitionTypeId => Arrow.Id;
 
         public bool AllowAutomatic => false;
 
