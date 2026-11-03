@@ -1,14 +1,13 @@
 using System;
 using System.Drawing;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.CustomGear.Barrier;
 using FullPotential.Standard.SpecialSlots;
-
-using FullPotential.Api.CoreTypeIds;
 
 namespace FullPotential.Standard.ValuePools
 {

@@ -1,12 +1,10 @@
 using Cysharp.Threading.Tasks;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.EventManagement;
 using FullPotential.Api.Input.Events;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.Items;
-
-
-using FullPotential.Api.CoreTypeIds;
 
 namespace FullPotential.Standard.CustomGear.Reloader.TeleportReloader
 {

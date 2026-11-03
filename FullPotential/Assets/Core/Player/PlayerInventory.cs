@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 
 using Cysharp.Threading.Tasks;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
@@ -16,9 +17,6 @@ using FullPotential.Core.GameManagement;
 using FullPotential.Models.LivingEntity;
 
 using Unity.Netcode;
-
-
-using FullPotential.Api.CoreTypeIds;
 
 namespace FullPotential.Core.Player
 {

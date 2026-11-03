@@ -1,5 +1,6 @@
 using System.Text;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Items;
@@ -10,8 +11,6 @@ using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.Armor;
 
 using UnityEngine;
-
-using FullPotential.Api.CoreTypeIds;
 
 namespace FullPotential.Standard.Items
 {

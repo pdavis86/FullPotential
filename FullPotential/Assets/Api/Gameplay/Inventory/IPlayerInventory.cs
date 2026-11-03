@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 
-using FullPotential.Api.Items.Base;
-
 using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.Items.Base;
 
 namespace FullPotential.Api.Gameplay.Inventory
 {

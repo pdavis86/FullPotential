@@ -1,9 +1,8 @@
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Behaviours;
 
 using UnityEngine;
-
-using FullPotential.Api.CoreTypeIds;
 
 namespace FullPotential.Standard.Weapons.Events
 {

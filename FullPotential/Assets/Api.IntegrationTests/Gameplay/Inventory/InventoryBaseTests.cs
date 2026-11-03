@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.IntegrationTests.TestHelpers;
 using FullPotential.Api.Items.Base;
@@ -17,9 +18,6 @@ using NUnit.Framework;
 using Unity.Netcode;
 
 using UnityEngine;
-
-
-using FullPotential.Api.CoreTypeIds;
 
 namespace FullPotential.Api.IntegrationTests.Gameplay.Inventory
 {

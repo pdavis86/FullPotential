@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
@@ -10,8 +11,6 @@ using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.ValuePools;
-
-using FullPotential.Api.CoreTypeIds;
 
 namespace FullPotential.Standard.CustomGear.Barrier
 {

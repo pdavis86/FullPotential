@@ -1,7 +1,6 @@
-using UnityEngine;
-
-
 using FullPotential.Api.CoreTypeIds;
+
+using UnityEngine;
 
 namespace FullPotential.Api.Ui
 {

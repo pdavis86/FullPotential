@@ -1,12 +1,10 @@
 using Cysharp.Threading.Tasks;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Combat.Events;
-using FullPotential.Standard.ValuePools;
 using FullPotential.Standard.SpecialSlots;
-
-
-using FullPotential.Api.CoreTypeIds;
+using FullPotential.Standard.ValuePools;
 
 namespace FullPotential.Standard.CustomGear.Barrier
 {

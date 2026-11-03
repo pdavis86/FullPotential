@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Drawing;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Logging;
@@ -12,9 +13,6 @@ using FullPotential.Core.UI.Events;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-
-
-using FullPotential.Api.CoreTypeIds;
 
 namespace FullPotential.Core.UI.Behaviours
 {

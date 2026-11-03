@@ -6,8 +6,8 @@ using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Logging;
-using FullPotential.Standard.ValuePools;
 using FullPotential.Standard.SpecialSlots;
+using FullPotential.Standard.ValuePools;
 
 
 namespace FullPotential.Standard.CustomGear.Barrier

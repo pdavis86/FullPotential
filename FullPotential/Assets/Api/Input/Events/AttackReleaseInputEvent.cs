@@ -1,7 +1,6 @@
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Behaviours;
-
-using FullPotential.Api.CoreTypeIds;
 
 namespace FullPotential.Api.Input.Events
 {

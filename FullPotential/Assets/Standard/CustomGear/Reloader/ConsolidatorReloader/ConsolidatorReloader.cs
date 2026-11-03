@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Standard.ValuePools;
-
-using FullPotential.Api.CoreTypeIds;
 
 namespace FullPotential.Standard.CustomGear.Reloader.ConsolidatorReloader
 {

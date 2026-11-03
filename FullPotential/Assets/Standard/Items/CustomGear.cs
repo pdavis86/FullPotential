@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Items;
@@ -14,8 +15,6 @@ using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 
 using UnityEngine;
-
-using FullPotential.Api.CoreTypeIds;
 
 namespace FullPotential.Standard.Items
 {

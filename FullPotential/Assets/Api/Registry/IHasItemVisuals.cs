@@ -1,6 +1,5 @@
-using FullPotential.Api.Gameplay;
-
 using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.Gameplay;
 
 namespace FullPotential.Api.Registry
 {
