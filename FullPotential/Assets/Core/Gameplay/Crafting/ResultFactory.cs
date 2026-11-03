@@ -16,6 +16,7 @@ using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Core.Registry;
 
 

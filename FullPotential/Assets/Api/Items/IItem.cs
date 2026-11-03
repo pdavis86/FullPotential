@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 
 using FullPotential.Api.Gameplay;
-using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
+using FullPotential.Api.Gameplay.Inventory;
 
 namespace FullPotential.Api.Items
 {

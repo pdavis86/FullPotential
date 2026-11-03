@@ -1,7 +1,6 @@
 using System;
 using System.Drawing;
 
-using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Registry.Gameplay;
 

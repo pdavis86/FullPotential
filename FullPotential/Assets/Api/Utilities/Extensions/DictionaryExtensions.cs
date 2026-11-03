@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using FullPotential.Api.Gameplay.Attributes;
+using FullPotential.Api.Gameplay.Inventory;
 
 namespace FullPotential.Api.Utilities.Extensions
 {

@@ -9,6 +9,7 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Api.Gameplay.Inventory;
 
 namespace FullPotential.Standard.Items
 {

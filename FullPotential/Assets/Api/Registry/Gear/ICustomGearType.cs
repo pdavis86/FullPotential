@@ -4,6 +4,7 @@ using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Registry.Gameplay;
 
 namespace FullPotential.Api.Registry.Gear
 {

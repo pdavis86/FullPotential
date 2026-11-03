@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;

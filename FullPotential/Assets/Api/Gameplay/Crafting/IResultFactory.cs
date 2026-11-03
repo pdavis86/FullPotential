@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 
-using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry;
+using FullPotential.Api.Gameplay.Inventory;
 
 namespace FullPotential.Api.Gameplay.Crafting
 {

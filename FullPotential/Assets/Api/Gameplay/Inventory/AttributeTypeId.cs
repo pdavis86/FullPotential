@@ -1,6 +1,6 @@
 using System;
 
-namespace FullPotential.Api.Gameplay.Attributes
+namespace FullPotential.Api.Gameplay.Inventory
 {
     public readonly struct AttributeTypeId : IEquatable<AttributeTypeId>
     {

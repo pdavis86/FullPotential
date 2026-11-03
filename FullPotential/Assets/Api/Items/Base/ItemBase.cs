@@ -5,9 +5,9 @@ using System.Text;
 
 using FullPotential.Api.Data;
 using FullPotential.Api.Gameplay;
-using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
+using FullPotential.Api.Gameplay.Inventory;
 
 namespace FullPotential.Api.Items.Base
 {

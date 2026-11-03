@@ -8,7 +8,6 @@ using Cysharp.Threading.Tasks;
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.EventManagement;
 using FullPotential.Api.GameManagement;
-using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Effects;
@@ -26,6 +25,7 @@ using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Api.Gameplay.Inventory;
 
 using TMPro;
 

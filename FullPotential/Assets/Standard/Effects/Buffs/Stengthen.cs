@@ -2,6 +2,7 @@ using System;
 
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Gameplay.Inventory;
 
 namespace FullPotential.Standard.Effects.Buffs
 {

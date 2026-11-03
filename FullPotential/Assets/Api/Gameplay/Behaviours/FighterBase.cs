@@ -8,6 +8,8 @@ using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Utilities;
+using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Registry.Gameplay;
 
 using Unity.Netcode;
 

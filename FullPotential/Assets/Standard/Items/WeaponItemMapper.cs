@@ -10,6 +10,7 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Api.Gameplay.Inventory;
 
 using Range = FullPotential.Api.Gameplay.Attributes.Range;
 

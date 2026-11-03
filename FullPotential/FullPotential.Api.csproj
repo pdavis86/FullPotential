@@ -117,6 +117,7 @@
     <Compile Include="Assets\Api\Registry\IItemStackType.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\Events\ValuePoolValueChangeEvent.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\Events\ItemChargePercentageChangeEvent.cs" />
+    <Compile Include="Assets\Api\Gameplay\Inventory\AttributeTypeId.cs" />
     <Compile Include="Assets\Api\Localization\UnitsType.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\BodyPartTransforms.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\Models\InventoryChangesForClient.cs" />
@@ -136,7 +137,7 @@
     <Compile Include="Assets\Api\Registry\Effects\IAttributeEffect.cs" />
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
     <Compile Include="Assets\Api\Ui\IUiAssistant.cs" />
-    <Compile Include="Assets\Api\CoreTypeIds\ValuePoolTypeId.cs" />
+    <Compile Include="Assets\Api\Registry\Gameplay\ValuePoolTypeId.cs" />
     <Compile Include="Assets\Api\Registry\Shapes\IShapeType.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\ActiveEffect.cs" />
     <Compile Include="Assets\Api\Logging\IAuditor.cs" />
@@ -154,7 +155,6 @@
     <Compile Include="Assets\Api\CoreTypeIds\SlotId.cs" />
     <Compile Include="Assets\Api\EventManagement\EventSubscription.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\ColliderExtensions.cs" />
-    <Compile Include="Assets\Api\Gameplay\Attributes\AttributeTypeId.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\ArrayExtensions.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\Events\SlotChangeEvent.cs" />
     <Compile Include="Assets\Api\Scenes\ISceneBehaviour.cs" />

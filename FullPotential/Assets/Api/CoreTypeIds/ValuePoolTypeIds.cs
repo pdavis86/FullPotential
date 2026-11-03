@@ -1,3 +1,5 @@
+using FullPotential.Api.Registry.Gameplay;
+
 namespace FullPotential.Api.CoreTypeIds
 {
     public static class ValuePoolTypeIds

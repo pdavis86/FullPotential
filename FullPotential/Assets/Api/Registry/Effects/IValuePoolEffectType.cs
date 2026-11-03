@@ -1,5 +1,5 @@
-using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Registry.Gameplay;
 
 namespace FullPotential.Api.Registry.Effects
 {

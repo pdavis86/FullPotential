@@ -1,6 +1,6 @@
 using System;
 
-namespace FullPotential.Api.CoreTypeIds
+namespace FullPotential.Api.Registry.Gameplay
 {
     public readonly struct ValuePoolTypeId : IEquatable<ValuePoolTypeId>
     {

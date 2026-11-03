@@ -1,4 +1,4 @@
-using FullPotential.Api.Gameplay.Attributes;
+using FullPotential.Api.Gameplay.Inventory;
 
 namespace FullPotential.Api.Registry.Effects
 {
