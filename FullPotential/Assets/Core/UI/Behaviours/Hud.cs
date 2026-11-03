@@ -343,7 +343,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         private void UpdateValuePoolBars(LivingEntityBase livingEntity)
         {
-            var valuePoolsInUse = livingEntity.Inventory.GetValuePoolsInUse();
+            var valuePoolsInUse = livingEntity.Inventory.GetValuePoolTypeIdsInUse();
 
             foreach (var valuePool in _valuePools)
             {
@@ -351,8 +351,8 @@ namespace FullPotential.Core.Ui.Behaviours
 
                 ToggleSliderBar(id, valuePoolsInUse.Contains(id));
 
-                var value = livingEntity.GetValuePoolValue(id);
-                var max = livingEntity.GetValuePoolMax(id);
+                var value = livingEntity.GetValuePoolValue(new ValuePoolTypeId(valuePool.TypeId));
+                var max = livingEntity.GetValuePoolMax(new ValuePoolTypeId(valuePool.TypeId));
 
                 UpdateSliderBar(id, value, max);
             }

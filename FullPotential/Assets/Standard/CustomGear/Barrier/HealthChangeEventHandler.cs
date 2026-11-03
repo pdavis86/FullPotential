@@ -43,7 +43,7 @@ namespace FullPotential.Standard.CustomGear.Barrier
                 return UniTask.FromResult(new HandlerResult());
             }
 
-            var barrierCharge = eventArgs.LivingEntity.GetValuePoolValue(BarrierChargeValuePool.TypeIdString);
+            var barrierCharge = eventArgs.LivingEntity.GetValuePoolValue(BarrierChargeValuePool.Id);
 
             if (barrierCharge <= 0)
             {
@@ -53,7 +53,7 @@ namespace FullPotential.Standard.CustomGear.Barrier
 
             barrier.SetCustomData(CustomDataKeyLastHit, DateTime.UtcNow.ToString("u"));
 
-            eventArgs.LivingEntity.TriggerValuePoolValueUpdate(BarrierChargeValuePool.TypeIdString, eventArgs.Change, eventArgs.SourceEntityName, eventArgs.SourceItemName);
+            eventArgs.LivingEntity.TriggerValuePoolValueUpdate(BarrierChargeValuePool.Id, eventArgs.Change, eventArgs.SourceEntityName, eventArgs.SourceItemName);
 
             if (barrierCharge < Math.Abs(eventArgs.Change))
             {

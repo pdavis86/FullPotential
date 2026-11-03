@@ -63,7 +63,7 @@ namespace FullPotential.Api.Items
         public float GetValuePoolChangePerSecond()
         {
             var healthEffects = EffectTypes
-                .Where(e => e is IValuePoolEffectType se && se.ValuePoolTypeIdString == ValuePoolTypeIds.HealthId)
+                .Where(e => e is IValuePoolEffectType se && se.ValuePoolTypeId == ValuePoolTypeIds.HealthId)
                 .Select(e => (IValuePoolEffectType)e)
                 .ToList();
 

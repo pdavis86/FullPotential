@@ -106,7 +106,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #endregion
 
-        public override bool IsConsumingValuePool(string typeId)
+        public override bool IsConsumingValuePool(ValuePoolTypeId typeId)
         {
             return _slotStatuses.Any(
                 kvp => kvp.Value.IsConsumingValuePool
@@ -168,7 +168,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public bool ConsumeValuePool(IValuePoolConsumer valuePoolConsumerUsingItem, bool slowDrain = false, bool isTest = false)
         {
             var valuePoolCost = valuePoolConsumerUsingItem.GetValuePoolCost();
-            var valuePoolTypeId = valuePoolConsumerUsingItem.ValuePoolType.TypeId.ToString();
+            var valuePoolTypeId = new ValuePoolTypeId(valuePoolConsumerUsingItem.ValuePoolType.TypeId);
 
             if (slowDrain)
             {

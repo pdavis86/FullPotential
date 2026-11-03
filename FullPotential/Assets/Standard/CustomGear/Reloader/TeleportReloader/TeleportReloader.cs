@@ -18,7 +18,7 @@ namespace FullPotential.Standard.CustomGear.Reloader.TeleportReloader
 
         public SlotId SlotId => SlotId.FromString(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
-        public IEnumerable<string> ValuePoolTypeIdsInUse { get; } = new[] { Energy.TypeIdString };
+        public IEnumerable<ValuePoolTypeId> ValuePoolTypeIdsInUse { get; } = new[] { Energy.Id };
 
         public string OverrideItemDescription(ItemBase item, ILocalizer localizer, LevelOfDetail levelOfDetail)
         {

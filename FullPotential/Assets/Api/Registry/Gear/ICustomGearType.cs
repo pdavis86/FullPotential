@@ -11,7 +11,7 @@ namespace FullPotential.Api.Registry.Gear
     {
         SlotId SlotId { get; }
 
-        IEnumerable<string> ValuePoolTypeIdsInUse { get; }
+        IEnumerable<ValuePoolTypeId> ValuePoolTypeIdsInUse { get; }
 
         string OverrideItemDescription(ItemBase item, ILocalizer localizer, LevelOfDetail levelOfDetail);
     }

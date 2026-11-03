@@ -136,6 +136,7 @@
     <Compile Include="Assets\Api\Registry\Effects\IAttributeEffect.cs" />
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
     <Compile Include="Assets\Api\Ui\IUiAssistant.cs" />
+    <Compile Include="Assets\Api\CoreTypeIds\ValuePoolTypeId.cs" />
     <Compile Include="Assets\Api\Registry\Shapes\IShapeType.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\ActiveEffect.cs" />
     <Compile Include="Assets\Api\Logging\IAuditor.cs" />

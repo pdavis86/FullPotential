@@ -16,12 +16,12 @@ namespace FullPotential.Standard.CustomGear.Barrier
 
         public UniTask<HandlerResult> HandleEventAsync(ValuePoolValueChangeEvent eventArgs)
         {
-            if (eventArgs.ValuePoolTypeId != BarrierChargeValuePool.TypeIdString)
+            if (eventArgs.ValuePoolTypeId != BarrierChargeValuePool.Id)
             {
                 return UniTask.FromResult(new HandlerResult());
             }
 
-            var remainingCharge = eventArgs.LivingEntity.GetValuePoolValue(BarrierChargeValuePool.TypeIdString);
+            var remainingCharge = eventArgs.LivingEntity.GetValuePoolValue(BarrierChargeValuePool.Id);
             var showVisuals = remainingCharge > 0;
 
             eventArgs.LivingEntity.Inventory.ToggleEquippedItemVisuals(SlotId.FromString(BarrierSlot.TypeIdString), showVisuals);

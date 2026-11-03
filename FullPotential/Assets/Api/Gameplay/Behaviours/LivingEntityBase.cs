@@ -225,7 +225,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             return GetValuePools().ToDictionary(
                 x => x.TypeId.ToString(),
-                x => GetValuePoolValue(x.TypeId.ToString()));
+                x => GetValuePoolValue(new ValuePoolTypeId(x.TypeId)));
         }
 
         private void SetupValuePoolReplenishing()
@@ -281,12 +281,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        public int GetValuePoolValue(string typeId)
+        public int GetValuePoolValue(ValuePoolTypeId typeId)
         {
-            return ClampValuePoolValue(typeId, _valuePoolValueCache[typeId]);
+            return ClampValuePoolValue(typeId, _valuePoolValueCache[typeId.ToString()]);
         }
 
-        protected int ClampValuePoolValue(string typeId, int value)
+        protected int ClampValuePoolValue(ValuePoolTypeId typeId, int value)
         {
             if (value < 0)
             {
@@ -305,12 +305,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return value;
         }
 
-        public void TriggerValuePoolValueUpdate(string typeId, int oldValue, int newValue, string sourceEntityName, string sourceItemName)
+        public void TriggerValuePoolValueUpdate(ValuePoolTypeId typeId, int oldValue, int newValue, string sourceEntityName, string sourceItemName)
         {
             TriggerValuePoolValueUpdate(typeId, newValue - oldValue, sourceEntityName, sourceItemName);
         }
 
-        public void TriggerValuePoolValueUpdate(string typeId, int change, string sourceEntityName, string sourceItemName)
+        public void TriggerValuePoolValueUpdate(ValuePoolTypeId typeId, int change, string sourceEntityName, string sourceItemName)
         {
             var currentValue = GetValuePoolValue(typeId);
             var newValue = currentValue + change;
@@ -318,18 +318,18 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _eventBus.Publish(changeEvent);
         }
 
-        public void UpdateValuePoolValue(string typeId, int newValue, string sourceEntityName, string sourceItemName)
+        public void UpdateValuePoolValue(ValuePoolTypeId typeId, int newValue, string sourceEntityName, string sourceItemName)
         {
             newValue = ClampValuePoolValue(typeId, newValue);
 
             if (_logger.IsEnabled(AuditLevel.Debug))
             {
                 var locationName = IsServer ? "Server" : "Client";
-                var registeredType = _typeRegistry.GetRegisteredByTypeId<IValuePoolType>(typeId);
-                _logger.Debug("{0}-{1}: '{2}' changed from {3} to {4} by {5} using '{6}'", locationName, OwnerClientId, _localizer.Translate(registeredType), _valuePoolValueCache[typeId], newValue, sourceEntityName, sourceItemName);
+                var registeredType = _typeRegistry.GetRegisteredByTypeId<IValuePoolType>(typeId.ToString());
+                _logger.Debug("{0}-{1}: '{2}' changed from {3} to {4} by {5} using '{6}'", locationName, OwnerClientId, _localizer.Translate(registeredType), _valuePoolValueCache[typeId.ToString()], newValue, sourceEntityName, sourceItemName);
             }
 
-            _valuePoolValueCache[typeId] = newValue;
+            _valuePoolValueCache[typeId.ToString()] = newValue;
 
             if (IsServer && typeId == ValuePoolTypeIds.HealthId)
             {
@@ -347,13 +347,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
             }
         }
 
-        public int GetValuePoolMax(string valuePoolTypeId)
+        public int GetValuePoolMax(ValuePoolTypeId valuePoolTypeId)
         {
             //todo: zzz v0.8 - trait-based valuePool max
             return 100 + GetValuePoolMaxAdjustment(valuePoolTypeId);
         }
 
-        public abstract bool IsConsumingValuePool(string typeId);
+        public abstract bool IsConsumingValuePool(ValuePoolTypeId typeId);
 
         #endregion
 
@@ -635,7 +635,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         private void ApplySingleValueChangeToValuePoolInternal(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position, CombatResult combatResult)
         {
-            if (valuePoolEffect.ValuePoolTypeIdString == ValuePoolTypeIds.HealthId)
+            if (valuePoolEffect.ValuePoolTypeId == ValuePoolTypeIds.HealthId)
             {
                 if (combatResult.Change < 0)
                 {
@@ -649,7 +649,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 }
             }
 
-            TriggerValuePoolValueUpdate(valuePoolEffect.ValuePoolTypeIdString, combatResult.Change, sourceFighter.name, itemUsed?.Name);
+            TriggerValuePoolValueUpdate(valuePoolEffect.ValuePoolTypeId, combatResult.Change, sourceFighter.name, itemUsed?.Name);
         }
 
         public void ApplyTemporaryMaxActionToValuePool(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect)
@@ -658,7 +658,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
             var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, valuePoolEffect, this);
             AddOrUpdateEffect(valuePoolEffect, combatResult.Change, expiry);
-            TriggerValuePoolValueUpdate(valuePoolEffect.ValuePoolTypeIdString, 0, sourceFighter.name, itemUsed.Name);
+            TriggerValuePoolValueUpdate(valuePoolEffect.ValuePoolTypeId, 0, sourceFighter.name, itemUsed.Name);
         }
 
         public List<ActiveEffect> GetActiveEffects()
@@ -680,12 +680,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 .Sum(x => x.Change * (x.Effect is IAttributeEffect attributeEffect && attributeEffect.IsTemporaryMaxIncrease ? 1 : -1));
         }
 
-        private int GetValuePoolMaxAdjustment(string valuePoolTypeId)
+        private int GetValuePoolMaxAdjustment(ValuePoolTypeId valuePoolTypeId)
         {
             return _activeEffects
                 .Where(x =>
                     x.Effect is IValuePoolEffectType valuePoolEffect
-                    && valuePoolEffect.ValuePoolTypeIdString == valuePoolTypeId
+                    && valuePoolEffect.ValuePoolTypeId == valuePoolTypeId
                     && valuePoolEffect.EffectActionType is EffectActionType.TemporaryMaxIncrease or EffectActionType.TemporaryMaxDecrease)
                 .Sum(x => x.Change);
         }
@@ -702,7 +702,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             //todo: zzz v0.7 - Add health single decrease effect to a UI options list that can be changed
             var hideEffectFromFighter = valuePoolEffect != null
                 && valuePoolEffect.EffectActionType == EffectActionType.SingleDecrease
-                && valuePoolEffect.ValuePoolTypeIdString == ValuePoolTypeIds.HealthId;
+                && valuePoolEffect.ValuePoolTypeId == ValuePoolTypeIds.HealthId;
 
             if (hideEffectFromFighter)
             {
@@ -776,7 +776,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 .Where(x =>
                     x.Effect is IValuePoolEffectType valuePoolEffect
                     && valuePoolEffect.EffectActionType is EffectActionType.TemporaryMaxIncrease or EffectActionType.TemporaryMaxDecrease)
-                .Select(x => ((IValuePoolEffectType)x.Effect).ValuePoolTypeIdString)
+                .Select(x => ((IValuePoolEffectType)x.Effect).ValuePoolTypeId)
                 .Distinct()
                 .ToList();
 

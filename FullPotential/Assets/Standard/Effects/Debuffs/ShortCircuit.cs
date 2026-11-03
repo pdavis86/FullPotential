@@ -1,5 +1,6 @@
 using System;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Standard.ValuePools;
@@ -12,6 +13,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public EffectActionType EffectActionType => EffectActionType.TemporaryMaxDecrease;
 
-        public string ValuePoolTypeIdString => Energy.TypeIdString;
+        public ValuePoolTypeId ValuePoolTypeId => Energy.Id;
     }
 }

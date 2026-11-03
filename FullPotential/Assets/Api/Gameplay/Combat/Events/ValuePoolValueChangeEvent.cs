@@ -1,4 +1,5 @@
 using FullPotential.Api.EventManagement;
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
 
 namespace FullPotential.Api.Gameplay.Combat.Events
@@ -7,7 +8,7 @@ namespace FullPotential.Api.Gameplay.Combat.Events
     {
         public LivingEntityBase LivingEntity { get; }
 
-        public string ValuePoolTypeId { get; }
+        public ValuePoolTypeId ValuePoolTypeId { get; }
 
         public int NewValue { get; }
 
@@ -21,7 +22,7 @@ namespace FullPotential.Api.Gameplay.Combat.Events
 
         public ValuePoolValueChangeEvent(
             LivingEntityBase livingEntity,
-            string valuePoolTypeId,
+            ValuePoolTypeId valuePoolTypeId,
             int newValue,
             int change,
             int maxValue,

@@ -2,6 +2,7 @@ using System;
 
 namespace FullPotential.Api.CoreTypeIds
 {
+    // todo: Create a SlotTypeId too
     public readonly struct SlotId : IEquatable<SlotId>
     {
         private readonly string _idString;

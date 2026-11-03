@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Effects;
@@ -14,6 +14,6 @@ namespace FullPotential.Standard.Effects
 
         public EffectActionType EffectActionType => EffectActionType.SingleIncrease;
 
-        public string ValuePoolTypeIdString => ValuePoolTypeIds.StaminaId;
+        public ValuePoolTypeId ValuePoolTypeId => ValuePoolTypeIds.StaminaId;
     }
 }

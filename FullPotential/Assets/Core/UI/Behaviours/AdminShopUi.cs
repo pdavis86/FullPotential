@@ -50,6 +50,7 @@ namespace FullPotential.Core.UI.Behaviours
         private List<IShapeType> _registeredShapes;
 
         private List<NameAndValueSlider> _attributeSliderBehaviours;
+        private List<NameAndValueSlider> _propertySliderBehaviours;
         private List<NameAndToggle> _propertyToggleBehaviours;
         private List<NameAndToggle> _effectToggleBehaviours;
         private List<NameAndToggle> _targetingToggleBehaviours;
@@ -96,6 +97,7 @@ namespace FullPotential.Core.UI.Behaviours
         private void InstantiateAttributeControls()
         {
             _attributeSliderBehaviours = new List<NameAndValueSlider>();
+            _propertySliderBehaviours = new List<NameAndValueSlider>();
             _propertyToggleBehaviours = new List<NameAndToggle>();
 
             foreach (var attribute in _typeRegistry.GetRegisteredTypes<IAttribute>())
@@ -107,7 +109,6 @@ namespace FullPotential.Core.UI.Behaviours
                 _attributeSliderBehaviours.Add(behaviour);
             }
 
-            // todo: make ExtraAmmoPerShot and IsAutomatic custom properties
             var extraAmmoSlider = Instantiate(_nameAndValueSliderPrefab, _attributesScrollViewContentParent.transform);
             var extraAmmoBehaviour = extraAmmoSlider.GetComponent<NameAndValueSlider>();
             extraAmmoBehaviour.Id = "ExtraAmmoPerShot";
@@ -115,7 +116,7 @@ namespace FullPotential.Core.UI.Behaviours
             extraAmmoBehaviour.Slider.maxValue = ResultFactory.MaxExtraAmmo;
             extraAmmoBehaviour.Slider.value = 1;
             extraAmmoBehaviour.Slider.value = 0;
-            _attributeSliderBehaviours.Add(extraAmmoBehaviour);
+            _propertySliderBehaviours.Add(extraAmmoBehaviour);
 
             var automaticToggle = Instantiate(_nameAndTogglePrefab, _attributesScrollViewContentParent.transform);
             var automaticBehaviour = automaticToggle.GetComponent<NameAndToggle>();
@@ -170,11 +171,14 @@ namespace FullPotential.Core.UI.Behaviours
 
         private void ResetSliders()
         {
-            foreach (var behaviour in _attributeSliderBehaviours)
+            foreach (var collection in new[] { _attributeSliderBehaviours, _propertySliderBehaviours })
             {
-                behaviour.Slider.value = Mathf.Approximately(behaviour.Slider.maxValue, 100)
-                    ? _random.Next(1, 101)
-                    : 0;
+                foreach (var behaviour in collection)
+                {
+                    behaviour.Slider.value = Mathf.Approximately(behaviour.Slider.maxValue, 100)
+                        ? _random.Next(1, 101)
+                        : 0;
+                }
             }
         }
 
@@ -194,6 +198,7 @@ namespace FullPotential.Core.UI.Behaviours
         private Dictionary<AttributeTypeId, int> GetAttributes()
         {
             var attributes = new Dictionary<AttributeTypeId, int>();
+
             foreach (var slider in _attributeSliderBehaviours)
             {
                 attributes[AttributeTypeId.FromString(slider.Id)] = (int)slider.Slider.value;
@@ -205,6 +210,12 @@ namespace FullPotential.Core.UI.Behaviours
         private Dictionary<string, string> GetProperties()
         {
             var properties = new Dictionary<string, string>();
+
+            foreach (var slider in _propertySliderBehaviours)
+            {
+                properties[slider.Id] = slider.Slider.value.ToString();
+            }
+
             foreach (var toggle in _propertyToggleBehaviours)
             {
                 properties[toggle.Id] = toggle.Toggle.isOn.ToString();

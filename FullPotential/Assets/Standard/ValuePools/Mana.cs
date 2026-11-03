@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Registry.Gameplay;
 
@@ -8,8 +9,9 @@ namespace FullPotential.Standard.ValuePools
 {
     public class Mana : IValuePoolType
     {
-        public const string TypeIdString = "378443ee-7942-4cd5-977d-818ee03333e9";
+        public static readonly ValuePoolTypeId Id = ValuePoolTypeId.FromString(TypeIdString);
 
+        private const string TypeIdString = "378443ee-7942-4cd5-977d-818ee03333e9";
         private static readonly Color ValuePoolBackgroundColor = Color.FromArgb(39, 80, 147); // Blue
         private static readonly Color ValuePoolTextColor = Color.FromArgb(255, 255, 255); // White
 
@@ -27,11 +29,11 @@ namespace FullPotential.Standard.ValuePools
 
         private void PerformReplenish(LivingEntityBase livingEntity)
         {
-            if (!livingEntity.IsConsumingValuePool(TypeIdString)
-                && livingEntity.GetValuePoolValue(TypeIdString) < livingEntity.GetValuePoolMax(TypeIdString))
+            if (!livingEntity.IsConsumingValuePool(ValuePoolTypeId.FromString(TypeIdString))
+                && livingEntity.GetValuePoolValue(ValuePoolTypeId.FromString(TypeIdString)) < livingEntity.GetValuePoolMax(ValuePoolTypeId.FromString(TypeIdString)))
             {
                 //todo: zzz v0.8 - trait-based valuePool recharge
-                livingEntity.TriggerValuePoolValueUpdate(TypeIdString, 1, livingEntity.name, null);
+                livingEntity.TriggerValuePoolValueUpdate(ValuePoolTypeId.FromString(TypeIdString), 1, livingEntity.name, null);
             }
         }
     }

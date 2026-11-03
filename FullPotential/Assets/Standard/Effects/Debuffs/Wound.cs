@@ -12,6 +12,6 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public EffectActionType EffectActionType => EffectActionType.TemporaryMaxDecrease;
 
-        public string ValuePoolTypeIdString => ValuePoolTypeIds.HealthId;
+        public ValuePoolTypeId ValuePoolTypeId => ValuePoolTypeIds.HealthId;
     }
 }

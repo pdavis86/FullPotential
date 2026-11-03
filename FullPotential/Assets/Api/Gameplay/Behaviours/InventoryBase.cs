@@ -459,7 +459,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             ApplyInventoryChanges(changes);
         }
 
-        public List<string> GetValuePoolsInUse()
+        public List<string> GetValuePoolTypeIdsInUse()
         {
             var valuePoolsInUse = new List<string> { ValuePoolTypeIds.HealthId, ValuePoolTypeIds.StaminaId };
 

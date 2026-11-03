@@ -13,7 +13,7 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public EffectActionType EffectActionType => EffectActionType.PeriodicDecrease;
 
-        public string ValuePoolTypeIdString => ValuePoolTypeIds.HealthId;
+        public ValuePoolTypeId ValuePoolTypeId => ValuePoolTypeIds.HealthId;
 
         public string SideEffectTypeIdString => LifeTap.TypeIdString;
     }

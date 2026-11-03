@@ -1,3 +1,4 @@
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Effects;
 
 namespace FullPotential.Api.Registry.Effects
@@ -12,6 +13,6 @@ namespace FullPotential.Api.Registry.Effects
         /// <summary>
         /// The Id of the valuePool type which will be affected
         /// </summary>
-        string ValuePoolTypeIdString { get; }
+        ValuePoolTypeId ValuePoolTypeId { get; }
     }
 }

@@ -22,7 +22,7 @@ namespace FullPotential.Standard.CustomGear.Barrier
 
         public SlotId SlotId => SlotId.FromString(SpecialSlots.BarrierSlot.TypeIdString);
 
-        public IEnumerable<string> ValuePoolTypeIdsInUse { get; } = new[] { Energy.TypeIdString, BarrierChargeValuePool.TypeIdString };
+        public IEnumerable<ValuePoolTypeId> ValuePoolTypeIdsInUse { get; } = new[] { Energy.Id, BarrierChargeValuePool.Id };
 
         public string OverrideItemDescription(ItemBase item, ILocalizer localizer, LevelOfDetail levelOfDetail)
         {

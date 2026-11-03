@@ -14,6 +14,6 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public EffectActionType EffectActionType => EffectActionType.PeriodicIncrease;
 
-        public string ValuePoolTypeIdString => ValuePoolTypeIds.HealthId;
+        public ValuePoolTypeId ValuePoolTypeId => ValuePoolTypeIds.HealthId;
     }
 }

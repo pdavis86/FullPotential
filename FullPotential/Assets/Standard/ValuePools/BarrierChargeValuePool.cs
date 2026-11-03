@@ -13,8 +13,9 @@ namespace FullPotential.Standard.ValuePools
 {
     public class BarrierChargeValuePool : IValuePoolType
     {
-        public const string TypeIdString = "9f026e17-d313-4402-9da6-c5b002e26c64";
+        public static readonly ValuePoolTypeId Id = ValuePoolTypeId.FromString(TypeIdString);
 
+        private const string TypeIdString = "9f026e17-d313-4402-9da6-c5b002e26c64";
         private static readonly Color ValuePoolBackgroundColor = Color.FromArgb(185, 36, 158); // Purple
         private static readonly Color ValuePoolTextColor = Color.FromArgb(255, 255, 255); // White
 
@@ -39,7 +40,7 @@ namespace FullPotential.Standard.ValuePools
 
         private void PerformReplenish(LivingEntityBase livingEntity)
         {
-            if (livingEntity.GetValuePoolValue(TypeIdString) >= livingEntity.GetValuePoolMax(TypeIdString))
+            if (livingEntity.GetValuePoolValue(ValuePoolTypeId.FromString(TypeIdString)) >= livingEntity.GetValuePoolMax(ValuePoolTypeId.FromString(TypeIdString)))
             {
                 return;
             }
@@ -71,11 +72,11 @@ namespace FullPotential.Standard.ValuePools
             }
 
             //Consume item valuePool (-2 to overcome replenish of 1)
-            livingEntity.TriggerValuePoolValueUpdate(equippedBarrier.ValuePoolType.TypeId.ToString(), -2, targetFighter.name, null);
+            livingEntity.TriggerValuePoolValueUpdate(new ValuePoolTypeId(equippedBarrier.ValuePoolType.TypeId), -2, targetFighter.name, null);
 
             //Replenish barrier valuePool
             //todo: zzz v0.8 - trait-based valuePool recharge
-            livingEntity.TriggerValuePoolValueUpdate(TypeIdString, Barrier.GetRechargeRate(equippedBarrier), targetFighter.name, null);
+            livingEntity.TriggerValuePoolValueUpdate(ValuePoolTypeId.FromString(TypeIdString), Barrier.GetRechargeRate(equippedBarrier), targetFighter.name, null);
         }
     }
 }

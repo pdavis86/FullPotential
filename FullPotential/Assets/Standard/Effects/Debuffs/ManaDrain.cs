@@ -1,5 +1,6 @@
 using System;
 
+using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Standard.Effects.Buffs;
@@ -13,7 +14,7 @@ namespace FullPotential.Standard.Effects.Debuffs
 
         public EffectActionType EffectActionType => EffectActionType.PeriodicDecrease;
 
-        public string ValuePoolTypeIdString => Mana.TypeIdString;
+        public ValuePoolTypeId ValuePoolTypeId => Mana.Id;
 
         public string SideEffectTypeIdString => ManaTap.TypeIdString;
     }

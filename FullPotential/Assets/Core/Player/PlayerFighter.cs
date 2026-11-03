@@ -465,10 +465,10 @@ namespace FullPotential.Core.Player
                 _entityName.Value = Username;
             }
 
-            var health = playerData.ValuePools.FirstOrDefault(kvp => kvp.Key == ValuePoolTypeIds.HealthId);
+            var health = playerData.ValuePools.FirstOrDefault(kvp => kvp.Key == ValuePoolTypeIds.HealthId.ToString());
             if (health.Value == 0)
             {
-                playerData.ValuePools[ValuePoolTypeIds.HealthId] = GetValuePoolMax(ValuePoolTypeIds.HealthId);
+                playerData.ValuePools[ValuePoolTypeIds.HealthId.ToString()] = GetValuePoolMax(ValuePoolTypeIds.HealthId);
             }
 
             // todo: These should come from the server

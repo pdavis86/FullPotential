@@ -12,6 +12,6 @@ namespace FullPotential.Standard.Effects.Buffs
 
         public EffectActionType EffectActionType => EffectActionType.TemporaryMaxIncrease;
 
-        public string ValuePoolTypeIdString => ValuePoolTypeIds.StaminaId;
+        public ValuePoolTypeId ValuePoolTypeId => ValuePoolTypeIds.StaminaId;
     }
 }

@@ -12,6 +12,6 @@ namespace FullPotential.Core.Registry.Effects
 
         public EffectActionType EffectActionType => EffectActionType.SingleDecrease;
 
-        public string ValuePoolTypeIdString => ValuePoolTypeIds.HealthId;
+        public ValuePoolTypeId ValuePoolTypeId => ValuePoolTypeIds.HealthId;
     }
 }
