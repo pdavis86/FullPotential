@@ -8,6 +8,7 @@ using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Registry.Visuals;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities;
@@ -18,7 +19,6 @@ using Unity.Collections;
 using Unity.Netcode;
 
 using UnityEngine;
-
 
 namespace FullPotential.Standard.Targeting
 {

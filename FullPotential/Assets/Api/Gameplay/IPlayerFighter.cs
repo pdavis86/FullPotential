@@ -4,7 +4,6 @@ using FullPotential.Models.LivingEntity;
 
 using UnityEngine;
 
-
 namespace FullPotential.Api.Gameplay
 {
     public interface IPlayerFighter : IFighter, ISaveable

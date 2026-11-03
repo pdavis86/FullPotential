@@ -38,7 +38,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 namespace FullPotential.Core.Ui.Behaviours
 {
     public class Hud : MonoBehaviour, IHud

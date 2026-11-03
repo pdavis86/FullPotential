@@ -2,7 +2,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-
 namespace FullPotential.Api.Gameplay
 {
     public interface IPlayerBehaviour

@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-
 namespace FullPotential.Api.Scenes
 {
     public interface ISceneBehaviour

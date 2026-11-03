@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using FullPotential.Models.GameManagement;
 using FullPotential.Models.LivingEntity;
 
-
 namespace FullPotential.Api.Data
 {
     public interface IDataSaver

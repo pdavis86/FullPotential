@@ -26,7 +26,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
 namespace FullPotential.Core.GameManagement
 {
     public class GameManager : MonoBehaviour, IGameManager

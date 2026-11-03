@@ -1,10 +1,10 @@
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
-using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Registry.Visuals;
 
 namespace FullPotential.Core.Gameplay.Crafting
 {

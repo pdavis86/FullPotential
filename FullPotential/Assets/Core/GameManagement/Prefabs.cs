@@ -2,7 +2,6 @@
 
 using UnityEngine;
 
-
 namespace FullPotential.Core.GameManagement
 {
     public class Prefabs : MonoBehaviour

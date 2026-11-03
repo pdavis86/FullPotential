@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using FullPotential.Api.Gameplay.Attributes;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Registry;
@@ -11,9 +12,9 @@ using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Registry.Visuals;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Models.LivingEntity;
 
 using Range = FullPotential.Api.Gameplay.Attributes.Range;

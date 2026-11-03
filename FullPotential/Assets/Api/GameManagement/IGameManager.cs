@@ -5,7 +5,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-
 namespace FullPotential.Api.GameManagement
 {
     public interface IGameManager

@@ -6,7 +6,6 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
 namespace FullPotential.Core.Unity.Static
 {
     [InitializeOnLoad]

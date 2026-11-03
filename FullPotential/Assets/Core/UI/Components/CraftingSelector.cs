@@ -13,7 +13,6 @@ using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 namespace FullPotential.Core.UI.Components
 {
     public class CraftingSelector : MonoBehaviour

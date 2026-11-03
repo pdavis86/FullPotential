@@ -16,7 +16,6 @@ using FullPotential.Core.UI.Components;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 namespace FullPotential.Core.Ui.Behaviours
 {
     public class CharacterMenuUiCraftingTab : MonoBehaviour

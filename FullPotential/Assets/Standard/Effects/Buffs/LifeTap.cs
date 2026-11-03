@@ -4,7 +4,6 @@ using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
-using FullPotential.Api.Registry.Effects;
 
 namespace FullPotential.Standard.Effects.Buffs
 {

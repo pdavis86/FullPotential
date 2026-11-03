@@ -9,7 +9,6 @@ using FullPotential.Api.Logging;
 using FullPotential.Standard.SpecialSlots;
 using FullPotential.Standard.ValuePools;
 
-
 namespace FullPotential.Standard.CustomGear.Barrier
 {
     public class HealthChangeEventHandler : IEventHandler<ValuePoolValueChangeEvent>

@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-
 namespace FullPotential.Core.Ui.Behaviours
 {
     public class CharacterMenuUi : MonoBehaviour

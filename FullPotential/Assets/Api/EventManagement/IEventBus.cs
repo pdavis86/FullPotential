@@ -2,7 +2,6 @@ using System;
 
 using Cysharp.Threading.Tasks;
 
-
 namespace FullPotential.Api.EventManagement
 {
     public interface IEventBus

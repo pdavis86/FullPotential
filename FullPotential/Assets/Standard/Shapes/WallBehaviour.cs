@@ -7,6 +7,7 @@ using FullPotential.Api.Items;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Shapes;
+using FullPotential.Api.Registry.Visuals;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;

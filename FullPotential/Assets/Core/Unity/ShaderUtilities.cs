@@ -4,7 +4,6 @@ using FullPotential.Api.Unity.Constants;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-
 namespace FullPotential.Core.Unity
 {
     public class ShaderUtilities : IShaderUtilities

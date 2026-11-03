@@ -21,7 +21,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-
 namespace FullPotential.Core.Localization
 {
     public class Localizer : ILocalizer

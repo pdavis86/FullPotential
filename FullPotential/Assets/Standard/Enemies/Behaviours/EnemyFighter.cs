@@ -4,7 +4,6 @@ using FullPotential.Api.Ui;
 
 using UnityEngine;
 
-
 namespace FullPotential.Standard.Enemies.Behaviours
 {
     public class EnemyFighter : FighterBase

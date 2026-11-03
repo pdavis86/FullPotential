@@ -8,7 +8,6 @@ using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 namespace FullPotential.Core.Utilities.UtilityBehaviours
 {
     [RequireComponent(typeof(Text))]

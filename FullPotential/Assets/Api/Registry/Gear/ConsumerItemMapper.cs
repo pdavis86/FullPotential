@@ -4,13 +4,13 @@ using System.Linq;
 
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Crafting;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Api.Gameplay.Inventory;
 
 using Range = FullPotential.Api.Gameplay.Attributes.Range;
 

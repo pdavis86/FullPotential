@@ -5,6 +5,7 @@ using System.Linq;
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Crafting;
 using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
@@ -16,9 +17,7 @@ using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Core.Registry;
-
 
 namespace FullPotential.Core.Gameplay.Crafting
 {

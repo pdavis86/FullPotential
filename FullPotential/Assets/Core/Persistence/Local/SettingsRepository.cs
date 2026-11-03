@@ -8,7 +8,6 @@ using FullPotential.Core.Localization;
 
 using UnityEngine;
 
-
 namespace FullPotential.Core.Persistence.Local
 {
     public class SettingsRepository : ISettingsRepository

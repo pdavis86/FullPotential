@@ -22,6 +22,7 @@ using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Registry.Visuals;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Core.Gameplay.Events;
 
@@ -29,7 +30,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-
 
 namespace FullPotential.Core.Registry
 {

@@ -14,7 +14,6 @@ using FullPotential.Api.Registry.Weapons;
 using FullPotential.Models.LivingEntity;
 using FullPotential.Standard.Items;
 
-
 namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 {
     public class ReloadEventHandler : IEventHandler<ReloadInputEvent>

@@ -13,7 +13,6 @@ using FullPotential.Standard.SpecialSlots;
 
 using UnityEngine;
 
-
 namespace FullPotential.Standard.CustomGear.Reloader
 {
     public class SlotChangeEventHandler : IEventHandler<SlotChangeEvent>

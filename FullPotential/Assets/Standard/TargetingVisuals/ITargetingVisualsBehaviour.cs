@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-
 namespace FullPotential.Standard.TargetingVisuals
 {
     public interface ITargetingVisualsBehaviour

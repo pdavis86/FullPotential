@@ -8,7 +8,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-
 namespace FullPotential.Core.Player
 {
     [RequireComponent(typeof(Rigidbody))]

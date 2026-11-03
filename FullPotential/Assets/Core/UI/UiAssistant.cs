@@ -4,7 +4,6 @@ using FullPotential.Api.Utilities.Extensions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-
 namespace FullPotential.Core.Ui
 {
     public class UiAssistant : IUiAssistant

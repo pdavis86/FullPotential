@@ -2,7 +2,6 @@ using Unity.Netcode.Components;
 
 using UnityEngine;
 
-
 namespace FullPotential.Core.Networking
 {
     /// <summary>

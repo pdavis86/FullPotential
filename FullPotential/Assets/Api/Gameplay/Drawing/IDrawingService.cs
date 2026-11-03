@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-
 namespace FullPotential.Api.Gameplay.Drawing
 {
     public interface IDrawingService

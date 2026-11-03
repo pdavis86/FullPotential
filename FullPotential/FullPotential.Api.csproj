@@ -139,8 +139,9 @@
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
     <Compile Include="Assets\Api\Ui\IUiAssistant.cs" />
     <Compile Include="Assets\Api\Registry\Gameplay\ValuePoolTypeId.cs" />
+    <Compile Include="Assets\Api\Registry\Visuals\ItemVisualsTypeId.cs" />
     <Compile Include="Assets\Api\Registry\Effects\EffectTypeId.cs" />
-    <Compile Include="Assets\Api\Registry\Shapes\IShapeType.cs" />
+    <Compile Include="Assets\Api\Registry\Shapes\IShapeType.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\ActiveEffect.cs" />
     <Compile Include="Assets\Api\Logging\IAuditor.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesCollection.cs" />
@@ -169,7 +170,7 @@
     <Compile Include="Assets\Api\Items\LevelOfDetail.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector2Extensions.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\PlayerJoinedEvent.cs" />
-    <Compile Include="Assets\Api\Registry\IItemVisualsType.cs" />
+    <Compile Include="Assets\Api\Registry\Visuals\IItemVisualsType.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector3Extensions.cs" />
     <Compile Include="Assets\Api\Utilities\MathsHelper.cs" />
     <Compile Include="Assets\Api\Items\Consumer.cs" />
@@ -201,7 +202,7 @@
     <Compile Include="Assets\Api\Registry\Gear\ConsumerItemMapper.cs" />
     <Compile Include="Assets\Api\Gameplay\Attributes\Luck.cs" />
     <Compile Include="Assets\Api\Gameplay\Crafting\IResultFactory.cs" />
-    <Compile Include="Assets\Api\Registry\IHasItemVisuals.cs" />
+    <Compile Include="Assets\Api\Registry\Visuals\IHasItemVisuals.cs" />
     <Compile Include="Assets\Api\Registry\IHasNetworkPrefab.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingType.cs" />
     <Compile Include="Assets\Api\Networking\IRpcService.cs" />
@@ -1339,8 +1340,6 @@
       <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
   </ItemGroup>
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
   <ItemGroup>

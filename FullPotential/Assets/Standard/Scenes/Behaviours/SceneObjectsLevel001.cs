@@ -11,7 +11,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-
 namespace FullPotential.Standard.Scenes.Behaviours
 {
     public class SceneObjectsLevel001 : NetworkBehaviour, ISceneBehaviour

@@ -5,7 +5,6 @@ using FullPotential.Api.Registry.Effects;
 
 using UnityEngine;
 
-
 namespace FullPotential.Api.Gameplay.Combat
 {
     public interface ICombatService

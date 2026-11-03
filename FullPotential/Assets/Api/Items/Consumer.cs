@@ -14,6 +14,7 @@ using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Registry.Visuals;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 
@@ -40,7 +41,7 @@ namespace FullPotential.Api.Items
         public IShapeType ShapeType { get; set; }
         public IValuePoolType ValuePoolType { get; set; }
 
-        public string VisualsTypeId { get; set; }
+        public ItemVisualsTypeId VisualsTypeId { get; set; }
 
         public IItemVisualsType Visuals { get; set; }
 

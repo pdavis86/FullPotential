@@ -9,7 +9,6 @@ using Unity.Netcode;
 
 using UnityEngine.InputSystem;
 
-
 namespace FullPotential.Standard.Scenes.Behaviours
 {
     public class ShopInteractable : Interactable

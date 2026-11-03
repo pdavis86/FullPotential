@@ -1,6 +1,7 @@
 using System;
 
-using FullPotential.Api.Registry;
+using FullPotential.Api.Registry.Visuals;
+
 using FullPotential.Standard.CustomGear.Barrier;
 
 namespace FullPotential.Standard.CustomGearVisuals

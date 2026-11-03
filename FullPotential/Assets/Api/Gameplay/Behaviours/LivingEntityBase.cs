@@ -11,6 +11,7 @@ using FullPotential.Api.GameManagement;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player.Events;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
@@ -25,7 +26,6 @@ using FullPotential.Api.Ui;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Api.Gameplay.Inventory;
 
 using TMPro;
 
@@ -33,8 +33,6 @@ using Unity.Collections;
 using Unity.Netcode;
 
 using UnityEngine;
-using FullPotential.Api.Registry.Effects;
-
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {

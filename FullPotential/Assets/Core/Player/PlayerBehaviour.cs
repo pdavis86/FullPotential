@@ -39,7 +39,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-
 namespace FullPotential.Core.Player
 {
     public class PlayerBehaviour : NetworkBehaviour, IPlayerBehaviour

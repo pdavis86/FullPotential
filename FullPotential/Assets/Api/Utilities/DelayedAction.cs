@@ -2,7 +2,6 @@ using System;
 
 using UnityEngine;
 
-
 namespace FullPotential.Api.Utilities
 {
     public class DelayedAction

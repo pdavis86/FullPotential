@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.Items;
 
-
 namespace FullPotential.Api.Registry
 {
     //todo: Remove anything from the Registry namespace that is not registerable

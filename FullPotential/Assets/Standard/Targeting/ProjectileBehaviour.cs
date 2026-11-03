@@ -7,6 +7,7 @@ using FullPotential.Api.Items;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Registry.Visuals;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.Weapons.Helpers;
 

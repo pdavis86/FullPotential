@@ -7,7 +7,6 @@ using TMPro;
 
 using UnityEngine;
 
-
 namespace FullPotential.Core.Utilities.UtilityBehaviours
 {
     [RequireComponent(typeof(TextMeshProUGUI))]

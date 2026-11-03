@@ -2,7 +2,6 @@ using System;
 
 using FullPotential.Api.Registry.Weapons;
 
-
 namespace FullPotential.Standard.Ammo
 {
     public class Bullet : IAmmunitionType

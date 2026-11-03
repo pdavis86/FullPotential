@@ -4,7 +4,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-
 namespace FullPotential.Api.Unity.Extensions
 {
     public static class GameObjectExtensions

@@ -8,7 +8,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-
 namespace FullPotential.Core.Networking
 {
     public class RpcService : IRpcService

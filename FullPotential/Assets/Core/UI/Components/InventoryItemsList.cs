@@ -17,7 +17,6 @@ using FullPotential.Core.UI.Behaviours;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 namespace FullPotential.Core.Ui.Components
 {
     public static class InventoryItemsList

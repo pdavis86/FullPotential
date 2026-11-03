@@ -4,7 +4,6 @@ using FullPotential.Api.Unity;
 
 using UnityEngine;
 
-
 namespace FullPotential.Core.Unity
 {
     public class UnityHelperUtilities : IUnityHelperUtilities

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 
 using Unity.Netcode;
 
-
 namespace FullPotential.Api.Utilities.Extensions
 {
     public static class SerializationExtensions

@@ -26,7 +26,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-
 namespace FullPotential.Api.Gameplay.Behaviours
 {
     public abstract class InventoryBase : NetworkBehaviour, ISaveable

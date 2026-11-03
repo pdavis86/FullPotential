@@ -4,7 +4,6 @@ using FullPotential.Api.Modding;
 
 using UnityEngine;
 
-
 namespace FullPotential.Standard
 {
     public class Registration : MonoBehaviour, IMod

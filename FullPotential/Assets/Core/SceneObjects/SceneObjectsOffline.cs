@@ -4,7 +4,6 @@ using FullPotential.Api.Unity.Constants;
 
 using UnityEngine;
 
-
 namespace FullPotential.Core.SceneObjects
 {
     public class SceneObjectsOffline : MonoBehaviour

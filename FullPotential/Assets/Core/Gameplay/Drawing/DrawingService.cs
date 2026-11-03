@@ -5,7 +5,6 @@ using FullPotential.Api.Unity.Extensions;
 
 using UnityEngine;
 
-
 namespace FullPotential.Core.Gameplay.Drawing
 {
     public class DrawingService : IDrawingService

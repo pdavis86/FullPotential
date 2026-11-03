@@ -7,10 +7,10 @@ using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Standard.ValuePools;
 
 namespace FullPotential.Standard.CustomGear.Barrier

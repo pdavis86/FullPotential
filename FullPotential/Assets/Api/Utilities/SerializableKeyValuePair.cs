@@ -1,6 +1,5 @@
 using System;
 
-
 namespace FullPotential.Api.Utilities
 {
     [Serializable]

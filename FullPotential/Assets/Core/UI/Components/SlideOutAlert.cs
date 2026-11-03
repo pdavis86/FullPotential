@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-
 namespace FullPotential.Core.Ui.Components
 {
     public class SlideOutAlert : MonoBehaviour

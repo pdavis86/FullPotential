@@ -2,7 +2,6 @@
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-
 namespace FullPotential.Core.Gameplay.Tooltips
 {
     public class Tooltips : MonoBehaviour

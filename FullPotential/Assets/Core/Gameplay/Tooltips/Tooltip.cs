@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-
 namespace FullPotential.Core.Gameplay.Tooltips
 {
     public class Tooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler

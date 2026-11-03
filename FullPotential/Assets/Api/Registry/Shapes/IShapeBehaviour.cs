@@ -3,7 +3,6 @@ using FullPotential.Api.Items;
 
 using UnityEngine;
 
-
 namespace FullPotential.Api.Registry.Shapes
 {
     public interface IShapeBehaviour

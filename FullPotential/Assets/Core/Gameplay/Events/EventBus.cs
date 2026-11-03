@@ -10,7 +10,6 @@ using FullPotential.Api.Logging;
 
 using Unity.Netcode;
 
-
 namespace FullPotential.Core.Gameplay.Events
 {
     public class EventBus : IEventBus

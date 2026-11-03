@@ -7,7 +7,6 @@ using FullPotential.Standard.Weapons.Events;
 
 using UnityEngine;
 
-
 namespace FullPotential.Standard.WeaponExtras
 {
     public class ShotFiredEventHandler : IEventHandler<ShotFiredAfterEvent>

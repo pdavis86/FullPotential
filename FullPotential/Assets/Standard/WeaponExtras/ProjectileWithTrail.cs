@@ -8,7 +8,6 @@ using FullPotential.Api.Unity.Extensions;
 
 using UnityEngine;
 
-
 namespace FullPotential.Standard.WeaponExtras
 {
     public class ProjectileWithTrail : MonoBehaviour

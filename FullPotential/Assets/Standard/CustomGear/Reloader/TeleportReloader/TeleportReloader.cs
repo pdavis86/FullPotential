@@ -5,8 +5,8 @@ using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
-using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Gameplay;
+using FullPotential.Api.Registry.Gear;
 using FullPotential.Standard.ValuePools;
 
 namespace FullPotential.Standard.CustomGear.Reloader.TeleportReloader

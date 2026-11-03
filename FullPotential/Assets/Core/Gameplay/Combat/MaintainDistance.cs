@@ -5,7 +5,6 @@ using FullPotential.Core.Networking;
 
 using UnityEngine;
 
-
 namespace FullPotential.Core.Gameplay.Combat
 {
     public class MaintainDistance : MonoBehaviour

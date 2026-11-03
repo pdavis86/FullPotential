@@ -1,6 +1,6 @@
 using System;
 
-using FullPotential.Api.Registry;
+using FullPotential.Api.Registry.Visuals;
 using FullPotential.Standard.Targeting;
 
 namespace FullPotential.Standard.TargetingVisuals

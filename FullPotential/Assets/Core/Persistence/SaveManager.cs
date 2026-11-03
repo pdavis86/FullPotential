@@ -13,7 +13,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-
 namespace FullPotential.Core.Persistence
 {
     public class SaveManager : ISaveManager

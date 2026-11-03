@@ -29,7 +29,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-
 namespace FullPotential.Core.Gameplay.Combat
 {
     public class CombatService : ICombatService

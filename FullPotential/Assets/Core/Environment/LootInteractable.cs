@@ -8,7 +8,6 @@ using Unity.Netcode;
 
 using UnityEngine.InputSystem;
 
-
 namespace FullPotential.Core.Environment
 {
     public class LootInteractable : Interactable

@@ -31,7 +31,6 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
 
-
 namespace FullPotential.Core.Player
 {
     public class PlayerFighter : FighterBase, IPlayerFighter

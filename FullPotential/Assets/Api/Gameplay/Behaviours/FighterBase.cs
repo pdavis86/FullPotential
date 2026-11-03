@@ -4,17 +4,16 @@ using System.Linq;
 
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Attributes;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
-using FullPotential.Api.Utilities;
-using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Registry.Gameplay;
+using FullPotential.Api.Utilities;
 
 using Unity.Netcode;
 
 using UnityEngine;
-
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {

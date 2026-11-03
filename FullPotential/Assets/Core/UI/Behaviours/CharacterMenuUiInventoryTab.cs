@@ -12,7 +12,6 @@ using FullPotential.Core.UI.Events;
 
 using UnityEngine;
 
-
 namespace FullPotential.Core.UI.Behaviours
 {
     public class CharacterMenuUiInventoryTab : MonoBehaviour

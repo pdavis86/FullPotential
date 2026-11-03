@@ -21,7 +21,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-
 namespace FullPotential.Core.GameManagement
 {
     public class JoinOrHostGame : MonoBehaviour

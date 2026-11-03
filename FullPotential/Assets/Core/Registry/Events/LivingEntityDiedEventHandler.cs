@@ -4,7 +4,6 @@ using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Combat.Events;
 
-
 namespace FullPotential.Core.Registry.Events
 {
     public class LivingEntityDiedEventHandler : IEventHandler<ValuePoolValueChangeEvent>

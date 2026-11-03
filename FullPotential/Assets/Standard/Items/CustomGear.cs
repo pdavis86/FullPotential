@@ -11,6 +11,7 @@ using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Registry.Gear;
+using FullPotential.Api.Registry.Visuals;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 

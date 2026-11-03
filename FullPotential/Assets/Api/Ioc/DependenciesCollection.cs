@@ -6,7 +6,6 @@ using System.Reflection;
 
 using UnityEngine;
 
-
 namespace FullPotential.Api.Ioc
 {
     public class DependenciesCollection

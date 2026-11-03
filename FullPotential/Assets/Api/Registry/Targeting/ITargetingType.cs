@@ -4,7 +4,6 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Items;
 
-
 namespace FullPotential.Api.Registry.Targeting
 {
     public interface ITargetingType : IRegisterableType, IHasNetworkPrefab

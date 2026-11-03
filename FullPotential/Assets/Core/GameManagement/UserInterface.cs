@@ -6,7 +6,6 @@ using FullPotential.Core.Ui.Behaviours;
 
 using UnityEngine;
 
-
 namespace FullPotential.Core.GameManagement
 {
     public class UserInterface : MonoBehaviour, IUserInterface

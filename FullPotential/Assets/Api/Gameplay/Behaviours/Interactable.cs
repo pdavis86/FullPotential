@@ -5,7 +5,6 @@ using Unity.Netcode;
 
 using UnityEngine;
 
-
 namespace FullPotential.Api.Gameplay.Behaviours
 {
     public abstract class Interactable : MonoBehaviour

@@ -14,7 +14,6 @@ using FullPotential.Core.Player;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 namespace FullPotential.Core.Ui.Behaviours
 {
     public class SettingsMenuUi : MonoBehaviour

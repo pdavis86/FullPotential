@@ -20,7 +20,6 @@ using FullPotential.Core.UI.Components;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 namespace FullPotential.Core.UI.Behaviours
 {
     public class AdminShopUi : MonoBehaviour

@@ -1,5 +1,3 @@
-using FullPotential.Api.Registry.Effects;
-
 namespace FullPotential.Api.Registry.Effects
 {
     public interface IHasSideEffect

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-
 namespace FullPotential.Api.Utilities.Extensions
 {
     public static class EnumerableExtensions

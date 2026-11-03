@@ -3,7 +3,6 @@ using FullPotential.Api.Scenes;
 
 using UnityEngine;
 
-
 namespace FullPotential.Core.Environment
 {
     public class SceneService : ISceneService
