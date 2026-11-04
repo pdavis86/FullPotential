@@ -1,6 +1,5 @@
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Items;
-using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.Effects;
 
 using UnityEngine;
@@ -11,33 +10,33 @@ namespace FullPotential.Api.Gameplay.Combat
     {
         void ApplyEffects(
             FighterBase sourceFighter,
-            CombatItemBase itemUsed,
+            ICombatItem itemUsed,
             GameObject target,
             Vector3? position
         );
 
         void SpawnTargetingGameObject(
             FighterBase sourceFighter,
-            Consumer consumer,
+            IConsumer consumer,
             Vector3 startPosition,
             Vector3 direction);
 
         void SpawnShapeGameObject(
             FighterBase sourceFighter,
-            Consumer consumer,
+            IConsumer consumer,
             GameObject target,
             Vector3 fallbackPosition,
             Vector3 lookDirection);
 
         float GetEffectBaseChange(
             FighterBase sourceFighter,
-            CombatItemBase itemUsed,
+            ICombatItem itemUsed,
             IEffectType effect,
             bool isCriticalHit);
 
         CombatResult GetCombatResult(
             FighterBase sourceFighter,
-            CombatItemBase itemUsed,
+            ICombatItem itemUsed,
             IEffectType effect,
             LivingEntityBase targetLivingEntity);
     }

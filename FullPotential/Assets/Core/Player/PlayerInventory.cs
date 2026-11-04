@@ -8,6 +8,7 @@ using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
+using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Visuals;
@@ -22,7 +23,7 @@ namespace FullPotential.Core.Player
 {
     public class PlayerInventory : InventoryBase, IPlayerInventory
     {
-        private Dictionary<string, CombatItemBase> _combatItemsWithShape;
+        private Dictionary<string, ICombatItem> _combatItemsWithShape;
         private PlayerFighter _playerFighter;
 
         #region Unity Events Handlers
@@ -114,8 +115,8 @@ namespace FullPotential.Core.Player
             base.LoadInventory(inventoryData);
 
             _combatItemsWithShape = _items
-                .Where(x => x.Value is CombatItemBase combatItem && combatItem.ShapeCode != null)
-                .ToDictionary(x => x.Key, x => (CombatItemBase)x.Value);
+                .Where(x => x.Value is ICombatItem combatItem && combatItem.ShapeCode != null)
+                .ToDictionary(x => x.Key, x => (ICombatItem)x.Value);
         }
 
         public override void ApplyEquippedItemChange(string itemId, SlotId slotId)
@@ -230,7 +231,7 @@ namespace FullPotential.Core.Player
 
             if (!_combatItemsWithShape.ContainsKey(itemId))
             {
-                _combatItemsWithShape.Add(itemId, (CombatItemBase)_items[itemId]);
+                _combatItemsWithShape.Add(itemId, (ICombatItem)_items[itemId]);
             }
 
             _combatItemsWithShape[itemId].ShapeCode = shapeCode;

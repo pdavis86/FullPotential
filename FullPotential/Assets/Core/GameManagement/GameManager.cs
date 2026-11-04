@@ -252,7 +252,7 @@ namespace FullPotential.Core.GameManagement
         public static Version GetGameVersion()
         {
             var appVersion = Application.version;
-            var lastWrite = System.IO.File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location);
+            var lastWrite = System.IO.File.GetLastWriteTime(Assembly.GetExecutingAssembly().GetLoadedAssemblyPath());
             return new Version(appVersion + "." + lastWrite.ToString("yyyyMMdd"));
         }
 

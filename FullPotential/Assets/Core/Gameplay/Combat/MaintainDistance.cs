@@ -1,3 +1,5 @@
+using System;
+
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Items;
 using FullPotential.Core.GameManagement;
@@ -9,9 +11,14 @@ namespace FullPotential.Core.Gameplay.Combat
 {
     public class MaintainDistance : MonoBehaviour
     {
-        public FighterBase SourceFighter;
+        [NonSerialized]
         public float Distance;
-        public Consumer Consumer;
+
+        [NonSerialized]
+        public FighterBase SourceFighter;
+
+        [NonSerialized]
+        public IConsumer Consumer;
 
         private GameObject _targetPositionGameObject;
         private FixedJoint _joint;

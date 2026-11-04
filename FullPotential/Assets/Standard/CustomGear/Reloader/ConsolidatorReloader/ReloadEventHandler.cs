@@ -23,7 +23,12 @@ namespace FullPotential.Standard.CustomGear.Reloader.ConsolidatorReloader
                 return new HandlerResult();
             }
 
-            var weapon = eventArgs.Fighter.Inventory.GetItemInSlot<Weapon>(eventArgs.SlotId);
+            var itemInSlot = eventArgs.Fighter.Inventory.GetItemInSlot(eventArgs.SlotId);
+
+            if (itemInSlot is not Weapon weapon)
+            {
+                return new HandlerResult();
+            }
 
             if (!weapon.IsRanged)
             {

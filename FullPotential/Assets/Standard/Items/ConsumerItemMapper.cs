@@ -9,12 +9,14 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
+using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gameplay;
+using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Utilities.Extensions;
 
 using Range = FullPotential.Api.Gameplay.Attributes.Range;
 
-namespace FullPotential.Api.Registry.Gear
+namespace FullPotential.Standard.Items
 {
     public class ConsumerItemMapper : IItemTypeMapping
     {

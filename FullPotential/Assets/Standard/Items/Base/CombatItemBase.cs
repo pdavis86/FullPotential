@@ -8,6 +8,8 @@ using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Items;
+using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
@@ -16,22 +18,19 @@ using FullPotential.Api.Utilities.Extensions;
 
 using UnityEngine;
 
-namespace FullPotential.Api.Items.Base
+namespace FullPotential.Standard.Items.Base
 {
-    public abstract class CombatItemBase : ItemBase, IHasEffects
+    public abstract class CombatItemBase : ItemBase, ICombatItem
     {
-        public const float DefensiveWeaponDpsMultiplier = 0.1f;
-        public const string AliasSegmentItem = "item";
+        //public const float DefensiveWeaponDpsMultiplier = 0.1f;
         public const string AliasSegmentDefensive = "defensiveitem";
 
         private readonly ICombatService _combatService;
         private readonly ITypeRegistry _typeRegistry;
 
-
         private int _baseDamage = -1;
         private float _meleeDps = -1;
-        private float _defensiveDps = -1;
-        private float _rangedDps = -1;
+        //private float _defensiveDps = -1;
         private IEffectType _hurtEffect;
 
         public bool IsTwoHanded
@@ -46,9 +45,11 @@ namespace FullPotential.Api.Items.Base
             set => Properties[nameof(ShapeCode)] = value;
         }
 
-        //public List<string> EffectIds { get; set; }
-
         public List<IEffectType> EffectTypes { get; set; }
+
+        public virtual bool IsChargePercentageUsed { get; }
+
+        public virtual int ChargePercentage { get; set; }
 
         protected CombatItemBase()
         {
@@ -103,12 +104,43 @@ namespace FullPotential.Api.Items.Base
             return GetChargeUpOrCooldownTime(Attributes.GetValueOrZero(Recovery.Id));
         }
 
-        public float GetDamagePerSecond(float damagePerItem, int numberOfItems, float itemsPerSecond, float reloadTime)
+        protected float GetDamagePerSecond(float damagePerItem, int numberOfItems, float itemsPerSecond, float reloadTime)
         {
             //https://www.reddit.com/r/Overwatch/comments/6x5q59/what_dps_is_and_how_to_calculate_it/
 
             return damagePerItem * numberOfItems / ((numberOfItems / itemsPerSecond) + reloadTime);
         }
+
+        public virtual float GetDamagePerSecond()
+        {
+            if (_meleeDps >= 0)
+            {
+                return _meleeDps;
+            }
+
+            var windUp = GetChargeUpTime();
+            var timeForTwoAttacks = windUp + GetCooldownTime() + windUp;
+
+            _meleeDps = GetBaseDamage() * 2 / timeForTwoAttacks;
+
+            return _meleeDps;
+        }
+
+        // todo: why is DefensiveWeaponDpsMultiplier necessary?
+        //public float GetDefensiveDps()
+        //{
+        //    if (_defensiveDps >= 0)
+        //    {
+        //        return _defensiveDps;
+        //    }
+
+        //    var windUp = GetChargeUpTime();
+        //    var timeForTwoAttacks = windUp + GetCooldownTime() + windUp;
+
+        //    _defensiveDps = GetBaseDamage() * 2 / timeForTwoAttacks * DefensiveWeaponDpsMultiplier;
+
+        //    return _defensiveDps;
+        //}
 
         public int GetValuePoolCost()
         {
@@ -154,74 +186,7 @@ namespace FullPotential.Api.Items.Base
             return returnValue;
         }
 
-        public int GetAmmoMax()
-        {
-            const int ammoCap = 100;
-            var returnValue = (int)(Attributes.GetValueOrZero(Efficiency.Id) / 100f * ammoCap);
-            return returnValue;
-        }
-
-        public float GetReloadTime()
-        {
-            var returnValue = MathsHelper.GetHighInLowOutInRange(Attributes.GetValueOrZero(Recovery.Id), 0.5f, 5);
-            return returnValue;
-        }
-
-        public float GetDelayBetweenShots()
-        {
-            //Roughly 2-6 bullets per second
-            var returnValue = MathsHelper.GetHighInLowOutInRange(Attributes.GetValueOrZero(Speed.Id), 0.07f, 0.4f);
-            return returnValue;
-        }
-
-        public float GetAmmoPerSecond()
-        {
-            return 1 / GetDelayBetweenShots();
-        }
-
-        public float GetMeleeDps()
-        {
-            if (_meleeDps >= 0)
-            {
-                return _meleeDps;
-            }
-
-            var windUp = GetChargeUpTime();
-            var timeForTwoAttacks = windUp + GetCooldownTime() + windUp;
-
-            _meleeDps = GetBaseDamage() * 2 / timeForTwoAttacks;
-
-            return _meleeDps;
-        }
-
-        public float GetDefensiveDps()
-        {
-            if (_defensiveDps >= 0)
-            {
-                return _defensiveDps;
-            }
-
-            var windUp = GetChargeUpTime();
-            var timeForTwoAttacks = windUp + GetCooldownTime() + windUp;
-
-            _defensiveDps = GetBaseDamage() * 2 / timeForTwoAttacks * DefensiveWeaponDpsMultiplier;
-
-            return _defensiveDps;
-        }
-
-        public float GetRangedDps()
-        {
-            if (_rangedDps >= 0)
-            {
-                return _rangedDps;
-            }
-
-            _rangedDps = GetDamagePerSecond(GetBaseDamage(), GetAmmoMax(), GetAmmoPerSecond(), GetReloadTime());
-
-            return _rangedDps;
-        }
-
-        private int GetBaseDamage()
+        protected int GetBaseDamage()
         {
             if (_baseDamage >= 0)
             {
@@ -244,6 +209,11 @@ namespace FullPotential.Api.Items.Base
             }
 
             return _baseDamage = baseDamage;
+        }
+
+        public virtual float GetAmmoPerSecond()
+        {
+            return 0;
         }
     }
 }

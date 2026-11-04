@@ -7,6 +7,7 @@ using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
@@ -19,31 +20,25 @@ using FullPotential.Api.Registry.Visuals;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 
+using FullPotential.Standard.Items.Base;
+
 using UnityEngine;
 
-namespace FullPotential.Api.Items
+namespace FullPotential.Standard.Items
 {
-    public class Consumer : CombatItemBase, IHasTargetingAndShape, IValuePoolConsumer, IHasCharge, IHasItemVisuals
+    public class Consumer : CombatItemBase, IConsumer
     {
         public const string AliasSegmentConsumer = "consumer";
 
         private readonly IAuditor _logger;
         private readonly ITypeRegistry _typeRegistry;
-
-        public bool IsChargePercentageUsed => true;
-
-        public int ChargePercentage { get; set; }
-
+        public override bool IsChargePercentageUsed => true;
         public List<IStoppable> Stoppables { get; } = new List<IStoppable>();
-
+        public IValuePoolType ValuePoolType { get; set; }
         public ITargetingType TargetingType { get; set; }
         public IItemVisualsType TargetingVisualsType { get; set; }
         public IItemVisualsType ShapeVisualsType { get; set; }
         public IShapeType ShapeType { get; set; }
-        public IValuePoolType ValuePoolType { get; set; }
-
-        public ItemVisualsTypeId VisualsTypeId { get; set; }
-
         public IItemVisualsType Visuals { get; set; }
 
         public Consumer(IAuditorFactory auditorFactory, ITypeRegistry typeRegistry)
@@ -128,7 +123,7 @@ namespace FullPotential.Api.Items
                 Attributes.GetValueOrZero(Range.Id),
                 nameof(Range),
                 AliasSegmentItem,
-                localizer.Translate(GetRangeForDisplay()),
+                localizer.Translate(GetRange().ToMetres()),
                 UnitsType.Distance);
 
             AppendToDescription(
@@ -211,12 +206,6 @@ namespace FullPotential.Api.Items
             return returnValue;
         }
 
-        public float GetRangeForDisplay()
-        {
-            //Rough translation from Unity units to metres
-            return GetRange() * 0.6f;
-        }
-
         public override string GetTextForUiComponent(string id, IPlayerFighter playerFighter)
         {
             return null;
@@ -259,5 +248,6 @@ namespace FullPotential.Api.Items
                     playerFighter.Inventory.SetEquippedItemVisuals(slotId, newObj);
                 });
         }
+
     }
 }

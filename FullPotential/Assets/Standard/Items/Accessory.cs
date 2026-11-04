@@ -4,13 +4,13 @@ using System.Text;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Items;
-using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Visuals;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Standard.Accessories;
+using FullPotential.Standard.Items.Base;
 
 using UnityEngine;
 

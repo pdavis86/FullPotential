@@ -28,7 +28,7 @@ namespace FullPotential.Standard.Targeting
 
         public FighterBase SourceFighter { get; set; }
 
-        public Consumer Consumer { get; set; }
+        public IConsumer Consumer { get; set; }
 
         public Vector3 Direction { get; set; }
 

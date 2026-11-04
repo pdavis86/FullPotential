@@ -142,8 +142,17 @@ namespace FullPotential.Core.Items
             item.Properties = new Dictionary<string, string>(model.Properties);
 
             // todo: zzz v0.8 - Remove backwards compatibility
-            item.Properties["IsAutomatic"] = model.Attributes?.GetStringValueOrNull("IsAutomatic");
-            item.Properties["ExtraAmmoPerShot"] = model.Attributes?.GetStringValueOrNull("ExtraAmmoPerShot");
+            var isAutomatic = model.Attributes?.GetStringValueOrNull("IsAutomatic");
+            if (!isAutomatic.IsNullOrWhiteSpace())
+            {
+                item.Properties["IsAutomatic"] = isAutomatic;
+            }
+
+            var extraAmmoPerShot = model.Attributes?.GetStringValueOrNull("ExtraAmmoPerShot");
+            if (!extraAmmoPerShot.IsNullOrWhiteSpace())
+            {
+                item.Properties["ExtraAmmoPerShot"] = extraAmmoPerShot;
+            }
         }
 
         public ItemData GetDataFromItem(string characterId, ItemBase item)
@@ -158,7 +167,7 @@ namespace FullPotential.Core.Items
                 Properties = GetNonDefaultValues(item.Properties),
             };
 
-            if (item is IHasEffects itemWithEffects)
+            if (item is IHasEffects itemWithEffects && itemWithEffects.EffectTypes != null)
             {
                 model.EffectIds = itemWithEffects.EffectTypes.Select(t => t.TypeId.ToString()).ToList();
             }

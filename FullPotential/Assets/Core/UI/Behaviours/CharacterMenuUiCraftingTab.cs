@@ -97,7 +97,7 @@ namespace FullPotential.Core.Ui.Behaviours
 
         public void AddComponent(string itemId)
         {
-            var item = _playerFighter.Inventory.GetItemWithId<CombatItemBase>(itemId);
+            var item = _playerFighter.Inventory.GetItemWithId<ItemBase>(itemId);
 
             if (item == null)
             {

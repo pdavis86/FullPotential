@@ -11,6 +11,7 @@ using FullPotential.Api.Items.Base;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Standard.Items.Base;
 
 using Range = FullPotential.Api.Gameplay.Attributes.Range;
 
@@ -40,9 +41,9 @@ namespace FullPotential.Standard.Items
 
             var weaponType = _typeRegistry.GetRegisteredByTypeId<IWeaponType>(itemTypeId);
 
-            var isTwoHandedCurrent = properties.GetBoolValue(nameof(CombatItemBase.IsTwoHanded));
+            var isTwoHandedCurrent = properties.GetBoolValue(nameof(ICombatItem.IsTwoHanded));
             var isTwoHandedNew = weaponType.EnforceTwoHanded || (weaponType.AllowTwoHanded && isTwoHandedCurrent);
-            properties[nameof(CombatItemBase.IsTwoHanded)] = isTwoHandedNew.ToString();
+            properties[nameof(ICombatItem.IsTwoHanded)] = isTwoHandedNew.ToString();
 
             var weapon = DependenciesContext.Dependencies.CreateInstance<Weapon>();
 

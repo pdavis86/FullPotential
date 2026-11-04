@@ -149,21 +149,10 @@ namespace FullPotential.Api.Gameplay.Behaviours
             base.HandleDeath();
         }
 
-        public bool StopActiveConsumerBehaviour(Consumer consumer)
+        public bool StopActiveConsumerBehaviour(IConsumer consumer)
         {
-            var leftConsumer = Inventory.GetItemInSlot<Consumer>(HandSlotIds.LeftHand);
-            if (leftConsumer == consumer)
-            {
-                return _slotStatuses[HandSlotIds.LeftHand].StopActiveConsumerBehaviour();
-            }
-
-            var rightConsumer = Inventory.GetItemInSlot<Consumer>(HandSlotIds.RightHand);
-            if (rightConsumer == consumer)
-            {
-                return _slotStatuses[HandSlotIds.RightHand].StopActiveConsumerBehaviour();
-            }
-
-            return false;
+            var slotId = Inventory.GetSlotIdForItem(consumer);
+            return slotId != null && _slotStatuses[slotId.Value].StopActiveConsumerBehaviour();
         }
 
         public bool ConsumeValuePool(IValuePoolConsumer valuePoolConsumerUsingItem, bool slowDrain = false, bool isTest = false)
@@ -199,7 +188,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 return;
             }
 
-            var consumer = Inventory.GetItemInSlot<Consumer>(slotStatus.SlotId);
+            var consumer = Inventory.GetItemInSlot<IConsumer>(slotStatus.SlotId);
 
             if (ConsumeValuePool(consumer, consumer.TargetingType.IsContinuous))
             {

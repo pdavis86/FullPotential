@@ -22,7 +22,7 @@ namespace FullPotential.Standard.Targeting
 
         public string NetworkPrefabAddress => null;
 
-        public IEnumerable<ViableTarget> GetTargets(FighterBase sourceFighter, Consumer consumer)
+        public IEnumerable<ViableTarget> GetTargets(FighterBase sourceFighter, IConsumer consumer)
         {
             const int maxDistance = 3;
 

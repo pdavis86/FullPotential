@@ -164,7 +164,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return true;
         }
 
-        private T CastItemAsType<T>(ItemBase item, bool errorIfNotFound, string identifierName, string id) where T : ItemBase
+        private T CastItemAsType<T>(ItemBase item, bool errorIfNotFound, string identifierName, string id) where T : IItem
         {
             if (item == null)
             {
@@ -172,7 +172,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 {
                     _logger.Error("Could not find the item with {0} '{1}'", identifierName, id);
                 }
-                return null;
+                return default;
             }
 
             if (item is not T castAsType)
@@ -183,13 +183,13 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return castAsType;
         }
 
-        public T GetItemWithId<T>(string id, bool errorIfNotFound = true) where T : ItemBase
+        public T GetItemWithId<T>(string id, bool errorIfNotFound = true) where T : IItem
         {
             var item = _items.FirstOrDefault(x => x.Value.Id == id).Value;
             return CastItemAsType<T>(item, errorIfNotFound, "ID", id);
         }
 
-        public T GetItemInSlot<T>(SlotId slotId, bool errorIfNotFound = false) where T : ItemBase
+        public T GetItemInSlot<T>(SlotId slotId, bool errorIfNotFound = false) where T : IItem
         {
             var item = GetItemInSlot(slotId);
             return CastItemAsType<T>(item, errorIfNotFound, "slot ID", slotId.ToString());
@@ -200,6 +200,12 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return _equippedItems.TryGetValue(slotId, out var equippedItem)
                 ? equippedItem.Item
                 : null;
+        }
+
+        public SlotId? GetSlotIdForItem(IItem item)
+        {
+            var match = _equippedItems.FirstOrDefault(x => x.Value.Item.Id == item.Id);
+            return match.Key == default ? null : match.Key;
         }
 
         public int TakeCountFromItemStacks(string typeId, int count)
@@ -389,7 +395,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             return item?.RegistryType != null
                 && item.RegistryType is IWeaponType
-                && item.Properties.GetBoolValue(nameof(CombatItemBase.IsTwoHanded));
+                && item.Properties.GetBoolValue(nameof(ICombatItem.IsTwoHanded));
         }
 
         protected void TriggerSlotChangeEvent(string itemId, SlotId slotId)

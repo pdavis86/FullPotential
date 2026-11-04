@@ -22,6 +22,7 @@ using UnityEngine.UI;
 
 namespace FullPotential.Core.UI.Behaviours
 {
+    // todo: move AdminShopUi to Standaard
     public class AdminShopUi : MonoBehaviour
     {
         private readonly System.Random _random = new System.Random();
@@ -252,7 +253,7 @@ namespace FullPotential.Core.UI.Behaviours
             return _registeredShapes.FirstOrDefault(x => x.GetType().Name == typeName);
         }
 
-        private CombatItemBase GetLootFromChoices()
+        private ItemBase GetLootFromChoices()
         {
             var lootItem = DependenciesContext.Dependencies.CreateInstance<AdminCraftingLootItem>();
             lootItem.RegistryType = _typeRegistry.GetRegisteredTypes<ILootType>().First();

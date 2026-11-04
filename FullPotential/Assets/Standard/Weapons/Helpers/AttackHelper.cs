@@ -58,7 +58,7 @@ namespace FullPotential.Standard.Weapons.Helpers
                     Punch(fighter);
                     break;
 
-                case Consumer consumer:
+                case IConsumer consumer:
                     UseConsumer(fighter, slotId, consumer);
                     break;
 
@@ -167,7 +167,7 @@ namespace FullPotential.Standard.Weapons.Helpers
             slotStatus.StartCooldownLoopAsync(weaponInHand).Forget();
         }
 
-        private void UseConsumer(FighterBase fighter, SlotId slotId, Consumer consumer)
+        private void UseConsumer(FighterBase fighter, SlotId slotId, IConsumer consumer)
         {
             if (consumer == null)
             {
@@ -188,7 +188,7 @@ namespace FullPotential.Standard.Weapons.Helpers
 
             if (!fighter.ConsumeValuePool(consumer, isTest: true))
             {
-                _logger.Error("Cancelling UseConsumer as there was not enough of the valuePool");
+                _logger.Warn("Cancelling UseConsumer as there was not enough of the valuePool");
                 return;
             }
 
@@ -205,7 +205,7 @@ namespace FullPotential.Standard.Weapons.Helpers
             }
         }
 
-        private void SpawnConsumerGameObjects(FighterBase fighter, SlotId slotId, Consumer consumer)
+        private void SpawnConsumerGameObjects(FighterBase fighter, SlotId slotId, IConsumer consumer)
         {
             var targets = consumer.TargetingType.GetTargets(fighter, consumer);
 
@@ -235,7 +235,7 @@ namespace FullPotential.Standard.Weapons.Helpers
             }
         }
 
-        public static Vector3 GetShotDirection(ItemBase item, Vector3 aimDirection)
+        public static Vector3 GetShotDirection(IItem item, Vector3 aimDirection)
         {
             const float MaximumAccuracyAngleDeviation = 4;
 

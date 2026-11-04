@@ -6,8 +6,12 @@ namespace FullPotential.Api.Registry
 {
     public interface IHasEffects
     {
-        //List<string> EffectIds { get; set; }
-
         List<IEffectType> EffectTypes { get; set; }
+
+        float GetEffectDuration();
+
+        int GetSingleEffectValueChange();
+
+        int GetPeriodicEffectValueChange();
     }
 }

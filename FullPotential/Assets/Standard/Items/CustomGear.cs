@@ -6,7 +6,6 @@ using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Items;
-using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Gameplay;
@@ -14,6 +13,7 @@ using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Visuals;
 using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Standard.Items.Base;
 
 using UnityEngine;
 
@@ -21,6 +21,8 @@ namespace FullPotential.Standard.Items
 {
     public class CustomGear : CombatItemBase, IValuePoolConsumer, IHasItemVisuals
     {
+        private const string AliasSegmentCustomGear = "customgear";
+
         private readonly ITypeRegistry _typeRegistry;
 
         public IValuePoolType ValuePoolType { get; set; }
@@ -61,7 +63,7 @@ namespace FullPotential.Standard.Items
                     localizer,
                     Attributes.GetValueOrZero(Efficiency.Id),
                     nameof(Efficiency),
-                    Consumer.AliasSegmentConsumer,
+                    AliasSegmentCustomGear,
                     $"{GetValuePoolCost()} {valuePoolConsumptionType}");
             }
 

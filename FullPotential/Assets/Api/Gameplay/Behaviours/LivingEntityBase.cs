@@ -14,6 +14,7 @@ using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player.Events;
 using FullPotential.Api.Ioc;
+using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
@@ -241,7 +242,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             });
         }
 
-        public void SetLastDamageValues(FighterBase sourceFighter, CombatItemBase itemUsed, int change)
+        public void SetLastDamageValues(FighterBase sourceFighter, ICombatItem itemUsed, int change)
         {
             _lastDamageSourceName = sourceFighter != null ? sourceFighter.FighterName : null;
             _lastDamageItemName = itemUsed?.Name.OrIfNullOrWhitespace(_localizer.Translate("ui.alert.attack.noitem"));
@@ -610,7 +611,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 durationSeconds);
         }
 
-        public void ApplyPeriodicActionToValuePool(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position)
+        public void ApplyPeriodicActionToValuePool(FighterBase sourceFighter, ICombatItem itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position)
         {
             var delay = itemUsed.GetChargeUpTime();
             var durationSeconds = itemUsed.GetEffectDuration();
@@ -619,7 +620,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             PeriodicActionToValuePoolAsync(sourceFighter, itemUsed, valuePoolEffect, position, delay, expiry, timerStartTimestamp, durationSeconds, _activeEffectsCancellationTokenSource.Token).Forget();
         }
 
-        private async UniTask PeriodicActionToValuePoolAsync(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position, float delay, DateTime expiry, long timerStartTimestamp, double durationSeconds, CancellationToken cancellationToken)
+        private async UniTask PeriodicActionToValuePoolAsync(FighterBase sourceFighter, ICombatItem itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position, float delay, DateTime expiry, long timerStartTimestamp, double durationSeconds, CancellationToken cancellationToken)
         {
             var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, valuePoolEffect, this);
             AddOrUpdateEffect(valuePoolEffect, combatResult.Change, expiry, timerStartTimestamp, durationSeconds);
@@ -632,7 +633,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             } while (_clock.GetElapsedSeconds(timerStartTimestamp) < durationSeconds);
         }
 
-        public void ApplySingleValueChangeToValuePool(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position)
+        public void ApplySingleValueChangeToValuePool(FighterBase sourceFighter, ICombatItem itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position)
         {
             var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, valuePoolEffect, this);
             AddOrUpdateEffect(
@@ -645,7 +646,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             ApplySingleValueChangeToValuePoolInternal(sourceFighter, itemUsed, valuePoolEffect, position, combatResult);
         }
 
-        private void ApplySingleValueChangeToValuePoolInternal(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position, CombatResult combatResult)
+        private void ApplySingleValueChangeToValuePoolInternal(FighterBase sourceFighter, ICombatItem itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position, CombatResult combatResult)
         {
             if (valuePoolEffect.ValuePoolTypeId == ValuePoolTypeIds.HealthId)
             {
@@ -664,7 +665,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             TriggerValuePoolValueUpdate(valuePoolEffect.ValuePoolTypeId, combatResult.Change, sourceFighter.name, itemUsed?.Name);
         }
 
-        public void ApplyTemporaryMaxActionToValuePool(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect)
+        public void ApplyTemporaryMaxActionToValuePool(FighterBase sourceFighter, ICombatItem itemUsed, IValuePoolEffectType valuePoolEffect)
         {
             var durationSeconds = itemUsed.GetEffectDuration();
             var expiry = _clock.UtcNow.AddSeconds(durationSeconds);

@@ -14,16 +14,26 @@ namespace FullPotential.Standard.Items
 {
     public class Loot : ItemBase, IHasTargetingAndShape, IHasEffects
     {
-        //public string TargetingTypeId { get; set; }
         public ITargetingType TargetingType { get; set; }
-        //public string TargetingVisualsTypeId { get; set; }
         public IItemVisualsType TargetingVisualsType { get; set; }
-        //public string ShapeVisualsTypeId { get; set; }
         public IItemVisualsType ShapeVisualsType { get; set; }
-        //public string ShapeTypeId { get; set; }
         public IShapeType ShapeType { get; set; }
-        //public List<string> EffectIds { get; set; }
         public List<IEffectType> EffectTypes { get; set; }
+
+        public float GetEffectDuration()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public int GetPeriodicEffectValueChange()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public int GetSingleEffectValueChange()
+        {
+            throw new System.NotImplementedException();
+        }
 
         public override string GetTextForUiComponent(string id, IPlayerFighter playerFighter)
         {

@@ -168,7 +168,7 @@ namespace FullPotential.Core.Gameplay.Crafting
                     .ToList();
             }
 
-            if (item is not Consumer consumer)
+            if (item is not IConsumer consumer)
             {
                 return;
             }
@@ -299,7 +299,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             }
 
             var typeTranslation = _localizer.Translate("crafting.loot.type");
-            var suffix = lootDrop is CombatItemBase combatItem
+            var suffix = lootDrop is ICombatItem combatItem
                 ? int.Parse(combatItem.GetNameHash().ToString().TrimStart('-').Substring(5)).ToString("D5")
                 : null;
 
@@ -349,7 +349,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             var properties = new Dictionary<string, string>
             {
                 { IValuePoolConsumer.PropertyKeyValuePoolTypeId, valuePoolTypeId },
-                { nameof(CombatItemBase.IsTwoHanded), isTwoHanded.ToString() }
+                { nameof(ICombatItem.IsTwoHanded), isTwoHanded.ToString() }
             };
 
             var craftedItem = _typeRegistry

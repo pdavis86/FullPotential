@@ -69,7 +69,6 @@
     <Compile Include="Assets\Api\Gameplay\Effects\MovementDirection.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingBehaviour.cs" />
     <Compile Include="Assets\Api\Data\IUserManagement.cs" />
-    <Compile Include="Assets\Api\Items\Base\CombatItemBase.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\SerializationExtensions.cs" />
     <Compile Include="Assets\Api\GameManagement\IService.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\CombatResult.cs" />
@@ -158,6 +157,7 @@
     <Compile Include="Assets\Api\Registry\Weapons\IWeaponType.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\DictionaryExtensions.cs" />
     <Compile Include="Assets\Api\Registry\Effects\ICustomEffectType.cs" />
+    <Compile Include="Assets\Api\Items\ICombatItem.cs" />
     <Compile Include="Assets\Api\Gameplay\Attributes\Accuracy.cs" />
     <Compile Include="Assets\Api\Data\ISettingsRepository.cs" />
     <Compile Include="Assets\Api\EventManagement\EventSubscription.cs" />
@@ -177,7 +177,6 @@
     <Compile Include="Assets\Api\Gameplay\Events\PlayerJoinedEvent.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector3Extensions.cs" />
     <Compile Include="Assets\Api\Utilities\MathsHelper.cs" />
-    <Compile Include="Assets\Api\Items\Consumer.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IMovementEffectType.cs" />
     <Compile Include="Assets\Api\Unity\IShaderUtilities.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesContext.cs" />
@@ -185,6 +184,7 @@
     <Compile Include="Assets\Api\Utilities\DelayedAction.cs" />
     <Compile Include="Assets\Api\Registry\Gear\ICraftableType.cs" />
     <Compile Include="Assets\Api\Items\IItemTypeMapping.cs" />
+    <Compile Include="Assets\Api\Unity\Extensions\UnitsExtensions.cs" />
     <Compile Include="Assets\Api\Ioc\Dependency.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IValuePoolEffectType.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IHasSideEffect.cs" />
@@ -203,11 +203,11 @@
     <Compile Include="Assets\Api\Gameplay\Attributes\Recovery.cs" />
     <Compile Include="Assets\Api\Gameplay\Attributes\Speed.cs" />
     <Compile Include="Assets\Api\EventManagement\IEventBus.cs" />
-    <Compile Include="Assets\Api\Registry\Gear\ConsumerItemMapper.cs" />
     <Compile Include="Assets\Api\Gameplay\Attributes\Luck.cs" />
     <Compile Include="Assets\Api\Gameplay\Crafting\IResultFactory.cs" />
     <Compile Include="Assets\Api\Registry\IHasNetworkPrefab.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingType.cs" />
+    <Compile Include="Assets\Api\Items\IConsumer.cs" />
     <Compile Include="Assets\Api\Networking\IRpcService.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\TransformExtensions.cs" />
     <Compile Include="Assets\Api\Input\Events\AttackReleaseInputEvent.cs" />

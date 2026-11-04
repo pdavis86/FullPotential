@@ -65,6 +65,7 @@
     <Compile Include="Assets\Core\Gameplay\Combat\Events\EntityDiedEventDefaultHandler.cs" />
     <Compile Include="Assets\Core\Registry\SpecialSlots\RightHand.cs" />
     <Compile Include="Assets\Core\UI\UiAssistant.cs" />
+    <Compile Include="Assets\Core\Items\ItemFactory.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltip.cs" />
     <Compile Include="Assets\Core\Player\PlayerFighter.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\ActiveEffectUi.cs" />
@@ -126,7 +127,6 @@
     <Compile Include="Assets\Core\Gameplay\Events\EventBus.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\Hud.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\CombatService.cs" />
-    <Compile Include="Assets\Core\Items\ItemFactory.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Hurt.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiSlot.cs" />
     <Compile Include="Assets\Core\Registry\ValuePools\Stamina.cs" />

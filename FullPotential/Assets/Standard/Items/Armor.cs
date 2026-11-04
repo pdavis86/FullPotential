@@ -4,12 +4,12 @@ using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Items;
-using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Visuals;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.Armor;
+using FullPotential.Standard.Items.Base;
 
 using UnityEngine;
 

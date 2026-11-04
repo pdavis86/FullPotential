@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +12,8 @@ namespace FullPotential.Api.Items.Base
 {
     public abstract class ItemBase : IItem, ISaveable
     {
+        public const string AliasSegmentItem = "item";
+
         public string Id { get; set; }
 
         public string CharacterId { get; set; }

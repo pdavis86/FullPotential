@@ -9,7 +9,7 @@ namespace FullPotential.Api.Registry.Targeting
     {
         FighterBase SourceFighter { get; set; }
 
-        Consumer Consumer { get; set; }
+        IConsumer Consumer { get; set; }
 
         Vector3 Direction { get; set; }
     }

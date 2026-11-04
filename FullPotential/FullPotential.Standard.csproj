@@ -68,6 +68,7 @@
     <Compile Include="Assets\Standard\Loot\Scrap.cs" />
     <Compile Include="Assets\Standard\Weapons\Sword.cs" />
     <Compile Include="Assets\Standard\AccessoryVisuals\SilverRing.cs" />
+    <Compile Include="Assets\Standard\Items\ConsumerItemMapper.cs" />
     <Compile Include="Assets\Standard\Registration.cs" />
     <Compile Include="Assets\Standard\Weapons\Helpers\AttackReleaseEventHandler.cs" />
     <Compile Include="Assets\Standard\CustomGear\Barrier\Barrier.cs" />
@@ -100,11 +101,13 @@
     <Compile Include="Assets\Standard\Shapes\Zone.cs" />
     <Compile Include="Assets\Standard\Accessories\Belt.cs" />
     <Compile Include="Assets\Standard\Weapons\Events\ReloadEventDefaultHandler.cs" />
+    <Compile Include="Assets\Standard\Items\Base\CombatItemBase.cs" />
     <Compile Include="Assets\Standard\Items\LootItemMapper.cs" />
     <Compile Include="Assets\Standard\CustomGear\Reloader\ConsolidatorReloader\ConsolidatorReloader.cs" />
     <Compile Include="Assets\Standard\Weapons\Helpers\AttackHelper.cs" />
     <Compile Include="Assets\Standard\Armor\Feet.cs" />
     <Compile Include="Assets\Standard\ValuePools\Energy.cs" />
+    <Compile Include="Assets\Standard\Items\Consumer.cs" />
     <Compile Include="Assets\Standard\ValuePools\BarrierChargeValuePool.cs" />
     <Compile Include="Assets\Standard\Effects\Elements\Ice.cs" />
     <Compile Include="Assets\Standard\TargetingVisuals\ProjectileFlames.cs" />

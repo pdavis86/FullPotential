@@ -13,7 +13,9 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Visuals;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Api.Unity.Extensions;
+using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Standard.Items.Base;
 
 using UnityEngine;
 
@@ -26,6 +28,8 @@ namespace FullPotential.Standard.Items
         private const string AliasSegmentMelee = "MeleeWeapon";
         private const string AliasSegmentRanged = "RangedWeapon";
 
+        private float _rangedDps = -1;
+
         public IWeaponType WeaponType => (IWeaponType)RegistryType;
 
         public bool IsRanged => WeaponType.AmmunitionTypeId != null;
@@ -34,9 +38,7 @@ namespace FullPotential.Standard.Items
 
         public bool IsDefensive => WeaponType.IsDefensive;
 
-        public bool IsChargePercentageUsed => !IsRanged;
-
-        public int ChargePercentage { get; set; }
+        public override bool IsChargePercentageUsed => !IsRanged;
 
         public int Ammo
         {
@@ -126,7 +128,7 @@ namespace FullPotential.Standard.Items
                 Attributes.GetValueOrZero(Strength.Id),
                 nameof(Strength),
                 AliasSegmentItem,
-                localizer.Translate(GetDefensiveDps()),
+                localizer.Translate(GetDamagePerSecond()),
                 UnitsType.UnitPerTime);
 
             return sb.ToString().Trim();
@@ -172,7 +174,7 @@ namespace FullPotential.Standard.Items
                 Attributes.GetValueOrZero(Strength.Id),
                 nameof(Strength),
                 AliasSegmentItem,
-                localizer.Translate(GetMeleeDps()),
+                localizer.Translate(GetDamagePerSecond()),
                 UnitsType.UnitPerTime);
 
             return sb.ToString().Trim();
@@ -303,6 +305,43 @@ namespace FullPotential.Standard.Items
 
                    playerFighter.Inventory.SetEquippedItemVisuals(slotId, newObj);
                });
+        }
+
+        public float GetRangedDps()
+        {
+            if (_rangedDps >= 0)
+            {
+                return _rangedDps;
+            }
+
+            _rangedDps = GetDamagePerSecond(GetBaseDamage(), GetAmmoMax(), GetAmmoPerSecond(), GetReloadTime());
+
+            return _rangedDps;
+        }
+
+        public int GetAmmoMax()
+        {
+            const int ammoCap = 100;
+            var returnValue = (int)(Attributes.GetValueOrZero(Efficiency.Id) / 100f * ammoCap);
+            return returnValue;
+        }
+
+        public float GetReloadTime()
+        {
+            var returnValue = MathsHelper.GetHighInLowOutInRange(Attributes.GetValueOrZero(Recovery.Id), 0.5f, 5);
+            return returnValue;
+        }
+
+        public float GetDelayBetweenShots()
+        {
+            //Roughly 2-6 bullets per second
+            var returnValue = MathsHelper.GetHighInLowOutInRange(Attributes.GetValueOrZero(Speed.Id), 0.07f, 0.4f);
+            return returnValue;
+        }
+
+        public override float GetAmmoPerSecond()
+        {
+            return 1 / GetDelayBetweenShots();
         }
     }
 }

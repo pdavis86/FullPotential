@@ -12,6 +12,6 @@ namespace FullPotential.Api.Registry.Targeting
 
         bool IsContinuous { get; }
 
-        IEnumerable<ViableTarget> GetTargets(FighterBase sourceFighter, Consumer consumer);
+        IEnumerable<ViableTarget> GetTargets(FighterBase sourceFighter, IConsumer consumer);
     }
 }

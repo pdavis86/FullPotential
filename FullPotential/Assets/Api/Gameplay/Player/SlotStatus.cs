@@ -189,7 +189,7 @@ namespace FullPotential.Api.Gameplay.Player
 
             _logger.Debug("StopActiveConsumerBehaviour");
 
-            var activeConsumer = Fighter.Inventory.GetItemInSlot<Consumer>(SlotId);
+            var activeConsumer = Fighter.Inventory.GetItemInSlot<IConsumer>(SlotId);
 
             activeConsumer.StopStoppables();
 

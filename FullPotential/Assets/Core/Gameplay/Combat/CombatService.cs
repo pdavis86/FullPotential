@@ -59,7 +59,7 @@ namespace FullPotential.Core.Gameplay.Combat
 
         public void ApplyEffects(
             FighterBase sourceFighter,
-            CombatItemBase itemUsed,
+            ICombatItem itemUsed,
             GameObject target,
             Vector3? position)
         {
@@ -122,7 +122,7 @@ namespace FullPotential.Core.Gameplay.Combat
             return true;
         }
 
-        private void ApplyEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IEffectType effect, GameObject targetGameObject, Vector3? position)
+        private void ApplyEffect(FighterBase sourceFighter, ICombatItem itemUsed, IEffectType effect, GameObject targetGameObject, Vector3? position)
         {
             if (effect is IMovementEffectType movementEffect)
             {
@@ -167,12 +167,8 @@ namespace FullPotential.Core.Gameplay.Combat
             return luckValue / 5f;
         }
 
-        public float GetEffectBaseChange(FighterBase sourceFighter, CombatItemBase itemUsed, IEffectType effect, bool isCriticalHit)
+        public float GetEffectBaseChange(FighterBase sourceFighter, ICombatItem itemUsed, IEffectType effect, bool isCriticalHit)
         {
-            var valuePoolEffect = effect as IValuePoolEffectType;
-
-            var isPeriodic = valuePoolEffect?.EffectActionType is EffectActionType.PeriodicDecrease or EffectActionType.PeriodicIncrease;
-
             float change;
 
             if (itemUsed == null)
@@ -188,14 +184,15 @@ namespace FullPotential.Core.Gameplay.Combat
             }
             else
             {
+                var isPeriodic = effect is IValuePoolEffectType { EffectActionType: EffectActionType.PeriodicDecrease or EffectActionType.PeriodicIncrease };
+
                 change = isPeriodic
                     ? itemUsed.GetPeriodicEffectValueChange()
                     : itemUsed.GetSingleEffectValueChange();
             }
 
-
             if (itemUsed != null
-                && itemUsed is CombatItemBase combatItem
+                && itemUsed is ICombatItem combatItem
                 && itemUsed.RegistryType is IWeaponType weaponType)
             {
                 var isMeleeWeapon = weaponType.AmmunitionTypeId == null;
@@ -223,7 +220,7 @@ namespace FullPotential.Core.Gameplay.Combat
             return change;
         }
 
-        public CombatResult GetCombatResult(FighterBase sourceFighter, CombatItemBase itemUsed, IEffectType effect, LivingEntityBase targetLivingEntity)
+        public CombatResult GetCombatResult(FighterBase sourceFighter, ICombatItem itemUsed, IEffectType effect, LivingEntityBase targetLivingEntity)
         {
             var isCriticalHit = false;
             if (sourceFighter != null)
@@ -285,7 +282,7 @@ namespace FullPotential.Core.Gameplay.Combat
             return defenceRatio;
         }
 
-        private void ApplyValuePoolEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect, FighterBase targetFighter, Vector3? position)
+        private void ApplyValuePoolEffect(FighterBase sourceFighter, ICombatItem itemUsed, IValuePoolEffectType valuePoolEffect, FighterBase targetFighter, Vector3? position)
         {
             switch (valuePoolEffect.EffectActionType)
             {
@@ -310,15 +307,15 @@ namespace FullPotential.Core.Gameplay.Combat
             }
         }
 
-        private void ApplyAttributeEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IAttributeEffect attributeEffect, FighterBase targetFighter)
+        private void ApplyAttributeEffect(FighterBase sourceFighter, ICombatItem itemUsed, IAttributeEffect attributeEffect, FighterBase targetFighter)
         {
             var attributeCombatResult = GetCombatResult(sourceFighter, itemUsed, attributeEffect, targetFighter);
             targetFighter.AddAttributeModifier(attributeEffect, attributeCombatResult.Change, itemUsed.GetEffectDuration());
         }
 
-        private void ApplyMaintainDistance(FighterBase sourceFighter, CombatItemBase itemUsed, GameObject targetGameObject)
+        private void ApplyMaintainDistance(FighterBase sourceFighter, ICombatItem itemUsed, GameObject targetGameObject)
         {
-            if (itemUsed is not Consumer consumer || !consumer.TargetingType.IsContinuous)
+            if (itemUsed is not IConsumer consumer || !consumer.TargetingType.IsContinuous)
             {
                 _logger.Warn("MaintainDistance has been incorrectly applied to an item");
                 return;
@@ -330,7 +327,7 @@ namespace FullPotential.Core.Gameplay.Combat
             comp.Consumer = consumer;
         }
 
-        private void ApplyMovementEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IMovementEffectType movementEffect, GameObject targetGameObject)
+        private void ApplyMovementEffect(FighterBase sourceFighter, ICombatItem itemUsed, IMovementEffectType movementEffect, GameObject targetGameObject)
         {
             if (!targetGameObject.TryGetComponent<Rigidbody>(out var targetRigidBody))
             {
@@ -461,7 +458,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 : between90And110Percent + adder;
         }
 
-        public void SpawnTargetingGameObject(FighterBase sourceFighter, Consumer consumer, Vector3 startPosition, Vector3 direction)
+        public void SpawnTargetingGameObject(FighterBase sourceFighter, IConsumer consumer, Vector3 startPosition, Vector3 direction)
         {
             if (consumer.TargetingType.NetworkPrefabAddress.IsNullOrWhiteSpace())
             {
@@ -490,7 +487,7 @@ namespace FullPotential.Core.Gameplay.Combat
                 });
         }
 
-        public void SpawnShapeGameObject(FighterBase sourceFighter, Consumer consumer, GameObject target, Vector3 fallbackPosition, Vector3 lookDirection)
+        public void SpawnShapeGameObject(FighterBase sourceFighter, IConsumer consumer, GameObject target, Vector3 fallbackPosition, Vector3 lookDirection)
         {
             if (consumer.ShapeType == null)
             {
