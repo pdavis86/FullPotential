@@ -11,21 +11,18 @@ using FullPotential.Api.Registry.Visuals;
 
 namespace FullPotential.Core.Gameplay.Crafting
 {
-    // todo: move to standard
-    public class AdminCraftingLootItem : ItemBase, ICombatItem // todo: CombatItemBase, IHasTargetingAndShape, IValuePoolConsumer
+    public class AdminCraftingLootItem : ItemBase, ICombatItem
     {
         public ITargetingType TargetingType { get; set; }
         public IItemVisualsType TargetingVisualsType { get; set; }
         public IItemVisualsType ShapeVisualsType { get; set; }
         public IShapeType ShapeType { get; set; }
         public IValuePoolType ValuePoolType { get; set; }
-        public bool IsTwoHanded { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-        public string ShapeCode { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-        public List<IEffectType> EffectTypes { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-
+        public bool IsTwoHanded { get; set; }
+        public string ShapeCode { get; set; }
+        public List<IEffectType> EffectTypes { get; set; }
         public bool IsChargePercentageUsed => throw new System.NotImplementedException();
-
-        public int ChargePercentage { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public int ChargePercentage { get; set; }
 
         public float GetAmmoPerSecond()
         {

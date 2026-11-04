@@ -10,11 +10,11 @@ using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items;
-using FullPotential.Api.Items.Base;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Unity.Extensions;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Standard.Items;
+using FullPotential.Standard.Items.Base;
 using FullPotential.Standard.Weapons.Events;
 
 using Unity.Netcode;
@@ -121,9 +121,8 @@ namespace FullPotential.Standard.Weapons.Helpers
                 ? rangedHit.point
                 : handPosition + (shotDirection * MaximumRange);
 
-            // todo: hard-coded ExtraAmmoPerShot
             var ammoUsed = Math.Min(
-                1 + weaponInHand.Properties.GetIntValueOrZero("ExtraAmmoPerShot"),
+                1 + weaponInHand.Properties.GetIntValueOrZero(nameof(Weapon.ExtraAmmoPerShot)),
                 weaponInHand.Ammo);
 
             var hitGameObject = rangedHit.transform != null ? rangedHit.transform.gameObject : null;

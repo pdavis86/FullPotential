@@ -2,7 +2,6 @@
   "Culture": "en-GB",
   "Name": "English (United Kingdom)",
   "Translations": {
-	"attribute.extraammopershot": "Extra ammo per shot",
     "combat.attack.critical": "CRIT:",
     "crafting.error.missingeffect": "At least one effect must be included",
     "crafting.error.toomanycomponents": "Too many components",

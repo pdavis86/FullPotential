@@ -13,82 +13,10 @@ MonoBehaviour:
   m_Name: Default Local Group
   m_EditorClassIdentifier: 
   m_GroupName: Default Local Group
-  m_Data:
-    m_SerializedData: []
   m_GUID: 105f2f79d7d24494f8cd35e100c8ea63
   m_SerializeEntries:
-  - m_GUID: 620e7d7564c784a43b86f2a97542709a
-    m_Address: Standard/Prefabs/Weapons/Axe.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 49b96cb05dc76f841a03a0533ed3240c
-    m_Address: Standard/Prefabs/Weapons/Bow.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 91ecae8b81a7bbe45bda67732f076637
-    m_Address: Standard/Prefabs/Weapons/Crossbow.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c254c49e9e23f1f478f7fe1c7e5f7726
-    m_Address: Standard/Prefabs/Weapons/Dagger.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 8c0273065c6f88d4e9a0cbe91a6925f4
-    m_Address: Standard/Prefabs/Weapons/Gun.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: d083539429da01f4a948d98d0bd435dc
-    m_Address: Standard/Prefabs/Weapons/Hammer.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: dba1d53db226b6a43b3cab4703b67937
-    m_Address: Standard/Prefabs/Weapons/Shield.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 9db79d108cde9f548a4ba1d52c1ea2b4
-    m_Address: Standard/Prefabs/Weapons/Staff.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 391bac2c0773fe348bd5f01f1e13ce91
-    m_Address: Standard/Prefabs/Weapons/Sword.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 5bb08d678285f4743b5823478c0c85a5
-    m_Address: Standard/Localization/en-GB.json
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: e6e95d7b1c9b08c4d99fd24ba141b94f
-    m_Address: Core/Localization/en-GB.json
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3e9bac88c44b6fe4a839faa88731081c
-    m_Address: Core/Localization/fr-FR.json
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 9e8fd00e6758ec343b98326ab8ae366a
-    m_Address: Standard/Prefabs/Weapons/Axe2.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 9a2fca4f38a418f4ebe89cbdd6f91d11
-    m_Address: Standard/Prefabs/Weapons/Gun2.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 87883062e23f7694082c717c986018c7
-    m_Address: Standard/Prefabs/Weapons/Hammer2.prefab
+  - m_GUID: 05df8d1c70568954883da0a9d9f7704f
+    m_Address: Standard/UI/Equipment/Ring.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -97,133 +25,8 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 38f890f391196a3439c4073aa142fb32
-    m_Address: Standard/Prefabs/Accessories/Amulet.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: cfe7dc976d723284dbc73a5a754a9ecf
-    m_Address: Standard/Prefabs/Accessories/Belt.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 4cd3d875fdeaea743810e6bae074ab9e
-    m_Address: Standard/Prefabs/Accessories/Ring.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 0b81378bdaf52434a86f167552f4518c
-    m_Address: Standard/Prefabs/Armor/Barrier.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 68cd17b3ebf818b4d8ea85117ca6d428
-    m_Address: Standard/Prefabs/Armor/Chest.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 855f09f2c1d06d248ae93bcd33065e0f
-    m_Address: Standard/Prefabs/Armor/Feet.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: f992588fd5d17eb4a98a4bcb3c2e05ad
-    m_Address: Standard/Prefabs/Armor/Helm.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 70889aa345dc4c24985b6460b0ab66b6
-    m_Address: Standard/Prefabs/Armor/Legs.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a11be9c5a65095d44ae0e51ea7f797e2
-    m_Address: Standard/Registration
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 0b5fd68a25a4ae04ab373c7fdb43b59a
-    m_Address: Standard/Prefabs/Targeting/ProjectileVisuals.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 33676b6f1d960ea4db1d947cb63ee983
-    m_Address: Standard/Prefabs/Targeting/BeamVisuals.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: af169d5b2c8e10c498c33bcc32cc3ea7
-    m_Address: Standard/Localization/fr-FR.json
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a14becadb0f4f4642b091407dc9c2ae7
-    m_Address: Standard/Prefabs/Shapes/WallVisuals.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ee66f94af399aef46b98d3e673fa9aa8
-    m_Address: Standard/Prefabs/Shapes/ZoneVisuals.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: d76b723de09f993479b0cbe5cf10694a
-    m_Address: Standard/Prefabs/Targeting/Projectile.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 41999c09d1855944f8323a0d9808169e
-    m_Address: Standard/Prefabs/Targeting/PointToPoint.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a2c569deaf0fe1745b9be93de6c19d6e
-    m_Address: Standard/Prefabs/Shapes/Wall.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: db85dbe43a3d3e8458e830f2530250e7
-    m_Address: Standard/Prefabs/Shapes/Zone.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 15d9e252bc9b1384886f51232aea20b5
-    m_Address: Standard/UI/Equipment/Amulet.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 34c758a507b94584cafa393d7671a00c
-    m_Address: Standard/UI/Equipment/Barrier.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 78fe1f61227d90a44a484daffd75d7c4
-    m_Address: Standard/UI/Equipment/Belt.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 05df8d1c70568954883da0a9d9f7704f
-    m_Address: Standard/UI/Equipment/Ring.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3ac78cedad3b52e4fa0d9b820b01ef73
-    m_Address: Standard/UI/Equipment/Reloader.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 6cb1565c59c3d40428f6cbd54968bd15
-    m_Address: Standard/UI/Equipment/Chest.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b222489b8a9e72c4f8d4dfdcd38e8eae
-    m_Address: Standard/UI/Equipment/Feet.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: afa8a3ffacb434f4e944b6474bc1dfd3
-    m_Address: Standard/UI/Equipment/Helm.png
+  - m_GUID: 09238381a799220488397887c17588f6
+    m_Address: Standard/UI/Equipment/HandWarning.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -232,18 +35,53 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0b5fd68a25a4ae04ab373c7fdb43b59a
+    m_Address: Standard/Prefabs/Targeting/ProjectileVisuals.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0b81378bdaf52434a86f167552f4518c
+    m_Address: Standard/Prefabs/Armor/Barrier.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 15d9e252bc9b1384886f51232aea20b5
+    m_Address: Standard/UI/Equipment/Amulet.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2f6b06db11b7372448224e4f01462702
     m_Address: Core/UI/Equipment/LeftHand.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 421dc9b863ebdd64988ef07e3db2ab02
-    m_Address: Core/UI/Equipment/RightHand.png
+  - m_GUID: 33676b6f1d960ea4db1d947cb63ee983
+    m_Address: Standard/Prefabs/Targeting/BeamVisuals.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: f48fb857652d00a409512598fbea223b
-    m_Address: Core/Prefabs/Combat/GadgetInHand.prefab
+  - m_GUID: 34c758a507b94584cafa393d7671a00c
+    m_Address: Standard/UI/Equipment/Barrier.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 38f890f391196a3439c4073aa142fb32
+    m_Address: Standard/Prefabs/Accessories/Amulet.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 391bac2c0773fe348bd5f01f1e13ce91
+    m_Address: Standard/Prefabs/Weapons/Sword.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3ac78cedad3b52e4fa0d9b820b01ef73
+    m_Address: Standard/UI/Equipment/Reloader.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e9bac88c44b6fe4a839faa88731081c
+    m_Address: Core/Localization/fr-FR.json
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -252,18 +90,78 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 41999c09d1855944f8323a0d9808169e
+    m_Address: Standard/Prefabs/Targeting/PointToPoint.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 421dc9b863ebdd64988ef07e3db2ab02
+    m_Address: Core/UI/Equipment/RightHand.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 49b96cb05dc76f841a03a0533ed3240c
+    m_Address: Standard/Prefabs/Weapons/Bow.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4cd3d875fdeaea743810e6bae074ab9e
+    m_Address: Standard/Prefabs/Accessories/Ring.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5bb08d678285f4743b5823478c0c85a5
+    m_Address: Standard/Localization/en-GB.json
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5eb315cf7251df740a8c45119362d0ed
     m_Address: Standard/UI/Equipment/AutoAmmoBuyer.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 09238381a799220488397887c17588f6
-    m_Address: Standard/UI/Equipment/HandWarning.prefab
+  - m_GUID: 620e7d7564c784a43b86f2a97542709a
+    m_Address: Standard/Prefabs/Weapons/Axe.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 9ed0afac89fcf0145a7bbfec0337d367
-    m_Address: Standard/Prefabs/Combat/BulletHole.prefab
+  - m_GUID: 68cd17b3ebf818b4d8ea85117ca6d428
+    m_Address: Standard/Prefabs/Armor/Chest.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6cb1565c59c3d40428f6cbd54968bd15
+    m_Address: Standard/UI/Equipment/Chest.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 70889aa345dc4c24985b6460b0ab66b6
+    m_Address: Standard/Prefabs/Armor/Legs.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 78fe1f61227d90a44a484daffd75d7c4
+    m_Address: Standard/UI/Equipment/Belt.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 855f09f2c1d06d248ae93bcd33065e0f
+    m_Address: Standard/Prefabs/Armor/Feet.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 87883062e23f7694082c717c986018c7
+    m_Address: Standard/Prefabs/Weapons/Hammer2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8c0273065c6f88d4e9a0cbe91a6925f4
+    m_Address: Standard/Prefabs/Weapons/Gun.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 91ecae8b81a7bbe45bda67732f076637
+    m_Address: Standard/Prefabs/Weapons/Crossbow.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -272,9 +170,109 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9a2fca4f38a418f4ebe89cbdd6f91d11
+    m_Address: Standard/Prefabs/Weapons/Gun2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9db79d108cde9f548a4ba1d52c1ea2b4
+    m_Address: Standard/Prefabs/Weapons/Staff.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9e8fd00e6758ec343b98326ab8ae366a
+    m_Address: Standard/Prefabs/Weapons/Axe2.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9ed0afac89fcf0145a7bbfec0337d367
+    m_Address: Standard/Prefabs/Combat/BulletHole.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a11be9c5a65095d44ae0e51ea7f797e2
+    m_Address: Standard/Registration
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a14becadb0f4f4642b091407dc9c2ae7
+    m_Address: Standard/Prefabs/Shapes/WallVisuals.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a2c569deaf0fe1745b9be93de6c19d6e
+    m_Address: Standard/Prefabs/Shapes/Wall.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: af169d5b2c8e10c498c33bcc32cc3ea7
+    m_Address: Standard/Localization/fr-FR.json
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: afa8a3ffacb434f4e944b6474bc1dfd3
+    m_Address: Standard/UI/Equipment/Helm.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b222489b8a9e72c4f8d4dfdcd38e8eae
+    m_Address: Standard/UI/Equipment/Feet.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c254c49e9e23f1f478f7fe1c7e5f7726
+    m_Address: Standard/Prefabs/Weapons/Dagger.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cfe7dc976d723284dbc73a5a754a9ecf
+    m_Address: Standard/Prefabs/Accessories/Belt.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d083539429da01f4a948d98d0bd435dc
+    m_Address: Standard/Prefabs/Weapons/Hammer.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d76b723de09f993479b0cbe5cf10694a
+    m_Address: Standard/Prefabs/Targeting/Projectile.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: db85dbe43a3d3e8458e830f2530250e7
+    m_Address: Standard/Prefabs/Shapes/Zone.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dba1d53db226b6a43b3cab4703b67937
+    m_Address: Standard/Prefabs/Weapons/Shield.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e6e95d7b1c9b08c4d99fd24ba141b94f
+    m_Address: Core/Localization/en-GB.json
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ee66f94af399aef46b98d3e673fa9aa8
+    m_Address: Standard/Prefabs/Shapes/ZoneVisuals.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f48fb857652d00a409512598fbea223b
+    m_Address: Core/Prefabs/Combat/GadgetInHand.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f992588fd5d17eb4a98a4bcb3c2e05ad
+    m_Address: Standard/Prefabs/Armor/Helm.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 101452080fc0cca43abdd31fc4649980, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: bf626c240807ac149b811ab6ea3408dd, type: 2}
     - {fileID: 11400000, guid: 5fe8bfb9e23fbd74890eeb6ac241fdc2, type: 2}
+    - {fileID: 11400000, guid: bf626c240807ac149b811ab6ea3408dd, type: 2}

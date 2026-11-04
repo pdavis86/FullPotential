@@ -22,7 +22,6 @@ using UnityEngine.UI;
 
 namespace FullPotential.Core.UI.Behaviours
 {
-    // todo: move AdminShopUi to Standaard
     public class AdminShopUi : MonoBehaviour
     {
         private readonly System.Random _random = new System.Random();
@@ -95,6 +94,8 @@ namespace FullPotential.Core.UI.Behaviours
 
         private void InstantiateAttributeControls()
         {
+            const int MaxExtraAmmo = 3;
+
             _attributeSliderBehaviours = new List<NameAndValueSlider>();
             _propertySliderBehaviours = new List<NameAndValueSlider>();
             _propertyToggleBehaviours = new List<NameAndToggle>();
@@ -108,11 +109,13 @@ namespace FullPotential.Core.UI.Behaviours
                 _attributeSliderBehaviours.Add(behaviour);
             }
 
+            // todo: scan through all properties to see what is avaialble
+
             var extraAmmoSlider = Instantiate(_nameAndValueSliderPrefab, _attributesScrollViewContentParent.transform);
             var extraAmmoBehaviour = extraAmmoSlider.GetComponent<NameAndValueSlider>();
             extraAmmoBehaviour.Id = "ExtraAmmoPerShot";
             extraAmmoBehaviour.Name.text = "ExtraAmmoPerShot";
-            extraAmmoBehaviour.Slider.maxValue = ResultFactory.MaxExtraAmmo;
+            extraAmmoBehaviour.Slider.maxValue = MaxExtraAmmo;
             extraAmmoBehaviour.Slider.value = 1;
             extraAmmoBehaviour.Slider.value = 0;
             _propertySliderBehaviours.Add(extraAmmoBehaviour);

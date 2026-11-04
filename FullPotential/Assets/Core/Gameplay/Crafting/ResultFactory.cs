@@ -23,9 +23,6 @@ namespace FullPotential.Core.Gameplay.Crafting
 {
     public class ResultFactory : IResultFactory
     {
-        // todo: move this to ExtraAmmoPerShot
-        public const int MaxExtraAmmo = 3;
-
         private readonly Random _random = new Random();
         private readonly IAuditor _logger;
         private readonly TypeRegistry _typeRegistry;
