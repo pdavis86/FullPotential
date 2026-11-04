@@ -65,6 +65,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         protected ICombatService _combatService;
         protected IEventBus _eventBus;
         protected ISceneService _sceneService;
+        protected IClock _clock;
 
         protected readonly NetworkVariable<FixedString128Bytes> _entityName = new NetworkVariable<FixedString128Bytes>();
 
@@ -117,6 +118,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _combatService = DependenciesContext.Dependencies.GetService<ICombatService>();
             _eventBus = DependenciesContext.Dependencies.GetService<IEventBus>();
             _sceneService = _gameManager.GetSceneBehaviour().GetSceneService();
+            _clock = DependenciesContext.Dependencies.GetService<IClock>();
 
             PopulateValuePoolValueCache();
 
@@ -183,7 +185,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             // todo: Does not work for clients joining mid-battle
             var effect = _typeRegistry.GetRegisteredByTypeId<IEffectType>(EffectTypeId.FromString(effectTypeId));
-            AddOrUpdateEffect(effect, change, expiry);
+            AddOrUpdateEffect(effect, change, expiry, _clock.GetTimestamp(), Math.Max(0, (expiry - _clock.UtcNow).TotalSeconds));
         }
 
         [ClientRpc]
@@ -598,36 +600,47 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         #region Effect-related methods
 
-        public void AddAttributeModifier(IAttributeEffect attributeEffect, int change, DateTime expiry)
+        public void AddAttributeModifier(IAttributeEffect attributeEffect, int change, float durationSeconds)
         {
-            AddOrUpdateEffect(attributeEffect, change, expiry);
+            AddOrUpdateEffect(
+                attributeEffect,
+                change,
+                _clock.UtcNow.AddSeconds(durationSeconds),
+                _clock.GetTimestamp(),
+                durationSeconds);
         }
 
         public void ApplyPeriodicActionToValuePool(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position)
         {
-            // todo: replace use of DateTime with TimeProvider to ensure UTC
             var delay = itemUsed.GetChargeUpTime();
-            var expiry = DateTime.Now.AddSeconds(itemUsed.GetEffectDuration());
-            PeriodicActionToValuePoolAsync(sourceFighter, itemUsed, valuePoolEffect, position, delay, expiry, _activeEffectsCancellationTokenSource.Token).Forget();
+            var durationSeconds = itemUsed.GetEffectDuration();
+            var expiry = _clock.UtcNow.AddSeconds(durationSeconds);
+            var timerStartTimestamp = _clock.GetTimestamp();
+            PeriodicActionToValuePoolAsync(sourceFighter, itemUsed, valuePoolEffect, position, delay, expiry, timerStartTimestamp, durationSeconds, _activeEffectsCancellationTokenSource.Token).Forget();
         }
 
-        private async UniTask PeriodicActionToValuePoolAsync(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position, float delay, DateTime expiry, CancellationToken cancellationToken)
+        private async UniTask PeriodicActionToValuePoolAsync(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position, float delay, DateTime expiry, long timerStartTimestamp, double durationSeconds, CancellationToken cancellationToken)
         {
             var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, valuePoolEffect, this);
-            AddOrUpdateEffect(valuePoolEffect, combatResult.Change, expiry);
+            AddOrUpdateEffect(valuePoolEffect, combatResult.Change, expiry, timerStartTimestamp, durationSeconds);
 
             do
             {
                 ApplySingleValueChangeToValuePoolInternal(sourceFighter, itemUsed, valuePoolEffect, position, combatResult);
                 await UniTask.WaitForSeconds(delay, cancellationToken: cancellationToken);
 
-            } while (DateTime.Now < expiry);
+            } while (_clock.GetElapsedSeconds(timerStartTimestamp) < durationSeconds);
         }
 
         public void ApplySingleValueChangeToValuePool(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position)
         {
             var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, valuePoolEffect, this);
-            AddOrUpdateEffect(valuePoolEffect, combatResult.Change, DateTime.Now.AddSeconds(SingleValuePoolChangeEffectDisplaySeconds));
+            AddOrUpdateEffect(
+                valuePoolEffect,
+                combatResult.Change,
+                _clock.UtcNow.AddSeconds(SingleValuePoolChangeEffectDisplaySeconds),
+                _clock.GetTimestamp(),
+                SingleValuePoolChangeEffectDisplaySeconds);
 
             ApplySingleValueChangeToValuePoolInternal(sourceFighter, itemUsed, valuePoolEffect, position, combatResult);
         }
@@ -653,10 +666,11 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void ApplyTemporaryMaxActionToValuePool(FighterBase sourceFighter, CombatItemBase itemUsed, IValuePoolEffectType valuePoolEffect)
         {
-            var expiry = DateTime.Now.AddSeconds(itemUsed.GetEffectDuration());
+            var durationSeconds = itemUsed.GetEffectDuration();
+            var expiry = _clock.UtcNow.AddSeconds(durationSeconds);
 
             var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, valuePoolEffect, this);
-            AddOrUpdateEffect(valuePoolEffect, combatResult.Change, expiry);
+            AddOrUpdateEffect(valuePoolEffect, combatResult.Change, expiry, _clock.GetTimestamp(), durationSeconds);
             TriggerValuePoolValueUpdate(valuePoolEffect.ValuePoolTypeId, 0, sourceFighter.name, itemUsed.Name);
         }
 
@@ -694,7 +708,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             return effectActionType is EffectActionType.TemporaryMaxIncrease or EffectActionType.TemporaryMaxDecrease;
         }
 
-        private void AddOrUpdateEffect(IEffectType effect, int change, DateTime expiry)
+        private void AddOrUpdateEffect(IEffectType effect, int change, DateTime expiry, long timerStartTimestamp, double durationSeconds)
         {
             var valuePoolEffect = effect as IValuePoolEffectType;
 
@@ -727,6 +741,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                         Effect = effect,
                         Change = change,
                         Expiry = expiry,
+                        TimerStartTimestamp = timerStartTimestamp,
+                        DurationSeconds = durationSeconds,
                         ShowExpiry = showExpiry
                     };
 
@@ -738,6 +754,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                 {
                     effectMatch.Change = change;
                     effectMatch.Expiry = expiry;
+                    effectMatch.TimerStartTimestamp = timerStartTimestamp;
+                    effectMatch.DurationSeconds = durationSeconds;
 
                     _eventBus.Publish(new ActiveEffectUpdatedEvent(this, effectMatch));
                 }
@@ -750,6 +768,8 @@ namespace FullPotential.Api.Gameplay.Behaviours
                     Effect = effect,
                     Change = change,
                     Expiry = expiry,
+                    TimerStartTimestamp = timerStartTimestamp,
+                    DurationSeconds = durationSeconds,
                     ShowExpiry = showExpiry
                 };
 
@@ -768,7 +788,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             //Note: .ToList() needed to avoid the "Collection was modified" exception
             var expiredEffects = _activeEffects
-                .Where(x => x.Expiry < DateTime.Now)
+                .Where(x => _clock.GetElapsedSeconds(x.TimerStartTimestamp) >= x.DurationSeconds)
                 .ToList();
 
             var valuePoolsNeedingUpdates = expiredEffects

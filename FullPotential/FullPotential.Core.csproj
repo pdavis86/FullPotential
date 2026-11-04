@@ -103,6 +103,7 @@
     <Compile Include="Assets\Core\UI\Behaviours\CharacterMenuUiCraftingTab.cs" />
     <Compile Include="Assets\Core\GameManagement\Data\CharacterSettingKey.cs" />
     <Compile Include="Assets\Core\UI\Components\InventoryItemsList.cs" />
+    <Compile Include="Assets\Core\Utilities\SystemClock.cs" />
     <Compile Include="Assets\Core\SceneObjects\SceneObjectsOffline.cs" />
     <Compile Include="Assets\Core\Registry\Events\LivingEntityDiedEventHandler.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\StickUiToWorldPosition.cs" />

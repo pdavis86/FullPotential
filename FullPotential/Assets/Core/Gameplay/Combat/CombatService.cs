@@ -35,6 +35,7 @@ namespace FullPotential.Core.Gameplay.Combat
     public class CombatService : ICombatService
     {
         private readonly IAuditor _logger;
+        private readonly IClock _clock;
         private readonly ITypeRegistry _typeRegistry;
         private readonly IRpcService _rpcService;
         private readonly IMovementEffectType _pushEffect;
@@ -44,11 +45,13 @@ namespace FullPotential.Core.Gameplay.Combat
         public CombatService(
             IAuditorFactory auditorFactory,
             ITypeRegistry typeRegistry,
-            IRpcService rpcService)
+            IRpcService rpcService,
+            IClock clock)
         {
             _logger = auditorFactory.Create(this);
             _typeRegistry = typeRegistry;
             _rpcService = rpcService;
+            _clock = clock;
 
             _pushEffect = typeRegistry.GetRegisteredByTypeId<IEffectType>(EffectTypeIds.PushId) as IMovementEffectType;
             _hurtEffect = typeRegistry.GetRegisteredByTypeId<IEffectType>(EffectTypeIds.HurtId);
@@ -309,9 +312,8 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private void ApplyAttributeEffect(FighterBase sourceFighter, CombatItemBase itemUsed, IAttributeEffect attributeEffect, FighterBase targetFighter)
         {
-            var expiry = DateTime.Now.AddSeconds(itemUsed.GetEffectDuration());
             var attributeCombatResult = GetCombatResult(sourceFighter, itemUsed, attributeEffect, targetFighter);
-            targetFighter.AddAttributeModifier(attributeEffect, attributeCombatResult.Change, expiry);
+            targetFighter.AddAttributeModifier(attributeEffect, attributeCombatResult.Change, itemUsed.GetEffectDuration());
         }
 
         private void ApplyMaintainDistance(FighterBase sourceFighter, CombatItemBase itemUsed, GameObject targetGameObject)

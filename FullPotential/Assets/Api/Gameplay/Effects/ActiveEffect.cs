@@ -12,6 +12,10 @@ namespace FullPotential.Api.Gameplay.Effects
 
         public DateTime Expiry { get; set; }
 
+        public long TimerStartTimestamp { get; set; }
+
+        public double DurationSeconds { get; set; }
+
         public int Change { get; set; }
 
         public bool ShowExpiry { get; set; }

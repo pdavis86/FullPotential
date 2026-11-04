@@ -153,7 +153,7 @@ namespace FullPotential.Api.Items
                 CharacterId = characterId,
                 RegistryTypeId = item.RegistryType?.TypeId.ToString(),
                 Name = item.Name,
-                Attributes = item.Attributes.ToDictionary(x => x.Key.ToString(), x => x.Value.ToString()),
+                Attributes = GetNonDefaultValues(item.Attributes),
                 Properties = GetNonDefaultValues(item.Properties),
             };
 
@@ -165,6 +165,18 @@ namespace FullPotential.Api.Items
             return model;
         }
 
+        private Dictionary<string, string> GetNonDefaultValues(Dictionary<AttributeTypeId, int> input)
+        {
+            if (input == null)
+            {
+                return new Dictionary<string, string>();
+            }
+
+            return input
+                .Where(kvp => kvp.Value > 0)
+                .ToDictionary(x => x.Key.ToString(), x => x.Value.ToString());
+        }
+
         private Dictionary<string, string> GetNonDefaultValues(Dictionary<string, string> input)
         {
             if (input == null)
@@ -172,12 +184,12 @@ namespace FullPotential.Api.Items
                 return new Dictionary<string, string>();
             }
 
-            var nonDefaultAttributes = input.Where(
+            var nonDefaultProperties = input.Where(
                 kvp => !string.IsNullOrWhiteSpace(kvp.Value)
                 && kvp.Value != "0"
                 && !kvp.Value.Equals(bool.FalseString, StringComparison.OrdinalIgnoreCase));
 
-            return nonDefaultAttributes.ToDictionary(x => x.Key, x => x.Value);
+            return nonDefaultProperties.ToDictionary(x => x.Key, x => x.Value);
         }
 
         public void FillTypesFromIds(ItemData model, ItemBase item)

@@ -105,6 +105,8 @@
     <Compile Include="Assets\Api\Items\Base\ItemStackBase.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IArmorType.cs" />
     <Compile Include="Assets\Api\Scenes\ISceneService.cs" />
+    <Compile Include="Assets\Api\Registry\Visuals\IHasItemVisuals.cs" />
+    <Compile Include="Assets\Api\Registry\Visuals\ItemVisualsTypeId.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\ColorExtensions.cs" />
     <Compile Include="Assets\Api\EventManagement\Timing.cs" />
     <Compile Include="Assets\Api\Registry\Effects\IEffectType.cs" />
@@ -120,13 +122,16 @@
     <Compile Include="Assets\Api\Gameplay\Combat\Events\ItemChargePercentageChangeEvent.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\AttributeTypeId.cs" />
     <Compile Include="Assets\Api\Localization\UnitsType.cs" />
+    <Compile Include="Assets\Api\Registry\Effects\EffectTypeId.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\BodyPartTransforms.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\Models\InventoryChangesForClient.cs" />
     <Compile Include="Assets\Api\Input\DefaultInputActions.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IInventory.cs" />
     <Compile Include="Assets\Api\Utilities\DestroyStoppable.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IAttribute.cs" />
+    <Compile Include="Assets\Api\Registry\Visuals\IItemVisualsType.cs" />
     <Compile Include="Assets\Api\Items\IItem.cs" />
+    <Compile Include="Assets\Api\Registry\Gameplay\ValuePoolTypeId.cs" />
     <Compile Include="Assets\Api\Items\IHasTargetingAndShape.cs" />
     <Compile Include="Assets\Api\Unity\Constants\GameObjectNames.cs" />
     <Compile Include="Assets\Api\Registry\Gear\IAccessoryType.cs" />
@@ -138,10 +143,7 @@
     <Compile Include="Assets\Api\Registry\Effects\IAttributeEffect.cs" />
     <Compile Include="Assets\Api\GameManagement\IGameManager.cs" />
     <Compile Include="Assets\Api\Ui\IUiAssistant.cs" />
-    <Compile Include="Assets\Api\Registry\Gameplay\ValuePoolTypeId.cs" />
-    <Compile Include="Assets\Api\Registry\Visuals\ItemVisualsTypeId.cs" />
-    <Compile Include="Assets\Api\Registry\Effects\EffectTypeId.cs" />
-    <Compile Include="Assets\Api\Registry\Shapes\IShapeType.cs" />
+    <Compile Include="Assets\Api\Registry\Shapes\IShapeType.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\ActiveEffect.cs" />
     <Compile Include="Assets\Api\Logging\IAuditor.cs" />
     <Compile Include="Assets\Api\Ioc\DependenciesCollection.cs" />
@@ -155,12 +157,12 @@
     <Compile Include="Assets\Api\Registry\Effects\ICustomEffectType.cs" />
     <Compile Include="Assets\Api\Gameplay\Attributes\Accuracy.cs" />
     <Compile Include="Assets\Api\Data\ISettingsRepository.cs" />
-    <Compile Include="Assets\Api\Gameplay\Inventory\SlotId.cs" />
     <Compile Include="Assets\Api\EventManagement\EventSubscription.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\ColliderExtensions.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\ArrayExtensions.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\Events\SlotChangeEvent.cs" />
     <Compile Include="Assets\Api\Scenes\ISceneBehaviour.cs" />
+    <Compile Include="Assets\Api\Gameplay\Inventory\SlotId.cs" />
     <Compile Include="Assets\Api\Data\IDataLoader.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\Events\ActiveEffectUpdatedEvent.cs" />
     <Compile Include="Assets\Api\Gameplay\Behaviours\LivingEntityBase.cs" />
@@ -170,7 +172,6 @@
     <Compile Include="Assets\Api\Items\LevelOfDetail.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector2Extensions.cs" />
     <Compile Include="Assets\Api\Gameplay\Events\PlayerJoinedEvent.cs" />
-    <Compile Include="Assets\Api\Registry\Visuals\IItemVisualsType.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\Vector3Extensions.cs" />
     <Compile Include="Assets\Api\Utilities\MathsHelper.cs" />
     <Compile Include="Assets\Api\Items\Consumer.cs" />
@@ -202,7 +203,6 @@
     <Compile Include="Assets\Api\Registry\Gear\ConsumerItemMapper.cs" />
     <Compile Include="Assets\Api\Gameplay\Attributes\Luck.cs" />
     <Compile Include="Assets\Api\Gameplay\Crafting\IResultFactory.cs" />
-    <Compile Include="Assets\Api\Registry\Visuals\IHasItemVisuals.cs" />
     <Compile Include="Assets\Api\Registry\IHasNetworkPrefab.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingType.cs" />
     <Compile Include="Assets\Api\Networking\IRpcService.cs" />
@@ -211,6 +211,7 @@
     <Compile Include="Assets\Api\Ui\IHud.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\EnumerableExtensions.cs" />
     <Compile Include="Assets\Api\Input\Events\ReloadInputEvent.cs" />
+    <Compile Include="Assets\Api\Utilities\IClock.cs" />
     <Compile Include="Assets\Api\Registry\IHasPrefab.cs" />
     <Compile Include="Assets\Api\CoreTypeIds\HandSlotIds.cs" />
     <Compile Include="Assets\Api\CoreTypeIds\EffectTypeIds.cs" />

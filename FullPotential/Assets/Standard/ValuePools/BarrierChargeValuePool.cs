@@ -6,6 +6,7 @@ using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Utilities.Extensions;
+using FullPotential.Api.Utilities;
 using FullPotential.Standard.CustomGear.Barrier;
 using FullPotential.Standard.SpecialSlots;
 
@@ -20,6 +21,7 @@ namespace FullPotential.Standard.ValuePools
         private static readonly Color ValuePoolTextColor = Color.FromArgb(255, 255, 255); // White
 
         private readonly IAuditor _logger;
+        private readonly IClock _clock;
 
         public Guid TypeId { get; } = new Guid(TypeIdString);
 
@@ -33,9 +35,10 @@ namespace FullPotential.Standard.ValuePools
 
         public Action<LivingEntityBase> ReplenishBehaviour => PerformReplenish;
 
-        public BarrierChargeValuePool(IAuditorFactory auditorFactory)
+        public BarrierChargeValuePool(IAuditorFactory auditorFactory, IClock clock)
         {
             _logger = auditorFactory.Create(this);
+            _clock = clock;
         }
 
         private void PerformReplenish(LivingEntityBase livingEntity)
@@ -65,7 +68,7 @@ namespace FullPotential.Standard.ValuePools
                 var rechargeDelay = Barrier.GetRechargeDelay(equippedBarrier);
 
                 if (DateTime.TryParse(lastHit, out var lastHitDateTime)
-                    && (DateTime.UtcNow - lastHitDateTime.ToUniversalTime()).TotalSeconds < rechargeDelay)
+                    && (_clock.UtcNow - lastHitDateTime.ToUniversalTime()).TotalSeconds < rechargeDelay)
                 {
                     return;
                 }

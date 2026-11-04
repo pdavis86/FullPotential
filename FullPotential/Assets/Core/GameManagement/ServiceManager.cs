@@ -14,6 +14,7 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<Api.GameManagement.IGameManager>(GameManager.Instance);
 
             //Singleton
+            DependenciesContext.Dependencies.Register<Api.Utilities.IClock, FullPotential.Core.Utilities.SystemClock>();
             DependenciesContext.Dependencies.Register<Api.Logging.IAuditorFactory, Logging.AuditorFactory>();
             DependenciesContext.Dependencies.Register<Api.Gameplay.Combat.ICombatService, Gameplay.Combat.CombatService>();
             DependenciesContext.Dependencies.Register<Api.Gameplay.Crafting.IResultFactory, Gameplay.Crafting.ResultFactory>();

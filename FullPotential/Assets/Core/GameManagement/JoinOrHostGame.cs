@@ -10,6 +10,7 @@ using FullPotential.Api.Ioc;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Ui;
+using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 
 using TMPro;
@@ -58,12 +59,14 @@ namespace FullPotential.Core.GameManagement
         private string _password;
         private string _networkAddress;
         private string _networkPort;
-        private DateTime _joinAttempt;
+        private long _joinAttemptTimestamp;
+        private IClock _clock;
         private bool _shiftTab;
 
         private void Awake()
         {
             _logger = DependenciesContext.Dependencies.GetService<IAuditorFactory>().Create(this);
+            _clock = DependenciesContext.Dependencies.GetService<IClock>();
             _dataLoader = DependenciesContext.Dependencies.GetService<IDataLoader>();
             _userManagement = DependenciesContext.Dependencies.GetService<IUserManagement>();
             _localizer = DependenciesContext.Dependencies.GetService<ILocalizer>();
@@ -406,7 +409,7 @@ namespace FullPotential.Core.GameManagement
             GameManager.Instance.LocalGameDataStore.HasDisconnected = false;
             GameManager.Instance.LocalGameDataStore.DisconnectReason = null;
 
-            _joinAttempt = DateTime.UtcNow;
+            _joinAttemptTimestamp = _clock.GetTimestamp();
             _networkManager.StartClient();
 
             _gameDetailsContainer.SetActive(false);
@@ -423,7 +426,7 @@ namespace FullPotential.Core.GameManagement
 
             do
             {
-                var timeTaken = (DateTime.UtcNow - _joinAttempt).TotalSeconds;
+                var timeTaken = _clock.GetElapsedSeconds(_joinAttemptTimestamp);
                 if (timeTaken > timeoutSeconds)
                 {
                     NetworkManager.Singleton.Shutdown();

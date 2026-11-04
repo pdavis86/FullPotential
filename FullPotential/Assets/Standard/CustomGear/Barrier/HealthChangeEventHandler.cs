@@ -7,6 +7,7 @@ using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Logging;
+using FullPotential.Api.Utilities;
 using FullPotential.Standard.SpecialSlots;
 using FullPotential.Standard.ValuePools;
 
@@ -17,14 +18,16 @@ namespace FullPotential.Standard.CustomGear.Barrier
         public const string CustomDataKeyLastHit = "LastHit";
 
         private readonly IAuditor _logger;
+        private readonly IClock _clock;
 
         public NetworkLocation Location => NetworkLocation.Server;
 
         public Timing Timing => Timing.Early;
 
-        public HealthChangeEventHandler(IAuditorFactory auditorFactory)
+        public HealthChangeEventHandler(IAuditorFactory auditorFactory, IClock clock)
         {
             _logger = auditorFactory.Create(this);
+            _clock = clock;
         }
 
         public UniTask<HandlerResult> HandleEventAsync(ValuePoolValueChangeEvent eventArgs)
@@ -51,7 +54,7 @@ namespace FullPotential.Standard.CustomGear.Barrier
                 return UniTask.FromResult(new HandlerResult());
             }
 
-            barrier.SetCustomData(CustomDataKeyLastHit, DateTime.UtcNow.ToString("u"));
+            barrier.SetCustomData(CustomDataKeyLastHit, _clock.UtcNow.ToString("u"));
 
             eventArgs.LivingEntity.TriggerValuePoolValueUpdate(BarrierChargeValuePool.Id, eventArgs.Change, eventArgs.SourceEntityName, eventArgs.SourceItemName);
 

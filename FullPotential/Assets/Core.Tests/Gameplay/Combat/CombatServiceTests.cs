@@ -47,7 +47,8 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
             _combatService = new CombatService(
                 Mock.Of<IAuditorFactory>(),
                 Mock.Of<ITypeRegistry>(),
-                Mock.Of<IRpcService>());
+                Mock.Of<IRpcService>(),
+                Mock.Of<FullPotential.Api.Utilities.IClock>());
         }
 
         // todo: zzz v0.6 - Create Standard.Tests and move this code there

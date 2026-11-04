@@ -35,11 +35,13 @@ namespace FullPotential.Core.Player
 {
     public class PlayerFighter : FighterBase, IPlayerFighter
     {
+        private const double UnclaimedLootLifetimeSeconds = 60 * 60;
+
         #region Variables
 
         private ClientRpcParams _clientRpcParams;
 
-        private readonly Dictionary<string, DateTime> _unclaimedLoot = new Dictionary<string, DateTime>();
+        private readonly Dictionary<string, long> _unclaimedLoot = new Dictionary<string, long>();
 
         private string _textureUrl;
         private Vector3 _positionAfterRespawn;
@@ -577,7 +579,7 @@ namespace FullPotential.Core.Player
 
             var id = Guid.NewGuid().ToString();
 
-            _unclaimedLoot.Add(id, DateTime.UtcNow.AddHours(1));
+            _unclaimedLoot.Add(id, _clock.GetTimestamp());
 
             var clientRpcParams = new ClientRpcParams
             {
@@ -599,7 +601,9 @@ namespace FullPotential.Core.Player
 
         private void ClearExpiredLoot()
         {
-            var expiredLoot = _unclaimedLoot.Where(x => x.Value < DateTime.UtcNow).ToList();
+            var expiredLoot = _unclaimedLoot
+                .Where(x => _clock.GetElapsedSeconds(x.Value) >= UnclaimedLootLifetimeSeconds)
+                .ToList();
 
             if (!expiredLoot.Any())
             {

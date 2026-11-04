@@ -1,5 +1,8 @@
 using System;
 
+using FullPotential.Api.Ioc;
+using FullPotential.Api.Utilities;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,6 +19,12 @@ namespace FullPotential.Core.UI.Behaviours
         private bool _showExpiry;
         private bool _isDestroySet;
         private DateTime _expiry;
+        private IClock _clock;
+
+        private void Awake()
+        {
+            _clock = DependenciesContext.Dependencies.GetService<IClock>();
+        }
 
         public void SetEffect(Guid id, Color color, string effectTranslation, bool showExpiry, DateTime expiry)
         {
@@ -50,7 +59,7 @@ namespace FullPotential.Core.UI.Behaviours
 
         public float GetSecondsRemaining()
         {
-            return (float)(_expiry - DateTime.Now).TotalSeconds;
+            return (float)(_expiry - _clock.UtcNow).TotalSeconds;
         }
 
         private void DestroyAfter(float timeToLive)
