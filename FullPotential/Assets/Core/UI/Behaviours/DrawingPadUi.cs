@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Drawing;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Unity.Extensions;

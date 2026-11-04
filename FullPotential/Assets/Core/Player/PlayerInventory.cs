@@ -101,7 +101,7 @@ namespace FullPotential.Core.Player
             {
                 matches = _items.Where(
                     i => i.Value.RegistryType is ICustomGearType customGearType
-                         && slotId.Value.ToString().StartsWith(customGearType.SlotId.ToString()));
+                         && slotId.Value.ToString().StartsWith(customGearType.SlotTypeId.ToString()));
             }
 
             return matches

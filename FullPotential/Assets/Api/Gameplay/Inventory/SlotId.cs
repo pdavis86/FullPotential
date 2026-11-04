@@ -1,8 +1,7 @@
 using System;
 
-namespace FullPotential.Api.CoreTypeIds
+namespace FullPotential.Api.Gameplay.Inventory
 {
-    // todo: Create a SlotTypeId too
     public readonly struct SlotId : IEquatable<SlotId>
     {
         private readonly string _idString;
@@ -19,14 +18,31 @@ namespace FullPotential.Api.CoreTypeIds
 
         public static SlotId FromString(string value)
         {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException("A slot ID cannot be null or empty.", nameof(value));
+            }
+
             if (!TryParse(value, out var slotId))
             {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    throw new ArgumentException("A slot ID cannot be null or empty.", nameof(value));
-                }
-
                 throw new FormatException($"'{value}' is not a valid slot ID.");
+            }
+
+            return slotId;
+        }
+
+        public static SlotId FromStringAndIndex(string value, int index)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException("A slot ID cannot be null or empty.", nameof(value));
+            }
+
+            var valueAndIndex = $"{value};{index}";
+
+            if (!TryParse(valueAndIndex, out var slotId))
+            {
+                throw new FormatException($"'{valueAndIndex}' is not a valid slot ID.");
             }
 
             return slotId;

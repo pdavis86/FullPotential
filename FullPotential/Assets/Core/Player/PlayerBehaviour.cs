@@ -12,6 +12,7 @@ using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Crafting;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Inventory.Events;
 using FullPotential.Api.Gameplay.Player.Events;
 using FullPotential.Api.Gameplay.Player.Models;

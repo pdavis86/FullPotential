@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.IntegrationTests.TestHelpers;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;

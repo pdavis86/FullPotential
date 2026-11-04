@@ -6,6 +6,7 @@ using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Effects;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;

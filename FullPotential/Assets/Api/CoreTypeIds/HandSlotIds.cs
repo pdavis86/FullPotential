@@ -1,3 +1,5 @@
+using FullPotential.Api.Gameplay.Inventory;
+
 namespace FullPotential.Api.CoreTypeIds
 {
     public static class HandSlotIds

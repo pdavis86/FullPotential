@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
@@ -17,7 +17,7 @@ namespace FullPotential.Standard.CustomGear.Reloader.TeleportReloader
 
         public Guid TypeId { get; } = new Guid(TypeIdString);
 
-        public SlotId SlotId => SlotId.FromString(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
+        public SlotId SlotTypeId => SlotId.FromString(SpecialSlots.RangedWeaponReloaderSlot.TypeIdString);
 
         public IEnumerable<ValuePoolTypeId> ValuePoolTypeIdsInUse { get; } = new[] { Energy.Id };
 

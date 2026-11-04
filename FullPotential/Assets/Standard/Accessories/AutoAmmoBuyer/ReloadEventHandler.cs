@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 
 using FullPotential.Api.EventManagement;
-using FullPotential.Api.Gameplay.Player;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Input.Events;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
@@ -35,7 +35,7 @@ namespace FullPotential.Standard.Accessories.AutoAmmoBuyer
 
         public UniTask<HandlerResult> HandleEventAsync(ReloadInputEvent eventArgs)
         {
-            var buyerSlotId = SlotStatus.GetSlotId(AutoAmmoBuyer.TypeIdString, 1);
+            var buyerSlotId = SlotId.FromStringAndIndex(AutoAmmoBuyer.TypeIdString, 1);
             var buyerItem = eventArgs.Fighter.Inventory.GetItemInSlot(buyerSlotId);
 
             if (buyerItem == null)

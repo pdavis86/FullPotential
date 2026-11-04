@@ -1,6 +1,6 @@
-using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Inventory;
 
 using UnityEngine;
 

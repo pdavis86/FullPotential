@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
-using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Inventory;
 
 namespace FullPotential.Standard.Enemies.Behaviours
 {

@@ -1,8 +1,8 @@
 using System;
 using System.Drawing;
 
-using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Behaviours;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Registry.Gameplay;
 using FullPotential.Api.Utilities.Extensions;

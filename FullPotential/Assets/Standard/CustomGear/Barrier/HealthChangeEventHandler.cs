@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Combat.Events;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Logging;
 using FullPotential.Standard.SpecialSlots;
 using FullPotential.Standard.ValuePools;

@@ -1,8 +1,8 @@
 using System;
 using System.Text;
 
-using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;

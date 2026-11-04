@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
@@ -10,7 +10,7 @@ namespace FullPotential.Api.Registry.Gear
 {
     public interface ICustomGearType : ICraftableType
     {
-        SlotId SlotId { get; }
+        SlotId SlotTypeId { get; }
 
         IEnumerable<ValuePoolTypeId> ValuePoolTypeIdsInUse { get; }
 

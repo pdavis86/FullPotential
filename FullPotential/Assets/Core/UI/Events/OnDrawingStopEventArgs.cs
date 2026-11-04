@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.Gameplay.Inventory;
 
 namespace FullPotential.Core.UI.Events
 {

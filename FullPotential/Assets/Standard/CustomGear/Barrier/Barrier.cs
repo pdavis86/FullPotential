@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using FullPotential.Api.CoreTypeIds;
 using FullPotential.Api.Gameplay.Attributes;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
@@ -21,7 +21,7 @@ namespace FullPotential.Standard.CustomGear.Barrier
 
         public Guid TypeId { get; } = new Guid(TypeIdString);
 
-        public SlotId SlotId => SlotId.FromString(SpecialSlots.BarrierSlot.TypeIdString);
+        public SlotId SlotTypeId => SlotId.FromString(SpecialSlots.BarrierSlot.TypeIdString);
 
         public IEnumerable<ValuePoolTypeId> ValuePoolTypeIdsInUse { get; } = new[] { Energy.Id, BarrierChargeValuePool.Id };
 

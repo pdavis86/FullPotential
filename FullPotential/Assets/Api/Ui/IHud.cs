@@ -1,4 +1,4 @@
-using FullPotential.Api.CoreTypeIds;
+using FullPotential.Api.Gameplay.Inventory;
 
 using UnityEngine;
 

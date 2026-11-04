@@ -7,6 +7,7 @@ using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;

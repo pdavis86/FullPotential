@@ -1,5 +1,4 @@
-using FullPotential.Api.CoreTypeIds;
-using FullPotential.Api.Gameplay.Player;
+using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
@@ -64,7 +63,7 @@ namespace FullPotential.Core.Ui.Behaviours
             {
                 for (var i = 1; i <= type.SlotCount; i++)
                 {
-                    InstantiateSlot(SlotStatus.GetSlotId(type.TypeId.ToString(), i), type.SlotSpritePrefabAddress, _rhs.transform);
+                    InstantiateSlot(new SlotId(type.TypeId, i), type.SlotSpritePrefabAddress, _rhs.transform);
                 }
             }
 
