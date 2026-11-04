@@ -68,7 +68,6 @@
     <Compile Include="Assets\Api\Items\IValuePoolConsumer.cs" />
     <Compile Include="Assets\Api\Gameplay\Effects\MovementDirection.cs" />
     <Compile Include="Assets\Api\Registry\Targeting\ITargetingBehaviour.cs" />
-    <Compile Include="Assets\Api\Items\ItemFactory.cs" />
     <Compile Include="Assets\Api\Data\IUserManagement.cs" />
     <Compile Include="Assets\Api\Items\Base\CombatItemBase.cs" />
     <Compile Include="Assets\Api\Utilities\Extensions\SerializationExtensions.cs" />

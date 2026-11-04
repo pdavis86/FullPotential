@@ -126,6 +126,7 @@
     <Compile Include="Assets\Core\Gameplay\Events\EventBus.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\Hud.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\CombatService.cs" />
+    <Compile Include="Assets\Core\Items\ItemFactory.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Hurt.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiSlot.cs" />
     <Compile Include="Assets\Core\Registry\ValuePools\Stamina.cs" />

@@ -4,6 +4,7 @@ using System.Linq;
 
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Inventory;
+using FullPotential.Api.Items;
 using FullPotential.Api.Items.Base;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Registry;
@@ -19,7 +20,7 @@ using FullPotential.Models.LivingEntity;
 
 using Range = FullPotential.Api.Gameplay.Attributes.Range;
 
-namespace FullPotential.Api.Items
+namespace FullPotential.Core.Items
 {
     public class ItemFactory : IItemFactory
     {

@@ -1,4 +1,3 @@
-using FullPotential.Api.EventManagement;
 using FullPotential.Api.Ioc;
 
 namespace FullPotential.Core.GameManagement
@@ -14,12 +13,12 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<Api.GameManagement.IGameManager>(GameManager.Instance);
 
             //Singleton
-            DependenciesContext.Dependencies.Register<Api.Utilities.IClock, FullPotential.Core.Utilities.SystemClock>();
+            DependenciesContext.Dependencies.Register<Api.Utilities.IClock, Utilities.SystemClock>();
             DependenciesContext.Dependencies.Register<Api.Logging.IAuditorFactory, Logging.AuditorFactory>();
             DependenciesContext.Dependencies.Register<Api.Gameplay.Combat.ICombatService, Gameplay.Combat.CombatService>();
             DependenciesContext.Dependencies.Register<Api.Gameplay.Crafting.IResultFactory, Gameplay.Crafting.ResultFactory>();
             DependenciesContext.Dependencies.Register<Api.Gameplay.Drawing.IDrawingService, Gameplay.Drawing.DrawingService>();
-            DependenciesContext.Dependencies.Register<IEventBus, Gameplay.Events.EventBus>();
+            DependenciesContext.Dependencies.Register<Api.EventManagement.IEventBus, Gameplay.Events.EventBus>();
             DependenciesContext.Dependencies.Register<Api.Localization.ILocalizer, Localization.Localizer>();
             DependenciesContext.Dependencies.Register<Api.Networking.IRpcService, Networking.RpcService>();
             DependenciesContext.Dependencies.Register<Api.Data.ISettingsRepository, Persistence.Local.SettingsRepository>();
@@ -28,7 +27,7 @@ namespace FullPotential.Core.GameManagement
             DependenciesContext.Dependencies.Register<Api.Unity.IShaderUtilities, Unity.ShaderUtilities>();
             DependenciesContext.Dependencies.Register<Api.Unity.IUnityHelperUtilities, Unity.UnityHelperUtilities>();
             DependenciesContext.Dependencies.Register<Api.Data.ISaveManager, Persistence.SaveManager>();
-            DependenciesContext.Dependencies.Register<Api.Items.IItemFactory, Api.Items.ItemFactory>();
+            DependenciesContext.Dependencies.Register<Api.Items.IItemFactory, Items.ItemFactory>();
 
             var settingsRepository = DependenciesContext.Dependencies.GetService<Api.Data.ISettingsRepository>();
             var settings = settingsRepository.Get();
