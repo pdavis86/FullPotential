@@ -94,12 +94,12 @@ namespace FullPotential.Standard.Items.Base
             return returnValue;
         }
 
-        public float GetChargeUpTime()
+        public virtual float GetChargeUpTime()
         {
             return GetChargeUpOrCooldownTime(Attributes.GetValueOrZero(Speed.Id));
         }
 
-        public float GetCooldownTime()
+        public virtual float GetCooldownTime()
         {
             return GetChargeUpOrCooldownTime(Attributes.GetValueOrZero(Recovery.Id));
         }

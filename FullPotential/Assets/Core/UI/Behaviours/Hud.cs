@@ -324,7 +324,7 @@ namespace FullPotential.Core.Ui.Behaviours
             _eventBus.SubscribeBehaviour<SlotChangeEvent>(this, e => e.LivingEntity == _playerFighter, e => HandleAttackOrReloadAsync(e.LivingEntity, e.SlotId, true, true, true));
             _eventBus.SubscribeBehaviour<AttackReleaseInputEvent>(this, e => e.Fighter == _playerFighter, e => HandleAttackOrReloadAsync(e.Fighter, e.SlotId, false, true, false));
             _eventBus.SubscribeBehaviour<SlotBusyChangeEvent>(this, e => e.Fighter == _playerFighter, e => HandleAttackOrReloadAsync(e.Fighter, e.SlotId, false, true, false));
-            _eventBus.SubscribeBehaviour<ItemChargePercentageChangeEvent>(this, e => e.Fighter == _playerFighter, e => HandleAttackOrReloadAsync(e.Fighter, e.SlotId, false, false, true));
+            _eventBus.SubscribeBehaviour<ItemChargePercentageChangeEvent>(this, e => e.Fighter == _playerFighter, e => HandleAttackOrReloadAsync(e.Fighter, e.SlotId, false, true, true));
             _eventBus.SubscribeBehaviour<ActiveEffectAddedEvent>(this, e => e.LivingEntity == _playerFighter, HandleActiveEffectAddedAsync);
             _eventBus.SubscribeBehaviour<ActiveEffectUpdatedEvent>(this, e => e.LivingEntity == _playerFighter, HandleActiveEffectUpdatedAsync);
             _eventBus.SubscribeBehaviour<EntityDiedAfterEvent>(this, e => e.LivingEntity == _playerFighter, HandleEntityDiedAsync);
@@ -393,6 +393,7 @@ namespace FullPotential.Core.Ui.Behaviours
                 return UniTask.CompletedTask;
             }
 
+            // todo: HUD should not need to know about ammo
             if (isAmmoChange)
             {
                 var ammoComponent = slotId == HandSlotIds.LeftHand ? _ammoLeft : _ammoRight;

@@ -326,6 +326,11 @@ namespace FullPotential.Standard.Items
             return returnValue;
         }
 
+        public override float GetCooldownTime()
+        {
+            return IsRanged ? GetDelayBetweenShots() : base.GetCooldownTime();
+        }
+
         public float GetReloadTime()
         {
             var returnValue = MathsHelper.GetHighInLowOutInRange(Attributes.GetValueOrZero(Recovery.Id), 0.5f, 5);

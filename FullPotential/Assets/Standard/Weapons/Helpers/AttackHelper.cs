@@ -7,6 +7,7 @@ using FullPotential.Api.EventManagement;
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
+using FullPotential.Api.Gameplay.Combat.Events;
 using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player;
 using FullPotential.Api.Items;
@@ -96,18 +97,24 @@ namespace FullPotential.Standard.Weapons.Helpers
 
             if (weaponInHand.IsRanged)
             {
-                UseRangedWeapon(fighter, slotId, slotStatus, weaponInHand);
+                UseRangedWeapon(fighter, slotId, slotStatus, weaponInHand, isAutoFire);
                 return;
             }
 
             UseMeleeWeapon(fighter, slotId, weaponInHand);
         }
 
-        private void UseRangedWeapon(FighterBase fighter, SlotId slotId, SlotStatus slotStatus, Weapon weaponInHand)
+        private void UseRangedWeapon(FighterBase fighter, SlotId slotId, SlotStatus slotStatus, Weapon weaponInHand, bool isAutoFire)
         {
             if (weaponInHand.Ammo == 0 || slotStatus.IsBusy)
             {
                 _logger.Debug("Cancelling UseRangedWeapon(). Ammo: {0}, IsBusy: {1}", weaponInHand.Ammo, slotStatus.IsBusy);
+                return;
+            }
+
+            if (weaponInHand.ChargePercentage > 0)
+            {
+                _logger.Debug("Cancelling UseRangedWeapon(). ChargePercentage: {0}", weaponInHand.ChargePercentage);
                 return;
             }
 
@@ -125,13 +132,25 @@ namespace FullPotential.Standard.Weapons.Helpers
                 1 + weaponInHand.Properties.GetIntValueOrZero(nameof(Weapon.ExtraAmmoPerShot)),
                 weaponInHand.Ammo);
 
+            if (!isAutoFire)
+            {
+                weaponInHand.ChargePercentage = 100;
+                slotStatus.StartCooldownLoopAsync(weaponInHand).Forget();
+            }
+            else
+            {
+                // todo: HUD should not need to know about ammo. Publish a different kind of event
+                var chargeChangeEvent = new ItemChargePercentageChangeEvent(fighter, slotId);
+                _eventBus.Publish(chargeChangeEvent);
+            }
+
             var hitGameObject = rangedHit.transform != null ? rangedHit.transform.gameObject : null;
-            var eventArgs = new ShotFiredAfterEvent(fighter, slotId, handPosition, endPos, ammoUsed, hitGameObject);
-            _eventBus.Publish(eventArgs);
+            var shotFiredEvent = new ShotFiredAfterEvent(fighter, slotId, handPosition, endPos, ammoUsed, hitGameObject);
+            _eventBus.Publish(shotFiredEvent);
 
             if (rangedHit.transform == null)
             {
-                _logger.Debug("Cancelling UseRangedWeapon(). Nothing was hit");
+                _logger.Debug("UseRangedWeapon() fired but nothing was hit");
                 return;
             }
 

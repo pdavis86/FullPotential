@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Threading;
 
@@ -65,18 +66,21 @@ namespace FullPotential.Api.Gameplay.Player
 
             while (item.ChargePercentage < 100 && !_preActionCts.IsCancellationRequested)
             {
-                await UniTask.WaitForSeconds(ChargeGaugeUpdateSeconds, cancellationToken: _preActionCts.Token);
+                var secondsToWait = Math.Min(ChargeGaugeUpdateSeconds, secondsToTake - elapsedSeconds);
+                await UniTask.WaitForSeconds(secondsToWait, cancellationToken: _preActionCts.Token);
 
                 if (_preActionCts.IsCancellationRequested)
                 {
                     return;
                 }
 
-                elapsedSeconds += ChargeGaugeUpdateSeconds;
+                elapsedSeconds += secondsToWait;
                 item.ChargePercentage = (int)(elapsedSeconds / secondsToTake * 100);
 
                 _eventBus.Publish(new ItemChargePercentageChangeEvent(Fighter, SlotId));
             }
+
+            item.ChargePercentage = 100;
 
             if (_logger.IsEnabled(AuditLevel.Debug))
             {
@@ -149,18 +153,21 @@ namespace FullPotential.Api.Gameplay.Player
 
             while (item.ChargePercentage > 0 && !_postActionCts.IsCancellationRequested)
             {
-                await UniTask.WaitForSeconds(ChargeGaugeUpdateSeconds, cancellationToken: _postActionCts.Token);
+                var secondsToWait = Math.Min(ChargeGaugeUpdateSeconds, secondsToTake - elapsedSeconds);
+                await UniTask.WaitForSeconds(secondsToWait, cancellationToken: _postActionCts.Token);
 
                 if (_postActionCts.IsCancellationRequested)
                 {
                     return;
                 }
 
-                elapsedSeconds += ChargeGaugeUpdateSeconds;
+                elapsedSeconds += secondsToWait;
                 item.ChargePercentage = 100 - (int)(elapsedSeconds / secondsToTake * 100);
 
                 _eventBus.Publish(new ItemChargePercentageChangeEvent(Fighter, SlotId));
             }
+
+            item.ChargePercentage = 0;
 
             if (_logger.IsEnabled(AuditLevel.Debug))
             {
