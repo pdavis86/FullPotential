@@ -71,14 +71,12 @@ namespace FullPotential.Core.Gameplay.Combat
                 ApplyEffect(pushContext, _pushEffect);
             }
 
-            var itemUsedEffects = itemUsed?.EffectTypes ?? new List<IEffectType>();
+            var itemUsedEffects = itemUsed?.EffectTypes;
+            IEnumerable<IEffectType> effectsToApply = itemUsedEffects == null || !itemUsedEffects.Any()
+                ? new[] { _hurtEffect }
+                : itemUsedEffects;
 
-            if (!itemUsedEffects.Any())
-            {
-                itemUsedEffects.Add(_hurtEffect);
-            }
-
-            foreach (var effect in itemUsedEffects)
+            foreach (var effect in effectsToApply)
             {
                 if (!IsEffectAllowed(target, effect))
                 {
@@ -173,20 +171,28 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private float GetEffectivePercentage(LivingEntityBase targetLivingEntity)
         {
-            //todo: zzz v0.8 - replace with sum of Strength of items with resistance to Hurt
+            if (targetLivingEntity == null)
+            {
+                return _combatCalculator.GetEffectivePercentage(0);
+            }
 
+            //todo: zzz v0.8 - replace with sum of Strength of items with resistance to Hurt
             var armorItems = _typeRegistry
                 .GetRegisteredTypes<IArmorType>()
-                .Select(x => targetLivingEntity.Inventory.GetItemInSlot<ItemBase>(new SlotId(x.TypeId)));
+                .Select(x => targetLivingEntity.Inventory.GetItemInSlot<ItemBase>(new SlotId(x.TypeId)))
+                .ToList();
+
+            if (armorItems.Count == 0)
+            {
+                return _combatCalculator.GetEffectivePercentage(0);
+            }
 
             var sum = armorItems
                 .Where(x => x != null)
                 .Sum(a => a.Attributes.GetValueOrZero(Strength.Id));
 
-            var targetDefenceValue = (int)Math.Floor((float)sum / armorItems.Count());
-
-            var targetDefence = targetLivingEntity != null ? targetDefenceValue : 0;
-            return _combatCalculator.GetEffectivePercentage(targetDefence);
+            var targetDefenceValue = (int)Math.Floor((float)sum / armorItems.Count);
+            return _combatCalculator.GetEffectivePercentage(targetDefenceValue);
         }
 
         public void SpawnTargetingGameObject(FighterBase sourceFighter, IConsumer consumer, Vector3 startPosition, Vector3 direction)

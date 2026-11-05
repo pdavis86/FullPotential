@@ -29,7 +29,8 @@ namespace FullPotential.Core.Gameplay.Combat
             _logger.Debug("Applying effect {0} to {1}", effect.TypeId, targetFighter.FighterName);
             var attributeEffect = (IAttributeEffect)effect;
             var result = _combatService.GetCombatResult(context.SourceFighter, context.ItemUsed, effect, targetFighter);
-            targetFighter.AddAttributeModifier(attributeEffect, result.Change, context.ItemUsed.GetEffectDuration());
+            var duration = context.ItemUsed?.GetEffectDuration() ?? 0;
+            targetFighter.AddAttributeModifier(attributeEffect, result.Change, duration);
         }
     }
 }

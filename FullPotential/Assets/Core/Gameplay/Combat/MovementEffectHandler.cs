@@ -66,6 +66,12 @@ namespace FullPotential.Core.Gameplay.Combat
                 return;
             }
 
+            if (itemUsed == null && sourceFighter == null)
+            {
+                _logger.Warn("Cannot apply a movement effect without an item or attack source");
+                return;
+            }
+
             if (targetGameObject.GetComponent<NetworkObject>() == null)
             {
                 _logger.Warn("Cannot apply a movement effect to target '{0}' as it does not have a NetworkObject component", targetGameObject.name);
