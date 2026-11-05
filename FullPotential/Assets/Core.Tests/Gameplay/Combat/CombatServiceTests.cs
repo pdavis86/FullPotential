@@ -8,10 +8,8 @@ using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
 using FullPotential.Api.Registry;
-using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Weapons;
 using FullPotential.Core.Gameplay.Combat;
-using FullPotential.Core.Registry.Effects;
 
 using Moq;
 
@@ -22,12 +20,12 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
     public class CombatServiceTests
     {
         private ICombatService _combatService;
-        private IEffectType _singleDamageEffect;
+        //private IEffectType _singleDamageEffect;
 
         [SetUp]
         public void Setup()
         {
-            _singleDamageEffect = new Hurt();
+            //_singleDamageEffect = new Hurt();
 
             DependenciesContext.Dependencies.ResetForTesting();
 
@@ -47,8 +45,7 @@ namespace FullPotential.Core.Tests.Gameplay.Combat
             _combatService = new CombatService(
                 Mock.Of<IAuditorFactory>(),
                 Mock.Of<ITypeRegistry>(),
-                Mock.Of<IRpcService>(),
-                Mock.Of<FullPotential.Api.Utilities.IClock>());
+                Mock.Of<IRpcService>());
         }
 
         // todo: zzz v0.6 - Create Standard.Tests and move this code there

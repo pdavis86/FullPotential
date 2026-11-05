@@ -35,26 +35,27 @@ namespace FullPotential.Core.Gameplay.Combat
     public class CombatService : ICombatService
     {
         private readonly IAuditor _logger;
-        private readonly IClock _clock;
         private readonly ITypeRegistry _typeRegistry;
-        private readonly IRpcService _rpcService;
         private readonly IMovementEffectType _pushEffect;
         private readonly IEffectType _hurtEffect;
         private readonly System.Random _random = new System.Random();
+        private readonly IReadOnlyList<ICombatEffectHandler> _effectHandlers;
 
         public CombatService(
             IAuditorFactory auditorFactory,
             ITypeRegistry typeRegistry,
-            IRpcService rpcService,
-            IClock clock)
+            IRpcService rpcService)
         {
             _logger = auditorFactory.Create(this);
             _typeRegistry = typeRegistry;
-            _rpcService = rpcService;
-            _clock = clock;
-
             _pushEffect = typeRegistry.GetRegisteredByTypeId<IEffectType>(EffectTypeIds.PushId) as IMovementEffectType;
             _hurtEffect = typeRegistry.GetRegisteredByTypeId<IEffectType>(EffectTypeIds.HurtId);
+            _effectHandlers = new ICombatEffectHandler[]
+            {
+                new MovementEffectHandler(auditorFactory, rpcService),
+                new ValuePoolEffectHandler(auditorFactory),
+                new AttributeEffectHandler(auditorFactory, this)
+            };
         }
 
         public void ApplyEffects(
@@ -71,7 +72,8 @@ namespace FullPotential.Core.Gameplay.Combat
 
             if (itemUsed == null)
             {
-                ApplyMovementEffect(sourceFighter, null, _pushEffect, target);
+                var pushContext = new CombatEffectContext(sourceFighter, null, target, position);
+                ApplyEffect(pushContext, _pushEffect);
             }
 
             var itemUsedEffects = itemUsed?.EffectTypes ?? new List<IEffectType>();
@@ -91,12 +93,14 @@ namespace FullPotential.Core.Gameplay.Combat
 
                 _logger.Debug("Applying effect {0} to {1}", effect.TypeId, target.name);
 
-                ApplyEffect(sourceFighter, itemUsed, effect, target, position);
+                var context = new CombatEffectContext(sourceFighter, itemUsed, target, position);
+                ApplyEffect(context, effect);
 
                 if (sourceFighter != null && effect is IHasSideEffect withSideEffect)
                 {
                     var sideEffect = _typeRegistry.GetRegisteredByTypeId<IEffectType>(withSideEffect.SideEffectTypeId);
-                    ApplyEffect(null, itemUsed, sideEffect, sourceFighter.GameObject, position);
+                    var sideEffectContext = new CombatEffectContext(null, itemUsed, sourceFighter.GameObject, position);
+                    ApplyEffect(sideEffectContext, sideEffect);
                 }
             }
         }
@@ -122,36 +126,16 @@ namespace FullPotential.Core.Gameplay.Combat
             return true;
         }
 
-        private void ApplyEffect(FighterBase sourceFighter, ICombatItem itemUsed, IEffectType effect, GameObject targetGameObject, Vector3? position)
+        private void ApplyEffect(CombatEffectContext context, IEffectType effect)
         {
-            if (effect is IMovementEffectType movementEffect)
+            var handler = _effectHandlers.FirstOrDefault(x => x.CanHandle(effect));
+            if (handler == null)
             {
-                ApplyMovementEffect(sourceFighter, itemUsed, movementEffect, targetGameObject);
+                _logger.Error("Not implemented handling for effect {0}", effect);
                 return;
             }
 
-            if (!targetGameObject.TryGetComponent<FighterBase>(out var targetFighter))
-            {
-                _logger.Debug("Not applying effect {0} to {1} because they are not an FighterBase", effect.TypeId, targetGameObject.name);
-                return;
-            }
-
-            _logger.Debug("Applying effect {0} to {1}", effect.TypeId, targetFighter.FighterName);
-
-            switch (effect)
-            {
-                case IValuePoolEffectType valuePoolEffect:
-                    ApplyValuePoolEffect(sourceFighter, itemUsed, valuePoolEffect, targetFighter, position);
-                    return;
-
-                case IAttributeEffect attributeEffect:
-                    ApplyAttributeEffect(sourceFighter, itemUsed, attributeEffect, targetFighter);
-                    return;
-
-                default:
-                    _logger.Error("Not implemented handling for effect {0}", effect);
-                    return;
-            }
+            handler.Apply(context, effect);
         }
 
         private float GetSourceCriticalHitChance(FighterBase sourceFighter)
@@ -280,170 +264,6 @@ namespace FullPotential.Core.Gameplay.Combat
             var targetDefence = targetLivingEntity != null ? targetDefenceValue : 0;
             var defenceRatio = 100f / (100 + targetDefence);
             return defenceRatio;
-        }
-
-        private void ApplyValuePoolEffect(FighterBase sourceFighter, ICombatItem itemUsed, IValuePoolEffectType valuePoolEffect, FighterBase targetFighter, Vector3? position)
-        {
-            switch (valuePoolEffect.EffectActionType)
-            {
-                case EffectActionType.PeriodicDecrease:
-                case EffectActionType.PeriodicIncrease:
-                    targetFighter.ApplyPeriodicActionToValuePool(sourceFighter, itemUsed, valuePoolEffect, position);
-                    return;
-
-                case EffectActionType.SingleDecrease:
-                case EffectActionType.SingleIncrease:
-                    targetFighter.ApplySingleValueChangeToValuePool(sourceFighter, itemUsed, valuePoolEffect, position);
-                    return;
-
-                case EffectActionType.TemporaryMaxDecrease:
-                case EffectActionType.TemporaryMaxIncrease:
-                    targetFighter.ApplyTemporaryMaxActionToValuePool(sourceFighter, itemUsed, valuePoolEffect);
-                    return;
-
-                default:
-                    _logger.Error("Not implemented handling for affect type {0}", valuePoolEffect.EffectActionType);
-                    return;
-            }
-        }
-
-        private void ApplyAttributeEffect(FighterBase sourceFighter, ICombatItem itemUsed, IAttributeEffect attributeEffect, FighterBase targetFighter)
-        {
-            var attributeCombatResult = GetCombatResult(sourceFighter, itemUsed, attributeEffect, targetFighter);
-            targetFighter.AddAttributeModifier(attributeEffect, attributeCombatResult.Change, itemUsed.GetEffectDuration());
-        }
-
-        private void ApplyMaintainDistance(FighterBase sourceFighter, ICombatItem itemUsed, GameObject targetGameObject)
-        {
-            if (itemUsed is not IConsumer consumer || !consumer.TargetingType.IsContinuous)
-            {
-                _logger.Warn("MaintainDistance has been incorrectly applied to an item");
-                return;
-            }
-
-            var comp = targetGameObject.AddComponent<MaintainDistance>();
-            comp.SourceFighter = sourceFighter;
-            comp.Distance = (targetGameObject.transform.position - sourceFighter.Transform.position).magnitude;
-            comp.Consumer = consumer;
-        }
-
-        private void ApplyMovementEffect(FighterBase sourceFighter, ICombatItem itemUsed, IMovementEffectType movementEffect, GameObject targetGameObject)
-        {
-            if (!targetGameObject.TryGetComponent<Rigidbody>(out var targetRigidBody))
-            {
-                _logger.Warn("Cannot move target '{0}' as it does not have a RigidBody", targetGameObject.name);
-                return;
-            }
-
-            if (targetGameObject.TryGetComponent<LivingEntityBase>(out var targetLivingEntity))
-            {
-                targetLivingEntity.SetLastMover(sourceFighter);
-            }
-
-            if (movementEffect.Direction == MovementDirection.MaintainDistance)
-            {
-                ApplyMaintainDistance(sourceFighter, itemUsed, targetGameObject);
-                return;
-            }
-
-            if (targetGameObject.GetComponent<NetworkObject>() == null)
-            {
-                _logger.Warn("Cannot apply a movement effect to target '{0}' as it does not have a NetworkObject component", targetGameObject.name);
-                return;
-            }
-
-            if (!targetGameObject.TryGetComponent<IMoveable>(out var targetMoveable))
-            {
-                _logger.Warn("Cannot apply a movement effect to target '{0}' as it has no components that implement {1}", targetGameObject.name, nameof(IMoveable));
-                return;
-            }
-
-            var adjustForGravity = movementEffect.Direction is MovementDirection.Up or MovementDirection.Down;
-            var strength = itemUsed?.Attributes.GetValueOrZero(Strength.Id) ?? sourceFighter.GetAdjustedAttributeValue(Strength.Id);
-            var rawForce = MathsHelper.GetHighInHighOutInRange(strength, 100, 300);
-
-            var force = adjustForGravity
-                ? rawForce * 2f
-                : rawForce;
-
-            //var effectPercentage = weaponInHand.IsDefensive ? Weapon.DefensiveWeaponDpsMultiplier : 1;
-
-            //force *= effectPercentage;
-
-            //todo: zzz v0.8 - adjust value for immunities, e.g. players are immune to Hold
-
-            Vector3 forceToApply;
-
-            switch (movementEffect.Direction)
-            {
-                case MovementDirection.AwayFromSource:
-                case MovementDirection.TowardSource:
-                case MovementDirection.LeftFromSource:
-                case MovementDirection.RightFromSource:
-
-                    if (sourceFighter == null)
-                    {
-                        _logger.Warn("Attack source not found. Did they sign out?");
-                        return;
-                    }
-
-                    if (movementEffect.Direction is MovementDirection.AwayFromSource or MovementDirection.TowardSource)
-                    {
-                        var sourcePosition = sourceFighter.RigidBody.transform.position;
-                        var targetPosition = targetRigidBody.transform.position;
-
-                        var forwardsBackwardsDirection = movementEffect.Direction == MovementDirection.AwayFromSource
-                            ? targetPosition - sourcePosition
-                            : sourcePosition - targetPosition;
-
-                        //If targeting self
-                        if (forwardsBackwardsDirection == Vector3.zero)
-                        {
-                            forwardsBackwardsDirection = -sourceFighter.RigidBody.transform.forward;
-                        }
-
-                        _logger.Debug("Applying {0} force to {1}", force, targetGameObject.name);
-
-                        forceToApply = forwardsBackwardsDirection.normalized * force;
-                    }
-                    else
-                    {
-                        var leftRightDirection = movementEffect.Direction == MovementDirection.LeftFromSource
-                            ? -sourceFighter.RigidBody.transform.right
-                            : sourceFighter.RigidBody.transform.right;
-
-                        forceToApply = leftRightDirection * force;
-                    }
-
-                    break;
-
-                case MovementDirection.Backwards:
-                    forceToApply = -targetGameObject.transform.forward * force;
-                    break;
-
-                case MovementDirection.Forwards:
-                    forceToApply = targetGameObject.transform.forward * force;
-                    break;
-
-                case MovementDirection.Down:
-                    forceToApply = -targetGameObject.transform.up * force;
-                    break;
-
-                case MovementDirection.Up:
-                    forceToApply = targetGameObject.transform.up * force;
-                    break;
-
-                default:
-                    _logger.Error("Not implemented handling for movement direction {0}", movementEffect.Direction);
-                    return;
-            }
-
-            const ForceMode forceMode = ForceMode.Force;
-
-            targetRigidBody.AddForce(forceToApply, forceMode);
-
-            var nearbyClients = _rpcService.ForNearbyPlayersExcept(targetGameObject.transform.position, 0);
-            targetMoveable.ApplyMovementForceClientRpc(forceToApply, forceMode, nearbyClients);
         }
 
         private int AddVariationToValue(float basicValue)

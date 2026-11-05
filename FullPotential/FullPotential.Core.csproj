@@ -60,6 +60,7 @@
     <Compile Include="Assets\Core\Persistence\Https\DataSaver.cs" />
     <Compile Include="Assets\Core\GameManagement\Data\ServerGameData.cs" />
     <Compile Include="Assets\Core\UI\Components\EquippedSummary.cs" />
+    <Compile Include="Assets\Core\Gameplay\Combat\MovementEffectHandler.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Push.cs" />
     <Compile Include="Assets\Core\GameManagement\UserInterface.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\Events\EntityDiedEventDefaultHandler.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="Assets\Core\UI\Behaviours\ProgressWheel.cs" />
     <Compile Include="Assets\Core\Registry\SpecialSlots\LeftHand.cs" />
     <Compile Include="Assets\Core\Logging\Auditor.cs" />
+    <Compile Include="Assets\Core\Gameplay\Combat\ValuePoolEffectHandler.cs" />
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\LookAtMainCamera.cs" />
     <Compile Include="Assets\Core\Player\PlayerInventory.cs" />
     <Compile Include="Assets\Core\Gameplay\Events\IGeneralEventHandlerGroup.cs" />
@@ -88,6 +90,7 @@
     <Compile Include="Assets\Core\Unity\Static\DefaultSceneLoader.cs" />
     <Compile Include="Assets\Core\Environment\LootInteractable.cs" />
     <Compile Include="Assets\Core\UI\Components\CraftingSelector.cs" />
+    <Compile Include="Assets\Core\Gameplay\Combat\CombatEffectContext.cs" />
     <Compile Include="Assets\Core\Localization\CultureAddressables.cs" />
     <Compile Include="Assets\Core\GameManagement\Prefabs.cs" />
     <Compile Include="Assets\Core\Gameplay\Crafting\ResultFactory.cs" />
@@ -114,6 +117,7 @@
     <Compile Include="Assets\Core\Utilities\UtilityBehaviours\StickUiToWorldPosition.cs" />
     <Compile Include="Assets\Core\Gameplay\Drawing\DrawingService.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\MaintainDistance.cs" />
+    <Compile Include="Assets\Core\Gameplay\Combat\ICombatEffectHandler.cs" />
     <Compile Include="Assets\Core\Localization\Models\LocalizationData.cs" />
     <Compile Include="Assets\Core\Gameplay\Tooltips\Tooltips.cs" />
     <Compile Include="Assets\Core\Player\PlayerBehaviour.cs" />
@@ -127,6 +131,7 @@
     <Compile Include="Assets\Core\Gameplay\Events\EventBus.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\Hud.cs" />
     <Compile Include="Assets\Core\Gameplay\Combat\CombatService.cs" />
+    <Compile Include="Assets\Core\Gameplay\Combat\AttributeEffectHandler.cs" />
     <Compile Include="Assets\Core\Registry\Effects\Hurt.cs" />
     <Compile Include="Assets\Core\UI\Behaviours\InventoryUiSlot.cs" />
     <Compile Include="Assets\Core\Registry\ValuePools\Stamina.cs" />
