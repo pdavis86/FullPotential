@@ -15,7 +15,6 @@ using FullPotential.Api.Gameplay.Inventory;
 using FullPotential.Api.Gameplay.Player.Events;
 using FullPotential.Api.Ioc;
 using FullPotential.Api.Items;
-using FullPotential.Api.Items.Base;
 using FullPotential.Api.Localization;
 using FullPotential.Api.Logging;
 using FullPotential.Api.Networking;
@@ -77,7 +76,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         #region Other Variables
 
         private readonly Dictionary<ulong, long> _damageTaken = new Dictionary<ulong, long>();
-        private readonly List<ActiveEffect> _activeEffects = new List<ActiveEffect>();
+        private ActiveEffectManager _activeEffectManager;
         protected readonly Dictionary<string, int> _valuePoolValueCache = new Dictionary<string, int>();
 
         private CancellationTokenSource _activeEffectsCancellationTokenSource = new CancellationTokenSource();
@@ -120,6 +119,18 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _eventBus = DependenciesContext.Dependencies.GetService<IEventBus>();
             _sceneService = _gameManager.GetSceneBehaviour().GetSceneService();
             _clock = DependenciesContext.Dependencies.GetService<IClock>();
+            _activeEffectManager = new ActiveEffectManager(
+                this,
+                _clock,
+                _eventBus,
+                (effect, change, expiry) =>
+                {
+                    if (OwnerClientId != NetworkManager.Singleton.LocalClientId)
+                    {
+                        AddOrUpdateEffectClientRpc(effect.TypeId.ToString(), change, expiry, _rpcService.ForPlayer(OwnerClientId));
+                    }
+                },
+                valuePoolTypeId => TriggerValuePoolValueUpdate(valuePoolTypeId, 0, null, null));
 
             PopulateValuePoolValueCache();
 
@@ -152,7 +163,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         protected virtual void FixedUpdate()
         {
-            RemoveExpiredEffects();
+            _activeEffectManager.RemoveExpiredEffects();
             ReplenishAndConsume();
         }
 
@@ -186,7 +197,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         {
             // todo: Does not work for clients joining mid-battle
             var effect = _typeRegistry.GetRegisteredByTypeId<IEffectType>(EffectTypeId.FromString(effectTypeId));
-            AddOrUpdateEffect(effect, change, expiry, _clock.GetTimestamp(), Math.Max(0, (expiry - _clock.UtcNow).TotalSeconds));
+            _activeEffectManager.AddOrUpdate(effect, change, expiry, _clock.GetTimestamp(), Math.Max(0, (expiry - _clock.UtcNow).TotalSeconds));
         }
 
         [ClientRpc]
@@ -352,7 +363,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public int GetValuePoolMax(ValuePoolTypeId valuePoolTypeId)
         {
             //todo: zzz v0.8 - trait-based valuePool max
-            return 100 + GetValuePoolMaxAdjustment(valuePoolTypeId);
+            return 100 + _activeEffectManager.GetValuePoolMaxAdjustment(valuePoolTypeId);
         }
 
         public abstract bool IsConsumingValuePool(ValuePoolTypeId typeId);
@@ -562,7 +573,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
             _activeEffectsCancellationTokenSource.Dispose();
             _activeEffectsCancellationTokenSource = new CancellationTokenSource();
 
-            _activeEffects.Clear();
+            _activeEffectManager.Clear();
 
             HandleDeathAfter();
         }
@@ -603,7 +614,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
 
         public void AddAttributeModifier(IAttributeEffect attributeEffect, int change, float durationSeconds)
         {
-            AddOrUpdateEffect(
+            _activeEffectManager.AddOrUpdate(
                 attributeEffect,
                 change,
                 _clock.UtcNow.AddSeconds(durationSeconds),
@@ -623,7 +634,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         private async UniTask PeriodicActionToValuePoolAsync(FighterBase sourceFighter, ICombatItem itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position, float delay, DateTime expiry, long timerStartTimestamp, double durationSeconds, CancellationToken cancellationToken)
         {
             var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, valuePoolEffect, this);
-            AddOrUpdateEffect(valuePoolEffect, combatResult.Change, expiry, timerStartTimestamp, durationSeconds);
+            _activeEffectManager.AddOrUpdate(valuePoolEffect, combatResult.Change, expiry, timerStartTimestamp, durationSeconds);
 
             do
             {
@@ -636,7 +647,7 @@ namespace FullPotential.Api.Gameplay.Behaviours
         public void ApplySingleValueChangeToValuePool(FighterBase sourceFighter, ICombatItem itemUsed, IValuePoolEffectType valuePoolEffect, Vector3? position)
         {
             var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, valuePoolEffect, this);
-            AddOrUpdateEffect(
+            _activeEffectManager.AddOrUpdate(
                 valuePoolEffect,
                 combatResult.Change,
                 _clock.UtcNow.AddSeconds(SingleValuePoolChangeEffectDisplaySeconds),
@@ -671,150 +682,18 @@ namespace FullPotential.Api.Gameplay.Behaviours
             var expiry = _clock.UtcNow.AddSeconds(durationSeconds);
 
             var combatResult = _combatService.GetCombatResult(sourceFighter, itemUsed, valuePoolEffect, this);
-            AddOrUpdateEffect(valuePoolEffect, combatResult.Change, expiry, _clock.GetTimestamp(), durationSeconds);
+            _activeEffectManager.AddOrUpdate(valuePoolEffect, combatResult.Change, expiry, _clock.GetTimestamp(), durationSeconds);
             TriggerValuePoolValueUpdate(valuePoolEffect.ValuePoolTypeId, 0, sourceFighter.name, itemUsed.Name);
         }
 
         public List<ActiveEffect> GetActiveEffects()
         {
-            if (AliveState != LivingEntityState.Alive)
-            {
-                return new List<ActiveEffect>();
-            }
-
-            return _activeEffects;
+            return _activeEffectManager.GetActiveEffects(AliveState == LivingEntityState.Alive);
         }
 
         protected int GetAttributeAdjustment(AttributeTypeId attributeId)
         {
-            return _activeEffects
-                .Where(x =>
-                    x.Effect is IAttributeEffect attributeEffect
-                    && attributeEffect.AttributeId == attributeId)
-                .Sum(x => x.Change * (x.Effect is IAttributeEffect attributeEffect && attributeEffect.IsTemporaryMaxIncrease ? 1 : -1));
-        }
-
-        private int GetValuePoolMaxAdjustment(ValuePoolTypeId valuePoolTypeId)
-        {
-            return _activeEffects
-                .Where(x =>
-                    x.Effect is IValuePoolEffectType valuePoolEffect
-                    && valuePoolEffect.ValuePoolTypeId == valuePoolTypeId
-                    && valuePoolEffect.EffectActionType is EffectActionType.TemporaryMaxIncrease or EffectActionType.TemporaryMaxDecrease)
-                .Sum(x => x.Change);
-        }
-
-        private bool DoesActionTypeAllowMultiple(EffectActionType effectActionType)
-        {
-            return effectActionType is EffectActionType.TemporaryMaxIncrease or EffectActionType.TemporaryMaxDecrease;
-        }
-
-        private void AddOrUpdateEffect(IEffectType effect, int change, DateTime expiry, long timerStartTimestamp, double durationSeconds)
-        {
-            var valuePoolEffect = effect as IValuePoolEffectType;
-
-            //todo: zzz v0.7 - Add health single decrease effect to a UI options list that can be changed
-            var hideEffectFromFighter = valuePoolEffect != null
-                && valuePoolEffect.EffectActionType == EffectActionType.SingleDecrease
-                && valuePoolEffect.ValuePoolTypeId == ValuePoolTypeIds.HealthId;
-
-            if (hideEffectFromFighter)
-            {
-                return;
-            }
-
-            var showExpiry = !(valuePoolEffect != null
-                && valuePoolEffect.EffectActionType is EffectActionType.SingleDecrease or EffectActionType.SingleIncrease);
-
-            var effectMatch = _activeEffects.FirstOrDefault(x => x.Effect == effect);
-
-            if (effectMatch != null)
-            {
-                var multipleAllowed =
-                    (valuePoolEffect != null && DoesActionTypeAllowMultiple(valuePoolEffect.EffectActionType))
-                    || effect is IAttributeEffect;
-
-                if (multipleAllowed)
-                {
-                    var anotherActiveEffect = new ActiveEffect
-                    {
-                        Id = Guid.NewGuid(),
-                        Effect = effect,
-                        Change = change,
-                        Expiry = expiry,
-                        TimerStartTimestamp = timerStartTimestamp,
-                        DurationSeconds = durationSeconds,
-                        ShowExpiry = showExpiry
-                    };
-
-                    _activeEffects.Add(anotherActiveEffect);
-
-                    _eventBus.Publish(new ActiveEffectAddedEvent(this, anotherActiveEffect));
-                }
-                else
-                {
-                    effectMatch.Change = change;
-                    effectMatch.Expiry = expiry;
-                    effectMatch.TimerStartTimestamp = timerStartTimestamp;
-                    effectMatch.DurationSeconds = durationSeconds;
-
-                    _eventBus.Publish(new ActiveEffectUpdatedEvent(this, effectMatch));
-                }
-            }
-            else
-            {
-                var newActiveEffect = new ActiveEffect
-                {
-                    Id = Guid.NewGuid(),
-                    Effect = effect,
-                    Change = change,
-                    Expiry = expiry,
-                    TimerStartTimestamp = timerStartTimestamp,
-                    DurationSeconds = durationSeconds,
-                    ShowExpiry = showExpiry
-                };
-
-                _activeEffects.Add(newActiveEffect);
-
-                _eventBus.Publish(new ActiveEffectAddedEvent(this, newActiveEffect));
-            }
-
-            if (OwnerClientId != NetworkManager.Singleton.LocalClientId)
-            {
-                AddOrUpdateEffectClientRpc(effect.TypeId.ToString(), change, expiry, _rpcService.ForPlayer(OwnerClientId));
-            }
-        }
-
-        private void RemoveExpiredEffects()
-        {
-            //Note: .ToList() needed to avoid the "Collection was modified" exception
-            var expiredEffects = _activeEffects
-                .Where(x => _clock.GetElapsedSeconds(x.TimerStartTimestamp) >= x.DurationSeconds)
-                .ToList();
-
-            var valuePoolsNeedingUpdates = expiredEffects
-                .Where(x =>
-                    x.Effect is IValuePoolEffectType valuePoolEffect
-                    && valuePoolEffect.EffectActionType is EffectActionType.TemporaryMaxIncrease or EffectActionType.TemporaryMaxDecrease)
-                .Select(x => ((IValuePoolEffectType)x.Effect).ValuePoolTypeId)
-                .Distinct()
-                .ToList();
-
-            var anyEffectRemoved = false;
-            foreach (var activeEffect in expiredEffects)
-            {
-                anyEffectRemoved |= _activeEffects.Remove(activeEffect);
-            }
-
-            if (anyEffectRemoved)
-            {
-                _eventBus.Publish(new ActiveEffectUpdatedEvent(this, null));
-            }
-
-            foreach (var valuePoolTypeId in valuePoolsNeedingUpdates)
-            {
-                TriggerValuePoolValueUpdate(valuePoolTypeId, 0, null, null);
-            }
+            return _activeEffectManager.GetAttributeAdjustment(attributeId);
         }
 
         #endregion

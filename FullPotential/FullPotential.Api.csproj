@@ -182,6 +182,7 @@
     <Compile Include="Assets\Api\Ioc\DependenciesContext.cs" />
     <Compile Include="Assets\Api\Gameplay\Combat\Events\EntityDiedAfterEvent.cs" />
     <Compile Include="Assets\Api\Utilities\DelayedAction.cs" />
+    <Compile Include="Assets\Api\Gameplay\Behaviours\ActiveEffectManager.cs" />
     <Compile Include="Assets\Api\Registry\Gear\ICraftableType.cs" />
     <Compile Include="Assets\Api\Items\IItemTypeMapping.cs" />
     <Compile Include="Assets\Api\Unity\Extensions\UnitsExtensions.cs" />
