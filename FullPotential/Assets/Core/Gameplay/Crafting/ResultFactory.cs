@@ -16,6 +16,7 @@ using FullPotential.Api.Registry.Gear;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
+using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.Registry;
 
@@ -23,7 +24,6 @@ namespace FullPotential.Core.Gameplay.Crafting
 {
     public class ResultFactory : IResultFactory
     {
-        private readonly Random _random = new Random();
         private readonly IAuditor _logger;
         private readonly TypeRegistry _typeRegistry;
         private readonly ILocalizer _localizer;
@@ -195,26 +195,26 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private bool IsSuccess(int percentageChance)
         {
-            return _random.Next(1, 101) <= percentageChance;
+            return ThreadSafeRandom.Next(1, 101) <= percentageChance;
         }
 
         private int GetAttributeValue(int percentageChance)
         {
             //todo: Replace all hard-coded 100 values
 
-            return IsSuccess(percentageChance) ? _random.Next(1, 100) : 0;
+            return IsSuccess(percentageChance) ? ThreadSafeRandom.Next(1, 100) : 0;
         }
 
         private IEffectType GetRandomEffect()
         {
-            return _effectsForLoot.ElementAt(_random.Next(0, _effectsForLoot.Count));
+            return _effectsForLoot.ElementAt(ThreadSafeRandom.Next(0, _effectsForLoot.Count));
         }
 
         private ITargetingType GetRandomTargetingOrNone()
         {
             if (IsSuccess(50))
             {
-                return _targetingTypes.ElementAt(_random.Next(0, _targetingTypes.Count));
+                return _targetingTypes.ElementAt(ThreadSafeRandom.Next(0, _targetingTypes.Count));
             }
             return null;
         }
@@ -223,7 +223,7 @@ namespace FullPotential.Core.Gameplay.Crafting
         {
             if (IsSuccess(10))
             {
-                return _shapeTypes.ElementAt(_random.Next(0, _shapeTypes.Count));
+                return _shapeTypes.ElementAt(ThreadSafeRandom.Next(0, _shapeTypes.Count));
             }
             return null;
         }
@@ -239,7 +239,7 @@ namespace FullPotential.Core.Gameplay.Crafting
             //    Attributes = new Dictionary<string, string>
             //    {
             //        { "IsAutomatic", IsSuccess(50).ToString() },
-            //        { "ExtraAmmoPerShot", (IsSuccess(20) ? Convert.ToByte(_random.Next(1, MaxExtraAmmo + 1)) : (byte)0).ToString() },
+            //        { "ExtraAmmoPerShot", (IsSuccess(20) ? Convert.ToByte(ThreadSafeRandom.Next(1, MaxExtraAmmo + 1)) : (byte)0).ToString() },
             //        { "Strength", GetAttributeValue(75).ToString() },
             //        { "Efficiency", GetAttributeValue(75).ToString() },
             //        { "Range", GetAttributeValue(75).ToString() },
@@ -250,13 +250,13 @@ namespace FullPotential.Core.Gameplay.Crafting
             //        { "Luck", GetAttributeValue(75).ToString() },
             //    },
             //    RegistryType = _lootTypes
-            //        .OrderBy(_ => _random.Next())
+            //        .OrderBy(_ => ThreadSafeRandom.Next())
             //        .First()
             //};
 
             lootDrop.Id = Guid.NewGuid().ToString();
             lootDrop.RegistryType = _lootTypes
-                    .OrderBy(_ => _random.Next())
+                    .OrderBy(_ => ThreadSafeRandom.Next())
                     .First();
 
             if (IsSuccess(50))
@@ -308,10 +308,10 @@ namespace FullPotential.Core.Gameplay.Crafting
         public ItemBase GetAmmoDrop()
         {
             var randomAmmo = _ammoTypes
-                .OrderBy(_ => _random.Next())
+                .OrderBy(_ => ThreadSafeRandom.Next())
                 .First();
 
-            var randomCount = _random.Next(randomAmmo.MinDropCount, randomAmmo.MaxDropCount);
+            var randomCount = ThreadSafeRandom.Next(randomAmmo.MinDropCount, randomAmmo.MaxDropCount);
 
             var item = _typeRegistry.GetItemTypeMapping<IAmmunitionType>().CreateNew();
 
@@ -325,7 +325,7 @@ namespace FullPotential.Core.Gameplay.Crafting
 
         private int GetMinBiasedNumber(int min, int max)
         {
-            return min + (int)Math.Round((max - min) * Math.Pow(_random.NextDouble(), 3), 0);
+            return min + (int)Math.Round((max - min) * Math.Pow(ThreadSafeRandom.NextDouble(), 3), 0);
         }
 
         private string GetItemNamePrefix(bool isAttack)

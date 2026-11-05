@@ -3,23 +3,12 @@ using System;
 using FullPotential.Api.Gameplay.Combat;
 using FullPotential.Api.Gameplay.Effects;
 using FullPotential.Api.Registry.Effects;
+using FullPotential.Api.Utilities;
 
 namespace FullPotential.Core.Gameplay.Combat
 {
     public class CombatCalculator
     {
-        private readonly Random _random;
-
-        public CombatCalculator()
-            : this(new Random())
-        {
-        }
-
-        public CombatCalculator(Random random)
-        {
-            _random = random;
-        }
-
         public float GetEffectivePercentage(int targetDefence)
         {
             return 100f / (100 + targetDefence);
@@ -64,7 +53,7 @@ namespace FullPotential.Core.Gameplay.Combat
             float effectivePercentage,
             IEffectType effect)
         {
-            var isCriticalHit = criticalHitChance >= 0 && _random.Next(0, 101) <= criticalHitChance;
+            var isCriticalHit = criticalHitChance >= 0 && ThreadSafeRandom.Next(0, 101) <= criticalHitChance;
             var change = isCriticalHit ? baseChange * 2 : baseChange;
             var adjustedChange = AddVariationToValue(change * effectivePercentage);
 
@@ -93,9 +82,9 @@ namespace FullPotential.Core.Gameplay.Combat
 
         private int AddVariationToValue(float basicValue)
         {
-            var between90And110Percent = (int)Math.Ceiling(basicValue * _random.Next(90, 111) / 100);
+            var between90And110Percent = (int)Math.Ceiling(basicValue * ThreadSafeRandom.Next(90, 111) / 100);
             var tenPercent = (int)Math.Ceiling(basicValue / 10f);
-            var adder = _random.Next(0, Math.Min(tenPercent, 6));
+            var adder = ThreadSafeRandom.Next(0, Math.Min(tenPercent, 6));
 
             return basicValue < 0
                 ? between90And110Percent - adder

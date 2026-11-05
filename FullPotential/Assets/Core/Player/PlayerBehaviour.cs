@@ -26,6 +26,7 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Unity;
 using FullPotential.Api.Unity.Constants;
 using FullPotential.Api.Unity.Extensions;
+using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Tooltips;
@@ -45,8 +46,6 @@ namespace FullPotential.Core.Player
     public class PlayerBehaviour : NetworkBehaviour, IPlayerBehaviour
     {
         private const string EventSource = nameof(PlayerBehaviour);
-
-        private readonly System.Random _random = new System.Random();
 
         private readonly Collider[] _collidersInRange = new Collider[10];
 
@@ -394,9 +393,9 @@ namespace FullPotential.Core.Player
         [ClientRpc]
         public void ShowHealthChangeClientRpc(Vector3 position, int change, bool isCritical, ClientRpcParams clientRpcParams)
         {
-            var offsetX = (float)_random.Next(-9, 10) / 100;
-            var offsetY = (float)_random.Next(-9, 10) / 100;
-            var offsetZ = (float)_random.Next(-9, 10) / 100;
+            var offsetX = (float)ThreadSafeRandom.Next(-9, 10) / 100;
+            var offsetY = (float)ThreadSafeRandom.Next(-9, 10) / 100;
+            var offsetZ = (float)ThreadSafeRandom.Next(-9, 10) / 100;
             var adjustedPosition = position + new Vector3(offsetX, offsetY, offsetZ);
 
             var hit = Instantiate(
@@ -550,7 +549,7 @@ namespace FullPotential.Core.Player
 
         private async UniTask SaveLootAndUpdatePlayerAsync()
         {
-            var newItem = _random.Next(1, 3) == 1
+            var newItem = ThreadSafeRandom.Next(1, 3) == 1
                 ? _resultFactory.GetAmmoDrop()
                 : _resultFactory.GetLootDrop();
 

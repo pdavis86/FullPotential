@@ -13,6 +13,7 @@ using FullPotential.Api.Utilities;
 
 namespace FullPotential.Api.Gameplay.Behaviours
 {
+    // todo: can ActiveEffectManager be moved to Core?
     internal sealed class ActiveEffectManager
     {
         private readonly LivingEntityBase _livingEntity;

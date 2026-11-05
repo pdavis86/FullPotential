@@ -11,6 +11,7 @@ using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Shapes;
 using FullPotential.Api.Registry.Targeting;
+using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
 using FullPotential.Core.GameManagement;
 using FullPotential.Core.Gameplay.Crafting;
@@ -24,8 +25,6 @@ namespace FullPotential.Core.UI.Behaviours
 {
     public class AdminShopUi : MonoBehaviour
     {
-        private readonly System.Random _random = new System.Random();
-
 #pragma warning disable 0649
         [SerializeField] private CraftingSelector _craftingSelector;
         [SerializeField] private GameObject _nameAndTogglePrefab;
@@ -178,7 +177,7 @@ namespace FullPotential.Core.UI.Behaviours
                 foreach (var behaviour in collection)
                 {
                     behaviour.Slider.value = Mathf.Approximately(behaviour.Slider.maxValue, 100)
-                        ? _random.Next(1, 101)
+                        ? ThreadSafeRandom.Next(1, 101)
                         : 0;
                 }
             }

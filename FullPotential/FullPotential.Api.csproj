@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Assets\Api\Registry\Gear\ISlotType.cs" />
     <Compile Include="Assets\Api\Gameplay\Inventory\IPlayerInventory.cs" />
+    <Compile Include="Assets\Api\Utilities\ThreadSafeRandom.cs" />
     <Compile Include="Assets\Api\Logging\IAuditorFactory.cs" />
     <Compile Include="Assets\Api\Data\ISaveManager.cs" />
     <Compile Include="Assets\Api\Gameplay\Player\PositionTransforms.cs" />
