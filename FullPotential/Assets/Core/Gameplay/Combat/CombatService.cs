@@ -15,14 +15,8 @@ using FullPotential.Api.Networking;
 using FullPotential.Api.Registry;
 using FullPotential.Api.Registry.Effects;
 using FullPotential.Api.Registry.Gear;
-using FullPotential.Api.Registry.Shapes;
-using FullPotential.Api.Registry.Targeting;
 using FullPotential.Api.Registry.Weapons;
-using FullPotential.Api.Unity.Constants;
-using FullPotential.Api.Unity.Extensions;
-using FullPotential.Api.Utilities;
 using FullPotential.Api.Utilities.Extensions;
-using FullPotential.Core.GameManagement;
 using FullPotential.Core.Player;
 
 using Unity.Netcode;
@@ -39,6 +33,7 @@ namespace FullPotential.Core.Gameplay.Combat
         private readonly IEffectType _hurtEffect;
         private readonly CombatCalculator _combatCalculator = new CombatCalculator();
         private readonly IReadOnlyList<ICombatEffectHandler> _effectHandlers;
+        private readonly CombatSpawnService _combatSpawnService;
 
         public CombatService(
             IAuditorFactory auditorFactory,
@@ -47,6 +42,7 @@ namespace FullPotential.Core.Gameplay.Combat
         {
             _logger = auditorFactory.Create(this);
             _typeRegistry = typeRegistry;
+            _combatSpawnService = new CombatSpawnService(auditorFactory, typeRegistry);
             _pushEffect = typeRegistry.GetRegisteredByTypeId<IEffectType>(EffectTypeIds.PushId) as IMovementEffectType;
             _hurtEffect = typeRegistry.GetRegisteredByTypeId<IEffectType>(EffectTypeIds.HurtId);
             _effectHandlers = new ICombatEffectHandler[]
@@ -195,78 +191,13 @@ namespace FullPotential.Core.Gameplay.Combat
 
         public void SpawnTargetingGameObject(FighterBase sourceFighter, IConsumer consumer, Vector3 startPosition, Vector3 direction)
         {
-            if (consumer.TargetingType.NetworkPrefabAddress.IsNullOrWhiteSpace())
-            {
-                return;
-            }
-
-            _typeRegistry.LoadAddessable<GameObject>(
-                consumer.TargetingType.NetworkPrefabAddress,
-                prefab =>
-                {
-                    var targetingGameObject = UnityEngine.Object.Instantiate(prefab, startPosition, Quaternion.identity);
-
-                    var targetingBehaviour = targetingGameObject.GetComponent<ITargetingBehaviour>();
-                    targetingBehaviour.SourceFighter = sourceFighter;
-                    targetingBehaviour.Consumer = consumer;
-                    targetingBehaviour.Direction = direction;
-
-                    targetingGameObject.NetworkSpawn(_logger);
-
-                    if (consumer.TargetingType.IsContinuous)
-                    {
-                        targetingGameObject.transform.parent = sourceFighter.Transform;
-                    }
-
-                    consumer.Stoppables.Add(new DestroyStoppable(targetingGameObject));
-                });
+            _combatSpawnService.SpawnTargetingGameObject(sourceFighter, consumer, startPosition, direction);
         }
 
         public void SpawnShapeGameObject(FighterBase sourceFighter, IConsumer consumer, GameObject target, Vector3 fallbackPosition, Vector3 lookDirection)
         {
-            if (consumer.ShapeType == null)
-            {
-                _logger.Debug("Cancelling SpawnShapeGameObject because there was no Shape");
-                return;
-            }
-
-            Vector3 spawnPosition;
-            if (target == null || !target.CompareTagAny(Tags.Player, Tags.Enemy))
-            {
-                spawnPosition = fallbackPosition;
-            }
-            else
-            {
-                var pointUnderTarget = new Vector3(target.transform.position.x, -100, target.transform.position.z);
-                var feetOfTarget = target.GetComponent<Collider>().ClosestPointOnBounds(pointUnderTarget);
-
-                spawnPosition = Physics.Raycast(feetOfTarget, Vector3.down, out var hit)
-                    ? hit.point
-                    : fallbackPosition;
-            }
-
-            var rotation = Quaternion.LookRotation(lookDirection);
-            rotation.x = 0;
-            rotation.z = 0;
-
-            _typeRegistry.LoadAddessable<GameObject>(
-                consumer.ShapeType.NetworkPrefabAddress,
-                prefab =>
-                {
-                    var shapeGameObject = UnityEngine.Object.Instantiate(prefab, spawnPosition, rotation);
-                    var sceneService = GameManager.Instance.GetSceneBehaviour().GetSceneService();
-
-                    shapeGameObject.transform.position = sceneService.GetHeightAdjustedPosition(spawnPosition, shapeGameObject);
-
-                    shapeGameObject.layer = LayerMask.NameToLayer(Layers.NonSolid);
-
-                    var shapeBehaviour = shapeGameObject.GetComponent<IShapeBehaviour>();
-                    shapeBehaviour.SourceFighter = sourceFighter;
-                    shapeBehaviour.Consumer = consumer;
-                    shapeBehaviour.Direction = lookDirection;
-
-                    shapeGameObject.NetworkSpawn(_logger);
-                });
+            _combatSpawnService.SpawnShapeGameObject(sourceFighter, consumer, target, fallbackPosition, lookDirection);
         }
+
     }
 }
