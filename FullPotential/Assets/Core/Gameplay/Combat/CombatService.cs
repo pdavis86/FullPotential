@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using FullPotential.Api.CoreTypeIds;
-using FullPotential.Api.Gameplay;
 using FullPotential.Api.Gameplay.Attributes;
 using FullPotential.Api.Gameplay.Behaviours;
 using FullPotential.Api.Gameplay.Combat;
@@ -38,7 +37,7 @@ namespace FullPotential.Core.Gameplay.Combat
         private readonly ITypeRegistry _typeRegistry;
         private readonly IMovementEffectType _pushEffect;
         private readonly IEffectType _hurtEffect;
-        private readonly System.Random _random = new System.Random();
+        private readonly CombatCalculator _combatCalculator = new CombatCalculator();
         private readonly IReadOnlyList<ICombatEffectHandler> _effectHandlers;
 
         public CombatService(
@@ -138,113 +137,42 @@ namespace FullPotential.Core.Gameplay.Combat
             handler.Apply(context, effect);
         }
 
-        private float GetSourceCriticalHitChance(FighterBase sourceFighter)
-        {
-            var luckValue = sourceFighter.GetAdjustedAttributeValue(Luck.Id);
-
-            if (luckValue < 20)
-            {
-                return 0;
-            }
-
-            //e.g. 50 luck would mean a 50/5 = 10% chance
-            return luckValue / 5f;
-        }
-
         public float GetEffectBaseChange(FighterBase sourceFighter, ICombatItem itemUsed, IEffectType effect, bool isCriticalHit)
         {
-            float change;
-
-            if (itemUsed == null)
+            if (itemUsed == null && sourceFighter == null)
             {
-                if (sourceFighter != null)
-                {
-                    change = LivingEntityBase.GetAdjustedStrength(sourceFighter.GetAdjustedAttributeValue(Strength.Id));
-                }
-                else
-                {
-                    return 1;
-                }
-            }
-            else
-            {
-                var isPeriodic = effect is IValuePoolEffectType { EffectActionType: EffectActionType.PeriodicDecrease or EffectActionType.PeriodicIncrease };
-
-                change = isPeriodic
-                    ? itemUsed.GetPeriodicEffectValueChange()
-                    : itemUsed.GetSingleEffectValueChange();
+                return 1;
             }
 
-            if (itemUsed != null
-                && itemUsed is ICombatItem combatItem
-                && itemUsed.RegistryType is IWeaponType weaponType)
-            {
-                var isMeleeWeapon = weaponType.AmmunitionTypeId == null;
+            var isPeriodic = effect is IValuePoolEffectType { EffectActionType: EffectActionType.PeriodicDecrease or EffectActionType.PeriodicIncrease };
+            var baseValue = itemUsed == null
+                ? LivingEntityBase.GetAdjustedStrength(sourceFighter.GetAdjustedAttributeValue(Strength.Id))
+                : isPeriodic ? itemUsed.GetPeriodicEffectValueChange() : itemUsed.GetSingleEffectValueChange();
+            var isWeapon = itemUsed != null && itemUsed.RegistryType is IWeaponType;
+            var isMeleeWeapon = isWeapon && ((IWeaponType)itemUsed.RegistryType).AmmunitionTypeId == null;
+            var ammoPerSecond = isWeapon && !isMeleeWeapon ? itemUsed.GetAmmoPerSecond() : 1;
 
-                if (isMeleeWeapon)
-                {
-                    change *= 2;
-                }
-                else
-                {
-                    change /= combatItem.GetAmmoPerSecond();
-                }
-            }
-
-            if (itemUsed != null && itemUsed.IsTwoHanded)
-            {
-                change *= 2;
-            }
-
-            if (isCriticalHit)
-            {
-                change *= 2;
-            }
-
-            return change;
+            return _combatCalculator.GetEffectBaseChange(
+                baseValue,
+                isWeapon,
+                isMeleeWeapon,
+                ammoPerSecond,
+                itemUsed?.IsTwoHanded ?? false,
+                isCriticalHit);
         }
 
         public CombatResult GetCombatResult(FighterBase sourceFighter, ICombatItem itemUsed, IEffectType effect, LivingEntityBase targetLivingEntity)
         {
-            var isCriticalHit = false;
-            if (sourceFighter != null)
-            {
-                var sourceFighterCriticalHitChance = GetSourceCriticalHitChance(sourceFighter);
-                var criticalTestValue = UnityEngine.Random.Range(0, 101);
-                isCriticalHit = criticalTestValue <= sourceFighterCriticalHitChance;
-            }
-
-            var change = GetEffectBaseChange(sourceFighter, itemUsed, effect, isCriticalHit);
-
+            var criticalChance = sourceFighter == null
+                ? -1
+                : _combatCalculator.GetCriticalHitChance(sourceFighter.GetAdjustedAttributeValue(Luck.Id));
             var effectivePercentage = GetEffectivePercentage(targetLivingEntity);
 
-            var adjustedChange = AddVariationToValue(change * effectivePercentage);
-
-            switch (effect)
-            {
-                case IValuePoolEffectType valuePoolEffect:
-                    if (valuePoolEffect.EffectActionType is EffectActionType.PeriodicDecrease or EffectActionType.SingleDecrease or EffectActionType.TemporaryMaxDecrease)
-                    {
-                        adjustedChange *= -1;
-                    }
-
-                    break;
-
-                case IAttributeEffect attributeEffect:
-                    if (!attributeEffect.IsTemporaryMaxIncrease)
-                    {
-                        adjustedChange *= -1;
-                    }
-
-                    break;
-
-            }
-
-            return new CombatResult
-            {
-                Change = adjustedChange,
-                IsCriticalHit = isCriticalHit
-            };
+            return _combatCalculator.GetCombatResult(
+                criticalChance,
+                GetEffectBaseChange(sourceFighter, itemUsed, effect, false),
+                effectivePercentage,
+                effect);
         }
 
         private float GetEffectivePercentage(LivingEntityBase targetLivingEntity)
@@ -262,20 +190,7 @@ namespace FullPotential.Core.Gameplay.Combat
             var targetDefenceValue = (int)Math.Floor((float)sum / armorItems.Count());
 
             var targetDefence = targetLivingEntity != null ? targetDefenceValue : 0;
-            var defenceRatio = 100f / (100 + targetDefence);
-            return defenceRatio;
-        }
-
-        private int AddVariationToValue(float basicValue)
-        {
-            var between90And110Percent = (int)Math.Ceiling(basicValue * _random.Next(90, 111) / 100);
-
-            var tenPercent = (int)Math.Ceiling(basicValue / 10f);
-            var adder = _random.Next(0, Math.Min(tenPercent, 6));
-
-            return basicValue < 0
-                ? between90And110Percent - adder
-                : between90And110Percent + adder;
+            return _combatCalculator.GetEffectivePercentage(targetDefence);
         }
 
         public void SpawnTargetingGameObject(FighterBase sourceFighter, IConsumer consumer, Vector3 startPosition, Vector3 direction)
